@@ -2,9 +2,9 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { BookOpenIcon, CoinsIcon, EarthIcon, ShieldUserIcon, SproutIcon } from 'lucide-react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -17,17 +17,38 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
       }}>
       <Tabs.Screen
-        name="index"
+        name="market"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Mercado',
+          tabBarIcon: ({ color }) => <CoinsIcon size={28}  color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="complaints"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Denunciar',
+          tabBarIcon: ({ color }) => <ShieldUserIcon size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <SproutIcon  size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="donations"
+        options={{
+          title: 'Doações',
+          tabBarIcon: ({ color }) => <EarthIcon size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="learn"
+        options={{
+          title: 'Aprender',
+          tabBarIcon: ({ color }) => <BookOpenIcon size={28} color={color} />,
         }}
       />
     </Tabs>
