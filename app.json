@@ -9,10 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-      "icon": "./src/assets/icons/ios-icon.png"
+      "bundleIdentifier": "com.oikos",
+      "supportsTablet": true
     },
     "android": {
+      "package": "com.oikos",
       "adaptiveIcon": {
         "backgroundColor": "#274E2D",
         "foregroundImage": "./src/assets/icons/android-icon.png"
@@ -39,6 +40,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4d7f8122-2f77-41c9-8ef3-63000041bc61"
+      }
     }
   }
 }
