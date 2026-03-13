@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import UserImage from "@/assets/images/mock/user-mock-image.png";
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -16,7 +16,22 @@ export default function HomeScreen() {
         paddingRight: insets.right,
       }}
     >
-      <Text>Doações</Text>
+      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, borderBlockColor: 'gray', borderWidth: 1, borderRadius: 8, padding: 16 }}>
+        <Image
+          source={UserImage}
+          style={{ width: 48, height: 48, borderRadius: 8 }}
+        />
+        <View>
+          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Christian Cesar Rodrigues Santos</Text>
+          <Text style={{ fontSize: 16, color: 'gray' }}>Rondonópolis - MT</Text>
+        </View>
+      </View>
+
+      <View className="flex-1 items-center justify-center bg-white">
+        <Text className="text-xl font-bold text-blue-500">
+          Welcome to Nativewind!
+        </Text>
+      </View>
     </View>
   );
 }
