@@ -6,6 +6,7 @@ Estas instrucoes definem o padrao tecnico obrigatorio para novas implementacoes 
 
 - Utilize `gluestack-ui v5` como biblioteca principal de componentes.
 - Utilize `NativeWind` para a construcao dos estilos (`className` como padrao).
+- Utilize fontes nativas para evitar problemas de compatibilidade entre dispositivos.
 - Priorize componentes do gluestack antes de primitives do React Native.
 - Evite estilos inline, exceto quando for estritamente necessario e com justificativa no PR.
 
@@ -44,6 +45,7 @@ Antes de concluir uma entrega, valide:
 
 1. Componentes em gluestack v5.
 2. Estilos com NativeWind.
-3. Tema principal lime com primary `lime-800`.
-4. Icones via lucide-react-native.
-5. Navegacao principal com @react-navigation/bottom-tabs e 5 acoes.
+3. Fontes nativas para compatibilidade com devices.
+4. Tema principal lime com primary `lime-800`.
+5. Icones via lucide-react-native.
+6. Navegacao principal com @react-navigation/bottom-tabs e 5 acoes.
