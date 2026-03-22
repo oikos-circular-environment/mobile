@@ -52,6 +52,7 @@
     "tailwind-variants": "^0.1.20"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/react": "~19.1.0",
     "babel-plugin-module-resolver": "^5.0.3",
