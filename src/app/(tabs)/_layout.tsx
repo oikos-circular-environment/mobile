@@ -9,6 +9,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         // tabBarButton: HapticTab,
+        headerTintColor: '#000',
       }}>
       <Tabs.Screen
         name="market"
