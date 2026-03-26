@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { createCompanies } from "@/libs/factories/create-companies";
+import { Link } from "expo-router";
 import { ArrowRightIcon, BellIcon, CoinsIcon, SettingsIcon } from "lucide-react-native";
 import { Image, ScrollView, View } from "react-native";
 
@@ -16,8 +17,6 @@ export default function HomeScreen() {
   return (
     <ScrollView className="flex-1 p-4 bg-white" >
       <View className="flex flex-col gap-4">
-
-
         <Card className="flex flex-row gap-4 shadow-none">
           <Image source={UserMockImage} className="size-16 rounded-md" />
           <View className="flex-1 flex flex-col">
@@ -29,9 +28,11 @@ export default function HomeScreen() {
                 <Button variant="secondary" size="icon">
                   <BellIcon size={12} />
                 </Button>
-                <Button variant="secondary" size="icon">
-                  <SettingsIcon size={12} />
-                </Button>
+                <Link href="/(tabs)/(home)/settings" asChild>
+                  <Button variant="secondary" size="icon">
+                    <SettingsIcon size={12} />
+                  </Button>
+                </Link>
               </View>
             </View>
             <Text>Software Engineer</Text>
@@ -78,12 +79,11 @@ export default function HomeScreen() {
           <Card className="flex flex-col gap-2 shadow-none size-60">
             <Image
               src="https://plus.unsplash.com/premium_vector-1711877749643-73289b60330e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              
               className="h-28 w-full rounded-md object-cover"
             />
             <View>
               <Heading>Como separar seu lixo?</Heading>
-              <Text>Aprenda a separar seu lixo corretamente e contribuir para um mundo mais sustentável.</Text>
+              <Text numberOfLines={3}>Aprenda a separar seu lixo corretamente e contribuir para um mundo mais sustentável.</Text>
             </View>
           </Card>
         </View>

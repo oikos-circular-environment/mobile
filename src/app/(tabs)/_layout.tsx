@@ -1,50 +1,32 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { BookOpenIcon, CoinsIcon, EarthIcon, ShieldUserIcon, SproutIcon } from 'lucide-react-native';
+import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: '#3d6300',
-      }}>
-      <Tabs.Screen
-        name="market"
-        options={{
-          title: 'Mercado',
-          tabBarIcon: ({ color }) => <CoinsIcon size={22}  color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="complaints"
-        options={{
-          title: 'Denunciar',
-          tabBarIcon: ({ color }) => <ShieldUserIcon size={22} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <SproutIcon  size={22} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="donations"
-        options={{
-          title: 'Doações',
-          tabBarIcon: ({ color }) => <EarthIcon size={22} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="learn"
-        options={{
-          title: 'Aprender',
-          tabBarIcon: ({ color }) => <BookOpenIcon size={22} color={color} />,
-        }}
-      />
-    </Tabs>
+    <NativeTabs tintColor="#3d6300">
+      <NativeTabs.Trigger name="(market)">
+        <Icon sf={{ default: 'dollarsign.circle', selected: 'dollarsign.circle.fill' }} />
+        <Label>Mercado</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="(complaints)">
+        <Icon sf={{ default: 'shield', selected: 'shield.fill' }} />
+        <Label>Denunciar</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="(home)">
+        <Icon sf={{ default: 'leaf', selected: 'leaf.fill' }} />
+        <Label>Home</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="(donations)">
+        <Icon sf={{ default: 'globe', selected: 'globe' }} />
+        <Label>Doações</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="(learn)">
+        <Icon sf={{ default: 'book', selected: 'book.fill' }} />
+        <Label>Aprender</Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
