@@ -63,22 +63,24 @@ export default function SettingsScreen() {
   return (
     <ScrollView className="flex-1 p-4 bg-white">
       <View className="flex flex-col gap-8">
-        <Card className="flex flex-row justify-between shadow-none bg-secondary">
-          <View className="flex-1">
-            <Heading className="text-2xl">Registrar-se</Heading>
-            <Text className="text-muted-foreground">
-              Infelizmente você ainda não está registrado em nossa plataforma,
-              registre-se é de graça!
-            </Text>
-          </View>
-          <Card className="bg-primary items-center justify-center">
-            <ArrowUpRightIcon color="white" />
+        <Link href="/sign-in">
+          <Card className="flex flex-row justify-between shadow-none bg-secondary">
+            <View className="flex-1">
+              <Heading className="text-2xl">Registrar-se</Heading>
+              <Text className="text-muted-foreground">
+                Infelizmente você ainda não está registrado em nossa plataforma,
+                registre-se é de graça!
+              </Text>
+            </View>
+            <Card className="bg-primary items-center justify-center">
+              <ArrowUpRightIcon color="white" />
+            </Card>
           </Card>
-        </Card>
+        </Link>
 
         <View className="flex flex-col gap-2">
           {settingsOptions.map(option => (
-            <Link href={option.link} key={option.title} className="">
+            <Link href={option.link} key={option.title}>
               <Card
                 key={option.title}
                 className={cn(

@@ -1,3 +1,11 @@
+import { Link } from "expo-router";
+import {
+  ArrowRightIcon,
+  BellIcon,
+  CoinsIcon,
+  SettingsIcon,
+} from "lucide-react-native";
+import { Image, ScrollView, View } from "react-native";
 import UserMockImage from "@/assets/images/mock/user-mock-image.png";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -5,17 +13,12 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { createCompanies } from "@/libs/factories/create-companies";
-import { Link } from "expo-router";
-import { ArrowRightIcon, BellIcon, CoinsIcon, SettingsIcon } from "lucide-react-native";
-import { Image, ScrollView, View } from "react-native";
-
 
 export default function HomeScreen() {
-
   const marketCompanies = createCompanies(5);
 
   return (
-    <ScrollView className="flex-1 p-4 bg-white" >
+    <ScrollView className="flex-1 p-4 bg-white">
       <View className="flex flex-col gap-4">
         <Card className="flex flex-row gap-4 shadow-none">
           <Image source={UserMockImage} className="size-16 rounded-md" />
@@ -44,34 +47,38 @@ export default function HomeScreen() {
           <View className="flex flex-row gap-2">
             <Card className="flex flex-row gap-2 shadow-none px-2 p-1 items-center">
               <Text>A partir das 7h</Text>
-              <Badge><Text>Seletiva</Text></Badge>
+              <Badge>
+                <Text className="text-muted">Seletiva</Text>
+              </Badge>
             </Card>
           </View>
         </Card>
         <View className="flex flex-col gap-4">
           <Heading>Mercado</Heading>
-          {
-            marketCompanies.map(company => (
-              <Card key={company.id} className="flex flex-row gap-4 shadow-none items-center justify-between">
-                <View className="flex flex-row flex-1 gap-4 justify-between">
-                  <Card className="size-12 rounded-md bg-gray-50 flex items-center justify-center">
-                    <CoinsIcon />
-                  </Card>
+          {marketCompanies.map(company => (
+            <Card
+              key={company.id}
+              className="flex flex-row gap-4 shadow-none items-center justify-between"
+            >
+              <View className="flex flex-row flex-1 gap-4 justify-between">
+                <Card className="size-12 rounded-md bg-gray-50 flex items-center justify-center">
+                  <CoinsIcon />
+                </Card>
 
-                  <View className="flex flex-col flex-1">
-                    <Heading numberOfLines={1}>{company.corporateName}</Heading>
-                    <Text numberOfLines={2}>{company.address?.street}, {company.address?.number}, {company.address?.district}</Text>
-                  </View>
-
+                <View className="flex flex-col flex-1">
+                  <Heading numberOfLines={1}>{company.corporateName}</Heading>
+                  <Text numberOfLines={2}>
+                    {company.address?.street}, {company.address?.number},{" "}
+                    {company.address?.district}
+                  </Text>
                 </View>
+              </View>
 
-                <View>
-                  <ArrowRightIcon />
-                </View>
-              </Card>
-            ))
-          }
-
+              <View>
+                <ArrowRightIcon />
+              </View>
+            </Card>
+          ))}
         </View>
 
         <View className="flex flex-col gap-4">
@@ -83,7 +90,10 @@ export default function HomeScreen() {
             />
             <View>
               <Heading>Como separar seu lixo?</Heading>
-              <Text numberOfLines={3}>Aprenda a separar seu lixo corretamente e contribuir para um mundo mais sustentável.</Text>
+              <Text numberOfLines={3}>
+                Aprenda a separar seu lixo corretamente e contribuir para um
+                mundo mais sustentável.
+              </Text>
             </View>
           </Card>
         </View>
