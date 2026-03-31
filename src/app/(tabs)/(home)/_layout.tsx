@@ -16,6 +16,10 @@ export default function HomeStackLayout() {
         options={{ title: "Configurações", headerShown: true }}
       />
       <Stack.Screen
+        name="profile"
+        options={{ title: "Perfil", headerShown: false }}
+      />
+      <Stack.Screen
         name="plans"
         options={{ title: "Planos", headerShown: true }}
       />

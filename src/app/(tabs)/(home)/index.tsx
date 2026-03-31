@@ -5,7 +5,7 @@ import {
   CoinsIcon,
   SettingsIcon,
 } from "lucide-react-native";
-import { Image, ScrollView, View } from "react-native";
+import { Image, Pressable, ScrollView, View } from "react-native";
 import UserMockImage from "@/assets/images/mock/user-mock-image.png";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,15 +21,17 @@ export default function HomeScreen() {
     <ScrollView className="flex-1 p-4 bg-white">
       <View className="flex flex-col gap-4">
         <Card className="flex flex-row gap-4 shadow-none">
-          <View className="flex flex-1 flex-row gap-4">
-            <Image source={UserMockImage} className="size-16 rounded-md" />
-            <View className="flex flex-col flex-1">
-              <Heading numberOfLines={2}>
-                Christian Cesar Rodrigues Santos
-              </Heading>
-              <Text className="text-muted-foreground">Ver perfil</Text>
-            </View>
-          </View>
+          <Link href="/(tabs)/(home)/profile" asChild>
+            <Pressable className="flex flex-1 flex-row gap-4">
+              <Image source={UserMockImage} className="size-16 rounded-md" />
+              <View className="flex flex-col flex-1">
+                <Heading numberOfLines={2}>
+                  Christian Cesar Rodrigues Santos
+                </Heading>
+                <Text className="text-muted-foreground">Ver perfil</Text>
+              </View>
+            </Pressable>
+          </Link>
           <View className="flex flex-row gap-2 items-start">
             <Button variant="secondary" size="icon">
               <BellIcon size={12} />
