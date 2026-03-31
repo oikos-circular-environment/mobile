@@ -1,11 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
-import { Chrome, Facebook } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
-import { View } from "react-native";
 import { z } from "zod";
 import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/ui/button";
 import {
   FormControl,
   FormControlError,
@@ -51,9 +49,9 @@ export default function SignUpScreen() {
       title="Criar conta"
       subtitle="Preencha seus dados para começar na Oikos."
       footer={
-        <Text className="text-xs text-white/70">
+        <Text className="text-xs/70">
           Já possui conta?{" "}
-          <Link href="/sign-in" className="font-semibold text-white">
+          <Link href="/sign-in" className="font-semibold">
             Entrar
           </Link>
         </Text>
@@ -61,22 +59,18 @@ export default function SignUpScreen() {
     >
       <FormControl isInvalid={!!errors.name} className="gap-2">
         <FormControlLabel>
-          <FormControlLabelText className="text-sm text-white">
-            Nome
-          </FormControlLabelText>
+          <FormControlLabelText className="text-sm">Nome</FormControlLabelText>
         </FormControlLabel>
         <Controller
           control={control}
           name="name"
           render={({ field: { onChange, onBlur, value } }) => (
-            <Input className="border-white/30 bg-white/10">
+            <Input>
               <InputField
                 value={value}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 placeholder="Digite seu nome"
-                placeholderTextColor="#94a3b8"
-                className="text-white"
               />
             </Input>
           )}
@@ -90,7 +84,7 @@ export default function SignUpScreen() {
 
       <FormControl isInvalid={!!errors.email} className="gap-2">
         <FormControlLabel>
-          <FormControlLabelText className="text-sm text-white">
+          <FormControlLabelText className="text-sm">
             E-mail
           </FormControlLabelText>
         </FormControlLabel>
@@ -98,16 +92,14 @@ export default function SignUpScreen() {
           control={control}
           name="email"
           render={({ field: { onChange, onBlur, value } }) => (
-            <Input className="border-white/30 bg-white/10">
+            <Input>
               <InputField
                 value={value}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 placeholder="Digite seu e-mail"
-                placeholderTextColor="#94a3b8"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                className="text-white"
               />
             </Input>
           )}
@@ -121,23 +113,19 @@ export default function SignUpScreen() {
 
       <FormControl isInvalid={!!errors.password} className="gap-2">
         <FormControlLabel>
-          <FormControlLabelText className="text-sm text-white">
-            Senha
-          </FormControlLabelText>
+          <FormControlLabelText className="text-sm">Senha</FormControlLabelText>
         </FormControlLabel>
         <Controller
           control={control}
           name="password"
           render={({ field: { onChange, onBlur, value } }) => (
-            <Input className="border-white/30 bg-white/10">
+            <Input>
               <InputField
                 value={value}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 placeholder="Crie sua senha"
-                placeholderTextColor="#94a3b8"
                 secureTextEntry
-                className="text-white"
               />
             </Input>
           )}
@@ -159,17 +147,6 @@ export default function SignUpScreen() {
       >
         <ButtonText>Criar conta</ButtonText>
       </Button>
-
-      <View className="gap-2">
-        <Button variant="outline" className="border-white/25 bg-transparent">
-          <ButtonIcon as={Chrome} className="text-white" />
-          <ButtonText className="text-white">Registrar com Google</ButtonText>
-        </Button>
-        <Button variant="outline" className="border-white/25 bg-transparent">
-          <ButtonIcon as={Facebook} className="text-white" />
-          <ButtonText className="text-white">Registrar com Facebook</ButtonText>
-        </Button>
-      </View>
     </AuthScreenLayout>
   );
 }

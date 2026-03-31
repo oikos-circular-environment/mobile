@@ -52,8 +52,8 @@ export default function VerifyCodeScreen() {
       title="Confirme seu e-mail"
       subtitle={`Enviamos um código para ${email}.`}
       footer={
-        <Text className="text-xs text-white/70">
-          <Link href="/sign-in" className="font-semibold text-white">
+        <Text className="text-xs">
+          <Link href="/sign-in" className="font-semibold">
             Voltar para login
           </Link>
         </Text>
@@ -64,7 +64,7 @@ export default function VerifyCodeScreen() {
           control={control}
           name="code"
           render={({ field: { onChange, onBlur, value } }) => (
-            <Input className="border-white/30 bg-white/10">
+            <Input>
               <InputField
                 value={value}
                 onBlur={onBlur}
@@ -75,8 +75,7 @@ export default function VerifyCodeScreen() {
                 keyboardType="number-pad"
                 maxLength={4}
                 placeholder="0000"
-                placeholderTextColor="#94a3b8"
-                className="text-center text-xl tracking-[8px] text-white"
+                className="text-center text-xl tracking-[8px]"
               />
             </Input>
           )}
@@ -88,9 +87,9 @@ export default function VerifyCodeScreen() {
             return (
               <View
                 key={`code-box-${index}`}
-                className="h-11 w-11 items-center justify-center rounded-md border border-white/25 bg-white/10"
+                className="h-11 w-11 items-center justify-center rounded-md"
               >
-                <Text className="text-xl font-semibold text-white">{char}</Text>
+                <Text className="text-xl font-semibold">{char}</Text>
               </View>
             );
           })}
@@ -112,9 +111,9 @@ export default function VerifyCodeScreen() {
         <ButtonText>Validar código</ButtonText>
       </Button>
 
-      <Text className="text-center text-xs text-white/70">
+      <Text className="text-center text-xs">
         Não recebeu o e-mail?{" "}
-        <Text className="font-semibold text-white">Clique para reenviar</Text>
+        <Text className="font-semibold">Clique para reenviar</Text>
       </Text>
     </AuthScreenLayout>
   );

@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
-import { Check, Chrome, Facebook } from "lucide-react-native";
+import { Check, Chrome } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
@@ -56,9 +56,9 @@ export default function SignInScreen() {
       title="Entrar na sua conta"
       subtitle="Bem-vindo de volta. Preencha seus dados."
       footer={
-        <Text className="text-xs text-white/70">
+        <Text className="text-xs ">
           Não tem uma conta?{" "}
-          <Link href="/sign-up" className="font-semibold text-white">
+          <Link href="/sign-up" className="font-semibold">
             Registrar-se
           </Link>
         </Text>
@@ -66,7 +66,7 @@ export default function SignInScreen() {
     >
       <FormControl isInvalid={!!errors.email} className="gap-2">
         <FormControlLabel>
-          <FormControlLabelText className="text-sm text-white">
+          <FormControlLabelText className="text-sm ">
             E-mail
           </FormControlLabelText>
         </FormControlLabel>
@@ -74,7 +74,7 @@ export default function SignInScreen() {
           control={control}
           name="email"
           render={({ field: { onChange, onBlur, value } }) => (
-            <Input className="border-white/30 bg-white/10">
+            <Input>
               <InputField
                 value={value}
                 onBlur={onBlur}
@@ -83,7 +83,6 @@ export default function SignInScreen() {
                 placeholderTextColor="#94a3b8"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                className="text-white"
               />
             </Input>
           )}
@@ -97,7 +96,7 @@ export default function SignInScreen() {
 
       <FormControl isInvalid={!!errors.password} className="gap-2">
         <FormControlLabel>
-          <FormControlLabelText className="text-sm text-white">
+          <FormControlLabelText className="text-sm ">
             Senha
           </FormControlLabelText>
         </FormControlLabel>
@@ -105,7 +104,7 @@ export default function SignInScreen() {
           control={control}
           name="password"
           render={({ field: { onChange, onBlur, value } }) => (
-            <Input className="border-white/30 bg-white/10">
+            <Input>
               <InputField
                 value={value}
                 onBlur={onBlur}
@@ -113,7 +112,6 @@ export default function SignInScreen() {
                 placeholder="Digite sua senha"
                 placeholderTextColor="#94a3b8"
                 secureTextEntry
-                className="text-white"
               />
             </Input>
           )}
@@ -132,10 +130,10 @@ export default function SignInScreen() {
         name="remember"
         render={({ field: { value, onChange } }) => (
           <Checkbox isChecked={value} onChange={onChange} value="remember">
-            <CheckboxIndicator className="border-white/30 bg-white/10 data-[checked=true]:border-primary data-[checked=true]:bg-primary">
+            <CheckboxIndicator className="data-[checked=true]:border-primary data-[checked=true]:bg-primary">
               <CheckboxIcon as={Check} />
             </CheckboxIndicator>
-            <CheckboxLabel className="text-xs text-white/80">
+            <CheckboxLabel className="text-xs">
               Lembrar de mim por 30 dias
             </CheckboxLabel>
           </Checkbox>
@@ -151,14 +149,9 @@ export default function SignInScreen() {
         <ButtonText>Entrar</ButtonText>
       </Button>
 
-      <Button variant="outline" className="border-white/25 bg-transparent">
-        <ButtonIcon as={Chrome} className="text-white" />
-        <ButtonText className="text-white">Entrar com Google</ButtonText>
-      </Button>
-
-      <Button variant="outline" className="border-white/25 bg-transparent">
-        <ButtonIcon as={Facebook} className="text-white" />
-        <ButtonText className="text-white">Entrar com Facebook</ButtonText>
+      <Button variant="outline" className="bg-transparent">
+        <ButtonIcon as={Chrome} />
+        <ButtonText>Entrar com Google</ButtonText>
       </Button>
     </AuthScreenLayout>
   );
