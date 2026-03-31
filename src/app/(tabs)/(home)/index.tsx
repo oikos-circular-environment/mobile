@@ -21,24 +21,24 @@ export default function HomeScreen() {
     <ScrollView className="flex-1 p-4 bg-white">
       <View className="flex flex-col gap-4">
         <Card className="flex flex-row gap-4 shadow-none">
-          <Image source={UserMockImage} className="size-16 rounded-md" />
-          <View className="flex-1 flex flex-col">
-            <View className="flex flex-row items-start justify-between gap-2">
-              <Heading className="flex-1" numberOfLines={2}>
+          <View className="flex flex-1 flex-row gap-4">
+            <Image source={UserMockImage} className="size-16 rounded-md" />
+            <View className="flex flex-col flex-1">
+              <Heading numberOfLines={2}>
                 Christian Cesar Rodrigues Santos
               </Heading>
-              <View className="flex flex-row gap-2 shrink-0">
-                <Button variant="secondary" size="icon">
-                  <BellIcon size={12} />
-                </Button>
-                <Link href="/(tabs)/(home)/settings" asChild>
-                  <Button variant="secondary" size="icon">
-                    <SettingsIcon size={12} />
-                  </Button>
-                </Link>
-              </View>
+              <Text className="text-muted-foreground">Ver perfil</Text>
             </View>
-            <Text>Software Engineer</Text>
+          </View>
+          <View className="flex flex-row gap-2 items-start">
+            <Button variant="secondary" size="icon">
+              <BellIcon size={12} />
+            </Button>
+            <Link href="/(tabs)/(home)/settings" asChild>
+              <Button variant="secondary" size="icon">
+                <SettingsIcon size={12} />
+              </Button>
+            </Link>
           </View>
         </Card>
 

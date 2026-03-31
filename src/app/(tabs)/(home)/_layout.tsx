@@ -9,7 +9,7 @@ export default function HomeStackLayout() {
     >
       <Stack.Screen
         name="index"
-        options={{ headerShown: true, title: "Início" }}
+        options={{ headerShown: false, title: "Início" }}
       />
       <Stack.Screen
         name="settings"
