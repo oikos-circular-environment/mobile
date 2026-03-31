@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { z } from "zod";
+import UserMockImage from "@/assets/images/mock/user-mock-image.png";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
   Checkbox,
@@ -44,20 +45,19 @@ const profileSchema = z.object({
     .regex(/^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/, "Informe um celular valido."),
   email: z.email("Informe um email valido."),
   isCollector: z.boolean(),
-  zipCode: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP valido."),
-  street: z.string().min(3, "Informe a rua."),
-  number: z.string().min(1, "Informe o numero."),
-  complement: z.string().min(2, "Informe o complemento."),
-  district: z.string().min(2, "Informe o bairro."),
-  city: z.string().min(2, "Informe a cidade."),
-  state: z.string().min(2, "Informe o estado."),
-  stateCode: z.string().length(2, "Use a sigla com 2 letras."),
+  address: z.object({
+    zipCode: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP valido."),
+    street: z.string().min(3, "Informe a rua."),
+    number: z.string().min(1, "Informe o numero."),
+    complement: z.string().min(2, "Informe o complemento."),
+    district: z.string().min(2, "Informe o bairro."),
+    city: z.string().min(2, "Informe a cidade."),
+    state: z.string().min(2, "Informe o estado."),
+    stateCode: z.string().length(2, "Use a sigla com 2 letras."),
+  }),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
-
-const MAP_IMAGE =
-  "https://www.figma.com/api/mcp/asset/185ec658-38d8-49cc-bdb6-c228c8f33273";
 
 export default function ProfileScreen() {
   const { user, updateUser } = useUser();
@@ -69,16 +69,18 @@ export default function ProfileScreen() {
       displayName: user.displayName,
       cpf: user.cpf,
       phone: user.phone,
-      email: `${user.emailLocalPart}@${user.emailDomain}`,
+      email: user.email,
       isCollector: user.isCollector,
-      zipCode: user.zipCode,
-      street: user.street,
-      number: user.number,
-      complement: user.complement,
-      district: user.district,
-      city: user.city,
-      state: user.state,
-      stateCode: user.stateCode,
+      address: {
+        zipCode: user.address.zipCode,
+        street: user.address.street,
+        number: user.address.number,
+        complement: user.address.complement,
+        district: user.address.district,
+        city: user.address.city,
+        state: user.address.state,
+        stateCode: user.address.stateCode,
+      },
     }),
     [user],
   );
@@ -98,13 +100,7 @@ export default function ProfileScreen() {
   }, [defaultValues, reset]);
 
   const onSubmit = (data: ProfileFormValues) => {
-    const [emailLocalPart, emailDomain] = data.email.toLowerCase().split("@");
-
-    updateUser({
-      ...data,
-      emailLocalPart,
-      emailDomain,
-    });
+    updateUser(data);
   };
 
   const onCancel = () => {
@@ -359,7 +355,10 @@ export default function ProfileScreen() {
                 <Heading size="xl">Endereço</Heading>
 
                 <View className="gap-3">
-                  <FormControl isInvalid={!!errors.zipCode} className="gap-2">
+                  <FormControl
+                    isInvalid={!!errors.address?.zipCode}
+                    className="gap-2"
+                  >
                     <FormControlLabel>
                       <FormControlLabelText className="text-sm">
                         CEP
@@ -367,7 +366,7 @@ export default function ProfileScreen() {
                     </FormControlLabel>
                     <Controller
                       control={control}
-                      name="zipCode"
+                      name="address.zipCode"
                       render={({ field: { onChange, onBlur, value } }) => (
                         <Input>
                           <InputField
@@ -383,10 +382,10 @@ export default function ProfileScreen() {
                         </Input>
                       )}
                     />
-                    {errors.zipCode?.message ? (
+                    {errors.address?.zipCode?.message ? (
                       <FormControlError>
                         <FormControlErrorText>
-                          {errors.zipCode.message}
+                          {errors.address.zipCode.message}
                         </FormControlErrorText>
                       </FormControlError>
                     ) : null}
@@ -394,7 +393,7 @@ export default function ProfileScreen() {
 
                   <View className="flex flex-row gap-2">
                     <FormControl
-                      isInvalid={!!errors.street}
+                      isInvalid={!!errors.address?.street}
                       className="flex-1 gap-2"
                     >
                       <FormControlLabel>
@@ -404,7 +403,7 @@ export default function ProfileScreen() {
                       </FormControlLabel>
                       <Controller
                         control={control}
-                        name="street"
+                        name="address.street"
                         render={({ field: { onChange, onBlur, value } }) => (
                           <Input>
                             <InputField
@@ -418,7 +417,7 @@ export default function ProfileScreen() {
                     </FormControl>
 
                     <FormControl
-                      isInvalid={!!errors.number}
+                      isInvalid={!!errors.address?.number}
                       className="w-20 gap-2"
                     >
                       <FormControlLabel>
@@ -428,7 +427,7 @@ export default function ProfileScreen() {
                       </FormControlLabel>
                       <Controller
                         control={control}
-                        name="number"
+                        name="address.number"
                         render={({ field: { onChange, onBlur, value } }) => (
                           <Input>
                             <InputField
@@ -443,7 +442,7 @@ export default function ProfileScreen() {
                   </View>
 
                   <FormControl
-                    isInvalid={!!errors.complement}
+                    isInvalid={!!errors.address?.complement}
                     className="gap-2"
                   >
                     <FormControlLabel>
@@ -453,7 +452,7 @@ export default function ProfileScreen() {
                     </FormControlLabel>
                     <Controller
                       control={control}
-                      name="complement"
+                      name="address.complement"
                       render={({ field: { onChange, onBlur, value } }) => (
                         <Input>
                           <InputField
@@ -466,7 +465,10 @@ export default function ProfileScreen() {
                     />
                   </FormControl>
 
-                  <FormControl isInvalid={!!errors.district} className="gap-2">
+                  <FormControl
+                    isInvalid={!!errors.address?.district}
+                    className="gap-2"
+                  >
                     <FormControlLabel>
                       <FormControlLabelText className="text-sm">
                         Bairro
@@ -474,7 +476,7 @@ export default function ProfileScreen() {
                     </FormControlLabel>
                     <Controller
                       control={control}
-                      name="district"
+                      name="address.district"
                       render={({ field: { onChange, onBlur, value } }) => (
                         <Input>
                           <InputField
@@ -487,7 +489,10 @@ export default function ProfileScreen() {
                     />
                   </FormControl>
 
-                  <FormControl isInvalid={!!errors.city} className="gap-2">
+                  <FormControl
+                    isInvalid={!!errors.address?.city}
+                    className="gap-2"
+                  >
                     <FormControlLabel>
                       <FormControlLabelText className="text-sm">
                         Cidade
@@ -495,7 +500,7 @@ export default function ProfileScreen() {
                     </FormControlLabel>
                     <Controller
                       control={control}
-                      name="city"
+                      name="address.city"
                       render={({ field: { onChange, onBlur, value } }) => (
                         <Input>
                           <InputField
@@ -510,7 +515,7 @@ export default function ProfileScreen() {
 
                   <View className="flex flex-row gap-2">
                     <FormControl
-                      isInvalid={!!errors.state}
+                      isInvalid={!!errors.address?.state}
                       className="flex-1 gap-2"
                     >
                       <FormControlLabel>
@@ -520,7 +525,7 @@ export default function ProfileScreen() {
                       </FormControlLabel>
                       <Controller
                         control={control}
-                        name="state"
+                        name="address.state"
                         render={({ field: { onChange, onBlur, value } }) => (
                           <Input>
                             <InputField
@@ -534,7 +539,7 @@ export default function ProfileScreen() {
                     </FormControl>
 
                     <FormControl
-                      isInvalid={!!errors.stateCode}
+                      isInvalid={!!errors.address?.stateCode}
                       className="w-16 gap-2"
                     >
                       <FormControlLabel>
@@ -544,7 +549,7 @@ export default function ProfileScreen() {
                       </FormControlLabel>
                       <Controller
                         control={control}
-                        name="stateCode"
+                        name="address.stateCode"
                         render={({ field: { onChange, onBlur, value } }) => (
                           <Input>
                             <InputField
@@ -564,7 +569,7 @@ export default function ProfileScreen() {
                     <Text className="text-sm">Mapa</Text>
                     <View className="relative overflow-hidden rounded-md border border-border">
                       <Image
-                        source={{ uri: MAP_IMAGE }}
+                        source={UserMockImage}
                         className="h-72 w-full"
                         resizeMode="cover"
                       />
