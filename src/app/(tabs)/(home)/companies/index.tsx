@@ -1,4 +1,4 @@
-import type { RelativePathString } from "expo-router";
+import type { Href } from "expo-router";
 import { Link } from "expo-router";
 import {
   ArrowRight,
@@ -23,7 +23,7 @@ type CompanySetting = {
   title: string;
   description: string;
   icon: LucideIcon;
-  href: RelativePathString;
+  href: Href;
 };
 
 type PremiumResource = {
@@ -39,37 +39,37 @@ const settings: CompanySetting[] = [
     title: "Empresa",
     description: "Informações cadastrais gerais sobre a sua empresa.",
     icon: FactoryIcon,
-    href: "./company",
+    href: "/(tabs)/(home)/companies/company",
   },
   {
     title: "Endereço",
     description: "Informe seu endereço para que as pessoas te encontre.",
     icon: MapPinIcon,
-    href: "./address",
+    href: "/(tabs)/(home)/companies/address",
   },
   {
     title: "Funcionamento",
     description: "Informe os dias e horários em que sua empresa está aberta.",
     icon: Clock3Icon,
-    href: "./business-hours",
+    href: "/(tabs)/(home)/companies/business-hours",
   },
   {
     title: "Método de pagamento",
     description: "Cadastre as formas de pagamento e recebimento aceitas.",
     icon: BanknoteIcon,
-    href: "./payment-methods",
+    href: "/(tabs)/(home)/companies/payment-methods",
   },
   {
     title: "Serviços",
     description: "Descreva os serviços que sua empresa oferece ao publico.",
     icon: WrenchIcon,
-    href: "./services",
+    href: "/(tabs)/(home)/companies/services",
   },
   {
     title: "Gestão de resíduos",
     description: "Configure como sua empresa lida com os tipos de resíduos.",
     icon: RecycleIcon,
-    href: "./waste-management",
+    href: "/(tabs)/(home)/companies/waste-management",
   },
 ];
 

@@ -1,23 +1,15 @@
-import { Address } from "./address";
-import { BusinessHour } from "./business-hour";
+import type { Address } from "./address";
+import type { BusinessHour } from "./business-hour";
 
-export type IdentityType = 
-  | "CPF"
-  | "CNPJ"
+export type IdentityType = "CPF" | "CNPJ";
 
-
-export type CompanyType = 
-  | "ONG"
-  | "COMPANY"
-  | "GOVERNMENT"
-  | "COLLECTOR"
+export type CompanyType = "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 
 export type Company = {
   id: string;
   identity: string;
   identityType: IdentityType;
   companyType: CompanyType;
-  // stateRegistration?: string | null; // Inscrição Estadual
   status: boolean; // Ativo ou Inativo
   isHeadquarters: boolean; // Matriz ou Filial
   businessName?: string | null; // Nome Fantasia
@@ -29,4 +21,21 @@ export type Company = {
   startedActivityIn: Date;
   businessHours?: BusinessHour[] | null; // Horário de funcionamento
   // wasteItems?: Item[] | null; // Resíduos que a empresa trabalha
-}
+};
+
+export type MapperValues<T> = {
+  value: T;
+  label: string;
+};
+
+export const companyTypeOptions: MapperValues<CompanyType>[] = [
+  { value: "ONG", label: "ONG" },
+  { value: "COMPANY", label: "Empresa" },
+  { value: "GOVERNMENT", label: "Governo" },
+  { value: "COLLECTOR", label: "Coletor" },
+];
+
+export const identityTypeOptions: MapperValues<IdentityType>[] = [
+  { value: "CPF", label: "CPF" },
+  { value: "CNPJ", label: "CNPJ" },
+];

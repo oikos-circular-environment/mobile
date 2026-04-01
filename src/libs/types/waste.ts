@@ -10,7 +10,7 @@ export type Measurement = {
 type Material = {
   name: string;
   category: string;
-}
+};
 
 export type Waste = {
   id: string;
@@ -19,7 +19,7 @@ export type Waste = {
   unit: Measurement;
   wasteType: WasteType;
   price: number; // Preço por unidade de medida
-}
+};
 
 export type Service = {
   id: string;
@@ -27,4 +27,4 @@ export type Service = {
   description: string;
   price: number;
   unit: Measurement;
-}
+};

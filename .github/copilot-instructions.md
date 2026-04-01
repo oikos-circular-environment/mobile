@@ -33,6 +33,21 @@ Estas instrucoes definem o padrao tecnico obrigatorio para novas implementacoes 
   - `learn`
 - Novas telas devem se integrar a esse fluxo sem quebrar a estrutura principal de 5 acoes.
 
+## Formularios
+
+- **KeyboardAvoidingView obrigatório**: Todo componente com formulário (inputs, textarea, etc) deve estar envolvido em `KeyboardAvoidingView` para evitar que o teclado virtual cubra os campos.
+- Padrão de uso:
+  ```jsx
+  <KeyboardAvoidingView behavior="padding" className="flex-1">
+    <ScrollView contentContainerClassName="p-4 pb-8">
+      {/* Formulário aqui */}
+    </ScrollView>
+  </KeyboardAvoidingView>
+  ```
+- O `behavior="padding"` é o padrão recomendado para iOS. Para Android, ele é ignorado.
+- Sempre combine com `ScrollView` para permitir scroll quando necessário.
+- Use `contentContainerClassName` para padding em vez de container externo.
+
 ## Regras para contribuicoes
 
 - Toda alteracao de UI deve respeitar estes padroes.

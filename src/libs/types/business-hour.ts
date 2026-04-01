@@ -1,23 +1,23 @@
-export type DayOfWeek = 
+export type DayOfWeek =
   | "SUNDAY"
   | "MONDAY"
   | "TUESDAY"
   | "WEDNESDAY"
   | "THURSDAY"
   | "FRIDAY"
-  | "SATURDAY"
+  | "SATURDAY";
 
 export type TimeSlot = {
   id: string;
   startTime: string; // Horário de início, formato "HH:mm"
   endTime: string; // Horário de fim, formato "HH:mm"
-}
+};
 
 export type BusinessHour = {
   id: string;
   dayOfWeek: DayOfWeek;
   timeSlots: TimeSlot[];
-}
+};
 
 export const daysOfWeek: { value: DayOfWeek; label: string }[] = [
   { value: "SUNDAY", label: "Domingo" },
