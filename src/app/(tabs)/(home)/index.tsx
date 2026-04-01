@@ -33,9 +33,11 @@ export default function HomeScreen() {
             </Pressable>
           </Link>
           <View className="flex flex-row gap-2 items-start">
-            <Button variant="secondary" size="icon">
-              <BellIcon size={12} />
-            </Button>
+            <Link href="/(tabs)/(home)/notifications" asChild>
+              <Button variant="secondary" size="icon">
+                <BellIcon size={12} />
+              </Button>
+            </Link>
             <Link href="/(tabs)/(home)/settings" asChild>
               <Button variant="secondary" size="icon">
                 <SettingsIcon size={12} />

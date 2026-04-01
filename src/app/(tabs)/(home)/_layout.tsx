@@ -13,15 +13,19 @@ export default function HomeStackLayout() {
       />
       <Stack.Screen
         name="settings"
-        options={{ title: "Configurações", headerShown: true }}
+        options={{ title: "Configurações", headerShown: false }}
       />
       <Stack.Screen
         name="profile"
         options={{ title: "Perfil", headerShown: false }}
       />
       <Stack.Screen
+        name="notifications"
+        options={{ title: "Notificações", headerShown: false }}
+      />
+      <Stack.Screen
         name="plans"
-        options={{ title: "Planos", headerShown: true }}
+        options={{ title: "Planos", headerShown: false }}
       />
       <Stack.Screen
         name="sign-in"
