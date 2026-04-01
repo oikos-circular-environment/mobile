@@ -39,7 +39,7 @@ export default function SettingsScreen() {
       icon: FactoryIcon,
       is_premium: true,
       highlight: false,
-      link: "/companies",
+      link: "/(tabs)/(home)/companies",
     },
     {
       title: "Para coletores",
@@ -48,7 +48,7 @@ export default function SettingsScreen() {
       icon: RecycleIcon,
       is_premium: false,
       highlight: false,
-      link: "/collectors",
+      link: "/(tabs)/(home)/collectors",
     },
     {
       title: "Seja um patrocinador",
@@ -57,7 +57,7 @@ export default function SettingsScreen() {
       icon: SproutIcon,
       is_premium: false,
       highlight: false,
-      link: "/sponsors",
+      link: "/(tabs)/(home)/sponsors",
     },
   ];
   return (

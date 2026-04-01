@@ -28,6 +28,18 @@ export default function HomeStackLayout() {
         options={{ title: "Planos", headerShown: false }}
       />
       <Stack.Screen
+        name="companies"
+        options={{ title: "Empresa", headerShown: false }}
+      />
+      <Stack.Screen
+        name="collectors"
+        options={{ title: "Para coletores", headerShown: false }}
+      />
+      <Stack.Screen
+        name="sponsors"
+        options={{ title: "Patrocinadores", headerShown: false }}
+      />
+      <Stack.Screen
         name="sign-in"
         options={{
           title: "Login",
