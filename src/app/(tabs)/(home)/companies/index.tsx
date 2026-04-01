@@ -7,6 +7,7 @@ import {
   Clock3Icon,
   CrownIcon,
   FactoryIcon,
+  type LucideIcon,
   MapPinIcon,
   RecycleIcon,
   RouteIcon,
@@ -21,14 +22,14 @@ import { Text } from "@/components/ui/text";
 type CompanySetting = {
   title: string;
   description: string;
-  icon: React.ComponentType<{ size?: number; color?: string }>;
+  icon: LucideIcon;
   href: RelativePathString;
 };
 
 type PremiumResource = {
   title: string;
   description: string;
-  icon: React.ComponentType<{ size?: number; color?: string }>;
+  icon: LucideIcon;
 };
 
 const completionRate = 70;
@@ -36,7 +37,7 @@ const completionRate = 70;
 const settings: CompanySetting[] = [
   {
     title: "Empresa",
-    description: "Informe informações cadastrais gerais sobre a sua empresa.",
+    description: "Informações cadastrais gerais sobre a sua empresa.",
     icon: FactoryIcon,
     href: "./company",
   },
@@ -60,7 +61,7 @@ const settings: CompanySetting[] = [
   },
   {
     title: "Serviços",
-    description: "Descreva os serviços que sua empresa oferece.",
+    description: "Descreva os serviços que sua empresa oferece ao publico.",
     icon: WrenchIcon,
     href: "./services",
   },
@@ -93,11 +94,11 @@ export default function CompaniesHomeScreen() {
       contentContainerClassName="px-4 pb-8 pt-10"
     >
       <View className="gap-8">
-        <Card className="bg-secondary p-4 shadow-none rounded-md">
+        <Card className="bg-secondary shadow-none">
           <View className="flex-row items-center justify-between gap-4">
             <View className="flex-1 gap-1">
-              <Heading className="text-base">Configurações</Heading>
-              <Text className="text-[10px] text-muted-foreground leading-4">
+              <Heading className="text-lg">Configurações</Heading>
+              <Text className="text-sm text-muted-foreground leading-4">
                 Preencha as infomações da sua empresa, desta forma você está
                 apto para se expor.
               </Text>
@@ -126,22 +127,22 @@ export default function CompaniesHomeScreen() {
             {settings.map(setting => (
               <Link key={setting.title} href={setting.href} asChild>
                 <Pressable>
-                  <Card className="rounded-xl border border-outline-200 px-2 py-2 shadow-none">
+                  <Card className="shadow-none">
                     <View className="flex-row items-center gap-3">
                       <View className="size-8 items-center justify-center">
-                        <setting.icon color="#111827" size={18} />
+                        <setting.icon size={28} strokeWidth={1.5} />
                       </View>
 
-                      <View className="flex-1 gap-0">
-                        <Text className="text-xs text-foreground">
+                      <View className="flex-1">
+                        <Text className="text-lg text-foreground font-semibold">
                           {setting.title}
                         </Text>
-                        <Text className="text-[10px] text-muted-foreground leading-3">
+                        <Text className="text-muted-foreground">
                           {setting.description}
                         </Text>
                       </View>
 
-                      <ArrowRight color="#111827" size={18} />
+                      <ArrowRight size={18} />
                     </View>
                   </Card>
                 </Pressable>
@@ -160,20 +161,17 @@ export default function CompaniesHomeScreen() {
 
           <View className="gap-2 pt-1">
             {premiumResources.map(resource => (
-              <Card
-                key={resource.title}
-                className="rounded-xl border border-outline-200 px-2 py-2 shadow-none"
-              >
+              <Card key={resource.title} className="shadow-none">
                 <View className="flex-row items-center gap-3">
                   <View className="size-8 items-center justify-center">
-                    <resource.icon color="#111827" size={18} />
+                    <resource.icon size={28} strokeWidth={1.5} />
                   </View>
 
-                  <View className="flex-1 gap-0">
-                    <Text className="text-xs text-foreground">
+                  <View className="flex-1">
+                    <Text className="text-lg text-foreground font-semibold">
                       {resource.title}
                     </Text>
-                    <Text className="text-[10px] text-muted-foreground leading-3">
+                    <Text className="text-muted-foreground">
                       {resource.description}
                     </Text>
                   </View>
