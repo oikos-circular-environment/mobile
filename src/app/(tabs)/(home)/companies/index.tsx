@@ -54,10 +54,10 @@ const settings: CompanySetting[] = [
     href: "/(tabs)/(home)/companies/business-hours",
   },
   {
-    title: "Método de pagamento",
+    title: "Métodos financeiros",
     description: "Cadastre as formas de pagamento e recebimento aceitas.",
     icon: BanknoteIcon,
-    href: "/(tabs)/(home)/companies/payment-methods",
+    href: "/(tabs)/(home)/companies/financial-methods",
   },
   {
     title: "Serviços",

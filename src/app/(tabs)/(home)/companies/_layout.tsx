@@ -36,9 +36,9 @@ export default function CompaniesLayout() {
         }}
       />
       <Stack.Screen
-        name="payment-methods"
+        name="financial-methods"
         options={{
-          title: "Métodos de pagamento",
+          title: "Métodos financeiros",
           headerShown: true,
         }}
       />
