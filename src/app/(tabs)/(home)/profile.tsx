@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack } from "expo-router";
-import { Check, MapPin, Search } from "lucide-react-native";
+import { Check, Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -11,7 +11,6 @@ import {
   View,
 } from "react-native";
 import { z } from "zod";
-import UserMockImage from "@/assets/images/mock/user-mock-image.png";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
   Checkbox,
@@ -29,6 +28,7 @@ import {
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import WrapperMapper from "@/components/wrapper-mapper";
 import { useUser } from "@/contexts/user-context";
 import { mask } from "@/libs/mask";
 
@@ -567,16 +567,7 @@ export default function ProfileScreen() {
 
                   <View className="gap-2">
                     <Text className="text-sm">Mapa</Text>
-                    <View className="relative overflow-hidden rounded-md border border-border">
-                      <Image
-                        source={UserMockImage}
-                        className="h-72 w-full"
-                        resizeMode="cover"
-                      />
-                      <View className="absolute left-1/2 top-1/2 -ml-3 -mt-6">
-                        <MapPin color="#3f6212" size={24} />
-                      </View>
-                    </View>
+                    <WrapperMapper />
                   </View>
                 </View>
               </View>
