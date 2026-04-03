@@ -1,5 +1,6 @@
 import type { Address } from "./address";
 import type { BusinessHour } from "./business-hour";
+import type { ValueMapping } from "./value-mapping";
 
 export type IdentityType = "CPF" | "CNPJ";
 
@@ -23,19 +24,14 @@ export type Company = {
   // wasteItems?: Item[] | null; // Resíduos que a empresa trabalha
 };
 
-export type MapperValues<T> = {
-  value: T;
-  label: string;
-};
-
-export const companyTypeOptions: MapperValues<CompanyType>[] = [
+export const companyTypeOptions: ValueMapping<CompanyType>[] = [
   { value: "ONG", label: "ONG" },
   { value: "COMPANY", label: "Empresa" },
   { value: "GOVERNMENT", label: "Governo" },
   { value: "COLLECTOR", label: "Coletor" },
 ];
 
-export const identityTypeOptions: MapperValues<IdentityType>[] = [
+export const identityTypeOptions: ValueMapping<IdentityType>[] = [
   { value: "CPF", label: "CPF" },
   { value: "CNPJ", label: "CNPJ" },
 ];
