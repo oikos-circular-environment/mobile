@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "com.oikos",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
+      }
     },
     "android": {
       "package": "com.oikos",
@@ -19,11 +22,12 @@
         "foregroundImage": "./src/assets/icons/android-icon.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
-    },
-    "web": {
-      "output": "static",
-      "favicon": "./src/assets/icons/favicon.png"
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
+        }
+      }
     },
     "plugins": [
       "expo-router",
@@ -34,6 +38,12 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#274E2D"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Permitir $(PRODUCT_NAME) usar sua localização?"
         }
       ]
     ],

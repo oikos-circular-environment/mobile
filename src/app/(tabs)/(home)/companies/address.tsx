@@ -3,15 +3,8 @@ import { Stack } from "expo-router";
 import { Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { z } from "zod";
-import UserMockImage from "@/assets/images/mock/user-mock-image.png";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
   FormControl,
@@ -23,6 +16,7 @@ import {
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import WrapperMapper from "@/components/wrapper-mapper";
 import { mask } from "@/libs/mask";
 import type { Address } from "@/libs/types/address";
 
@@ -35,6 +29,8 @@ const addressSchema = z.object({
   city: z.string().min(2, "Informe a cidade."),
   state: z.string().min(2, "Informe o estado."),
   stateAcronym: z.string().length(2, "Use a sigla com 2 letras."),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
 });
 
 type AddressFormValues = z.infer<typeof addressSchema>;
@@ -61,6 +57,8 @@ export default function CompanyAddressScreen() {
       city: address.city ?? "",
       state: address.state ?? "",
       stateAcronym: address.stateAcronym ?? "",
+      latitude: address.latitude ?? null,
+      longitude: address.longitude ?? null,
     }),
     [address],
   );
@@ -69,11 +67,16 @@ export default function CompanyAddressScreen() {
     control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
     defaultValues,
   });
+
+  const latitude = watch("latitude");
+  const longitude = watch("longitude");
 
   useEffect(() => {
     reset(defaultValues);
@@ -85,6 +88,14 @@ export default function CompanyAddressScreen() {
 
   const onCancel = () => {
     reset(defaultValues);
+  };
+
+  const handleLocationChange = (location: {
+    latitude: number;
+    longitude: number;
+  }) => {
+    setValue("latitude", location.latitude, { shouldDirty: true });
+    setValue("longitude", location.longitude, { shouldDirty: true });
   };
 
   return (
@@ -345,13 +356,16 @@ export default function CompanyAddressScreen() {
 
               <View className="gap-2">
                 <Text className="text-sm">Mapa</Text>
-                <View className="relative overflow-hidden rounded-md border border-border">
-                  <Image
-                    source={UserMockImage}
-                    className="h-72 w-full"
-                    resizeMode="cover"
-                  />
-                </View>
+                <WrapperMapper
+                  latitude={latitude}
+                  longitude={longitude}
+                  onChange={handleLocationChange}
+                />
+                <Text className="text-xs text-muted-foreground">
+                  {latitude != null && longitude != null
+                    ? `Ponto selecionado: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+                    : "Use o mapa para definir a localização exata da empresa."}
+                </Text>
               </View>
             </View>
 
