@@ -70,7 +70,6 @@ export function DayBusinessHourField({
               {fields.length < 2 && (
                 <Button
                   variant="outline"
-                  size="sm"
                   onPress={() =>
                     append({
                       id: `${Date.now()}-${Math.random()}`,
@@ -81,7 +80,7 @@ export function DayBusinessHourField({
                   className="gap-2"
                 >
                   <ButtonIcon as={Plus} size="sm" />
-                  <ButtonText size="sm">Adicionar horário</ButtonText>
+                  <ButtonText>Adicionar horário</ButtonText>
                 </Button>
               )}
             </View>

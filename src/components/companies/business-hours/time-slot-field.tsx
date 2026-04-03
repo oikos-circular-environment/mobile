@@ -115,13 +115,8 @@ export function TimeSlotField({
         </FormControl>
 
         {showRemoveButton && (
-          <Button
-            size="sm"
-            variant="destructive"
-            onPress={onRemove}
-            className="mb-0"
-          >
-            <ButtonIcon as={Trash2} size="sm" />
+          <Button variant="destructive" size="icon" onPress={onRemove}>
+            <ButtonIcon as={Trash2} />
           </Button>
         )}
       </View>
