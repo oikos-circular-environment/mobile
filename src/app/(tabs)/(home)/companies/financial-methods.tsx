@@ -1,14 +1,18 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack } from "expo-router";
 import { useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import {
+  type FinancialMethodsFormValues,
+  financialMethodsFormSchema,
+} from "@/components/companies/financial-methods/financial-methods-form-schema";
 import { PaymentsTab } from "@/components/companies/financial-methods/payments-tab";
 import { ReceiptsTab } from "@/components/companies/financial-methods/receipts-tab";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import {
   companyFinancial,
-  type Financial,
-  type FinancialFlag,
   type FinancialType,
 } from "@/libs/types/financial-method";
 
@@ -17,60 +21,26 @@ const tabLabels: Record<FinancialType, string> = {
   RECEIPT: "Recebimentos",
 };
 
-const getEntryKey = (entry: Financial) =>
-  `${entry.type}-${entry.financial_means}`;
-
 export default function CompanyFinancialMethodsScreen() {
   const [activeTab, setActiveTab] = useState<FinancialType>("PAYMENT");
-  const [financial, setFinancial] = useState<Financial[]>(companyFinancial);
 
-  const updateEntry = (
-    entryKey: string,
-    updater: (entry: Financial) => Financial,
-  ) => {
-    setFinancial(current =>
-      current.map(entry => {
-        if (getEntryKey(entry) !== entryKey) return entry;
-        return updater(entry);
-      }),
-    );
-  };
+  const form = useForm<FinancialMethodsFormValues>({
+    resolver: zodResolver(financialMethodsFormSchema),
+    defaultValues: {
+      methods:
+        companyFinancial as unknown as FinancialMethodsFormValues["methods"],
+    },
+    mode: "onChange",
+  });
 
-  const toggleEntryActive = (entryKey: string, value: boolean) => {
-    updateEntry(entryKey, entry => ({ ...entry, active: value }));
-  };
+  const fieldArray = useFieldArray({
+    control: form.control,
+    name: "methods",
+  });
 
-  const toggleFlag = (
-    entryKey: string,
-    flag: FinancialFlag,
-    checked: boolean,
-  ) => {
-    updateEntry(entryKey, entry => {
-      const nextFlags = new Set(entry.flags ?? []);
-      if (checked) {
-        nextFlags.add(flag);
-      } else {
-        nextFlags.delete(flag);
-      }
-
-      return {
-        ...entry,
-        flags: nextFlags.size > 0 ? Array.from(nextFlags) : null,
-      };
-    });
-  };
-
-  const toggleAllFlags = (entryKey: string, checked: boolean) => {
-    updateEntry(entryKey, entry => ({
-      ...entry,
-      flags: checked
-        ? ["VISA", "MASTERCARD", "ELO", "AMEX", "HIPERCARD"]
-        : null,
-    }));
-  };
-
-  const updateObservation = (entryKey: string, value: string) => {
-    updateEntry(entryKey, entry => ({ ...entry, observations: value }));
+  const onSubmit = (data: FinancialMethodsFormValues) => {
+    console.log("Financial methods data:", data);
+    // TODO: Send to API
   };
 
   return (
@@ -105,24 +75,18 @@ export default function CompanyFinancialMethodsScreen() {
             </View>
 
             {activeTab === "PAYMENT" ? (
-              <PaymentsTab
-                financial={financial}
-                toggleEntryActive={toggleEntryActive}
-                toggleFlag={toggleFlag}
-                toggleAllFlags={toggleAllFlags}
-                updateObservation={updateObservation}
-                getEntryKey={getEntryKey}
-              />
+              <PaymentsTab form={form} fieldArray={fieldArray} />
             ) : (
-              <ReceiptsTab
-                financial={financial}
-                toggleEntryActive={toggleEntryActive}
-                toggleFlag={toggleFlag}
-                toggleAllFlags={toggleAllFlags}
-                updateObservation={updateObservation}
-                getEntryKey={getEntryKey}
-              />
+              <ReceiptsTab form={form} fieldArray={fieldArray} />
             )}
+
+            <Button
+              onPress={form.handleSubmit(onSubmit)}
+              disabled={!form.formState.isValid}
+              className="mt-4"
+            >
+              <ButtonText>Salvar Configurações</ButtonText>
+            </Button>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
