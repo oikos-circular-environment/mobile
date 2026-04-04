@@ -16,6 +16,9 @@ export const services: Service[] = [
     price: 150.0,
     quantity: 3,
     unit: "M3",
-    observations: "Coleta semanal às segundas-feiras.",
+    observations:
+      "Entulhos descartados que não sejam RCC, será cobrado um valor adicional de R$ 300,00.",
+    sub_items: ["concreto", "tijolos", "solos", "metais", "gesso", "ferros"],
+    wasteType: "RECYCLABLE",
   },
 ];
