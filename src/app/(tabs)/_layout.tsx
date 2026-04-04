@@ -27,10 +27,10 @@ export default function TabLayout() {
         <Label>Home</Label>
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="donations">
+      {/* <NativeTabs.Trigger name="donations">
         <Icon sf={{ default: "globe", selected: "globe" }} />
         <Label>Doações</Label>
-      </NativeTabs.Trigger>
+      </NativeTabs.Trigger> */}
 
       <NativeTabs.Trigger name="learn">
         <Icon sf={{ default: "book", selected: "book.fill" }} />

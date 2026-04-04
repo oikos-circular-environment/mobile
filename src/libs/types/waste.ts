@@ -1,30 +1,34 @@
+import type { Item } from "./item";
+import type { Material } from "./material";
+import type { ValueMapping } from "./value-mapping";
+
+// ? Acredito que a melhor forma não seja criar o resíduo como um item, mas listar as categorias de resíduos e os materiais vinculados a esta categoria. Desta forma, a empresa pode escolher quais categorias de resíduos ela trabalha e os materiais vinculados a esta categoria. Além disso, o serviço de coleta de resíduos pode ser vinculado a uma categoria de resíduo, e não a um material específico, já que a empresa pode coletar vários materiais dentro da mesma categoria de resíduo. Por exemplo, uma empresa pode coletar plástico, papel e metal, mas não vidro. Desta forma, o serviço de coleta de resíduos seria vinculado à categoria de resíduo "Reciclável", e não ao material específico "Plástico".
+
 export type WasteType = "RECYCLABLE" | "GARBAGE";
 
-export type MeasurementSymbol = "KG" | "L" | "UNIT";
+export const wasteTypes: ValueMapping<WasteType>[] = [
+  { value: "RECYCLABLE", label: "Reciclável" },
+  { value: "GARBAGE", label: "Resíduo" },
+];
 
-export type Measurement = {
-  name: string;
-  symbol: MeasurementSymbol;
-};
-
-type Material = {
-  name: string;
-  category: string;
-};
-
-export type Waste = {
-  id: string;
+export type Waste = Item & {
   waste: Material;
-  amount: number;
-  unit: Measurement;
   wasteType: WasteType;
-  price: number; // Preço por unidade de medida
 };
 
-export type Service = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  unit: Measurement;
-};
+export const wastes: Waste[] = [
+  {
+    id: "b70cd448-6a2c-4f8d-931d-692cdc1e082d",
+    name: "Coleta de Plástico",
+    description:
+      "Serviço de coleta de resíduos plásticos, como garrafas, sacolas e embalagens.",
+    price: 0.2,
+    unit: "KG",
+    waste: {
+      id: "1",
+      name: "Plastic Bottle",
+      category: "Plastic",
+    },
+    wasteType: "RECYCLABLE",
+  },
+];
