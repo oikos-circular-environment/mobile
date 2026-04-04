@@ -27,7 +27,6 @@ export const wastes: Waste[] = [
     waste: {
       id: "1",
       name: "Plastic Bottle",
-      category: "Plastic",
     },
     wasteType: "RECYCLABLE",
   },
