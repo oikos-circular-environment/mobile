@@ -6,7 +6,7 @@ import {
   Recycle,
   TriangleAlert,
 } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Linking, Pressable, ScrollView, View } from "react-native";
 import { BusinessHoursModal } from "@/components/market/business-hours-modal";
 import { Badge, BadgeText } from "@/components/ui/badge";
@@ -48,11 +48,76 @@ const formatIdentity = (identity: string, identityType: "CPF" | "CNPJ") => {
 const getDayLabel = (day: string) =>
   daysOfWeek.find(item => item.value === day)?.label ?? "Dia não informado";
 
+const dayOfWeekByIndex = [
+  "SUNDAY",
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+] as const;
+
+const timeToMinutes = (time: string) => {
+  const [hours, minutes] = time.split(":").map(Number);
+
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    return null;
+  }
+
+  return hours * 60 + minutes;
+};
+
+const isTimeInsideSlot = (
+  currentDate: Date,
+  slot: { startTime: string; endTime: string },
+) => {
+  const startMinutes = timeToMinutes(slot.startTime);
+  const endMinutes = timeToMinutes(slot.endTime);
+
+  if (startMinutes === null || endMinutes === null) {
+    return false;
+  }
+
+  const currentMinutes = currentDate.getHours() * 60 + currentDate.getMinutes();
+
+  if (endMinutes <= startMinutes) {
+    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+  }
+
+  return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+};
+
 export default function MarketCompanyDetailScreen() {
   const { companyId } = useLocalSearchParams<{ companyId: string }>();
   const company = getMarketCompanyById(companyId ?? "");
   const [isBusinessHoursModalOpen, setIsBusinessHoursModalOpen] =
     useState(false);
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+
+  useEffect(() => {
+    const syncClock = () => setCurrentDate(new Date());
+
+    syncClock();
+    const intervalId = setInterval(syncClock, 60_000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const currentDayOfWeek = dayOfWeekByIndex[currentDate.getDay()];
+  const currentBusinessHour =
+    company?.businessHours?.find(item => item.dayOfWeek === currentDayOfWeek) ??
+    null;
+  const isOpenNow = Boolean(
+    currentBusinessHour?.is_open &&
+      currentBusinessHour.timeSlots.some(slot =>
+        isTimeInsideSlot(currentDate, slot),
+      ),
+  );
+  const currentTimeLabel = currentDate.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   if (!company) {
     return (
@@ -73,12 +138,6 @@ export default function MarketCompanyDetailScreen() {
       </>
     );
   }
-
-  const wednesdayHour = company.businessHours?.find(
-    item => item.dayOfWeek === "WEDNESDAY",
-  );
-  const defaultBusinessHour =
-    wednesdayHour ?? company.businessHours?.[0] ?? null;
 
   const address = company.address;
   const phone = company.phones?.[0] ?? "Telefone não informado";
@@ -182,26 +241,22 @@ export default function MarketCompanyDetailScreen() {
             <Pressable onPress={() => setIsBusinessHoursModalOpen(true)}>
               <Card className="gap-2 rounded-lg border-gray-200 p-2 shadow-none">
                 <View className="flex-row items-center justify-between gap-2">
-                  <View className="flex-row items-center gap-2">
+                  <View className="gap-0.5">
                     <Text className="text-md font-bold text-gray-700">
-                      {defaultBusinessHour
-                        ? getDayLabel(defaultBusinessHour.dayOfWeek)
-                        : "Horário"}
+                      {getDayLabel(currentDayOfWeek)}
                     </Text>
-                    <Badge
-                      variant={
-                        defaultBusinessHour?.is_open ? "default" : "destructive"
-                      }
-                    >
-                      <BadgeText>
-                        {defaultBusinessHour?.is_open ? "Aberto" : "Fechado"}
-                      </BadgeText>
-                    </Badge>
+                    <Text className="text-xs text-gray-500">
+                      Agora, {currentTimeLabel}
+                    </Text>
                   </View>
 
-                  <View className="items-end">
-                    {defaultBusinessHour?.timeSlots?.length ? (
-                      defaultBusinessHour.timeSlots.map(slot => (
+                  <View className="items-end gap-1">
+                    <Badge variant={isOpenNow ? "default" : "destructive"}>
+                      <BadgeText>{isOpenNow ? "Aberto" : "Fechado"}</BadgeText>
+                    </Badge>
+
+                    {currentBusinessHour?.timeSlots?.length ? (
+                      currentBusinessHour.timeSlots.map(slot => (
                         <Text
                           key={slot.id}
                           className="text-xs font-bold text-gray-700"
