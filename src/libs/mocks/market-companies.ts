@@ -1,3 +1,8 @@
+import type {
+  BusinessHour,
+  DayOfWeek,
+  TimeSlot,
+} from "@/libs/types/business-hour";
 import type { Company } from "@/libs/types/companies";
 import type { Service } from "@/libs/types/service";
 import type { Waste } from "@/libs/types/waste";
@@ -57,6 +62,48 @@ const serviceItems: Service[] = [
   },
 ];
 
+const weekOrder: DayOfWeek[] = [
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+  "SUNDAY",
+];
+
+const buildTimeSlot = (
+  companyKey: string,
+  day: DayOfWeek,
+  index: number,
+  startTime: string,
+  endTime: string,
+): TimeSlot => ({
+  id: `${companyKey}-${day}-slot-${index}`,
+  startTime,
+  endTime,
+});
+
+const buildBusinessHours = (
+  companyKey: string,
+  config: Partial<
+    Record<DayOfWeek, { is_open: boolean; slots: Array<[string, string]> }>
+  >,
+): BusinessHour[] => {
+  return weekOrder.map(day => {
+    const dayConfig = config[day] ?? { is_open: false, slots: [] };
+
+    return {
+      id: `${companyKey}-${day}`,
+      dayOfWeek: day,
+      is_open: dayConfig.is_open,
+      timeSlots: dayConfig.slots.map((slot, index) =>
+        buildTimeSlot(companyKey, day, index + 1, slot[0], slot[1]),
+      ),
+    };
+  });
+};
+
 export const marketCompaniesMock: Company[] = [
   {
     id: "grupo-alemao",
@@ -84,17 +131,51 @@ export const marketCompaniesMock: Company[] = [
       longitude: -54.65,
     },
     startedActivityIn: new Date("2016-02-09"),
-    businessHours: [
-      {
-        id: "bh-grupo-quarta",
-        dayOfWeek: "WEDNESDAY",
+    businessHours: buildBusinessHours("grupo-alemao", {
+      MONDAY: {
         is_open: true,
-        timeSlots: [
-          { id: "bh-grupo-q1", startTime: "07:00", endTime: "11:00" },
-          { id: "bh-grupo-q2", startTime: "13:00", endTime: "17:00" },
+        slots: [
+          ["07:00", "11:00"],
+          ["13:00", "17:00"],
         ],
       },
-    ],
+      TUESDAY: {
+        is_open: true,
+        slots: [
+          ["07:00", "11:00"],
+          ["13:00", "17:00"],
+        ],
+      },
+      WEDNESDAY: {
+        is_open: true,
+        slots: [
+          ["07:00", "11:00"],
+          ["13:00", "17:00"],
+        ],
+      },
+      THURSDAY: {
+        is_open: true,
+        slots: [
+          ["07:00", "11:00"],
+          ["13:00", "17:00"],
+        ],
+      },
+      FRIDAY: {
+        is_open: true,
+        slots: [
+          ["07:00", "11:00"],
+          ["13:00", "17:00"],
+        ],
+      },
+      SATURDAY: {
+        is_open: true,
+        slots: [["08:00", "12:00"]],
+      },
+      SUNDAY: {
+        is_open: false,
+        slots: [],
+      },
+    }),
     waste: wasteItems,
     services: serviceItems,
   },
@@ -124,16 +205,36 @@ export const marketCompaniesMock: Company[] = [
       longitude: -54.62,
     },
     startedActivityIn: new Date("2018-05-18"),
-    businessHours: [
-      {
-        id: "bh-dinao-quarta",
-        dayOfWeek: "WEDNESDAY",
+    businessHours: buildBusinessHours("sucatao-do-dinao", {
+      MONDAY: {
         is_open: true,
-        timeSlots: [
-          { id: "bh-dinao-q1", startTime: "08:00", endTime: "18:00" },
-        ],
+        slots: [["08:00", "18:00"]],
       },
-    ],
+      TUESDAY: {
+        is_open: true,
+        slots: [["08:00", "18:00"]],
+      },
+      WEDNESDAY: {
+        is_open: true,
+        slots: [["08:00", "18:00"]],
+      },
+      THURSDAY: {
+        is_open: true,
+        slots: [["08:00", "18:00"]],
+      },
+      FRIDAY: {
+        is_open: true,
+        slots: [["08:00", "17:30"]],
+      },
+      SATURDAY: {
+        is_open: true,
+        slots: [["08:00", "12:00"]],
+      },
+      SUNDAY: {
+        is_open: false,
+        slots: [],
+      },
+    }),
     waste: wasteItems,
     services: serviceItems,
   },
@@ -163,17 +264,39 @@ export const marketCompaniesMock: Company[] = [
       longitude: -54.64,
     },
     startedActivityIn: new Date("2021-03-10"),
-    businessHours: [
-      {
-        id: "bh-henrique-quarta",
-        dayOfWeek: "WEDNESDAY",
+    businessHours: buildBusinessHours("henrique-flores", {
+      MONDAY: {
         is_open: true,
-        timeSlots: [
-          { id: "bh-henrique-q1", startTime: "07:00", endTime: "11:00" },
-          { id: "bh-henrique-q2", startTime: "13:00", endTime: "17:00" },
+        slots: [["07:00", "17:00"]],
+      },
+      TUESDAY: {
+        is_open: true,
+        slots: [["07:00", "17:00"]],
+      },
+      WEDNESDAY: {
+        is_open: true,
+        slots: [
+          ["07:00", "11:00"],
+          ["13:00", "17:00"],
         ],
       },
-    ],
+      THURSDAY: {
+        is_open: true,
+        slots: [["07:00", "17:00"]],
+      },
+      FRIDAY: {
+        is_open: true,
+        slots: [["07:00", "17:00"]],
+      },
+      SATURDAY: {
+        is_open: true,
+        slots: [["08:00", "11:00"]],
+      },
+      SUNDAY: {
+        is_open: false,
+        slots: [],
+      },
+    }),
     waste: wasteItems,
     services: serviceItems,
   },

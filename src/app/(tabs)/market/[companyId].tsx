@@ -6,7 +6,9 @@ import {
   Recycle,
   TriangleAlert,
 } from "lucide-react-native";
+import { useState } from "react";
 import { Linking, Pressable, ScrollView, View } from "react-native";
+import { BusinessHoursModal } from "@/components/market/business-hours-modal";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -48,6 +50,8 @@ const getDayLabel = (day: string) =>
 export default function MarketCompanyDetailScreen() {
   const { companyId } = useLocalSearchParams<{ companyId: string }>();
   const company = getMarketCompanyById(companyId ?? "");
+  const [isBusinessHoursModalOpen, setIsBusinessHoursModalOpen] =
+    useState(false);
 
   if (!company) {
     return (
@@ -69,7 +73,11 @@ export default function MarketCompanyDetailScreen() {
     );
   }
 
-  const defaultBusinessHour = company.businessHours?.[0] ?? null;
+  const wednesdayHour = company.businessHours?.find(
+    item => item.dayOfWeek === "WEDNESDAY",
+  );
+  const defaultBusinessHour =
+    wednesdayHour ?? company.businessHours?.[0] ?? null;
   const address = company.address;
   const phone = company.phones?.[0] ?? "Telefone não informado";
 
@@ -169,33 +177,41 @@ export default function MarketCompanyDetailScreen() {
               para mais detalhes.
             </Text>
 
-            <Card className="gap-2 rounded-lg border-gray-200 p-2 shadow-none">
-              <View className="flex-row items-center justify-between gap-2">
-                <View className="flex-row items-center gap-2">
-                  <Text className="text-md font-bold text-gray-700">
-                    {defaultBusinessHour
-                      ? getDayLabel(defaultBusinessHour.dayOfWeek)
-                      : "Horário"}
-                  </Text>
-                  <View className="rounded-md bg-primary px-2 py-0.5">
-                    <Text className="text-xs text-white">
-                      {defaultBusinessHour?.is_open ? "Aberto" : "Fechado"}
+            <Pressable onPress={() => setIsBusinessHoursModalOpen(true)}>
+              <Card className="gap-2 rounded-lg border-gray-200 p-2 shadow-none">
+                <View className="flex-row items-center justify-between gap-2">
+                  <View className="flex-row items-center gap-2">
+                    <Text className="text-md font-bold text-gray-700">
+                      {defaultBusinessHour
+                        ? getDayLabel(defaultBusinessHour.dayOfWeek)
+                        : "Horário"}
                     </Text>
+                    <View className="rounded-md bg-primary px-2 py-0.5">
+                      <Text className="text-xs text-white">
+                        {defaultBusinessHour?.is_open ? "Aberto" : "Fechado"}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="items-end">
+                    {defaultBusinessHour?.timeSlots?.length ? (
+                      defaultBusinessHour.timeSlots.map(slot => (
+                        <Text
+                          key={slot.id}
+                          className="text-xs font-bold text-gray-700"
+                        >
+                          {slot.startTime} - {slot.endTime}
+                        </Text>
+                      ))
+                    ) : (
+                      <Text className="text-xs font-bold text-gray-700">
+                        Fechado
+                      </Text>
+                    )}
                   </View>
                 </View>
-
-                <View className="items-end">
-                  {defaultBusinessHour?.timeSlots?.map(slot => (
-                    <Text
-                      key={slot.id}
-                      className="text-xs font-bold text-gray-700"
-                    >
-                      {slot.startTime} - {slot.endTime}
-                    </Text>
-                  ))}
-                </View>
-              </View>
-            </Card>
+              </Card>
+            </Pressable>
           </View>
           <View className="gap-2">
             <Heading size="md" className="text-sm text-gray-950">
@@ -287,6 +303,12 @@ export default function MarketCompanyDetailScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <BusinessHoursModal
+        isOpen={isBusinessHoursModalOpen}
+        onClose={() => setIsBusinessHoursModalOpen(false)}
+        businessHours={company.businessHours}
+      />
     </>
   );
 }
