@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "expo-router";
 import { ArrowRight, Search, Sprout } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -19,6 +20,7 @@ import {
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { marketCompaniesMock } from "@/libs/mocks/market-companies";
 
 const searchSchema = z.object({
   query: z
@@ -28,36 +30,6 @@ const searchSchema = z.object({
 });
 
 type SearchFormValues = z.infer<typeof searchSchema>;
-
-const mockMarketItems = [
-  {
-    id: "grupo-alemao",
-    name: "Grupo Alemão",
-    description: "Alumínio, ferro, cobre, aerossol, panelas de ferro, panela",
-    badge: null as string | null,
-    initials: "GA",
-    avatarClassName: "bg-slate-950",
-    textClassName: "text-white",
-  },
-  {
-    id: "sucatao-do-dinao",
-    name: "Sucatão do Dinão",
-    description: "Alumínio, ferro, cobre, aerossol, panelas de ferro, panela",
-    badge: null as string | null,
-    initials: "SD",
-    avatarClassName: "bg-blue-600",
-    textClassName: "text-white",
-  },
-  {
-    id: "henrique-flores",
-    name: "Henrique Flores",
-    description: "Alumínio, ferro, cobre, aerossol, panelas de ferro, panela",
-    badge: "Coletor independente",
-    initials: null as string | null,
-    avatarClassName: "bg-gray-200",
-    textClassName: "text-gray-950",
-  },
-];
 
 export default function MarketScreen() {
   const [appliedQuery, setAppliedQuery] = useState("");
@@ -77,12 +49,16 @@ export default function MarketScreen() {
     const normalizedQuery = appliedQuery.trim().toLowerCase();
 
     if (!normalizedQuery) {
-      return mockMarketItems;
+      return marketCompaniesMock;
     }
 
-    return mockMarketItems.filter(item => {
+    return marketCompaniesMock.filter(item => {
+      const wasteNames = item.waste?.map(waste => waste.name).join(" ") ?? "";
+      const serviceNames =
+        item.services?.map(service => service.name).join(" ") ?? "";
+
       const searchableText =
-        `${item.name} ${item.description} ${item.badge ?? ""}`.toLowerCase();
+        `${item.corporateName} ${item.businessName ?? ""} ${wasteNames} ${serviceNames}`.toLowerCase();
 
       return searchableText.includes(normalizedQuery);
     });
@@ -164,47 +140,64 @@ export default function MarketScreen() {
 
             <View className="gap-3">
               {visibleItems.map(item => (
-                <Pressable key={item.id}>
-                  <Card size="sm" className="border-0 bg-gray-100 shadow-none">
-                    <View className="flex-row items-center gap-3">
-                      <View
-                        className={`h-8 w-8 items-center justify-center overflow-hidden rounded-[5px] ${item.avatarClassName}`}
-                      >
-                        {item.initials ? (
-                          <Text
-                            className={`text-[10px] font-semibold ${item.textClassName}`}
-                          >
-                            {item.initials}
-                          </Text>
-                        ) : (
-                          <Sprout size={16} color="#111827" />
-                        )}
-                      </View>
-
-                      <View className="min-w-0 flex-1 gap-1">
-                        <View className="flex-row items-center gap-2">
-                          <Text className="flex-1 text-sm font-semibold text-gray-950">
-                            {item.name}
-                          </Text>
-
-                          {item.badge ? (
-                            <View className="rounded-[5px] bg-primary px-3 py-1">
-                              <Text className="text-[8px] text-white">
-                                {item.badge}
-                              </Text>
-                            </View>
-                          ) : null}
+                <Link
+                  key={item.id}
+                  href={{
+                    pathname: "/market/[companyId]",
+                    params: { companyId: item.id },
+                  }}
+                  asChild
+                >
+                  <Pressable>
+                    <Card
+                      size="sm"
+                      className="border-0 bg-gray-100 shadow-none"
+                    >
+                      <View className="flex-row items-center gap-3">
+                        <View
+                          className={`h-8 w-8 items-center justify-center overflow-hidden rounded-[5px] ${item.companyType === "COLLECTOR" ? "bg-gray-200" : item.id === "sucatao-do-dinao" ? "bg-blue-600" : "bg-slate-950"}`}
+                        >
+                          {item.companyType === "COLLECTOR" ? (
+                            <Sprout size={16} color="#111827" />
+                          ) : (
+                            <Text className="text-[10px] font-semibold text-white">
+                              {item.corporateName
+                                .split(" ")
+                                .slice(0, 2)
+                                .map(word => word[0]?.toUpperCase() ?? "")
+                                .join("")}
+                            </Text>
+                          )}
                         </View>
 
-                        <Text className="text-xs leading-4 text-gray-500">
-                          {item.description}
-                        </Text>
-                      </View>
+                        <View className="min-w-0 flex-1 gap-1">
+                          <View className="flex-row items-center gap-2">
+                            <Text className="flex-1 text-sm font-semibold text-gray-950">
+                              {item.corporateName}
+                            </Text>
 
-                      <ArrowRight size={16} color="#111827" />
-                    </View>
-                  </Card>
-                </Pressable>
+                            {item.companyType === "COLLECTOR" ? (
+                              <View className="rounded-[5px] bg-primary px-3 py-1">
+                                <Text className="text-[8px] text-white">
+                                  Coletor independente
+                                </Text>
+                              </View>
+                            ) : null}
+                          </View>
+
+                          <Text className="text-xs leading-4 text-gray-500">
+                            {item.waste
+                              ?.map(waste => waste.name)
+                              .slice(0, 6)
+                              .join(", ")}
+                          </Text>
+                        </View>
+
+                        <ArrowRight size={16} color="#111827" />
+                      </View>
+                    </Card>
+                  </Pressable>
+                </Link>
               ))}
 
               {visibleItems.length === 0 ? (
