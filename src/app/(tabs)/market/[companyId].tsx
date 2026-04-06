@@ -1,6 +1,5 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import {
-  ChevronDown,
   CornerUpRight,
   Hammer,
   MessageCircle,
@@ -86,7 +85,7 @@ export default function MarketCompanyDetailScreen() {
         contentInsetAdjustmentBehavior="automatic"
       >
         <View className="gap-4">
-          <View className="flex-row gap-3">
+          <View className="flex-row gap-2 items-center">
             <View className="h-16 w-16 items-center justify-center rounded-[5px] bg-slate-950">
               <Text className="text-sm font-semibold text-white">
                 {company.corporateName
@@ -116,15 +115,15 @@ export default function MarketCompanyDetailScreen() {
             </Heading>
 
             <View className="gap-2">
-              <View className="flex-row items-center gap-2">
-                <Text className="flex-1 text-xs leading-4 text-gray-700">
+              <Card className="flex-row items-center gap-2 shadow-none">
+                <Text className="flex-1 text-md">
                   {address
                     ? `${address.street}, ${address.number} - ${address.district}, ${address.city} - ${address.stateAcronym}, ${address.zipCode}`
                     : "Endereço não informado"}
                 </Text>
 
                 <Pressable
-                  className="h-5.5 w-5.5 items-center justify-center rounded-[5px] bg-gray-100"
+                  className="size-10 items-center justify-center rounded-[5px] bg-gray-100"
                   onPress={() => {
                     if (!address) {
                       return;
@@ -140,12 +139,12 @@ export default function MarketCompanyDetailScreen() {
                 >
                   <CornerUpRight size={12} color="#111827" />
                 </Pressable>
-              </View>
+              </Card>
 
-              <View className="flex-row items-center gap-2">
-                <Text className="flex-1 text-xs text-gray-700">{phone}</Text>
+              <Card className="flex-row items-center gap-2 shadow-none">
+                <Text className="flex-1 text-md">{phone}</Text>
                 <Pressable
-                  className="h-5.5 w-5.5 items-center justify-center rounded-[5px] bg-gray-100"
+                  className="size-10 items-center justify-center rounded-[5px] bg-gray-100"
                   onPress={() => {
                     if (phone === "Telefone não informado") {
                       return;
@@ -157,42 +156,47 @@ export default function MarketCompanyDetailScreen() {
                 >
                   <MessageCircle size={12} color="#111827" />
                 </Pressable>
-              </View>
+              </Card>
             </View>
           </View>
 
-          <Card className="gap-2 rounded-lg border-gray-200 p-2 shadow-none">
-            <View className="flex-row items-start justify-between gap-2">
-              <View className="flex-row items-center gap-2">
-                <Text className="text-xs font-bold text-gray-700">
-                  {defaultBusinessHour
-                    ? getDayLabel(defaultBusinessHour.dayOfWeek)
-                    : "Horário"}
-                </Text>
-                <View className="rounded-md bg-primary px-2 py-0.5">
-                  <Text className="text-xs text-white">
-                    {defaultBusinessHour?.is_open ? "Aberto" : "Fechado"}
+          <View className="gap-2">
+            <Heading size="md" className="text-sm text-gray-950">
+              Horário de funcionamento
+            </Heading>
+            <Text className="text-sm text-gray-700">
+              O horário de funcionamento pode variar, clique sobre o horário
+              para mais detalhes.
+            </Text>
+
+            <Card className="gap-2 rounded-lg border-gray-200 p-2 shadow-none">
+              <View className="flex-row items-center justify-between gap-2">
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-md font-bold text-gray-700">
+                    {defaultBusinessHour
+                      ? getDayLabel(defaultBusinessHour.dayOfWeek)
+                      : "Horário"}
                   </Text>
+                  <View className="rounded-md bg-primary px-2 py-0.5">
+                    <Text className="text-xs text-white">
+                      {defaultBusinessHour?.is_open ? "Aberto" : "Fechado"}
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="items-end">
+                  {defaultBusinessHour?.timeSlots?.map(slot => (
+                    <Text
+                      key={slot.id}
+                      className="text-xs font-bold text-gray-700"
+                    >
+                      {slot.startTime} - {slot.endTime}
+                    </Text>
+                  ))}
                 </View>
               </View>
-
-              <View className="items-end">
-                {defaultBusinessHour?.timeSlots?.map(slot => (
-                  <Text
-                    key={slot.id}
-                    className="text-xs font-bold text-gray-700"
-                  >
-                    {slot.startTime} - {slot.endTime}
-                  </Text>
-                ))}
-              </View>
-            </View>
-
-            <Pressable className="h-6 items-center justify-center rounded-[5px] bg-gray-100">
-              <ChevronDown size={16} color="#6B7280" />
-            </Pressable>
-          </Card>
-
+            </Card>
+          </View>
           <View className="gap-2">
             <Heading size="md" className="text-sm text-gray-950">
               Produtos
