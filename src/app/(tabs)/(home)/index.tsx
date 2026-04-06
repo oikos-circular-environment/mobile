@@ -58,7 +58,7 @@ export default function HomeScreen() {
           </View>
         </Card>
         <View className="flex flex-col gap-4">
-          <Heading>Mercado</Heading>
+          <Heading>Pontos de coleta</Heading>
           {marketCompanies.map(company => (
             <Card
               key={company.id}
