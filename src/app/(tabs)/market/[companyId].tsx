@@ -217,26 +217,26 @@ export default function MarketCompanyDetailScreen() {
               {company.waste?.map(waste => (
                 <Card
                   key={waste.id}
-                  className="flex-row items-center gap-2 border-0 bg-gray-100 p-2 shadow-none"
+                  className="flex-row items-center gap-2 shadow-none"
                 >
-                  <View className="h-10 w-10 items-center justify-center rounded-[5px] bg-gray-50">
+                  <View className="h-10 w-10 items-center justify-center ">
                     <Recycle size={22} color="#111827" />
                   </View>
 
                   <View className="min-w-0 flex-1">
-                    <Text className="text-sm font-semibold text-gray-900">
+                    <Text className="text-md font-semibold text-gray-900">
                       {waste.name}
                     </Text>
-                    <Text className="text-xs text-gray-700">
+                    <Text className="text-sm text-gray-700">
                       {waste.description}
                     </Text>
                   </View>
 
                   <View className="flex-row items-end gap-0.5">
-                    <Text className="text-xs font-bold text-gray-900">
+                    <Text className="text-md font-bold text-gray-900">
                       {formatCurrency(waste.price)}
                     </Text>
-                    <Text className="text-[10px] text-gray-400">
+                    <Text className="text-xs text-gray-400">
                       {measurementSymbol[waste.unit]}
                     </Text>
                   </View>
@@ -254,26 +254,26 @@ export default function MarketCompanyDetailScreen() {
               {company.services?.map(service => (
                 <Card
                   key={service.id}
-                  className="flex-row items-center gap-2 border-0 bg-gray-100 p-2 shadow-none"
+                  className="flex-row items-center gap-2 shadow-none"
                 >
-                  <View className="h-10 w-10 items-center justify-center rounded-[5px] bg-gray-50">
+                  <View className="size-10 items-center justify-center">
                     <Hammer size={22} color="#111827" />
                   </View>
 
                   <View className="min-w-0 flex-1">
-                    <Text className="text-sm font-semibold text-gray-900">
+                    <Text className="text-md font-semibold text-gray-900">
                       {service.name}
                     </Text>
-                    <Text className="text-xs text-gray-700">
+                    <Text className="text-sm text-gray-700">
                       {service.description}
                     </Text>
                   </View>
 
                   <View className="flex-row items-end gap-0.5">
-                    <Text className="text-xs font-bold text-gray-900">
+                    <Text className="text-md font-bold text-gray-900">
                       {formatCurrency(service.price)}
                     </Text>
-                    <Text className="text-[10px] text-gray-400">
+                    <Text className="text-xs text-gray-400">
                       {measurementSymbol[service.unit]}
                     </Text>
                   </View>
