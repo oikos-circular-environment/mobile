@@ -1,5 +1,7 @@
-import { CircleX } from "lucide-react-native";
+import { XIcon } from "lucide-react-native";
 import { View } from "react-native";
+import { Badge, BadgeText } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import {
   Modal,
@@ -32,46 +34,41 @@ export function BusinessHoursModal({
       <ModalContent className="gap-3">
         <ModalHeader>
           <Heading size="md" className="text-base text-gray-950">
-            Horários cadastrados
+            Horários de funcionamento
           </Heading>
 
           <ModalCloseButton onPress={onClose}>
-            <CircleX size={16} color="#374151" />
+            <XIcon size={16} />
           </ModalCloseButton>
         </ModalHeader>
 
-        <ModalBody className="gap-2">
-          {businessHours?.map(day => (
-            <View
-              key={day.id}
-              className="rounded-md border border-gray-200 bg-gray-50 p-2"
-            >
-              <View className="flex-row items-center justify-between">
-                <Text className="text-sm font-semibold text-gray-900">
-                  {getDayLabel(day.dayOfWeek)}
-                </Text>
-                <Text
-                  className={`text-xs font-semibold ${day.is_open ? "text-primary" : "text-red-500"}`}
-                >
-                  {day.is_open ? "Aberto" : "Fechado"}
-                </Text>
-              </View>
-
-              {day.timeSlots.length ? (
-                <View className="mt-1 gap-0.5">
-                  {day.timeSlots.map(slot => (
-                    <Text key={slot.id} className="text-xs text-gray-700">
-                      {slot.startTime} - {slot.endTime}
-                    </Text>
-                  ))}
+        <ModalBody>
+          <View className="flex flex-col gap-2">
+            {businessHours?.map(day => (
+              <Card key={day.id} className="shadow-none">
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-sm font-semibold text-gray-900">
+                    {getDayLabel(day.dayOfWeek)}
+                  </Text>
+                  <View>
+                    {day.timeSlots.length ? (
+                      <View className="mt-1 gap-0.5">
+                        {day.timeSlots.map(slot => (
+                          <Text key={slot.id} className="text-xs text-gray-700">
+                            {slot.startTime} - {slot.endTime}
+                          </Text>
+                        ))}
+                      </View>
+                    ) : (
+                      <Badge variant="destructive">
+                        <BadgeText>Fechado</BadgeText>
+                      </Badge>
+                    )}
+                  </View>
                 </View>
-              ) : (
-                <Text className="mt-1 text-xs text-gray-500">
-                  Sem atendimento neste dia.
-                </Text>
-              )}
-            </View>
-          ))}
+              </Card>
+            ))}
+          </View>
         </ModalBody>
       </ModalContent>
     </Modal>

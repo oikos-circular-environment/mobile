@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { Linking, Pressable, ScrollView, View } from "react-native";
 import { BusinessHoursModal } from "@/components/market/business-hours-modal";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -78,6 +79,7 @@ export default function MarketCompanyDetailScreen() {
   );
   const defaultBusinessHour =
     wednesdayHour ?? company.businessHours?.[0] ?? null;
+
   const address = company.address;
   const phone = company.phones?.[0] ?? "Telefone não informado";
 
@@ -186,11 +188,15 @@ export default function MarketCompanyDetailScreen() {
                         ? getDayLabel(defaultBusinessHour.dayOfWeek)
                         : "Horário"}
                     </Text>
-                    <View className="rounded-md bg-primary px-2 py-0.5">
-                      <Text className="text-xs text-white">
+                    <Badge
+                      variant={
+                        defaultBusinessHour?.is_open ? "default" : "destructive"
+                      }
+                    >
+                      <BadgeText>
                         {defaultBusinessHour?.is_open ? "Aberto" : "Fechado"}
-                      </Text>
-                    </View>
+                      </BadgeText>
+                    </Badge>
                   </View>
 
                   <View className="items-end">
