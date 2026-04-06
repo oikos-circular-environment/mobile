@@ -2,7 +2,7 @@ import { Link } from "expo-router";
 import {
   ArrowRightIcon,
   BellIcon,
-  CoinsIcon,
+  RecycleIcon,
   SettingsIcon,
 } from "lucide-react-native";
 import { Image, Pressable, ScrollView, View } from "react-native";
@@ -66,7 +66,7 @@ export default function HomeScreen() {
             >
               <View className="flex flex-row flex-1 gap-4 justify-between">
                 <Card className="size-12 rounded-md bg-gray-50 flex items-center justify-center">
-                  <CoinsIcon />
+                  <RecycleIcon />
                 </Card>
 
                 <View className="flex flex-col flex-1">
@@ -85,7 +85,7 @@ export default function HomeScreen() {
           ))}
         </View>
 
-        <View className="flex flex-col gap-4">
+        {/* <View className="flex flex-col gap-4">
           <Heading>Aprender</Heading>
           <Card className="flex flex-col gap-2 shadow-none size-60">
             <Image
@@ -100,7 +100,7 @@ export default function HomeScreen() {
               </Text>
             </View>
           </Card>
-        </View>
+        </View> */}
       </View>
     </ScrollView>
   );
