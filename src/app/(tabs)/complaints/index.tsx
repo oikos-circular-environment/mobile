@@ -3,12 +3,17 @@
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import * as Location from "expo-location";
-import { decimalToSexagesimal } from "geolib";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import {
+  formatHeading,
+  formatMeters,
+  formatSexagesimalCoordinate,
+  formatSpeed,
+} from "@/libs/geospatial";
 
 export default function ComplaintsScreen() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -152,45 +157,6 @@ export default function ComplaintsScreen() {
     [currentDate],
   );
 
-  const formatHeading = (value: number | null | undefined) => {
-    if (value == null || Number.isNaN(value) || value < 0) {
-      return "indisponivel";
-    }
-
-    return `${value.toFixed(1)} graus`;
-  };
-
-  const formatSpeed = (value: number | null | undefined) => {
-    if (value == null || Number.isNaN(value) || value < 0) {
-      return "indisponivel";
-    }
-
-    return `${value.toFixed(2)} m/s (${(value * 3.6).toFixed(1)} km/h)`;
-  };
-
-  const formatMeters = (value: number | null | undefined) => {
-    if (value == null || Number.isNaN(value) || value < 0) {
-      return "indisponivel";
-    }
-
-    return `${value.toFixed(1)} metros`;
-  };
-
-  const formatSexagesimalCoordinate = (
-    value: number | null | undefined,
-    axis: "latitude" | "longitude",
-  ) => {
-    if (value == null || Number.isNaN(value)) {
-      return "indisponivel";
-    }
-
-    const hemisphere =
-      axis === "latitude" ? (value < 0 ? "S" : "N") : value < 0 ? "W" : "E";
-
-    const sexagesimalValue = decimalToSexagesimal(Math.abs(value));
-    return `${sexagesimalValue} ${hemisphere}`;
-  };
-
   return (
     <KeyboardAvoidingView
       behavior={process.env.EXPO_OS === "ios" ? "padding" : "height"}
@@ -219,8 +185,16 @@ export default function ComplaintsScreen() {
             <View className="mt-2 flex-col gap-4">
               <View>
                 <Text>Precisão da bússola: {heading?.accuracy}</Text>
-                <Text>Direção magnética: {heading?.magHeading}</Text>
-                <Text>Direção verdadeira: {heading?.trueHeading}</Text>
+                <Text>
+                  Direção magnética: {formatHeading(heading?.magHeading, {
+                    includeCompass: true,
+                  })}
+                </Text>
+                <Text>
+                  Direção verdadeira: {formatHeading(heading?.trueHeading, {
+                    includeCompass: true,
+                  })}
+                </Text>
               </View>
 
               <View>
