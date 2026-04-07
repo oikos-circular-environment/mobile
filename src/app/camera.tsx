@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  type CameraType,
   CameraView,
   useCameraPermissions,
   useMicrophonePermissions,
@@ -22,7 +21,6 @@ type MemoryCapture = {
 
 export default function CameraScreen() {
   const cameraRef = useRef<CameraView | null>(null);
-  const [facing, setFacing] = useState<CameraType>("back");
   const [mode, setMode] = useState<CaptureMode>("photo");
   const [isRecording, setIsRecording] = useState(false);
   const [captures, setCaptures] = useState<MemoryCapture[]>([]);
@@ -115,7 +113,6 @@ export default function CameraScreen() {
       <CameraView
         ref={cameraRef}
         style={{ flex: 1 }}
-        facing={facing}
         mode={mode === "photo" ? "picture" : "video"}
       />
 
@@ -128,7 +125,7 @@ export default function CameraScreen() {
         </TouchableOpacity>
       </View>
 
-      <View className="absolute bottom-44 left-0 right-0 px-4">
+      <View className="absolute bottom-46 left-0 right-0 px-4">
         <View className="flex-row rounded-2xl bg-white/90 p-1">
           <TouchableOpacity
             className={`flex-1 items-center rounded-xl py-3 ${
@@ -197,12 +194,12 @@ export default function CameraScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className={`h-28 w-28 items-center justify-center rounded-full border-4 border-white ${
-              mode === "video" && isRecording ? "bg-red-600" : "bg-[#0b1a3a]/85"
+            className={`size-22 items-center justify-center rounded-full border-4 border-white ${
+              mode === "video" && isRecording ? "bg-red-600" : "bg-white"
             }`}
             onPress={handleCapture}
           >
-            <View className="h-24 w-24 rounded-full border-2 border-white/90" />
+            <View className="h-24 w-24 rounded-full border-2 border-white/50" />
           </TouchableOpacity>
 
           <TouchableOpacity
