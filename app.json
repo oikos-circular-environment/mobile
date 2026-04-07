@@ -45,7 +45,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Permitir $(PRODUCT_NAME) usar sua localização?"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,
