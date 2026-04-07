@@ -16,13 +16,13 @@ export function formatHeading(
   }
 
   if (!options?.includeCompass) {
-    return `${value.toFixed(1)} graus`;
+    return `${value.toFixed(1)}º`;
   }
 
   const compass = headingToCompass(value);
   if (compass == null) {
-    return `${value.toFixed(1)} graus`;
+    return `${value.toFixed(1)}º`;
   }
 
-  return `${value.toFixed(1)} graus (${compass.abbreviation} - ${compass.labelPtBr})`;
+  return `${value.toFixed(1)}º (${compass.abbreviation} - ${compass.labelPtBr})`;
 }

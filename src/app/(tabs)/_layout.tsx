@@ -4,7 +4,7 @@ export const unstable_settings = {
   initialRouteName: "(home)",
 };
 
-export default function TabLayout() {
+export default function TabsNavigator() {
   return (
     <NativeTabs tintColor="#3d6300">
       <NativeTabs.Trigger name="market">
@@ -30,12 +30,12 @@ export default function TabLayout() {
       {/* <NativeTabs.Trigger name="donations">
         <Icon sf={{ default: "globe", selected: "globe" }} />
         <Label>Doações</Label>
-      </NativeTabs.Trigger> */}
+        </NativeTabs.Trigger> */}
 
       {/* <NativeTabs.Trigger name="learn">
         <Icon sf={{ default: "book", selected: "book.fill" }} />
         <Label>Aprender</Label>
-      </NativeTabs.Trigger> */}
+        </NativeTabs.Trigger> */}
     </NativeTabs>
   );
 }
