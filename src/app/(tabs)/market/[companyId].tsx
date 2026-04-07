@@ -183,48 +183,50 @@ export default function MarketCompanyDetailScreen() {
             </Heading>
 
             <View className="gap-2">
-              <Card className="flex-row items-center gap-2 shadow-none">
-                <Text className="flex-1 text-md">
-                  {address
-                    ? `${address.street}, ${address.number} - ${address.district}, ${address.city} - ${address.stateAcronym}, ${address.zipCode}`
-                    : "Endereço não informado"}
-                </Text>
+              <Pressable
+                onPress={() => {
+                  if (!address) {
+                    return;
+                  }
 
-                <Pressable
-                  className="size-10 items-center justify-center rounded-[5px] bg-gray-100"
-                  onPress={() => {
-                    if (!address) {
-                      return;
-                    }
+                  const query = encodeURIComponent(
+                    `${address.street}, ${address.number}, ${address.city}`,
+                  );
+                  Linking.openURL(
+                    `https://www.google.com/maps/search/?api=1&query=${query}`,
+                  );
+                }}
+              >
+                <Card className="flex-row items-center gap-2 shadow-none">
+                  <Text className="flex-1 text-md">
+                    {address
+                      ? `${address.street}, ${address.number} - ${address.district}, ${address.city} - ${address.stateAcronym}, ${address.zipCode}`
+                      : "Endereço não informado"}
+                  </Text>
 
-                    const query = encodeURIComponent(
-                      `${address.street}, ${address.number}, ${address.city}`,
-                    );
-                    Linking.openURL(
-                      `https://www.google.com/maps/search/?api=1&query=${query}`,
-                    );
-                  }}
-                >
-                  <CornerUpRight size={12} color="#111827" />
-                </Pressable>
-              </Card>
+                  <View className="size-10 items-center justify-center rounded-[5px] bg-gray-100">
+                    <CornerUpRight size={12} color="#111827" />
+                  </View>
+                </Card>
+              </Pressable>
 
-              <Card className="flex-row items-center gap-2 shadow-none">
-                <Text className="flex-1 text-md">{phone}</Text>
-                <Pressable
-                  className="size-10 items-center justify-center rounded-[5px] bg-gray-100"
-                  onPress={() => {
-                    if (phone === "Telefone não informado") {
-                      return;
-                    }
+              <Pressable
+                onPress={() => {
+                  if (phone === "Telefone não informado") {
+                    return;
+                  }
 
-                    const onlyDigits = phone.replace(/\D/g, "");
-                    Linking.openURL(`https://wa.me/55${onlyDigits}`);
-                  }}
-                >
-                  <MessageCircle size={12} color="#111827" />
-                </Pressable>
-              </Card>
+                  const onlyDigits = phone.replace(/\D/g, "");
+                  Linking.openURL(`https://wa.me/55${onlyDigits}`);
+                }}
+              >
+                <Card className="flex-row items-center gap-2 shadow-none">
+                  <Text className="flex-1 text-md">{phone}</Text>
+                  <View className="size-10 items-center justify-center rounded-[5px] bg-gray-100">
+                    <MessageCircle size={12} color="#111827" />
+                  </View>
+                </Card>
+              </Pressable>
             </View>
           </View>
 
