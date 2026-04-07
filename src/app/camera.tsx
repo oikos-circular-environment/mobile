@@ -1,5 +1,7 @@
 "use client";
 
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale/pt-BR";
 import {
   CameraView,
   useCameraPermissions,
@@ -8,8 +10,16 @@ import {
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
-import { useRef, useState } from "react";
-import { Button, Text, TouchableOpacity, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { Button, TouchableOpacity, View } from "react-native";
+import { Heading } from "@/components/ui/heading";
+import { Text } from "@/components/ui/text";
+import { useGeospatial } from "@/contexts/geospatial-context";
+import {
+  formatHeading,
+  formatMeters,
+  formatSexagesimalCoordinate,
+} from "@/libs/geospatial";
 
 type CaptureMode = "photo" | "video";
 
@@ -30,6 +40,8 @@ export default function CameraScreen() {
     useMicrophonePermissions();
   const latestCapture = captures[0] ?? null;
   const previousCapture = captures[1] ?? null;
+
+  const { addresses, currentDate, location, heading } = useGeospatial();
 
   function saveInMemory(uri: string, type: CaptureMode) {
     setCaptures(current => [
@@ -87,6 +99,28 @@ export default function CameraScreen() {
     }
   }
 
+  const date = useMemo(
+    () => format(currentDate, "dd/MM/yyyy", { locale: ptBR }),
+    [currentDate],
+  );
+  const time = useMemo(
+    () => format(currentDate, "HH:mm:ss", { locale: ptBR }),
+    [currentDate],
+  );
+  const dayOfWeek = useMemo(
+    () => format(currentDate, "EEEE", { locale: ptBR }),
+    [currentDate],
+  );
+
+  const addressFormatted = useMemo(() => {
+    if (addresses.length === 0) {
+      return null;
+    }
+
+    const address = addresses[0];
+    return `${address.street}, ${address.streetNumber}, ${address.district}, ${address.city}, ${address.region} - ${address.postalCode}`;
+  }, [addresses]);
+
   if (!cameraPermission) {
     return <View className="flex-1 bg-black" />;
   }
@@ -123,6 +157,50 @@ export default function CameraScreen() {
         >
           <Text className="text-white">Fechar</Text>
         </TouchableOpacity>
+      </View>
+
+      <View className="absolute bottom-70 left-0 right-0 px-4">
+        <View className="text-white font-semibold">
+          <Heading className="text-white font-semibold text-2xl">
+            {date}
+          </Heading>
+          <View className="flex flex-row gap-2">
+            <Text className="text-white font-semibold">{time}</Text>
+            <Text className="text-white font-semibold">{dayOfWeek}</Text>
+          </View>
+        </View>
+        <View>
+          <Text className="text-white font-semibold">
+            Bússola:{" "}
+            {formatHeading(heading?.magHeading, {
+              includeCompass: true,
+            })}
+          </Text>
+          <Text className="text-white font-semibold">
+            Latitude:{" "}
+            {location?.coords.latitude != null
+              ? formatSexagesimalCoordinate(
+                  location.coords.latitude,
+                  "latitude",
+                )
+              : "indisponivel"}
+          </Text>
+          <Text className="text-white font-semibold">
+            Longitude:{" "}
+            {location?.coords.longitude != null
+              ? formatSexagesimalCoordinate(
+                  location.coords.longitude,
+                  "longitude",
+                )
+              : "indisponivel"}
+          </Text>
+          <Text className="text-white font-semibold">
+            Altitude: {formatMeters(location?.coords.altitude)}
+          </Text>
+          <Text className="text-white font-semibold">
+            Endereço: {addressFormatted ?? "indisponivel"}
+          </Text>
+        </View>
       </View>
 
       <View className="absolute bottom-46 left-0 right-0 px-4">

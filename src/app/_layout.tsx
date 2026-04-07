@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { GeospatialProvider } from "@/contexts/geospatial-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import { UserProvider } from "@/contexts/user-context";
 import "react-native-reanimated";
@@ -14,25 +15,33 @@ export const unstable_settings = {
 export default function RootLayout() {
   return (
     <UserProvider>
-      <NotificationProvider>
-        <GluestackUIProvider mode="light">
-          <SafeAreaProvider>
-            <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="camera"
-                  options={{
-                    headerShown: false,
-                    presentation: "fullScreenModal",
-                  }}
-                />
-              </Stack>
-              <StatusBar style="dark" animated />
-            </SafeAreaView>
-          </SafeAreaProvider>
-        </GluestackUIProvider>
-      </NotificationProvider>
+      <GeospatialProvider>
+        <NotificationProvider>
+          <GluestackUIProvider mode="light">
+            <SafeAreaProvider>
+              <SafeAreaView
+                style={{ flex: 1 }}
+                edges={["top", "left", "right"]}
+              >
+                <Stack>
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="camera"
+                    options={{
+                      headerShown: false,
+                      presentation: "fullScreenModal",
+                    }}
+                  />
+                </Stack>
+                <StatusBar style="dark" animated />
+              </SafeAreaView>
+            </SafeAreaProvider>
+          </GluestackUIProvider>
+        </NotificationProvider>
+      </GeospatialProvider>
     </UserProvider>
   );
 }
