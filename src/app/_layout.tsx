@@ -20,6 +20,13 @@ export default function RootLayout() {
             <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
               <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="camera"
+                  options={{
+                    headerShown: false,
+                    presentation: "fullScreenModal",
+                  }}
+                />
               </Stack>
               <StatusBar style="dark" animated />
             </SafeAreaView>
