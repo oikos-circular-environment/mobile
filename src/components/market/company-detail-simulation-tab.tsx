@@ -152,15 +152,20 @@ export function CompanyDetailSimulationTab({
     setCheckoutItems(nextItems);
     setQuantity("1");
     setNote("");
-    setStatusMessage("Item adicionado ao orçamento.");
+    setStatusMessage("Item adicionado a simulação.");
   };
 
   return (
     <View className="gap-4">
       <Card className="gap-3 rounded-lg border-gray-200 p-3 shadow-none">
-        <Heading size="md" className="text-base text-gray-950">
-          Novo item
-        </Heading>
+        <View>
+          <Heading size="md" className="text-base text-gray-950">
+            Simulação
+          </Heading>
+          <Text className="text-sm text-gray-500">
+            Selecione os itens e quantidades para montar sua simulação.
+          </Text>
+        </View>
 
         <View className="flex-row gap-2">
           <Pressable
@@ -276,13 +281,13 @@ export function CompanyDetailSimulationTab({
         </Card>
 
         <Button className="rounded-md bg-lime-800" onPress={addItemToCheckout}>
-          <ButtonText>Adicionar ao orçamento</ButtonText>
+          <ButtonText>Adicionar a simulação</ButtonText>
         </Button>
       </Card>
 
       <Card className="gap-3 rounded-lg border-gray-200 p-3 shadow-none">
         <Heading size="md" className="text-base text-gray-950">
-          Orçamento
+          Lista
         </Heading>
 
         {checkoutItems.length ? (
@@ -323,7 +328,7 @@ export function CompanyDetailSimulationTab({
                           ),
                       ),
                     );
-                    setStatusMessage("Item removido do orçamento.");
+                    setStatusMessage("Item removido da simulação.");
                   }}
                 >
                   <Text className="text-xs font-semibold text-red-500">
@@ -339,7 +344,7 @@ export function CompanyDetailSimulationTab({
           ))
         ) : (
           <Text className="text-sm text-gray-500">
-            Nenhum item adicionado ao orçamento.
+            Nenhum item adicionado a simulação.
           </Text>
         )}
 
