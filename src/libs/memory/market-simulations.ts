@@ -11,7 +11,25 @@ export type MarketSimulationDraft = {
   updatedAt: number;
 };
 
+export type MarketCheckoutItemDraft = {
+  itemId: string;
+  itemType: MarketSimulationItemType;
+  itemName: string;
+  unit: string;
+  unitPrice: number;
+  quantity: number;
+  note: string;
+  total: number;
+};
+
+export type MarketCheckoutDraft = {
+  companyId: string;
+  items: MarketCheckoutItemDraft[];
+  updatedAt: number;
+};
+
 const simulationStore = new Map<string, MarketSimulationDraft>();
+const checkoutStore = new Map<string, MarketCheckoutDraft>();
 
 const buildSimulationKey = (
   companyId: string,
@@ -29,4 +47,11 @@ export const getMarketSimulationDraft = (
 export const saveMarketSimulationDraft = (draft: MarketSimulationDraft) => {
   const key = buildSimulationKey(draft.companyId, draft.itemType, draft.itemId);
   simulationStore.set(key, draft);
+};
+
+export const getMarketCheckoutDraft = (companyId: string) =>
+  checkoutStore.get(companyId) ?? null;
+
+export const saveMarketCheckoutDraft = (draft: MarketCheckoutDraft) => {
+  checkoutStore.set(draft.companyId, draft);
 };

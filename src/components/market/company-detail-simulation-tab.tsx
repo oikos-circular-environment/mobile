@@ -1,15 +1,17 @@
-import { Calculator, Package, Wrench } from "lucide-react-native";
+import { Calculator } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import {
-  getMarketSimulationDraft,
+  getMarketCheckoutDraft,
+  type MarketCheckoutItemDraft,
   type MarketSimulationItemType,
-  saveMarketSimulationDraft,
+  saveMarketCheckoutDraft,
 } from "@/libs/memory/market-simulations";
 import type { Company } from "@/libs/types/companies";
 import type { Measurement } from "@/libs/types/measurement";
@@ -56,105 +58,197 @@ export function CompanyDetailSimulationTab({
   company,
   selectedItem,
 }: CompanyDetailSimulationTabProps) {
-  const item = useMemo(() => {
-    if (!selectedItem) {
-      return null;
-    }
-
-    if (selectedItem.itemType === "waste") {
-      return (
-        company.waste?.find(entry => entry.id === selectedItem.itemId) ?? null
-      );
-    }
-
-    return (
-      company.services?.find(entry => entry.id === selectedItem.itemId) ?? null
-    );
-  }, [company.services, company.waste, selectedItem]);
-
+  const [activeItemType, setActiveItemType] =
+    useState<MarketSimulationItemType>(selectedItem?.itemType ?? "waste");
+  const [selectedCatalogItemId, setSelectedCatalogItemId] = useState(
+    selectedItem?.itemId ?? "",
+  );
   const [quantity, setQuantity] = useState("1");
   const [note, setNote] = useState("");
+  const [checkoutItems, setCheckoutItems] = useState<MarketCheckoutItemDraft[]>(
+    [],
+  );
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  const catalogItems = useMemo(() => {
+    if (activeItemType === "waste") {
+      return company.waste ?? [];
+    }
+
+    return company.services ?? [];
+  }, [activeItemType, company.services, company.waste]);
+
+  const selectedCatalogItem = useMemo(() => {
+    if (!selectedCatalogItemId) {
+      return catalogItems[0] ?? null;
+    }
+
+    return catalogItems.find(item => item.id === selectedCatalogItemId) ?? null;
+  }, [catalogItems, selectedCatalogItemId]);
+
+  useEffect(() => {
+    const draft = getMarketCheckoutDraft(company.id);
+    setCheckoutItems(draft?.items ?? []);
+    setStatusMessage(null);
+  }, [company.id]);
 
   useEffect(() => {
     if (!selectedItem) {
-      setQuantity("1");
-      setNote("");
-      setStatusMessage(null);
       return;
     }
 
-    const draft = getMarketSimulationDraft(
-      company.id,
-      selectedItem.itemType,
-      selectedItem.itemId,
-    );
+    setActiveItemType(selectedItem.itemType);
+    setSelectedCatalogItemId(selectedItem.itemId);
+  }, [selectedItem]);
 
-    setQuantity(draft?.quantity ? String(draft.quantity) : "1");
-    setNote(draft?.note ?? "");
-    setStatusMessage(null);
-  }, [company.id, selectedItem]);
+  useEffect(() => {
+    if (!catalogItems.length) {
+      setSelectedCatalogItemId("");
+      return;
+    }
 
-  if (!selectedItem || !item) {
-    return (
-      <Card className="gap-2 rounded-lg border-gray-200 p-3 shadow-none">
-        <Heading size="md" className="text-base text-gray-950">
-          Simulação
-        </Heading>
-        <Text className="text-sm text-gray-500">
-          Selecione um item na aba Geral para iniciar a simulação.
-        </Text>
-      </Card>
-    );
-  }
+    if (catalogItems.some(item => item.id === selectedCatalogItemId)) {
+      return;
+    }
+
+    setSelectedCatalogItemId(catalogItems[0].id);
+  }, [catalogItems, selectedCatalogItemId]);
 
   const parsedQuantity = parseNumber(quantity);
-  const unitPrice = item.price;
+  const unitPrice = selectedCatalogItem?.price ?? 0;
   const total = parsedQuantity * unitPrice;
+  const orderTotal = checkoutItems.reduce((acc, item) => acc + item.total, 0);
+
+  const addItemToCheckout = () => {
+    if (!selectedCatalogItem || parsedQuantity <= 0) {
+      setStatusMessage("Informe uma quantidade maior que zero para adicionar.");
+      return;
+    }
+
+    const nextItems = [...checkoutItems];
+    const existingIndex = nextItems.findIndex(
+      item =>
+        item.itemId === selectedCatalogItem.id &&
+        item.itemType === activeItemType,
+    );
+
+    const nextItem: MarketCheckoutItemDraft = {
+      itemId: selectedCatalogItem.id,
+      itemType: activeItemType,
+      itemName: selectedCatalogItem.name,
+      unit: measurementSymbol[selectedCatalogItem.unit],
+      unitPrice,
+      quantity: parsedQuantity,
+      note,
+      total,
+    };
+
+    if (existingIndex >= 0) {
+      nextItems[existingIndex] = nextItem;
+    } else {
+      nextItems.push(nextItem);
+    }
+
+    setCheckoutItems(nextItems);
+    setQuantity("1");
+    setNote("");
+    setStatusMessage("Item adicionado ao orçamento.");
+  };
 
   return (
     <View className="gap-4">
       <Card className="gap-3 rounded-lg border-gray-200 p-3 shadow-none">
-        <View className="flex-row items-center gap-2">
-          <View className="size-8 items-center justify-center rounded-[5px] bg-gray-100">
-            {selectedItem.itemType === "waste" ? (
-              <Package size={16} color="#111827" />
-            ) : (
-              <Wrench size={16} color="#111827" />
-            )}
-          </View>
-          <View className="min-w-0 flex-1">
-            <Heading size="md" className="text-base text-gray-950">
-              {item.name}
-            </Heading>
-            <Text className="text-xs text-gray-500">
-              {company.corporateName}
+        <Heading size="md" className="text-base text-gray-950">
+          Novo item
+        </Heading>
+
+        <View className="flex-row gap-2">
+          <Pressable
+            className={`flex-1 items-center rounded-md px-3 py-2 ${activeItemType === "waste" ? "bg-lime-800" : "bg-gray-100"}`}
+            onPress={() => setActiveItemType("waste")}
+          >
+            <Text
+              className={`text-xs font-semibold ${activeItemType === "waste" ? "text-white" : "text-gray-700"}`}
+            >
+              Produtos
             </Text>
-          </View>
+          </Pressable>
+          <Pressable
+            className={`flex-1 items-center rounded-md px-3 py-2 ${activeItemType === "service" ? "bg-lime-800" : "bg-gray-100"}`}
+            onPress={() => setActiveItemType("service")}
+          >
+            <Text
+              className={`text-xs font-semibold ${activeItemType === "service" ? "text-white" : "text-gray-700"}`}
+            >
+              Serviços
+            </Text>
+          </Pressable>
         </View>
 
-        <Text className="text-sm text-gray-600">{item.description}</Text>
+        <View className="gap-2">
+          {catalogItems.length ? (
+            catalogItems.map(item => {
+              const isSelected = item.id === selectedCatalogItem?.id;
 
-        <View className="flex-row items-center justify-between">
-          <Text className="text-sm text-gray-500">Valor unitário</Text>
-          <Text className="text-sm font-semibold text-gray-900">
-            {formatCurrency(unitPrice)} / {measurementSymbol[item.unit]}
-          </Text>
+              return (
+                <Pressable
+                  key={item.id}
+                  className={`rounded-md border px-3 py-2 ${isSelected ? "border-lime-800 bg-lime-800/5" : "border-gray-200 bg-white"}`}
+                  onPress={() => setSelectedCatalogItemId(item.id)}
+                >
+                  <View className="flex-row items-center justify-between gap-2">
+                    <View className="min-w-0 flex-1">
+                      <Text className="text-sm font-semibold text-gray-900">
+                        {item.name}
+                      </Text>
+                      <Text className="text-xs text-gray-500">
+                        {item.description}
+                      </Text>
+                    </View>
+                    <Text className="text-xs font-semibold text-gray-800">
+                      {formatCurrency(item.price)} /{" "}
+                      {measurementSymbol[item.unit]}
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            })
+          ) : (
+            <Text className="text-sm text-gray-500">
+              Este estabelecimento não possui itens nesta categoria.
+            </Text>
+          )}
         </View>
       </Card>
 
       <Card className="gap-3 rounded-lg border-gray-200 p-3 shadow-none">
-        <View className="gap-1">
-          <Text className="text-xs text-gray-500">Quantidade</Text>
-          <Input className="rounded-md border-gray-200 bg-white">
-            <InputField
-              value={quantity}
-              onChangeText={setQuantity}
-              keyboardType="decimal-pad"
-              placeholder="1"
-              className="text-sm"
-            />
-          </Input>
+        <View className="flex-row gap-4">
+          <View className="flex-1 gap-1">
+            <Text className="text-xs text-gray-500">Quantidade</Text>
+            <Input className="rounded-md border-gray-200 bg-white">
+              <InputField
+                value={quantity}
+                onChangeText={setQuantity}
+                keyboardType="decimal-pad"
+                placeholder="1"
+                className="text-sm"
+              />
+            </Input>
+          </View>
+
+          <View className="gap-1">
+            <Text className="text-xs text-gray-500">Unidade</Text>
+            <Input className="rounded-md border-gray-200 bg-white" isDisabled>
+              <InputField
+                value={
+                  selectedCatalogItem
+                    ? measurementSymbol[selectedCatalogItem.unit]
+                    : ""
+                }
+                className="text-sm"
+              />
+            </Input>
+          </View>
         </View>
 
         <View className="gap-1">
@@ -173,7 +267,7 @@ export function CompanyDetailSimulationTab({
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-2">
               <Calculator size={16} color="#3F6212" />
-              <Text className="text-sm text-lime-800">Total estimado</Text>
+              <Text className="text-sm text-lime-800">Total do item</Text>
             </View>
             <Text className="text-base font-bold text-lime-800">
               {formatCurrency(total)}
@@ -181,24 +275,100 @@ export function CompanyDetailSimulationTab({
           </View>
         </Card>
 
+        <Button className="rounded-md bg-lime-800" onPress={addItemToCheckout}>
+          <ButtonText>Adicionar ao orçamento</ButtonText>
+        </Button>
+      </Card>
+
+      <Card className="gap-3 rounded-lg border-gray-200 p-3 shadow-none">
+        <Heading size="md" className="text-base text-gray-950">
+          Orçamento
+        </Heading>
+
+        {checkoutItems.length ? (
+          checkoutItems.map(item => (
+            <Card
+              key={`${item.itemType}-${item.itemId}`}
+              className="gap-2 border-gray-200 p-2 shadow-none"
+            >
+              <View className="flex-row items-center justify-between gap-2">
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-semibold text-gray-900">
+                    {item.itemName}
+                  </Text>
+                  <Text className="text-xs text-gray-500">
+                    {item.itemType === "waste" ? "Produto" : "Serviço"}
+                  </Text>
+                </View>
+
+                <Text className="text-sm font-semibold text-gray-900">
+                  {formatCurrency(item.total)}
+                </Text>
+              </View>
+
+              <View className="flex-row items-center justify-between">
+                <Text className="text-xs text-gray-500">
+                  {item.quantity} x {formatCurrency(item.unitPrice)} /{" "}
+                  {item.unit}
+                </Text>
+
+                <Pressable
+                  onPress={() => {
+                    setCheckoutItems(prev =>
+                      prev.filter(
+                        current =>
+                          !(
+                            current.itemId === item.itemId &&
+                            current.itemType === item.itemType
+                          ),
+                      ),
+                    );
+                    setStatusMessage("Item removido do orçamento.");
+                  }}
+                >
+                  <Text className="text-xs font-semibold text-red-500">
+                    Remover
+                  </Text>
+                </Pressable>
+              </View>
+
+              {item.note ? (
+                <Text className="text-xs text-gray-500">Obs.: {item.note}</Text>
+              ) : null}
+            </Card>
+          ))
+        ) : (
+          <Text className="text-sm text-gray-500">
+            Nenhum item adicionado ao orçamento.
+          </Text>
+        )}
+
+        <Card className="border-0 bg-lime-800/10 p-3 shadow-none">
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-2">
+              <Calculator size={16} color="#3F6212" />
+              <Text className="text-sm text-lime-800">Total geral</Text>
+            </View>
+            <Text className="text-base font-bold text-lime-800">
+              {formatCurrency(orderTotal)}
+            </Text>
+          </View>
+        </Card>
+
         <Button
           className="rounded-md bg-lime-800"
           onPress={() => {
-            saveMarketSimulationDraft({
+            saveMarketCheckoutDraft({
               companyId: company.id,
-              itemId: selectedItem.itemId,
-              itemType: selectedItem.itemType,
-              quantity: parsedQuantity,
-              note,
-              unitPrice,
-              total,
+              items: checkoutItems,
               updatedAt: Date.now(),
             });
 
-            setStatusMessage("Simulação salva em memória no dispositivo.");
+            setStatusMessage("Orçamento salvo em memória no dispositivo.");
           }}
+          isDisabled={!checkoutItems.length}
         >
-          <ButtonText>Salvar simulação</ButtonText>
+          <ButtonText>Salvar orçamento</ButtonText>
         </Button>
 
         {statusMessage ? (
