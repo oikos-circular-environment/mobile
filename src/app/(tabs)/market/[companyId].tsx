@@ -6,7 +6,7 @@ import {
   isWithinInterval,
   parse,
 } from "date-fns";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Link, Stack, useLocalSearchParams } from "expo-router";
 import {
   CornerUpRight,
   Hammer,
@@ -20,6 +20,7 @@ import { BusinessHoursModal } from "@/components/market/business-hours-modal";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { Pressable as GPressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { getMarketCompanyById } from "@/libs/mocks/market-companies";
 import { daysOfWeek } from "@/libs/types/business-hour";
@@ -277,6 +278,7 @@ export default function MarketCompanyDetailScreen() {
               </Card>
             </Pressable>
           </View>
+
           <View className="gap-2">
             <Heading size="md" className="text-sm text-gray-950">
               Produtos
@@ -299,32 +301,44 @@ export default function MarketCompanyDetailScreen() {
 
             <View className="gap-2">
               {company.waste?.map(waste => (
-                <Card
+                <Link
                   key={waste.id}
-                  className="flex-row items-center gap-2 shadow-none"
+                  href={{
+                    pathname: "/market/simulation",
+                    params: {
+                      companyId: company.id,
+                      itemType: "waste",
+                      itemId: waste.id,
+                    },
+                  }}
+                  asChild
                 >
-                  <View className="h-10 w-10 items-center justify-center ">
-                    <Recycle size={22} color="#111827" />
-                  </View>
+                  <GPressable>
+                    <Card className="flex-row items-center gap-2 shadow-none">
+                      <View className="h-10 w-10 items-center justify-center ">
+                        <Recycle size={22} color="#111827" />
+                      </View>
 
-                  <View className="min-w-0 flex-1">
-                    <Text className="text-md font-semibold text-gray-900">
-                      {waste.name}
-                    </Text>
-                    <Text className="text-sm text-gray-700">
-                      {waste.description}
-                    </Text>
-                  </View>
+                      <View className="min-w-0 flex-1">
+                        <Text className="text-md font-semibold text-gray-900">
+                          {waste.name}
+                        </Text>
+                        <Text className="text-sm text-gray-700">
+                          {waste.description}
+                        </Text>
+                      </View>
 
-                  <View className="flex-row items-end gap-0.5">
-                    <Text className="text-md font-bold text-gray-900">
-                      {formatCurrency(waste.price)}
-                    </Text>
-                    <Text className="text-xs text-gray-400">
-                      {measurementSymbol[waste.unit]}
-                    </Text>
-                  </View>
-                </Card>
+                      <View className="flex-row items-end gap-0.5">
+                        <Text className="text-md font-bold text-gray-900">
+                          {formatCurrency(waste.price)}
+                        </Text>
+                        <Text className="text-xs text-gray-400">
+                          {measurementSymbol[waste.unit]}
+                        </Text>
+                      </View>
+                    </Card>
+                  </GPressable>
+                </Link>
               ))}
             </View>
           </View>
@@ -336,32 +350,44 @@ export default function MarketCompanyDetailScreen() {
 
             <View className="gap-2">
               {company.services?.map(service => (
-                <Card
+                <Link
                   key={service.id}
-                  className="flex-row items-center gap-2 shadow-none"
+                  href={{
+                    pathname: "/market/simulation",
+                    params: {
+                      companyId: company.id,
+                      itemType: "service",
+                      itemId: service.id,
+                    },
+                  }}
+                  asChild
                 >
-                  <View className="size-10 items-center justify-center">
-                    <Hammer size={22} color="#111827" />
-                  </View>
+                  <GPressable>
+                    <Card className="flex-row items-center gap-2 shadow-none">
+                      <View className="size-10 items-center justify-center">
+                        <Hammer size={22} color="#111827" />
+                      </View>
 
-                  <View className="min-w-0 flex-1">
-                    <Text className="text-md font-semibold text-gray-900">
-                      {service.name}
-                    </Text>
-                    <Text className="text-sm text-gray-700">
-                      {service.description}
-                    </Text>
-                  </View>
+                      <View className="min-w-0 flex-1">
+                        <Text className="text-md font-semibold text-gray-900">
+                          {service.name}
+                        </Text>
+                        <Text className="text-sm text-gray-700">
+                          {service.description}
+                        </Text>
+                      </View>
 
-                  <View className="flex-row items-end gap-0.5">
-                    <Text className="text-md font-bold text-gray-900">
-                      {formatCurrency(service.price)}
-                    </Text>
-                    <Text className="text-xs text-gray-400">
-                      {measurementSymbol[service.unit]}
-                    </Text>
-                  </View>
-                </Card>
+                      <View className="flex-row items-end gap-0.5">
+                        <Text className="text-md font-bold text-gray-900">
+                          {formatCurrency(service.price)}
+                        </Text>
+                        <Text className="text-xs text-gray-400">
+                          {measurementSymbol[service.unit]}
+                        </Text>
+                      </View>
+                    </Card>
+                  </GPressable>
+                </Link>
               ))}
             </View>
           </View>
