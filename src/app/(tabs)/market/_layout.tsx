@@ -8,10 +8,6 @@ export default function MarketStackLayout() {
         name="[companyId]"
         options={{ headerShown: false, title: "Empresa" }}
       />
-      <Stack.Screen
-        name="simulation"
-        options={{ headerShown: false, title: "Simulação" }}
-      />
     </Stack>
   );
 }
