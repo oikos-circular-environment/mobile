@@ -1,3 +1,11 @@
+import {
+  addDays,
+  format,
+  getDay,
+  isBefore,
+  isWithinInterval,
+  parse,
+} from "date-fns";
 import { Stack, useLocalSearchParams } from "expo-router";
 import {
   CornerUpRight,
@@ -58,34 +66,28 @@ const dayOfWeekByIndex = [
   "SATURDAY",
 ] as const;
 
-const timeToMinutes = (time: string) => {
-  const [hours, minutes] = time.split(":").map(Number);
-
-  if (Number.isNaN(hours) || Number.isNaN(minutes)) {
-    return null;
-  }
-
-  return hours * 60 + minutes;
-};
-
 const isTimeInsideSlot = (
   currentDate: Date,
   slot: { startTime: string; endTime: string },
 ) => {
-  const startMinutes = timeToMinutes(slot.startTime);
-  const endMinutes = timeToMinutes(slot.endTime);
+  const slotStart = parse(slot.startTime, "HH:mm", currentDate);
+  const parsedSlotEnd = parse(slot.endTime, "HH:mm", currentDate);
 
-  if (startMinutes === null || endMinutes === null) {
+  if (
+    Number.isNaN(slotStart.getTime()) ||
+    Number.isNaN(parsedSlotEnd.getTime())
+  ) {
     return false;
   }
 
-  const currentMinutes = currentDate.getHours() * 60 + currentDate.getMinutes();
+  const slotEnd = isBefore(parsedSlotEnd, slotStart)
+    ? addDays(parsedSlotEnd, 1)
+    : parsedSlotEnd;
 
-  if (endMinutes <= startMinutes) {
-    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
-  }
-
-  return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+  return isWithinInterval(currentDate, {
+    start: slotStart,
+    end: slotEnd,
+  });
 };
 
 export default function MarketCompanyDetailScreen() {
@@ -104,7 +106,7 @@ export default function MarketCompanyDetailScreen() {
     return () => clearInterval(intervalId);
   }, []);
 
-  const currentDayOfWeek = dayOfWeekByIndex[currentDate.getDay()];
+  const currentDayOfWeek = dayOfWeekByIndex[getDay(currentDate)];
   const currentBusinessHour =
     company?.businessHours?.find(item => item.dayOfWeek === currentDayOfWeek) ??
     null;
@@ -114,10 +116,7 @@ export default function MarketCompanyDetailScreen() {
         isTimeInsideSlot(currentDate, slot),
       ),
   );
-  const currentTimeLabel = currentDate.toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const currentTimeLabel = format(currentDate, "HH:mm");
 
   if (!company) {
     return (
@@ -241,20 +240,22 @@ export default function MarketCompanyDetailScreen() {
             <Pressable onPress={() => setIsBusinessHoursModalOpen(true)}>
               <Card className="gap-2 rounded-lg border-gray-200 p-2 shadow-none">
                 <View className="flex-row items-center justify-between gap-2">
-                  <View className="gap-0.5">
-                    <Text className="text-md font-bold text-gray-700">
-                      {getDayLabel(currentDayOfWeek)}
-                    </Text>
-                    <Text className="text-xs text-gray-500">
-                      Agora, {currentTimeLabel}
+                  <View>
+                    <View className="flex flex-row gap-2 items-center">
+                      <Text className="text-md font-bold text-gray-700">
+                        {getDayLabel(currentDayOfWeek)}
+                      </Text>
+                      <Badge variant={isOpenNow ? "default" : "destructive"}>
+                        <BadgeText>
+                          {isOpenNow ? "Aberto" : "Fechado"}
+                        </BadgeText>
+                      </Badge>
+                    </View>
+                    <Text className="text-xs">
+                      Agora são {currentTimeLabel}
                     </Text>
                   </View>
-
                   <View className="items-end gap-1">
-                    <Badge variant={isOpenNow ? "default" : "destructive"}>
-                      <BadgeText>{isOpenNow ? "Aberto" : "Fechado"}</BadgeText>
-                    </Badge>
-
                     {currentBusinessHour?.timeSlots?.length ? (
                       currentBusinessHour.timeSlots.map(slot => (
                         <Text
