@@ -1,55 +1,195 @@
+"use client";
+
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import * as Location from "expo-location";
+import { decimalToSexagesimal } from "geolib";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 
-// Heading Updated: {"accuracy": 1, "magHeading": 33.76374435424805, "trueHeading": 14.356485366821289}
+export default function ComplaintsScreen() {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [heading, setHeading] = useState<Location.LocationHeadingObject | null>(
+    null,
+  );
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null,
+  );
+  const [addressList, setAddressList] = useState<
+    Location.LocationGeocodedAddress[]
+  >([]);
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const [isResolving, setIsResolving] = useState(true);
+  const [reverseGeocodeError, setReverseGeocodeError] = useState(false);
 
-// Location Updated: {"coords": {"accuracy": 7.6362911885009215, "altitude": 235.5077483150772, "altitudeAccuracy": 30, "heading": -1, "latitude": -16.485559690169907, "longitude": -54.601839772724354, "speed": -1}, "timestamp": 1775568547085.4941}
+  const lastReverseGeocodeAtRef = useRef<number>(0);
 
-export default async function ComplaintsScreen() {
-  // Location.watchHeadingAsync(heading => {
-  //   console.log("Heading Updated:", heading);
-  // });
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDate(new Date());
+    }, 1000);
 
-  // Location.watchPositionAsync(
-  //   {
-  //     accuracy: Location.Accuracy.High,
-  //     timeInterval: 5000, // Update every 5 seconds
-  //     distanceInterval: 10, // Update every 10 meters
-  //   },
-  //   location => {
-  //     console.log("Location Updated:", location);
-  //   },
-  // );
-  const heading = await Location.getHeadingAsync();
-  console.log("Current Heading:", heading);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
-  const location = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.High,
-  });
+  useEffect(() => {
+    let isMounted = true;
+    let headingSubscription: Location.LocationSubscription | null = null;
+    let locationSubscription: Location.LocationSubscription | null = null;
 
-  // console.log("Current Location:", location);
+    const shouldReverseGeocode = () => {
+      const now = Date.now();
 
-  const result = await Location.reverseGeocodeAsync({
-    latitude: location.coords.latitude,
-    longitude: location.coords.longitude,
-  });
+      if (now - lastReverseGeocodeAtRef.current < 15000) {
+        return false;
+      }
 
-  console.log("Reverse Geocode Result:", result);
+      lastReverseGeocodeAtRef.current = now;
+      return true;
+    };
 
-  const currentDate = new Date();
+    const startWatchers = async () => {
+      try {
+        setIsResolving(true);
 
-  const date = format(currentDate, "dd/MM/yyyy", { locale: ptBR });
-  const time = format(currentDate, "HH:mm", { locale: ptBR });
-  const dayOfWeek = format(currentDate, "EEEE", { locale: ptBR });
+        const currentPermission =
+          await Location.getForegroundPermissionsAsync();
+        let granted = currentPermission.status === "granted";
 
-  console.log(`Current Date: ${date}`);
-  console.log(`Current Time: ${time}`);
-  console.log(`Day of the Week: ${dayOfWeek}`);
+        if (!granted) {
+          const requestedPermission =
+            await Location.requestForegroundPermissionsAsync();
+          granted = requestedPermission.status === "granted";
+        }
+
+        if (!granted) {
+          if (isMounted) {
+            setPermissionDenied(true);
+          }
+          return;
+        }
+
+        if (isMounted) {
+          setPermissionDenied(false);
+        }
+
+        headingSubscription = await Location.watchHeadingAsync(nextHeading => {
+          if (isMounted) {
+            setHeading(nextHeading);
+          }
+        });
+
+        locationSubscription = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.High,
+            timeInterval: 2000,
+            distanceInterval: 2,
+            mayShowUserSettingsDialog: true,
+          },
+          async nextLocation => {
+            if (!isMounted) {
+              return;
+            }
+
+            setLocation(nextLocation);
+
+            if (!shouldReverseGeocode()) {
+              return;
+            }
+
+            try {
+              const result = await Location.reverseGeocodeAsync({
+                latitude: nextLocation.coords.latitude,
+                longitude: nextLocation.coords.longitude,
+              });
+
+              if (isMounted) {
+                setAddressList(result);
+                setReverseGeocodeError(false);
+              }
+            } catch {
+              if (isMounted) {
+                setReverseGeocodeError(true);
+              }
+            }
+          },
+        );
+      } catch {
+        if (isMounted) {
+          setPermissionDenied(true);
+        }
+      } finally {
+        if (isMounted) {
+          setIsResolving(false);
+        }
+      }
+    };
+
+    void startWatchers();
+
+    return () => {
+      isMounted = false;
+      headingSubscription?.remove();
+      locationSubscription?.remove();
+    };
+  }, []);
+
+  const date = useMemo(
+    () => format(currentDate, "dd/MM/yyyy", { locale: ptBR }),
+    [currentDate],
+  );
+  const time = useMemo(
+    () => format(currentDate, "HH:mm:ss", { locale: ptBR }),
+    [currentDate],
+  );
+  const dayOfWeek = useMemo(
+    () => format(currentDate, "EEEE", { locale: ptBR }),
+    [currentDate],
+  );
+
+  const formatHeading = (value: number | null | undefined) => {
+    if (value == null || Number.isNaN(value) || value < 0) {
+      return "indisponivel";
+    }
+
+    return `${value.toFixed(1)} graus`;
+  };
+
+  const formatSpeed = (value: number | null | undefined) => {
+    if (value == null || Number.isNaN(value) || value < 0) {
+      return "indisponivel";
+    }
+
+    return `${value.toFixed(2)} m/s (${(value * 3.6).toFixed(1)} km/h)`;
+  };
+
+  const formatMeters = (value: number | null | undefined) => {
+    if (value == null || Number.isNaN(value) || value < 0) {
+      return "indisponivel";
+    }
+
+    return `${value.toFixed(1)} metros`;
+  };
+
+  const formatSexagesimalCoordinate = (
+    value: number | null | undefined,
+    axis: "latitude" | "longitude",
+  ) => {
+    if (value == null || Number.isNaN(value)) {
+      return "indisponivel";
+    }
+
+    const hemisphere =
+      axis === "latitude" ? (value < 0 ? "S" : "N") : value < 0 ? "W" : "E";
+
+    const sexagesimalValue = decimalToSexagesimal(Math.abs(value));
+    return `${sexagesimalValue} ${hemisphere}`;
+  };
 
   return (
     <KeyboardAvoidingView
@@ -76,26 +216,60 @@ export default async function ComplaintsScreen() {
           <Card>
             <Heading>Localização</Heading>
 
-            <View className="flex-col gap-2r">
+            <View className="mt-2 flex-col gap-4">
               <View>
-                <Text>Precisão: {heading.accuracy} graus</Text>
-                <Text>Direção magnética: {heading.magHeading} graus</Text>
-                <Text>Direção verdadeira: {heading.trueHeading} graus</Text>
+                <Text>Precisão da bússola: {heading?.accuracy}</Text>
+                <Text>Direção magnética: {heading?.magHeading}</Text>
+                <Text>Direção verdadeira: {heading?.trueHeading}</Text>
               </View>
 
               <View>
-                <Text>Precisão: {location.coords.accuracy} metros</Text>
-                <Text>Latitude: {location.coords.latitude}</Text>
-                <Text>Longitude: {location.coords.longitude}</Text>
-                <Text>Precisão: {location.coords.accuracy} metros</Text>
-                <Text>Altitude: {location.coords.altitude} metros</Text>
-                <Text>Direção: {location.coords.heading} graus</Text>
-                <Text>Velocidade: {location.coords.speed} m/s</Text>
+                <Text>
+                  Precisão horizontal: {formatMeters(location?.coords.accuracy)}
+                </Text>
+                <Text>
+                  Latitude:{" "}
+                  {location?.coords.latitude != null
+                    ? formatSexagesimalCoordinate(
+                        location.coords.latitude,
+                        "latitude",
+                      )
+                    : "indisponivel"}
+                </Text>
+                <Text>
+                  Longitude:{" "}
+                  {location?.coords.longitude != null
+                    ? formatSexagesimalCoordinate(
+                        location.coords.longitude,
+                        "longitude",
+                      )
+                    : "indisponivel"}
+                </Text>
+                <Text>Altitude: {formatMeters(location?.coords.altitude)}</Text>
+                <Text>
+                  Precisão da altitude:{" "}
+                  {formatMeters(location?.coords.altitudeAccuracy)}
+                </Text>
+                <Text>Direção: {formatHeading(location?.coords.heading)}</Text>
+                <Text>Velocidade: {formatSpeed(location?.coords.speed)}</Text>
+                <Text>
+                  Última leitura:{" "}
+                  {location?.timestamp
+                    ? format(new Date(location.timestamp), "HH:mm:ss", {
+                        locale: ptBR,
+                      })
+                    : "indisponivel"}
+                </Text>
               </View>
 
               <View>
                 <Text>Endereço:</Text>
-                {result.map((address, index) => (
+                {addressList.length === 0 ? (
+                  <Text className="mt-2 text-sm text-muted-foreground">
+                    Aguardando atualização do endereço...
+                  </Text>
+                ) : null}
+                {addressList.map((address, index) => (
                   <View key={index} className="mt-2">
                     <Text>Nome: {address.name}</Text>
                     <Text>Rua: {address.street}</Text>
@@ -107,10 +281,28 @@ export default async function ComplaintsScreen() {
                     <Text>País: {address.country}</Text>
                     <Text>ISO País: {address.isoCountryCode}</Text>
                     <Text>Endereço formatado: {address.formattedAddress}</Text>
-                    <Text>Timezone: {address.timezone}</Text>
                   </View>
                 ))}
               </View>
+
+              {isResolving ? (
+                <Text className="text-sm text-muted-foreground">
+                  Obtendo dados em tempo real...
+                </Text>
+              ) : null}
+
+              {permissionDenied ? (
+                <Text className="text-sm text-destructive">
+                  Permissão de localização negada. Ative a permissão para obter
+                  dados em tempo real.
+                </Text>
+              ) : null}
+
+              {reverseGeocodeError ? (
+                <Text className="text-sm text-destructive">
+                  Não foi possível atualizar o endereço nesta leitura.
+                </Text>
+              ) : null}
             </View>
           </Card>
         </View>
