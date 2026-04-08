@@ -1,19 +1,30 @@
 "use client";
 
+import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import {
   EllipsisVertical,
+  EyeIcon,
+  MapPinned,
   Plus,
   Shield,
   ShieldCheck,
-  ShieldQuestionMark,
-  ShieldX,
+  ShieldCheckIcon,
+  ShieldIcon,
+  ShieldQuestionMarkIcon,
+  ShieldXIcon,
 } from "lucide-react-native";
-import { ScrollView, View } from "react-native";
+import { Alert, Platform, ScrollView, View } from "react-native";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import {
+  Menu,
+  MenuItem,
+  MenuItemLabel,
+  MenuSeparator,
+} from "@/components/ui/menu";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 
@@ -21,25 +32,25 @@ const stats = [
   {
     label: "Total de denúncias",
     value: "10",
-    icon: Shield,
+    icon: ShieldIcon,
     iconClassName: "bg-sky-100 text-sky-500",
   },
   {
     label: "Denúncias resolvidas",
     value: "5",
-    icon: ShieldCheck,
+    icon: ShieldCheckIcon,
     iconClassName: "bg-lime-100 text-lime-800",
   },
   {
     label: "Denúncias pendentes",
     value: "3",
-    icon: ShieldQuestionMark,
+    icon: ShieldQuestionMarkIcon,
     iconClassName: "bg-amber-100 text-amber-500",
   },
   {
     label: "Denúncias canceladas",
     value: "2",
-    icon: ShieldX,
+    icon: ShieldXIcon,
     iconClassName: "bg-red-100 text-red-500",
   },
 ] as const;
@@ -61,6 +72,43 @@ const reportItem = {
 };
 
 export default function ComplaintsScreen() {
+  const handleViewComplaint = () => {
+    Alert.alert("Denúncia", "Abrindo detalhes da denúncia.");
+  };
+
+  const handleMarkResolved = () => {
+    Alert.alert("Denúncia", "Denúncia marcada como resolvida.");
+  };
+
+  const handleCancelComplaint = () => {
+    Alert.alert("Denúncia", "Denúncia cancelada.");
+  };
+
+  const handleOpenInMaps = async () => {
+    const { latitude, longitude } = reportItem;
+    const mapsUrl =
+      Platform.OS === "ios"
+        ? `http://maps.apple.com/?ll=${latitude},${longitude}`
+        : `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
+
+    const fallbackUrl =
+      `https://www.google.com/maps/search/?api=1&query=` +
+      `${latitude},${longitude}`;
+
+    try {
+      const canOpenNative = await Linking.canOpenURL(mapsUrl);
+
+      if (canOpenNative) {
+        await Linking.openURL(mapsUrl);
+        return;
+      }
+
+      await Linking.openURL(fallbackUrl);
+    } catch {
+      Alert.alert("Maps", "Não foi possível abrir o aplicativo de mapas.");
+    }
+  };
+
   return (
     <ScrollView
       className="flex-1 bg-white"
@@ -151,9 +199,74 @@ export default function ComplaintsScreen() {
                 <ShieldCheck size={12} strokeWidth={2.5} color="#3F6212" />
               </View>
 
-              <Pressable className="size-5 items-center justify-center">
-                <EllipsisVertical size={12} color="#030712" strokeWidth={2.2} />
-              </Pressable>
+              <Menu
+                placement="bottom right"
+                offset={8}
+                trigger={triggerProps => {
+                  return (
+                    <Pressable
+                      className="size-5 items-center justify-center"
+                      {...triggerProps}
+                    >
+                      <EllipsisVertical
+                        size={12}
+                        color="#030712"
+                        strokeWidth={2.2}
+                      />
+                    </Pressable>
+                  );
+                }}
+              >
+                <MenuItem
+                  key="view-complaint"
+                  textValue="Ver denúncia"
+                  onPress={handleViewComplaint}
+                >
+                  <View className="flex-row items-center gap-2">
+                    <EyeIcon size={14} strokeWidth={2.2} />
+                    <MenuItemLabel>Ver denúncia</MenuItemLabel>
+                  </View>
+                </MenuItem>
+
+                <MenuItem
+                  key="mark-resolved"
+                  textValue="Marcar como resolvida"
+                  onPress={handleMarkResolved}
+                >
+                  <View className="flex-row items-center gap-2">
+                    <ShieldCheckIcon
+                      size={14}
+                      color="#3F6212"
+                      strokeWidth={2.2}
+                    />
+                    <MenuItemLabel>Marcar como resolvida</MenuItemLabel>
+                  </View>
+                </MenuItem>
+
+                <MenuItem
+                  key="cancel-complaint"
+                  textValue="Cancelar denúncia"
+                  onPress={handleCancelComplaint}
+                >
+                  <View className="flex-row items-center gap-2">
+                    <ShieldXIcon size={14} color="#B91C1C" strokeWidth={2.2} />
+                    <MenuItemLabel>Cancelar denúncia</MenuItemLabel>
+                  </View>
+                </MenuItem>
+
+                <MenuSeparator />
+
+                <MenuItem
+                  key="open-maps"
+                  textValue="Abrir no maps"
+                  onPress={handleOpenInMaps}
+                >
+                  <View className="flex-row items-center gap-2">
+                    <MapPinned size={14} strokeWidth={2.2} />
+                    <MenuItemLabel>Abrir no mapa</MenuItemLabel>
+                  </View>
+                </MenuItem>
+              </Menu>
             </View>
           </View>
 
