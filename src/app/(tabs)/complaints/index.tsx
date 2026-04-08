@@ -17,19 +17,6 @@ import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 
-function sexagesimalToDecimal(
-  degrees: number,
-  minutes: number,
-  seconds: number,
-  direction: "N" | "S" | "E" | "W",
-): number {
-  let decimal = degrees + minutes / 60 + seconds / 3600;
-  if (direction === "S" || direction === "W") {
-    decimal = -decimal;
-  }
-  return decimal;
-}
-
 const stats = [
   {
     label: "Total de denúncias",
@@ -70,6 +57,7 @@ const reportItem = {
   },
   latitude: -16.487742,
   longitude: -54.582445,
+  status: "pending", // "resolved", "canceled"
 };
 
 export default function ComplaintsScreen() {
