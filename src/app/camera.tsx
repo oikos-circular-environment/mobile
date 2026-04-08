@@ -29,6 +29,12 @@ type MemoryCapture = {
   type: CaptureMode;
 };
 
+const overlayTextStrokeStyle = {
+  textShadowColor: "rgba(0, 0, 0, 0.92)",
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 6,
+};
+
 export default function CameraScreen() {
   const cameraRef = useRef<CameraView | null>(null);
   const [mode, setMode] = useState<CaptureMode>("photo");
@@ -160,46 +166,74 @@ export default function CameraScreen() {
       </View>
 
       <View className="absolute bottom-70 left-0 right-0 px-4">
-        <View className="text-white font-semibold">
-          <Heading className="text-white font-semibold text-2xl">
+        <View className="rounded-2xl bg-black/35 p-3">
+          <Heading
+            className="text-white font-semibold text-2xl"
+            style={overlayTextStrokeStyle}
+          >
             {date}
           </Heading>
           <View className="flex flex-row gap-2">
-            <Text className="text-white font-semibold">{time}</Text>
-            <Text className="text-white font-semibold">{dayOfWeek}</Text>
+            <Text
+              className="text-white font-semibold text-md"
+              style={overlayTextStrokeStyle}
+            >
+              {time}
+            </Text>
+            <Text
+              className="text-white font-semibold text-md"
+              style={overlayTextStrokeStyle}
+            >
+              {dayOfWeek}
+            </Text>
           </View>
-        </View>
-        <View>
-          <Text className="text-white font-semibold">
-            Bússola:{" "}
-            {formatHeading(heading?.magHeading, {
-              includeCompass: true,
-            })}
-          </Text>
-          <Text className="text-white font-semibold">
-            Latitude:{" "}
-            {location?.coords.latitude != null
-              ? formatSexagesimalCoordinate(
-                  location.coords.latitude,
-                  "latitude",
-                )
-              : "indisponivel"}
-          </Text>
-          <Text className="text-white font-semibold">
-            Longitude:{" "}
-            {location?.coords.longitude != null
-              ? formatSexagesimalCoordinate(
-                  location.coords.longitude,
-                  "longitude",
-                )
-              : "indisponivel"}
-          </Text>
-          <Text className="text-white font-semibold">
-            Altitude: {formatMeters(location?.coords.altitude)}
-          </Text>
-          <Text className="text-white font-semibold">
-            Endereço: {addressFormatted ?? "indisponivel"}
-          </Text>
+          <View className="mt-1">
+            <Text
+              className="text-white font-semibold text-md"
+              style={overlayTextStrokeStyle}
+            >
+              Bússola:{" "}
+              {formatHeading(heading?.magHeading, {
+                includeCompass: true,
+              })}
+            </Text>
+            <Text
+              className="text-white font-semibold text-md"
+              style={overlayTextStrokeStyle}
+            >
+              Latitude:{" "}
+              {location?.coords.latitude != null
+                ? formatSexagesimalCoordinate(
+                    location.coords.latitude,
+                    "latitude",
+                  )
+                : "indisponivel"}
+            </Text>
+            <Text
+              className="text-white font-semibold text-md"
+              style={overlayTextStrokeStyle}
+            >
+              Longitude:{" "}
+              {location?.coords.longitude != null
+                ? formatSexagesimalCoordinate(
+                    location.coords.longitude,
+                    "longitude",
+                  )
+                : "indisponivel"}
+            </Text>
+            <Text
+              className="text-white font-semibold text-md"
+              style={overlayTextStrokeStyle}
+            >
+              Altitude: {formatMeters(location?.coords.altitude)}
+            </Text>
+            <Text
+              className="text-white font-semibold text-md"
+              style={overlayTextStrokeStyle}
+            >
+              Endereço: {addressFormatted ?? "indisponivel"}
+            </Text>
+          </View>
         </View>
       </View>
 
