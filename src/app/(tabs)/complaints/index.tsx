@@ -10,12 +10,12 @@ import {
   ShieldX,
 } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
+import { ComplaintMap } from "@/components/complaints/complaint-map";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import WrapperMapper from "@/components/wrapper-mapper";
 
 function sexagesimalToDecimal(
   degrees: number,
@@ -63,9 +63,13 @@ const reportItem = {
   address:
     "Rua A 144, QD 485, LT 50, São Cristovão, Rondonópolis - MT, 78700-000",
   dateTime: "14/06/2025 11:50:26 - Sábado",
-  coordinates: "16°50’10’’S, 80°30’10’’W",
-  latitude: sexagesimalToDecimal(16, 50, 10, "S"),
-  longitude: sexagesimalToDecimal(80, 30, 10, "W"),
+  coordinates: {
+    latitude: 16.836111,
+    longitude: -80.502778,
+    formatted: "16° 50' 10\" S, 80° 30' 10\" W",
+  },
+  latitude: -16.487742,
+  longitude: -54.582445,
 };
 
 export default function ComplaintsScreen() {
@@ -150,7 +154,7 @@ export default function ComplaintsScreen() {
                 {reportItem.dateTime}
               </Text>
               <Text className="text-sm text-gray-500" selectable>
-                {reportItem.coordinates}
+                {reportItem.coordinates.formatted}
               </Text>
             </View>
 
@@ -165,7 +169,7 @@ export default function ComplaintsScreen() {
             </View>
           </View>
 
-          <WrapperMapper
+          <ComplaintMap
             latitude={reportItem.latitude}
             longitude={reportItem.longitude}
           />
