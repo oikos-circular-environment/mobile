@@ -26,25 +26,25 @@ const stats = [
     label: "Total de denúncias",
     value: "10",
     icon: Shield,
-    iconClassName: "bg-sky-50 text-sky-500",
+    iconClassName: "bg-sky-100 text-sky-500",
   },
   {
     label: "Denúncias resolvidas",
     value: "5",
     icon: ShieldCheck,
-    iconClassName: "bg-lime-50 text-lime-800",
+    iconClassName: "bg-lime-100 text-lime-800",
   },
   {
     label: "Denúncias pendentes",
     value: "3",
     icon: ShieldQuestionMark,
-    iconClassName: "bg-amber-50 text-amber-500",
+    iconClassName: "bg-amber-100 text-amber-500",
   },
   {
     label: "Denúncias canceladas",
     value: "2",
     icon: ShieldX,
-    iconClassName: "bg-red-50 text-red-500",
+    iconClassName: "bg-red-100 text-red-500",
   },
 ] as const;
 
@@ -67,9 +67,7 @@ export default function ComplaintsScreen() {
       <Card className=" bg-gray-100 p-4 shadow-none">
         <View className="flex-row items-center gap-4">
           <View className="flex-1 gap-1">
-            <Heading className="text-xl font-bold text-gray-950">
-              Denunciar
-            </Heading>
+            <Heading>Denunciar</Heading>
             <Text className="text-sm text-gray-500" selectable>
               Faça a sua denúncia anônima e gratuita. Ajude a manter o meio
               ambiente livre do descarte irregular.
@@ -82,20 +80,15 @@ export default function ComplaintsScreen() {
         </View>
       </Card>
 
-      <Button
-        className="h-13.5 rounded-md bg-lime-800 px-4"
-        onPress={() => router.push("/camera" as never)}
-      >
-        <ButtonText className="flex-1 text-center text-[16px] font-semibold text-white">
+      <Button size="lg" onPress={() => router.push("/camera" as never)}>
+        <ButtonText className="flex-1 text-center font-semibold text-white">
           Nova Denúncia
         </ButtonText>
-        <ButtonIcon as={Plus} className="text-white" height={24} width={24} />
+        <ButtonIcon as={Plus} className="text-white" height={18} width={18} />
       </Button>
 
-      <View className="items-center justify-center">
-        <Text className="text-[12px] font-semibold text-black" selectable>
-          Painel
-        </Text>
+      <View className="justify-center">
+        <Heading>Painel de Denúncias</Heading>
       </View>
 
       <View className="gap-2">
@@ -111,21 +104,16 @@ export default function ComplaintsScreen() {
                   className="flex-1 gap-2 rounded-md border border-gray-200 bg-white p-2 shadow-none"
                 >
                   <View className="flex-row items-center justify-between">
-                    <Text
-                      className="text-[16px] font-semibold text-gray-950"
-                      selectable
-                    >
-                      {stat.value}
-                    </Text>
+                    <Heading>{stat.value}</Heading>
 
                     <View
-                      className={`h-4.5 w-4.5 items-center justify-center rounded-md ${stat.iconClassName}`}
+                      className={`size-5 items-center justify-center rounded-md ${stat.iconClassName}`}
                     >
                       <Icon size={12} strokeWidth={2.5} />
                     </View>
                   </View>
 
-                  <Text className="text-[10px] text-gray-500" selectable>
+                  <Text className="text-sm text-gray-500" selectable>
                     {stat.label}
                   </Text>
                 </Card>
@@ -135,10 +123,8 @@ export default function ComplaintsScreen() {
         ))}
       </View>
 
-      <View className="items-center justify-center pt-1">
-        <Text className="text-[12px] font-semibold text-black" selectable>
-          Denúncias
-        </Text>
+      <View>
+        <Heading>Denúncias</Heading>
       </View>
 
       <Card
@@ -155,13 +141,11 @@ export default function ComplaintsScreen() {
           </View>
 
           <View className="flex-1 justify-center">
-            <Text className="text-[12px] leading-5 text-gray-950" selectable>
-              {reportItem.address}
-            </Text>
-            <Text className="text-[8px] text-gray-500" selectable>
+            <Heading numberOfLines={1}>{reportItem.address}</Heading>
+            <Text className="text-sm text-gray-500" selectable>
               {reportItem.dateTime}
             </Text>
-            <Text className="text-[8px] text-gray-500" selectable>
+            <Text className="text-sm text-gray-500" selectable>
               {reportItem.coordinates}
             </Text>
           </View>
