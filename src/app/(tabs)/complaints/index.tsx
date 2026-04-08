@@ -7,15 +7,14 @@ import {
   EyeIcon,
   MapPinned,
   Plus,
-  Shield,
   ShieldCheck,
   ShieldCheckIcon,
   ShieldIcon,
-  ShieldQuestionMarkIcon,
   ShieldXIcon,
 } from "lucide-react-native";
 import { Alert, Platform, ScrollView, View } from "react-native";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
+import { ComplaintPainel } from "@/components/complaints/complaint-painel";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -28,34 +27,12 @@ import {
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 
-const stats = [
-  {
-    label: "Total de denúncias",
-    value: "10",
-    icon: ShieldIcon,
-    iconClassName: "bg-sky-100 text-sky-500",
-  },
-  {
-    label: "Denúncias resolvidas",
-    value: "5",
-    icon: ShieldCheckIcon,
-    iconClassName: "bg-lime-100 text-lime-800",
-  },
-  {
-    label: "Denúncias pendentes",
-    value: "3",
-    icon: ShieldQuestionMarkIcon,
-    iconClassName: "bg-amber-100 text-amber-500",
-  },
-  {
-    label: "Denúncias canceladas",
-    value: "2",
-    icon: ShieldXIcon,
-    iconClassName: "bg-red-100 text-red-500",
-  },
-] as const;
-
-const statRows = [stats.slice(0, 2), stats.slice(2, 4)];
+const complaintPainelValues = {
+  total: 10,
+  resolved: 4,
+  pending: 5,
+  canceled: 1,
+};
 
 const reportItem = {
   address:
@@ -126,7 +103,7 @@ export default function ComplaintsScreen() {
           </View>
 
           <View className="size-14 items-center justify-center rounded-lg bg-lime-800">
-            <Shield size={24} color="#FFFFFF" strokeWidth={2.25} />
+            <ShieldIcon size={24} color="#FFFFFF" strokeWidth={2.25} />
           </View>
         </View>
       </Card>
@@ -145,41 +122,7 @@ export default function ComplaintsScreen() {
         <Heading>Painel de Denúncias</Heading>
       </View>
 
-      <View className="gap-2">
-        {statRows.map((row, rowIndex) => (
-          <View key={`stat-row-${rowIndex}`} className="flex-row gap-2">
-            {row.map(stat => {
-              const Icon = stat.icon;
-
-              return (
-                <Card
-                  key={stat.label}
-                  size="sm"
-                  className="flex-1 gap-2 rounded-md border border-gray-200 shadow-none"
-                >
-                  <View className="flex-row items-center justify-between">
-                    <Heading>{stat.value}</Heading>
-
-                    <View
-                      className={`size-5 items-center justify-center rounded-md ${stat.iconClassName}`}
-                    >
-                      <Icon
-                        size={12}
-                        strokeWidth={2.5}
-                        className="bg-amber-700"
-                      />
-                    </View>
-                  </View>
-
-                  <Text className="text-sm text-gray-500" selectable>
-                    {stat.label}
-                  </Text>
-                </Card>
-              );
-            })}
-          </View>
-        ))}
-      </View>
+      <ComplaintPainel panel={complaintPainelValues} />
 
       <View>
         <Heading>Denúncias</Heading>
