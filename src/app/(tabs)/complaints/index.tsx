@@ -1,6 +1,5 @@
 "use client";
 
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import {
   EllipsisVertical,
@@ -16,10 +15,20 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import WrapperMapper from "@/components/wrapper-mapper";
 
-const mapPreviewSource = {
-  uri: "https://www.figma.com/api/mcp/asset/0ccee78c-4c58-475d-9263-2a69491a5208",
-};
+function sexagesimalToDecimal(
+  degrees: number,
+  minutes: number,
+  seconds: number,
+  direction: "N" | "S" | "E" | "W",
+): number {
+  let decimal = degrees + minutes / 60 + seconds / 3600;
+  if (direction === "S" || direction === "W") {
+    decimal = -decimal;
+  }
+  return decimal;
+}
 
 const stats = [
   {
@@ -55,6 +64,8 @@ const reportItem = {
     "Rua A 144, QD 485, LT 50, São Cristovão, Rondonópolis - MT, 78700-000",
   dateTime: "14/06/2025 11:50:26 - Sábado",
   coordinates: "16°50’10’’S, 80°30’10’’W",
+  latitude: sexagesimalToDecimal(16, 50, 10, "S"),
+  longitude: sexagesimalToDecimal(80, 30, 10, "W"),
 };
 
 export default function ComplaintsScreen() {
@@ -129,36 +140,35 @@ export default function ComplaintsScreen() {
 
       <Card
         size="sm"
-        className="gap-0 rounded-md border border-gray-100 bg-white p-2 shadow-none"
+        className="gap-3 rounded-md border border-gray-100 bg-white p-3 shadow-none"
       >
-        <View className="flex-row items-center gap-2">
-          <View className="h-16 w-16 overflow-hidden rounded-md bg-gray-100">
-            <Image
-              source={mapPreviewSource}
-              className="h-full w-full"
-              contentFit="cover"
-            />
-          </View>
-
-          <View className="flex-1 justify-center">
-            <Heading numberOfLines={1}>{reportItem.address}</Heading>
-            <Text className="text-sm text-gray-500" selectable>
-              {reportItem.dateTime}
-            </Text>
-            <Text className="text-sm text-gray-500" selectable>
-              {reportItem.coordinates}
-            </Text>
-          </View>
-
-          <View className="items-center gap-2 rounded-md bg-gray-50 p-1">
-            <View className="h-4.5 w-4.5 items-center justify-center rounded-md bg-lime-100">
-              <ShieldCheck size={12} strokeWidth={2.5} color="#3F6212" />
+        <View className="gap-2">
+          <View className="flex-row items-center gap-2">
+            <View className="flex-1 justify-center">
+              <Heading numberOfLines={1}>{reportItem.address}</Heading>
+              <Text className="text-sm text-gray-500" selectable>
+                {reportItem.dateTime}
+              </Text>
+              <Text className="text-sm text-gray-500" selectable>
+                {reportItem.coordinates}
+              </Text>
             </View>
 
-            <Pressable className="h-3 w-3 items-center justify-center">
-              <EllipsisVertical size={12} color="#030712" strokeWidth={2.2} />
-            </Pressable>
+            <View className="items-center gap-2 rounded-md bg-gray-100 p-1">
+              <View className="size-5 items-center justify-center rounded-md bg-lime-100">
+                <ShieldCheck size={12} strokeWidth={2.5} color="#3F6212" />
+              </View>
+
+              <Pressable className="size-5 items-center justify-center">
+                <EllipsisVertical size={12} color="#030712" strokeWidth={2.2} />
+              </Pressable>
+            </View>
           </View>
+
+          <WrapperMapper
+            latitude={reportItem.latitude}
+            longitude={reportItem.longitude}
+          />
         </View>
       </Card>
     </ScrollView>
