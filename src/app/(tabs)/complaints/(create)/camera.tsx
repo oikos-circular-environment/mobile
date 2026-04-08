@@ -9,7 +9,7 @@ import {
 } from "expo-camera";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { ArrowRight } from "lucide-react-native";
+import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { useMemo, useRef, useState } from "react";
 import { Button, TouchableOpacity, View } from "react-native";
 import { Heading } from "@/components/ui/heading";
@@ -20,14 +20,11 @@ import {
   formatMeters,
   formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
-
-type CaptureMode = "photo" | "video";
-
-type MemoryCapture = {
-  id: string;
-  uri: string;
-  type: CaptureMode;
-};
+import {
+  type ComplaintCaptureDraft,
+  type ComplaintCaptureMode,
+  saveComplaintCreateDraft,
+} from "@/libs/memory/complaint-create";
 
 const overlayTextStrokeStyle = {
   textShadowColor: "rgba(0, 0, 0, 0.92)",
@@ -35,29 +32,90 @@ const overlayTextStrokeStyle = {
   textShadowRadius: 6,
 };
 
-export default function CameraScreen() {
+export default function ComplaintCameraScreen() {
   const cameraRef = useRef<CameraView | null>(null);
-  const [mode, setMode] = useState<CaptureMode>("photo");
+  const [mode, setMode] = useState<ComplaintCaptureMode>("photo");
   const [isRecording, setIsRecording] = useState(false);
-  const [captures, setCaptures] = useState<MemoryCapture[]>([]);
+  const [captures, setCaptures] = useState<ComplaintCaptureDraft[]>([]);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [microphonePermission, requestMicrophonePermission] =
     useMicrophonePermissions();
-  const latestCapture = captures[0] ?? null;
-  const previousCapture = captures[1] ?? null;
 
   const { addresses, currentDate, location, heading } = useGeospatial();
 
-  function saveInMemory(uri: string, type: CaptureMode) {
-    setCaptures(current => [
-      {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        uri,
-        type,
-      },
-      ...current,
-    ]);
+  const latestCapture = captures[0] ?? null;
+  const previousCapture = captures[1] ?? null;
+
+  const date = useMemo(
+    () => format(currentDate, "dd/MM/yyyy", { locale: ptBR }),
+    [currentDate],
+  );
+  const time = useMemo(
+    () => format(currentDate, "HH:mm:ss", { locale: ptBR }),
+    [currentDate],
+  );
+  const dayOfWeek = useMemo(
+    () => format(currentDate, "EEEE", { locale: ptBR }),
+    [currentDate],
+  );
+
+  const addressFormatted = useMemo(() => {
+    if (addresses.length === 0) {
+      return "indisponivel";
+    }
+
+    const address = addresses[0];
+    return `${address.street}, ${address.streetNumber}, ${address.district}, ${address.city}, ${address.region} - ${address.postalCode}`;
+  }, [addresses]);
+
+  const headingFormatted = useMemo(
+    () =>
+      formatHeading(heading?.magHeading, {
+        includeCompass: true,
+      }),
+    [heading?.magHeading],
+  );
+
+  const latitudeFormatted = useMemo(
+    () =>
+      location?.coords.latitude != null
+        ? formatSexagesimalCoordinate(location.coords.latitude, "latitude")
+        : "indisponivel",
+    [location?.coords.latitude],
+  );
+
+  const longitudeFormatted = useMemo(
+    () =>
+      location?.coords.longitude != null
+        ? formatSexagesimalCoordinate(location.coords.longitude, "longitude")
+        : "indisponivel",
+    [location?.coords.longitude],
+  );
+
+  const altitudeFormatted = useMemo(
+    () => formatMeters(location?.coords.altitude),
+    [location?.coords.altitude],
+  );
+
+  function saveInMemory(uri: string, type: ComplaintCaptureMode) {
+    const snapshot: ComplaintCaptureDraft = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      uri,
+      type,
+      createdAt: `${date} ${time}`,
+      dayOfWeek,
+      address: addressFormatted,
+      latitude: location?.coords.latitude ?? null,
+      longitude: location?.coords.longitude ?? null,
+      latitudeFormatted,
+      longitudeFormatted,
+      altitudeFormatted,
+      headingFormatted,
+      observation: "",
+    };
+
+    setCaptures(current => [snapshot, ...current]);
   }
 
   async function ensureMicrophonePermission() {
@@ -105,27 +163,14 @@ export default function CameraScreen() {
     }
   }
 
-  const date = useMemo(
-    () => format(currentDate, "dd/MM/yyyy", { locale: ptBR }),
-    [currentDate],
-  );
-  const time = useMemo(
-    () => format(currentDate, "HH:mm:ss", { locale: ptBR }),
-    [currentDate],
-  );
-  const dayOfWeek = useMemo(
-    () => format(currentDate, "EEEE", { locale: ptBR }),
-    [currentDate],
-  );
-
-  const addressFormatted = useMemo(() => {
-    if (addresses.length === 0) {
-      return null;
+  const handleAdvance = () => {
+    if (captures.length === 0) {
+      return;
     }
 
-    const address = addresses[0];
-    return `${address.street}, ${address.streetNumber}, ${address.district}, ${address.city}, ${address.region} - ${address.postalCode}`;
-  }, [addresses]);
+    saveComplaintCreateDraft({ captures });
+    router.push("/complaints/review" as never);
+  };
 
   if (!cameraPermission) {
     return <View className="flex-1 bg-black" />;
@@ -158,80 +203,41 @@ export default function CameraScreen() {
 
       <View className="absolute left-0 right-0 top-16 flex-row justify-between px-5">
         <TouchableOpacity
-          className="rounded-full bg-black/50 px-4 py-2"
+          className="rounded-xl bg-white/90 p-3"
           onPress={() => router.back()}
         >
-          <Text className="text-white">Fechar</Text>
+          <ArrowLeft size={20} color="#4B5563" strokeWidth={2.2} />
         </TouchableOpacity>
       </View>
 
       <View className="absolute bottom-70 left-0 right-0 px-4">
         <View className="rounded-2xl bg-black/35 p-3">
           <Heading
-            className="text-white font-semibold text-2xl"
+            className="text-white text-4xl"
             style={overlayTextStrokeStyle}
           >
             {date}
           </Heading>
-          <View className="flex flex-row gap-2">
-            <Text
-              className="text-white font-semibold text-md"
-              style={overlayTextStrokeStyle}
-            >
+          <View className="flex-row gap-4">
+            <Text className="text-white text-xl" style={overlayTextStrokeStyle}>
               {time}
             </Text>
-            <Text
-              className="text-white font-semibold text-md"
-              style={overlayTextStrokeStyle}
-            >
+            <Text className="text-white text-xl" style={overlayTextStrokeStyle}>
               {dayOfWeek}
             </Text>
           </View>
           <View className="mt-1">
-            <Text
-              className="text-white font-semibold text-md"
-              style={overlayTextStrokeStyle}
-            >
-              Bússola:{" "}
-              {formatHeading(heading?.magHeading, {
-                includeCompass: true,
-              })}
+            <Text className="text-white text-md" style={overlayTextStrokeStyle}>
+              {addressFormatted}
             </Text>
-            <Text
-              className="text-white font-semibold text-md"
-              style={overlayTextStrokeStyle}
-            >
-              Latitude:{" "}
-              {location?.coords.latitude != null
-                ? formatSexagesimalCoordinate(
-                    location.coords.latitude,
-                    "latitude",
-                  )
-                : "indisponivel"}
+            <Text className="text-white text-md" style={overlayTextStrokeStyle}>
+              {latitudeFormatted}, {longitudeFormatted}
             </Text>
-            <Text
-              className="text-white font-semibold text-md"
-              style={overlayTextStrokeStyle}
-            >
-              Longitude:{" "}
-              {location?.coords.longitude != null
-                ? formatSexagesimalCoordinate(
-                    location.coords.longitude,
-                    "longitude",
-                  )
-                : "indisponivel"}
+            <Text className="text-white text-md" style={overlayTextStrokeStyle}>
+              {altitudeFormatted}
             </Text>
-            <Text
-              className="text-white font-semibold text-md"
-              style={overlayTextStrokeStyle}
-            >
-              Altitude: {formatMeters(location?.coords.altitude)}
-            </Text>
-            <Text
-              className="text-white font-semibold text-md"
-              style={overlayTextStrokeStyle}
-            >
-              Endereço: {addressFormatted ?? "indisponivel"}
+            <Text className="text-white text-md" style={overlayTextStrokeStyle}>
+              {headingFormatted}
             </Text>
           </View>
         </View>
@@ -247,9 +253,7 @@ export default function CameraScreen() {
             disabled={isRecording}
           >
             <Text
-              className={`text-lg font-medium ${
-                mode === "video" ? "text-white" : "text-zinc-500"
-              }`}
+              className={`text-lg ${mode === "video" ? "text-white" : "text-zinc-500"}`}
             >
               Video
             </Text>
@@ -263,9 +267,7 @@ export default function CameraScreen() {
             disabled={isRecording}
           >
             <Text
-              className={`text-lg font-medium ${
-                mode === "photo" ? "text-white" : "text-zinc-500"
-              }`}
+              className={`text-lg ${mode === "photo" ? "text-white" : "text-zinc-500"}`}
             >
               Foto
             </Text>
@@ -277,7 +279,7 @@ export default function CameraScreen() {
         <View className="flex-row items-end justify-between">
           <TouchableOpacity
             className="h-20 w-20 overflow-hidden rounded-xl"
-            disabled={latestCapture == null}
+            disabled
           >
             {latestCapture ? (
               <>
@@ -318,7 +320,7 @@ export default function CameraScreen() {
             className={`h-20 w-20 items-center justify-center rounded-xl ${
               captures.length > 0 ? "bg-white" : "bg-white/40"
             }`}
-            onPress={() => router.back()}
+            onPress={handleAdvance}
             disabled={captures.length === 0}
           >
             <ArrowRight size={34} color="#3d6300" strokeWidth={2.2} />

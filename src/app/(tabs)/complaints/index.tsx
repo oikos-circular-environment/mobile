@@ -131,7 +131,10 @@ export default function ComplaintsScreen() {
         </View>
       </Card>
 
-      <Button size="lg" onPress={() => router.push("/camera" as never)}>
+      <Button
+        size="lg"
+        onPress={() => router.push("/complaints/camera" as never)}
+      >
         <ButtonText className="flex-1 text-center font-semibold text-white">
           Nova Denúncia
         </ButtonText>
@@ -152,7 +155,7 @@ export default function ComplaintsScreen() {
                 <Card
                   key={stat.label}
                   size="sm"
-                  className="flex-1 gap-2 rounded-md border border-gray-200 bg-white p-2 shadow-none"
+                  className="flex-1 gap-2 rounded-md border border-gray-200 shadow-none"
                 >
                   <View className="flex-row items-center justify-between">
                     <Heading>{stat.value}</Heading>
@@ -160,7 +163,11 @@ export default function ComplaintsScreen() {
                     <View
                       className={`size-5 items-center justify-center rounded-md ${stat.iconClassName}`}
                     >
-                      <Icon size={12} strokeWidth={2.5} />
+                      <Icon
+                        size={12}
+                        strokeWidth={2.5}
+                        className="bg-amber-700"
+                      />
                     </View>
                   </View>
 

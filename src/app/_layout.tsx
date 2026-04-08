@@ -28,13 +28,6 @@ export default function RootLayout() {
                     name="(tabs)"
                     options={{ headerShown: false }}
                   />
-                  <Stack.Screen
-                    name="camera"
-                    options={{
-                      headerShown: false,
-                      presentation: "fullScreenModal",
-                    }}
-                  />
                 </Stack>
                 <StatusBar style="dark" animated />
               </SafeAreaView>
