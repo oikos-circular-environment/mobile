@@ -22,7 +22,7 @@ export function ComplaintPainel({ panel }: ComplaintPainelProps) {
   return (
     <View className="flex-1">
       <View className="flex-row flex-wrap gap-2">
-        <Card className="flex items-start flex-1 gap-2 border-gray-200 shadow-none">
+        <Card className="w-[48%] items-start gap-2 border-gray-200 shadow-none">
           <View className="flex-row items-center">
             <View className="flex-1">
               <Heading>{panel.total}</Heading>
@@ -36,7 +36,7 @@ export function ComplaintPainel({ panel }: ComplaintPainelProps) {
           <Text className="text-sm text-gray-500">Total de denúncias</Text>
         </Card>
 
-        <Card className="flex items-start flex-1 gap-2 border-gray-200 shadow-none">
+        <Card className="w-[48%] items-start gap-2 border-gray-200 shadow-none">
           <View className="flex-row items-center">
             <View className="flex-1">
               <Heading>{panel.resolved}</Heading>
@@ -50,7 +50,7 @@ export function ComplaintPainel({ panel }: ComplaintPainelProps) {
           <Text className="text-sm text-gray-500">Denúncias resolvidas</Text>
         </Card>
 
-        <Card className="flex items-start flex-1 gap-2 border-gray-200 shadow-none">
+        <Card className="w-[48%] items-start gap-2 border-gray-200 shadow-none">
           <View className="flex-row items-center">
             <View className="flex-1">
               <Heading>{panel.pending}</Heading>
@@ -64,7 +64,7 @@ export function ComplaintPainel({ panel }: ComplaintPainelProps) {
           <Text className="text-sm text-gray-500">Denúncias pendentes</Text>
         </Card>
 
-        <Card className="flex items-start flex-1 gap-2 border-gray-200 shadow-none">
+        <Card className="w-[48%] items-start gap-2 border-gray-200 shadow-none">
           <View className="flex-row items-center">
             <View className="flex-1">
               <Heading>{panel.canceled}</Heading>
