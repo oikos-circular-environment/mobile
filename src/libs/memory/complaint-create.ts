@@ -1,23 +1,7 @@
-export type ComplaintCaptureMode = "photo" | "video";
-
-export type ComplaintCaptureDraft = {
-  id: string;
-  uri: string;
-  type: ComplaintCaptureMode;
-  createdAt: string;
-  dayOfWeek: string;
-  address: string;
-  latitude: number | null;
-  longitude: number | null;
-  latitudeFormatted: string;
-  longitudeFormatted: string;
-  altitudeFormatted: string;
-  headingFormatted: string;
-  observation: string;
-};
+import type { ComplaintCapture } from "../types/complaint";
 
 export type ComplaintCreateDraft = {
-  captures: ComplaintCaptureDraft[];
+  captures: ComplaintCapture[];
 };
 
 let complaintCreateDraft: ComplaintCreateDraft | null = null;

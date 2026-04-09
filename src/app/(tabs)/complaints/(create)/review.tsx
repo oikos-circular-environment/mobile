@@ -133,9 +133,24 @@ export default function ComplaintReviewScreen() {
       />
 
       <View className="gap-2">
+        <Heading size="md">Observação da mídia selecionada</Heading>
+        <Input className="min-h-20">
+          <InputField
+            multiline
+            textAlignVertical="top"
+            numberOfLines={4}
+            placeholder="Adicione observações sobre esta evidência"
+            value={selectedCapture.observation}
+            onChangeText={handleObservationChange}
+          />
+        </Input>
+      </View>
+
+      <View className="gap-2">
         <Heading size="md">Fotos e vídeos</Heading>
         <Text className="text-sm text-gray-500">
-          Selecione uma mídia para conferir os dados e acrescentar observações.
+          Selecione uma mídia para conferir os dados e acrescentar observações
+          ou mantenha pressionado para deletar.
         </Text>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -167,20 +182,6 @@ export default function ComplaintReviewScreen() {
             ))}
           </View>
         </ScrollView>
-      </View>
-
-      <View className="gap-2">
-        <Heading size="md">Observação da mídia selecionada</Heading>
-        <Input className="min-h-20">
-          <InputField
-            multiline
-            textAlignVertical="top"
-            numberOfLines={4}
-            placeholder="Adicione observações sobre esta evidência"
-            value={selectedCapture.observation}
-            onChangeText={handleObservationChange}
-          />
-        </Input>
       </View>
 
       <View className="flex-row gap-3 pt-2">

@@ -22,9 +22,9 @@ import {
 } from "@/libs/geospatial";
 import {
   type ComplaintCaptureDraft,
-  type ComplaintCaptureMode,
   saveComplaintCreateDraft,
 } from "@/libs/memory/complaint-create";
+import type { ComplaintCaptureMode } from "@/libs/types/complaint";
 
 const overlayTextStrokeStyle = {
   textShadowColor: "rgba(0, 0, 0, 0.92)",
@@ -154,7 +154,7 @@ export default function ComplaintCameraScreen() {
 
     try {
       setIsRecording(true);
-      const video = await cameraRef.current.recordAsync({ maxDuration: 120 });
+      const video = await cameraRef.current.recordAsync();
       if (video?.uri) {
         saveInMemory(video.uri, "video");
       }
