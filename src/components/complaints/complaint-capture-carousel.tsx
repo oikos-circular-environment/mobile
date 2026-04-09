@@ -3,7 +3,7 @@
 import { Image } from "expo-image";
 import type { VideoThumbnail } from "expo-video";
 import { createVideoPlayer, useVideoPlayer, VideoView } from "expo-video";
-import { CirclePlay, Eye, Trash2 } from "lucide-react-native";
+import { EyeIcon, Trash2Icon } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import type { ComplaintCapture } from "@/libs/types/complaint";
+import { cn } from "@/libs/utils";
 
 type ComplaintCaptureCarouselProps = {
   captures: ComplaintCapture[];
@@ -26,6 +27,8 @@ type ComplaintCaptureCarouselProps = {
   onSelectCapture: (captureId: string) => void;
   onDeleteCapture: (captureId: string) => void;
 };
+
+type VideoThumbnailState = VideoThumbnail | "failed";
 
 const getCaptureUri = (capture: ComplaintCapture) =>
   capture.capture.object?.uri;
@@ -51,8 +54,9 @@ export function ComplaintCaptureCarousel({
   onDeleteCapture,
   onSelectCapture,
 }: ComplaintCaptureCarouselProps) {
+  console.log(JSON.stringify(captures, null, 2));
   const [videoThumbnails, setVideoThumbnails] = useState<
-    Record<string, VideoThumbnail | null>
+    Record<string, VideoThumbnailState>
   >({});
   const [actionCaptureId, setActionCaptureId] = useState("");
   const [previewCaptureId, setPreviewCaptureId] = useState("");
@@ -76,7 +80,7 @@ export function ComplaintCaptureCarousel({
       );
 
       const pending = videoCaptures.filter(
-        capture => !videoThumbnails[capture.id],
+        capture => !Object.hasOwn(videoThumbnails, capture.id),
       );
 
       if (pending.length === 0) {
@@ -103,7 +107,7 @@ export function ComplaintCaptureCarousel({
 
             setVideoThumbnails(current => ({
               ...current,
-              [capture.id]: result ?? null,
+              [capture.id]: result ?? "failed",
             }));
           } catch {
             if (!isMounted) {
@@ -112,7 +116,7 @@ export function ComplaintCaptureCarousel({
 
             setVideoThumbnails(current => ({
               ...current,
-              [capture.id]: null,
+              [capture.id]: "failed",
             }));
           }
         }),
@@ -158,51 +162,44 @@ export function ComplaintCaptureCarousel({
 
   return (
     <>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <ScrollView
+        horizontal
+        nestedScrollEnabled
+        keyboardShouldPersistTaps="handled"
+        showsHorizontalScrollIndicator={false}
+      >
         <View className="flex-row gap-2 pr-4">
           {captures.map(capture => {
             const captureUri = getCaptureUri(capture);
-            const videoThumbnailUri = videoThumbnails[capture.id];
+            const videoThumbnail = videoThumbnails[capture.id];
             const isSelected = capture.id === selectedCaptureId;
             const canRenderPhoto =
               capture.capture.type === "photo" && captureUri != null;
             const canRenderVideoThumbnail =
-              capture.capture.type === "video" && !!videoThumbnailUri;
+              capture.capture.type === "video" &&
+              !!videoThumbnail &&
+              videoThumbnail !== "failed";
 
             return (
               <Pressable
                 key={capture.id}
-                className={`h-24 w-24 overflow-hidden rounded-lg border ${
-                  isSelected ? "border-lime-800" : "border-gray-200"
-                }`}
-                onPress={() => onSelectCapture(capture.id)}
-                onLongPress={() => setActionCaptureId(capture.id)}
-                delayLongPress={260}
-              >
-                {canRenderPhoto ? (
-                  <Image
-                    source={{ uri: captureUri }}
-                    className="h-full w-full"
-                    contentFit="cover"
-                  />
-                ) : canRenderVideoThumbnail ? (
-                  <View className="h-full w-full">
-                    <Image
-                      source={videoThumbnailUri}
-                      className="h-full w-full"
-                      contentFit="cover"
-                    />
-                    <View className="absolute inset-0 items-center justify-center bg-black/25">
-                      <CirclePlay size={22} color="#FFFFFF" strokeWidth={2.2} />
-                    </View>
-                  </View>
-                ) : (
-                  <View className="flex-1 items-center justify-center bg-zinc-800">
-                    <Text className="text-[10px] font-semibold text-white">
-                      VIDEO
-                    </Text>
-                  </View>
+                className={cn(
+                  "h-24 w-24 overflow-hidden rounded-lg border",
+                  isSelected ? "border-lime-800" : "border-gray-200",
                 )}
+                onPress={() => onSelectCapture(capture.id)}
+                onLongPress={() => {
+                  onSelectCapture(capture.id);
+                  setActionCaptureId(capture.id);
+                }}
+                delayLongPress={260}
+                hitSlop={6}
+              >
+                <Image
+                  source={{ uri: captureUri }}
+                  className="h-full w-full"
+                  contentFit="cover"
+                />
               </Pressable>
             );
           })}
@@ -226,7 +223,7 @@ export function ComplaintCaptureCarousel({
           </ModalBody>
           <ModalFooter className="flex-col items-stretch gap-2">
             <Button className="bg-lime-800" onPress={handlePreview}>
-              <Eye size={16} color="#FFFFFF" strokeWidth={2.2} />
+              <EyeIcon size={16} color="#FFFFFF" strokeWidth={2.2} />
               <ButtonText>Previsualizar</ButtonText>
             </Button>
             <Button
@@ -234,7 +231,7 @@ export function ComplaintCaptureCarousel({
               className="border-red-300"
               onPress={handleDelete}
             >
-              <Trash2 size={16} color="#DC2626" strokeWidth={2.2} />
+              <Trash2Icon size={16} color="#DC2626" strokeWidth={2.2} />
               <ButtonText className="text-red-600">Deletar captura</ButtonText>
             </Button>
             <Button variant="outline" onPress={closeActionMenu}>

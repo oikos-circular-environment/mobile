@@ -1,5 +1,6 @@
 "use client";
 
+import { faker } from "@faker-js/faker";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import {
@@ -142,7 +143,7 @@ export default function ComplaintCameraScreen() {
     const nowIso = new Date().toISOString();
 
     const snapshot: ComplaintCapture = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      id: faker.database.mongodbObjectId(),
       capture: {
         type: captureType,
         object: captureObject,
