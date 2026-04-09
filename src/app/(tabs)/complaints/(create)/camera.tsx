@@ -3,11 +3,13 @@
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import {
+  type CameraCapturedPicture,
   CameraView,
   useCameraPermissions,
   useMicrophonePermissions,
 } from "expo-camera";
 import { Image } from "expo-image";
+import type * as Location from "expo-location";
 import { router } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { useMemo, useRef, useState } from "react";
@@ -20,11 +22,12 @@ import {
   formatMeters,
   formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
-import {
-  type ComplaintCaptureDraft,
-  saveComplaintCreateDraft,
-} from "@/libs/memory/complaint-create";
-import type { ComplaintCaptureMode } from "@/libs/types/complaint";
+import { saveComplaintCreateDraft } from "@/libs/memory/complaint-create";
+import type {
+  CameraCapturedVideo,
+  ComplaintCapture,
+  ComplaintCaptureMode,
+} from "@/libs/types/complaint";
 
 const overlayTextStrokeStyle = {
   textShadowColor: "rgba(0, 0, 0, 0.92)",
@@ -36,7 +39,7 @@ export default function ComplaintCameraScreen() {
   const cameraRef = useRef<CameraView | null>(null);
   const [mode, setMode] = useState<ComplaintCaptureMode>("photo");
   const [isRecording, setIsRecording] = useState(false);
-  const [captures, setCaptures] = useState<ComplaintCaptureDraft[]>([]);
+  const [captures, setCaptures] = useState<ComplaintCapture[]>([]);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [microphonePermission, requestMicrophonePermission] =
@@ -98,21 +101,62 @@ export default function ComplaintCameraScreen() {
     [location?.coords.altitude],
   );
 
-  function saveInMemory(uri: string, type: ComplaintCaptureMode) {
-    const snapshot: ComplaintCaptureDraft = {
+  function saveInMemory(
+    captureObject: CameraCapturedPicture | CameraCapturedVideo,
+    captureType: ComplaintCaptureMode,
+  ) {
+    const fallbackHeading: Location.LocationHeadingObject = {
+      magHeading: 0,
+      trueHeading: 0,
+      accuracy: 0,
+    };
+
+    const fallbackLocation: Location.LocationObject = {
+      coords: {
+        latitude: 0,
+        longitude: 0,
+        altitude: null,
+        accuracy: null,
+        altitudeAccuracy: null,
+        heading: null,
+        speed: null,
+      },
+      timestamp: Date.now(),
+    };
+
+    const fallbackAddress: Location.LocationGeocodedAddress = {
+      city: "",
+      country: "",
+      district: "",
+      formattedAddress: "",
+      isoCountryCode: "",
+      name: "",
+      postalCode: "",
+      region: "",
+      street: "",
+      streetNumber: "",
+      subregion: "",
+      timezone: "",
+    };
+
+    const nowIso = new Date().toISOString();
+
+    const snapshot: ComplaintCapture = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      uri,
-      type,
-      createdAt: `${date} ${time}`,
-      dayOfWeek,
-      address: addressFormatted,
-      latitude: location?.coords.latitude ?? null,
-      longitude: location?.coords.longitude ?? null,
-      latitudeFormatted,
-      longitudeFormatted,
-      altitudeFormatted,
-      headingFormatted,
+      capture: {
+        type: captureType,
+        object: captureObject,
+      },
+      date: nowIso,
+      geospatial: {
+        heading: heading ?? fallbackHeading,
+        location: location ?? fallbackLocation,
+        addresses: addresses[0] ?? fallbackAddress,
+      },
+      type: "irregular_disposal",
       observation: "",
+      created_at: nowIso,
+      updated_at: nowIso,
     };
 
     setCaptures(current => [snapshot, ...current]);
@@ -137,7 +181,7 @@ export default function ComplaintCameraScreen() {
         quality: 0.8,
       });
       if (picture?.uri) {
-        saveInMemory(picture.uri, "photo");
+        saveInMemory(picture, "photo");
       }
       return;
     }
@@ -156,7 +200,7 @@ export default function ComplaintCameraScreen() {
       setIsRecording(true);
       const video = await cameraRef.current.recordAsync();
       if (video?.uri) {
-        saveInMemory(video.uri, "video");
+        saveInMemory(video, "video");
       }
     } finally {
       setIsRecording(false);
@@ -286,9 +330,10 @@ export default function ComplaintCameraScreen() {
                 {previousCapture ? (
                   <View className="absolute -left-1 -top-1 h-full w-full rounded-xl bg-zinc-700/70" />
                 ) : null}
-                {latestCapture.type === "photo" ? (
+                {latestCapture.capture.type === "photo" &&
+                latestCapture.capture.object?.uri ? (
                   <Image
-                    source={{ uri: latestCapture.uri }}
+                    source={{ uri: latestCapture.capture.object.uri }}
                     contentFit="cover"
                     style={{ flex: 1 }}
                   />
