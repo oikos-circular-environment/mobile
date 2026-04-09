@@ -1,10 +1,13 @@
 import { Stack } from "expo-router";
+import { ComplaintCreateProvider } from "../../../../contexts/create-complaint-context";
 
 export default function ComplaintsCreateStackLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="camera" options={{ headerShown: false }} />
-      <Stack.Screen name="review" options={{ headerShown: false }} />
-    </Stack>
+    <ComplaintCreateProvider>
+      <Stack>
+        <Stack.Screen name="camera" options={{ headerShown: false }} />
+        <Stack.Screen name="review" options={{ headerShown: false }} />
+      </Stack>
+    </ComplaintCreateProvider>
   );
 }

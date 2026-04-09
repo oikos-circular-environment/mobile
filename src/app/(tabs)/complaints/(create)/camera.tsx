@@ -22,12 +22,12 @@ import {
   formatMeters,
   formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
-import { saveComplaintCreateDraft } from "@/libs/memory/complaint-create";
 import type {
   CameraCapturedVideo,
   ComplaintCapture,
   ComplaintCaptureMode,
 } from "@/libs/types/complaint";
+import { useComplaintCreateContext } from "../../../../contexts/create-complaint-context";
 
 const overlayTextStrokeStyle = {
   textShadowColor: "rgba(0, 0, 0, 0.92)",
@@ -39,7 +39,7 @@ export default function ComplaintCameraScreen() {
   const cameraRef = useRef<CameraView | null>(null);
   const [mode, setMode] = useState<ComplaintCaptureMode>("photo");
   const [isRecording, setIsRecording] = useState(false);
-  const [captures, setCaptures] = useState<ComplaintCapture[]>([]);
+  const { addCapture, captures } = useComplaintCreateContext();
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [microphonePermission, requestMicrophonePermission] =
@@ -159,7 +159,7 @@ export default function ComplaintCameraScreen() {
       updated_at: nowIso,
     };
 
-    setCaptures(current => [snapshot, ...current]);
+    addCapture(snapshot);
   }
 
   async function ensureMicrophonePermission() {
@@ -212,7 +212,6 @@ export default function ComplaintCameraScreen() {
       return;
     }
 
-    saveComplaintCreateDraft({ captures });
     router.push("/complaints/review" as never);
   };
 

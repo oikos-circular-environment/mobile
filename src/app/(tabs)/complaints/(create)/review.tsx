@@ -3,13 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import { ShieldAlert } from "lucide-react-native";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
+import { ComplaintCaptureCarousel } from "@/components/complaints/complaint-capture-carousel";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -32,15 +32,11 @@ import {
   formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
 import {
-  clearComplaintCreateDraft,
-  getComplaintCreateDraft,
-  saveComplaintCreateDraft,
-} from "@/libs/memory/complaint-create";
-import {
   type ComplaintCapture,
   type ComplaintType,
   complaintTypeValues,
 } from "@/libs/types/complaint";
+import { useComplaintCreateContext } from "../../../../contexts/create-complaint-context";
 
 const complaintTypeSchema = z.enum([
   "irregular_disposal",
@@ -77,23 +73,16 @@ const formatAddress = (capture: ComplaintCapture) => {
   return parts.join(", ");
 };
 
-const getCaptureUri = (capture: ComplaintCapture) =>
-  capture.capture.object?.uri;
-
 export default function ComplaintReviewScreen() {
-  const initialDraft = getComplaintCreateDraft();
-
-  const [selectedCaptureId, setSelectedCaptureId] = useState(
-    initialDraft?.captures[0]?.id ?? "",
-  );
-  const [, setRefreshToken] = useState(0);
-
-  const draft = getComplaintCreateDraft();
-
-  const selectedCapture =
-    draft?.captures.find(capture => capture.id === selectedCaptureId) ??
-    draft?.captures[0] ??
-    null;
+  const {
+    captures,
+    clearDraft,
+    deleteCapture,
+    selectedCapture,
+    selectedCaptureId,
+    setSelectedCaptureId,
+    updateCapture,
+  } = useComplaintCreateContext();
 
   const {
     control,
@@ -130,7 +119,7 @@ export default function ComplaintReviewScreen() {
     });
   }, [selectedCapture, reset]);
 
-  if (!draft || draft.captures.length === 0 || !selectedCapture) {
+  if (captures.length === 0 || !selectedCapture) {
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-white px-6">
         <Heading size="lg">Nenhuma mídia capturada</Heading>
@@ -142,7 +131,7 @@ export default function ComplaintReviewScreen() {
   }
 
   const handleConfirm = () => {
-    clearComplaintCreateDraft();
+    clearDraft();
     router.replace("/complaints" as never);
   };
 
@@ -153,27 +142,11 @@ export default function ComplaintReviewScreen() {
   const updateSelectedCapture = (
     payload: Partial<Pick<ComplaintCapture, "observation" | "type">>,
   ) => {
-    const currentDraft = getComplaintCreateDraft();
+    updateCapture(selectedCapture.id, payload);
+  };
 
-    if (!currentDraft) {
-      return;
-    }
-
-    const updatedAt = new Date().toISOString();
-
-    saveComplaintCreateDraft({
-      captures: currentDraft.captures.map(capture =>
-        capture.id === selectedCapture.id
-          ? {
-              ...capture,
-              ...payload,
-              updated_at: updatedAt,
-            }
-          : capture,
-      ),
-    });
-
-    setRefreshToken(current => current + 1);
+  const handleDeleteCapture = (captureId: string) => {
+    deleteCapture(captureId);
   };
 
   const captureDate = new Date(selectedCapture.date);
@@ -391,39 +364,12 @@ export default function ComplaintReviewScreen() {
             ou mantenha pressionado para deletar.
           </Text>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-row gap-2 pr-4">
-              {draft.captures.map(capture => {
-                const captureUri = getCaptureUri(capture);
-
-                return (
-                  <Pressable
-                    key={capture.id}
-                    className={`h-24 w-24 overflow-hidden rounded-lg border ${
-                      capture.id === selectedCapture.id
-                        ? "border-lime-800"
-                        : "border-gray-200"
-                    }`}
-                    onPress={() => setSelectedCaptureId(capture.id)}
-                  >
-                    {capture.capture.type === "photo" && captureUri ? (
-                      <Image
-                        source={{ uri: captureUri }}
-                        className="h-full w-full"
-                        contentFit="cover"
-                      />
-                    ) : (
-                      <View className="flex-1 items-center justify-center bg-zinc-800">
-                        <Text className="text-[10px] font-semibold text-white">
-                          VIDEO
-                        </Text>
-                      </View>
-                    )}
-                  </Pressable>
-                );
-              })}
-            </View>
-          </ScrollView>
+          <ComplaintCaptureCarousel
+            captures={captures}
+            selectedCaptureId={selectedCaptureId}
+            onSelectCapture={setSelectedCaptureId}
+            onDeleteCapture={handleDeleteCapture}
+          />
         </View>
 
         <View className="flex-row gap-3 pt-2">
