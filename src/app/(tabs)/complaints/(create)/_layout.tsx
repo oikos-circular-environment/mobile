@@ -7,6 +7,14 @@ export default function ComplaintsCreateStackLayout() {
       <Stack>
         <Stack.Screen name="camera" options={{ headerShown: false }} />
         <Stack.Screen name="review" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="preview"
+          options={{
+            headerShown: false,
+            presentation: "fullScreenModal",
+            animation: "fade",
+          }}
+        />
       </Stack>
     </ComplaintCreateProvider>
   );
