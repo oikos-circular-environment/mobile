@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
-import { ComplaintCaptureCarousel } from "@/components/complaints/complaint-capture-carousel";
+import { ComplaintCarousel } from "@/components/complaints/complaint-carousel";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -363,7 +363,7 @@ export default function ComplaintReviewScreen() {
             ou mantenha pressionado para deletar.
           </Text>
 
-          <ComplaintCaptureCarousel
+          <ComplaintCarousel
             captures={captures}
             selectedCaptureId={selectedCaptureId}
             onSelectCapture={setSelectedCaptureId}

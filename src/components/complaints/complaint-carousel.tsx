@@ -1,15 +1,12 @@
 "use client";
 
-import { Image } from "expo-image";
 import { router } from "expo-router";
-import type { VideoThumbnail } from "expo-video";
-import { createVideoPlayer } from "expo-video";
 import { EyeIcon, Trash2Icon } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ScrollView, View } from "react-native";
+import { MediaThumbnail } from "@/components/common";
 import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
 import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
 import type { ComplaintCapture } from "@/libs/types/complaint";
 import { cn } from "@/libs/utils";
 
@@ -20,112 +17,16 @@ type ComplaintCaptureCarouselProps = {
   onDeleteCapture: (captureId: string) => void;
 };
 
-type VideoThumbnailState = VideoThumbnail | "failed";
-
 const getCaptureUri = (capture: ComplaintCapture) =>
   capture.capture.object?.uri;
 
-function VideoThumbnailUI({
-  thumbnail,
-}: {
-  thumbnail: VideoThumbnailState | undefined;
-}) {
-  if (!thumbnail || thumbnail === "failed") {
-    return (
-      <View className="flex-1 items-center justify-center bg-zinc-800">
-        <Text className="text-[10px] font-semibold text-white">VIDEO</Text>
-      </View>
-    );
-  }
-
-  return (
-    <Image
-      source={
-        typeof thumbnail === "object" && thumbnail && "uri" in thumbnail
-          ? { uri: thumbnail.uri as string }
-          : undefined
-      }
-      style={{
-        height: "100%",
-        width: "100%",
-        borderRadius: 6,
-      }}
-      contentFit="cover"
-    />
-  );
-}
-
-export function ComplaintCaptureCarousel({
+export function ComplaintCarousel({
   captures,
   selectedCaptureId,
   onDeleteCapture,
   onSelectCapture,
 }: ComplaintCaptureCarouselProps) {
-  // console.log(JSON.stringify(captures, null, 2));
-
-  const [videoThumbnails, setVideoThumbnails] = useState<
-    Record<string, VideoThumbnailState>
-  >({});
   const [openMenuCaptureId, setOpenMenuCaptureId] = useState("");
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const generateVideoThumbnails = async () => {
-      const videoCaptures = captures.filter(
-        capture => capture.capture.type === "video" && getCaptureUri(capture),
-      );
-
-      const pending = videoCaptures.filter(
-        capture => !Object.hasOwn(videoThumbnails, capture.id),
-      );
-
-      if (pending.length === 0) {
-        return;
-      }
-
-      await Promise.all(
-        pending.map(async capture => {
-          const uri = getCaptureUri(capture);
-
-          if (!uri) {
-            return;
-          }
-
-          try {
-            const player = createVideoPlayer({ uri });
-            const [result] = await player.generateThumbnailsAsync(0.5, {
-              maxHeight: 240,
-            });
-
-            if (!isMounted) {
-              return;
-            }
-
-            setVideoThumbnails(current => ({
-              ...current,
-              [capture.id]: result ?? "failed",
-            }));
-          } catch {
-            if (!isMounted) {
-              return;
-            }
-
-            setVideoThumbnails(current => ({
-              ...current,
-              [capture.id]: "failed",
-            }));
-          }
-        }),
-      );
-    };
-
-    generateVideoThumbnails();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [captures, videoThumbnails]);
 
   return (
     <ScrollView
@@ -138,11 +39,6 @@ export function ComplaintCaptureCarousel({
         {captures.map(capture => {
           const captureUri = getCaptureUri(capture);
           const isSelected = capture.id === selectedCaptureId;
-          const videoThumbnail = videoThumbnails[capture.id];
-          const canRenderPhoto =
-            capture.capture.type === "photo" && captureUri != null;
-          const canRenderVideoThumbnail =
-            capture.capture.type === "video" && !!videoThumbnail;
 
           return (
             <Menu
@@ -175,25 +71,12 @@ export function ComplaintCaptureCarousel({
                     delayLongPress={260}
                     hitSlop={6}
                   >
-                    {canRenderPhoto ? (
-                      <Image
-                        source={{ uri: captureUri }}
-                        style={{
-                          height: "100%",
-                          width: "100%",
-                          borderRadius: 6,
-                        }}
-                        contentFit="cover"
-                      />
-                    ) : canRenderVideoThumbnail ? (
-                      <VideoThumbnailUI thumbnail={videoThumbnail} />
-                    ) : (
-                      <View className="flex-1 items-center justify-center bg-zinc-700">
-                        <Text className="text-[10px] text-white/70">
-                          Carregando
-                        </Text>
-                      </View>
-                    )}
+                    <MediaThumbnail
+                      mediaType={capture.capture.type}
+                      uri={captureUri}
+                      loadingLabel="Carregando"
+                      fallbackLabel="Vídeo"
+                    />
                   </Pressable>
                 );
               }}
