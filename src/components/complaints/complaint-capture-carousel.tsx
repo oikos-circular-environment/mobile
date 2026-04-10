@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
 import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
 import type { ComplaintCapture } from "@/libs/types/complaint";
 import { cn } from "@/libs/utils";
 
@@ -23,6 +24,36 @@ type VideoThumbnailState = VideoThumbnail | "failed";
 
 const getCaptureUri = (capture: ComplaintCapture) =>
   capture.capture.object?.uri;
+
+function VideoThumbnailUI({
+  thumbnail,
+}: {
+  thumbnail: VideoThumbnailState | undefined;
+}) {
+  if (!thumbnail || thumbnail === "failed") {
+    return (
+      <View className="flex-1 items-center justify-center bg-zinc-800">
+        <Text className="text-[10px] font-semibold text-white">VIDEO</Text>
+      </View>
+    );
+  }
+
+  return (
+    <Image
+      source={
+        typeof thumbnail === "object" && thumbnail && "uri" in thumbnail
+          ? { uri: thumbnail.uri as string }
+          : undefined
+      }
+      style={{
+        height: "100%",
+        width: "100%",
+        borderRadius: 6,
+      }}
+      contentFit="cover"
+    />
+  );
+}
 
 export function ComplaintCaptureCarousel({
   captures,
@@ -107,6 +138,11 @@ export function ComplaintCaptureCarousel({
         {captures.map(capture => {
           const captureUri = getCaptureUri(capture);
           const isSelected = capture.id === selectedCaptureId;
+          const videoThumbnail = videoThumbnails[capture.id];
+          const canRenderPhoto =
+            capture.capture.type === "photo" && captureUri != null;
+          const canRenderVideoThumbnail =
+            capture.capture.type === "video" && !!videoThumbnail;
 
           return (
             <Menu
@@ -139,15 +175,25 @@ export function ComplaintCaptureCarousel({
                     delayLongPress={260}
                     hitSlop={6}
                   >
-                    <Image
-                      source={{ uri: captureUri }}
-                      style={{
-                        height: "100%",
-                        width: "100%",
-                        borderRadius: 6,
-                      }}
-                      contentFit="cover"
-                    />
+                    {canRenderPhoto ? (
+                      <Image
+                        source={{ uri: captureUri }}
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          borderRadius: 6,
+                        }}
+                        contentFit="cover"
+                      />
+                    ) : canRenderVideoThumbnail ? (
+                      <VideoThumbnailUI thumbnail={videoThumbnail} />
+                    ) : (
+                      <View className="flex-1 items-center justify-center bg-zinc-700">
+                        <Text className="text-[10px] text-white/70">
+                          Carregando
+                        </Text>
+                      </View>
+                    )}
                   </Pressable>
                 );
               }}

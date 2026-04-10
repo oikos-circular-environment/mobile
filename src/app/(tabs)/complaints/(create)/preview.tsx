@@ -1,21 +1,12 @@
 "use client";
 
-import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { useVideoPlayer, VideoView } from "expo-video";
 import { View } from "react-native";
+import { ImagePreviewViewer } from "@/components/common/image-preview-viewer";
+import { VideoPreviewPlayer } from "@/components/common/video-preview-player";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
-
-function VideoPreviewPlayer({ uri }: { uri: string }) {
-  const player = useVideoPlayer(uri, setupPlayer => {
-    setupPlayer.loop = true;
-    setupPlayer.play();
-  });
-
-  return <VideoView player={player} nativeControls style={{ flex: 1 }} />;
-}
 
 export default function ComplaintPreviewScreen() {
   const { captureId } = useLocalSearchParams<{ captureId?: string }>();
@@ -28,11 +19,7 @@ export default function ComplaintPreviewScreen() {
     <View className="flex-1">
       {previewCapture && captureUri ? (
         previewCapture.capture.type === "photo" ? (
-          <Image
-            source={{ uri: captureUri }}
-            style={{ flex: 1 }}
-            contentFit="contain"
-          />
+          <ImagePreviewViewer uri={captureUri} />
         ) : (
           <VideoPreviewPlayer uri={captureUri} />
         )
