@@ -20,14 +20,53 @@ const complaintPainelValues = {
 
 const complaint: Complaint[] = [
   {
-    address:
-      "Rua A 144, QD 485, LT 50, São Cristovão, Rondonópolis - MT, 78700-000",
-    dateTime: "14/06/2025 11:50:26 - Sábado",
-    coordinates: {
-      latitude: 16.836111,
-      longitude: -80.502778,
-      formatted: "16° 50' 10\" S, 80° 30' 10\" W",
+    id: "complaint-1",
+    capture: {
+      type: "photo",
+      object: {
+        uri: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=960&q=80",
+      },
     },
+    date: "2026-04-09T14:50:26.000Z",
+    geospatial: {
+      heading: {
+        accuracy: 3,
+        trueHeading: 124.5,
+        magHeading: 120.3,
+      },
+      location: {
+        coords: {
+          accuracy: 5,
+          altitude: 320,
+          latitude: -16.4708,
+          longitude: -54.6354,
+          altitudeAccuracy: 8,
+          heading: 124.5,
+          speed: 0,
+        },
+        timestamp: 1744210226000,
+        mocked: true,
+      },
+      addresses: {
+        streetNumber: "144",
+        street: "Rua A",
+        city: "Rondonópolis",
+        country: "Brasil",
+        postalCode: "78700-000",
+        region: "Mato Grosso",
+        subregion: "Centro-Sul Mato-grossense",
+        district: "São Cristóvão",
+        formattedAddress:
+          "Rua A, 144, São Cristóvão, Rondonópolis - MT, 78700-000",
+        isoCountryCode: "BR",
+        name: "Ponto de descarte irregular",
+        timezone: "America/Cuiaba",
+      },
+    },
+    type: "irregular_disposal",
+    observation: "Acúmulo de entulho e resíduos em via pública.",
+    created_at: "2026-04-09T14:50:26.000Z",
+    updated_at: "2026-04-09T14:50:26.000Z",
     status: "pending",
   },
 ];
@@ -57,7 +96,7 @@ export default function ComplaintsScreen() {
 
       <Button
         size="lg"
-        onPress={() => router.push("/complaints/camera" as never)}
+        onPress={() => router.push("/(tabs)/complaints/(create)/camera")}
       >
         <ButtonText className="flex-1 text-center font-semibold text-white">
           Nova Denúncia

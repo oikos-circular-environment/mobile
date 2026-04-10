@@ -27,6 +27,28 @@ interface ComplaintCardProps {
 }
 
 export function ComplaintCard({ complaint }: ComplaintCardProps) {
+  const { coords } = complaint.geospatial.location;
+  const address =
+    complaint.geospatial.addresses.formattedAddress ??
+    [
+      complaint.geospatial.addresses.street,
+      complaint.geospatial.addresses.streetNumber,
+      complaint.geospatial.addresses.district,
+      complaint.geospatial.addresses.city,
+      complaint.geospatial.addresses.region,
+      complaint.geospatial.addresses.postalCode,
+    ]
+      .filter(Boolean)
+      .join(", ");
+  const createdAtLabel = new Date(complaint.created_at).toLocaleString(
+    "pt-BR",
+    {
+      dateStyle: "short",
+      timeStyle: "medium",
+    },
+  );
+  const coordinatesLabel = `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`;
+
   const handleViewComplaint = () => {
     Alert.alert("Denúncia", "Abrindo detalhes da denúncia.");
   };
@@ -40,7 +62,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
   };
 
   const handleOpenInMaps = async () => {
-    const { latitude, longitude } = complaint.coordinates;
+    const { latitude, longitude } = coords;
     const mapsUrl =
       Platform.OS === "ios"
         ? `http://maps.apple.com/?ll=${latitude},${longitude}`
@@ -72,12 +94,14 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
       <View className="gap-2">
         <View className="flex-row items-center gap-2">
           <View className="flex-1 justify-center">
-            <Heading numberOfLines={1}>{complaint.address}</Heading>
+            <Heading numberOfLines={1}>
+              {address || "Endereço não informado"}
+            </Heading>
             <Text className="text-sm text-gray-500" selectable>
-              {complaint.dateTime}
+              {createdAtLabel}
             </Text>
             <Text className="text-sm text-gray-500" selectable>
-              {complaint.coordinates.formatted}
+              {coordinatesLabel}
             </Text>
           </View>
 
@@ -156,10 +180,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
           </View>
         </View>
 
-        <ComplaintMap
-          latitude={complaint.coordinates.latitude}
-          longitude={complaint.coordinates.longitude}
-        />
+        <ComplaintMap latitude={coords.latitude} longitude={coords.longitude} />
       </View>
     </Card>
   );

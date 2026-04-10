@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
 import {
   Modal,
   ModalBackdrop,
@@ -54,17 +55,13 @@ export function ComplaintCaptureCarousel({
   onDeleteCapture,
   onSelectCapture,
 }: ComplaintCaptureCarouselProps) {
-  console.log(JSON.stringify(captures, null, 2));
+  // console.log(JSON.stringify(captures, null, 2));
+
   const [videoThumbnails, setVideoThumbnails] = useState<
     Record<string, VideoThumbnailState>
   >({});
-  const [actionCaptureId, setActionCaptureId] = useState("");
+  const [openMenuCaptureId, setOpenMenuCaptureId] = useState("");
   const [previewCaptureId, setPreviewCaptureId] = useState("");
-
-  const selectedActionCapture = useMemo(
-    () => captures.find(capture => capture.id === actionCaptureId) ?? null,
-    [actionCaptureId, captures],
-  );
 
   const previewCapture = useMemo(
     () => captures.find(capture => capture.id === previewCaptureId) ?? null,
@@ -130,34 +127,8 @@ export function ComplaintCaptureCarousel({
     };
   }, [captures, videoThumbnails]);
 
-  const closeActionMenu = () => {
-    setActionCaptureId("");
-  };
-
   const closePreview = () => {
     setPreviewCaptureId("");
-  };
-
-  const handleDelete = () => {
-    if (!selectedActionCapture) {
-      return;
-    }
-
-    onDeleteCapture(selectedActionCapture.id);
-    closeActionMenu();
-
-    if (previewCaptureId === selectedActionCapture.id) {
-      closePreview();
-    }
-  };
-
-  const handlePreview = () => {
-    if (!selectedActionCapture) {
-      return;
-    }
-
-    setPreviewCaptureId(selectedActionCapture.id);
-    closeActionMenu();
   };
 
   return (
@@ -171,75 +142,91 @@ export function ComplaintCaptureCarousel({
         <View className="flex-row gap-2 pr-4">
           {captures.map(capture => {
             const captureUri = getCaptureUri(capture);
-            const videoThumbnail = videoThumbnails[capture.id];
             const isSelected = capture.id === selectedCaptureId;
-            const canRenderPhoto =
-              capture.capture.type === "photo" && captureUri != null;
-            const canRenderVideoThumbnail =
-              capture.capture.type === "video" &&
-              !!videoThumbnail &&
-              videoThumbnail !== "failed";
 
             return (
-              <Pressable
+              <Menu
                 key={capture.id}
-                className={cn(
-                  "h-24 w-24 overflow-hidden rounded-lg border",
-                  isSelected ? "border-lime-800" : "border-gray-200",
-                )}
-                onPress={() => onSelectCapture(capture.id)}
-                onLongPress={() => {
-                  onSelectCapture(capture.id);
-                  setActionCaptureId(capture.id);
+                placement="bottom"
+                offset={8}
+                useRNModal
+                isOpen={openMenuCaptureId === capture.id}
+                onClose={() => {
+                  setOpenMenuCaptureId(current =>
+                    current === capture.id ? "" : current,
+                  );
                 }}
-                delayLongPress={260}
-                hitSlop={6}
+                trigger={triggerProps => {
+                  const { onLongPress: _onLongPress, ...restTriggerProps } =
+                    triggerProps;
+
+                  return (
+                    <Pressable
+                      className={cn(
+                        "size-24 p-0.5 overflow-hidden rounded-lg border",
+                        isSelected ? "border-lime-800" : "border-gray-200",
+                      )}
+                      {...restTriggerProps}
+                      onPress={() => onSelectCapture(capture.id)}
+                      onLongPress={() => {
+                        onSelectCapture(capture.id);
+                        setOpenMenuCaptureId(capture.id);
+                      }}
+                      delayLongPress={260}
+                      hitSlop={6}
+                    >
+                      <Image
+                        source={{ uri: captureUri }}
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          borderRadius: 6,
+                        }}
+                        contentFit="cover"
+                      />
+                    </Pressable>
+                  );
+                }}
               >
-                <Image
-                  source={{ uri: captureUri }}
-                  className="h-full w-full"
-                  contentFit="cover"
-                />
-              </Pressable>
+                <MenuItem
+                  key={`preview-${capture.id}`}
+                  textValue="Previsualizar"
+                  onPress={() => {
+                    onSelectCapture(capture.id);
+                    setPreviewCaptureId(capture.id);
+                    setOpenMenuCaptureId("");
+                  }}
+                >
+                  <View className="flex-row items-center gap-2">
+                    <EyeIcon size={14} color="#FFFFFF" strokeWidth={2.2} />
+                    <MenuItemLabel>Previsualizar</MenuItemLabel>
+                  </View>
+                </MenuItem>
+
+                <MenuItem
+                  key={`delete-${capture.id}`}
+                  textValue="Deletar captura"
+                  onPress={() => {
+                    if (previewCaptureId === capture.id) {
+                      closePreview();
+                    }
+
+                    setOpenMenuCaptureId("");
+                    onDeleteCapture(capture.id);
+                  }}
+                >
+                  <View className="flex-row items-center gap-2">
+                    <Trash2Icon size={14} color="#DC2626" strokeWidth={2.2} />
+                    <MenuItemLabel className="text-red-600">
+                      Deletar captura
+                    </MenuItemLabel>
+                  </View>
+                </MenuItem>
+              </Menu>
             );
           })}
         </View>
       </ScrollView>
-
-      <Modal
-        isOpen={!!selectedActionCapture}
-        onClose={closeActionMenu}
-        size="sm"
-      >
-        <ModalBackdrop />
-        <ModalContent>
-          <ModalHeader>
-            <Heading size="md">Ações da captura</Heading>
-          </ModalHeader>
-          <ModalBody>
-            <Text className="text-sm text-gray-600">
-              Escolha uma ação para a captura selecionada.
-            </Text>
-          </ModalBody>
-          <ModalFooter className="flex-col items-stretch gap-2">
-            <Button className="bg-lime-800" onPress={handlePreview}>
-              <EyeIcon size={16} color="#FFFFFF" strokeWidth={2.2} />
-              <ButtonText>Previsualizar</ButtonText>
-            </Button>
-            <Button
-              variant="outline"
-              className="border-red-300"
-              onPress={handleDelete}
-            >
-              <Trash2Icon size={16} color="#DC2626" strokeWidth={2.2} />
-              <ButtonText className="text-red-600">Deletar captura</ButtonText>
-            </Button>
-            <Button variant="outline" onPress={closeActionMenu}>
-              <ButtonText>Cancelar</ButtonText>
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
 
       <Modal isOpen={!!previewCapture} onClose={closePreview} size="lg">
         <ModalBackdrop />

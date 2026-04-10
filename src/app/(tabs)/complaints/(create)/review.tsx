@@ -120,22 +120,21 @@ export default function ComplaintReviewScreen() {
   }, [selectedCapture, reset]);
 
   if (captures.length === 0 || !selectedCapture) {
-    return (
-      <View className="flex-1 items-center justify-center gap-4 bg-white px-6">
-        <Heading size="lg">Nenhuma mídia capturada</Heading>
-        <Button onPress={() => router.replace("/complaints" as never)}>
-          <ButtonText>Voltar para denúncias</ButtonText>
-        </Button>
-      </View>
-    );
+    // return router.replace("/(tabs)/complaints/(create)/camera");
+    return router.back();
   }
 
   const handleConfirm = () => {
     clearDraft();
-    router.replace("/complaints" as never);
+    router.replace("/(tabs)/complaints");
   };
 
   const handleBack = () => {
+    if (captures.length === 0) {
+      router.replace("/(tabs)/complaints/(create)/camera");
+      return;
+    }
+
     router.back();
   };
 

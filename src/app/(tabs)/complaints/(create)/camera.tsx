@@ -13,10 +13,12 @@ import { Image } from "expo-image";
 import type * as Location from "expo-location";
 import { router } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, TouchableOpacity, View } from "react-native";
 import { Heading } from "@/components/ui/heading";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import {
   formatHeading,
@@ -28,7 +30,6 @@ import type {
   ComplaintCapture,
   ComplaintCaptureMode,
 } from "@/libs/types/complaint";
-import { useComplaintCreateContext } from "../../../../contexts/create-complaint-context";
 
 const overlayTextStrokeStyle = {
   textShadowColor: "rgba(0, 0, 0, 0.92)",
@@ -38,8 +39,12 @@ const overlayTextStrokeStyle = {
 
 export default function ComplaintCameraScreen() {
   const cameraRef = useRef<CameraView | null>(null);
+  const modeTransitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const [mode, setMode] = useState<ComplaintCaptureMode>("photo");
   const [isRecording, setIsRecording] = useState(false);
+  const [isModeTransitioning, setIsModeTransitioning] = useState(false);
   const { addCapture, captures } = useComplaintCreateContext();
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -101,6 +106,45 @@ export default function ComplaintCameraScreen() {
     () => formatMeters(location?.coords.altitude),
     [location?.coords.altitude],
   );
+
+  useEffect(() => {
+    return () => {
+      if (modeTransitionTimeoutRef.current) {
+        clearTimeout(modeTransitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleModeChange = (nextMode: ComplaintCaptureMode) => {
+    if (nextMode === mode || isRecording || isModeTransitioning) {
+      return;
+    }
+
+    setIsModeTransitioning(true);
+    setMode(nextMode);
+
+    if (modeTransitionTimeoutRef.current) {
+      clearTimeout(modeTransitionTimeoutRef.current);
+    }
+
+    // Fallback: alguns devices podem não disparar onCameraReady ao trocar mode.
+    modeTransitionTimeoutRef.current = setTimeout(() => {
+      setIsModeTransitioning(false);
+    }, 700);
+  };
+
+  const handleCameraReady = () => {
+    if (!isModeTransitioning) {
+      return;
+    }
+
+    if (modeTransitionTimeoutRef.current) {
+      clearTimeout(modeTransitionTimeoutRef.current);
+      modeTransitionTimeoutRef.current = null;
+    }
+
+    setIsModeTransitioning(false);
+  };
 
   function saveInMemory(
     captureObject: CameraCapturedPicture | CameraCapturedVideo,
@@ -173,7 +217,7 @@ export default function ComplaintCameraScreen() {
   }
 
   async function handleCapture() {
-    if (!cameraRef.current) {
+    if (!cameraRef.current || isModeTransitioning) {
       return;
     }
 
@@ -243,7 +287,17 @@ export default function ComplaintCameraScreen() {
         ref={cameraRef}
         style={{ flex: 1 }}
         mode={mode === "photo" ? "picture" : "video"}
+        onCameraReady={handleCameraReady}
       />
+
+      {isModeTransitioning ? (
+        <View className="absolute inset-0 items-center justify-center bg-black/30">
+          <View className="items-center gap-2 rounded-xl bg-black/55 px-5 py-4">
+            <Spinner className="text-white" size="small" />
+            <Text className="text-sm text-white">Alternando modo...</Text>
+          </View>
+        </View>
+      ) : null}
 
       <View className="absolute left-0 right-0 top-16 flex-row justify-between px-5">
         <TouchableOpacity
@@ -293,8 +347,8 @@ export default function ComplaintCameraScreen() {
             className={`flex-1 items-center rounded-xl py-3 ${
               mode === "video" ? "bg-lime-900" : "bg-transparent"
             }`}
-            onPress={() => setMode("video")}
-            disabled={isRecording}
+            onPress={() => handleModeChange("video")}
+            disabled={isRecording || isModeTransitioning}
           >
             <Text
               className={`text-lg ${mode === "video" ? "text-white" : "text-zinc-500"}`}
@@ -307,8 +361,8 @@ export default function ComplaintCameraScreen() {
             className={`flex-1 items-center rounded-xl py-3 ${
               mode === "photo" ? "bg-lime-900" : "bg-transparent"
             }`}
-            onPress={() => setMode("photo")}
-            disabled={isRecording}
+            onPress={() => handleModeChange("photo")}
+            disabled={isRecording || isModeTransitioning}
           >
             <Text
               className={`text-lg ${mode === "photo" ? "text-white" : "text-zinc-500"}`}
@@ -357,6 +411,7 @@ export default function ComplaintCameraScreen() {
               mode === "video" && isRecording ? "bg-red-600" : "bg-white"
             }`}
             onPress={handleCapture}
+            disabled={isModeTransitioning}
           >
             <View className="h-24 w-24 rounded-full border-2 border-white/50" />
           </TouchableOpacity>
@@ -376,9 +431,11 @@ export default function ComplaintCameraScreen() {
           <Text className="text-xs text-white/85">
             {mode === "photo"
               ? "Toque para capturar foto"
-              : isRecording
-                ? "Gravando video"
-                : "Toque para iniciar video"}
+              : isModeTransitioning
+                ? "Alternando modo"
+                : isRecording
+                  ? "Gravando video"
+                  : "Toque para iniciar video"}
           </Text>
         </View>
       </View>
