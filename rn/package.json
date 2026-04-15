@@ -2,6 +2,7 @@
   "name": "oikos",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -75,7 +76,6 @@
     "tailwindcss": "^4.2.2",
     "typescript": "~5.9.2"
   },
-  "private": true,
   "resolutions": {
     "lightningcss": "1.30.1"
   }
