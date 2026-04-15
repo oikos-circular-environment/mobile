@@ -1,14 +1,14 @@
-import Fastify from "fastify";
-
-const app = Fastify({
-  logger: true,
-});
+import { app } from "./app";
+import { env } from "./env";
 
 app
-  .listen({ port: 3000 })
-  .then(() => {
-    console.log("Server is running on port 3000");
+  .listen({
+    host: "0.0.0.0",
+    port: env.PORT,
   })
-  .catch((err) => {
-    console.error("Error starting server:", err);
+  .then(() => {
+    console.log(`Server is running on http://localhost:${env.PORT}`);
+    console.log(
+      `API documentation available at http://localhost:${env.PORT}/docs`,
+    );
   });
