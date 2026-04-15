@@ -10,6 +10,8 @@ import {
 } from "fastify-type-provider-zod";
 import { ZodError } from "zod";
 import { env } from "@/env";
+import { companiesRoutes } from "./modules/companies/route";
+import { usersRoutes } from "./modules/users/routes";
 
 export const app = Fastify({
   logger: true,
@@ -61,6 +63,9 @@ app.register(ScalarApiReference, {
     ],
   },
 });
+
+app.register(usersRoutes, { prefix: "/v1/users" });
+app.register(companiesRoutes, { prefix: "/v1/companies" });
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {
