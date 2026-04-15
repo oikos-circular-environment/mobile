@@ -1,0 +1,24 @@
+{
+  "name": "oikos-api",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.12",
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2",
+    "fastify": "^5.8.5"
+  }
+}
