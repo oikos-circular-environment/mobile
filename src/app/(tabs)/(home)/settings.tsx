@@ -2,7 +2,6 @@ import { type Href, Link } from "expo-router";
 import {
   ArrowRight,
   ArrowUpRightIcon,
-  CrownIcon,
   FactoryIcon,
   type LucideIcon,
   RecycleIcon,
@@ -25,14 +24,14 @@ type SettingsOption = {
 
 export default function SettingsScreen() {
   const settingsOptions: SettingsOption[] = [
-    {
-      title: "Planos",
-      description: "Descubra como podemos agregar valor ao seu negócio!",
-      icon: CrownIcon,
-      is_premium: false,
-      highlight: true,
-      link: "/plans",
-    },
+    // {
+    //   title: "Planos",
+    //   description: "Descubra como podemos agregar valor ao seu negócio!",
+    //   icon: CrownIcon,
+    //   is_premium: false,
+    //   highlight: true,
+    //   link: "/plans",
+    // },
     {
       title: "Para empresas",
       description: "Gerencie suas empresas, produtos e serviços",

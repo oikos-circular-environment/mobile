@@ -2,15 +2,11 @@ import type { Href } from "expo-router";
 import { Link } from "expo-router";
 import {
   ArrowRight,
-  BanknoteIcon,
-  ClipboardClockIcon,
   Clock3Icon,
-  CrownIcon,
   FactoryIcon,
   type LucideIcon,
   MapPinIcon,
   RecycleIcon,
-  RouteIcon,
   SettingsIcon,
   WrenchIcon,
 } from "lucide-react-native";
@@ -53,12 +49,12 @@ const settings: CompanySetting[] = [
     icon: Clock3Icon,
     href: "/(tabs)/(home)/companies/business-hours",
   },
-  {
-    title: "Métodos financeiros",
-    description: "Cadastre as formas de pagamento e recebimento aceitas.",
-    icon: BanknoteIcon,
-    href: "/(tabs)/(home)/companies/financial-methods",
-  },
+  // {
+  //   title: "Métodos financeiros",
+  //   description: "Cadastre as formas de pagamento e recebimento aceitas.",
+  //   icon: BanknoteIcon,
+  //   href: "/(tabs)/(home)/companies/financial-methods",
+  // },
   {
     title: "Serviços",
     description: "Descreva os serviços que sua empresa oferece ao publico.",
@@ -73,19 +69,19 @@ const settings: CompanySetting[] = [
   },
 ];
 
-const premiumResources: PremiumResource[] = [
-  {
-    title: "Agendamentos",
-    description: "Acompanhe e gerencie seus agendamentos de forma prática.",
-    icon: ClipboardClockIcon,
-  },
-  {
-    title: "Rotas",
-    description:
-      "Consulte o plano de rotas para otimizar a coleta dos seus resíduos.",
-    icon: RouteIcon,
-  },
-];
+// const premiumResources: PremiumResource[] = [
+//   {
+//     title: "Agendamentos",
+//     description: "Acompanhe e gerencie seus agendamentos de forma prática.",
+//     icon: ClipboardClockIcon,
+//   },
+//   {
+//     title: "Rotas",
+//     description:
+//       "Consulte o plano de rotas para otimizar a coleta dos seus resíduos.",
+//     icon: RouteIcon,
+//   },
+// ];
 
 export default function CompaniesHomeScreen() {
   return (
@@ -151,7 +147,7 @@ export default function CompaniesHomeScreen() {
           </View>
         </View>
 
-        <View className="gap-2">
+        {/* <View className="gap-2">
           <View className="flex-row items-center justify-between">
             <Heading className="text-base">Recursos premium</Heading>
             <View className="size-8 items-center justify-center rounded-md bg-primary/10">
@@ -181,7 +177,7 @@ export default function CompaniesHomeScreen() {
               </Card>
             ))}
           </View>
-        </View>
+        </View> */}
       </View>
     </ScrollView>
   );
