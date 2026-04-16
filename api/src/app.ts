@@ -1,4 +1,6 @@
+import fastifyCookie from "@fastify/cookie";
 import { fastifyCors } from "@fastify/cors";
+import fastifyJwt from "@fastify/jwt";
 import { fastifySwagger } from "@fastify/swagger";
 import ScalarApiReference from "@scalar/fastify-api-reference";
 import Fastify from "fastify";
@@ -8,14 +10,27 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
-import { ZodError } from "zod";
 import { env } from "@/env";
+import { AppError } from "./modules/common/errors/app-error";
 import { companiesRoutes } from "./modules/companies/route";
 import { usersRoutes } from "./modules/users/routes";
 
 export const app = Fastify({
   logger: true,
 }).withTypeProvider<ZodTypeProvider>();
+
+app.register(fastifyJwt, {
+  secret: env.JWT_SECRET,
+  cookie: {
+    cookieName: "refreshToken",
+    signed: false,
+  },
+  sign: {
+    expiresIn: "7d",
+  },
+});
+
+app.register(fastifyCookie);
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
@@ -52,7 +67,7 @@ app.register(ScalarApiReference, {
         description: "Production server",
       },
       {
-        url: "http://localhost:3000",
+        url: `http://localhost:${env.PORT}`,
         description: "Local development server",
         variables: {
           port: {
@@ -68,10 +83,13 @@ app.register(usersRoutes, { prefix: "/v1/users" });
 app.register(companiesRoutes, { prefix: "/v1/companies" });
 
 app.setErrorHandler((error, _, reply) => {
-  if (error instanceof ZodError) {
-    return reply
-      .status(400)
-      .send({ message: "Validation error.", issues: error.format() });
+  if (error instanceof AppError) {
+    return reply.status(error.statusCode ?? 400).send({
+      statusCode: error.statusCode,
+      message: error.message,
+      code: error.code,
+      validation: error.validation,
+    });
   }
 
   if (env.NODE_ENV !== "production") {
@@ -80,5 +98,5 @@ app.setErrorHandler((error, _, reply) => {
     // TODO: Here we should log to a external tool like DataDog/NewRelic/Sentry
   }
 
-  return reply.status(500).send({ message: "Internal server error." });
+  // return reply.status(500).send({ message: "Internal server error." });
 });
