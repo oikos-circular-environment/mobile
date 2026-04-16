@@ -1,4 +1,4 @@
-import { AppError } from "@/modules/common/errors/app-error";
+import { AppError } from "@/modules/common/errors/app-error.js";
 
 export class InvalidCredentialsError extends AppError {
   constructor() {

@@ -2,11 +2,10 @@ import { compare, hash } from "bcryptjs";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { AppError } from "../common/errors/app-error";
-import { createUserSchema, userSchema } from "./entities/user";
-import { InvalidCredentialsError } from "./errors/invalid-credentials-error";
-import { UserAlreadyExistsError } from "./errors/user-already-exists-error";
-import { InMemoryUsersRepository } from "./repositories/in-memory/in-memory-users-repositories";
+import { createUserSchema, userSchema } from "./entities/user.js";
+import { InvalidCredentialsError } from "./errors/invalid-credentials-error.js";
+import { UserAlreadyExistsError } from "./errors/user-already-exists-error.js";
+import { InMemoryUsersRepository } from "./repositories/in-memory/in-memory-users-repositories.js";
 
 const usersRepository = new InMemoryUsersRepository();
 

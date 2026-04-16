@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import type { CreateUser, User } from "@/modules/users/entities/user";
-import type { UsersRepository } from "../users-repository";
+import type { CreateUser, User } from "@/modules/users/entities/user.js";
+import type { UsersRepository } from "../users-repository.js";
 
 export class InMemoryUsersRepository implements UsersRepository {
   public items: User[] = [];
