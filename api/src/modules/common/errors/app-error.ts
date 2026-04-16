@@ -14,8 +14,8 @@ export class AppError implements FastifyError {
   stack?: string | undefined;
   cause?: unknown;
 
-  constructor(message: string) {
-    this.message = message;
+  constructor() {
+    this.message = "An unexpected error occurred.";
     this.code = "APP_ERROR";
     this.name = "AppError";
     this.statusCode = 500;

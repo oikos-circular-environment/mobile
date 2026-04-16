@@ -81,22 +81,3 @@ app.register(ScalarApiReference, {
 
 app.register(usersRoutes, { prefix: "/v1/users" });
 app.register(companiesRoutes, { prefix: "/v1/companies" });
-
-app.setErrorHandler((error, _, reply) => {
-  if (error instanceof AppError) {
-    return reply.status(error.statusCode ?? 400).send({
-      statusCode: error.statusCode,
-      message: error.message,
-      code: error.code,
-      validation: error.validation,
-    });
-  }
-
-  if (env.NODE_ENV !== "production") {
-    console.error(error);
-  } else {
-    // TODO: Here we should log to a external tool like DataDog/NewRelic/Sentry
-  }
-
-  // return reply.status(500).send({ message: "Internal server error." });
-});
