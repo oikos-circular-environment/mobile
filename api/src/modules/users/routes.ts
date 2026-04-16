@@ -1,8 +1,10 @@
-import { hash } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
+import { AppError } from "../common/errors/app-error";
 import { createUserSchema, userSchema } from "./entities/user";
+import { InvalidCredentialsError } from "./errors/invalid-credentials-error";
 import { UserAlreadyExistsError } from "./errors/user-already-exists-error";
 import { InMemoryUsersRepository } from "./repositories/in-memory/in-memory-users-repositories";
 
@@ -61,6 +63,55 @@ export async function usersRoutes(app: FastifyInstance) {
       });
 
       reply.send(user);
+    },
+  );
+
+  typedApp.post(
+    "/auth",
+    {
+      schema: {
+        tags: ["Users"],
+        summary: "Authenticate a user",
+        description: "Authenticates a user and returns a token.",
+        body: z.object({
+          email: z.string().email(),
+          password: z.string(),
+        }),
+        response: {
+          200: z.object({
+            token: z.string(),
+          }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const { email, password } = request.body;
+      const user = await usersRepository.findByEmail(email);
+
+      if (!user) {
+        throw new InvalidCredentialsError();
+      }
+
+      const doestPasswordMatches = await compare(password, user.password);
+
+      if (!doestPasswordMatches) {
+        throw new InvalidCredentialsError();
+      }
+
+      const token = await reply.jwtSign(
+        {
+          user: user,
+        },
+        {
+          sign: {
+            sub: user.id,
+          },
+        },
+      );
+
+      reply.send({
+        token,
+      });
     },
   );
 }
