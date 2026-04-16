@@ -10,10 +10,8 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
-import { env } from "@/env";
-import { AppError } from "./modules/common/errors/app-error";
-import { companiesRoutes } from "./modules/companies/route";
-import { usersRoutes } from "./modules/users/routes";
+import { env } from "@/env/index.js";
+import { usersRoutes } from "./modules/users/routes.js";
 
 export const app = Fastify({
   logger: true,
@@ -80,4 +78,4 @@ app.register(ScalarApiReference, {
 });
 
 app.register(usersRoutes, { prefix: "/v1/users" });
-app.register(companiesRoutes, { prefix: "/v1/companies" });
+// app.register(companiesRoutes, { prefix: "/v1/companies" });

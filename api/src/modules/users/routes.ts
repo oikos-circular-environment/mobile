@@ -6,8 +6,7 @@ import { createUserSchema, userSchema } from "./entities/user.js";
 import { InvalidCredentialsError } from "./errors/invalid-credentials-error.js";
 import { UserAlreadyExistsError } from "./errors/user-already-exists-error.js";
 import { InMemoryUsersRepository } from "./repositories/in-memory/in-memory-users-repositories.js";
-
-const usersRepository = new InMemoryUsersRepository();
+import { PrismaUsersRepository } from "./repositories/prisma/users-repository-prisma.js";
 
 export async function usersRoutes(app: FastifyInstance) {
   const typedApp = app.withTypeProvider<ZodTypeProvider>();
@@ -25,6 +24,7 @@ export async function usersRoutes(app: FastifyInstance) {
       },
     },
     async (_request, reply) => {
+      const usersRepository = new PrismaUsersRepository();
       const users = await usersRepository.findAll();
       return reply.send(users);
     },
@@ -48,7 +48,7 @@ export async function usersRoutes(app: FastifyInstance) {
       const { name, email, password } = request.body;
 
       const password_hash = await hash(password, 6);
-
+      const usersRepository = new PrismaUsersRepository();
       const userWithSameEmail = await usersRepository.findByEmail(email);
 
       if (userWithSameEmail) {
@@ -85,6 +85,7 @@ export async function usersRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const { email, password } = request.body;
+      const usersRepository = new PrismaUsersRepository();
       const user = await usersRepository.findByEmail(email);
 
       if (!user) {
