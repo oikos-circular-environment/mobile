@@ -65,6 +65,15 @@ app.register(ScalarApiReference, {
   configuration: {
     favicon: "https://avatars.githubusercontent.com/u/276378809?s=96&v=4",
     theme: "fastify",
+    persistAuth: true,
+    authentication: {
+      preferredSecurityScheme: "bearerAuth",
+      securitySchemes: {
+        bearerAuth: {
+          token: "",
+        },
+      },
+    },
     metaData: {
       title: "Oikos Documentation",
       description: "Boosting the circular economy",
