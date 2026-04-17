@@ -18,6 +18,46 @@ model User {
   email     String   @unique
   password  String
   created_at DateTime @default(now())
+  profile   Profile?
 
   @@map("users")
+}
+
+model Profile {
+  id            String   @id @default(uuid())
+  full_name     String
+  display_name  String
+  cpf           String   @unique
+  phone         String
+  email         String   @unique
+  is_collector   Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  user_id  String  @unique
+  user     User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  address  Address?
+
+  @@map("profiles")
+}
+
+model Address {
+  id           String   @id @default(uuid())
+  zip_code     String
+  street       String
+  number       String
+  complement   String?
+  district     String
+  city         String
+  state        String
+  state_code   String
+  latitude     Float?
+  longitude    Float?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  profile_id String  @unique
+  profile    Profile @relation(fields: [profile_id], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
 }
