@@ -30,6 +30,11 @@
       "source": "scalar/scalar",
       "sourceType": "github",
       "computedHash": "71988d44cdffe5377c0652df354d23172619b39dbc7b04a6dbb1d158e904a42e"
+    },
+    "vitest": {
+      "source": "supabase/supabase",
+      "sourceType": "github",
+      "computedHash": "669c7275f7e1379b06b2bcfa593603aead4c983b951c7e8edbc09640aa38d0a1"
     }
   }
 }
