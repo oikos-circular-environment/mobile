@@ -8,7 +8,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "biome lint --write --files-ignore-unknown=true .",
+    "format": "biome format --write --files-ignore-unknown=true ."
   },
   "overrides": {
     "lightningcss": "1.30.1"

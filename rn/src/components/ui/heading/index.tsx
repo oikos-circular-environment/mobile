@@ -1,4 +1,5 @@
-import React, { forwardRef, memo } from 'react';
+import type React from 'react';
+import { forwardRef, memo } from 'react';
 import {
   H1 as H1Base,
   H2 as H2Base,
