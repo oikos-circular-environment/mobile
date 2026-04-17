@@ -1,36 +1,9 @@
 import { prisma } from "@/lib/prisma.js";
 import type {
-  Address,
   CreateAddress,
   UpdateAddress,
 } from "@/modules/profiles/dtos/profiles-dto.js";
 import type { AddressesRepository } from "../address-repository.js";
-
-type PrismaAddressWithRelations = Awaited<
-  ReturnType<typeof prisma.address.findUnique>
->;
-
-const mapAddress = (address: PrismaAddressWithRelations): Address | null => {
-  if (!address) {
-    return null;
-  }
-
-  return {
-    id: address.id,
-    zip_code: address.zip_code,
-    street: address.street,
-    number: address.number,
-    complement: address.complement,
-    district: address.district,
-    city: address.city,
-    state: address.state,
-    state_code: address.state_code,
-    latitude: address.latitude,
-    longitude: address.longitude,
-    created_at: address.created_at,
-    updated_at: address.updated_at,
-  };
-};
 
 export class PrismaAddressesRepository implements AddressesRepository {
   async findById(id: string) {
@@ -40,7 +13,7 @@ export class PrismaAddressesRepository implements AddressesRepository {
       },
     });
 
-    return mapAddress(address);
+    return address;
   }
 
   async findByProfileId(profileId: string) {
@@ -53,7 +26,7 @@ export class PrismaAddressesRepository implements AddressesRepository {
       },
     });
 
-    return mapAddress(profileAddress?.address ?? null);
+    return profileAddress?.address ?? null;
   }
 
   async create(data: CreateAddress) {
@@ -83,13 +56,7 @@ export class PrismaAddressesRepository implements AddressesRepository {
       return createdAddress;
     });
 
-    const mappedAddress = mapAddress(address);
-
-    if (!mappedAddress) {
-      throw new Error("Failed to create address");
-    }
-
-    return mappedAddress;
+    return address;
   }
 
   async update(id: string, data: UpdateAddress) {
@@ -110,6 +77,6 @@ export class PrismaAddressesRepository implements AddressesRepository {
       data,
     });
 
-    return mapAddress(updatedAddress);
+    return updatedAddress;
   }
 }
