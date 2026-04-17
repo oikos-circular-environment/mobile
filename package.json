@@ -15,5 +15,8 @@
     "lint:rn": "npm run lint -w @oikos/rn",
     "format:api": "npm run format -w @oikos/api"
   },
-  "packageManager": "npm@11.12.0"
+  "packageManager": "npm@11.12.0",
+  "devDependencies": {
+    "@biomejs/biome": "2.4.12"
+  }
 }
