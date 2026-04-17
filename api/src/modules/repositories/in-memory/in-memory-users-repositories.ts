@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { CreateUser, User } from "@/modules/users/entities/user.js";
+import type { CreateUser, User } from "@/modules/users/dtos/users-dto.js";
 import type { UsersRepository } from "../users-repository.js";
 
 export class InMemoryUsersRepository implements UsersRepository {

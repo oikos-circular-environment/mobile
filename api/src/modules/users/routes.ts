@@ -2,9 +2,8 @@ import { compare, hash } from "bcryptjs";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { InMemoryUsersRepository } from "../repositories/in-memory/in-memory-users-repositories.js";
 import { PrismaUsersRepository } from "../repositories/prisma/users-repository-prisma.js";
-import { createUserSchema, userSchema } from "./entities/user.js";
+import { createUserSchema, userSchema } from "./dtos/users-dto.js";
 import { InvalidCredentialsError } from "./errors/invalid-credentials-error.js";
 import { UserAlreadyExistsError } from "./errors/user-already-exists-error.js";
 
