@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { AppError, appErrorSchema } from "../common/errors/app-error.js";
+import { appErrorSchema } from "../common/errors/app-error.js";
 import { verifyJwt } from "../common/middlewares/verify-jwt.js";
 import { withBearerAuth } from "../common/types/openapi-security.js";
 import {
@@ -13,9 +13,33 @@ import {
 } from "./dtos/profiles-dto.js";
 import { PrismaAddressesRepository } from "./repositories/prisma/addresses-repository-prisma.js";
 import { PrismaProfilesRepository } from "./repositories/prisma/profiles-repository-prisma.js";
+import { CreateProfileAddressUseCase } from "./use-cases/create-profile-address-use-case.js";
+import { CreateProfileUseCase } from "./use-cases/create-profile-use-case.js";
+import { GetProfileAddressUseCase } from "./use-cases/get-profile-address-use-case.js";
+import { GetProfileUseCase } from "./use-cases/get-profile-use-case.js";
+import { UpdateProfileAddressUseCase } from "./use-cases/update-profile-address-use-case.js";
+import { UpdateProfileUseCase } from "./use-cases/update-profile-use-case.js";
 
 export async function profileRoutes(app: FastifyInstance) {
   const typedApp = app.withTypeProvider<ZodTypeProvider>();
+  const profilesRepository = new PrismaProfilesRepository();
+  const addressesRepository = new PrismaAddressesRepository();
+
+  const createProfileUseCase = new CreateProfileUseCase(profilesRepository);
+  const getProfileUseCase = new GetProfileUseCase(profilesRepository);
+  const updateProfileUseCase = new UpdateProfileUseCase(profilesRepository);
+  const createProfileAddressUseCase = new CreateProfileAddressUseCase(
+    profilesRepository,
+    addressesRepository,
+  );
+  const getProfileAddressUseCase = new GetProfileAddressUseCase(
+    profilesRepository,
+    addressesRepository,
+  );
+  const updateProfileAddressUseCase = new UpdateProfileAddressUseCase(
+    profilesRepository,
+    addressesRepository,
+  );
 
   typedApp.addHook("onRequest", async (request) => {
     await verifyJwt(request);
@@ -38,17 +62,9 @@ export async function profileRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const userId = request.user.sub;
-      const profilesRepository = new PrismaProfilesRepository();
-
-      const existingProfile = await profilesRepository.findByUserId(userId);
-
-      if (existingProfile) {
-        throw new AppError("Profile already exists", "PROFILE_ALREADY_EXISTS", 409);
-      }
-
-      const profile = await profilesRepository.create({
-        ...request.body,
-        user_id: userId,
+      const profile = await createProfileUseCase.execute({
+        userId,
+        data: request.body,
       });
 
       return reply.send(profile);
@@ -70,8 +86,7 @@ export async function profileRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const userId = request.user.sub;
-      const profilesRepository = new PrismaProfilesRepository();
-      const profile = await profilesRepository.findByUserId(userId);
+      const profile = await getProfileUseCase.execute({ userId });
 
       return reply.send(profile);
     },
@@ -95,15 +110,10 @@ export async function profileRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const userId = request.user.sub;
-      const profilesRepository = new PrismaProfilesRepository();
-
-      const profile = await profilesRepository.findByUserId(userId);
-
-      if (!profile) {
-        throw new AppError("Profile not found", "PROFILE_NOT_FOUND", 404);
-      }
-
-      const updatedProfile = await profilesRepository.update(profile.id, request.body);
+      const updatedProfile = await updateProfileUseCase.execute({
+        userId,
+        data: request.body,
+      });
 
       return reply.send(updatedProfile);
     },
@@ -127,24 +137,9 @@ export async function profileRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const userId = request.user.sub;
-      const profilesRepository = new PrismaProfilesRepository();
-      const addressesRepository = new PrismaAddressesRepository();
-
-      const profile = await profilesRepository.findByUserId(userId);
-
-      if (!profile) {
-        throw new AppError("Profile not found", "PROFILE_NOT_FOUND", 404);
-      }
-
-      const existingAddress = await addressesRepository.findByProfileId(profile.id);
-
-      if (existingAddress) {
-        throw new AppError("Address already exists", "ADDRESS_ALREADY_EXISTS", 409);
-      }
-
-      const address = await addressesRepository.create({
-        ...request.body,
-        profile_id: profile.id,
+      const address = await createProfileAddressUseCase.execute({
+        userId,
+        data: request.body,
       });
 
       return reply.send(address);
@@ -167,16 +162,7 @@ export async function profileRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const userId = request.user.sub;
-      const profilesRepository = new PrismaProfilesRepository();
-      const addressesRepository = new PrismaAddressesRepository();
-
-      const profile = await profilesRepository.findByUserId(userId);
-
-      if (!profile) {
-        throw new AppError("Profile not found", "PROFILE_NOT_FOUND", 404);
-      }
-
-      const address = await addressesRepository.findByProfileId(profile.id);
+      const address = await getProfileAddressUseCase.execute({ userId });
 
       return reply.send(address);
     },
@@ -199,22 +185,10 @@ export async function profileRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const userId = request.user.sub;
-      const profilesRepository = new PrismaProfilesRepository();
-      const addressesRepository = new PrismaAddressesRepository();
-
-      const profile = await profilesRepository.findByUserId(userId);
-
-      if (!profile) {
-        throw new AppError("Profile not found", "PROFILE_NOT_FOUND", 404);
-      }
-
-      const address = await addressesRepository.findByProfileId(profile.id);
-
-      if (!address) {
-        throw new AppError("Address not found", "ADDRESS_NOT_FOUND", 404);
-      }
-
-      const updatedAddress = await addressesRepository.update(address.id, request.body);
+      const updatedAddress = await updateProfileAddressUseCase.execute({
+        userId,
+        data: request.body,
+      });
 
       return reply.send(updatedAddress);
     },
