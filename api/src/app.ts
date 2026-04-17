@@ -1,9 +1,10 @@
 import fastifyCookie from "@fastify/cookie";
 import { fastifyCors } from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
+import fastifyRateLimit from "@fastify/rate-limit";
 import { fastifySwagger } from "@fastify/swagger";
 import ScalarApiReference from "@scalar/fastify-api-reference";
-import Fastify from "fastify";
+import Fastify, { type FastifyRequest } from "fastify";
 import {
   jsonSchemaTransform,
   serializerCompiler,
@@ -30,6 +31,17 @@ app.register(fastifyJwt, {
 });
 
 app.register(fastifyCookie);
+
+app.register(fastifyRateLimit, {
+  max: 100,
+  timeWindow: "1 minute",
+  cache: 10000,
+  allowList: ["/docs", "/docs/openapi.json"],
+  skipOnError: false,
+  keyGenerator: (request: FastifyRequest) => {
+    return request.ip;
+  },
+});
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
