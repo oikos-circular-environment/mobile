@@ -8,7 +8,5 @@ app
   })
   .then(() => {
     console.log(`Server is running on http://localhost:${env.PORT}`);
-    console.log(
-      `API documentation available at http://localhost:${env.PORT}/docs`,
-    );
+    console.log(`API documentation available at http://localhost:${env.PORT}/docs`);
   });
