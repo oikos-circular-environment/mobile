@@ -1,0 +1,19 @@
+{
+  "name": "oikos-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "api",
+    "rn",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w @oikos/api",
+    "dev:rn": "npm run start -w @oikos/rn",
+    "build:api": "npm run build -w @oikos/api",
+    "lint:api": "npm run lint -w @oikos/api",
+    "lint:rn": "npm run lint -w @oikos/rn",
+    "format:api": "npm run format -w @oikos/api"
+  },
+  "packageManager": "npm@11.12.0"
+}

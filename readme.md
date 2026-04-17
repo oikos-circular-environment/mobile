@@ -61,6 +61,50 @@ Este projeto está organizado em dois principais módulos:
 - api/: backend da plataforma, com foco em regras de negócio, persistência e serviços.
 - rn/: aplicativo mobile (React Native/Expo) para experiência dos usuários em campo.
 
+## Monorepo com npm Workspaces
+
+Este repositório está configurado como monorepo com npm workspaces para facilitar o compartilhamento de código entre backend e frontend.
+
+### Workspaces atuais
+
+- `@oikos/api`: backend.
+- `@oikos/rn`: app mobile.
+- `@oikos/contracts`: pacote compartilhado para contratos/tipos.
+
+### Estrutura
+
+```txt
+oikos/
+	api/
+	rn/
+	packages/
+		contracts/
+```
+
+### Comandos úteis (na raiz)
+
+```bash
+npm install
+npm run dev:api
+npm run dev:rn
+npm run build:api
+```
+
+### Por que essa estrutura ajuda
+
+- Permite criar pacotes internos simples para reaproveitamento imediato.
+- Evita duplicação de tipos, validações e contratos entre API e app.
+- Facilita evolução gradual, mesmo com um único desenvolvedor.
+
+### Caso de uso futuro: tRPC + TanStack Query
+
+Uma evolução natural é criar um pacote dedicado para contratos/roteador tRPC e compartilhar tipagem ponta a ponta:
+- Backend expõe roteadores tRPC fortemente tipados.
+- Frontend consome os endpoints com TanStack Query usando os mesmos tipos.
+- Reduz erro de integração e acelera manutenção.
+
+Com a base de workspaces pronta, basta adicionar novos pacotes em `packages/*` e referenciá-los pela versão do pacote (ex.: `0.1.0`) nas dependências dos apps para que o npm faça o link local no monorepo.
+
 ## Direção do Projeto
 
 Oikos combina tecnologia, validação de mercado e impacto socioambiental para construir uma solução viável no longo prazo. O foco atual está em consolidar a proposta de valor, validar o modelo de negócio com dados reais e transformar os aprendizados em produto robusto e escalável.
