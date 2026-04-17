@@ -3,7 +3,6 @@ import type { AuthTokenPayload } from "@/modules/common/types/auth-token-payload
 
 declare module "@fastify/jwt" {
   interface FastifyJWT {
-    payload: AuthTokenPayload;
     user: AuthTokenPayload;
   }
 }

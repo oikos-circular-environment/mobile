@@ -1,8 +1,6 @@
 export type AuthTokenUser = {
   id: string;
-  email?: string;
-  password?: string;
-  created_at?: string | Date;
+  email: string;
 };
 
 export type AuthTokenPayload = {

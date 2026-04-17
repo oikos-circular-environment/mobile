@@ -1,11 +1,10 @@
-import { compare, hash } from "bcryptjs";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { createUserSchema, userSchema } from "./dtos/users-dto.js";
-import { InvalidCredentialsError } from "./errors/invalid-credentials-error.js";
-import { UserAlreadyExistsError } from "./errors/user-already-exists-error.js";
 import { PrismaUsersRepository } from "./repositories/prisma/users-repository-prisma.js";
+import { AuthenticateUserUseCase } from "./use-cases/authenticate-user-use-case.js";
+import { RegisterUserUseCase } from "./use-cases/register-user-use-case.js";
 
 export async function userRoutes(app: FastifyInstance) {
   const typedApp = app.withTypeProvider<ZodTypeProvider>();
@@ -25,18 +24,11 @@ export async function userRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const { email, password } = request.body;
-
-      const password_hash = await hash(password, 6);
       const usersRepository = new PrismaUsersRepository();
-      const userWithSameEmail = await usersRepository.findByEmail(email);
-
-      if (userWithSameEmail) {
-        throw new UserAlreadyExistsError();
-      }
-
-      const user = await usersRepository.create({
+      const registerUserUseCase = new RegisterUserUseCase(usersRepository);
+      const user = await registerUserUseCase.execute({
         email,
-        password: password_hash,
+        password,
       });
 
       reply.send(user);
@@ -61,21 +53,18 @@ export async function userRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { email, password } = request.body;
       const usersRepository = new PrismaUsersRepository();
-      const user = await usersRepository.findByEmail(email);
-
-      if (!user) {
-        throw new InvalidCredentialsError();
-      }
-
-      const doestPasswordMatches = await compare(password, user.password);
-
-      if (!doestPasswordMatches) {
-        throw new InvalidCredentialsError();
-      }
+      const authenticateUserUseCase = new AuthenticateUserUseCase(usersRepository);
+      const user = await authenticateUserUseCase.execute({
+        email,
+        password,
+      });
 
       const token = await reply.jwtSign(
         {
-          user: user,
+          user: {
+            id: user.id,
+            email: user.email,
+          },
         },
         {
           sign: {
