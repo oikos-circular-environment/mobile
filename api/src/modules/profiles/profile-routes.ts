@@ -1,6 +1,6 @@
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import z from "zod";
+import { AppError, appErrorSchema } from "../common/errors/app-error.js";
 import { verifyJwt } from "../common/middlewares/verify-jwt.js";
 import {
   addressSchema,
@@ -13,33 +13,11 @@ import {
 import { PrismaAddressesRepository } from "./repositories/prisma/addresses-repository-prisma.js";
 import { PrismaProfilesRepository } from "./repositories/prisma/profiles-repository-prisma.js";
 
-type JwtPayload = {
-  sub?: string;
-  user?: {
-    id?: string;
-  };
-};
-
-const errorResponseSchema = z.object({
-  message: z.string(),
-});
-
-function getUserIdFromRequest(request: FastifyRequest): string {
-  const payload = request.user as JwtPayload;
-  const userId = payload.sub ?? payload.user?.id;
-
-  if (!userId) {
-    throw new Error("Invalid token payload");
-  }
-
-  return userId;
-}
-
 export async function profileRoutes(app: FastifyInstance) {
   const typedApp = app.withTypeProvider<ZodTypeProvider>();
 
-  typedApp.addHook("onRequest", async (request, reply) => {
-    await verifyJwt(request, reply);
+  typedApp.addHook("onRequest", async (request) => {
+    await verifyJwt(request);
   });
 
   typedApp.post(
@@ -53,19 +31,19 @@ export async function profileRoutes(app: FastifyInstance) {
         body: createProfileSchema.omit({ user_id: true }),
         response: {
           200: profileSchema,
-          401: errorResponseSchema,
-          409: errorResponseSchema,
+          401: appErrorSchema,
+          409: appErrorSchema,
         },
       },
     },
     async (request, reply) => {
-      const userId = getUserIdFromRequest(request);
+      const userId = request.user.sub;
       const profilesRepository = new PrismaProfilesRepository();
 
       const existingProfile = await profilesRepository.findByUserId(userId);
 
       if (existingProfile) {
-        return reply.status(409).send({ message: "Profile already exists" });
+        throw new AppError("Profile already exists", "PROFILE_ALREADY_EXISTS", 409);
       }
 
       const profile = await profilesRepository.create({
@@ -87,12 +65,12 @@ export async function profileRoutes(app: FastifyInstance) {
           "Returns the profile of the authenticated user. Address is always present and can be null.",
         response: {
           200: profileSchema.nullable(),
-          401: errorResponseSchema,
+          401: appErrorSchema,
         },
       },
     },
     async (request, reply) => {
-      const userId = getUserIdFromRequest(request);
+      const userId = request.user.sub;
       const profilesRepository = new PrismaProfilesRepository();
       const profile = await profilesRepository.findByUserId(userId);
 
@@ -111,19 +89,19 @@ export async function profileRoutes(app: FastifyInstance) {
         body: updateProfileSchema,
         response: {
           200: profileSchema.nullable(),
-          401: errorResponseSchema,
-          404: errorResponseSchema,
+          401: appErrorSchema,
+          404: appErrorSchema,
         },
       },
     },
     async (request, reply) => {
-      const userId = getUserIdFromRequest(request);
+      const userId = request.user.sub;
       const profilesRepository = new PrismaProfilesRepository();
 
       const profile = await profilesRepository.findByUserId(userId);
 
       if (!profile) {
-        return reply.status(404).send({ message: "Profile not found" });
+        throw new AppError("Profile not found", "PROFILE_NOT_FOUND", 404);
       }
 
       const updatedProfile = await profilesRepository.update(profile.id, request.body);
@@ -142,27 +120,27 @@ export async function profileRoutes(app: FastifyInstance) {
         body: createAddressSchema.omit({ profile_id: true }),
         response: {
           200: addressSchema,
-          401: errorResponseSchema,
-          404: errorResponseSchema,
-          409: errorResponseSchema,
+          401: appErrorSchema,
+          404: appErrorSchema,
+          409: appErrorSchema,
         },
       },
     },
     async (request, reply) => {
-      const userId = getUserIdFromRequest(request);
+      const userId = request.user.sub;
       const profilesRepository = new PrismaProfilesRepository();
       const addressesRepository = new PrismaAddressesRepository();
 
       const profile = await profilesRepository.findByUserId(userId);
 
       if (!profile) {
-        return reply.status(404).send({ message: "Profile not found" });
+        throw new AppError("Profile not found", "PROFILE_NOT_FOUND", 404);
       }
 
       const existingAddress = await addressesRepository.findByProfileId(profile.id);
 
       if (existingAddress) {
-        return reply.status(409).send({ message: "Address already exists" });
+        throw new AppError("Address already exists", "ADDRESS_ALREADY_EXISTS", 409);
       }
 
       const address = await addressesRepository.create({
@@ -183,20 +161,20 @@ export async function profileRoutes(app: FastifyInstance) {
         description: "Returns only the authenticated user's profile address.",
         response: {
           200: addressSchema.nullable(),
-          401: errorResponseSchema,
-          404: errorResponseSchema,
+          401: appErrorSchema,
+          404: appErrorSchema,
         },
       },
     },
     async (request, reply) => {
-      const userId = getUserIdFromRequest(request);
+      const userId = request.user.sub;
       const profilesRepository = new PrismaProfilesRepository();
       const addressesRepository = new PrismaAddressesRepository();
 
       const profile = await profilesRepository.findByUserId(userId);
 
       if (!profile) {
-        return reply.status(404).send({ message: "Profile not found" });
+        throw new AppError("Profile not found", "PROFILE_NOT_FOUND", 404);
       }
 
       const address = await addressesRepository.findByProfileId(profile.id);
@@ -215,26 +193,26 @@ export async function profileRoutes(app: FastifyInstance) {
         body: updateAddressSchema,
         response: {
           200: addressSchema.nullable(),
-          401: errorResponseSchema,
-          404: errorResponseSchema,
+          401: appErrorSchema,
+          404: appErrorSchema,
         },
       },
     },
     async (request, reply) => {
-      const userId = getUserIdFromRequest(request);
+      const userId = request.user.sub;
       const profilesRepository = new PrismaProfilesRepository();
       const addressesRepository = new PrismaAddressesRepository();
 
       const profile = await profilesRepository.findByUserId(userId);
 
       if (!profile) {
-        return reply.status(404).send({ message: "Profile not found" });
+        throw new AppError("Profile not found", "PROFILE_NOT_FOUND", 404);
       }
 
       const address = await addressesRepository.findByProfileId(profile.id);
 
       if (!address) {
-        return reply.status(404).send({ message: "Address not found" });
+        throw new AppError("Address not found", "ADDRESS_NOT_FOUND", 404);
       }
 
       const updatedAddress = await addressesRepository.update(address.id, request.body);

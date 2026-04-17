@@ -7,27 +7,8 @@ import { InvalidCredentialsError } from "./errors/invalid-credentials-error.js";
 import { UserAlreadyExistsError } from "./errors/user-already-exists-error.js";
 import { PrismaUsersRepository } from "./repositories/prisma/users-repository-prisma.js";
 
-export async function usersRoutes(app: FastifyInstance) {
+export async function userRoutes(app: FastifyInstance) {
   const typedApp = app.withTypeProvider<ZodTypeProvider>();
-
-  typedApp.get(
-    "/",
-    {
-      schema: {
-        tags: ["Users"],
-        summary: "Get a list of users",
-        description: "Returns a list of all users in the system.",
-        response: {
-          200: z.array(userSchema),
-        },
-      },
-    },
-    async (_request, reply) => {
-      const usersRepository = new PrismaUsersRepository();
-      const users = await usersRepository.findAll();
-      return reply.send(users);
-    },
-  );
 
   typedApp.post(
     "/register",
