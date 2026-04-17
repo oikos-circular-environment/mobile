@@ -50,71 +50,75 @@ enum WasteType {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
   created_at DateTime @default(now())
-  profile   Profile?
+  profile    Profile?
+
+  company Company?
 
   @@map("users")
 }
 
 model Profile {
-  id            String   @id @default(uuid())
-  full_name     String
-  display_name  String
-  cpf           String   @unique
-  phone         String
-  email         String   @unique
-  is_collector   Boolean  @default(false)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  id           String   @id @default(uuid())
+  full_name    String
+  display_name String
+  cpf          String   @unique
+  phone        String
+  email        String   @unique
+  is_collector Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
-  user_id  String  @unique
-  user     User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id         String          @unique
+  user            User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
   profile_address ProfileAddress?
 
   @@map("profiles")
 }
 
 model Company {
-  id                   String       @id @default(uuid())
-  identity             String       @unique
-  identity_type        IdentityType
-  company_type         CompanyType
-  status               Boolean      @default(true)
-  is_headquarters      Boolean      @default(false)
-  business_name        String?
-  corporate_name       String
-  accept_appointments  Boolean      @default(false)
-  email                String?
-  phones               String[]
-  started_activity_in  DateTime
-  created_at           DateTime     @default(now())
-  updated_at           DateTime     @updatedAt
+  id                  String       @id @default(uuid())
+  identity            String       @unique
+  identity_type       IdentityType
+  company_type        CompanyType
+  status              Boolean      @default(true)
+  is_headquarters     Boolean      @default(false)
+  business_name       String?
+  corporate_name      String
+  accept_appointments Boolean      @default(false)
+  email               String?
+  phones              String[]
+  started_activity_in DateTime
+  created_at          DateTime     @default(now())
+  updated_at          DateTime     @updatedAt
 
-  company_address      CompanyAddress?
-  business_hours       CompanyBusinessHour[]
-  wastes               CompanyWaste[]
-  services             CompanyService[]
+  company_address CompanyAddress?
+  business_hours  CompanyBusinessHour[]
+  wastes          CompanyWaste[]
+  services        CompanyService[]
+  user_id         String                @unique
+  user            User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("companies")
 }
 
 model Address {
-  id           String   @id @default(uuid())
-  zip_code     String
-  street       String
-  number       String
-  complement   String?
-  district     String
-  city         String
-  state        String
-  state_code   String
-  latitude     Float?
-  longitude    Float?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  id         String   @id @default(uuid())
+  zip_code   String
+  street     String
+  number     String
+  complement String?
+  district   String
+  city       String
+  state      String
+  state_code String
+  latitude   Float?
+  longitude  Float?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   profile_address ProfileAddress?
   company_address CompanyAddress?
@@ -127,8 +131,8 @@ model ProfileAddress {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  profile_id String  @unique
-  address_id String  @unique
+  profile_id String @unique
+  address_id String @unique
 
   profile Profile @relation(fields: [profile_id], references: [id], onDelete: Cascade)
   address Address @relation(fields: [address_id], references: [id], onDelete: Cascade)
@@ -141,8 +145,8 @@ model CompanyAddress {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  company_id String  @unique
-  address_id String  @unique
+  company_id String @unique
+  address_id String @unique
 
   company Company @relation(fields: [company_id], references: [id], onDelete: Cascade)
   address Address @relation(fields: [address_id], references: [id], onDelete: Cascade)
@@ -151,14 +155,14 @@ model CompanyAddress {
 }
 
 model CompanyBusinessHour {
-  id         String    @id @default(uuid())
+  id          String    @id @default(uuid())
   day_of_week DayOfWeek
-  is_open    Boolean   @default(false)
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  is_open     Boolean   @default(false)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
 
   company_id String
-  company    Company @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  company    Company                @relation(fields: [company_id], references: [id], onDelete: Cascade)
   time_slots BusinessHourTimeSlot[]
 
   @@unique([company_id, day_of_week])
@@ -166,28 +170,28 @@ model CompanyBusinessHour {
 }
 
 model BusinessHourTimeSlot {
-  id               String   @id @default(uuid())
-  start_time       String
-  end_time         String
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id         String   @id @default(uuid())
+  start_time String
+  end_time   String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   business_hour_id String
-  business_hour     CompanyBusinessHour @relation(fields: [business_hour_id], references: [id], onDelete: Cascade)
+  business_hour    CompanyBusinessHour @relation(fields: [business_hour_id], references: [id], onDelete: Cascade)
 
   @@map("business_hour_time_slots")
 }
 
 model CompanyWaste {
-  id           String      @id @default(uuid())
-  name         String
-  description  String?
-  price        Decimal     @db.Decimal(12, 2)
-  unit         Measurement
-  waste_type   WasteType
-  sub_items    String[]
-  created_at   DateTime    @default(now())
-  updated_at   DateTime    @updatedAt
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal     @db.Decimal(12, 2)
+  unit        Measurement
+  waste_type  WasteType
+  sub_items   String[]
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
 
   company_id String
   company    Company @relation(fields: [company_id], references: [id], onDelete: Cascade)
@@ -196,17 +200,17 @@ model CompanyWaste {
 }
 
 model CompanyService {
-  id            String      @id @default(uuid())
-  name          String
-  description   String?
-  price         Decimal     @db.Decimal(12, 2)
-  unit          Measurement
-  waste_type    WasteType
-  quantity      Int
-  observations  String?
-  sub_items     String[]
-  created_at    DateTime    @default(now())
-  updated_at    DateTime    @updatedAt
+  id           String      @id @default(uuid())
+  name         String
+  description  String?
+  price        Decimal     @db.Decimal(12, 2)
+  unit         Measurement
+  waste_type   WasteType
+  quantity     Int
+  observations String?
+  sub_items    String[]
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
 
   company_id String
   company    Company @relation(fields: [company_id], references: [id], onDelete: Cascade)

@@ -10,13 +10,18 @@
     "dev": "tsx watch --env-file=.env src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+
     "format": "biome format --write --files-ignore-unknown=true .",
     "lint": "biome lint --write --files-ignore-unknown=true .",
     "prepare": "lefthook install",
+
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+
+    "migrate:dev": "prisma migrate dev",
+    "migrate:generate": "prisma generate"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

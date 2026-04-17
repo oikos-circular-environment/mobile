@@ -6,4 +6,7 @@
     "source.organizeImports.biome": "always",
     "source.fixAll.biome": "always"
   },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
 }
