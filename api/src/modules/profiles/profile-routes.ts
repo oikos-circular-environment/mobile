@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { AppError, appErrorSchema } from "../common/errors/app-error.js";
 import { verifyJwt } from "../common/middlewares/verify-jwt.js";
+import { withBearerAuth } from "../common/types/openapi-security.js";
 import {
   addressSchema,
   createAddressSchema,
@@ -23,18 +24,17 @@ export async function profileRoutes(app: FastifyInstance) {
   typedApp.post(
     "/profiles",
     {
-      schema: {
+      schema: withBearerAuth({
         tags: ["Profiles"],
         summary: "Create user profile",
-        description:
-          "Creates a profile for the authenticated user. The user id is resolved from JWT.",
+        description: "Creates a profile for the authenticated user.",
         body: createProfileSchema.omit({ user_id: true }),
         response: {
           200: profileSchema,
           401: appErrorSchema,
           409: appErrorSchema,
         },
-      },
+      }),
     },
     async (request, reply) => {
       const userId = request.user.sub;
@@ -58,7 +58,7 @@ export async function profileRoutes(app: FastifyInstance) {
   typedApp.get(
     "/profiles",
     {
-      schema: {
+      schema: withBearerAuth({
         tags: ["Profiles"],
         summary: "Get authenticated user profile",
         description:
@@ -67,7 +67,7 @@ export async function profileRoutes(app: FastifyInstance) {
           200: profileSchema.nullable(),
           401: appErrorSchema,
         },
-      },
+      }),
     },
     async (request, reply) => {
       const userId = request.user.sub;
@@ -81,7 +81,7 @@ export async function profileRoutes(app: FastifyInstance) {
   typedApp.put(
     "/profiles",
     {
-      schema: {
+      schema: withBearerAuth({
         tags: ["Profiles"],
         summary: "Update authenticated user profile",
         description:
@@ -92,7 +92,7 @@ export async function profileRoutes(app: FastifyInstance) {
           401: appErrorSchema,
           404: appErrorSchema,
         },
-      },
+      }),
     },
     async (request, reply) => {
       const userId = request.user.sub;
@@ -113,7 +113,7 @@ export async function profileRoutes(app: FastifyInstance) {
   typedApp.post(
     "/profiles/addresses",
     {
-      schema: {
+      schema: withBearerAuth({
         tags: ["Profiles"],
         summary: "Create profile address",
         description: "Creates an address for the authenticated user's profile.",
@@ -124,7 +124,7 @@ export async function profileRoutes(app: FastifyInstance) {
           404: appErrorSchema,
           409: appErrorSchema,
         },
-      },
+      }),
     },
     async (request, reply) => {
       const userId = request.user.sub;
@@ -155,7 +155,7 @@ export async function profileRoutes(app: FastifyInstance) {
   typedApp.get(
     "/profiles/addresses",
     {
-      schema: {
+      schema: withBearerAuth({
         tags: ["Profiles"],
         summary: "Get profile address",
         description: "Returns only the authenticated user's profile address.",
@@ -164,7 +164,7 @@ export async function profileRoutes(app: FastifyInstance) {
           401: appErrorSchema,
           404: appErrorSchema,
         },
-      },
+      }),
     },
     async (request, reply) => {
       const userId = request.user.sub;
@@ -186,7 +186,7 @@ export async function profileRoutes(app: FastifyInstance) {
   typedApp.put(
     "/profiles/addresses",
     {
-      schema: {
+      schema: withBearerAuth({
         tags: ["Profiles"],
         summary: "Update profile address",
         description: "Updates only address data for the authenticated user's profile.",
@@ -196,7 +196,7 @@ export async function profileRoutes(app: FastifyInstance) {
           401: appErrorSchema,
           404: appErrorSchema,
         },
-      },
+      }),
     },
     async (request, reply) => {
       const userId = request.user.sub;

@@ -47,6 +47,15 @@ app.register(fastifySwagger, {
         email: "christian.cesar@gmail.com",
       },
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   transform: jsonSchemaTransform,
 });
@@ -70,7 +79,7 @@ app.register(ScalarApiReference, {
         description: "Local development server",
         variables: {
           port: {
-            default: "3000",
+            default: env.PORT,
           },
         },
       },
