@@ -60,9 +60,8 @@ export async function profileRoutes(app: FastifyInstance) {
     {
       schema: withBearerAuth({
         tags: ["Profiles"],
-        summary: "Get authenticated user profile",
-        description:
-          "Returns the profile of the authenticated user. Address is always present and can be null.",
+        summary: "Get user profile",
+        description: "Returns the profile of the authenticated user.",
         response: {
           200: profileSchema.nullable(),
           401: appErrorSchema,
@@ -83,7 +82,7 @@ export async function profileRoutes(app: FastifyInstance) {
     {
       schema: withBearerAuth({
         tags: ["Profiles"],
-        summary: "Update authenticated user profile",
+        summary: "Update user profile",
         description:
           "Updates only profile data for the authenticated user. Address fields are not handled by this route.",
         body: updateProfileSchema,

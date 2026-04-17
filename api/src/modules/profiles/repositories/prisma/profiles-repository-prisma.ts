@@ -1,13 +1,7 @@
 import { prisma } from "@/lib/prisma.js";
-import type {
-  CreateProfile,
-  UpdateProfile,
-} from "@/modules/profiles/dtos/profiles-dto.js";
+import type { CreateProfile, UpdateProfile } from "@/modules/profiles/dtos/profiles-dto.js";
 import type { ProfilesRepository } from "../profiles-repository.js";
-import {
-  type PrismaProfileWithRelations,
-  profileMapper,
-} from "./mappers/profile-mapper.js";
+import { type PrismaProfileWithRelations, profileMapper } from "./mappers/profile-mapper.js";
 
 export class PrismaProfilesRepository implements ProfilesRepository {
   async findById(id: string) {
