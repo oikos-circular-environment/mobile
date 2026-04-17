@@ -68,6 +68,6 @@ export function profileMapper(
           created_at: address.created_at,
           updated_at: address.updated_at,
         } satisfies Address)
-      : undefined,
+      : null,
   };
 }

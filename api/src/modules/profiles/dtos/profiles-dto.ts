@@ -45,13 +45,13 @@ export const addressSchema = z.object({
   zip_code: z.string(),
   street: z.string(),
   number: z.string(),
-  complement: z.string().optional().nullable(),
+  complement: z.string().nullable(),
   district: z.string(),
   city: z.string(),
   state: z.string(),
   state_code: z.string(),
-  latitude: z.number().optional().nullable(),
-  longitude: z.number().optional().nullable(),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
   created_at: z.date(),
   updated_at: z.date(),
 });
@@ -62,7 +62,7 @@ export const profileSchema = createProfileSchema.extend({
   id: z.string(),
   created_at: z.date(),
   updated_at: z.date(),
-  address: addressSchema.optional(),
+  address: addressSchema.nullable(),
 });
 
 export type Profile = z.infer<typeof profileSchema>;

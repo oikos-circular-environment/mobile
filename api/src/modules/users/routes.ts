@@ -35,8 +35,7 @@ export async function usersRoutes(app: FastifyInstance) {
       schema: {
         tags: ["Users"],
         summary: "Register a new user",
-        description:
-          "Creates a new user account with the provided information.",
+        description: "Creates a new user account with the provided information.",
         body: createUserSchema,
         response: {
           200: userSchema,
@@ -44,7 +43,7 @@ export async function usersRoutes(app: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const { name, email, password } = request.body;
+      const { email, password } = request.body;
 
       const password_hash = await hash(password, 6);
       const usersRepository = new PrismaUsersRepository();
@@ -55,7 +54,6 @@ export async function usersRoutes(app: FastifyInstance) {
       }
 
       const user = await usersRepository.create({
-        name,
         email,
         password: password_hash,
       });
