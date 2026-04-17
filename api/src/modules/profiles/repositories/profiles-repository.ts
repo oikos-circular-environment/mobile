@@ -2,7 +2,7 @@ import type {
   CreateProfile,
   Profile,
   UpdateProfile,
-} from "../profiles/dtos/profiles-dto.js";
+} from "@/modules/profiles/dtos/profiles-dto.js";
 
 export interface ProfilesRepository {
   findById(id: string): Promise<Profile | null>;

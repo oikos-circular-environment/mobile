@@ -1,4 +1,4 @@
-import type { CreateUser, User } from "../users/dtos/users-dto.js";
+import type { CreateUser, User } from "@/modules/users/dtos/users-dto.js";
 
 export interface UsersRepository {
   findById(id: string): Promise<User | null>;

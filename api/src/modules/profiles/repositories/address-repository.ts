@@ -2,7 +2,7 @@ import type {
   Address,
   CreateAddress,
   UpdateAddress,
-} from "../profiles/dtos/profiles-dto.js";
+} from "@/modules/profiles/dtos/profiles-dto.js";
 
 export interface AddressesRepository {
   findById(id: string): Promise<Address | null>;
