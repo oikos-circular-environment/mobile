@@ -11,7 +11,11 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "format": "biome format --write ./src",
-    "lint": "biome lint --write ./src"
+    "lint": "biome lint --write ./src",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

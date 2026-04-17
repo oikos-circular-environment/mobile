@@ -34,7 +34,7 @@ export class InMemoryProfilesRepository implements ProfilesRepository {
       is_collector: data.is_collector,
       created_at: now,
       updated_at: now,
-      address: undefined,
+      address: null,
     } satisfies Profile;
 
     this.items.push(profile);
