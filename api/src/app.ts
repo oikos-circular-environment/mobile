@@ -11,6 +11,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { env } from "@/env/index.js";
+import { profileRoutes } from "./modules/profiles/profile-routes.js";
 import { usersRoutes } from "./modules/users/user-routes.js";
 
 export const app = Fastify({
@@ -78,4 +79,5 @@ app.register(ScalarApiReference, {
 });
 
 app.register(usersRoutes, { prefix: "/v1/users" });
+app.register(profileRoutes, { prefix: "/v1" });
 // app.register(companiesRoutes, { prefix: "/v1/companies" });

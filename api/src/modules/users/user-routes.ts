@@ -69,10 +69,7 @@ export async function usersRoutes(app: FastifyInstance) {
         tags: ["Users"],
         summary: "Authenticate a user",
         description: "Authenticates a user and returns a token.",
-        body: z.object({
-          email: z.string().email(),
-          password: z.string(),
-        }),
+        body: createUserSchema,
         response: {
           200: z.object({
             token: z.string(),
