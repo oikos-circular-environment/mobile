@@ -1,8 +1,0 @@
-# dependencies
-node_modules/
-
-*/generated/
-.env
-
-## vitest
-coverage/

@@ -1,37 +1,48 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  },
+  "extends": "//",
   "files": {
-    "ignoreUnknown": false
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "lineWidth": 100,
-    "indentWidth": 2
+    "includes": ["**", "!**/node_modules", "!**/next", "!**/old", "!app.json"]
   },
   "linter": {
-    "enabled": true,
     "rules": {
-      "recommended": true
+      "correctness": {
+        "noUnusedImports": {
+          "fix": "safe",
+          "level": "warn"
+        }
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "off",
+        "useKeyWithClickEvents": "off"
+      },
+      "complexity": {
+        "noStaticOnlyClass": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      }
     }
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double",
-      "trailingCommas": "all"
+      "jsxQuoteStyle": "double",
+      "semicolons": "always",
+      "arrowParentheses": "asNeeded"
     }
   },
-  "assist": {
-    "enabled": true,
-    "actions": {
-      "source": {
-        "organizeImports": "on"
-      }
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "html": {
+    "experimentalFullSupportEnabled": true,
+    "formatter": {
+      "selfCloseVoidElements": "always"
     }
   }
 }
