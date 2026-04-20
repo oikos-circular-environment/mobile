@@ -1,8 +1,3 @@
-export type Location = {
-  lat: number;
-  lng: number;
-};
-
 export type Address = {
   id: string;
   street: string;
