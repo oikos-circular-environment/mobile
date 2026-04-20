@@ -1,0 +1,110 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@layer theme {
+  :root {
+    --primary: #3f6212;
+    --primary-foreground: #fafafa;
+    --card: #ffffff;
+    --secondary: #f5f5f5;
+    --secondary-foreground: #171717;
+    --background: #ffffff;
+    --popover: #ffffff;
+    --popover-foreground: #0a0a0a;
+    --muted: #f5f5f5;
+    --muted-foreground: #737373;
+    --destructive: #e7000b;
+    --foreground: #0a0a0a;
+    --border: #e5e5e5;
+    --input: #e5e5e5;
+    --ring: #d4d4d4;
+    --accent: #f7f7f7;
+    --accent-foreground: #343434;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary: #3f6212;
+      --primary-foreground: #fafafa;
+      --card: #171717;
+      --secondary: #262626;
+      --secondary-foreground: #fafafa;
+      --background: #0a0a0a;
+      --popover: #171717;
+      --popover-foreground: #fafafa;
+      --muted: #262626;
+      --muted-foreground: #a1a1a1;
+      --destructive: #ff6467;
+      --foreground: #fafafa;
+      --border: #2e2e2e;
+      --input: #2e2e2e;
+      --ring: #737373;
+      --accent: #262626;
+      --accent-foreground: #fafafa;
+    }
+  }
+
+  /* Web: class-based toggle overrides system preference */
+  :root.dark {
+    --primary: #3f6212;
+    --primary-foreground: #fafafa;
+    --card: #171717;
+    --secondary: #262626;
+    --secondary-foreground: #fafafa;
+    --background: #0a0a0a;
+    --popover: #171717;
+    --popover-foreground: #fafafa;
+    --muted: #262626;
+    --muted-foreground: #a1a1a1;
+    --destructive: #ff6467;
+    --foreground: #fafafa;
+    --border: #2e2e2e;
+    --input: #2e2e2e;
+    --ring: #737373;
+    --accent: #262626;
+    --accent-foreground: #fafafa;
+  }
+
+  :root.light {
+    --primary: #3f6212;
+    --primary-foreground: #fafafa;
+    --card: #ffffff;
+    --secondary: #f5f5f5;
+    --secondary-foreground: #171717;
+    --background: #ffffff;
+    --popover: #ffffff;
+    --popover-foreground: #0a0a0a;
+    --muted: #f5f5f5;
+    --muted-foreground: #737373;
+    --destructive: #e7000b;
+    --foreground: #0a0a0a;
+    --border: #e5e5e5;
+    --input: #e5e5e5;
+    --ring: #d4d4d4;
+    --accent: #f7f7f7;
+    --accent-foreground: #343434;
+  }
+}
+
+@layer base {
+  :root {
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-card: var(--card);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-background: var(--background);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-destructive: var(--destructive);
+    --color-foreground: var(--foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+  }
+}
