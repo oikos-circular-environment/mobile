@@ -40,10 +40,9 @@ export default function SignUpScreen() {
 		},
 		onSuccess: () => {
 			console.log("Sucesso");
-			// router.push({
-			// 	pathname: "/verify-code",
-			// 	params: { email: data.email },
-			// });
+			router.push({
+				pathname: "/sign-in",
+			});
 		},
 		onError: error => {
 			console.log("Error", error);
@@ -81,9 +80,7 @@ export default function SignUpScreen() {
 		>
 			<FormControl isInvalid={!!errors.email} className="gap-2">
 				<FormControlLabel>
-					<FormControlLabelText className="text-sm">
-						E-mail
-					</FormControlLabelText>
+					<FormControlLabelText>E-mail</FormControlLabelText>
 				</FormControlLabel>
 				<Controller
 					control={control}
@@ -97,6 +94,7 @@ export default function SignUpScreen() {
 								placeholder="Digite seu e-mail"
 								keyboardType="email-address"
 								autoCapitalize="none"
+								className="text-base"
 							/>
 						</Input>
 					)}
@@ -110,7 +108,7 @@ export default function SignUpScreen() {
 
 			<FormControl isInvalid={!!errors.password} className="gap-2">
 				<FormControlLabel>
-					<FormControlLabelText className="text-sm">Senha</FormControlLabelText>
+					<FormControlLabelText>Senha</FormControlLabelText>
 				</FormControlLabel>
 				<Controller
 					control={control}
@@ -123,6 +121,7 @@ export default function SignUpScreen() {
 								onChangeText={onChange}
 								placeholder="Crie sua senha"
 								secureTextEntry
+								className="text-base"
 							/>
 						</Input>
 					)}
@@ -137,12 +136,11 @@ export default function SignUpScreen() {
 			</FormControl>
 
 			<Button
-				size="lg"
 				className="mt-1 bg-primary"
 				onPress={handleSubmit(onSubmit)}
 				isDisabled={isSubmitting}
 			>
-				<ButtonText>Criar conta</ButtonText>
+				<ButtonText className="text-base font-semibold">Criar conta</ButtonText>
 			</Button>
 		</AuthScreenLayout>
 	);
