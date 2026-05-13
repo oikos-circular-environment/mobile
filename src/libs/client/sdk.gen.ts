@@ -7,6 +7,35 @@ import {
 	type TDataShape,
 } from "./client";
 import { client } from "./client.gen";
+import {
+	getV1CompaniesAddressesResponseTransformer,
+	getV1CompaniesResponseTransformer,
+	getV1CompaniesServicesResponseTransformer,
+	getV1CompaniesWastesResponseTransformer,
+	getV1ComplaintsByIdResponseTransformer,
+	getV1ComplaintsResponseTransformer,
+	getV1ProfilesAddressesResponseTransformer,
+	getV1ProfilesResponseTransformer,
+	patchV1ComplaintsByIdCanceledResponseTransformer,
+	patchV1ComplaintsByIdResolvedResponseTransformer,
+	patchV1ComplaintsByIdResponseTransformer,
+	postV1CompaniesAddressesResponseTransformer,
+	postV1CompaniesResponseTransformer,
+	postV1CompaniesServicesResponseTransformer,
+	postV1CompaniesWastesResponseTransformer,
+	postV1ComplaintsAttachmentsResponseTransformer,
+	postV1ComplaintsResponseTransformer,
+	postV1ProfilesAddressesResponseTransformer,
+	postV1ProfilesImagesResponseTransformer,
+	postV1ProfilesResponseTransformer,
+	postV1UsersRegisterResponseTransformer,
+	putV1CompaniesAddressesResponseTransformer,
+	putV1CompaniesResponseTransformer,
+	putV1CompaniesServicesResponseTransformer,
+	putV1CompaniesWastesResponseTransformer,
+	putV1ProfilesAddressesResponseTransformer,
+	putV1ProfilesResponseTransformer,
+} from "./transformers.gen";
 import type {
 	DeleteV1ProfilesImagesData,
 	DeleteV1ProfilesImagesErrors,
@@ -138,6 +167,8 @@ export const postV1UsersRegister = <ThrowOnError extends boolean = false>(
 		unknown,
 		ThrowOnError
 	>({
+		responseTransformer: postV1UsersRegisterResponseTransformer,
+		responseType: "json",
 		url: "/v1/users/register",
 		...options,
 		headers: {
@@ -159,6 +190,7 @@ export const postV1UsersAuth = <ThrowOnError extends boolean = false>(
 		unknown,
 		ThrowOnError
 	>({
+		responseType: "json",
 		url: "/v1/users/auth",
 		...options,
 		headers: {
@@ -180,6 +212,8 @@ export const getV1Profiles = <ThrowOnError extends boolean = false>(
 		GetV1ProfilesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: getV1ProfilesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles",
 		...options,
@@ -198,6 +232,8 @@ export const postV1Profiles = <ThrowOnError extends boolean = false>(
 		PostV1ProfilesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: postV1ProfilesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles",
 		...options,
@@ -220,6 +256,8 @@ export const putV1Profiles = <ThrowOnError extends boolean = false>(
 		PutV1ProfilesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: putV1ProfilesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles",
 		...options,
@@ -242,6 +280,7 @@ export const deleteV1ProfilesImages = <ThrowOnError extends boolean = false>(
 		DeleteV1ProfilesImagesErrors,
 		ThrowOnError
 	>({
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/images",
 		...options,
@@ -260,6 +299,8 @@ export const postV1ProfilesImages = <ThrowOnError extends boolean = false>(
 		PostV1ProfilesImagesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: postV1ProfilesImagesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/images",
 		...options,
@@ -278,6 +319,8 @@ export const getV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
 		GetV1ProfilesAddressesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: getV1ProfilesAddressesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/addresses",
 		...options,
@@ -296,6 +339,8 @@ export const postV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
 		PostV1ProfilesAddressesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: postV1ProfilesAddressesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/addresses",
 		...options,
@@ -318,6 +363,8 @@ export const putV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
 		PutV1ProfilesAddressesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: putV1ProfilesAddressesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/addresses",
 		...options,
@@ -340,6 +387,8 @@ export const getV1Companies = <ThrowOnError extends boolean = false>(
 		GetV1CompaniesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: getV1CompaniesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies",
 		...options,
@@ -358,6 +407,8 @@ export const postV1Companies = <ThrowOnError extends boolean = false>(
 		PostV1CompaniesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: postV1CompaniesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies",
 		...options,
@@ -380,6 +431,8 @@ export const putV1Companies = <ThrowOnError extends boolean = false>(
 		PutV1CompaniesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: putV1CompaniesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies",
 		...options,
@@ -404,6 +457,7 @@ export const getV1CompaniesBusinessHours = <
 		GetV1CompaniesBusinessHoursErrors,
 		ThrowOnError
 	>({
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/business-hours",
 		...options,
@@ -424,6 +478,7 @@ export const postV1CompaniesBusinessHours = <
 		PostV1CompaniesBusinessHoursErrors,
 		ThrowOnError
 	>({
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/business-hours",
 		...options,
@@ -448,6 +503,7 @@ export const putV1CompaniesBusinessHours = <
 		PutV1CompaniesBusinessHoursErrors,
 		ThrowOnError
 	>({
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/business-hours",
 		...options,
@@ -470,6 +526,8 @@ export const getV1CompaniesWastes = <ThrowOnError extends boolean = false>(
 		GetV1CompaniesWastesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: getV1CompaniesWastesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/wastes",
 		...options,
@@ -488,6 +546,8 @@ export const postV1CompaniesWastes = <ThrowOnError extends boolean = false>(
 		PostV1CompaniesWastesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: postV1CompaniesWastesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/wastes",
 		...options,
@@ -510,6 +570,8 @@ export const putV1CompaniesWastes = <ThrowOnError extends boolean = false>(
 		PutV1CompaniesWastesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: putV1CompaniesWastesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/wastes",
 		...options,
@@ -532,6 +594,8 @@ export const getV1CompaniesServices = <ThrowOnError extends boolean = false>(
 		GetV1CompaniesServicesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: getV1CompaniesServicesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/services",
 		...options,
@@ -550,6 +614,8 @@ export const postV1CompaniesServices = <ThrowOnError extends boolean = false>(
 		PostV1CompaniesServicesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: postV1CompaniesServicesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/services",
 		...options,
@@ -572,6 +638,8 @@ export const putV1CompaniesServices = <ThrowOnError extends boolean = false>(
 		PutV1CompaniesServicesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: putV1CompaniesServicesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/services",
 		...options,
@@ -594,6 +662,8 @@ export const getV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
 		GetV1CompaniesAddressesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: getV1CompaniesAddressesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/addresses",
 		...options,
@@ -612,6 +682,8 @@ export const postV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
 		PostV1CompaniesAddressesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: postV1CompaniesAddressesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/addresses",
 		...options,
@@ -634,6 +706,8 @@ export const putV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
 		PutV1CompaniesAddressesErrors,
 		ThrowOnError
 	>({
+		responseTransformer: putV1CompaniesAddressesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/addresses",
 		...options,
@@ -656,6 +730,8 @@ export const getV1Complaints = <ThrowOnError extends boolean = false>(
 		GetV1ComplaintsErrors,
 		ThrowOnError
 	>({
+		responseTransformer: getV1ComplaintsResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints",
 		...options,
@@ -674,6 +750,8 @@ export const postV1Complaints = <ThrowOnError extends boolean = false>(
 		PostV1ComplaintsErrors,
 		ThrowOnError
 	>({
+		responseTransformer: postV1ComplaintsResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints",
 		...options,
@@ -696,6 +774,7 @@ export const getV1ComplaintsDashboard = <ThrowOnError extends boolean = false>(
 		GetV1ComplaintsDashboardErrors,
 		ThrowOnError
 	>({
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/dashboard",
 		...options,
@@ -714,6 +793,8 @@ export const getV1ComplaintsById = <ThrowOnError extends boolean = false>(
 		GetV1ComplaintsByIdErrors,
 		ThrowOnError
 	>({
+		responseTransformer: getV1ComplaintsByIdResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}",
 		...options,
@@ -732,6 +813,8 @@ export const patchV1ComplaintsById = <ThrowOnError extends boolean = false>(
 		PatchV1ComplaintsByIdErrors,
 		ThrowOnError
 	>({
+		responseTransformer: patchV1ComplaintsByIdResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}",
 		...options,
@@ -756,6 +839,8 @@ export const patchV1ComplaintsByIdResolved = <
 		PatchV1ComplaintsByIdResolvedErrors,
 		ThrowOnError
 	>({
+		responseTransformer: patchV1ComplaintsByIdResolvedResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}/resolved",
 		...options,
@@ -776,6 +861,8 @@ export const patchV1ComplaintsByIdCanceled = <
 		PatchV1ComplaintsByIdCanceledErrors,
 		ThrowOnError
 	>({
+		responseTransformer: patchV1ComplaintsByIdCanceledResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}/canceled",
 		...options,
@@ -797,6 +884,8 @@ export const postV1ComplaintsAttachments = <
 		ThrowOnError
 	>({
 		...formDataBodySerializer,
+		responseTransformer: postV1ComplaintsAttachmentsResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/attachments",
 		...options,

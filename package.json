@@ -10,7 +10,7 @@
 		"web": "expo start --web",
 		"lint": "biome lint --write --files-ignore-unknown=true .",
 		"format": "biome format --write --files-ignore-unknown=true .",
-		"generate:api": "npx @hey-api/openapi-ts -i http://localhost:3333/docs/openapi.json -o ./src/libs/client"
+		"generate:api": "openapi-ts"
 	},
 	"dependencies": {
 		"@expo/html-elements": "^0.12.5",
@@ -71,6 +71,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.12",
 		"@faker-js/faker": "^10.3.0",
+		"@hey-api/openapi-ts": "0.97.1",
 		"@tailwindcss/postcss": "^4.2.2",
 		"@types/react": "~19.1.0",
 		"babel-plugin-module-resolver": "^5.0.3",

@@ -8,6 +8,7 @@ import { UserProvider } from "@/contexts/user-context";
 import "react-native-reanimated";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
+import "@/libs/api/oikos-api";
 
 export const unstable_settings = {
 	anchor: "(tabs)",
