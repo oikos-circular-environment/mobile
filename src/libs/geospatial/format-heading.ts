@@ -8,21 +8,21 @@ import { headingToCompass } from "./heading-to-compass";
  * Saida (com direcao): "32.7 graus (NNE - Norte-Nordeste)"
  */
 export function formatHeading(
-  value: number | null | undefined,
-  options?: { includeCompass?: boolean },
+	value: number | null | undefined,
+	options?: { includeCompass?: boolean },
 ) {
-  if (value == null || Number.isNaN(value) || value < 0) {
-    return "indisponivel";
-  }
+	if (value == null || Number.isNaN(value) || value < 0) {
+		return "indisponivel";
+	}
 
-  if (!options?.includeCompass) {
-    return `${value.toFixed(1)}º`;
-  }
+	if (!options?.includeCompass) {
+		return `${value.toFixed(1)}º`;
+	}
 
-  const compass = headingToCompass(value);
-  if (compass == null) {
-    return `${value.toFixed(1)}º`;
-  }
+	const compass = headingToCompass(value);
+	if (compass == null) {
+		return `${value.toFixed(1)}º`;
+	}
 
-  return `${value.toFixed(1)}º (${compass.abbreviation} - ${compass.labelPtBr})`;
+	return `${value.toFixed(1)}º (${compass.abbreviation} - ${compass.labelPtBr})`;
 }

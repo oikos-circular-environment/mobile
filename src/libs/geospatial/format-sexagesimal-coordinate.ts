@@ -7,16 +7,16 @@ import { decimalToSexagesimal } from "geolib";
  * Saida: "16° 29' 8\" S"
  */
 export function formatSexagesimalCoordinate(
-  value: number | null | undefined,
-  axis: "latitude" | "longitude",
+	value: number | null | undefined,
+	axis: "latitude" | "longitude",
 ) {
-  if (value == null || Number.isNaN(value)) {
-    return "indisponivel";
-  }
+	if (value == null || Number.isNaN(value)) {
+		return "indisponivel";
+	}
 
-  const hemisphere =
-    axis === "latitude" ? (value < 0 ? "S" : "N") : value < 0 ? "W" : "E";
+	const hemisphere =
+		axis === "latitude" ? (value < 0 ? "S" : "N") : value < 0 ? "W" : "E";
 
-  const sexagesimalValue = decimalToSexagesimal(Math.abs(value));
-  return `${sexagesimalValue} ${hemisphere}`;
+	const sexagesimalValue = decimalToSexagesimal(Math.abs(value));
+	return `${sexagesimalValue} ${hemisphere}`;
 }

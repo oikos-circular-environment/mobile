@@ -6,40 +6,40 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 
 type AuthScreenLayoutProps = {
-  title: string;
-  subtitle: string;
-  children: ReactNode;
-  footer?: ReactNode;
+	title: string;
+	subtitle: string;
+	children: ReactNode;
+	footer?: ReactNode;
 };
 
 export function AuthScreenLayout({
-  title,
-  subtitle,
-  children,
-  footer,
+	title,
+	subtitle,
+	children,
+	footer,
 }: AuthScreenLayoutProps) {
-  return (
-    <ScrollView className="flex-1 " contentInsetAdjustmentBehavior="automatic">
-      <View className="relative min-h-full flex-1 justify-center px-5 py-10">
-        <Card className="z-10 w-full self-center max-w-md gap-6 rounded-2xl p-5 shadow-none">
-          <View className="gap-6">
-            <View className="flex-row items-center gap-3">
-              <SproutIcon size={18} color="black" />
-              <View className="h-px flex-1 bg-black" />
-            </View>
-            <View className="gap-1">
-              <Heading className="text-2xl">{title}</Heading>
-              <Text className="text-sm text-muted">{subtitle}</Text>
-            </View>
-          </View>
+	return (
+		<ScrollView className="flex-1 " contentInsetAdjustmentBehavior="automatic">
+			<View className="relative min-h-full flex-1 justify-center px-5 py-10">
+				<Card className="z-10 w-full self-center max-w-md gap-6 rounded-2xl p-5 shadow-none">
+					<View className="gap-6">
+						<View className="flex-row items-center gap-3">
+							<SproutIcon size={18} color="black" />
+							<View className="h-px flex-1 bg-black" />
+						</View>
+						<View className="gap-1">
+							<Heading className="text-2xl">{title}</Heading>
+							<Text className="text-sm text-muted">{subtitle}</Text>
+						</View>
+					</View>
 
-          {children}
-        </Card>
+					{children}
+				</Card>
 
-        {footer ? (
-          <View className="z-10 mt-5 items-center">{footer}</View>
-        ) : null}
-      </View>
-    </ScrollView>
-  );
+				{footer ? (
+					<View className="z-10 mt-5 items-center">{footer}</View>
+				) : null}
+			</View>
+		</ScrollView>
+	);
 }
