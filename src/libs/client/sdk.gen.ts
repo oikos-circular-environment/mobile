@@ -28,7 +28,6 @@ import {
 	postV1ProfilesAddressesResponseTransformer,
 	postV1ProfilesImagesResponseTransformer,
 	postV1ProfilesResponseTransformer,
-	postV1UsersRegisterResponseTransformer,
 	putV1CompaniesAddressesResponseTransformer,
 	putV1CompaniesResponseTransformer,
 	putV1CompaniesServicesResponseTransformer,
@@ -112,6 +111,7 @@ import type {
 	PostV1UsersAuthData,
 	PostV1UsersAuthResponses,
 	PostV1UsersRegisterData,
+	PostV1UsersRegisterErrors,
 	PostV1UsersRegisterResponses,
 	PutV1CompaniesAddressesData,
 	PutV1CompaniesAddressesErrors,
@@ -164,10 +164,9 @@ export const postV1UsersRegister = <ThrowOnError extends boolean = false>(
 ) =>
 	(options.client ?? client).post<
 		PostV1UsersRegisterResponses,
-		unknown,
+		PostV1UsersRegisterErrors,
 		ThrowOnError
 	>({
-		responseTransformer: postV1UsersRegisterResponseTransformer,
 		responseType: "json",
 		url: "/v1/users/register",
 		...options,

@@ -12,6 +12,7 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Input, InputField } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useUserContext } from "@/contexts/user-context";
 
@@ -23,7 +24,7 @@ const signInSchema = z.object({
 type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignInScreen() {
-	const { signIn, isLoading } = useUserContext();
+	const { signIn, isLoading, isAuthenticated } = useUserContext();
 
 	const {
 		control,
@@ -120,6 +121,7 @@ export default function SignInScreen() {
 				isDisabled={isLoading}
 			>
 				<ButtonText>Entrar</ButtonText>
+				{isLoading && <Spinner />}
 			</Button>
 		</AuthScreenLayout>
 	);

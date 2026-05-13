@@ -47,9 +47,9 @@ export function UserProvider({ children }: PropsWithChildren) {
 				setAuthToken(token);
 				setIsAuthenticated(true);
 
-				const profileResponse = await getV1Profiles();
-				const profile = profileResponse.data;
-
+				const response = await getV1Profiles();
+				const profile = response.data?.profile;
+				console.log(profile);
 				if (profile) {
 					setUser(profile);
 					router.push("/(tabs)/(home)");

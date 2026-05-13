@@ -21,7 +21,6 @@ import type {
 	PostV1ProfilesAddressesResponse,
 	PostV1ProfilesImagesResponse,
 	PostV1ProfilesResponse,
-	PostV1UsersRegisterResponse,
 	PutV1CompaniesAddressesResponse,
 	PutV1CompaniesResponse,
 	PutV1CompaniesServicesResponse,
@@ -30,25 +29,24 @@ import type {
 	PutV1ProfilesResponse,
 } from "./types.gen";
 
-export const postV1UsersRegisterResponseTransformer = async (
-	data: any,
-): Promise<PostV1UsersRegisterResponse> => {
-	data.created_at = new Date(data.created_at);
-	return data;
-};
-
 export const getV1ProfilesResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ProfilesResponse> => {
-	if (data) {
-		data.created_at = new Date(data.created_at);
-		data.updated_at = new Date(data.updated_at);
-		if (data.address) {
-			data.address.created_at = new Date(data.address.created_at);
-			data.address.updated_at = new Date(data.address.updated_at);
+	if (data.profile) {
+		data.profile.created_at = new Date(data.profile.created_at);
+		data.profile.updated_at = new Date(data.profile.updated_at);
+		if (data.profile.address) {
+			data.profile.address.created_at = new Date(
+				data.profile.address.created_at,
+			);
+			data.profile.address.updated_at = new Date(
+				data.profile.address.updated_at,
+			);
 		}
-		if (data.profile_image) {
-			data.profile_image.created_at = new Date(data.profile_image.created_at);
+		if (data.profile.profile_image) {
+			data.profile.profile_image.created_at = new Date(
+				data.profile.profile_image.created_at,
+			);
 		}
 	}
 	return data;

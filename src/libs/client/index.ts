@@ -162,6 +162,8 @@ export type {
 	PostV1UsersAuthResponse,
 	PostV1UsersAuthResponses,
 	PostV1UsersRegisterData,
+	PostV1UsersRegisterError,
+	PostV1UsersRegisterErrors,
 	PostV1UsersRegisterResponse,
 	PostV1UsersRegisterResponses,
 	PutV1CompaniesAddressesData,

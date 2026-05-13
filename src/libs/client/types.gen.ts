@@ -14,15 +14,26 @@ export type PostV1UsersRegisterData = {
 	url: "/v1/users/register";
 };
 
+export type PostV1UsersRegisterErrors = {
+	/**
+	 * Default Response
+	 */
+	409: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PostV1UsersRegisterError =
+	PostV1UsersRegisterErrors[keyof PostV1UsersRegisterErrors];
+
 export type PostV1UsersRegisterResponses = {
 	/**
 	 * Default Response
 	 */
-	200: {
-		id: string;
-		email: string;
-		password: string;
-		created_at: Date;
+	204: {
+		[key: string]: never;
 	};
 };
 
@@ -76,40 +87,42 @@ export type GetV1ProfilesResponses = {
 	 * Default Response
 	 */
 	200: {
-		user_id: string;
-		full_name: string;
-		display_name: string;
-		cpf: string;
-		phone: string;
-		email: string;
-		is_collector: boolean;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-		address: {
+		profile: {
+			user_id: string;
+			full_name: string;
+			display_name: string;
+			cpf: string;
+			phone: string;
+			email: string;
+			is_collector: boolean;
 			id: string;
-			zip_code: string;
-			street: string;
-			number: string;
-			complement: string | null;
-			district: string;
-			city: string;
-			state: string;
-			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
 			created_at: Date;
 			updated_at: Date;
+			address: {
+				id: string;
+				zip_code: string;
+				street: string;
+				number: string;
+				complement: string | null;
+				district: string;
+				city: string;
+				state: string;
+				state_code: string;
+				latitude: number | null;
+				longitude: number | null;
+				created_at: Date;
+				updated_at: Date;
+			} | null;
+			profile_image: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				created_at: Date;
+			} | null;
 		} | null;
-		profile_image: {
-			id: string;
-			url: string;
-			file_name: string;
-			path: string;
-			base64: string;
-			created_at: Date;
-		} | null;
-	} | null;
+	};
 };
 
 export type GetV1ProfilesResponse =
