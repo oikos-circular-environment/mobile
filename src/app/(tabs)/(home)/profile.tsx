@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack } from "expo-router";
 import { Check, Search } from "lucide-react-native";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	Image,
@@ -11,6 +11,7 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
+import DefaultImage from "@/assets/icons/icon.png";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
 	Checkbox,
@@ -60,30 +61,8 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileScreen() {
-	const { user, updateUser } = useUserContext();
+	const { user } = useUserContext();
 	const [activeTab, setActiveTab] = useState<ProfileTab>("profile");
-
-	const defaultValues = useMemo<ProfileFormValues>(
-		() => ({
-			fullName: user.fullName,
-			displayName: user.displayName,
-			cpf: user.cpf,
-			phone: user.phone,
-			email: user.email,
-			is_collector: user.is_collector,
-			address: {
-				zip_code: user.address.zip_code,
-				street: user.address.street,
-				number: user.address.number,
-				complement: user.address.complement,
-				district: user.address.district,
-				city: user.address.city,
-				state: user.address.state,
-				stateCode: user.address.stateCode,
-			},
-		}),
-		[user],
-	);
 
 	const {
 		control,
@@ -92,19 +71,14 @@ export default function ProfileScreen() {
 		formState: { errors, isSubmitting },
 	} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileSchema),
-		defaultValues,
 	});
 
-	useEffect(() => {
-		reset(defaultValues);
-	}, [defaultValues, reset]);
-
 	const onSubmit = (data: ProfileFormValues) => {
-		updateUser(data);
+		console.log(data);
 	};
 
 	const onCancel = () => {
-		reset(defaultValues);
+		reset();
 	};
 
 	return (
@@ -135,10 +109,7 @@ export default function ProfileScreen() {
 
 						{activeTab === "profile" ? (
 							<View className="gap-4">
-								<Heading size="xl">Perfil</Heading>
-
 								<View className="gap-2">
-									<Text className="text-sm">Imagem</Text>
 									<View className="relative mb-8">
 										<View className="h-24 items-center justify-center rounded-md bg-primary">
 											<Heading className="text-4xl text-primary-foreground">
@@ -156,7 +127,7 @@ export default function ProfileScreen() {
 										<View className="absolute left-1/2 top-full -ml-8 -mt-8">
 											<View className="rounded-md shadow-lg shadow-black/40">
 												<Image
-													source={user.avatarImage}
+													source={user?.profile_image?.url || DefaultImage}
 													className="size-16 rounded-md"
 												/>
 											</View>
@@ -352,8 +323,6 @@ export default function ProfileScreen() {
 							</View>
 						) : (
 							<View className="gap-4">
-								<Heading size="xl">Endereço</Heading>
-
 								<View className="gap-3">
 									<FormControl
 										isInvalid={!!errors.address?.zip_code}
