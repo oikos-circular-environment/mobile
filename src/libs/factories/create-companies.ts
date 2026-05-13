@@ -22,19 +22,21 @@ export const createCompanies = (count: number): Company[] => {
 		status: faker.datatype.boolean(),
 		isHeadquarters: faker.datatype.boolean(),
 		startedActivityIn: faker.date.past({ years: 20 }), // Data aleatória nos últimos 20 anos
-		businessHours: [],
+		businessHours: null,
 		address: {
 			id: faker.database.mongodbObjectId(),
 			street: faker.location.streetAddress(),
 			number: faker.location.buildingNumber(),
 			city: faker.location.city(),
 			state: faker.location.state(),
-			stateAcronym: faker.location.state({ abbreviated: true }),
+			state_code: faker.location.state({ abbreviated: true }),
 			district: faker.location.county(),
-			zipCode: faker.location.zipCode("#####-###"),
+			zip_code: faker.location.zipCode("#####-###"),
 			latitude: faker.location.latitude(),
 			longitude: faker.location.longitude(),
-			complement: "",
+			complement: null,
 		},
+		waste: null,
+		services: null,
 	}));
 };

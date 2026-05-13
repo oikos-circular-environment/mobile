@@ -29,7 +29,7 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import WrapperMapper from "@/components/wrapper-mapper";
-import { useUser } from "@/contexts/user-context";
+import { useUserContext } from "@/contexts/user-context";
 import { mask } from "@/libs/mask";
 
 type ProfileTab = "profile" | "address";
@@ -44,9 +44,9 @@ const profileSchema = z.object({
 		.string()
 		.regex(/^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/, "Informe um celular valido."),
 	email: z.email("Informe um email valido."),
-	isCollector: z.boolean(),
+	is_collector: z.boolean(),
 	address: z.object({
-		zipCode: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP valido."),
+		zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP valido."),
 		street: z.string().min(3, "Informe a rua."),
 		number: z.string().min(1, "Informe o numero."),
 		complement: z.string().min(2, "Informe o complemento."),
@@ -60,7 +60,7 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileScreen() {
-	const { user, updateUser } = useUser();
+	const { user, updateUser } = useUserContext();
 	const [activeTab, setActiveTab] = useState<ProfileTab>("profile");
 
 	const defaultValues = useMemo<ProfileFormValues>(
@@ -70,9 +70,9 @@ export default function ProfileScreen() {
 			cpf: user.cpf,
 			phone: user.phone,
 			email: user.email,
-			isCollector: user.isCollector,
+			is_collector: user.is_collector,
 			address: {
-				zipCode: user.address.zipCode,
+				zip_code: user.address.zip_code,
 				street: user.address.street,
 				number: user.address.number,
 				complement: user.address.complement,
@@ -174,7 +174,7 @@ export default function ProfileScreen() {
 								<View>
 									<Controller
 										control={control}
-										name="isCollector"
+										name="is_collector"
 										render={({ field: { value, onChange } }) => (
 											<Checkbox
 												value="collector"
@@ -356,7 +356,7 @@ export default function ProfileScreen() {
 
 								<View className="gap-3">
 									<FormControl
-										isInvalid={!!errors.address?.zipCode}
+										isInvalid={!!errors.address?.zip_code}
 										className="gap-2"
 									>
 										<FormControlLabel>
@@ -366,7 +366,7 @@ export default function ProfileScreen() {
 										</FormControlLabel>
 										<Controller
 											control={control}
-											name="address.zipCode"
+											name="address.zip_code"
 											render={({ field: { onChange, onBlur, value } }) => (
 												<Input>
 													<InputField
@@ -382,10 +382,10 @@ export default function ProfileScreen() {
 												</Input>
 											)}
 										/>
-										{errors.address?.zipCode?.message ? (
+										{errors.address?.zip_code?.message ? (
 											<FormControlError>
 												<FormControlErrorText>
-													{errors.address.zipCode.message}
+													{errors.address.zip_code.message}
 												</FormControlErrorText>
 											</FormControlError>
 										) : null}

@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { Link, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,10 +13,10 @@ import {
 } from "@/components/ui/form-control";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import { postV1UsersRegister } from "@/libs/client";
+import { useUserContext } from "@/contexts/user-context";
 
 const signUpSchema = z.object({
-	email: z.email("Digite um e-mail válido."),
+	email: z.string().email("Digite um e-mail válido."),
 	password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
 });
 
@@ -25,34 +24,12 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpScreen() {
 	const router = useRouter();
-
-	const signUpMutation = useMutation({
-		mutationKey: ["signup"],
-		mutationFn: async (data: SignUpFormValues) => {
-			const response = await postV1UsersRegister({
-				body: {
-					email: data.email,
-					password: data.password,
-				},
-			});
-
-			return response;
-		},
-		onSuccess: () => {
-			console.log("Sucesso");
-			router.push({
-				pathname: "/sign-in",
-			});
-		},
-		onError: error => {
-			console.log("Error", error);
-		},
-	});
+	const { signUp, isLoading } = useUserContext();
 
 	const {
 		control,
 		handleSubmit,
-		formState: { errors, isSubmitting },
+		formState: { errors },
 	} = useForm<SignUpFormValues>({
 		resolver: zodResolver(signUpSchema),
 		defaultValues: {
@@ -61,8 +38,15 @@ export default function SignUpScreen() {
 		},
 	});
 
-	const onSubmit = (data: SignUpFormValues) => {
-		signUpMutation.mutate(data);
+	const onSubmit = async (data: SignUpFormValues) => {
+		try {
+			await signUp(data);
+			router.push({
+				pathname: "/sign-in",
+			});
+		} catch (error) {
+			console.log("Error", error);
+		}
 	};
 
 	return (
@@ -138,7 +122,7 @@ export default function SignUpScreen() {
 			<Button
 				className="mt-1 bg-primary"
 				onPress={handleSubmit(onSubmit)}
-				isDisabled={isSubmitting}
+				isDisabled={isLoading}
 			>
 				<ButtonText className="text-base font-semibold">Criar conta</ButtonText>
 			</Button>

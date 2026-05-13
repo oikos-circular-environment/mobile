@@ -21,14 +21,14 @@ import { mask } from "@/libs/mask";
 import type { Address } from "@/libs/types/address";
 
 const addressSchema = z.object({
-	zipCode: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP válido."),
+	zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP válido."),
 	street: z.string().min(3, "Informe a rua."),
 	number: z.string().min(1, "Informe o número."),
 	complement: z.string().optional().nullable(),
 	district: z.string().min(2, "Informe o bairro."),
 	city: z.string().min(2, "Informe a cidade."),
 	state: z.string().min(2, "Informe o estado."),
-	stateAcronym: z.string().length(2, "Use a sigla com 2 letras."),
+	state_code: z.string().length(2, "Use a sigla com 2 letras."),
 	latitude: z.number().nullable().optional(),
 	longitude: z.number().nullable().optional(),
 });
@@ -37,26 +37,26 @@ type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function CompanyAddressScreen() {
 	const [address] = useState<Partial<Address>>({
-		zipCode: "",
+		zip_code: "",
 		street: "",
 		number: "",
 		complement: null,
 		district: "",
 		city: "",
 		state: "",
-		stateAcronym: "",
+		state_code: "",
 	});
 
 	const defaultValues = useMemo<AddressFormValues>(
 		() => ({
-			zipCode: address.zipCode ?? "",
+			zip_code: address.zip_code ?? "",
 			street: address.street ?? "",
 			number: address.number ?? "",
 			complement: address.complement ?? null,
 			district: address.district ?? "",
 			city: address.city ?? "",
 			state: address.state ?? "",
-			stateAcronym: address.stateAcronym ?? "",
+			state_code: address.state_code ?? "",
 			latitude: address.latitude ?? null,
 			longitude: address.longitude ?? null,
 		}),
@@ -110,7 +110,7 @@ export default function CompanyAddressScreen() {
 						<Heading size="xl">Endereço da Empresa</Heading>
 
 						<View className="gap-3">
-							<FormControl isInvalid={!!errors.zipCode} className="gap-2">
+							<FormControl isInvalid={!!errors.zip_code} className="gap-2">
 								<FormControlLabel>
 									<FormControlLabelText className="text-sm">
 										CEP
@@ -118,7 +118,7 @@ export default function CompanyAddressScreen() {
 								</FormControlLabel>
 								<Controller
 									control={control}
-									name="zipCode"
+									name="zip_code"
 									render={({ field: { onChange, onBlur, value } }) => (
 										<Input>
 											<InputField
@@ -134,10 +134,10 @@ export default function CompanyAddressScreen() {
 										</Input>
 									)}
 								/>
-								{errors.zipCode?.message ? (
+								{errors.zip_code?.message ? (
 									<FormControlError>
 										<FormControlErrorText>
-											{errors.zipCode.message}
+											{errors.zip_code.message}
 										</FormControlErrorText>
 									</FormControlError>
 								) : null}
@@ -321,7 +321,7 @@ export default function CompanyAddressScreen() {
 								</FormControl>
 
 								<FormControl
-									isInvalid={!!errors.stateAcronym}
+									isInvalid={!!errors.state_code}
 									className="w-16 gap-2"
 								>
 									<FormControlLabel>
@@ -331,7 +331,7 @@ export default function CompanyAddressScreen() {
 									</FormControlLabel>
 									<Controller
 										control={control}
-										name="stateAcronym"
+										name="state_code"
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
@@ -344,10 +344,10 @@ export default function CompanyAddressScreen() {
 											</Input>
 										)}
 									/>
-									{errors.stateAcronym?.message ? (
+									{errors.state_code?.message ? (
 										<FormControlError>
 											<FormControlErrorText>
-												{errors.stateAcronym.message}
+												{errors.state_code.message}
 											</FormControlErrorText>
 										</FormControlError>
 									) : null}

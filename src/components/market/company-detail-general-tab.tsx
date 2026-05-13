@@ -83,7 +83,7 @@ export function CompanyDetailGeneralTab({
 						<Card className="flex-row items-center gap-2 shadow-none">
 							<Text className="flex-1 text-md">
 								{address
-									? `${address.street}, ${address.number} - ${address.district}, ${address.city} - ${address.stateAcronym}, ${address.zipCode}`
+									? `${address.street}, ${address.number} - ${address.district}, ${address.city} - ${address.state_code}, ${address.zip_code}`
 									: "Endereço não informado"}
 							</Text>
 

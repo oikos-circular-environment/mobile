@@ -6,8 +6,8 @@ export type Address = {
 	district: string;
 	city: string;
 	state: string;
-	stateAcronym: string;
-	zipCode: string;
+	state_code: string;
+	zip_code: string;
 	latitude: number | null;
 	longitude: number | null;
 };
