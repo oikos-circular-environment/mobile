@@ -22,6 +22,7 @@ type UserContextValue = {
 	signIn: (data: { email: string; password: string }) => Promise<void>;
 	signUp: (data: { email: string; password: string }) => Promise<void>;
 	signOut: () => void;
+	updateUserProfile: (data: Partial<User>) => void;
 };
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -32,6 +33,10 @@ export function UserProvider({ children }: PropsWithChildren) {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 	const router = useRouter();
+
+	const updateUserProfile = useCallback((data: Partial<User>) => {
+		setUser((prev) => (prev ? { ...prev, ...data } : (data as User)));
+	}, []);
 
 	const signIn = useCallback(
 		async (data: { email: string; password: string }) => {
@@ -91,8 +96,9 @@ export function UserProvider({ children }: PropsWithChildren) {
 			signIn,
 			signUp,
 			signOut,
+			updateUserProfile,
 		}),
-		[user, isLoading, signIn, signUp, signOut, isAuthenticated],
+		[user, isLoading, signIn, signUp, signOut, isAuthenticated, updateUserProfile],
 	);
 
 	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

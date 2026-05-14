@@ -169,39 +169,41 @@ export type PostV1ProfilesResponses = {
 	 * Default Response
 	 */
 	200: {
-		user_id: string;
-		full_name: string;
-		display_name: string;
-		cpf: string;
-		phone: string;
-		email: string;
-		is_collector: boolean;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-		address: {
+		profile: {
+			user_id: string;
+			full_name: string;
+			display_name: string;
+			cpf: string;
+			phone: string;
+			email: string;
+			is_collector: boolean;
 			id: string;
-			zip_code: string;
-			street: string;
-			number: string;
-			complement: string | null;
-			district: string;
-			city: string;
-			state: string;
-			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
 			created_at: Date;
 			updated_at: Date;
-		} | null;
-		profile_image: {
-			id: string;
-			url: string;
-			file_name: string;
-			path: string;
-			base64: string;
-			created_at: Date;
-		} | null;
+			address: {
+				id: string;
+				zip_code: string;
+				street: string;
+				number: string;
+				complement: string | null;
+				district: string;
+				city: string;
+				state: string;
+				state_code: string;
+				latitude: number | null;
+				longitude: number | null;
+				created_at: Date;
+				updated_at: Date;
+			} | null;
+			profile_image: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				created_at: Date;
+			} | null;
+		};
 	};
 };
 
@@ -248,40 +250,42 @@ export type PutV1ProfilesResponses = {
 	 * Default Response
 	 */
 	200: {
-		user_id: string;
-		full_name: string;
-		display_name: string;
-		cpf: string;
-		phone: string;
-		email: string;
-		is_collector: boolean;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-		address: {
+		profile: {
+			user_id: string;
+			full_name: string;
+			display_name: string;
+			cpf: string;
+			phone: string;
+			email: string;
+			is_collector: boolean;
 			id: string;
-			zip_code: string;
-			street: string;
-			number: string;
-			complement: string | null;
-			district: string;
-			city: string;
-			state: string;
-			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
 			created_at: Date;
 			updated_at: Date;
+			address: {
+				id: string;
+				zip_code: string;
+				street: string;
+				number: string;
+				complement: string | null;
+				district: string;
+				city: string;
+				state: string;
+				state_code: string;
+				latitude: number | null;
+				longitude: number | null;
+				created_at: Date;
+				updated_at: Date;
+			} | null;
+			profile_image: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				created_at: Date;
+			} | null;
 		} | null;
-		profile_image: {
-			id: string;
-			url: string;
-			file_name: string;
-			path: string;
-			base64: string;
-			created_at: Date;
-		} | null;
-	} | null;
+	};
 };
 
 export type PutV1ProfilesResponse =
@@ -422,20 +426,22 @@ export type GetV1ProfilesAddressesResponses = {
 	 * Default Response
 	 */
 	200: {
-		id: string;
-		zip_code: string;
-		street: string;
-		number: string;
-		complement: string | null;
-		district: string;
-		city: string;
-		state: string;
-		state_code: string;
-		latitude: number | null;
-		longitude: number | null;
-		created_at: Date;
-		updated_at: Date;
-	} | null;
+		address: {
+			id: string;
+			zip_code: string;
+			street: string;
+			number: string;
+			complement: string | null;
+			district: string;
+			city: string;
+			state: string;
+			state_code: string;
+			latitude: number | null;
+			longitude: number | null;
+			created_at: Date;
+			updated_at: Date;
+		} | null;
+	};
 };
 
 export type GetV1ProfilesAddressesResponse =
@@ -494,19 +500,21 @@ export type PostV1ProfilesAddressesResponses = {
 	 * Default Response
 	 */
 	200: {
-		id: string;
-		zip_code: string;
-		street: string;
-		number: string;
-		complement: string | null;
-		district: string;
-		city: string;
-		state: string;
-		state_code: string;
-		latitude: number | null;
-		longitude: number | null;
-		created_at: Date;
-		updated_at: Date;
+		address: {
+			id: string;
+			zip_code: string;
+			street: string;
+			number: string;
+			complement: string | null;
+			district: string;
+			city: string;
+			state: string;
+			state_code: string;
+			latitude: number | null;
+			longitude: number | null;
+			created_at: Date;
+			updated_at: Date;
+		};
 	};
 };
 
@@ -558,20 +566,22 @@ export type PutV1ProfilesAddressesResponses = {
 	 * Default Response
 	 */
 	200: {
-		id: string;
-		zip_code: string;
-		street: string;
-		number: string;
-		complement: string | null;
-		district: string;
-		city: string;
-		state: string;
-		state_code: string;
-		latitude: number | null;
-		longitude: number | null;
-		created_at: Date;
-		updated_at: Date;
-	} | null;
+		address: {
+			id: string;
+			zip_code: string;
+			street: string;
+			number: string;
+			complement: string | null;
+			district: string;
+			city: string;
+			state: string;
+			state_code: string;
+			latitude: number | null;
+			longitude: number | null;
+			created_at: Date;
+			updated_at: Date;
+		} | null;
+	};
 };
 
 export type PutV1ProfilesAddressesResponse =

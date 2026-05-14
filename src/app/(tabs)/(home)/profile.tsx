@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { Check, Search } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	Image,
@@ -12,7 +13,8 @@ import {
 } from "react-native";
 import { z } from "zod";
 import DefaultImage from "@/assets/icons/icon.png";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
 	Checkbox,
 	CheckboxIcon,
@@ -28,12 +30,23 @@ import {
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import {
+	Tabs,
+	TabsTab,
+	TabsTabList,
+	TabsTabPanel,
+	TabsTabPanels,
+	TabsTabTitle,
+} from "@/components/ui/tabs";
 import { Text } from "@/components/ui/text";
 import WrapperMapper from "@/components/wrapper-mapper";
 import { useUserContext } from "@/contexts/user-context";
+import {
+	postV1Profiles,
+	putV1Profiles,
+	putV1ProfilesAddresses,
+} from "@/libs/client";
 import { mask } from "@/libs/mask";
-
-type ProfileTab = "profile" | "address";
 
 const profileSchema = z.object({
 	fullName: z.string().min(3, "Informe seu nome completo."),
@@ -44,13 +57,13 @@ const profileSchema = z.object({
 	phone: z
 		.string()
 		.regex(/^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/, "Informe um celular valido."),
-	email: z.email("Informe um email valido."),
+	email: z.string().email("Informe um email valido."),
 	is_collector: z.boolean(),
 	address: z.object({
 		zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP valido."),
 		street: z.string().min(3, "Informe a rua."),
 		number: z.string().min(1, "Informe o numero."),
-		complement: z.string().min(2, "Informe o complemento."),
+		complement: z.string().optional().nullable(),
 		district: z.string().min(2, "Informe o bairro."),
 		city: z.string().min(2, "Informe a cidade."),
 		state: z.string().min(2, "Informe o estado."),
@@ -61,25 +74,144 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileScreen() {
-	const { user } = useUserContext();
-	const [activeTab, setActiveTab] = useState<ProfileTab>("profile");
+	const { user, updateUserProfile } = useUserContext();
+	const [activeTab, setActiveTab] = useState("profile");
 
 	const {
 		control,
 		handleSubmit,
 		reset,
-		formState: { errors, isSubmitting },
+		formState: { errors },
 	} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileSchema),
+		defaultValues: {
+			fullName: user?.profile?.full_name || "",
+			displayName: user?.profile?.display_name || "",
+			cpf: user?.profile?.cpf ? mask.cpf(user.profile.cpf) : "",
+			phone: user?.profile?.phone ? mask.phoneBr(user.profile.phone) : "",
+			email: user?.profile?.email || "",
+			is_collector: user?.profile?.is_collector || false,
+			address: {
+				zip_code: user?.profile?.address?.zip_code
+					? mask.cep(user.profile.address.zip_code)
+					: "",
+				street: user?.profile?.address?.street || "",
+				number: user?.profile?.address?.number || "",
+				complement: user?.profile?.address?.complement || "",
+				district: user?.profile?.address?.district || "",
+				city: user?.profile?.address?.city || "",
+				state: user?.profile?.address?.state || "",
+				stateCode: user?.profile?.address?.state_code || "",
+			},
+		},
 	});
 
-	const onSubmit = (data: ProfileFormValues) => {
-		console.log(data);
+	useEffect(() => {
+		if (user?.profile) {
+			reset({
+				fullName: user.profile.full_name || "",
+				displayName: user.profile.display_name || "",
+				cpf: user.profile.cpf ? mask.cpf(user.profile.cpf) : "",
+				phone: user.profile.phone ? mask.phoneBr(user.profile.phone) : "",
+				email: user.profile.email || "",
+				is_collector: user.profile.is_collector || false,
+				address: {
+					zip_code: user.profile.address?.zip_code
+						? mask.cep(user.profile.address.zip_code)
+						: "",
+					street: user.profile.address?.street || "",
+					number: user.profile.address?.number || "",
+					complement: user.profile.address?.complement || "",
+					district: user.profile.address?.district || "",
+					city: user.profile.address?.city || "",
+					state: user.profile.address?.state || "",
+					stateCode: user.profile.address?.state_code || "",
+				},
+			});
+		}
+	}, [user, reset]);
+
+	const profileMutation = useMutation({
+		mutationFn: async (data: ProfileFormValues) => {
+			const profileData = {
+				full_name: data.fullName,
+				display_name: data.displayName,
+				cpf: data.cpf.replace(/\D/g, ""),
+				phone: data.phone.replace(/\D/g, ""),
+				email: data.email,
+				is_collector: data.is_collector,
+			};
+
+			if (!user?.profile?.id) {
+				return await postV1Profiles({ body: profileData });
+			}
+			return await putV1Profiles({ body: profileData });
+		},
+		onSuccess: response => {
+			if (response.data?.profile) {
+				updateUserProfile({ profile: response.data.profile });
+				toast.success("Perfil atualizado!", "Suas informações foram salvas.");
+			}
+		},
+		onError: () => {
+			toast.error(
+				"Erro ao salvar",
+				"Ocorreu um problema ao atualizar seu perfil.",
+			);
+		},
+	});
+
+	const addressMutation = useMutation({
+		mutationFn: async (data: ProfileFormValues["address"]) => {
+			return await putV1ProfilesAddresses({
+				body: {
+					zip_code: data.zip_code.replace(/\D/g, ""),
+					street: data.street,
+					number: data.number,
+					complement: data.complement || "",
+					district: data.district,
+					city: data.city,
+					state: data.state,
+					state_code: data.stateCode,
+				},
+			});
+		},
+		onSuccess: response => {
+			if (response.data?.address && user?.profile) {
+				updateUserProfile({
+					profile: {
+						...user.profile,
+						address: response.data.address,
+					},
+				});
+				toast.success(
+					"Endereço atualizado!",
+					"Seu endereço foi salvo com sucesso.",
+				);
+			}
+		},
+		onError: () => {
+			toast.error(
+				"Erro ao salvar",
+				"Ocorreu um problema ao atualizar seu endereço.",
+			);
+		},
+	});
+
+	const onSubmit = async (data: ProfileFormValues) => {
+		try {
+			await profileMutation.mutateAsync(data);
+			await addressMutation.mutateAsync(data.address);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	const onCancel = () => {
 		reset();
 	};
+
+	const isLoading = profileMutation.isPending || addressMutation.isPending;
 
 	return (
 		<>
@@ -89,26 +221,22 @@ export default function ProfileScreen() {
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 			>
 				<ScrollView className="flex-1 bg-white p-4">
-					<View className="flex gap-4 pb-8">
-						<View className="flex flex-row items-center rounded-md border border-border p-1">
-							<Button
-								variant={activeTab === "profile" ? "secondary" : "ghost"}
-								className="flex-1"
-								onPress={() => setActiveTab("profile")}
-							>
-								<ButtonText>Perfil</ButtonText>
-							</Button>
-							<Button
-								variant={activeTab === "address" ? "secondary" : "ghost"}
-								className="flex-1"
-								onPress={() => setActiveTab("address")}
-							>
-								<ButtonText>Endereço</ButtonText>
-							</Button>
-						</View>
+					<Tabs
+						value={activeTab}
+						onValueChange={setActiveTab}
+						className="flex-1 gap-4 pb-8"
+					>
+						<TabsTabList className="flex-row items-center rounded-md border border-border p-1 bg-muted/20">
+							<TabsTab value="profile" className="flex-1">
+								<TabsTabTitle>Perfil</TabsTabTitle>
+							</TabsTab>
+							<TabsTab value="address" className="flex-1">
+								<TabsTabTitle>Endereço</TabsTabTitle>
+							</TabsTab>
+						</TabsTabList>
 
-						{activeTab === "profile" ? (
-							<View className="gap-4">
+						<TabsTabPanels>
+							<TabsTabPanel value="profile" className="gap-4">
 								<View className="gap-2">
 									<View className="relative mb-8">
 										<View className="h-24 items-center justify-center rounded-md bg-primary">
@@ -128,7 +256,9 @@ export default function ProfileScreen() {
 											<View className="rounded-md shadow-lg shadow-black/40">
 												<Image
 													source={
-														user?.profile.profile_image?.url || DefaultImage
+														user?.profile?.profile_image?.url
+															? { uri: user.profile.profile_image.url }
+															: DefaultImage
 													}
 													className="size-16 rounded-md"
 												/>
@@ -149,21 +279,23 @@ export default function ProfileScreen() {
 										control={control}
 										name="is_collector"
 										render={({ field: { value, onChange } }) => (
-											<Checkbox
-												value="collector"
-												isChecked={value}
-												onChange={onChange}
-											>
-												<CheckboxIndicator className="data-[checked=true]:border-primary data-[checked=true]:bg-primary">
-													<CheckboxIcon as={Check} />
-												</CheckboxIndicator>
-												<CheckboxLabel>Sou coletor</CheckboxLabel>
-											</Checkbox>
+											<Card className="shadow-none" id="is_collector">
+												<Checkbox
+													id="is_collector"
+													value="collector"
+													isChecked={value}
+													onChange={onChange}
+												>
+													<CheckboxIndicator className="data-[checked=true]:border-primary data-[checked=true]:bg-primary">
+														<CheckboxIcon as={Check} />
+													</CheckboxIndicator>
+													<CheckboxLabel>
+														Sou coletor independente
+													</CheckboxLabel>
+												</Checkbox>
+											</Card>
 										)}
 									/>
-									<Text className="mt-2 text-xs text-muted-foreground">
-										Ser coletor está sujeito a validação prévia
-									</Text>
 								</View>
 
 								<View className="gap-3">
@@ -314,17 +446,11 @@ export default function ProfileScreen() {
 												</FormControlErrorText>
 											</FormControlError>
 										) : null}
-										<View>
-											<Heading size="xs" className="text-muted-foreground">
-												Este email pode ser diferente do email vinculado a sua
-												conta para autenticação.
-											</Heading>
-										</View>
 									</FormControl>
 								</View>
-							</View>
-						) : (
-							<View className="gap-4">
+							</TabsTabPanel>
+
+							<TabsTabPanel value="address" className="gap-4">
 								<View className="gap-3">
 									<FormControl
 										isInvalid={!!errors.address?.zip_code}
@@ -347,7 +473,7 @@ export default function ProfileScreen() {
 														keyboardType="number-pad"
 														maxLength={9}
 													/>
-													<InputSlot>
+													<InputSlot className="pr-3">
 														<InputIcon as={Search} />
 													</InputSlot>
 												</Input>
@@ -427,7 +553,7 @@ export default function ProfileScreen() {
 											render={({ field: { onChange, onBlur, value } }) => (
 												<Input>
 													<InputField
-														value={value}
+														value={value || ""}
 														onBlur={onBlur}
 														onChangeText={onChange}
 													/>
@@ -541,8 +667,8 @@ export default function ProfileScreen() {
 										<WrapperMapper />
 									</View>
 								</View>
-							</View>
-						)}
+							</TabsTabPanel>
+						</TabsTabPanels>
 
 						<View className="flex flex-row gap-2 pt-4">
 							<Button variant="outline" className="flex-1" onPress={onCancel}>
@@ -551,12 +677,15 @@ export default function ProfileScreen() {
 							<Button
 								className="flex-1"
 								onPress={handleSubmit(onSubmit)}
-								isDisabled={isSubmitting}
+								isDisabled={isLoading}
 							>
-								<ButtonText>Confirmar</ButtonText>
+								{isLoading && <ButtonSpinner />}
+								<ButtonText>
+									{isLoading ? "Salvando..." : "Confirmar"}
+								</ButtonText>
 							</Button>
 						</View>
-					</View>
+					</Tabs>
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</>
