@@ -127,7 +127,9 @@ export default function ProfileScreen() {
 										<View className="absolute left-1/2 top-full -ml-8 -mt-8">
 											<View className="rounded-md shadow-lg shadow-black/40">
 												<Image
-													source={user?.profile_image?.url || DefaultImage}
+													source={
+														user?.profile.profile_image?.url || DefaultImage
+													}
 													className="size-16 rounded-md"
 												/>
 											</View>

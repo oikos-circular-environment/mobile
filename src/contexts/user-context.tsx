@@ -13,10 +13,10 @@ import {
 	postV1UsersAuth,
 	postV1UsersRegister,
 } from "@/libs/client";
-import type { Profile } from "@/libs/types/profile";
+import type { User } from "@/libs/types/user";
 
 type UserContextValue = {
-	user: Profile | null;
+	user: User | null;
 	isAuthenticated: boolean;
 	isLoading: boolean;
 	signIn: (data: { email: string; password: string }) => Promise<void>;
@@ -27,7 +27,7 @@ type UserContextValue = {
 const UserContext = createContext<UserContextValue | null>(null);
 
 export function UserProvider({ children }: PropsWithChildren) {
-	const [user, setUser] = useState<Profile | null>(null);
+	const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -51,7 +51,7 @@ export function UserProvider({ children }: PropsWithChildren) {
 				const profile = response.data?.profile;
 				console.log(profile);
 				if (profile) {
-					setUser(profile);
+					setUser({ profile });
 					router.push("/(tabs)/(home)");
 				} else {
 					router.push("/(tabs)/(home)/profile");
