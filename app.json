@@ -1,87 +1,85 @@
 {
-  "expo": {
-    "name": "oikos",
-    "slug": "oikos",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./src/assets/icons/icon.png",
-    "scheme": "oikos",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "bundleIdentifier": "com.oikos",
-      "supportsTablet": true,
-      "config": {
-        "googleMapsApiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
-      }
-    },
-    "android": {
-      "package": "com.oikos",
-      "adaptiveIcon": {
-        "backgroundColor": "#274E2D",
-        "foregroundImage": "./src/assets/icons/android-icon.png"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
-        }
-      }
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./src/assets/icons/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#274E2D"
-        }
-      ],
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Permitir $(PRODUCT_NAME) usar sua localização?"
-        }
-      ],
-      "expo-localization",
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-          "recordAudioAndroid": true
-        }
-      ],
-      [
-        "react-native-vision-camera",
-        {
-          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
-
-          // optionally, if you want to record audio:
-          "enableMicrophonePermission": true,
-          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
-        }
-      ],
-      [
-        "expo-video",
-        {
-          "supportsBackgroundPlayback": true,
-          "supportsPictureInPicture": true
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "4d7f8122-2f77-41c9-8ef3-63000041bc61"
-      }
-    }
-  }
+	"expo": {
+		"name": "oikos",
+		"slug": "oikos",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./src/assets/icons/icon.png",
+		"scheme": "oikos",
+		"userInterfaceStyle": "automatic",
+		"newArchEnabled": true,
+		"ios": {
+			"bundleIdentifier": "com.oikos",
+			"supportsTablet": true,
+			"config": {
+				"googleMapsApiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
+			}
+		},
+		"android": {
+			"package": "com.oikos",
+			"adaptiveIcon": {
+				"backgroundColor": "#274E2D",
+				"foregroundImage": "./src/assets/icons/android-icon.png"
+			},
+			"edgeToEdgeEnabled": true,
+			"predictiveBackGestureEnabled": false,
+			"config": {
+				"googleMaps": {
+					"apiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
+				}
+			}
+		},
+		"plugins": [
+			"expo-router",
+			[
+				"expo-splash-screen",
+				{
+					"image": "./src/assets/icons/splash-icon.png",
+					"imageWidth": 200,
+					"resizeMode": "contain",
+					"backgroundColor": "#274E2D"
+				}
+			],
+			[
+				"expo-location",
+				{
+					"locationAlwaysAndWhenInUsePermission": "Permitir $(PRODUCT_NAME) usar sua localização?"
+				}
+			],
+			"expo-localization",
+			[
+				"expo-camera",
+				{
+					"cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+					"microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+					"recordAudioAndroid": true
+				}
+			],
+			[
+				"react-native-vision-camera",
+				{
+					"cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+					"enableMicrophonePermission": true,
+					"microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
+				}
+			],
+			[
+				"expo-video",
+				{
+					"supportsBackgroundPlayback": true,
+					"supportsPictureInPicture": true
+				}
+			]
+		],
+		"experiments": {
+			"typedRoutes": true,
+			"reactCompiler": true
+		},
+		"extra": {
+			"router": {},
+			"eas": {
+				"projectId": "4d7f8122-2f77-41c9-8ef3-63000041bc61"
+			}
+		}
+	}
 }
