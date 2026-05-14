@@ -5,9 +5,9 @@
  * Saida: "7.6 metros"
  */
 export function formatMeters(value: number | null | undefined) {
-  if (value == null || Number.isNaN(value) || value < 0) {
-    return "indisponivel";
-  }
+	if (value == null || Number.isNaN(value) || value < 0) {
+		return "indisponivel";
+	}
 
-  return `${value.toFixed(1)} metros`;
+	return `${value.toFixed(1)} metros`;
 }

@@ -1,81 +1,109 @@
+import { useRouter } from "expo-router";
 import {
-  createContext,
-  type PropsWithChildren,
-  useContext,
-  useMemo,
-  useState,
+	createContext,
+	type PropsWithChildren,
+	useCallback,
+	useContext,
+	useMemo,
+	useState,
 } from "react";
-import UserMockImage from "@/assets/images/mock/user-mock-image.png";
-
-export type UserProfile = {
-  fullName: string;
-  displayName: string;
-  cpf: string;
-  phone: string;
-  email: string;
-  isCollector: boolean;
-  address: {
-    zipCode: string;
-    street: string;
-    number: string;
-    complement: string;
-    district: string;
-    city: string;
-    state: string;
-    stateCode: string;
-  };
-  avatarImage: number;
-};
+import { setAuthToken } from "@/libs/api/oikos-api";
+import {
+	getV1Profiles,
+	postV1UsersAuth,
+	postV1UsersRegister,
+} from "@/libs/client";
+import type { User } from "@/libs/types/user";
 
 type UserContextValue = {
-  user: UserProfile;
-  updateUser: (updates: Partial<UserProfile>) => void;
-};
-
-const mockUser: UserProfile = {
-  fullName: "Christian Cesar Rodrigues Santos",
-  displayName: "Christian Cesar",
-  cpf: "08414565258",
-  phone: "65999999999",
-  email: "christian.rodrigues@hotmail.com",
-  isCollector: true,
-  address: {
-    zipCode: "78700000",
-    street: "Rua A 144",
-    number: "254",
-    complement: "QD 485, LT 50",
-    district: "Sao Cristovao",
-    city: "Rondonopolis",
-    state: "Mato Grosso",
-    stateCode: "MT",
-  },
-  avatarImage: UserMockImage,
+	user: User | null;
+	isAuthenticated: boolean;
+	isLoading: boolean;
+	signIn: (data: { email: string; password: string }) => Promise<void>;
+	signUp: (data: { email: string; password: string }) => Promise<void>;
+	signOut: () => void;
 };
 
 const UserContext = createContext<UserContextValue | null>(null);
 
 export function UserProvider({ children }: PropsWithChildren) {
-  const [user, setUser] = useState<UserProfile>(mockUser);
+	const [user, setUser] = useState<User | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const value = useMemo(
-    () => ({
-      user,
-      updateUser: (updates: Partial<UserProfile>) => {
-        setUser(current => ({ ...current, ...updates }));
-      },
-    }),
-    [user],
-  );
+	const router = useRouter();
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+	const signIn = useCallback(
+		async (data: { email: string; password: string }) => {
+			setIsLoading(true);
+			try {
+				const authResponse = await postV1UsersAuth({
+					body: { email: data.email, password: data.password },
+				});
+
+				const token = authResponse.data?.token;
+				if (!token) throw new Error("Token não recebido");
+
+				setAuthToken(token);
+				setIsAuthenticated(true);
+
+				const response = await getV1Profiles();
+				const profile = response.data?.profile;
+				console.log(profile);
+				if (profile) {
+					setUser({ profile });
+					router.push("/(tabs)/(home)");
+				} else {
+					router.push("/(tabs)/(home)/profile");
+				}
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[router],
+	);
+
+	const signUp = useCallback(
+		async (data: { email: string; password: string }) => {
+			setIsLoading(true);
+			try {
+				await postV1UsersRegister({
+					body: { email: data.email, password: data.password },
+				});
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[],
+	);
+
+	const signOut = useCallback(() => {
+		setAuthToken(null);
+		setUser(null);
+		setIsAuthenticated(false);
+	}, []);
+
+	const value = useMemo(
+		() => ({
+			user,
+			isAuthenticated: isAuthenticated,
+			isLoading,
+			signIn,
+			signUp,
+			signOut,
+		}),
+		[user, isLoading, signIn, signUp, signOut, isAuthenticated],
+	);
+
+	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
-export function useUser() {
-  const context = useContext(UserContext);
+export function useUserContext() {
+	const context = useContext(UserContext);
 
-  if (!context) {
-    throw new Error("useUser must be used within UserProvider");
-  }
+	if (!context) {
+		throw new Error("useUserContext must be used within UserProvider");
+	}
 
-  return context;
+	return context;
 }
