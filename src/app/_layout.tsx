@@ -9,6 +9,7 @@ import "react-native-reanimated";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
+import { Toaster } from "@/components/toast";
 
 export const unstable_settings = {
 	anchor: "(tabs)",
@@ -24,6 +25,7 @@ export default function RootLayout() {
 					<NotificationProvider>
 						<GluestackUIProvider mode="light">
 							<SafeAreaProvider>
+								<Toaster />
 								<SafeAreaView
 									style={{ flex: 1 }}
 									edges={["top", "left", "right"]}

@@ -3,6 +3,7 @@ import { Link, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
+import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -44,8 +45,8 @@ export default function SignUpScreen() {
 			router.push({
 				pathname: "/sign-in",
 			});
-		} catch (error) {
-			console.log("Error", error);
+		} catch {
+			toast.error("Erro seu registro", "Verifique os dados e tente novamente");
 		}
 	};
 

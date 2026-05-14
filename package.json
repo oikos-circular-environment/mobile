@@ -45,7 +45,7 @@
 		"expo-video": "~3.0.16",
 		"expo-web-browser": "~15.0.10",
 		"geolib": "^3.3.14",
-		"lucide-react-native": "^0.577.0",
+		"lucide-react-native": "^1.16.0",
 		"nativewind": "^5.0.0-preview.2",
 		"react": "19.1.0",
 		"react-aria": "^3.47.0",
