@@ -3,6 +3,7 @@ import { Link } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
+import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -41,8 +42,8 @@ export default function SignInScreen() {
 	const onSubmit = async (data: SignInFormValues) => {
 		try {
 			await signIn(data);
-		} catch (error) {
-			console.log("Error", error);
+		} catch {
+			toast.error("Erro ao fazer login", "Verifique suas credenciais");
 		}
 	};
 
