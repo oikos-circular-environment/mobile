@@ -7,8 +7,9 @@ import {
 } from "lucide-react-native";
 import { Image, Pressable, ScrollView, View } from "react-native";
 import UserMockImage from "@/assets/images/mock/user-mock-image.png";
+import { toast } from "@/components/toast";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -45,7 +46,15 @@ export default function HomeScreen() {
 						</Link>
 					</View>
 				</Card>
-
+				<Card>
+					<Button
+						onPress={() => {
+							toast.error("Ocorreu um erro", "tetando erro");
+						}}
+					>
+						<ButtonText>Open toast</ButtonText>
+					</Button>
+				</Card>
 				<Card className="shadow-none gap-2">
 					<Text>Coletas na sua região hoje</Text>
 					<View className="flex flex-row gap-2">
