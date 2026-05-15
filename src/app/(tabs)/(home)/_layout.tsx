@@ -17,7 +17,7 @@ export default function HomeStackLayout() {
 			/>
 			<Stack.Screen
 				name="profile"
-				options={{ title: "Perfil", headerShown: false }}
+				options={{ title: "Perfil", headerShown: true }}
 			/>
 			<Stack.Screen
 				name="notifications"

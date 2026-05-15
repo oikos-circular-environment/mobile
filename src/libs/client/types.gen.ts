@@ -93,7 +93,6 @@ export type GetV1ProfilesResponses = {
 			display_name: string;
 			cpf: string;
 			phone: string;
-			email: string;
 			is_collector: boolean;
 			id: string;
 			created_at: Date;
@@ -128,13 +127,12 @@ export type GetV1ProfilesResponses = {
 export type GetV1ProfilesResponse =
 	GetV1ProfilesResponses[keyof GetV1ProfilesResponses];
 
-export type PostV1ProfilesData = {
+export type PutV1ProfilesData = {
 	body: {
 		full_name: string;
 		display_name: string;
 		cpf: string;
 		phone: string;
-		email: string;
 		is_collector?: boolean;
 	};
 	path?: never;
@@ -142,7 +140,7 @@ export type PostV1ProfilesData = {
 	url: "/v1/profiles";
 };
 
-export type PostV1ProfilesErrors = {
+export type PutV1ProfilesErrors = {
 	/**
 	 * Default Response
 	 */
@@ -161,10 +159,9 @@ export type PostV1ProfilesErrors = {
 	};
 };
 
-export type PostV1ProfilesError =
-	PostV1ProfilesErrors[keyof PostV1ProfilesErrors];
+export type PutV1ProfilesError = PutV1ProfilesErrors[keyof PutV1ProfilesErrors];
 
-export type PostV1ProfilesResponses = {
+export type PutV1ProfilesResponses = {
 	/**
 	 * Default Response
 	 */
@@ -175,7 +172,6 @@ export type PostV1ProfilesResponses = {
 			display_name: string;
 			cpf: string;
 			phone: string;
-			email: string;
 			is_collector: boolean;
 			id: string;
 			created_at: Date;
@@ -204,87 +200,6 @@ export type PostV1ProfilesResponses = {
 				created_at: Date;
 			} | null;
 		};
-	};
-};
-
-export type PostV1ProfilesResponse =
-	PostV1ProfilesResponses[keyof PostV1ProfilesResponses];
-
-export type PutV1ProfilesData = {
-	body: {
-		full_name?: string;
-		display_name?: string;
-		cpf?: string;
-		phone?: string;
-		email?: string;
-		is_collector?: boolean;
-	};
-	path?: never;
-	query?: never;
-	url: "/v1/profiles";
-};
-
-export type PutV1ProfilesErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PutV1ProfilesError = PutV1ProfilesErrors[keyof PutV1ProfilesErrors];
-
-export type PutV1ProfilesResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		profile: {
-			user_id: string;
-			full_name: string;
-			display_name: string;
-			cpf: string;
-			phone: string;
-			email: string;
-			is_collector: boolean;
-			id: string;
-			created_at: Date;
-			updated_at: Date;
-			address: {
-				id: string;
-				zip_code: string;
-				street: string;
-				number: string;
-				complement: string | null;
-				district: string;
-				city: string;
-				state: string;
-				state_code: string;
-				latitude: number | null;
-				longitude: number | null;
-				created_at: Date;
-				updated_at: Date;
-			} | null;
-			profile_image: {
-				id: string;
-				url: string;
-				file_name: string;
-				path: string;
-				base64: string;
-				created_at: Date;
-			} | null;
-		} | null;
 	};
 };
 

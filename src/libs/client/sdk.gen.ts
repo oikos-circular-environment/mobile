@@ -27,7 +27,6 @@ import {
 	postV1ComplaintsResponseTransformer,
 	postV1ProfilesAddressesResponseTransformer,
 	postV1ProfilesImagesResponseTransformer,
-	postV1ProfilesResponseTransformer,
 	putV1CompaniesAddressesResponseTransformer,
 	putV1CompaniesResponseTransformer,
 	putV1CompaniesServicesResponseTransformer,
@@ -102,12 +101,9 @@ import type {
 	PostV1ProfilesAddressesData,
 	PostV1ProfilesAddressesErrors,
 	PostV1ProfilesAddressesResponses,
-	PostV1ProfilesData,
-	PostV1ProfilesErrors,
 	PostV1ProfilesImagesData,
 	PostV1ProfilesImagesErrors,
 	PostV1ProfilesImagesResponses,
-	PostV1ProfilesResponses,
 	PostV1UsersAuthData,
 	PostV1UsersAuthResponses,
 	PostV1UsersRegisterData,
@@ -219,33 +215,9 @@ export const getV1Profiles = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Create user profile
+ * Upsert user profile
  *
- * Creates a profile for the authenticated user.
- */
-export const postV1Profiles = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1ProfilesData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1ProfilesResponses,
-		PostV1ProfilesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1ProfilesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/profiles",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Update user profile
- *
- * Updates only profile data for the authenticated user. Address fields are not handled by this route.
+ * Creates or updates the profile for the authenticated user. Address fields are not handled by this route.
  */
 export const putV1Profiles = <ThrowOnError extends boolean = false>(
 	options: Options<PutV1ProfilesData, ThrowOnError>,

@@ -20,7 +20,6 @@ import type {
 	PostV1ComplaintsResponse,
 	PostV1ProfilesAddressesResponse,
 	PostV1ProfilesImagesResponse,
-	PostV1ProfilesResponse,
 	PutV1CompaniesAddressesResponse,
 	PutV1CompaniesResponse,
 	PutV1CompaniesServicesResponse,
@@ -52,9 +51,9 @@ export const getV1ProfilesResponseTransformer = async (
 	return data;
 };
 
-export const postV1ProfilesResponseTransformer = async (
+export const putV1ProfilesResponseTransformer = async (
 	data: any,
-): Promise<PostV1ProfilesResponse> => {
+): Promise<PutV1ProfilesResponse> => {
 	data.profile.created_at = new Date(data.profile.created_at);
 	data.profile.updated_at = new Date(data.profile.updated_at);
 	if (data.profile.address) {
@@ -65,29 +64,6 @@ export const postV1ProfilesResponseTransformer = async (
 		data.profile.profile_image.created_at = new Date(
 			data.profile.profile_image.created_at,
 		);
-	}
-	return data;
-};
-
-export const putV1ProfilesResponseTransformer = async (
-	data: any,
-): Promise<PutV1ProfilesResponse> => {
-	if (data.profile) {
-		data.profile.created_at = new Date(data.profile.created_at);
-		data.profile.updated_at = new Date(data.profile.updated_at);
-		if (data.profile.address) {
-			data.profile.address.created_at = new Date(
-				data.profile.address.created_at,
-			);
-			data.profile.address.updated_at = new Date(
-				data.profile.address.updated_at,
-			);
-		}
-		if (data.profile.profile_image) {
-			data.profile.profile_image.created_at = new Date(
-				data.profile.profile_image.created_at,
-			);
-		}
 	}
 	return data;
 };
