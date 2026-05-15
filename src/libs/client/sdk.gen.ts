@@ -25,13 +25,11 @@ import {
 	postV1CompaniesWastesResponseTransformer,
 	postV1ComplaintsAttachmentsResponseTransformer,
 	postV1ComplaintsResponseTransformer,
-	postV1ProfilesAddressesResponseTransformer,
-	postV1ProfilesImagesResponseTransformer,
 	putV1CompaniesAddressesResponseTransformer,
 	putV1CompaniesResponseTransformer,
 	putV1CompaniesServicesResponseTransformer,
 	putV1CompaniesWastesResponseTransformer,
-	putV1ProfilesAddressesResponseTransformer,
+	putV1ProfilesImagesResponseTransformer,
 	putV1ProfilesResponseTransformer,
 } from "./transformers.gen";
 import type {
@@ -98,12 +96,6 @@ import type {
 	PostV1ComplaintsData,
 	PostV1ComplaintsErrors,
 	PostV1ComplaintsResponses,
-	PostV1ProfilesAddressesData,
-	PostV1ProfilesAddressesErrors,
-	PostV1ProfilesAddressesResponses,
-	PostV1ProfilesImagesData,
-	PostV1ProfilesImagesErrors,
-	PostV1ProfilesImagesResponses,
 	PostV1UsersAuthData,
 	PostV1UsersAuthResponses,
 	PostV1UsersRegisterData,
@@ -124,11 +116,11 @@ import type {
 	PutV1CompaniesWastesData,
 	PutV1CompaniesWastesErrors,
 	PutV1CompaniesWastesResponses,
-	PutV1ProfilesAddressesData,
-	PutV1ProfilesAddressesErrors,
-	PutV1ProfilesAddressesResponses,
 	PutV1ProfilesData,
 	PutV1ProfilesErrors,
+	PutV1ProfilesImagesData,
+	PutV1ProfilesImagesErrors,
+	PutV1ProfilesImagesResponses,
 	PutV1ProfilesResponses,
 } from "./types.gen";
 
@@ -217,7 +209,7 @@ export const getV1Profiles = <ThrowOnError extends boolean = false>(
 /**
  * Upsert user profile
  *
- * Creates or updates the profile for the authenticated user. Address fields are not handled by this route.
+ * Creates or updates the profile for the authenticated user. Optionally creates or updates the address in the same request.
  */
 export const putV1Profiles = <ThrowOnError extends boolean = false>(
 	options: Options<PutV1ProfilesData, ThrowOnError>,
@@ -258,19 +250,19 @@ export const deleteV1ProfilesImages = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Create profile image
+ * Upsert profile image
  *
- * Creates or updates the authenticated user's profile image. Only jpeg and png files are accepted up to 10MB.
+ * Creates or replaces the authenticated user's profile image. The old image is always deleted from storage. Only jpeg and png files are accepted up to 10MB.
  */
-export const postV1ProfilesImages = <ThrowOnError extends boolean = false>(
-	options?: Options<PostV1ProfilesImagesData, ThrowOnError>,
+export const putV1ProfilesImages = <ThrowOnError extends boolean = false>(
+	options?: Options<PutV1ProfilesImagesData, ThrowOnError>,
 ) =>
-	(options?.client ?? client).post<
-		PostV1ProfilesImagesResponses,
-		PostV1ProfilesImagesErrors,
+	(options?.client ?? client).put<
+		PutV1ProfilesImagesResponses,
+		PutV1ProfilesImagesErrors,
 		ThrowOnError
 	>({
-		responseTransformer: postV1ProfilesImagesResponseTransformer,
+		responseTransformer: putV1ProfilesImagesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/images",
@@ -295,54 +287,6 @@ export const getV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/addresses",
 		...options,
-	});
-
-/**
- * Create profile address
- *
- * Creates an address for the authenticated user's profile.
- */
-export const postV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1ProfilesAddressesData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1ProfilesAddressesResponses,
-		PostV1ProfilesAddressesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1ProfilesAddressesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/profiles/addresses",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Update profile address
- *
- * Updates only address data for the authenticated user's profile.
- */
-export const putV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
-	options: Options<PutV1ProfilesAddressesData, ThrowOnError>,
-) =>
-	(options.client ?? client).put<
-		PutV1ProfilesAddressesResponses,
-		PutV1ProfilesAddressesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: putV1ProfilesAddressesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/profiles/addresses",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
 	});
 
 /**

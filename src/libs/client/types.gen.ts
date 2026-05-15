@@ -134,6 +134,18 @@ export type PutV1ProfilesData = {
 		cpf: string;
 		phone: string;
 		is_collector?: boolean;
+		address?: {
+			zip_code: string;
+			street: string;
+			number: string;
+			complement?: string | null;
+			district: string;
+			city: string;
+			state: string;
+			state_code: string;
+			latitude?: number | null;
+			longitude?: number | null;
+		} | null;
 	};
 	path?: never;
 	query?: never;
@@ -245,14 +257,14 @@ export type DeleteV1ProfilesImagesResponses = {
 export type DeleteV1ProfilesImagesResponse =
 	DeleteV1ProfilesImagesResponses[keyof DeleteV1ProfilesImagesResponses];
 
-export type PostV1ProfilesImagesData = {
+export type PutV1ProfilesImagesData = {
 	body?: never;
 	path?: never;
 	query?: never;
 	url: "/v1/profiles/images";
 };
 
-export type PostV1ProfilesImagesErrors = {
+export type PutV1ProfilesImagesErrors = {
 	/**
 	 * Default Response
 	 */
@@ -287,10 +299,10 @@ export type PostV1ProfilesImagesErrors = {
 	};
 };
 
-export type PostV1ProfilesImagesError =
-	PostV1ProfilesImagesErrors[keyof PostV1ProfilesImagesErrors];
+export type PutV1ProfilesImagesError =
+	PutV1ProfilesImagesErrors[keyof PutV1ProfilesImagesErrors];
 
-export type PostV1ProfilesImagesResponses = {
+export type PutV1ProfilesImagesResponses = {
 	/**
 	 * Default Response
 	 */
@@ -304,8 +316,8 @@ export type PostV1ProfilesImagesResponses = {
 	};
 };
 
-export type PostV1ProfilesImagesResponse =
-	PostV1ProfilesImagesResponses[keyof PostV1ProfilesImagesResponses];
+export type PutV1ProfilesImagesResponse =
+	PutV1ProfilesImagesResponses[keyof PutV1ProfilesImagesResponses];
 
 export type GetV1ProfilesAddressesData = {
 	body?: never;
@@ -361,146 +373,6 @@ export type GetV1ProfilesAddressesResponses = {
 
 export type GetV1ProfilesAddressesResponse =
 	GetV1ProfilesAddressesResponses[keyof GetV1ProfilesAddressesResponses];
-
-export type PostV1ProfilesAddressesData = {
-	body: {
-		zip_code: string;
-		street: string;
-		number: string;
-		complement?: string | null;
-		district: string;
-		city: string;
-		state: string;
-		state_code: string;
-		latitude?: number | null;
-		longitude?: number | null;
-	};
-	path?: never;
-	query?: never;
-	url: "/v1/profiles/addresses";
-};
-
-export type PostV1ProfilesAddressesErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	409: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PostV1ProfilesAddressesError =
-	PostV1ProfilesAddressesErrors[keyof PostV1ProfilesAddressesErrors];
-
-export type PostV1ProfilesAddressesResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		address: {
-			id: string;
-			zip_code: string;
-			street: string;
-			number: string;
-			complement: string | null;
-			district: string;
-			city: string;
-			state: string;
-			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
-			created_at: Date;
-			updated_at: Date;
-		};
-	};
-};
-
-export type PostV1ProfilesAddressesResponse =
-	PostV1ProfilesAddressesResponses[keyof PostV1ProfilesAddressesResponses];
-
-export type PutV1ProfilesAddressesData = {
-	body: {
-		zip_code?: string;
-		street?: string;
-		number?: string;
-		complement?: string | null;
-		district?: string;
-		city?: string;
-		state?: string;
-		state_code?: string;
-		latitude?: number | null;
-		longitude?: number | null;
-	};
-	path?: never;
-	query?: never;
-	url: "/v1/profiles/addresses";
-};
-
-export type PutV1ProfilesAddressesErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PutV1ProfilesAddressesError =
-	PutV1ProfilesAddressesErrors[keyof PutV1ProfilesAddressesErrors];
-
-export type PutV1ProfilesAddressesResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		address: {
-			id: string;
-			zip_code: string;
-			street: string;
-			number: string;
-			complement: string | null;
-			district: string;
-			city: string;
-			state: string;
-			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
-			created_at: Date;
-			updated_at: Date;
-		} | null;
-	};
-};
-
-export type PutV1ProfilesAddressesResponse =
-	PutV1ProfilesAddressesResponses[keyof PutV1ProfilesAddressesResponses];
 
 export type GetV1CompaniesData = {
 	body?: never;

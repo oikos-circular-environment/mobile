@@ -18,13 +18,11 @@ import type {
 	PostV1CompaniesWastesResponse,
 	PostV1ComplaintsAttachmentsResponse,
 	PostV1ComplaintsResponse,
-	PostV1ProfilesAddressesResponse,
-	PostV1ProfilesImagesResponse,
 	PutV1CompaniesAddressesResponse,
 	PutV1CompaniesResponse,
 	PutV1CompaniesServicesResponse,
 	PutV1CompaniesWastesResponse,
-	PutV1ProfilesAddressesResponse,
+	PutV1ProfilesImagesResponse,
 	PutV1ProfilesResponse,
 } from "./types.gen";
 
@@ -68,9 +66,9 @@ export const putV1ProfilesResponseTransformer = async (
 	return data;
 };
 
-export const postV1ProfilesImagesResponseTransformer = async (
+export const putV1ProfilesImagesResponseTransformer = async (
 	data: any,
-): Promise<PostV1ProfilesImagesResponse> => {
+): Promise<PutV1ProfilesImagesResponse> => {
 	data.created_at = new Date(data.created_at);
 	return data;
 };
@@ -78,24 +76,6 @@ export const postV1ProfilesImagesResponseTransformer = async (
 export const getV1ProfilesAddressesResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ProfilesAddressesResponse> => {
-	if (data.address) {
-		data.address.created_at = new Date(data.address.created_at);
-		data.address.updated_at = new Date(data.address.updated_at);
-	}
-	return data;
-};
-
-export const postV1ProfilesAddressesResponseTransformer = async (
-	data: any,
-): Promise<PostV1ProfilesAddressesResponse> => {
-	data.address.created_at = new Date(data.address.created_at);
-	data.address.updated_at = new Date(data.address.updated_at);
-	return data;
-};
-
-export const putV1ProfilesAddressesResponseTransformer = async (
-	data: any,
-): Promise<PutV1ProfilesAddressesResponse> => {
 	if (data.address) {
 		data.address.created_at = new Date(data.address.created_at);
 		data.address.updated_at = new Date(data.address.updated_at);
