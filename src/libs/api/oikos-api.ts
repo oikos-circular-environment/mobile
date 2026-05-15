@@ -6,7 +6,7 @@ const baseURL = Platform.select({
 	android: "http://10.0.2.2:3333",
 });
 
-client.setConfig({ baseURL });
+client.setConfig({ baseURL, throwOnError: true });
 
 let authToken: string | null = null;
 

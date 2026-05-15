@@ -35,7 +35,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMapper from "@/components/wrapper-mapper";
 import { useUserContext } from "@/contexts/user-context";
-import { putV1Profiles, putV1ProfilesAddresses } from "@/libs/client";
+import { putV1Profiles } from "@/libs/client";
 import { mask } from "@/libs/mask";
 
 const profileSchema = z.object({
@@ -125,6 +125,16 @@ export default function ProfileScreen() {
 				cpf: data.cpf.replace(/\D/g, ""),
 				phone: data.phone.replace(/\D/g, ""),
 				is_collector: data.is_collector,
+				address: {
+					zip_code: data.address.zip_code.replace(/\D/g, ""),
+					street: data.address.street,
+					number: data.address.number,
+					complement: data.address.complement || "",
+					district: data.address.district,
+					city: data.address.city,
+					state: data.address.state,
+					state_code: data.address.stateCode,
+				},
 			};
 
 			return await putV1Profiles({ body: profileData });
@@ -144,47 +154,9 @@ export default function ProfileScreen() {
 		},
 	});
 
-	const addressMutation = useMutation({
-		mutationFn: async (data: ProfileFormValues["address"]) => {
-			return await putV1ProfilesAddresses({
-				body: {
-					zip_code: data.zip_code.replace(/\D/g, ""),
-					street: data.street,
-					number: data.number,
-					complement: data.complement || "",
-					district: data.district,
-					city: data.city,
-					state: data.state,
-					state_code: data.stateCode,
-				},
-			});
-		},
-		onSuccess: response => {
-			if (response.data?.address && user?.profile) {
-				updateUserProfile({
-					profile: {
-						...user.profile,
-						address: response.data.address,
-					},
-				});
-				toast.success(
-					"Endereço atualizado!",
-					"Seu endereço foi salvo com sucesso.",
-				);
-			}
-		},
-		onError: () => {
-			toast.error(
-				"Erro ao salvar",
-				"Ocorreu um problema ao atualizar seu endereço.",
-			);
-		},
-	});
-
 	const onSubmit = async (data: ProfileFormValues) => {
 		try {
 			await profileMutation.mutateAsync(data);
-			await addressMutation.mutateAsync(data.address);
 		} catch (error) {
 			console.error(error);
 		}
@@ -194,7 +166,7 @@ export default function ProfileScreen() {
 		reset();
 	};
 
-	const isLoading = profileMutation.isPending || addressMutation.isPending;
+	const isLoading = profileMutation.isPending;
 
 	return (
 		<>
