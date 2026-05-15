@@ -104,7 +104,9 @@ export type GetV1ProfilesResponses = {
 				number: string;
 				complement: string | null;
 				district: string;
+				city_ibge_id: number;
 				city: string;
+				state_ibge_id: number;
 				state: string;
 				state_code: string;
 				latitude: number | null;
@@ -140,7 +142,9 @@ export type PutV1ProfilesData = {
 			number: string;
 			complement?: string | null;
 			district: string;
+			city_ibge_id: number;
 			city: string;
+			state_ibge_id: number;
 			state: string;
 			state_code: string;
 			latitude?: number | null;
@@ -195,7 +199,9 @@ export type PutV1ProfilesResponses = {
 				number: string;
 				complement: string | null;
 				district: string;
+				city_ibge_id: number;
 				city: string;
+				state_ibge_id: number;
 				state: string;
 				state_code: string;
 				latitude: number | null;
@@ -360,7 +366,9 @@ export type GetV1ProfilesAddressesResponses = {
 			number: string;
 			complement: string | null;
 			district: string;
+			city_ibge_id: number;
 			city: string;
+			state_ibge_id: number;
 			state: string;
 			state_code: string;
 			latitude: number | null;
@@ -1180,7 +1188,9 @@ export type GetV1CompaniesAddressesResponses = {
 		number: string;
 		complement: string | null;
 		district: string;
+		city_ibge_id: number;
 		city: string;
+		state_ibge_id: number;
 		state: string;
 		state_code: string;
 		latitude: number | null;
@@ -1200,7 +1210,9 @@ export type PostV1CompaniesAddressesData = {
 		number: string;
 		complement?: string | null;
 		district: string;
+		city_ibge_id: number;
 		city: string;
+		state_ibge_id: number;
 		state: string;
 		state_code: string;
 		latitude?: number | null;
@@ -1252,7 +1264,9 @@ export type PostV1CompaniesAddressesResponses = {
 		number: string;
 		complement: string | null;
 		district: string;
+		city_ibge_id: number;
 		city: string;
+		state_ibge_id: number;
 		state: string;
 		state_code: string;
 		latitude: number | null;
@@ -1272,7 +1286,9 @@ export type PutV1CompaniesAddressesData = {
 		number?: string;
 		complement?: string | null;
 		district?: string;
+		city_ibge_id?: number;
 		city?: string;
+		state_ibge_id?: number;
 		state?: string;
 		state_code?: string;
 		latitude?: number | null;
@@ -1316,7 +1332,9 @@ export type PutV1CompaniesAddressesResponses = {
 		number: string;
 		complement: string | null;
 		district: string;
+		city_ibge_id: number;
 		city: string;
+		state_ibge_id: number;
 		state: string;
 		state_code: string;
 		latitude: number | null;

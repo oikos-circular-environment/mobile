@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import {
 	AlertCircleIcon,
 	Check,
-	ChevronDownIcon,
+	ChevronDown,
 	Search,
 } from "lucide-react-native";
 import { useEffect } from "react";
@@ -32,8 +32,6 @@ import {
 	FormControlError,
 	FormControlErrorIcon,
 	FormControlErrorText,
-	FormControlHelper,
-	FormControlHelperText,
 	FormControlLabel,
 	FormControlLabelText,
 } from "@/components/ui/form-control";
@@ -58,7 +56,9 @@ import WrapperMapper from "@/components/wrapper-mapper";
 import { useUserContext } from "@/contexts/user-context";
 import {
 	type GetCepV2BrasilApiParams,
+	getAllStatesV1BrasilApi,
 	getCepV2BrasilApi,
+	getCitiesByStateV1BrasilApi,
 } from "@/libs/brasil-api/client";
 import { putV1Profiles } from "@/libs/client";
 import { mask } from "@/libs/mask";
@@ -74,14 +74,18 @@ const profileSchema = z.object({
 		.regex(/^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/, "Informe um celular valido."),
 	is_collector: z.boolean(),
 	address: z.object({
-		zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP valido."),
+		zip_code: z
+			.string()
+			.regex(/^[0-9]{8}$|^[0-9]{5}-[0-9]{3}$/, "Informe um CEP valido."),
 		street: z.string().min(3, "Informe a rua."),
 		number: z.string().min(1, "Informe o numero."),
 		complement: z.string().optional().nullable(),
 		district: z.string().min(2, "Informe o bairro."),
 		city: z.string().min(2, "Informe a cidade."),
+		city_ibge_id: z.number(),
 		state: z.string().min(2, "Informe o estado."),
 		state_code: z.string().length(2, "Use a sigla com 2 letras."),
+		state_ibge_id: z.number(),
 	}),
 });
 
@@ -94,6 +98,8 @@ export default function ProfileScreen() {
 		control,
 		handleSubmit,
 		reset,
+		setValue,
+		watch,
 		formState: { errors },
 	} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileSchema),
@@ -112,10 +118,38 @@ export default function ProfileScreen() {
 				complement: user?.profile?.address?.complement || "",
 				district: user?.profile?.address?.district || "",
 				city: user?.profile?.address?.city || "",
+				city_ibge_id: user?.profile?.address?.city_ibge_id
+					? Number(user.profile.address.city_ibge_id)
+					: 0,
 				state: user?.profile?.address?.state || "",
 				state_code: user?.profile?.address?.state_code || "",
+				state_ibge_id: user?.profile?.address?.state_ibge_id
+					? Number(user.profile.address.state_ibge_id)
+					: 0,
 			},
 		},
+	});
+
+	const selectedStateCode = watch("address.state_code");
+
+	const { data: states = [] } = useQuery({
+		queryKey: ["states"],
+		queryFn: async () => {
+			const response = await getAllStatesV1BrasilApi();
+			return response.data;
+		},
+		staleTime: 1000 * 60 * 60 * 24, // 24 hours
+	});
+
+	const { data: cities = [] } = useQuery({
+		queryKey: ["cities", selectedStateCode],
+		queryFn: async () => {
+			const response = await getCitiesByStateV1BrasilApi({
+				code: selectedStateCode,
+			});
+			return response.data;
+		},
+		enabled: !!selectedStateCode && selectedStateCode.length === 2,
 	});
 
 	useEffect(() => {
@@ -135,8 +169,14 @@ export default function ProfileScreen() {
 					complement: user.profile.address?.complement || "",
 					district: user.profile.address?.district || "",
 					city: user.profile.address?.city || "",
+					city_ibge_id: user.profile.address?.city_ibge_id
+						? Number(user.profile.address.city_ibge_id)
+						: 0,
 					state: user.profile.address?.state || "",
 					state_code: user.profile.address?.state_code || "",
+					state_ibge_id: user.profile.address?.state_ibge_id
+						? Number(user.profile.address.state_ibge_id)
+						: 0,
 				},
 			});
 		}
@@ -157,8 +197,10 @@ export default function ProfileScreen() {
 					complement: data.address.complement || "",
 					district: data.address.district,
 					city: data.address.city,
+					city_ibge_id: data.address.city_ibge_id,
 					state: data.address.state,
 					state_code: data.address.state_code,
+					state_ibge_id: data.address.state_ibge_id,
 				},
 			};
 
@@ -199,12 +241,25 @@ export default function ProfileScreen() {
 							street: data.street || currentValues.address.street,
 							district: data.neighborhood || currentValues.address.district,
 							city: data.city || currentValues.address.city,
-							state: data.state || currentValues.address.state, // state da brasil api é a sigla apenas
+							state: data.state || currentValues.address.state,
 							state_code: data.state || currentValues.address.state_code,
+							state_ibge_id: currentValues.address.state_ibge_id,
+							city_ibge_id: currentValues.address.city_ibge_id,
 						},
 					},
 					{ keepDefaultValues: true },
 				);
+
+				// Se o estado mudou via CEP, precisamos atualizar o nome do estado se possível
+				if (data.state) {
+					getAllStatesV1BrasilApi().then(res => {
+						const state = res.data.find(s => s.sigla === data.state);
+						if (state) {
+							setValue("address.state", state.nome);
+							setValue("address.state_ibge_id", Number(state.id));
+						}
+					});
+				}
 			}
 		},
 		onError: () => {
@@ -357,6 +412,7 @@ export default function ProfileScreen() {
 									/>
 									{errors.fullName?.message ? (
 										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.fullName.message}
 											</FormControlErrorText>
@@ -385,6 +441,7 @@ export default function ProfileScreen() {
 									/>
 									{errors.displayName?.message ? (
 										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.displayName.message}
 											</FormControlErrorText>
@@ -415,6 +472,7 @@ export default function ProfileScreen() {
 									/>
 									{errors.phone?.message ? (
 										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.phone.message}
 											</FormControlErrorText>
@@ -493,6 +551,14 @@ export default function ProfileScreen() {
 												</Input>
 											)}
 										/>
+										{errors.address?.street?.message ? (
+											<FormControlError>
+												<FormControlErrorIcon as={AlertCircleIcon} />
+												<FormControlErrorText>
+													{errors.address.street.message}
+												</FormControlErrorText>
+											</FormControlError>
+										) : null}
 									</FormControl>
 
 									<FormControl
@@ -517,6 +583,14 @@ export default function ProfileScreen() {
 												</Input>
 											)}
 										/>
+										{errors.address?.number?.message ? (
+											<FormControlError>
+												<FormControlErrorIcon as={AlertCircleIcon} />
+												<FormControlErrorText>
+													{errors.address.number.message}
+												</FormControlErrorText>
+											</FormControlError>
+										) : null}
 									</FormControl>
 								</View>
 
@@ -542,6 +616,14 @@ export default function ProfileScreen() {
 											</Input>
 										)}
 									/>
+									{errors.address?.complement?.message ? (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.address.complement.message}
+											</FormControlErrorText>
+										</FormControlError>
+									) : null}
 								</FormControl>
 
 								<FormControl
@@ -566,128 +648,173 @@ export default function ProfileScreen() {
 											</Input>
 										)}
 									/>
-								</FormControl>
-
-								<FormControl
-									isInvalid={!!errors.address?.city}
-									className="gap-2"
-								>
-									<FormControlLabel>
-										<FormControlLabelText className="text-sm">
-											Cidade
-										</FormControlLabelText>
-									</FormControlLabel>
-									<Controller
-										control={control}
-										name="address.city"
-										render={({ field: { onChange, onBlur, value } }) => (
-											<Input>
-												<InputField
-													value={value}
-													onBlur={onBlur}
-													onChangeText={onChange}
-												/>
-											</Input>
-										)}
-									/>
-								</FormControl>
-
-								<View className="flex flex-row gap-2">
-									{/* <FormControl
-										isInvalid={!!errors.address?.state}
-										className="flex-1 gap-2"
-									>
-										<FormControlLabel>
-											<FormControlLabelText className="text-sm">
-												Estado
-											</FormControlLabelText>
-										</FormControlLabel>
-										<Controller
-											control={control}
-											name="address.state"
-											render={({ field: { onChange, onBlur, value } }) => (
-												<Input>
-													<InputField
-														value={value}
-														onBlur={onBlur}
-														onChangeText={onChange}
-													/>
-												</Input>
-											)}
-										/>
-									</FormControl> */}
-
-									<FormControl
-										isRequired
-										isInvalid={!!errors.address?.state}
-										className="flex-1 gap-2"
-									>
-										<FormControlLabel>
-											<FormControlLabelText>Estado</FormControlLabelText>
-										</FormControlLabel>
-										<Select>
-											<SelectTrigger>
-												<SelectInput
-													placeholder="Select option"
-													className="flex-1"
-												/>
-												<SelectIcon className="mr-3" as={ChevronDownIcon} />
-											</SelectTrigger>
-											<SelectPortal>
-												<SelectBackdrop />
-												<SelectContent>
-													<SelectDragIndicatorWrapper>
-														<SelectDragIndicator />
-													</SelectDragIndicatorWrapper>
-													<SelectItem label="Red" value="red" />
-													<SelectItem label="Blue" value="blue" />
-													<SelectItem label="Black" value="black" />
-													<SelectItem
-														label="Pink"
-														value="pink"
-														isDisabled={true}
-													/>
-													<SelectItem label="Green" value="green" />
-												</SelectContent>
-											</SelectPortal>
-										</Select>
-										<FormControlHelper>
-											<FormControlHelperText>
-												You can only select one option
-											</FormControlHelperText>
-										</FormControlHelper>
+									{errors.address?.district?.message ? (
 										<FormControlError>
 											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
-												Mandatory field
+												{errors.address.district.message}
 											</FormControlErrorText>
 										</FormControlError>
-									</FormControl>
+									) : null}
+								</FormControl>
+
+								<View className="flex flex-col gap-3">
+									<View className="flex flex-row gap-2">
+										<FormControl
+											isInvalid={!!errors.address?.state}
+											className="flex-1 gap-2"
+										>
+											<FormControlLabel>
+												<FormControlLabelText className="text-sm">
+													Estado
+												</FormControlLabelText>
+											</FormControlLabel>
+											<Controller
+												control={control}
+												name="address.state"
+												render={({ field: { value, onChange } }) => (
+													<Select
+														selectedValue={value}
+														onValueChange={val => {
+															onChange(val);
+															const state = states.find(s => s.nome === val);
+															if (state) {
+																setValue("address.state_code", state.sigla);
+																setValue(
+																	"address.state_ibge_id",
+																	Number(state.id),
+																);
+															}
+														}}
+													>
+														<SelectTrigger>
+															<SelectInput
+																placeholder="Selecione o estado"
+																className="flex-1"
+															/>
+															<SelectIcon className="mr-3" as={ChevronDown} />
+														</SelectTrigger>
+														<SelectPortal>
+															<SelectBackdrop />
+															<SelectContent>
+																<SelectDragIndicatorWrapper>
+																	<SelectDragIndicator />
+																</SelectDragIndicatorWrapper>
+																<ScrollView className="w-full max-h-80">
+																	{states.map(state => (
+																		<SelectItem
+																			key={state.id}
+																			label={state.nome}
+																			value={state.nome}
+																		/>
+																	))}
+																</ScrollView>
+															</SelectContent>
+														</SelectPortal>
+													</Select>
+												)}
+											/>
+											{errors.address?.state?.message && (
+												<FormControlError>
+													<FormControlErrorIcon as={AlertCircleIcon} />
+													<FormControlErrorText>
+														{errors.address.state.message}
+													</FormControlErrorText>
+												</FormControlError>
+											)}
+										</FormControl>
+
+										<FormControl
+											isInvalid={!!errors.address?.state_code}
+											isReadOnly
+											className="w-20 gap-2"
+										>
+											<FormControlLabel>
+												<FormControlLabelText className="text-sm">
+													Sigla
+												</FormControlLabelText>
+											</FormControlLabel>
+											<Controller
+												control={control}
+												name="address.state_code"
+												render={({ field: { value } }) => (
+													<Input isReadOnly>
+														<InputField value={value} />
+													</Input>
+												)}
+											/>
+											{errors.address?.state_code?.message && (
+												<FormControlError>
+													<FormControlErrorIcon as={AlertCircleIcon} />
+													<FormControlErrorText>
+														{errors.address.state_code.message}
+													</FormControlErrorText>
+												</FormControlError>
+											)}
+										</FormControl>
+									</View>
 
 									<FormControl
-										isInvalid={!!errors.address?.state_code}
-										className="w-16 gap-2"
+										isInvalid={!!errors.address?.city}
+										className="gap-2"
 									>
 										<FormControlLabel>
 											<FormControlLabelText className="text-sm">
-												Sigla
+												Cidade
 											</FormControlLabelText>
 										</FormControlLabel>
 										<Controller
 											control={control}
-											name="address.state_code"
-											render={({ field: { onChange, onBlur, value } }) => (
-												<Input>
-													<InputField
-														value={value}
-														onBlur={onBlur}
-														onChangeText={onChange}
-														maxLength={2}
-														autoCapitalize="characters"
-													/>
-												</Input>
+											name="address.city"
+											render={({ field: { value, onChange } }) => (
+												<Select
+													selectedValue={value}
+													onValueChange={val => {
+														onChange(val);
+														const city = cities.find(c => c.nome === val);
+														if (city) {
+															setValue(
+																"address.city_ibge_id",
+																Number(city.codigo_ibge),
+															);
+														}
+													}}
+												>
+													<SelectTrigger>
+														<SelectInput
+															placeholder="Selecione a cidade"
+															className="flex-1"
+														/>
+														<SelectIcon className="mr-3" as={ChevronDown} />
+													</SelectTrigger>
+													<SelectPortal>
+														<SelectBackdrop />
+														<SelectContent>
+															<SelectDragIndicatorWrapper>
+																<SelectDragIndicator />
+															</SelectDragIndicatorWrapper>
+															<ScrollView className="w-full max-h-80">
+																{cities.map(city => (
+																	<SelectItem
+																		key={city.codigo_ibge}
+																		label={city.nome}
+																		value={city.nome}
+																	/>
+																))}
+															</ScrollView>
+														</SelectContent>
+													</SelectPortal>
+												</Select>
 											)}
 										/>
+										{errors.address?.city?.message && (
+											<FormControlError>
+												<FormControlErrorIcon as={AlertCircleIcon} />
+												<FormControlErrorText>
+													{errors.address.city.message}
+												</FormControlErrorText>
+											</FormControlError>
+										)}
 									</FormControl>
 								</View>
 
