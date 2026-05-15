@@ -1,7 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Stack } from "expo-router";
-import { Check, Search } from "lucide-react-native";
+import {
+	AlertCircleIcon,
+	Check,
+	ChevronDownIcon,
+	Search,
+} from "lucide-react-native";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -25,12 +30,27 @@ import {
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
+	FormControlHelper,
+	FormControlHelperText,
 	FormControlLabel,
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import {
+	Select,
+	SelectBackdrop,
+	SelectContent,
+	SelectDragIndicator,
+	SelectDragIndicatorWrapper,
+	SelectIcon,
+	SelectInput,
+	SelectItem,
+	SelectPortal,
+	SelectTrigger,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -573,7 +593,7 @@ export default function ProfileScreen() {
 								</FormControl>
 
 								<View className="flex flex-row gap-2">
-									<FormControl
+									{/* <FormControl
 										isInvalid={!!errors.address?.state}
 										className="flex-1 gap-2"
 									>
@@ -595,6 +615,53 @@ export default function ProfileScreen() {
 												</Input>
 											)}
 										/>
+									</FormControl> */}
+
+									<FormControl
+										isRequired
+										isInvalid={!!errors.address?.state}
+										className="flex-1 gap-2"
+									>
+										<FormControlLabel>
+											<FormControlLabelText>Estado</FormControlLabelText>
+										</FormControlLabel>
+										<Select>
+											<SelectTrigger>
+												<SelectInput
+													placeholder="Select option"
+													className="flex-1"
+												/>
+												<SelectIcon className="mr-3" as={ChevronDownIcon} />
+											</SelectTrigger>
+											<SelectPortal>
+												<SelectBackdrop />
+												<SelectContent>
+													<SelectDragIndicatorWrapper>
+														<SelectDragIndicator />
+													</SelectDragIndicatorWrapper>
+													<SelectItem label="Red" value="red" />
+													<SelectItem label="Blue" value="blue" />
+													<SelectItem label="Black" value="black" />
+													<SelectItem
+														label="Pink"
+														value="pink"
+														isDisabled={true}
+													/>
+													<SelectItem label="Green" value="green" />
+												</SelectContent>
+											</SelectPortal>
+										</Select>
+										<FormControlHelper>
+											<FormControlHelperText>
+												You can only select one option
+											</FormControlHelperText>
+										</FormControlHelper>
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												Mandatory field
+											</FormControlErrorText>
+										</FormControlError>
 									</FormControl>
 
 									<FormControl
