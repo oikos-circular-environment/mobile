@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
 import { toast } from "@/components/toast";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
 	FormControlError,
@@ -126,6 +126,7 @@ export default function SignUpScreen() {
 				isDisabled={isLoading}
 			>
 				<ButtonText className="text-base font-semibold">Criar conta</ButtonText>
+				{isLoading && <ButtonSpinner />}
 			</Button>
 		</AuthScreenLayout>
 	);

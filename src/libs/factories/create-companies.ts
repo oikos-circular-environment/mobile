@@ -38,5 +38,5 @@ export const createCompanies = (count: number): Company[] => {
 		},
 		waste: null,
 		services: null,
-	}));
+	} as Company));
 };

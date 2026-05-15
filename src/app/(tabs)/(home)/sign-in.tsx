@@ -3,8 +3,7 @@ import { Link } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
-import { toast } from "@/components/toast";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
 	FormControlError,
@@ -13,7 +12,6 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Input, InputField } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useUserContext } from "@/contexts/user-context";
 
@@ -40,11 +38,7 @@ export default function SignInScreen() {
 	});
 
 	const onSubmit = async (data: SignInFormValues) => {
-		try {
-			await signIn(data);
-		} catch {
-			toast.error("Erro ao fazer login", "Verifique suas credenciais");
-		}
+		await signIn(data);
 	};
 
 	return (
@@ -122,7 +116,7 @@ export default function SignInScreen() {
 				isDisabled={isLoading}
 			>
 				<ButtonText>Entrar</ButtonText>
-				{isLoading && <Spinner />}
+				{isLoading && <ButtonSpinner />}
 			</Button>
 		</AuthScreenLayout>
 	);

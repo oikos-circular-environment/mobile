@@ -1,3 +1,5 @@
+import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { useRouter } from "expo-router";
 import {
 	createContext,
@@ -7,6 +9,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { toast } from "@/components/toast";
 import { setAuthToken } from "@/libs/api/oikos-api";
 import {
 	getV1Profiles,
@@ -29,58 +32,75 @@ const UserContext = createContext<UserContextValue | null>(null);
 
 export function UserProvider({ children }: PropsWithChildren) {
 	const [user, setUser] = useState<User | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 	const router = useRouter();
 
 	const updateUserProfile = useCallback((data: Partial<User>) => {
-		setUser((prev) => (prev ? { ...prev, ...data } : (data as User)));
+		setUser(prev => (prev ? { ...prev, ...data } : (data as User)));
 	}, []);
 
-	const signIn = useCallback(
-		async (data: { email: string; password: string }) => {
-			setIsLoading(true);
-			try {
-				const authResponse = await postV1UsersAuth({
-					body: { email: data.email, password: data.password },
-				});
+	const signInMutation = useMutation({
+		mutationFn: async (data: { email: string; password: string }) => {
+			const authResponse = await postV1UsersAuth({
+				body: { email: data.email, password: data.password },
+			});
 
-				const token = authResponse.data?.token;
-				if (!token) throw new Error("Token não recebido");
+			const token = authResponse.data?.token;
+			if (!token) throw new Error("Token não recebido");
 
-				setAuthToken(token);
-				setIsAuthenticated(true);
+			setAuthToken(token);
+			return await getV1Profiles();
+		},
+		onSuccess: response => {
+			setIsAuthenticated(true);
+			const profile = response.data?.profile;
 
-				const response = await getV1Profiles();
-				const profile = response.data?.profile;
-				console.log(profile);
-				if (profile) {
-					setUser({ profile });
-					router.push("/(tabs)/(home)");
-				} else {
-					router.push("/(tabs)/(home)/profile");
+			if (profile) {
+				const user = {
+					profile,
+				};
+				setUser(user);
+				toast.success("Autenticado");
+				router.push("/(tabs)/(home)");
+			} else {
+				toast.success("Autenticado", "Agora finalize o seu cadastro.");
+				router.push("/(tabs)/(home)/profile");
+			}
+		},
+		onError: error => {
+			console.error(error);
+			if (error instanceof AxiosError) {
+				switch (error.response?.data.code) {
+					case "INVALID_CREDENTIALS":
+						toast.error(
+							"Verifique suas credenciais",
+							"Os dados estão incorretos ou não existem.",
+						);
+						break;
+					default:
+						toast.error("Verifique suas credenciais");
 				}
-			} finally {
-				setIsLoading(false);
+			} else {
+				toast.error(
+					"Erro na autenticação",
+					"Caso o erro persista, entre em contato com a nossa equipe!",
+				);
+				console.error("SignIn Error:", error);
 			}
 		},
-		[router],
-	);
+	});
 
-	const signUp = useCallback(
-		async (data: { email: string; password: string }) => {
-			setIsLoading(true);
-			try {
-				await postV1UsersRegister({
-					body: { email: data.email, password: data.password },
-				});
-			} finally {
-				setIsLoading(false);
-			}
+	const signUpMutation = useMutation({
+		mutationFn: async (data: { email: string; password: string }) => {
+			return await postV1UsersRegister({
+				body: { email: data.email, password: data.password },
+			});
 		},
-		[],
-	);
+		onError: error => {
+			console.error("SignUp Error:", error);
+		},
+	});
 
 	const signOut = useCallback(() => {
 		setAuthToken(null);
@@ -91,14 +111,25 @@ export function UserProvider({ children }: PropsWithChildren) {
 	const value = useMemo(
 		() => ({
 			user,
-			isAuthenticated: isAuthenticated,
-			isLoading,
-			signIn,
-			signUp,
+			isAuthenticated,
+			isLoading: signInMutation.isPending || signUpMutation.isPending,
+			signIn: async (data: { email: string; password: string }) => {
+				await signInMutation.mutateAsync(data);
+			},
+			signUp: async (data: { email: string; password: string }) => {
+				await signUpMutation.mutateAsync(data);
+			},
 			signOut,
 			updateUserProfile,
 		}),
-		[user, isLoading, signIn, signUp, signOut, isAuthenticated, updateUserProfile],
+		[
+			user,
+			isAuthenticated,
+			signInMutation,
+			signUpMutation,
+			signOut,
+			updateUserProfile,
+		],
 	);
 
 	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
