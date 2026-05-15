@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRouter } from "expo-router";
 import {
@@ -6,6 +6,7 @@ import {
 	type PropsWithChildren,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useState,
 } from "react";
@@ -36,6 +37,21 @@ export function UserProvider({ children }: PropsWithChildren) {
 
 	const router = useRouter();
 
+	const { isLoading: isLoadingProfile, isError } = useQuery({
+		queryKey: ["user", "profile"],
+		queryFn: async () => {
+			const response = await getV1Profiles();
+			const profile = response.data?.profile;
+			if (profile) {
+				setUser({ profile } as User);
+				setIsAuthenticated(true);
+			}
+			return profile;
+		},
+		// retry: false,
+		// staleTime: Infinity,
+	});
+
 	const updateUserProfile = useCallback((data: Partial<User>) => {
 		setUser(prev => (prev ? { ...prev, ...data } : (data as User)));
 	}, []);
@@ -51,17 +67,16 @@ export function UserProvider({ children }: PropsWithChildren) {
 			if (!token) throw new Error("Token não recebido");
 
 			setAuthToken(token);
-			return await getV1Profiles();
+
+			const response = await getV1Profiles();
+			return response.data;
 		},
-		onSuccess: response => {
+		onSuccess: data => {
 			setIsAuthenticated(true);
-			const profile = response.data?.profile;
+			const profile = data?.profile;
 
 			if (profile) {
-				const user = {
-					profile,
-				};
-				setUser(user);
+				setUser({ profile } as User);
 				router.push("/(tabs)/(home)");
 			} else {
 				toast.success(
@@ -120,11 +135,20 @@ export function UserProvider({ children }: PropsWithChildren) {
 		setIsAuthenticated(false);
 	}, []);
 
+	useEffect(() => {
+		if (isError) {
+			toast.info("Você não está autenticado, faça seu login novamente.");
+		}
+	}, [isError]);
+
 	const value = useMemo(
 		() => ({
 			user,
 			isAuthenticated,
-			isLoading: signInMutation.isPending || signUpMutation.isPending,
+			isLoading:
+				isLoadingProfile ||
+				signInMutation.isPending ||
+				signUpMutation.isPending,
 			signIn: async (data: { email: string; password: string }) => {
 				await signInMutation.mutateAsync(data);
 			},
@@ -137,6 +161,7 @@ export function UserProvider({ children }: PropsWithChildren) {
 		[
 			user,
 			isAuthenticated,
+			isLoadingProfile,
 			signInMutation,
 			signUpMutation,
 			signOut,
