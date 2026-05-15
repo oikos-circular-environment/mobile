@@ -41,6 +41,7 @@ export function UserProvider({ children }: PropsWithChildren) {
 	}, []);
 
 	const signInMutation = useMutation({
+		mutationKey: ["sign-in"],
 		mutationFn: async (data: { email: string; password: string }) => {
 			const authResponse = await postV1UsersAuth({
 				body: { email: data.email, password: data.password },
@@ -61,10 +62,12 @@ export function UserProvider({ children }: PropsWithChildren) {
 					profile,
 				};
 				setUser(user);
-				toast.success("Autenticado");
 				router.push("/(tabs)/(home)");
 			} else {
-				toast.success("Autenticado", "Agora finalize o seu cadastro.");
+				toast.success(
+					"Autenticado",
+					"Por favor, preencha as informações no seu cadastro.",
+				);
 				router.push("/(tabs)/(home)/profile");
 			}
 		},
@@ -92,12 +95,21 @@ export function UserProvider({ children }: PropsWithChildren) {
 	});
 
 	const signUpMutation = useMutation({
+		mutationKey: ["sign-up"],
 		mutationFn: async (data: { email: string; password: string }) => {
 			return await postV1UsersRegister({
 				body: { email: data.email, password: data.password },
 			});
 		},
+		onSuccess: () => {
+			router.push("/sign-in");
+			toast.success(
+				"Conta criada",
+				"Agora, informe os dados para fazer o login.",
+			);
+		},
 		onError: error => {
+			toast.error("Erro ao criar a conta", "Verfique os dados incluidos!");
 			console.error("SignUp Error:", error);
 		},
 	});

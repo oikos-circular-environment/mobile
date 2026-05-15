@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
 	Check,
@@ -94,6 +94,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileScreen() {
 	const { user, updateUserProfile } = useUserContext();
+	const router = useRouter();
 
 	const {
 		control,
@@ -101,7 +102,7 @@ export default function ProfileScreen() {
 		reset,
 		setValue,
 		watch,
-		formState: { errors },
+		formState: { errors, isDirty },
 	} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileSchema),
 		defaultValues: {
@@ -226,6 +227,7 @@ export default function ProfileScreen() {
 				updateUserProfile({ profile: response.data.profile });
 				toast.success("Perfil atualizado!", "Suas informações foram salvas.");
 			}
+			router.push("/(tabs)/(home)");
 		},
 		onError: error => {
 			console.log("Error:", error);
@@ -872,14 +874,19 @@ export default function ProfileScreen() {
 							</View>
 						</Card>
 					</VStack>
-					<View className="flex flex-row gap-2 pt-4">
-						<Button variant="outline" className="flex-1" onPress={onCancel}>
+					<View className="flex flex-row gap-2 pb-10 pt-4">
+						<Button
+							variant="outline"
+							className="flex-1"
+							onPress={onCancel}
+							isDisabled={!isDirty}
+						>
 							<ButtonText>Cancelar</ButtonText>
 						</Button>
 						<Button
 							className="flex-1"
 							onPress={handleSubmit(onSubmit)}
-							isDisabled={isLoading}
+							isDisabled={isLoading || !isDirty}
 						>
 							<ButtonText>Confirmar</ButtonText>
 							{isLoading && <ButtonSpinner />}

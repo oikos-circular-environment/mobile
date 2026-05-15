@@ -1,9 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
-import { toast } from "@/components/toast";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -24,7 +23,6 @@ const signUpSchema = z.object({
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpScreen() {
-	const router = useRouter();
 	const { signUp, isLoading } = useUserContext();
 
 	const {
@@ -40,14 +38,7 @@ export default function SignUpScreen() {
 	});
 
 	const onSubmit = async (data: SignUpFormValues) => {
-		try {
-			await signUp(data);
-			router.push({
-				pathname: "/sign-in",
-			});
-		} catch {
-			toast.error("Erro seu registro", "Verifique os dados e tente novamente");
-		}
+		await signUp(data);
 	};
 
 	return (
