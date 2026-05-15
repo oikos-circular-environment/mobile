@@ -50,7 +50,6 @@ import {
 	SelectTrigger,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMapper from "@/components/wrapper-mapper";
 import { useUserContext } from "@/contexts/user-context";
@@ -86,6 +85,8 @@ const profileSchema = z.object({
 		state: z.string().min(2, "Informe o estado."),
 		state_code: z.string().length(2, "Use a sigla com 2 letras."),
 		state_ibge_id: z.number(),
+		latitude: z.number().nullable(),
+		longitude: z.number().nullable(),
 	}),
 });
 
@@ -126,6 +127,12 @@ export default function ProfileScreen() {
 				state_ibge_id: user?.profile?.address?.state_ibge_id
 					? Number(user.profile.address.state_ibge_id)
 					: 0,
+				latitude: user?.profile?.address?.latitude
+					? Number(user.profile.address.latitude)
+					: null,
+				longitude: user?.profile?.address?.longitude
+					? Number(user.profile.address.longitude)
+					: null,
 			},
 		},
 	});
@@ -177,6 +184,12 @@ export default function ProfileScreen() {
 					state_ibge_id: user.profile.address?.state_ibge_id
 						? Number(user.profile.address.state_ibge_id)
 						: 0,
+					latitude: user.profile.address?.latitude
+						? Number(user.profile.address.latitude)
+						: null,
+					longitude: user.profile.address?.longitude
+						? Number(user.profile.address.longitude)
+						: null,
 				},
 			});
 		}
@@ -201,6 +214,8 @@ export default function ProfileScreen() {
 					state: data.address.state,
 					state_code: data.address.state_code,
 					state_ibge_id: data.address.state_ibge_id,
+					latitude: data.address.latitude,
+					longitude: data.address.longitude,
 				},
 			};
 
@@ -818,10 +833,42 @@ export default function ProfileScreen() {
 									</FormControl>
 								</View>
 
-								<View className="gap-2">
-									<Text className="text-sm">Mapa</Text>
-									<WrapperMapper />
-								</View>
+								<FormControl
+									isInvalid={
+										!!errors.address?.latitude || !!errors.address?.longitude
+									}
+									className="gap-2"
+								>
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											Localização no Mapa
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="address"
+										render={({ field: { value } }) => (
+											<WrapperMapper
+												latitude={value.latitude}
+												longitude={value.longitude}
+												onChange={loc => {
+													setValue("address.latitude", loc.latitude);
+													setValue("address.longitude", loc.longitude);
+												}}
+											/>
+										)}
+									/>
+									{(errors.address?.latitude || errors.address?.longitude) && (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.address?.latitude?.message ||
+													errors.address?.longitude?.message ||
+													"Localização inválida"}
+											</FormControlErrorText>
+										</FormControlError>
+									)}
+								</FormControl>
 							</View>
 						</Card>
 					</VStack>
