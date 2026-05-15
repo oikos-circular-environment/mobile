@@ -31,10 +31,15 @@ import {
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMapper from "@/components/wrapper-mapper";
 import { useUserContext } from "@/contexts/user-context";
+import {
+	type GetCepV2BrasilApiParams,
+	getCepV2BrasilApi,
+} from "@/libs/brasil-api/client";
 import { putV1Profiles } from "@/libs/client";
 import { mask } from "@/libs/mask";
 
@@ -56,7 +61,7 @@ const profileSchema = z.object({
 		district: z.string().min(2, "Informe o bairro."),
 		city: z.string().min(2, "Informe a cidade."),
 		state: z.string().min(2, "Informe o estado."),
-		stateCode: z.string().length(2, "Use a sigla com 2 letras."),
+		state_code: z.string().length(2, "Use a sigla com 2 letras."),
 	}),
 });
 
@@ -88,7 +93,7 @@ export default function ProfileScreen() {
 				district: user?.profile?.address?.district || "",
 				city: user?.profile?.address?.city || "",
 				state: user?.profile?.address?.state || "",
-				stateCode: user?.profile?.address?.state_code || "",
+				state_code: user?.profile?.address?.state_code || "",
 			},
 		},
 	});
@@ -111,7 +116,7 @@ export default function ProfileScreen() {
 					district: user.profile.address?.district || "",
 					city: user.profile.address?.city || "",
 					state: user.profile.address?.state || "",
-					stateCode: user.profile.address?.state_code || "",
+					state_code: user.profile.address?.state_code || "",
 				},
 			});
 		}
@@ -133,7 +138,7 @@ export default function ProfileScreen() {
 					district: data.address.district,
 					city: data.address.city,
 					state: data.address.state,
-					state_code: data.address.stateCode,
+					state_code: data.address.state_code,
 				},
 			};
 
@@ -154,12 +159,50 @@ export default function ProfileScreen() {
 		},
 	});
 
+	const getCepMutation = useMutation({
+		mutationKey: ["get", "cep", "brasil-api"],
+		mutationFn: async ({ cep }: GetCepV2BrasilApiParams) => {
+			const response = await getCepV2BrasilApi({ cep });
+			return response.data;
+		},
+		onSuccess: data => {
+			if (data) {
+				const currentValues = control._formValues as ProfileFormValues;
+				reset(
+					{
+						...currentValues,
+						address: {
+							...currentValues.address,
+							zip_code: data.cep
+								? mask.cep(data.cep)
+								: currentValues.address.zip_code,
+							street: data.street || currentValues.address.street,
+							district: data.neighborhood || currentValues.address.district,
+							city: data.city || currentValues.address.city,
+							state: data.state || currentValues.address.state, // state da brasil api é a sigla apenas
+							state_code: data.state || currentValues.address.state_code,
+						},
+					},
+					{ keepDefaultValues: true },
+				);
+			}
+		},
+		onError: () => {
+			toast.error("Erro ao buscar cep", "Confira o cep e tente novamente");
+		},
+	});
+
 	const onSubmit = async (data: ProfileFormValues) => {
-		try {
-			await profileMutation.mutateAsync(data);
-		} catch (error) {
-			console.error(error);
+		await profileMutation.mutateAsync(data);
+	};
+
+	const onPressSearchCep = async ({ cep }: GetCepV2BrasilApiParams) => {
+		const cleanCep = cep.replace(/\D/g, "");
+		if (cleanCep.length !== 8) {
+			toast.error("CEP inválido", "O CEP deve conter 8 dígitos.");
+			return;
 		}
+		await getCepMutation.mutateAsync({ cep: cleanCep });
 	};
 
 	const onCancel = () => {
@@ -387,8 +430,13 @@ export default function ProfileScreen() {
 													keyboardType="number-pad"
 													maxLength={9}
 												/>
-												<InputSlot className="pr-3">
-													<InputIcon as={Search} />
+												<InputSlot
+													className="pr-3"
+													onPress={() => onPressSearchCep({ cep: value })}
+												>
+													<InputIcon
+														as={getCepMutation.isPending ? Spinner : Search}
+													/>
 												</InputSlot>
 											</Input>
 										)}
@@ -550,7 +598,7 @@ export default function ProfileScreen() {
 									</FormControl>
 
 									<FormControl
-										isInvalid={!!errors.address?.stateCode}
+										isInvalid={!!errors.address?.state_code}
 										className="w-16 gap-2"
 									>
 										<FormControlLabel>
@@ -560,7 +608,7 @@ export default function ProfileScreen() {
 										</FormControlLabel>
 										<Controller
 											control={control}
-											name="address.stateCode"
+											name="address.state_code"
 											render={({ field: { onChange, onBlur, value } }) => (
 												<Input>
 													<InputField
