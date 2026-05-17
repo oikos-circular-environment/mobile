@@ -67,9 +67,9 @@ import {
 	getCepV2BrasilApi,
 	getCitiesByStateV1BrasilApi,
 } from "@/libs/brasil-api/client";
-import { putV1Profiles } from "@/libs/client";
-import { client } from "@/libs/client/client.gen";
 import { mask } from "@/libs/mask";
+import { putV1Profiles } from "@/libs/oikos-sdk";
+import { client } from "@/libs/oikos-sdk/client.gen";
 
 const profileSchema = z.object({
 	fullName: z.string().min(3, "Informe seu nome completo."),

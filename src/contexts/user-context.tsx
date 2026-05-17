@@ -14,14 +14,14 @@ import { toast } from "@/components/toast";
 import {
 	getAuthToken,
 	setAuthToken,
-	setRefreshToken,
 	setOnUnauthenticated,
+	setRefreshToken,
 } from "@/libs/api/oikos-api";
 import {
 	getV1Profiles,
 	postV1AuthLogin,
 	postV1UsersRegister,
-} from "@/libs/client";
+} from "@/libs/oikos-sdk";
 import type { User } from "@/libs/types/user";
 
 type UserContextValue = {
