@@ -11,7 +11,7 @@ import {
 	useState,
 } from "react";
 import { toast } from "@/components/toast";
-import { setAuthToken } from "@/libs/api/oikos-api";
+import { getAuthToken, setAuthToken } from "@/libs/api/oikos-api";
 import {
 	getV1Profiles,
 	postV1UsersAuth,
@@ -34,10 +34,15 @@ const UserContext = createContext<UserContextValue | null>(null);
 export function UserProvider({ children }: PropsWithChildren) {
 	const [user, setUser] = useState<User | null>(null);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [isInitializing, setIsInitializing] = useState(true);
 
 	const router = useRouter();
 
-	const { isLoading: isLoadingProfile, isError } = useQuery({
+	const {
+		isLoading: isLoadingProfile,
+		isError,
+		refetch,
+	} = useQuery({
 		queryKey: ["user", "profile"],
 		queryFn: async () => {
 			const response = await getV1Profiles();
@@ -48,9 +53,26 @@ export function UserProvider({ children }: PropsWithChildren) {
 			}
 			return profile;
 		},
-		// retry: false,
-		// staleTime: Infinity,
+		enabled: false,
 	});
+
+	useEffect(() => {
+		async function loadStorageData() {
+			try {
+				const tokenValue = getAuthToken();
+
+				if (tokenValue) {
+					await refetch();
+				}
+			} catch (error) {
+				console.error("Error loading stored token:", error);
+			} finally {
+				setIsInitializing(false);
+			}
+		}
+
+		loadStorageData();
+	}, [refetch]);
 
 	const updateUserProfile = useCallback((data: Partial<User>) => {
 		setUser(prev => (prev ? { ...prev, ...data } : (data as User)));
@@ -146,6 +168,7 @@ export function UserProvider({ children }: PropsWithChildren) {
 			user,
 			isAuthenticated,
 			isLoading:
+				isInitializing ||
 				isLoadingProfile ||
 				signInMutation.isPending ||
 				signUpMutation.isPending,
@@ -161,6 +184,7 @@ export function UserProvider({ children }: PropsWithChildren) {
 		[
 			user,
 			isAuthenticated,
+			isInitializing,
 			isLoadingProfile,
 			signInMutation,
 			signUpMutation,
