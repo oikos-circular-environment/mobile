@@ -67,7 +67,8 @@ import {
 	getCepV2BrasilApi,
 	getCitiesByStateV1BrasilApi,
 } from "@/libs/brasil-api/client";
-import { putV1Profiles, putV1ProfilesImages } from "@/libs/client";
+import { putV1Profiles } from "@/libs/client";
+import { client } from "@/libs/client/client.gen";
 import { mask } from "@/libs/mask";
 
 const profileSchema = z.object({
@@ -258,19 +259,29 @@ export default function ProfileScreen() {
 				uri: imageUri,
 				name: filename,
 				type,
-			});
+			} as any);
 
-			return await putV1ProfilesImages({
-				body: formData,
-				headers: {
-					"Content-Type": "multipart/form-data",
+			const response = await client.instance.put(
+				"/v1/profiles/images",
+				formData,
+				{
+					headers: { "Content-Type": "multipart/form-data" },
 				},
-			});
+			);
+			return response.data as {
+				id: string;
+				url: string;
+				file_name: string;
+			};
 		},
-		onSuccess: response => {
-			if (response.data?.profile) {
-				updateUserProfile({ profile: response.data.profile });
-			}
+		onSuccess: data => {
+			setValue("profileImage", data.url);
+			updateUserProfile({
+				profile: {
+					...user?.profile,
+					profile_image: { url: data.url },
+				},
+			} as any);
 		},
 		onError: error => {
 			console.log("Error Image:", error);

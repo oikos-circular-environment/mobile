@@ -1,6 +1,15 @@
+import { AxiosError } from "axios";
 import { Platform } from "react-native";
 import { client } from "../client/client.gen";
-import { getAuthToken as getStoredToken, saveAuthToken, removeAuthToken } from "../storage";
+import {
+	clearTokens,
+	getAuthToken as getStoredToken,
+	getRefreshToken as getStoredRefreshToken,
+	removeAuthToken,
+	removeRefreshToken,
+	saveAuthToken,
+	saveRefreshToken,
+} from "../storage";
 
 const baseURL = Platform.select({
 	ios: "http://192.168.18.44:3333",
@@ -10,12 +19,15 @@ const baseURL = Platform.select({
 client.setConfig({ baseURL, throwOnError: true });
 
 let authToken: string | null = null;
+let refreshToken: string | null = null;
+let onUnauthenticated: (() => void) | null = null;
 
-// Initialize token from storage
+// Initialize tokens from storage
 getStoredToken().then(token => {
-	if (token) {
-		authToken = token;
-	}
+	if (token) authToken = token;
+});
+getStoredRefreshToken().then(token => {
+	if (token) refreshToken = token;
 });
 
 export function setAuthToken(token: string | null) {
@@ -31,9 +43,115 @@ export function getAuthToken(): string | null {
 	return authToken;
 }
 
+export function setRefreshToken(token: string | null) {
+	refreshToken = token;
+	if (token) {
+		saveRefreshToken(token);
+	} else {
+		removeRefreshToken();
+	}
+}
+
+export function getRefreshToken(): string | null {
+	return refreshToken;
+}
+
+export function setOnUnauthenticated(callback: (() => void) | null) {
+	onUnauthenticated = callback;
+}
+
+// Request interceptor: inject Bearer token
 client.instance.interceptors.request.use(config => {
 	if (authToken) {
 		config.headers.set("Authorization", `Bearer ${authToken}`);
 	}
 	return config;
 });
+
+// Response interceptor: handle 401 with auto-refresh
+let isRefreshing = false;
+let failedQueue: Array<{
+	resolve: (token: string) => void;
+	reject: (error: unknown) => void;
+}> = [];
+
+function processQueue(error: unknown, token: string | null = null) {
+	failedQueue.forEach(prom => {
+		if (error) prom.reject(error);
+		else prom.resolve(token!);
+	});
+	failedQueue = [];
+}
+
+client.instance.interceptors.response.use(
+	response => response,
+	async (error: AxiosError) => {
+		const originalRequest = error.config as {
+			_retry?: boolean;
+			url?: string;
+			headers: Record<string, string>;
+		} & typeof error.config;
+
+		if (
+			error.response?.status !== 401 ||
+			originalRequest?._retry ||
+			originalRequest?.url?.includes("/v1/auth/refresh")
+		) {
+			return Promise.reject(error);
+		}
+
+		if (isRefreshing) {
+			return new Promise<string>((resolve, reject) => {
+				failedQueue.push({ resolve, reject });
+			}).then(token => {
+				originalRequest.headers.Authorization = `Bearer ${token}`;
+				return client.instance(originalRequest);
+			});
+		}
+
+		originalRequest._retry = true;
+		isRefreshing = true;
+
+		try {
+			const storedRefreshToken = await getStoredRefreshToken();
+			if (!storedRefreshToken) throw new Error("No refresh token");
+
+			const response = await client.instance.patch(
+				"/v1/auth/refresh",
+				{ refreshToken: storedRefreshToken },
+				{ headers: { "Content-Type": "application/json" } },
+			);
+
+			const { token: newToken, refreshToken: newRefreshToken } =
+				response.data as { token: string; refreshToken: string };
+
+			authToken = newToken;
+			refreshToken = newRefreshToken;
+			await Promise.all([
+				saveAuthToken(newToken),
+				saveRefreshToken(newRefreshToken),
+			]);
+
+			processQueue(null, newToken);
+
+			originalRequest.headers.Authorization = `Bearer ${newToken}`;
+			return client.instance(originalRequest);
+		} catch (refreshError) {
+			processQueue(refreshError, null);
+
+			if (
+				refreshError instanceof AxiosError &&
+				refreshError.response?.status === 401
+			) {
+				authToken = null;
+				refreshToken = null;
+				await clearTokens();
+				onUnauthenticated?.();
+			}
+
+			return Promise.reject(refreshError);
+		} finally {
+			isRefreshing = false;
+		}
+	},
+);

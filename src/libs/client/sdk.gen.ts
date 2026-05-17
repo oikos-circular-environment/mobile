@@ -66,6 +66,9 @@ import type {
 	GetV1ProfilesData,
 	GetV1ProfilesErrors,
 	GetV1ProfilesResponses,
+	PatchV1AuthRefreshData,
+	PatchV1AuthRefreshErrors,
+	PatchV1AuthRefreshResponses,
 	PatchV1ComplaintsByIdCanceledData,
 	PatchV1ComplaintsByIdCanceledErrors,
 	PatchV1ComplaintsByIdCanceledResponses,
@@ -75,6 +78,9 @@ import type {
 	PatchV1ComplaintsByIdResolvedErrors,
 	PatchV1ComplaintsByIdResolvedResponses,
 	PatchV1ComplaintsByIdResponses,
+	PostV1AuthLoginData,
+	PostV1AuthLoginErrors,
+	PostV1AuthLoginResponses,
 	PostV1CompaniesAddressesData,
 	PostV1CompaniesAddressesErrors,
 	PostV1CompaniesAddressesResponses,
@@ -96,8 +102,6 @@ import type {
 	PostV1ComplaintsData,
 	PostV1ComplaintsErrors,
 	PostV1ComplaintsResponses,
-	PostV1UsersAuthData,
-	PostV1UsersAuthResponses,
 	PostV1UsersRegisterData,
 	PostV1UsersRegisterErrors,
 	PostV1UsersRegisterResponses,
@@ -143,6 +147,50 @@ export type Options<
 };
 
 /**
+ * Authenticate a user
+ *
+ * Authenticates a user and returns an access token.
+ */
+export const postV1AuthLogin = <ThrowOnError extends boolean = false>(
+	options: Options<PostV1AuthLoginData, ThrowOnError>,
+) =>
+	(options.client ?? client).post<
+		PostV1AuthLoginResponses,
+		PostV1AuthLoginErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		url: "/v1/auth/login",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
+ * Refresh access token
+ *
+ * Issues a new access token and a rotated refresh token. Accepts the refresh token from the request body (mobile) or from the httpOnly cookie (web). Body takes precedence.
+ */
+export const patchV1AuthRefresh = <ThrowOnError extends boolean = false>(
+	options: Options<PatchV1AuthRefreshData, ThrowOnError>,
+) =>
+	(options.client ?? client).patch<
+		PatchV1AuthRefreshResponses,
+		PatchV1AuthRefreshErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		url: "/v1/auth/refresh",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
  * Register a new user
  *
  * Creates a new user account with the provided information.
@@ -157,28 +205,6 @@ export const postV1UsersRegister = <ThrowOnError extends boolean = false>(
 	>({
 		responseType: "json",
 		url: "/v1/users/register",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Authenticate a user
- *
- * Authenticates a user and returns a token.
- */
-export const postV1UsersAuth = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1UsersAuthData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1UsersAuthResponses,
-		unknown,
-		ThrowOnError
-	>({
-		responseType: "json",
-		url: "/v1/users/auth",
 		...options,
 		headers: {
 			"Content-Type": "application/json",

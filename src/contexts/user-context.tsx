@@ -11,10 +11,15 @@ import {
 	useState,
 } from "react";
 import { toast } from "@/components/toast";
-import { getAuthToken, setAuthToken } from "@/libs/api/oikos-api";
+import {
+	getAuthToken,
+	setAuthToken,
+	setRefreshToken,
+	setOnUnauthenticated,
+} from "@/libs/api/oikos-api";
 import {
 	getV1Profiles,
-	postV1UsersAuth,
+	postV1AuthLogin,
 	postV1UsersRegister,
 } from "@/libs/client";
 import type { User } from "@/libs/types/user";
@@ -81,14 +86,15 @@ export function UserProvider({ children }: PropsWithChildren) {
 	const signInMutation = useMutation({
 		mutationKey: ["sign-in"],
 		mutationFn: async (data: { email: string; password: string }) => {
-			const authResponse = await postV1UsersAuth({
+			const authResponse = await postV1AuthLogin({
 				body: { email: data.email, password: data.password },
 			});
 
-			const token = authResponse.data?.token;
-			if (!token) throw new Error("Token não recebido");
+			const { token, refreshToken } = authResponse.data ?? {};
+			if (!token || !refreshToken) throw new Error("Token não recebido");
 
 			setAuthToken(token);
+			setRefreshToken(refreshToken);
 
 			const response = await getV1Profiles();
 			return response.data;
@@ -153,9 +159,20 @@ export function UserProvider({ children }: PropsWithChildren) {
 
 	const signOut = useCallback(() => {
 		setAuthToken(null);
+		setRefreshToken(null);
 		setUser(null);
 		setIsAuthenticated(false);
 	}, []);
+
+	useEffect(() => {
+		setOnUnauthenticated(() => {
+			setUser(null);
+			setIsAuthenticated(false);
+			toast.info("Sessão expirada", "Faça o login novamente.");
+			router.push("/sign-in");
+		});
+		return () => setOnUnauthenticated(null);
+	}, [router]);
 
 	useEffect(() => {
 		if (isError) {

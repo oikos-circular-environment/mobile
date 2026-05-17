@@ -4,6 +4,79 @@ export type ClientOptions = {
 	baseURL: "http://localhost:3333" | (string & {});
 };
 
+export type PostV1AuthLoginData = {
+	body: {
+		email: string;
+		password: string;
+	};
+	path?: never;
+	query?: never;
+	url: "/v1/auth/login";
+};
+
+export type PostV1AuthLoginErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PostV1AuthLoginError =
+	PostV1AuthLoginErrors[keyof PostV1AuthLoginErrors];
+
+export type PostV1AuthLoginResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		token: string;
+		refreshToken: string;
+	};
+};
+
+export type PostV1AuthLoginResponse =
+	PostV1AuthLoginResponses[keyof PostV1AuthLoginResponses];
+
+export type PatchV1AuthRefreshData = {
+	body: {
+		refreshToken?: string;
+	};
+	path?: never;
+	query?: never;
+	url: "/v1/auth/refresh";
+};
+
+export type PatchV1AuthRefreshErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PatchV1AuthRefreshError =
+	PatchV1AuthRefreshErrors[keyof PatchV1AuthRefreshErrors];
+
+export type PatchV1AuthRefreshResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		token: string;
+		refreshToken: string;
+	};
+};
+
+export type PatchV1AuthRefreshResponse =
+	PatchV1AuthRefreshResponses[keyof PatchV1AuthRefreshResponses];
+
 export type PostV1UsersRegisterData = {
 	body: {
 		email: string;
@@ -39,28 +112,6 @@ export type PostV1UsersRegisterResponses = {
 
 export type PostV1UsersRegisterResponse =
 	PostV1UsersRegisterResponses[keyof PostV1UsersRegisterResponses];
-
-export type PostV1UsersAuthData = {
-	body: {
-		email: string;
-		password: string;
-	};
-	path?: never;
-	query?: never;
-	url: "/v1/users/auth";
-};
-
-export type PostV1UsersAuthResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		token: string;
-	};
-};
-
-export type PostV1UsersAuthResponse =
-	PostV1UsersAuthResponses[keyof PostV1UsersAuthResponses];
 
 export type GetV1ProfilesData = {
 	body?: never;
