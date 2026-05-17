@@ -1,10 +1,10 @@
 import { AxiosError } from "axios";
 import { Platform } from "react-native";
-import { client } from "../client/client.gen";
+import { client } from "../oikos-sdk/client.gen";
 import {
 	clearTokens,
-	getAuthToken as getStoredToken,
 	getRefreshToken as getStoredRefreshToken,
+	getAuthToken as getStoredToken,
 	removeAuthToken,
 	removeRefreshToken,
 	saveAuthToken,
@@ -12,7 +12,7 @@ import {
 } from "../storage";
 
 const baseURL = Platform.select({
-	ios: "http://192.168.18.44:3333",
+	ios: "http://192.168.1.16:3333",
 	android: "http://10.0.2.2:3333",
 });
 

@@ -68,8 +68,7 @@ import {
 	getCitiesByStateV1BrasilApi,
 } from "@/libs/brasil-api/client";
 import { mask } from "@/libs/mask";
-import { putV1Profiles } from "@/libs/oikos-sdk";
-import { client } from "@/libs/oikos-sdk/client.gen";
+import { putV1Profiles, putV1ProfilesImages } from "@/libs/oikos-sdk";
 
 const profileSchema = z.object({
 	fullName: z.string().min(3, "Informe seu nome completo."),
@@ -255,19 +254,12 @@ export default function ProfileScreen() {
 			const match = /\.(\w+)$/.exec(filename ?? "");
 			const type = match ? `image/${match[1]}` : "image";
 
-			formData.append("image", {
-				uri: imageUri,
-				name: filename,
-				type,
-			} as any);
+			formData.append("file", { uri: imageUri, name: filename, type } as any);
 
-			const response = await client.instance.put(
-				"/v1/profiles/images",
-				formData,
-				{
-					headers: { "Content-Type": "multipart/form-data" },
-				},
-			);
+			const response = await putV1ProfilesImages({
+				body: formData as any, // passa FormData diretamente, bypassa o serializer
+			});
+
 			return response.data as {
 				id: string;
 				url: string;
