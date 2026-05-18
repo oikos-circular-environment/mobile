@@ -162,7 +162,9 @@ export function UserProvider({ children }: PropsWithChildren) {
 		setRefreshToken(null);
 		setUser(null);
 		setIsAuthenticated(false);
-	}, []);
+		router.navigate("/(tabs)/(home)");
+		toast.success("Você foi deslogado com sucesso!");
+	}, [router]);
 
 	useEffect(() => {
 		setOnUnauthenticated(() => {

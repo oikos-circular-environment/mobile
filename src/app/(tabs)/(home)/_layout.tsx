@@ -1,6 +1,8 @@
 import { Stack } from "expo-router";
+import { useUserContext } from "@/contexts/user-context";
 
 export default function HomeStackLayout() {
+	const { isAuthenticated } = useUserContext();
 	return (
 		<Stack
 			screenOptions={{
@@ -11,14 +13,18 @@ export default function HomeStackLayout() {
 				name="index"
 				options={{ headerShown: false, title: "Início" }}
 			/>
-			<Stack.Screen
-				name="settings"
-				options={{ title: "Configurações", headerShown: false }}
-			/>
-			<Stack.Screen
-				name="profile"
-				options={{ title: "Perfil", headerShown: true }}
-			/>
+			<Stack.Protected guard={isAuthenticated}>
+				<Stack.Screen
+					name="settings"
+					options={{ title: "Configurações", headerShown: true }}
+				/>
+			</Stack.Protected>
+			<Stack.Protected guard={isAuthenticated}>
+				<Stack.Screen
+					name="profile"
+					options={{ title: "Perfil", headerShown: true }}
+				/>
+			</Stack.Protected>
 			<Stack.Screen
 				name="notifications"
 				options={{ title: "Notificações", headerShown: false }}

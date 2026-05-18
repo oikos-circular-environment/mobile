@@ -1,7 +1,7 @@
 import { type Href, Link } from "expo-router";
 import {
 	ArrowRight,
-	ArrowUpRightIcon,
+	CrownIcon,
 	FactoryIcon,
 	LogOutIcon,
 	type LucideIcon,
@@ -26,16 +26,17 @@ type SettingsOption = {
 };
 
 export default function SettingsScreen() {
-	const { isAuthenticated, signOut } = useUserContext();
+	const { signOut } = useUserContext();
+
 	const settingsOptions: SettingsOption[] = [
-		// {
-		//   title: "Planos",
-		//   description: "Descubra como podemos agregar valor ao seu negócio!",
-		//   icon: CrownIcon,
-		//   is_premium: false,
-		//   highlight: true,
-		//   link: "/plans",
-		// },
+		{
+			title: "Planos",
+			description: "Descubra como podemos agregar valor ao seu negócio!",
+			icon: CrownIcon,
+			is_premium: false,
+			highlight: true,
+			link: "/plans",
+		},
 		{
 			title: "Para empresas",
 			description: "Gerencie suas empresas, produtos e serviços",
@@ -63,24 +64,10 @@ export default function SettingsScreen() {
 			link: "/(tabs)/(home)/sponsors",
 		},
 	];
+
 	return (
 		<ScrollView className="flex-1 p-4 bg-white">
 			<View className="flex flex-col gap-8">
-				<Link href="/sign-in">
-					<Card className="flex flex-row justify-between shadow-none bg-secondary">
-						<View className="flex-1">
-							<Heading className="text-2xl">Registrar-se</Heading>
-							<Text className="text-muted-foreground">
-								Infelizmente você ainda não está registrado em nossa plataforma,
-								registre-se é de graça!
-							</Text>
-						</View>
-						<Card className="bg-primary items-center justify-center">
-							<ArrowUpRightIcon color="white" />
-						</Card>
-					</Card>
-				</Link>
-
 				<View className="flex  flex-col justify-between">
 					<View className="flex flex-1 flex-col gap-2">
 						{settingsOptions.map(option => (
@@ -126,26 +113,21 @@ export default function SettingsScreen() {
 								</Card>
 							</Link>
 						))}
+						<Pressable onPress={signOut}>
+							<Card
+								className={cn(
+									"flex flex-row flex-1 gap-2 items-center shadow-none bg-red-100 border-red-100 mt-6",
+								)}
+							>
+								<View className="flex justify-center items-center">
+									<LogOutIcon color={"red"} size={18} />
+								</View>
+								<Heading className="text-xl font-semibold text-red-500">
+									Desconectar
+								</Heading>
+							</Card>
+						</Pressable>
 					</View>
-
-					<Pressable onPress={signOut}>
-						<Card
-							className={cn(
-								"flex flex-row flex-1 gap-2 items-center shadow-none bg-red-200 border-red-200",
-							)}
-						>
-							<View className="flex justify-center items-center p-2">
-								<LogOutIcon color={"red"} />
-							</View>
-							<View className="flex-1">
-								<Heading className="text-xl text-red-500">Desconectar</Heading>
-								<Text className="text-red-700">
-									Está ação irá deslogar o seu usuário. Mas não se preocupe,
-									você pode fazer login quando quiser.
-								</Text>
-							</View>
-						</Card>
-					</Pressable>
 				</View>
 			</View>
 		</ScrollView>

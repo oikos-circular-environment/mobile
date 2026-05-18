@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
 import {
@@ -12,7 +13,7 @@ import {
 import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-	Image,
+	Animated,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
@@ -105,6 +106,7 @@ export default function ProfileScreen() {
 	const { user, updateUserProfile } = useUserContext();
 	const router = useRouter();
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
+	const contentOpacity = useRef(new Animated.Value(0)).current;
 
 	const {
 		control,
@@ -248,7 +250,7 @@ export default function ProfileScreen() {
 		},
 	});
 
-	const imageMutation = useMutation({
+	const profileAvatarMutation = useMutation({
 		mutationFn: async (asset: ImagePicker.ImagePickerAsset) => {
 			const formData = new FormData();
 			const file = {
@@ -337,7 +339,7 @@ export default function ProfileScreen() {
 			}
 
 			if (selectedAsset.current) {
-				promises.push(imageMutation.mutateAsync(selectedAsset.current));
+				promises.push(profileAvatarMutation.mutateAsync(selectedAsset.current));
 			}
 
 			if (promises.length > 0) {
@@ -363,7 +365,8 @@ export default function ProfileScreen() {
 		reset();
 	};
 
-	const isLoading = profileMutation.isPending || imageMutation.isPending;
+	const isLoading =
+		profileMutation.isPending || profileAvatarMutation.isPending;
 
 	const pickImage = async (onChange: (value: string) => void) => {
 		const result = await ImagePicker.launchImageLibraryAsync({
@@ -380,6 +383,18 @@ export default function ProfileScreen() {
 		}
 	};
 
+	useEffect(() => {
+		if (!isLoading) {
+			Animated.timing(contentOpacity, {
+				toValue: 1,
+				duration: 400,
+				useNativeDriver: true,
+			}).start();
+		} else {
+			contentOpacity.setValue(0);
+		}
+	}, [isLoading, contentOpacity]);
+
 	return (
 		<>
 			<Stack.Screen options={{ title: "Perfil" }} />
@@ -390,20 +405,12 @@ export default function ProfileScreen() {
 				<ScrollView className="flex-1 bg-white p-4">
 					<VStack className="gap-4">
 						<View className="relative mb-8">
-							<View className="h-28 items-center justify-center rounded-md bg-primary">
-								{/* <Heading className="text-4xl text-primary-foreground">
-									Oikos
-								</Heading> */}
-								{/* <Button
-									size="sm"
-									variant="secondary"
-									className="absolute bottom-1 right-1"
-								>
-									<ButtonText>Editar</ButtonText>
-								</Button> */}
-							</View>
+							<View className="h-28 items-center justify-center rounded-md bg-primary"></View>
 
-							<View className="absolute left-1/2 top-24 -ml-8 -mt-8">
+							<Animated.View
+								style={{ opacity: contentOpacity }}
+								className="absolute left-1/2 top-24 -ml-8 -mt-8"
+							>
 								<Controller
 									control={control}
 									name="profileImage"
@@ -416,7 +423,11 @@ export default function ProfileScreen() {
 											>
 												<Image
 													source={value ? { uri: value } : DefaultImage}
-													className="size-20 rounded-md"
+													style={{
+														width: 80,
+														height: 80,
+														borderRadius: 6,
+													}}
 												/>
 											</TouchableOpacity>
 											<Button
@@ -430,7 +441,7 @@ export default function ProfileScreen() {
 										</View>
 									)}
 								/>
-							</View>
+							</Animated.View>
 						</View>
 
 						<VStack className="gap-4">
