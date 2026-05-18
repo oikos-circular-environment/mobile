@@ -1,10 +1,11 @@
 import type { Href } from "expo-router";
 import { Link } from "expo-router";
 import {
-	ArrowRight,
+	ArrowRightIcon,
 	Clock3Icon,
 	FactoryIcon,
 	type LucideIcon,
+	LockKeyholeIcon,
 	MapPinIcon,
 	RecycleIcon,
 	SettingsIcon,
@@ -72,7 +73,8 @@ const companyOptions: CompanySetting[] = [
 // ];
 
 export default function CompaniesHomeScreen() {
-	const { completionRate } = useUserCompanyContext();
+	const { company, completionRate } = useUserCompanyContext();
+	const isCompanyRegistered = company != null;
 
 	return (
 		<ScrollView
@@ -107,30 +109,50 @@ export default function CompaniesHomeScreen() {
 					</Progress>
 
 					<View className="gap-2 pt-1">
-						{companyOptions.map(option => (
-							<Link key={option.title} href={option.href} asChild>
-								<Pressable>
-									<Card className="shadow-none">
-										<View className="flex-row items-center gap-3">
-											<View className="size-8 items-center justify-center">
-												<option.icon size={28} strokeWidth={1.5} />
-											</View>
+						{companyOptions.map((option, index) => {
+							const isLocked = index !== 0 && !isCompanyRegistered;
 
-											<View className="flex-1">
-												<Text className="text-lg text-foreground font-semibold">
-													{option.title}
-												</Text>
-												<Text className="text-muted-foreground">
-													{option.description}
-												</Text>
-											</View>
-
-											<ArrowRight size={18} />
+							const cardContent = (
+								<Card className="shadow-none">
+									<View className="flex-row items-center gap-3">
+										<View className="size-8 items-center justify-center">
+											<option.icon
+												size={28}
+												strokeWidth={1.5}
+												className={isLocked ? "text-muted-foreground" : undefined}
+											/>
 										</View>
-									</Card>
-								</Pressable>
-							</Link>
-						))}
+
+										<View className="flex-1">
+											<Text
+												className={`text-lg font-semibold ${isLocked ? "text-muted-foreground" : "text-foreground"}`}
+											>
+												{option.title}
+											</Text>
+											<Text className="text-muted-foreground">
+												{option.description}
+											</Text>
+										</View>
+
+										{isLocked ? (
+											<LockKeyholeIcon size={18} className="text-muted-foreground" />
+										) : (
+											<ArrowRightIcon size={18} />
+										)}
+									</View>
+								</Card>
+							);
+
+							if (isLocked) {
+								return <View key={option.title}>{cardContent}</View>;
+							}
+
+							return (
+								<Link key={option.title} href={option.href} asChild>
+									<Pressable>{cardContent}</Pressable>
+								</Link>
+							);
+						})}
 					</View>
 				</View>
 
