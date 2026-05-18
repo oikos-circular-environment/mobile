@@ -30,7 +30,7 @@ type PremiumResource = {
 
 const completionRate = 70;
 
-const settings: CompanySetting[] = [
+const companyOptions: CompanySetting[] = [
 	{
 		title: "Empresa",
 		description: "Informações cadastrais gerais sobre a sua empresa.",
@@ -49,12 +49,6 @@ const settings: CompanySetting[] = [
 		icon: Clock3Icon,
 		href: "/(tabs)/(home)/companies/business-hours",
 	},
-	// {
-	//   title: "Métodos financeiros",
-	//   description: "Cadastre as formas de pagamento e recebimento aceitas.",
-	//   icon: BanknoteIcon,
-	//   href: "/(tabs)/(home)/companies/financial-methods",
-	// },
 	{
 		title: "Serviços",
 		description: "Descreva os serviços que sua empresa oferece ao publico.",
@@ -120,21 +114,21 @@ export default function CompaniesHomeScreen() {
 					</View>
 
 					<View className="gap-2 pt-1">
-						{settings.map(setting => (
-							<Link key={setting.title} href={setting.href} asChild>
+						{companyOptions.map(option => (
+							<Link key={option.title} href={option.href} asChild>
 								<Pressable>
 									<Card className="shadow-none">
 										<View className="flex-row items-center gap-3">
 											<View className="size-8 items-center justify-center">
-												<setting.icon size={28} strokeWidth={1.5} />
+												<option.icon size={28} strokeWidth={1.5} />
 											</View>
 
 											<View className="flex-1">
 												<Text className="text-lg text-foreground font-semibold">
-													{setting.title}
+													{option.title}
 												</Text>
 												<Text className="text-muted-foreground">
-													{setting.description}
+													{option.description}
 												</Text>
 											</View>
 

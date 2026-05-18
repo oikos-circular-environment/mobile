@@ -12,10 +12,7 @@ import type {
 	PatchV1ComplaintsByIdCanceledResponse,
 	PatchV1ComplaintsByIdResolvedResponse,
 	PatchV1ComplaintsByIdResponse,
-	PostV1CompaniesAddressesResponse,
 	PostV1CompaniesResponse,
-	PostV1CompaniesServicesResponse,
-	PostV1CompaniesWastesResponse,
 	PostV1ComplaintsAttachmentsResponse,
 	PostV1ComplaintsResponse,
 	PutV1CompaniesAddressesResponse,
@@ -86,10 +83,12 @@ export const getV1ProfilesAddressesResponseTransformer = async (
 export const getV1CompaniesResponseTransformer = async (
 	data: any,
 ): Promise<GetV1CompaniesResponse> => {
-	if (data) {
-		data.started_activity_in = new Date(data.started_activity_in);
-		data.created_at = new Date(data.created_at);
-		data.updated_at = new Date(data.updated_at);
+	if (data.company) {
+		data.company.started_activity_in = new Date(
+			data.company.started_activity_in,
+		);
+		data.company.created_at = new Date(data.company.created_at);
+		data.company.updated_at = new Date(data.company.updated_at);
 	}
 	return data;
 };
@@ -97,19 +96,21 @@ export const getV1CompaniesResponseTransformer = async (
 export const postV1CompaniesResponseTransformer = async (
 	data: any,
 ): Promise<PostV1CompaniesResponse> => {
-	data.started_activity_in = new Date(data.started_activity_in);
-	data.created_at = new Date(data.created_at);
-	data.updated_at = new Date(data.updated_at);
+	data.company.started_activity_in = new Date(data.company.started_activity_in);
+	data.company.created_at = new Date(data.company.created_at);
+	data.company.updated_at = new Date(data.company.updated_at);
 	return data;
 };
 
 export const putV1CompaniesResponseTransformer = async (
 	data: any,
 ): Promise<PutV1CompaniesResponse> => {
-	if (data) {
-		data.started_activity_in = new Date(data.started_activity_in);
-		data.created_at = new Date(data.created_at);
-		data.updated_at = new Date(data.updated_at);
+	if (data.company) {
+		data.company.started_activity_in = new Date(
+			data.company.started_activity_in,
+		);
+		data.company.created_at = new Date(data.company.created_at);
+		data.company.updated_at = new Date(data.company.updated_at);
 	}
 	return data;
 };
@@ -117,18 +118,7 @@ export const putV1CompaniesResponseTransformer = async (
 export const getV1CompaniesWastesResponseTransformer = async (
 	data: any,
 ): Promise<GetV1CompaniesWastesResponse> => {
-	data = data.map((item: any) => {
-		item.created_at = new Date(item.created_at);
-		item.updated_at = new Date(item.updated_at);
-		return item;
-	});
-	return data;
-};
-
-export const postV1CompaniesWastesResponseTransformer = async (
-	data: any,
-): Promise<PostV1CompaniesWastesResponse> => {
-	data = data.map((item: any) => {
+	data.wastes = data.wastes.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
 		return item;
@@ -139,7 +129,7 @@ export const postV1CompaniesWastesResponseTransformer = async (
 export const putV1CompaniesWastesResponseTransformer = async (
 	data: any,
 ): Promise<PutV1CompaniesWastesResponse> => {
-	data = data.map((item: any) => {
+	data.wastes = data.wastes.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
 		return item;
@@ -150,18 +140,7 @@ export const putV1CompaniesWastesResponseTransformer = async (
 export const getV1CompaniesServicesResponseTransformer = async (
 	data: any,
 ): Promise<GetV1CompaniesServicesResponse> => {
-	data = data.map((item: any) => {
-		item.created_at = new Date(item.created_at);
-		item.updated_at = new Date(item.updated_at);
-		return item;
-	});
-	return data;
-};
-
-export const postV1CompaniesServicesResponseTransformer = async (
-	data: any,
-): Promise<PostV1CompaniesServicesResponse> => {
-	data = data.map((item: any) => {
+	data.services = data.services.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
 		return item;
@@ -172,7 +151,7 @@ export const postV1CompaniesServicesResponseTransformer = async (
 export const putV1CompaniesServicesResponseTransformer = async (
 	data: any,
 ): Promise<PutV1CompaniesServicesResponse> => {
-	data = data.map((item: any) => {
+	data.services = data.services.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
 		return item;
@@ -183,28 +162,18 @@ export const putV1CompaniesServicesResponseTransformer = async (
 export const getV1CompaniesAddressesResponseTransformer = async (
 	data: any,
 ): Promise<GetV1CompaniesAddressesResponse> => {
-	if (data) {
-		data.created_at = new Date(data.created_at);
-		data.updated_at = new Date(data.updated_at);
+	if (data.address) {
+		data.address.created_at = new Date(data.address.created_at);
+		data.address.updated_at = new Date(data.address.updated_at);
 	}
-	return data;
-};
-
-export const postV1CompaniesAddressesResponseTransformer = async (
-	data: any,
-): Promise<PostV1CompaniesAddressesResponse> => {
-	data.created_at = new Date(data.created_at);
-	data.updated_at = new Date(data.updated_at);
 	return data;
 };
 
 export const putV1CompaniesAddressesResponseTransformer = async (
 	data: any,
 ): Promise<PutV1CompaniesAddressesResponse> => {
-	if (data) {
-		data.created_at = new Date(data.created_at);
-		data.updated_at = new Date(data.updated_at);
-	}
+	data.address.created_at = new Date(data.address.created_at);
+	data.address.updated_at = new Date(data.address.updated_at);
 	return data;
 };
 
