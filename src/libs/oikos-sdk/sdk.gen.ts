@@ -262,23 +262,18 @@ export const putV1Profiles = <ThrowOnError extends boolean = false>(
  * Creates or replaces the authenticated user's profile image. Accepted types: `image/jpeg`, `image/png`. Maximum size: 10MB.
  */
 export const putV1ProfilesAvatar = <ThrowOnError extends boolean = false>(
-	options: Options<PutV1ProfilesAvatarData, ThrowOnError>,
+	options?: Options<PutV1ProfilesAvatarData, ThrowOnError>,
 ) =>
-	(options.client ?? client).put<
+	(options?.client ?? client).put<
 		PutV1ProfilesAvatarResponses,
 		PutV1ProfilesAvatarErrors,
 		ThrowOnError
 	>({
-		...formDataBodySerializer,
 		responseTransformer: putV1ProfilesAvatarResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/avatar",
 		...options,
-		headers: {
-			"Content-Type": null,
-			...options.headers,
-		},
 	});
 
 /**

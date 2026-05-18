@@ -274,9 +274,7 @@ export type PutV1ProfilesResponse =
 	PutV1ProfilesResponses[keyof PutV1ProfilesResponses];
 
 export type PutV1ProfilesAvatarData = {
-	body: {
-		file: Blob | File;
-	};
+	body?: never;
 	path?: never;
 	query?: never;
 	url: "/v1/profiles/avatar";

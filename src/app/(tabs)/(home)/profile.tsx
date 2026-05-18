@@ -9,7 +9,7 @@ import {
 	PencilIcon,
 	Search,
 } from "lucide-react-native";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	Image,
@@ -104,6 +104,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 export default function ProfileScreen() {
 	const { user, updateUserProfile } = useUserContext();
 	const router = useRouter();
+	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
 
 	const {
 		control,
@@ -248,34 +249,27 @@ export default function ProfileScreen() {
 	});
 
 	const imageMutation = useMutation({
-		mutationFn: async (imageUri: string) => {
-			const filename = imageUri.split("/").pop() ?? "image.jpg";
-			const match = /\.(\w+)$/.exec(filename);
-			const type = match ? `image/${match[1]}` : "image/jpeg";
-
-			const fileResponse = await fetch(imageUri);
-			const buffer = await fileResponse.arrayBuffer();
-			const blob = new Blob([buffer], { type });
-
+		mutationFn: async (asset: ImagePicker.ImagePickerAsset) => {
 			const formData = new FormData();
-			formData.append("file", blob);
+			const file = {
+				uri: asset.uri,
+				name: asset.fileName ?? "image.jpg",
+				type: asset.mimeType ?? "image/jpeg",
+			} as unknown as Blob;
+			formData.append("file", file);
 
 			const response = await putV1ProfilesAvatar({
 				body: formData as any,
 			});
 
-			return response.data as {
-				id: string;
-				url: string;
-				file_name: string;
-			};
+			return response.data;
 		},
 		onSuccess: data => {
-			setValue("profileImage", data.url);
+			setValue("profileImage", data?.url);
 			updateUserProfile({
 				profile: {
 					...user?.profile,
-					profile_image: { url: data.url },
+					profile_image: { url: data?.url },
 				},
 			} as any);
 		},
@@ -342,11 +336,8 @@ export default function ProfileScreen() {
 				promises.push(profileMutation.mutateAsync(data));
 			}
 
-			if (
-				data.profileImage &&
-				data.profileImage !== user?.profile?.profile_image?.url
-			) {
-				promises.push(imageMutation.mutateAsync(data.profileImage));
+			if (selectedAsset.current) {
+				promises.push(imageMutation.mutateAsync(selectedAsset.current));
 			}
 
 			if (promises.length > 0) {
@@ -383,7 +374,9 @@ export default function ProfileScreen() {
 		});
 
 		if (!result.canceled) {
-			onChange(result.assets[0].uri);
+			const asset = result.assets[0];
+			selectedAsset.current = asset;
+			onChange(asset.uri);
 		}
 	};
 
@@ -1003,11 +996,7 @@ export default function ProfileScreen() {
 							<Button
 								className="flex-1"
 								onPress={handleSubmit(onSubmit)}
-								isDisabled={
-									isLoading ||
-									(!isDirty &&
-										watch("profileImage") === user?.profile?.profile_image?.url)
-								}
+								isDisabled={isLoading || (!isDirty && !selectedAsset.current)}
 							>
 								<ButtonText>Confirmar</ButtonText>
 								{isLoading && <ButtonSpinner />}
