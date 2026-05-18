@@ -2,13 +2,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { UserProvider } from "@/contexts/auth-context";
 import { GeospatialProvider } from "@/contexts/geospatial-context";
 import { NotificationProvider } from "@/contexts/notification-context";
-import { UserProvider } from "@/contexts/user-context";
 import "react-native-reanimated";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
+import { FloatingDevTools } from "@buoy-gg/core";
 import { Toaster } from "@/components/toast";
 
 export const unstable_settings = {
@@ -18,6 +19,8 @@ export const unstable_settings = {
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
+	const isDevelopmentMode = process.env.NODE_ENV === "development";
+
 	return (
 		<QueryClientProvider client={queryClient}>
 			<UserProvider>
@@ -43,6 +46,8 @@ export default function RootLayout() {
 					</NotificationProvider>
 				</GeospatialProvider>
 			</UserProvider>
+			{isDevelopmentMode && <FloatingDevTools />}
+			{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
 		</QueryClientProvider>
 	);
 }
