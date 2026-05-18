@@ -22,7 +22,7 @@ import type {
 	PutV1CompaniesResponse,
 	PutV1CompaniesServicesResponse,
 	PutV1CompaniesWastesResponse,
-	PutV1ProfilesImagesResponse,
+	PutV1ProfilesAvatarResponse,
 	PutV1ProfilesResponse,
 } from "./types.gen";
 
@@ -66,9 +66,9 @@ export const putV1ProfilesResponseTransformer = async (
 	return data;
 };
 
-export const putV1ProfilesImagesResponseTransformer = async (
+export const putV1ProfilesAvatarResponseTransformer = async (
 	data: any,
-): Promise<PutV1ProfilesImagesResponse> => {
+): Promise<PutV1ProfilesAvatarResponse> => {
 	data.created_at = new Date(data.created_at);
 	return data;
 };

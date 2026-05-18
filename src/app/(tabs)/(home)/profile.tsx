@@ -68,7 +68,7 @@ import {
 	getCitiesByStateV1BrasilApi,
 } from "@/libs/brasil-api/client";
 import { mask } from "@/libs/mask";
-import { putV1Profiles, putV1ProfilesImages } from "@/libs/oikos-sdk";
+import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
 
 const profileSchema = z.object({
 	fullName: z.string().min(3, "Informe seu nome completo."),
@@ -249,15 +249,19 @@ export default function ProfileScreen() {
 
 	const imageMutation = useMutation({
 		mutationFn: async (imageUri: string) => {
+			const filename = imageUri.split("/").pop() ?? "image.jpg";
+			const match = /\.(\w+)$/.exec(filename);
+			const type = match ? `image/${match[1]}` : "image/jpeg";
+
+			const fileResponse = await fetch(imageUri);
+			const buffer = await fileResponse.arrayBuffer();
+			const blob = new Blob([buffer], { type });
+
 			const formData = new FormData();
-			const filename = imageUri.split("/").pop();
-			const match = /\.(\w+)$/.exec(filename ?? "");
-			const type = match ? `image/${match[1]}` : "image";
+			formData.append("file", blob);
 
-			formData.append("file", { uri: imageUri, name: filename, type } as any);
-
-			const response = await putV1ProfilesImages({
-				body: formData as any, // passa FormData diretamente, bypassa o serializer
+			const response = await putV1ProfilesAvatar({
+				body: formData as any,
 			});
 
 			return response.data as {

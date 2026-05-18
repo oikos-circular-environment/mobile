@@ -32,7 +32,7 @@ export {
 	putV1CompaniesServices,
 	putV1CompaniesWastes,
 	putV1Profiles,
-	putV1ProfilesImages,
+	putV1ProfilesAvatar,
 } from "./sdk.gen";
 export type {
 	ClientOptions,
@@ -181,14 +181,14 @@ export type {
 	PutV1CompaniesWastesErrors,
 	PutV1CompaniesWastesResponse,
 	PutV1CompaniesWastesResponses,
+	PutV1ProfilesAvatarData,
+	PutV1ProfilesAvatarError,
+	PutV1ProfilesAvatarErrors,
+	PutV1ProfilesAvatarResponse,
+	PutV1ProfilesAvatarResponses,
 	PutV1ProfilesData,
 	PutV1ProfilesError,
 	PutV1ProfilesErrors,
-	PutV1ProfilesImagesData,
-	PutV1ProfilesImagesError,
-	PutV1ProfilesImagesErrors,
-	PutV1ProfilesImagesResponse,
-	PutV1ProfilesImagesResponses,
 	PutV1ProfilesResponse,
 	PutV1ProfilesResponses,
 } from "./types.gen";

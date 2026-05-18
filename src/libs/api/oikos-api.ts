@@ -12,7 +12,7 @@ import {
 } from "../storage";
 
 const baseURL = Platform.select({
-	ios: "http://192.168.1.16:3333",
+	ios: "http://192.168.18.44:3333",
 	android: "http://10.0.2.2:3333",
 });
 

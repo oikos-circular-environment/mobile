@@ -29,7 +29,7 @@ import {
 	putV1CompaniesResponseTransformer,
 	putV1CompaniesServicesResponseTransformer,
 	putV1CompaniesWastesResponseTransformer,
-	putV1ProfilesImagesResponseTransformer,
+	putV1ProfilesAvatarResponseTransformer,
 	putV1ProfilesResponseTransformer,
 } from "./transformers.gen";
 import type {
@@ -120,11 +120,11 @@ import type {
 	PutV1CompaniesWastesData,
 	PutV1CompaniesWastesErrors,
 	PutV1CompaniesWastesResponses,
+	PutV1ProfilesAvatarData,
+	PutV1ProfilesAvatarErrors,
+	PutV1ProfilesAvatarResponses,
 	PutV1ProfilesData,
 	PutV1ProfilesErrors,
-	PutV1ProfilesImagesData,
-	PutV1ProfilesImagesErrors,
-	PutV1ProfilesImagesResponses,
 	PutV1ProfilesResponses,
 } from "./types.gen";
 
@@ -257,6 +257,31 @@ export const putV1Profiles = <ThrowOnError extends boolean = false>(
 	});
 
 /**
+ * Upsert profile avatar
+ *
+ * Creates or replaces the authenticated user's profile image. Accepted types: `image/jpeg`, `image/png`. Maximum size: 10MB.
+ */
+export const putV1ProfilesAvatar = <ThrowOnError extends boolean = false>(
+	options: Options<PutV1ProfilesAvatarData, ThrowOnError>,
+) =>
+	(options.client ?? client).put<
+		PutV1ProfilesAvatarResponses,
+		PutV1ProfilesAvatarErrors,
+		ThrowOnError
+	>({
+		...formDataBodySerializer,
+		responseTransformer: putV1ProfilesAvatarResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/profiles/avatar",
+		...options,
+		headers: {
+			"Content-Type": null,
+			...options.headers,
+		},
+	});
+
+/**
  * Delete profile image
  *
  * Deletes the authenticated user's profile image.
@@ -269,26 +294,6 @@ export const deleteV1ProfilesImages = <ThrowOnError extends boolean = false>(
 		DeleteV1ProfilesImagesErrors,
 		ThrowOnError
 	>({
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/profiles/images",
-		...options,
-	});
-
-/**
- * Upsert profile image
- *
- * Creates or replaces the authenticated user's profile image. The old image is always deleted from storage. Only jpeg and png files are accepted up to 10MB.
- */
-export const putV1ProfilesImages = <ThrowOnError extends boolean = false>(
-	options?: Options<PutV1ProfilesImagesData, ThrowOnError>,
-) =>
-	(options?.client ?? client).put<
-		PutV1ProfilesImagesResponses,
-		PutV1ProfilesImagesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: putV1ProfilesImagesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/images",

@@ -170,7 +170,6 @@ export type GetV1ProfilesResponses = {
 				url: string;
 				file_name: string;
 				path: string;
-				base64: string;
 				created_at: Date;
 			} | null;
 		} | null;
@@ -265,7 +264,6 @@ export type PutV1ProfilesResponses = {
 				url: string;
 				file_name: string;
 				path: string;
-				base64: string;
 				created_at: Date;
 			} | null;
 		};
@@ -274,6 +272,69 @@ export type PutV1ProfilesResponses = {
 
 export type PutV1ProfilesResponse =
 	PutV1ProfilesResponses[keyof PutV1ProfilesResponses];
+
+export type PutV1ProfilesAvatarData = {
+	body: {
+		file: Blob | File;
+	};
+	path?: never;
+	query?: never;
+	url: "/v1/profiles/avatar";
+};
+
+export type PutV1ProfilesAvatarErrors = {
+	/**
+	 * Default Response
+	 */
+	400: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	500: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PutV1ProfilesAvatarError =
+	PutV1ProfilesAvatarErrors[keyof PutV1ProfilesAvatarErrors];
+
+export type PutV1ProfilesAvatarResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		id: string;
+		url: string;
+		file_name: string;
+		path: string;
+		created_at: Date;
+	};
+};
+
+export type PutV1ProfilesAvatarResponse =
+	PutV1ProfilesAvatarResponses[keyof PutV1ProfilesAvatarResponses];
 
 export type DeleteV1ProfilesImagesData = {
 	body?: never;
@@ -313,68 +374,6 @@ export type DeleteV1ProfilesImagesResponses = {
 
 export type DeleteV1ProfilesImagesResponse =
 	DeleteV1ProfilesImagesResponses[keyof DeleteV1ProfilesImagesResponses];
-
-export type PutV1ProfilesImagesData = {
-	body?: never;
-	path?: never;
-	query?: never;
-	url: "/v1/profiles/images";
-};
-
-export type PutV1ProfilesImagesErrors = {
-	/**
-	 * Default Response
-	 */
-	400: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	500: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PutV1ProfilesImagesError =
-	PutV1ProfilesImagesErrors[keyof PutV1ProfilesImagesErrors];
-
-export type PutV1ProfilesImagesResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		id: string;
-		url: string;
-		file_name: string;
-		path: string;
-		base64: string;
-		created_at: Date;
-	};
-};
-
-export type PutV1ProfilesImagesResponse =
-	PutV1ProfilesImagesResponses[keyof PutV1ProfilesImagesResponses];
 
 export type GetV1ProfilesAddressesData = {
 	body?: never;

@@ -3,6 +3,7 @@ import {
 	ArrowRight,
 	ArrowUpRightIcon,
 	FactoryIcon,
+	LogOutIcon,
 	type LucideIcon,
 	RecycleIcon,
 	SproutIcon,
@@ -10,7 +11,9 @@ import {
 import { ScrollView, View } from "react-native";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useUserContext } from "@/contexts/user-context";
 import { cn } from "@/libs/utils";
 
 type SettingsOption = {
@@ -23,6 +26,7 @@ type SettingsOption = {
 };
 
 export default function SettingsScreen() {
+	const { isAuthenticated, signOut } = useUserContext();
 	const settingsOptions: SettingsOption[] = [
 		// {
 		//   title: "Planos",
@@ -77,50 +81,71 @@ export default function SettingsScreen() {
 					</Card>
 				</Link>
 
-				<View className="flex flex-col gap-2">
-					{settingsOptions.map(option => (
-						<Link href={option.link} key={option.title}>
-							<Card
-								key={option.title}
-								className={cn(
-									"flex flex-row flex-1 gap-2 items-center shadow-none",
-									option.highlight ? "bg-primary" : "bg-white",
-								)}
-							>
-								<View className="flex justify-center items-center p-2">
-									<option.icon
-										color={cn(option.highlight ? "white" : "black")}
-										size={32}
-										strokeWidth={1}
-									/>
-								</View>
-								<View className="flex-1">
-									<Heading
-										className={cn(
-											"text-xl ",
-											option.highlight ? "text-white" : "text-black",
-										)}
-									>
-										{option.title}
-									</Heading>
-									<Text
-										className={cn(
-											"text-muted ",
-											option.highlight ? "text-white" : "text-black",
-										)}
-									>
-										{option.description}
-									</Text>
-								</View>
-								<View className="flex items-center p-2">
-									<ArrowRight
-										className="self-end"
-										color={cn(option.highlight ? "white" : "black")}
-									/>
-								</View>
-							</Card>
-						</Link>
-					))}
+				<View className="flex  flex-col justify-between">
+					<View className="flex flex-1 flex-col gap-2">
+						{settingsOptions.map(option => (
+							<Link href={option.link} key={option.title}>
+								<Card
+									key={option.title}
+									className={cn(
+										"flex flex-row flex-1 gap-2 items-center shadow-none",
+										option.highlight ? "bg-primary" : "bg-white",
+									)}
+								>
+									<View className="flex justify-center items-center p-2">
+										<option.icon
+											color={cn(option.highlight ? "white" : "black")}
+											size={32}
+											strokeWidth={1}
+										/>
+									</View>
+									<View className="flex-1">
+										<Heading
+											className={cn(
+												"text-xl ",
+												option.highlight ? "text-white" : "text-black",
+											)}
+										>
+											{option.title}
+										</Heading>
+										<Text
+											className={cn(
+												"text-muted ",
+												option.highlight ? "text-white" : "text-black",
+											)}
+										>
+											{option.description}
+										</Text>
+									</View>
+									<View className="flex items-center p-2">
+										<ArrowRight
+											className="self-end"
+											color={cn(option.highlight ? "white" : "black")}
+										/>
+									</View>
+								</Card>
+							</Link>
+						))}
+					</View>
+
+					<Pressable onPress={signOut}>
+						<Card
+							className={cn(
+								"flex flex-row flex-1 gap-2 items-center shadow-none bg-red-200 border-red-200",
+							)}
+						>
+							<View className="flex justify-center items-center p-2">
+								<LogOutIcon color={"red"} />
+							</View>
+							<View className="flex-1">
+								<Heading className="text-xl text-red-500">Desconectar</Heading>
+								<Text className="text-red-700">
+									Está ação irá deslogar o seu usuário. Mas não se preocupe,
+									você pode fazer login quando quiser.
+								</Text>
+							</View>
+						</Card>
+					</Pressable>
 				</View>
 			</View>
 		</ScrollView>
