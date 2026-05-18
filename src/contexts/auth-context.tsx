@@ -24,7 +24,7 @@ import {
 } from "@/libs/oikos-sdk";
 import type { User } from "@/libs/types/user";
 
-type UserContextValue = {
+type AuthContextValue = {
 	user: User | null;
 	isAuthenticated: boolean;
 	isLoading: boolean;
@@ -34,7 +34,7 @@ type UserContextValue = {
 	updateUserProfile: (data: Partial<User>) => void;
 };
 
-const UserContext = createContext<UserContextValue | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function UserProvider({ children }: PropsWithChildren) {
 	const [user, setUser] = useState<User | null>(null);
@@ -212,14 +212,14 @@ export function UserProvider({ children }: PropsWithChildren) {
 		],
 	);
 
-	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useUserContext() {
-	const context = useContext(UserContext);
+export function useAuthContext() {
+	const context = useContext(AuthContext);
 
 	if (!context) {
-		throw new Error("useUserContext must be used within UserProvider");
+		throw new Error("useAuthContext must be used within UserProvider");
 	}
 
 	return context;

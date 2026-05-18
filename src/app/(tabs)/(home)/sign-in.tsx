@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form-control";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import { useUserContext } from "@/contexts/user-context";
+import { useAuthContext } from "@/contexts/auth-context";
 
 const signInSchema = z.object({
 	email: z.email("Digite um e-mail válido."),
@@ -23,7 +23,7 @@ const signInSchema = z.object({
 type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignInScreen() {
-	const { signIn, isLoading } = useUserContext();
+	const { signIn, isLoading } = useAuthContext();
 
 	const {
 		control,

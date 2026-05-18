@@ -114,7 +114,7 @@ PutV1ProfilesImagesResponses = {
 };
 ```
 
-`response.data?.profile` sempre será `undefined`. A URL da imagem nunca é atualizada no `UserContext`, então o avatar não reflete a troca.
+`response.data?.profile` sempre será `undefined`. A URL da imagem nunca é atualizada no `AuthContext`, então o avatar não reflete a troca.
 
 ### 3.3 Correção
 

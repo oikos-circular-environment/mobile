@@ -13,7 +13,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { useUserContext } from "@/contexts/user-context";
+import { useAuthContext } from "@/contexts/auth-context";
 import { cn } from "@/libs/utils";
 
 type SettingsOption = {
@@ -26,7 +26,7 @@ type SettingsOption = {
 };
 
 export default function SettingsScreen() {
-	const { signOut } = useUserContext();
+	const { signOut } = useAuthContext();
 
 	const settingsOptions: SettingsOption[] = [
 		{

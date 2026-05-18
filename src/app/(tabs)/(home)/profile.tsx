@@ -61,7 +61,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMapper from "@/components/wrapper-mapper";
-import { useUserContext } from "@/contexts/user-context";
+import { useAuthContext } from "@/contexts/auth-context";
 import {
 	type GetCepV2BrasilApiParams,
 	getAllStatesV1BrasilApi,
@@ -103,7 +103,7 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileScreen() {
-	const { user, updateUserProfile } = useUserContext();
+	const { user, updateUserProfile } = useAuthContext();
 	const router = useRouter();
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
 	const contentOpacity = useRef(new Animated.Value(0)).current;

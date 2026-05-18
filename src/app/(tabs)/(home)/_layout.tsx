@@ -1,8 +1,8 @@
 import { Stack } from "expo-router";
-import { useUserContext } from "@/contexts/user-context";
+import { useAuthContext } from "@/contexts/auth-context";
 
 export default function HomeStackLayout() {
-	const { isAuthenticated } = useUserContext();
+	const { isAuthenticated } = useAuthContext();
 	return (
 		<Stack
 			screenOptions={{

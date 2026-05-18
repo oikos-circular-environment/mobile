@@ -151,7 +151,7 @@ CREATE TABLE profile (
 
 ### Fase 4 — Integração com UI
 
-- [ ] Refatorar `UserContext` para ler/escrever profile no SQLite
+- [ ] Refatorar `AuthContext` para ler/escrever profile no SQLite
 - [ ] Refatorar `ComplaintCreateContext` para persistir no SQLite
 - [ ] Refatorar `complaints/index.tsx`:
   - `useQuery` lendo do SQLite como fallback offline
