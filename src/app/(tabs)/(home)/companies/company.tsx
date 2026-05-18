@@ -2,8 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parse } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AlertCircle } from "lucide-react-native";
+import { useEffect } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, ScrollView, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,8 +19,8 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Input, InputField } from "@/components/ui/input";
+import { useUserCompanyContext } from "@/contexts/user-company-context";
 
-// Validadores auxiliares
 const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
 const phoneRegex = /^(\(\d{2}\)\s?)?\d{4,5}-?\d{4}$/;
 
@@ -53,9 +54,13 @@ const companySchema = z.object({
 type CompanyFormData = z.infer<typeof companySchema>;
 
 export default function CompanyGeneralInfoScreen() {
+	const { company, isLoadingCompany, saveCompany, isSavingCompany } =
+		useUserCompanyContext();
+
 	const {
 		control,
 		handleSubmit,
+		reset,
 		formState: { errors },
 	} = useForm({
 		resolver: zodResolver(companySchema),
@@ -66,19 +71,59 @@ export default function CompanyGeneralInfoScreen() {
 			email: "",
 			phones: [""],
 			startedActivityIn: new Date(),
-			companyType: "COMPANY",
-			identityType: "CNPJ",
+			companyType: "COMPANY" as const,
+			identityType: "CNPJ" as const,
 			status: true,
 			isHeadquarters: true,
 			acceptAppointments: false,
 		},
 	});
 
-	const handleFormSubmit: SubmitHandler<CompanyFormData> = (
-		data: CompanyFormData,
-	) => {
-		console.log("Company form values", data);
+	useEffect(() => {
+		if (company) {
+			reset({
+				identity: company.identity,
+				corporateName: company.corporate_name,
+				businessName: company.business_name ?? "",
+				email: company.email ?? "",
+				phones: company.phones ?? [""],
+				startedActivityIn: new Date(company.started_activity_in),
+				companyType: company.company_type,
+				identityType: company.identity_type,
+				status: company.status,
+				isHeadquarters: company.is_headquarters,
+				acceptAppointments: company.accept_appointments,
+			});
+		}
+	}, [company, reset]);
+
+	const handleFormSubmit: SubmitHandler<CompanyFormData> = async data => {
+		try {
+			await saveCompany({
+				identity: data.identity,
+				identity_type: data.identityType,
+				corporate_name: data.corporateName,
+				business_name: data.businessName || null,
+				email: data.email || null,
+				phones: data.phones ?? [],
+				started_activity_in: data.startedActivityIn,
+				company_type: data.companyType,
+				status: data.status,
+				is_headquarters: data.isHeadquarters,
+				accept_appointments: data.acceptAppointments,
+			});
+		} catch {
+			// handled by context mutation's onError
+		}
 	};
+
+	if (isLoadingCompany) {
+		return (
+			<View className="flex-1 items-center justify-center bg-white">
+				<ActivityIndicator size="large" />
+			</View>
+		);
+	}
 
 	return (
 		<KeyboardAvoidingView behavior="padding" className="flex-1">
@@ -88,7 +133,6 @@ export default function CompanyGeneralInfoScreen() {
 			>
 				<View className="gap-4">
 					<Card className="shadow-none gap-3">
-						{/* Campo Documento (CNPJ) */}
 						<Controller
 							control={control}
 							name="identity"
@@ -115,7 +159,6 @@ export default function CompanyGeneralInfoScreen() {
 							)}
 						/>
 
-						{/* Campo Razão Social */}
 						<Controller
 							control={control}
 							name="corporateName"
@@ -144,7 +187,6 @@ export default function CompanyGeneralInfoScreen() {
 							)}
 						/>
 
-						{/* Campo Nome Fantasia */}
 						<Controller
 							control={control}
 							name="businessName"
@@ -173,7 +215,6 @@ export default function CompanyGeneralInfoScreen() {
 							)}
 						/>
 
-						{/* Campo Email */}
 						<Controller
 							control={control}
 							name="email"
@@ -201,7 +242,6 @@ export default function CompanyGeneralInfoScreen() {
 							)}
 						/>
 
-						{/* Campo Telefone */}
 						<Controller
 							control={control}
 							name="phones"
@@ -230,7 +270,6 @@ export default function CompanyGeneralInfoScreen() {
 							)}
 						/>
 
-						{/* Campo Data de Início da Atividade */}
 						<Controller
 							control={control}
 							name="startedActivityIn"
@@ -253,15 +292,13 @@ export default function CompanyGeneralInfoScreen() {
 														dateStr,
 														"dd/MM/yyyy",
 														new Date(),
-														{
-															locale: ptBR,
-														},
+														{ locale: ptBR },
 													);
 													if (!Number.isNaN(parsed.getTime())) {
 														onChange(parsed);
 													}
 												} catch {
-													// Invalid date format, do nothing
+													// invalid date format
 												}
 											}}
 											placeholder="DD/MM/YYYY"
@@ -283,7 +320,11 @@ export default function CompanyGeneralInfoScreen() {
 							)}
 						/>
 
-						<Button className="mt-4" onPress={handleSubmit(handleFormSubmit)}>
+						<Button
+							className="mt-4"
+							onPress={handleSubmit(handleFormSubmit)}
+							isDisabled={isSavingCompany}
+						>
 							<ButtonText>Salvar dados da empresa</ButtonText>
 						</Button>
 					</Card>

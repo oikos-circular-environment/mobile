@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack } from "expo-router";
 import { Search } from "lucide-react-native";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
@@ -17,8 +17,8 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import WrapperMapper from "@/components/wrapper-mapper";
+import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { mask } from "@/libs/mask";
-import type { Address } from "@/libs/types/address";
 
 const addressSchema = z.object({
 	zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP válido."),
@@ -36,29 +36,21 @@ const addressSchema = z.object({
 type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function CompanyAddressScreen() {
-	const [address] = useState<Partial<Address>>({
-		zip_code: "",
-		street: "",
-		number: "",
-		complement: null,
-		district: "",
-		city: "",
-		state: "",
-		state_code: "",
-	});
+	const { address, isLoadingAddress, saveAddress, isSavingAddress } =
+		useUserCompanyContext();
 
 	const defaultValues = useMemo<AddressFormValues>(
 		() => ({
-			zip_code: address.zip_code ?? "",
-			street: address.street ?? "",
-			number: address.number ?? "",
-			complement: address.complement ?? null,
-			district: address.district ?? "",
-			city: address.city ?? "",
-			state: address.state ?? "",
-			state_code: address.state_code ?? "",
-			latitude: address.latitude ?? null,
-			longitude: address.longitude ?? null,
+			zip_code: address?.zip_code ?? "",
+			street: address?.street ?? "",
+			number: address?.number ?? "",
+			complement: address?.complement ?? null,
+			district: address?.district ?? "",
+			city: address?.city ?? "",
+			state: address?.state ?? "",
+			state_code: address?.state_code ?? "",
+			latitude: address?.latitude ?? null,
+			longitude: address?.longitude ?? null,
 		}),
 		[address],
 	);
@@ -69,7 +61,7 @@ export default function CompanyAddressScreen() {
 		reset,
 		setValue,
 		watch,
-		formState: { errors, isSubmitting },
+		formState: { errors },
 	} = useForm<AddressFormValues>({
 		resolver: zodResolver(addressSchema),
 		defaultValues,
@@ -82,8 +74,25 @@ export default function CompanyAddressScreen() {
 		reset(defaultValues);
 	}, [defaultValues, reset]);
 
-	const onSubmit = (data: AddressFormValues) => {
-		console.log("Company address values", data);
+	const onSubmit = async (data: AddressFormValues) => {
+		try {
+			await saveAddress({
+				zip_code: data.zip_code,
+				street: data.street,
+				number: data.number,
+				complement: data.complement ?? null,
+				district: data.district,
+				city: data.city,
+				state: data.state,
+				state_code: data.state_code,
+				latitude: data.latitude ?? null,
+				longitude: data.longitude ?? null,
+				city_ibge_id: 0,
+				state_ibge_id: 0,
+			});
+		} catch {
+			// handled by context mutation's onError
+		}
 	};
 
 	const onCancel = () => {
@@ -97,6 +106,14 @@ export default function CompanyAddressScreen() {
 		setValue("latitude", location.latitude, { shouldDirty: true });
 		setValue("longitude", location.longitude, { shouldDirty: true });
 	};
+
+	if (isLoadingAddress) {
+		return (
+			<View className="flex-1 items-center justify-center bg-white">
+				<ActivityIndicator size="large" />
+			</View>
+		);
+	}
 
 	return (
 		<>
@@ -370,13 +387,18 @@ export default function CompanyAddressScreen() {
 						</View>
 
 						<View className="flex flex-row gap-2 pt-4">
-							<Button variant="outline" className="flex-1" onPress={onCancel}>
+							<Button
+								variant="outline"
+								className="flex-1"
+								onPress={onCancel}
+								isDisabled={isSavingAddress}
+							>
 								<ButtonText>Cancelar</ButtonText>
 							</Button>
 							<Button
 								className="flex-1"
 								onPress={handleSubmit(onSubmit)}
-								isDisabled={isSubmitting}
+								isDisabled={isSavingAddress}
 							>
 								<ButtonText>Confirmar</ButtonText>
 							</Button>

@@ -4,6 +4,7 @@ import { AlertCircle, X } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+	ActivityIndicator,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
@@ -28,8 +29,9 @@ import {
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { type Measurement, measurements } from "@/libs/types/measurement";
-import { type Waste, type WasteType, wasteTypes } from "@/libs/types/waste";
+import { type WasteType, wasteTypes } from "@/libs/types/waste";
 
 const measurementLabelByValue = Object.fromEntries(
 	measurements.map(measurement => [measurement.value, measurement.label]),
@@ -42,18 +44,16 @@ const wasteTypeLabelByValue = Object.fromEntries(
 function parsePrice(value: string) {
 	const normalized = value.replace(",", ".");
 	const parsed = Number(normalized);
-
 	return Number.isNaN(parsed) ? 0 : parsed;
 }
 
 export default function CompanyWasteManagementScreen() {
+	const { wastes, isLoadingWastes, saveWastes, isSavingWastes } =
+		useUserCompanyContext();
+
 	const [subItemDraft, setSubItemDraft] = useState("");
 
-	const form = useForm<
-		WasteManagementFormInput,
-		undefined,
-		WasteManagementFormValues
-	>({
+	const form = useForm<WasteManagementFormInput, undefined, WasteManagementFormValues>({
 		resolver: zodResolver(wasteManagementFormSchema),
 		defaultValues: {
 			name: "",
@@ -73,18 +73,12 @@ export default function CompanyWasteManagementScreen() {
 
 	const onAddSubItem = () => {
 		const nextSubItem = subItemDraft.trim();
-
-		if (!nextSubItem) {
-			return;
-		}
-
+		if (!nextSubItem) return;
 		const currentSubItems = getValues("subItems") ?? [];
-
 		if (currentSubItems.includes(nextSubItem)) {
 			setSubItemDraft("");
 			return;
 		}
-
 		setValue("subItems", [...currentSubItems, nextSubItem], {
 			shouldDirty: true,
 			shouldValidate: true,
@@ -96,26 +90,56 @@ export default function CompanyWasteManagementScreen() {
 		setValue(
 			"subItems",
 			(getValues("subItems") ?? []).filter(item => item !== subItem),
-			{
-				shouldDirty: true,
-				shouldValidate: true,
-			},
+			{ shouldDirty: true, shouldValidate: true },
 		);
 	};
 
-	const onSubmit = (data: WasteManagementFormValues) => {
-		const payload: Waste = {
-			id: Date.now().toString(),
-			name: data.name.trim(),
-			description: data.description.trim() ? data.description.trim() : null,
-			price: data.price,
-			unit: data.unit,
-			wasteType: data.wasteType,
-			sub_items: data.subItems.length > 0 ? data.subItems : null,
-		};
+	const handleRemoveWaste = async (wasteId: string) => {
+		const remaining = (wastes ?? []).filter(w => w.id !== wasteId);
+		try {
+			await saveWastes({
+				wastes: remaining.map(w => ({
+					name: w.name,
+					description: w.description ?? null,
+					price: w.price,
+					unit: w.unit,
+					waste_type: w.waste_type,
+					sub_items: w.sub_items,
+				})),
+			});
+		} catch {
+			// handled by context mutation's onError
+		}
+	};
 
-		console.log("Waste payload:", payload);
-		// TODO: Send to API
+	const onSubmit = async (data: WasteManagementFormValues) => {
+		const existing = (wastes ?? []).map(w => ({
+			name: w.name,
+			description: w.description ?? null,
+			price: w.price,
+			unit: w.unit,
+			waste_type: w.waste_type,
+			sub_items: w.sub_items,
+		}));
+
+		try {
+			await saveWastes({
+				wastes: [
+					...existing,
+					{
+						name: data.name.trim(),
+						description: data.description.trim() || null,
+						price: data.price,
+						unit: data.unit,
+						waste_type: data.wasteType,
+						sub_items: data.subItems.length > 0 ? data.subItems : null,
+					},
+				],
+			});
+			form.reset();
+		} catch {
+			// handled by context mutation's onError
+		}
 	};
 
 	return (
@@ -136,6 +160,36 @@ export default function CompanyWasteManagementScreen() {
 							seu perfil e facilitar o entendimento dos materiais aceitos.
 						</Text>
 					</Card>
+
+					{isLoadingWastes ? (
+						<View className="items-center py-4">
+							<ActivityIndicator size="small" />
+						</View>
+					) : wastes && wastes.length > 0 ? (
+						<Card className="shadow-none gap-3">
+							<Heading size="sm">Resíduos cadastrados</Heading>
+							{wastes.map(waste => (
+								<View
+									key={waste.id}
+									className="flex-row items-center justify-between gap-3"
+								>
+									<View className="flex-1">
+										<Text className="font-semibold">{waste.name}</Text>
+										<Text className="text-sm text-muted-foreground">
+											R$ {waste.price} / {waste.unit}
+										</Text>
+									</View>
+									<Pressable
+										onPress={() => handleRemoveWaste(waste.id)}
+										disabled={isSavingWastes}
+										className="p-1"
+									>
+										<X size={18} className="text-muted-foreground" />
+									</Pressable>
+								</View>
+							))}
+						</Card>
+					) : null}
 
 					<Card className="shadow-none gap-4">
 						<Heading size="sm">Informações principais</Heading>
@@ -259,7 +313,6 @@ export default function CompanyWasteManagementScreen() {
 								<View className="flex-row flex-wrap gap-2">
 									{measurements.map(measurement => {
 										const isSelected = measurement.value === value;
-
 										return (
 											<Button
 												key={measurement.value}
@@ -290,7 +343,6 @@ export default function CompanyWasteManagementScreen() {
 								<View className="flex-row gap-2">
 									{wasteTypes.map(wasteType => {
 										const isSelected = wasteType.value === value;
-
 										return (
 											<Button
 												key={wasteType.value}
@@ -331,7 +383,6 @@ export default function CompanyWasteManagementScreen() {
 									onSubmitEditing={onAddSubItem}
 								/>
 							</Input>
-
 							<Button size="sm" onPress={onAddSubItem}>
 								<ButtonText>Adicionar</ButtonText>
 							</Button>
@@ -364,7 +415,9 @@ export default function CompanyWasteManagementScreen() {
 					<Button
 						className="mt-1"
 						onPress={handleSubmit(onSubmit)}
-						isDisabled={!formState.isValid || formState.isSubmitting}
+						isDisabled={
+							!formState.isValid || formState.isSubmitting || isSavingWastes
+						}
 					>
 						<ButtonText>Cadastrar resíduo</ButtonText>
 					</Button>

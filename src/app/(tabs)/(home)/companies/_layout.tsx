@@ -1,7 +1,9 @@
 import { Stack } from "expo-router";
+import { UserCompanyProvider } from "@/contexts/user-company-context";
 
 export default function CompaniesLayout() {
 	return (
+		<UserCompanyProvider>
 		<Stack
 			screenOptions={{
 				headerBackButtonDisplayMode: "minimal",
@@ -57,5 +59,6 @@ export default function CompaniesLayout() {
 				}}
 			/>
 		</Stack>
+		</UserCompanyProvider>
 	);
 }

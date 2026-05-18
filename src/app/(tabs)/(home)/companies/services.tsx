@@ -4,6 +4,7 @@ import { AlertCircle, X } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+	ActivityIndicator,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
@@ -28,8 +29,8 @@ import {
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { type Measurement, measurements } from "@/libs/types/measurement";
-import type { Service } from "@/libs/types/service";
 import { type WasteType, wasteTypes } from "@/libs/types/waste";
 
 const measurementLabelByValue = Object.fromEntries(
@@ -43,17 +44,18 @@ const wasteTypeLabelByValue = Object.fromEntries(
 function parsePrice(value: string) {
 	const normalized = value.replace(",", ".");
 	const parsed = Number(normalized);
-
 	return Number.isNaN(parsed) ? 0 : parsed;
 }
 
 function parseQuantity(value: string) {
 	const parsed = Number.parseInt(value, 10);
-
 	return Number.isNaN(parsed) ? 0 : parsed;
 }
 
 export default function CompanyServicesScreen() {
+	const { services, isLoadingServices, saveServices, isSavingServices } =
+		useUserCompanyContext();
+
 	const [subItemDraft, setSubItemDraft] = useState("");
 
 	const form = useForm<ServiceFormInput, undefined, ServiceFormValues>({
@@ -78,18 +80,12 @@ export default function CompanyServicesScreen() {
 
 	const onAddSubItem = () => {
 		const nextSubItem = subItemDraft.trim();
-
-		if (!nextSubItem) {
-			return;
-		}
-
+		if (!nextSubItem) return;
 		const currentSubItems = getValues("subItems") ?? [];
-
 		if (currentSubItems.includes(nextSubItem)) {
 			setSubItemDraft("");
 			return;
 		}
-
 		setValue("subItems", [...currentSubItems, nextSubItem], {
 			shouldDirty: true,
 			shouldValidate: true,
@@ -101,28 +97,62 @@ export default function CompanyServicesScreen() {
 		setValue(
 			"subItems",
 			(getValues("subItems") ?? []).filter(item => item !== subItem),
-			{
-				shouldDirty: true,
-				shouldValidate: true,
-			},
+			{ shouldDirty: true, shouldValidate: true },
 		);
 	};
 
-	const onSubmit = (data: ServiceFormValues) => {
-		const payload: Service = {
-			id: Date.now().toString(),
-			name: data.name.trim(),
-			description: data.description.trim() ? data.description.trim() : null,
-			price: data.price,
-			quantity: data.quantity,
-			unit: data.unit,
-			wasteType: data.wasteType,
-			sub_items: data.subItems.length > 0 ? data.subItems : null,
-			observations: data.observations.trim() ? data.observations.trim() : null,
-		};
+	const handleRemoveService = async (serviceId: string) => {
+		const remaining = (services ?? []).filter(s => s.id !== serviceId);
+		try {
+			await saveServices({
+				services: remaining.map(s => ({
+					name: s.name,
+					description: s.description ?? null,
+					price: s.price,
+					quantity: s.quantity,
+					unit: s.unit,
+					waste_type: s.waste_type,
+					sub_items: s.sub_items,
+					observations: s.observations ?? null,
+				})),
+			});
+		} catch {
+			// handled by context mutation's onError
+		}
+	};
 
-		console.log("Service payload:", payload);
-		// TODO: Send to API
+	const onSubmit = async (data: ServiceFormValues) => {
+		const existing = (services ?? []).map(s => ({
+			name: s.name,
+			description: s.description ?? null,
+			price: s.price,
+			quantity: s.quantity,
+			unit: s.unit,
+			waste_type: s.waste_type,
+			sub_items: s.sub_items,
+			observations: s.observations ?? null,
+		}));
+
+		try {
+			await saveServices({
+				services: [
+					...existing,
+					{
+						name: data.name.trim(),
+						description: data.description.trim() || null,
+						price: data.price,
+						quantity: data.quantity,
+						unit: data.unit,
+						waste_type: data.wasteType,
+						sub_items: data.subItems.length > 0 ? data.subItems : null,
+						observations: data.observations.trim() || null,
+					},
+				],
+			});
+			form.reset();
+		} catch {
+			// handled by context mutation's onError
+		}
 	};
 
 	return (
@@ -143,6 +173,36 @@ export default function CompanyServicesScreen() {
 							resíduos aceitos para deixar a oferta mais clara para clientes.
 						</Text>
 					</Card>
+
+					{isLoadingServices ? (
+						<View className="items-center py-4">
+							<ActivityIndicator size="small" />
+						</View>
+					) : services && services.length > 0 ? (
+						<Card className="shadow-none gap-3">
+							<Heading size="sm">Serviços cadastrados</Heading>
+							{services.map(service => (
+								<View
+									key={service.id}
+									className="flex-row items-center justify-between gap-3"
+								>
+									<View className="flex-1">
+										<Text className="font-semibold">{service.name}</Text>
+										<Text className="text-sm text-muted-foreground">
+											R$ {service.price} / {service.unit}
+										</Text>
+									</View>
+									<Pressable
+										onPress={() => handleRemoveService(service.id)}
+										disabled={isSavingServices}
+										className="p-1"
+									>
+										<X size={18} className="text-muted-foreground" />
+									</Pressable>
+								</View>
+							))}
+						</Card>
+					) : null}
 
 					<Card className="shadow-none gap-4">
 						<Heading size="sm">Informações principais</Heading>
@@ -345,7 +405,6 @@ export default function CompanyServicesScreen() {
 										<View className="flex-row flex-wrap gap-2">
 											{measurements.map(measurement => {
 												const isSelected = measurement.value === value;
-
 												return (
 													<Button
 														key={measurement.value}
@@ -364,9 +423,7 @@ export default function CompanyServicesScreen() {
 							</View>
 
 							<View className="gap-2">
-								<Text className="text-sm font-medium">
-									Categoria de resíduo
-								</Text>
+								<Text className="text-sm font-medium">Categoria de resíduo</Text>
 								<Controller
 									control={control}
 									name="wasteType"
@@ -374,7 +431,6 @@ export default function CompanyServicesScreen() {
 										<View className="flex-row gap-2">
 											{wasteTypes.map(wasteType => {
 												const isSelected = wasteType.value === value;
-
 												return (
 													<Button
 														key={wasteType.value}
@@ -418,7 +474,6 @@ export default function CompanyServicesScreen() {
 									onSubmitEditing={onAddSubItem}
 								/>
 							</Input>
-
 							<Button size="sm" onPress={onAddSubItem}>
 								<ButtonText>Adicionar</ButtonText>
 							</Button>
@@ -451,7 +506,9 @@ export default function CompanyServicesScreen() {
 					<Button
 						className="mt-1"
 						onPress={handleSubmit(onSubmit)}
-						isDisabled={!formState.isValid || formState.isSubmitting}
+						isDisabled={
+							!formState.isValid || formState.isSubmitting || isSavingServices
+						}
 					>
 						<ButtonText>Cadastrar serviço</ButtonText>
 					</Button>

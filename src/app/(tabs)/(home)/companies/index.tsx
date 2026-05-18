@@ -13,7 +13,9 @@ import {
 import { Pressable, ScrollView, View } from "react-native";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { Text } from "@/components/ui/text";
+import { useUserCompanyContext } from "@/contexts/user-company-context";
 
 type CompanySetting = {
 	title: string;
@@ -21,14 +23,6 @@ type CompanySetting = {
 	icon: LucideIcon;
 	href: Href;
 };
-
-type PremiumResource = {
-	title: string;
-	description: string;
-	icon: LucideIcon;
-};
-
-const completionRate = 70;
 
 const companyOptions: CompanySetting[] = [
 	{
@@ -78,6 +72,8 @@ const companyOptions: CompanySetting[] = [
 // ];
 
 export default function CompaniesHomeScreen() {
+	const { completionRate } = useUserCompanyContext();
+
 	return (
 		<ScrollView
 			className="flex-1 bg-white"
@@ -106,12 +102,9 @@ export default function CompaniesHomeScreen() {
 						<Text className="text-xs">{completionRate}%</Text>
 					</View>
 
-					<View className="h-2 rounded-full bg-muted overflow-hidden">
-						<View
-							className="h-2 rounded-full bg-lime-500"
-							style={{ width: "26%" }}
-						/>
-					</View>
+					<Progress value={completionRate} className="h-2">
+						<ProgressFilledTrack className="bg-lime-500" />
+					</Progress>
 
 					<View className="gap-2 pt-1">
 						{companyOptions.map(option => (
