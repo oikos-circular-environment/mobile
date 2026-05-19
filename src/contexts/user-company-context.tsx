@@ -7,6 +7,18 @@ import {
 	useMemo,
 } from "react";
 import { toast } from "@/components/toast";
+import type {
+	GetV1CompaniesAddressesResponse,
+	GetV1CompaniesBusinessHoursResponse,
+	GetV1CompaniesResponse,
+	GetV1CompaniesServicesResponse,
+	GetV1CompaniesWastesResponse,
+	PostV1CompaniesData,
+	PutV1CompaniesAddressesData,
+	PutV1CompaniesBusinessHoursData,
+	PutV1CompaniesServicesData,
+	PutV1CompaniesWastesData,
+} from "@/libs/oikos-sdk";
 import {
 	getV1Companies,
 	getV1CompaniesAddresses,
@@ -19,18 +31,6 @@ import {
 	putV1CompaniesBusinessHours,
 	putV1CompaniesServices,
 	putV1CompaniesWastes,
-} from "@/libs/oikos-sdk";
-import type {
-	GetV1CompaniesAddressesResponse,
-	GetV1CompaniesBusinessHoursResponse,
-	GetV1CompaniesResponse,
-	GetV1CompaniesServicesResponse,
-	GetV1CompaniesWastesResponse,
-	PostV1CompaniesData,
-	PutV1CompaniesAddressesData,
-	PutV1CompaniesBusinessHoursData,
-	PutV1CompaniesServicesData,
-	PutV1CompaniesWastesData,
 } from "@/libs/oikos-sdk";
 
 type Company = NonNullable<GetV1CompaniesResponse["company"]>;

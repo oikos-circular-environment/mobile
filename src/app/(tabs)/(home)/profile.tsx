@@ -323,7 +323,6 @@ export default function ProfileScreen() {
 					{ keepDefaultValues: true },
 				);
 
-				// Se o estado mudou via CEP, precisamos atualizar o nome do estado se possível
 				if (data.state) {
 					listIbgeUfs().then(res => {
 						const state = res.data?.find(s => s.sigla === data.state);
