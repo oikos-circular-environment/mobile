@@ -21,5 +21,5 @@ export type CreateClientConfig<T extends ClientOptions = ClientOptions2> = (
 ) => Config<Required<ClientOptions> & T>;
 
 export const client = createClient(
-  createConfig<ClientOptions2>({ baseUrl: 'https://brasilapi.com.br/api' })
+  createConfig<ClientOptions2>({ baseURL: 'https://brasilapi.com.br/api' })
 );

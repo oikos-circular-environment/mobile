@@ -141,6 +141,7 @@ export const listBanks = <ThrowOnError extends boolean = false>(
   options?: Options<ListBanksData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<ListBanksResponses, unknown, ThrowOnError>({
+    responseType: 'json',
     url: '/banks/v1',
     ...options,
   });
@@ -152,7 +153,11 @@ export const getBank = <ThrowOnError extends boolean = false>(
   options: Options<GetBankData, ThrowOnError>
 ) =>
   (options.client ?? client).get<GetBankResponses, GetBankErrors, ThrowOnError>(
-    { url: '/banks/v1/{code}', ...options }
+    {
+      responseType: 'json',
+      url: '/banks/v1/{code}',
+      ...options,
+    }
   );
 
 /**
@@ -167,7 +172,11 @@ export const listCambioMoedas = <ThrowOnError extends boolean = false>(
     ListCambioMoedasResponses,
     ListCambioMoedasErrors,
     ThrowOnError
-  >({ url: '/cambio/v1/moedas', ...options });
+  >({
+    responseType: 'json',
+    url: '/cambio/v1/moedas',
+    ...options,
+  });
 
 /**
  * Busca pelo câmbio do Real com outra moeda, em uma data específica
@@ -181,7 +190,11 @@ export const getCambioCotacao = <ThrowOnError extends boolean = false>(
     GetCambioCotacaoResponses,
     GetCambioCotacaoErrors,
     ThrowOnError
-  >({ url: '/cambio/v1/cotacao/{moeda}/{data}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cambio/v1/cotacao/{moeda}/{data}',
+    ...options,
+  });
 
 /**
  * Busca por CEP com múltiplos providers de fallback.
@@ -192,6 +205,7 @@ export const getCep = <ThrowOnError extends boolean = false>(
   options: Options<GetCepData, ThrowOnError>
 ) =>
   (options.client ?? client).get<GetCepResponses, GetCepErrors, ThrowOnError>({
+    responseType: 'json',
     url: '/cep/v1/{cep}',
     ...options,
   });
@@ -208,7 +222,11 @@ export const getCepV2 = <ThrowOnError extends boolean = false>(
     GetCepV2Responses,
     GetCepV2Errors,
     ThrowOnError
-  >({ url: '/cep/v2/{cep}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cep/v2/{cep}',
+    ...options,
+  });
 
 /**
  * Busca por CNPJ na API Minha Receita.
@@ -219,7 +237,11 @@ export const getCnpj = <ThrowOnError extends boolean = false>(
   options: Options<GetCnpjData, ThrowOnError>
 ) =>
   (options.client ?? client).get<GetCnpjResponses, GetCnpjErrors, ThrowOnError>(
-    { url: '/cnpj/v1/{cnpj}', ...options }
+    {
+      responseType: 'json',
+      url: '/cnpj/v1/{cnpj}',
+      ...options,
+    }
   );
 
 /**
@@ -232,7 +254,11 @@ export const listCorretoras = <ThrowOnError extends boolean = false>(
     ListCorretorasResponses,
     unknown,
     ThrowOnError
-  >({ url: '/cvm/corretoras/v1', ...options });
+  >({
+    responseType: 'json',
+    url: '/cvm/corretoras/v1',
+    ...options,
+  });
 
 /**
  * Busca por corretoras nos arquivos da CVM.
@@ -244,7 +270,11 @@ export const getCorretora = <ThrowOnError extends boolean = false>(
     GetCorretoraResponses,
     GetCorretoraErrors,
     ThrowOnError
-  >({ url: '/cvm/corretoras/v1/{cnpj}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cvm/corretoras/v1/{cnpj}',
+    ...options,
+  });
 
 /**
  * Listar localidades
@@ -260,7 +290,11 @@ export const listCptecCidades = <ThrowOnError extends boolean = false>(
     ListCptecCidadesResponses,
     unknown,
     ThrowOnError
-  >({ url: '/cptec/v1/cidade', ...options });
+  >({
+    responseType: 'json',
+    url: '/cptec/v1/cidade',
+    ...options,
+  });
 
 /**
  * Buscar localidades
@@ -275,7 +309,11 @@ export const searchCptecCidade = <ThrowOnError extends boolean = false>(
     SearchCptecCidadeResponses,
     SearchCptecCidadeErrors,
     ThrowOnError
-  >({ url: '/cptec/v1/cidade/{cityName}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cptec/v1/cidade/{cityName}',
+    ...options,
+  });
 
 /**
  * Condições atuais nas capitais
@@ -289,7 +327,11 @@ export const listCptecClimaCapitais = <ThrowOnError extends boolean = false>(
     ListCptecClimaCapitaisResponses,
     unknown,
     ThrowOnError
-  >({ url: '/cptec/v1/clima/capital', ...options });
+  >({
+    responseType: 'json',
+    url: '/cptec/v1/clima/capital',
+    ...options,
+  });
 
 /**
  * Condições atuais no aeroporto (/cptec/v1/clima/aeroporto/:icaoCode)
@@ -303,7 +345,11 @@ export const getCptecClimaAeroporto = <ThrowOnError extends boolean = false>(
     GetCptecClimaAeroportoResponses,
     GetCptecClimaAeroportoErrors,
     ThrowOnError
-  >({ url: '/cptec/v1/clima/aeroporto/{icaoCode}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cptec/v1/clima/aeroporto/{icaoCode}',
+    ...options,
+  });
 
 /**
  * Previsão meteorológica para uma cidade
@@ -317,7 +363,11 @@ export const getCptecClimaPrevisao = <ThrowOnError extends boolean = false>(
     GetCptecClimaPrevisaoResponses,
     GetCptecClimaPrevisaoErrors,
     ThrowOnError
-  >({ url: '/cptec/v1/clima/previsao/{cityCode}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cptec/v1/clima/previsao/{cityCode}',
+    ...options,
+  });
 
 /**
  * Previsão meteorológica para, até, 6 dias
@@ -332,7 +382,11 @@ export const getCptecClimaPrevisaoDays = <ThrowOnError extends boolean = false>(
     GetCptecClimaPrevisaoDaysResponses,
     unknown,
     ThrowOnError
-  >({ url: '/cptec/v1/clima/previsao/{cityCode}/{days}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cptec/v1/clima/previsao/{cityCode}/{days}',
+    ...options,
+  });
 
 /**
  * Previsão meteorológica com base na latitude e longitude
@@ -349,7 +403,11 @@ export const getCptecClimaPrevisaoSemana = <
     GetCptecClimaPrevisaoSemanaResponses,
     unknown,
     ThrowOnError
-  >({ url: '/cptec/v1/clima/previsao/semana/{lat}/{long}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cptec/v1/clima/previsao/semana/{lat}/{long}',
+    ...options,
+  });
 
 /**
  * Previsão oceânica
@@ -360,7 +418,11 @@ export const getCptecOndas = <ThrowOnError extends boolean = false>(
   options: Options<GetCptecOndasData, ThrowOnError>
 ) =>
   (options.client ?? client).get<GetCptecOndasResponses, unknown, ThrowOnError>(
-    { url: '/cptec/v1/ondas/{cityCode}', ...options }
+    {
+      responseType: 'json',
+      url: '/cptec/v1/ondas/{cityCode}',
+      ...options,
+    }
   );
 
 /**
@@ -375,7 +437,11 @@ export const getCptecOndasDays = <ThrowOnError extends boolean = false>(
     GetCptecOndasDaysResponses,
     GetCptecOndasDaysErrors,
     ThrowOnError
-  >({ url: '/cptec/v1/ondas/{cityCode}/{days}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cptec/v1/ondas/{cityCode}/{days}',
+    ...options,
+  });
 
 /**
  * Retorna estado e lista de cidades por DDD
@@ -386,6 +452,7 @@ export const getDdd = <ThrowOnError extends boolean = false>(
   options: Options<GetDddData, ThrowOnError>
 ) =>
   (options.client ?? client).get<GetDddResponses, GetDddErrors, ThrowOnError>({
+    responseType: 'json',
     url: '/ddd/v1/{ddd}',
     ...options,
   });
@@ -400,7 +467,11 @@ export const listFipeMarcas = <ThrowOnError extends boolean = false>(
     ListFipeMarcasResponses,
     ListFipeMarcasErrors,
     ThrowOnError
-  >({ url: '/fipe/marcas/v1/{tipoVeiculo}', ...options });
+  >({
+    responseType: 'json',
+    url: '/fipe/marcas/v1/{tipoVeiculo}',
+    ...options,
+  });
 
 /**
  * Consulta o preço do veículo segundo a tabela FIPE.
@@ -414,7 +485,11 @@ export const getFipePreco = <ThrowOnError extends boolean = false>(
     GetFipePrecoResponses,
     GetFipePrecoErrors,
     ThrowOnError
-  >({ url: '/fipe/preco/v1/{codigoFipe}', ...options });
+  >({
+    responseType: 'json',
+    url: '/fipe/preco/v1/{codigoFipe}',
+    ...options,
+  });
 
 /**
  * Lista as tabelas de referência existentes.
@@ -426,7 +501,11 @@ export const listFipeTabelas = <ThrowOnError extends boolean = false>(
     ListFipeTabelasResponses,
     unknown,
     ThrowOnError
-  >({ url: '/fipe/tabelas/v1', ...options });
+  >({
+    responseType: 'json',
+    url: '/fipe/tabelas/v1',
+    ...options,
+  });
 
 /**
  * Lista os veículos de acordo com a marca e o tipo de veículo
@@ -438,7 +517,11 @@ export const listFipeVeiculos = <ThrowOnError extends boolean = false>(
     ListFipeVeiculosResponses,
     ListFipeVeiculosErrors,
     ThrowOnError
-  >({ url: '/fipe/veiculos/v1/{tipoVeiculo}/{codigoMarca}', ...options });
+  >({
+    responseType: 'json',
+    url: '/fipe/veiculos/v1/{tipoVeiculo}/{codigoMarca}',
+    ...options,
+  });
 
 /**
  * Retorna lista de fundos de investimentos registrados na CVM.
@@ -449,6 +532,7 @@ export const listFundos = <ThrowOnError extends boolean = false>(
   options?: Options<ListFundosData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<ListFundosResponses, unknown, ThrowOnError>({
+    responseType: 'json',
     url: '/cvm/fundos/v1',
     ...options,
   });
@@ -463,7 +547,11 @@ export const getFundo = <ThrowOnError extends boolean = false>(
     GetFundoResponses,
     GetFundoErrors,
     ThrowOnError
-  >({ url: '/cvm/fundos/v1/{cnpj}', ...options });
+  >({
+    responseType: 'json',
+    url: '/cvm/fundos/v1/{cnpj}',
+    ...options,
+  });
 
 /**
  * Lista os feriados nacionais de determinado ano.
@@ -477,7 +565,11 @@ export const listFeriados = <ThrowOnError extends boolean = false>(
     ListFeriadosResponses,
     ListFeriadosErrors,
     ThrowOnError
-  >({ url: '/feriados/v1/{ano}', ...options });
+  >({
+    responseType: 'json',
+    url: '/feriados/v1/{ano}',
+    ...options,
+  });
 
 /**
  * Retorna os municípios da unidade federativa
@@ -491,7 +583,11 @@ export const listIbgeMunicipios = <ThrowOnError extends boolean = false>(
     ListIbgeMunicipiosResponses,
     ListIbgeMunicipiosErrors,
     ThrowOnError
-  >({ url: '/ibge/municipios/v1/{siglaUF}', ...options });
+  >({
+    responseType: 'json',
+    url: '/ibge/municipios/v1/{siglaUF}',
+    ...options,
+  });
 
 /**
  * Retorna informações de todos estados do Brasil
@@ -500,6 +596,7 @@ export const listIbgeUfs = <ThrowOnError extends boolean = false>(
   options?: Options<ListIbgeUfsData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<ListIbgeUfsResponses, unknown, ThrowOnError>({
+    responseType: 'json',
     url: '/ibge/uf/v1',
     ...options,
   });
@@ -514,7 +611,11 @@ export const getIbgeUf = <ThrowOnError extends boolean = false>(
     GetIbgeUfResponses,
     GetIbgeUfErrors,
     ThrowOnError
-  >({ url: '/ibge/uf/v1/{code}', ...options });
+  >({
+    responseType: 'json',
+    url: '/ibge/uf/v1/{code}',
+    ...options,
+  });
 
 /**
  * Informações sobre o livro a partir do ISBN
@@ -529,6 +630,7 @@ export const getIsbn = <ThrowOnError extends boolean = false>(
       querySerializer: {
         parameters: { providers: { array: { explode: false } } },
       },
+      responseType: 'json',
       url: '/isbn/v1/{isbn}',
       ...options,
     }
@@ -543,6 +645,7 @@ export const listNcm = <ThrowOnError extends boolean = false>(
   options?: Options<ListNcmData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<ListNcmResponses, unknown, ThrowOnError>({
+    responseType: 'json',
     url: '/ncm/v1',
     ...options,
   });
@@ -556,6 +659,7 @@ export const getNcm = <ThrowOnError extends boolean = false>(
   options: Options<GetNcmData, ThrowOnError>
 ) =>
   (options.client ?? client).get<GetNcmResponses, GetNcmErrors, ThrowOnError>({
+    responseType: 'json',
     url: '/ncm/v1/{code}',
     ...options,
   });
@@ -572,7 +676,11 @@ export const listPixParticipants = <ThrowOnError extends boolean = false>(
     ListPixParticipantsResponses,
     ListPixParticipantsErrors,
     ThrowOnError
-  >({ url: '/pix/v1/participants', ...options });
+  >({
+    responseType: 'json',
+    url: '/pix/v1/participants',
+    ...options,
+  });
 
 /**
  * Avalia o status de um dominio .br
@@ -584,7 +692,11 @@ export const getRegistroBr = <ThrowOnError extends boolean = false>(
     GetRegistroBrResponses,
     GetRegistroBrErrors,
     ThrowOnError
-  >({ url: '/registrobr/v1/{domain}', ...options });
+  >({
+    responseType: 'json',
+    url: '/registrobr/v1/{domain}',
+    ...options,
+  });
 
 /**
  * Retorna as taxas de juros e alguns índices oficiais do Brasil
@@ -593,6 +705,7 @@ export const listTaxas = <ThrowOnError extends boolean = false>(
   options?: Options<ListTaxasData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<ListTaxasResponses, unknown, ThrowOnError>({
+    responseType: 'json',
     url: '/taxas/v1',
     ...options,
   });
@@ -607,7 +720,11 @@ export const getTaxa = <ThrowOnError extends boolean = false>(
     GetTaxaResponses,
     GetTaxaErrors,
     ThrowOnError
-  >({ url: '/taxas/v1/{sigla}', ...options });
+  >({
+    responseType: 'json',
+    url: '/taxas/v1/{sigla}',
+    ...options,
+  });
 
 /**
  * Retorna a lista de tickers das empresas listadas na B3
@@ -621,7 +738,11 @@ export const listTickersAcoes = <ThrowOnError extends boolean = false>(
     ListTickersAcoesResponses,
     ListTickersAcoesErrors,
     ThrowOnError
-  >({ url: '/tickers/b3/acoes/v1', ...options });
+  >({
+    responseType: 'json',
+    url: '/tickers/b3/acoes/v1',
+    ...options,
+  });
 
 /**
  * Retorna a lista de tickers de fundos de investimento listados na B3
@@ -635,7 +756,11 @@ export const listTickersFundos = <ThrowOnError extends boolean = false>(
     ListTickersFundosResponses,
     ListTickersFundosErrors,
     ThrowOnError
-  >({ url: '/tickers/b3/fundos/v1/{typeFund}', ...options });
+  >({
+    responseType: 'json',
+    url: '/tickers/b3/fundos/v1/{typeFund}',
+    ...options,
+  });
 
 /**
  * Lista termos TUSS (Terminologia Unificada da Saúde Suplementar) com suporte a busca por nome e código
@@ -646,6 +771,7 @@ export const listTuss = <ThrowOnError extends boolean = false>(
   options?: Options<ListTussData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<ListTussResponses, unknown, ThrowOnError>({
+    responseType: 'json',
     url: '/tuss/v1',
     ...options,
   });
@@ -657,7 +783,11 @@ export const getTuss = <ThrowOnError extends boolean = false>(
   options: Options<GetTussData, ThrowOnError>
 ) =>
   (options.client ?? client).get<GetTussResponses, GetTussErrors, ThrowOnError>(
-    { url: '/tuss/v1/{tuss}', ...options }
+    {
+      responseType: 'json',
+      url: '/tuss/v1/{tuss}',
+      ...options,
+    }
   );
 
 /**
@@ -669,6 +799,7 @@ export const searchTuss = <ThrowOnError extends boolean = false>(
   options?: Options<SearchTussData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<SearchTussResponses, unknown, ThrowOnError>({
+    responseType: 'json',
     url: '/tuss/v1/search',
     ...options,
   });
@@ -685,4 +816,8 @@ export const autocompleteTuss = <ThrowOnError extends boolean = false>(
     AutocompleteTussResponses,
     unknown,
     ThrowOnError
-  >({ url: '/tuss/v1/autocomplete', ...options });
+  >({
+    responseType: 'json',
+    url: '/tuss/v1/autocomplete',
+    ...options,
+  });
