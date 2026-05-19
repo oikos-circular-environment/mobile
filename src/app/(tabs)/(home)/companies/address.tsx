@@ -6,7 +6,8 @@ import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { AddressFormSkeleton } from "@/components/companies/skeletons";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
 	FormControl,
 	FormControlError,
@@ -62,7 +63,7 @@ export default function CompanyAddressScreen() {
 		reset,
 		setValue,
 		watch,
-		formState: { errors },
+		formState: { errors, isDirty },
 	} = useForm<AddressFormValues>({
 		resolver: zodResolver(addressSchema),
 		defaultValues,
@@ -388,16 +389,17 @@ export default function CompanyAddressScreen() {
 								variant="outline"
 								className="flex-1"
 								onPress={onCancel}
-								isDisabled={isSavingAddress}
+								isDisabled={!isDirty || isSavingAddress}
 							>
 								<ButtonText>Cancelar</ButtonText>
 							</Button>
 							<Button
 								className="flex-1"
 								onPress={handleSubmit(onSubmit)}
-								isDisabled={isSavingAddress}
+								isDisabled={!isDirty || isSavingAddress}
 							>
-								<ButtonText>Confirmar</ButtonText>
+								<ButtonText>Salvar</ButtonText>
+								{isSavingAddress && <ButtonIcon as={Spinner} />}
 							</Button>
 						</View>
 					</View>

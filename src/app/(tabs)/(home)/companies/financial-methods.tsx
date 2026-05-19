@@ -9,7 +9,8 @@ import {
 } from "@/components/companies/financial-methods/financial-methods-form-schema";
 import { PaymentsTab } from "@/components/companies/financial-methods/payments-tab";
 import { ReceiptsTab } from "@/components/companies/financial-methods/receipts-tab";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Heading } from "@/components/ui/heading";
 import {
 	companyFinancial,
@@ -80,13 +81,24 @@ export default function CompanyFinancialMethodsScreen() {
 							<ReceiptsTab form={form} fieldArray={fieldArray} />
 						)}
 
-						<Button
-							onPress={form.handleSubmit(onSubmit)}
-							disabled={!form.formState.isValid}
-							className="mt-4"
-						>
-							<ButtonText>Salvar Configurações</ButtonText>
-						</Button>
+						<View className="flex-row gap-2 mt-4">
+							<Button
+								variant="outline"
+								className="flex-1"
+								onPress={() => form.reset()}
+								isDisabled={!form.formState.isDirty}
+							>
+								<ButtonText>Cancelar</ButtonText>
+							</Button>
+							<Button
+								className="flex-1"
+								onPress={form.handleSubmit(onSubmit)}
+								isDisabled={!form.formState.isDirty || !form.formState.isValid}
+							>
+								<ButtonText>Salvar</ButtonText>
+								{form.formState.isSubmitting && <ButtonIcon as={Spinner} />}
+							</Button>
+						</View>
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>

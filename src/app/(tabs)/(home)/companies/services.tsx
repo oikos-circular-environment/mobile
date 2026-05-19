@@ -16,7 +16,8 @@ import {
 	serviceFormSchema,
 } from "@/components/companies/services/services-form-schema";
 import { ServicesListSkeleton } from "@/components/companies/skeletons";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/ui/card";
 import {
 	FormControl,
@@ -501,15 +502,26 @@ export default function CompanyServicesScreen() {
 						</View>
 					</Card>
 
-					<Button
-						className="mt-1"
-						onPress={handleSubmit(onSubmit)}
-						isDisabled={
-							!formState.isValid || formState.isSubmitting || isSavingServices
-						}
-					>
-						<ButtonText>Cadastrar serviço</ButtonText>
-					</Button>
+					<View className="flex-row gap-2 mt-1">
+						<Button
+							variant="outline"
+							className="flex-1"
+							onPress={() => form.reset()}
+							isDisabled={!formState.isDirty || isSavingServices}
+						>
+							<ButtonText>Limpar</ButtonText>
+						</Button>
+						<Button
+							className="flex-1"
+							onPress={handleSubmit(onSubmit)}
+							isDisabled={
+								!formState.isValid || formState.isSubmitting || isSavingServices
+							}
+						>
+							<ButtonText>Cadastrar</ButtonText>
+							{isSavingServices && <ButtonIcon as={Spinner} />}
+						</Button>
+					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</>

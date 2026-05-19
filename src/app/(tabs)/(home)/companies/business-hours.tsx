@@ -8,7 +8,8 @@ import {
 } from "@/components/companies/business-hours/business-hours-form-schema";
 import { DayBusinessHourField } from "@/components/companies/business-hours/day-business-hour-field";
 import { BusinessHoursSkeleton } from "@/components/companies/skeletons";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Heading } from "@/components/ui/heading";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { daysOfWeek, defaultBusinessHours } from "@/libs/types/business-hour";
@@ -35,7 +36,7 @@ export default function CompanyBusinessHoursScreen() {
 		handleSubmit,
 		watch,
 		reset,
-		formState: { errors },
+		formState: { errors, isDirty },
 	} = useForm<BusinessHoursFormValues>({
 		resolver: zodResolver(businessHoursFormSchema),
 		defaultValues: {
@@ -115,11 +116,20 @@ export default function CompanyBusinessHoursScreen() {
 
 					<View className="flex-row gap-2 pt-4">
 						<Button
+							variant="outline"
+							className="flex-1"
+							onPress={() => reset()}
+							isDisabled={!isDirty || isSavingBusinessHours}
+						>
+							<ButtonText>Cancelar</ButtonText>
+						</Button>
+						<Button
 							className="flex-1"
 							onPress={handleSubmit(onSubmit)}
-							isDisabled={isSavingBusinessHours}
+							isDisabled={!isDirty || isSavingBusinessHours}
 						>
 							<ButtonText>Salvar</ButtonText>
+							{isSavingBusinessHours && <ButtonIcon as={Spinner} />}
 						</Button>
 					</View>
 				</View>

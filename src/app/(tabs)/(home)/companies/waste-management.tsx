@@ -16,7 +16,8 @@ import {
 	wasteManagementFormSchema,
 } from "@/components/companies/waste/waste-form-schema";
 import { WasteListSkeleton } from "@/components/companies/skeletons";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/ui/card";
 import {
 	FormControl,
@@ -410,15 +411,26 @@ export default function CompanyWasteManagementScreen() {
 						</View>
 					</Card>
 
-					<Button
-						className="mt-1"
-						onPress={handleSubmit(onSubmit)}
-						isDisabled={
-							!formState.isValid || formState.isSubmitting || isSavingWastes
-						}
-					>
-						<ButtonText>Cadastrar resíduo</ButtonText>
-					</Button>
+					<View className="flex-row gap-2 mt-1">
+						<Button
+							variant="outline"
+							className="flex-1"
+							onPress={() => form.reset()}
+							isDisabled={!formState.isDirty || isSavingWastes}
+						>
+							<ButtonText>Limpar</ButtonText>
+						</Button>
+						<Button
+							className="flex-1"
+							onPress={handleSubmit(onSubmit)}
+							isDisabled={
+								!formState.isValid || formState.isSubmitting || isSavingWastes
+							}
+						>
+							<ButtonText>Cadastrar</ButtonText>
+							{isSavingWastes && <ButtonIcon as={Spinner} />}
+						</Button>
+					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</>
