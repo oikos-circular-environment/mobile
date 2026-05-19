@@ -10,8 +10,8 @@ import {
 import { PaymentsTab } from "@/components/companies/financial-methods/payments-tab";
 import { ReceiptsTab } from "@/components/companies/financial-methods/receipts-tab";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import { Heading } from "@/components/ui/heading";
+import { Spinner } from "@/components/ui/spinner";
 import {
 	companyFinancial,
 	type FinancialType,

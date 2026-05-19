@@ -201,7 +201,7 @@ export default function CompanyAddressScreen() {
 
 	useEffect(() => {
 		if (selectedCity) {
-			const city = cities?.find(city => city.nome.localeCompare(selectedCity));
+			const city = cities?.find(c => c.nome === selectedCity);
 			if (city) {
 				setValue("city_ibge_id", Number(city.codigo_ibge));
 			}
@@ -211,8 +211,6 @@ export default function CompanyAddressScreen() {
 	if (isLoadingAddress) {
 		return <AddressFormSkeleton />;
 	}
-
-	console.log(watch("city_ibge_id"));
 
 	return (
 		<>
