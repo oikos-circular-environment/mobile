@@ -1,12 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import {
 	type BusinessHoursFormValues,
 	businessHoursFormSchema,
 } from "@/components/companies/business-hours/business-hours-form-schema";
 import { DayBusinessHourField } from "@/components/companies/business-hours/day-business-hour-field";
+import { BusinessHoursSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
@@ -87,11 +88,7 @@ export default function CompanyBusinessHoursScreen() {
 	};
 
 	if (isLoadingBusinessHours) {
-		return (
-			<View className="flex-1 items-center justify-center bg-white">
-				<ActivityIndicator size="large" />
-			</View>
-		);
+		return <BusinessHoursSkeleton />;
 	}
 
 	return (

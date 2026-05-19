@@ -3,8 +3,9 @@ import { Stack } from "expo-router";
 import { Search } from "lucide-react-native";
 import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { z } from "zod";
+import { AddressFormSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -108,11 +109,7 @@ export default function CompanyAddressScreen() {
 	};
 
 	if (isLoadingAddress) {
-		return (
-			<View className="flex-1 items-center justify-center bg-white">
-				<ActivityIndicator size="large" />
-			</View>
-		);
+		return <AddressFormSkeleton />;
 	}
 
 	return (

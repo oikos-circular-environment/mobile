@@ -4,7 +4,6 @@ import { AlertCircle, X } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-	ActivityIndicator,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
@@ -16,6 +15,7 @@ import {
 	type ServiceFormValues,
 	serviceFormSchema,
 } from "@/components/companies/services/services-form-schema";
+import { ServicesListSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -175,9 +175,7 @@ export default function CompanyServicesScreen() {
 					</Card>
 
 					{isLoadingServices ? (
-						<View className="items-center py-4">
-							<ActivityIndicator size="small" />
-						</View>
+						<ServicesListSkeleton />
 					) : services && services.length > 0 ? (
 						<Card className="shadow-none gap-3">
 							<Heading size="sm">Serviços cadastrados</Heading>

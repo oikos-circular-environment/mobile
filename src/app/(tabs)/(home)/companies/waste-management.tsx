@@ -4,7 +4,6 @@ import { AlertCircle, X } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-	ActivityIndicator,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
@@ -16,6 +15,7 @@ import {
 	type WasteManagementFormValues,
 	wasteManagementFormSchema,
 } from "@/components/companies/waste/waste-form-schema";
+import { WasteListSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -162,9 +162,7 @@ export default function CompanyWasteManagementScreen() {
 					</Card>
 
 					{isLoadingWastes ? (
-						<View className="items-center py-4">
-							<ActivityIndicator size="small" />
-						</View>
+						<WasteListSkeleton />
 					) : wastes && wastes.length > 0 ? (
 						<Card className="shadow-none gap-3">
 							<Heading size="sm">Resíduos cadastrados</Heading>

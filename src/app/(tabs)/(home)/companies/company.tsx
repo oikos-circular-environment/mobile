@@ -1,12 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, parse } from "date-fns";
+import { useMutation } from "@tanstack/react-query";
+import { format, parse, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AlertCircle } from "lucide-react-native";
+import { AlertCircle, Search } from "lucide-react-native";
 import { useEffect } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
-import { ActivityIndicator, KeyboardAvoidingView, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
-import { Button, ButtonText } from "@/components/ui/button";
+import { CompanyFormSkeleton } from "@/components/companies/skeletons";
+import { toast } from "@/components/toast";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
 	FormControl,
@@ -18,11 +21,15 @@ import {
 	FormControlLabel,
 	FormControlLabelText,
 } from "@/components/ui/form-control";
-import { Input, InputField } from "@/components/ui/input";
+import { HStack } from "@/components/ui/hstack";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
+import { getCnpj } from "@/libs/brasil-api-sdk";
+import { mask } from "@/libs/mask";
 
 const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
-const phoneRegex = /^(\(\d{2}\)\s?)?\d{4,5}-?\d{4}$/;
+const phoneRegex = /^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/;
 
 const companySchema = z.object({
 	identity: z
@@ -37,7 +44,7 @@ const companySchema = z.object({
 		.optional()
 		.refine(
 			v => !v?.length || phoneRegex.test(v[0] || ""),
-			"Telefone deve estar no formato: (00) 00000-0000",
+			"Telefone deve estar no formato: (00) 0 0000-0000",
 		),
 	startedActivityIn: z
 		.date()
@@ -61,7 +68,8 @@ export default function CompanyGeneralInfoScreen() {
 		control,
 		handleSubmit,
 		reset,
-		formState: { errors },
+		setValue,
+		formState: { errors, isDirty },
 	} = useForm({
 		resolver: zodResolver(companySchema),
 		defaultValues: {
@@ -78,6 +86,41 @@ export default function CompanyGeneralInfoScreen() {
 			acceptAppointments: false,
 		},
 	});
+
+	const getCnpjMutation = useMutation({
+		mutationKey: ["get", "cnpj", "brasil-api"],
+		mutationFn: async ({ cnpj }: { cnpj: string }) => {
+			const response = await getCnpj({ path: { cnpj } });
+			return response.data;
+		},
+		onSuccess: data => {
+			if (!data) return;
+			if (data.razao_social) setValue("corporateName", data.razao_social);
+			if (data.nome_fantasia) setValue("businessName", data.nome_fantasia);
+			if (data.email) setValue("email", data.email);
+			if (data.ddd_telefone_1) {
+				setValue("phones", [mask.phoneBr(data.ddd_telefone_1)]);
+			}
+			if (data.data_inicio_atividade) {
+				setValue("startedActivityIn", parseISO(data.data_inicio_atividade));
+			}
+		},
+		onError: () => {
+			toast.error(
+				"CNPJ não encontrado",
+				"Verifique o número e tente novamente.",
+			);
+		},
+	});
+
+	const onPressSearchCnpj = () => {
+		const digits = (control._formValues.identity as string).replace(/\D/g, "");
+		if (digits.length !== 14) {
+			toast.error("CNPJ inválido", "O CNPJ deve conter 14 dígitos.");
+			return;
+		}
+		getCnpjMutation.mutate({ cnpj: digits });
+	};
 
 	useEffect(() => {
 		if (company) {
@@ -118,11 +161,7 @@ export default function CompanyGeneralInfoScreen() {
 	};
 
 	if (isLoadingCompany) {
-		return (
-			<View className="flex-1 items-center justify-center bg-white">
-				<ActivityIndicator size="large" />
-			</View>
-		);
+		return <CompanyFormSkeleton />;
 	}
 
 	return (
@@ -133,159 +172,164 @@ export default function CompanyGeneralInfoScreen() {
 			>
 				<View className="gap-4">
 					<Card className="shadow-none gap-3">
-						<Controller
-							control={control}
-							name="identity"
-							render={({ field: { value, onChange } }) => (
-								<FormControl isInvalid={!!errors.identity} className="gap-2">
-									<FormControlLabel>
-										<FormControlLabelText>CNPJ</FormControlLabelText>
-									</FormControlLabel>
-									<Input>
+						<FormControl isInvalid={!!errors.identity} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>CNPJ</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="identity"
+								render={({ field: { value, onChange, onBlur } }) => (
+									<Input className="h-8">
 										<InputField
 											value={value}
-											onChangeText={onChange}
+											onBlur={onBlur}
+											onChangeText={text => onChange(mask.cnpj(text))}
+											keyboardType="number-pad"
 											placeholder="00.000.000/0000-00"
-											keyboardType="decimal-pad"
 										/>
+										<InputSlot className="pr-3" onPress={onPressSearchCnpj}>
+											<InputIcon
+												as={getCnpjMutation.isPending ? Spinner : Search}
+											/>
+										</InputSlot>
 									</Input>
-									<FormControlError>
-										<FormControlErrorIcon as={AlertCircle} className="size-4" />
-										<FormControlErrorText>
-											{errors.identity?.message}
-										</FormControlErrorText>
-									</FormControlError>
-								</FormControl>
-							)}
-						/>
+								)}
+							/>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.identity?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
 
-						<Controller
-							control={control}
-							name="corporateName"
-							render={({ field: { value, onChange } }) => (
-								<FormControl
-									isInvalid={!!errors.corporateName}
-									className="gap-2"
-								>
-									<FormControlLabel>
-										<FormControlLabelText>Razão Social</FormControlLabelText>
-									</FormControlLabel>
+						<FormControl isInvalid={!!errors.corporateName} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>Razão Social</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="corporateName"
+								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
 											value={value}
+											onBlur={onBlur}
 											onChangeText={onChange}
 											placeholder="Nome completo da empresa"
 										/>
 									</Input>
-									<FormControlError>
-										<FormControlErrorIcon as={AlertCircle} className="size-4" />
-										<FormControlErrorText>
-											{errors.corporateName?.message}
-										</FormControlErrorText>
-									</FormControlError>
-								</FormControl>
-							)}
-						/>
+								)}
+							/>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.corporateName?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
 
-						<Controller
-							control={control}
-							name="businessName"
-							render={({ field: { value, onChange } }) => (
-								<FormControl
-									isInvalid={!!errors.businessName}
-									className="gap-2"
-								>
-									<FormControlLabel>
-										<FormControlLabelText>Nome Fantasia</FormControlLabelText>
-									</FormControlLabel>
+						<FormControl isInvalid={!!errors.businessName} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>Nome Fantasia</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="businessName"
+								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
 											value={value ?? ""}
+											onBlur={onBlur}
 											onChangeText={onChange}
 											placeholder="Nome fantasia (opcional)"
 										/>
 									</Input>
-									<FormControlError>
-										<FormControlErrorIcon as={AlertCircle} className="size-4" />
-										<FormControlErrorText>
-											{errors.businessName?.message}
-										</FormControlErrorText>
-									</FormControlError>
-								</FormControl>
-							)}
-						/>
+								)}
+							/>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.businessName?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
 
-						<Controller
-							control={control}
-							name="email"
-							render={({ field: { value, onChange } }) => (
-								<FormControl isInvalid={!!errors.email} className="gap-2">
-									<FormControlLabel>
-										<FormControlLabelText>E-mail</FormControlLabelText>
-									</FormControlLabel>
+						<FormControl isInvalid={!!errors.email} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>E-mail</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="email"
+								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
 											value={value ?? ""}
+											onBlur={onBlur}
 											onChangeText={onChange}
 											placeholder="contato@empresa.com"
 											keyboardType="email-address"
 											autoCapitalize="none"
 										/>
 									</Input>
-									<FormControlError>
-										<FormControlErrorIcon as={AlertCircle} className="size-4" />
-										<FormControlErrorText>
-											{errors.email?.message}
-										</FormControlErrorText>
-									</FormControlError>
-								</FormControl>
-							)}
-						/>
+								)}
+							/>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.email?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
 
-						<Controller
-							control={control}
-							name="phones"
-							render={({ field: { value, onChange } }) => (
-								<FormControl isInvalid={!!errors.phones} className="gap-2">
-									<FormControlLabel>
-										<FormControlLabelText>
-											Telefone Principal
-										</FormControlLabelText>
-									</FormControlLabel>
+						<FormControl isInvalid={!!errors.phones} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>Telefone Principal</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="phones"
+								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
 											value={value?.[0] ?? ""}
-											onChangeText={v => onChange(v.length ? [v] : null)}
+											onBlur={onBlur}
+											onChangeText={v =>
+												onChange(v.length ? [mask.phoneBr(v)] : null)
+											}
 											placeholder="(00) 00000-0000"
 											keyboardType="phone-pad"
 										/>
 									</Input>
-									<FormControlError>
-										<FormControlErrorIcon as={AlertCircle} className="size-4" />
-										<FormControlErrorText>
-											{errors.phones?.message}
-										</FormControlErrorText>
-									</FormControlError>
-								</FormControl>
-							)}
-						/>
+								)}
+							/>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.phones?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
 
-						<Controller
-							control={control}
-							name="startedActivityIn"
-							render={({ field: { value, onChange } }) => (
-								<FormControl
-									isInvalid={!!errors.startedActivityIn}
-									className="gap-2"
-								>
-									<FormControlLabel>
-										<FormControlLabelText>
-											Data de Início da Atividade
-										</FormControlLabelText>
-									</FormControlLabel>
+						<FormControl
+							isInvalid={!!errors.startedActivityIn}
+							className="gap-2"
+						>
+							<FormControlLabel>
+								<FormControlLabelText>
+									Data de Início da atividade
+								</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="startedActivityIn"
+								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
 											value={format(value, "dd/MM/yyyy", { locale: ptBR })}
+											onBlur={onBlur}
 											onChangeText={dateStr => {
 												try {
 													const parsed = parse(
@@ -305,28 +349,40 @@ export default function CompanyGeneralInfoScreen() {
 											keyboardType="decimal-pad"
 										/>
 									</Input>
-									<FormControlHelper>
-										<FormControlHelperText>
-											Formato: DD/MM/YYYY
-										</FormControlHelperText>
-									</FormControlHelper>
-									<FormControlError>
-										<FormControlErrorIcon as={AlertCircle} className="size-4" />
-										<FormControlErrorText>
-											{errors.startedActivityIn?.message}
-										</FormControlErrorText>
-									</FormControlError>
-								</FormControl>
-							)}
-						/>
+								)}
+							/>
+							<FormControlHelper>
+								<FormControlHelperText>
+									Formato: DD/MM/YYYY
+								</FormControlHelperText>
+							</FormControlHelper>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.startedActivityIn?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
 
-						<Button
-							className="mt-4"
-							onPress={handleSubmit(handleFormSubmit)}
-							isDisabled={isSavingCompany}
-						>
-							<ButtonText>Salvar dados da empresa</ButtonText>
-						</Button>
+						<HStack className="gap-2 mt-4">
+							<Button
+								variant="outline"
+								className="flex-1"
+								onPress={() => reset()}
+								isDisabled={!isDirty || isSavingCompany}
+							>
+								<ButtonText>Cancelar</ButtonText>
+							</Button>
+
+							<Button
+								className="flex-1"
+								onPress={handleSubmit(handleFormSubmit)}
+								isDisabled={!isDirty || isSavingCompany}
+							>
+								<ButtonText>Salvar</ButtonText>
+								{isSavingCompany && <ButtonIcon as={Spinner} />}
+							</Button>
+						</HStack>
 					</Card>
 				</View>
 			</ScrollView>
