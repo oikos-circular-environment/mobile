@@ -1,14 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Stack } from "expo-router";
-import { ChevronDown, Search } from "lucide-react-native";
+import { ChevronDown, MapIcon, Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { AddressFormSkeleton } from "@/components/companies/skeletons";
 import { toast } from "@/components/toast";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
 	FormControl,
 	FormControlError,
@@ -16,6 +16,7 @@ import {
 	FormControlLabel,
 	FormControlLabelText,
 } from "@/components/ui/form-control";
+import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import {
 	Select,
@@ -213,14 +214,29 @@ export default function CompanyAddressScreen() {
 	}
 
 	return (
-		<>
-			<Stack.Screen options={{ title: "Endereço da Empresa" }} />
-			<KeyboardAvoidingView
-				className="flex-1"
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
+		<KeyboardAvoidingView behavior="padding" className="flex-1">
+			<ScrollView
+				className="flex-1 bg-white"
+				contentContainerClassName="p-4 pb-8"
 			>
-				<ScrollView className="flex-1 bg-white p-4">
-					<View className="flex gap-4 pb-8">
+				<View className="gap-4">
+					<Card className="bg-secondary shadow-none">
+						<View className="flex-row items-center justify-between gap-4">
+							<View className="size-15 items-center justify-center rounded-lg bg-primary">
+								<MapIcon color="white" size={20} />
+							</View>
+							<View className="flex-1 gap-1">
+								<Heading className="text-lg">Endereço</Heading>
+								<Text className="text-sm ">
+									Estes dados serão expostos na plataforma, o preenchimento com
+									informações reais trazem mais confiabilidade para os usuários
+									da plataforma.
+								</Text>
+							</View>
+						</View>
+					</Card>
+
+					<Card className="shadow-none">
 						<View className="gap-3">
 							<FormControl isInvalid={!!errors.zip_code} className="gap-2">
 								<FormControlLabel>
@@ -565,9 +581,9 @@ export default function CompanyAddressScreen() {
 								{isSavingAddress && <ButtonIcon as={Spinner} />}
 							</Button>
 						</View>
-					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</>
+					</Card>
+				</View>
+			</ScrollView>
+		</KeyboardAvoidingView>
 	);
 }

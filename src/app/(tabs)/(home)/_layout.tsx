@@ -16,13 +16,13 @@ export default function HomeStackLayout() {
 			<Stack.Protected guard={isAuthenticated}>
 				<Stack.Screen
 					name="settings"
-					options={{ title: "Configurações", headerShown: true }}
+					options={{ title: "Configurações", headerShown: false }}
 				/>
 			</Stack.Protected>
 			<Stack.Protected guard={isAuthenticated}>
 				<Stack.Screen
 					name="profile"
-					options={{ title: "Perfil", headerShown: true }}
+					options={{ title: "Perfil", headerShown: false }}
 				/>
 			</Stack.Protected>
 			<Stack.Screen

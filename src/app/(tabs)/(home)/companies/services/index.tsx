@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
-import { PlusIcon } from "lucide-react-native";
+import { PlusIcon, WrenchIcon } from "lucide-react-native";
 import { useEffect } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, ScrollView, View } from "react-native";
 import { ServiceSkeleton } from "@/components/companies/services/service-skeleton";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -39,78 +39,87 @@ export default function ServicesIndexScreen() {
 	};
 
 	return (
-		<FlatList
-			data={services}
-			keyExtractor={item => item.id}
-			contentContainerClassName="p-4 pb-8 gap-4"
-			className="bg-white"
-			ListHeaderComponent={
-				<View className="gap-4 mb-2">
-					<Card className="shadow-none gap-2">
-						<Heading size="xl">Serviços</Heading>
-						<Text className="text-muted-foreground">
-							Gerencie os serviços que sua empresa oferece.
-						</Text>
-					</Card>
-					<Button className="w-full gap-2" onPress={handleCreate}>
-						<PlusIcon size={16} color="white" />
-						<ButtonText>Novo serviço</ButtonText>
-					</Button>
-				</View>
-			}
-			renderItem={({ item }) => (
-				<Card className="shadow-none p-4 gap-2 border-border/50">
-					<View className="flex-row justify-between items-start">
-						<View className="flex-1">
-							<Heading size="sm">{item.name}</Heading>
-							{item.description ? (
-								<Text
-									size="sm"
-									className="text-muted-foreground"
-									numberOfLines={2}
-								>
-									{item.description}
+		<ScrollView className="flex-1 bg-white" contentContainerClassName="p-4">
+			<FlatList
+				data={services}
+				keyExtractor={item => item.id}
+				contentContainerClassName="gap-4"
+				className="bg-white"
+				ListHeaderComponent={
+					<Card className="shadow-none ">
+						<View className="flex-row items-center justify-between gap-4">
+							<View className="size-15 items-center justify-center rounded-lg bg-secondary">
+								<WrenchIcon color="#3d6300" size={20} />
+							</View>
+							<View className="flex-1">
+								<Heading className="text-lg">Serviços</Heading>
+								<Text className="text-sm ">
+									Gerencie seus serviços, você pode criar, editar ou deletar da
+									maneira que quiser.
 								</Text>
-							) : null}
+							</View>
 						</View>
-						<Text className="font-bold text-primary-600">
-							{new Intl.NumberFormat("pt-BR", {
-								style: "currency",
-								currency: "BRL",
-							}).format(item.price)}
+
+						<Button className="w-full gap-2" onPress={handleCreate}>
+							<PlusIcon size={16} color="white" />
+							<ButtonText>Novo serviço</ButtonText>
+						</Button>
+					</Card>
+				}
+				renderItem={({ item }) => (
+					<Card className="shadow-none p-4 gap-2 border-border/50">
+						<View className="flex-row justify-between items-start">
+							<View className="flex-1">
+								<Heading size="sm">{item.name}</Heading>
+								{item.description ? (
+									<Text
+										size="sm"
+										className="text-muted-foreground"
+										numberOfLines={2}
+									>
+										{item.description}
+									</Text>
+								) : null}
+							</View>
+							<Text className="font-bold text-primary-600">
+								{new Intl.NumberFormat("pt-BR", {
+									style: "currency",
+									currency: "BRL",
+								}).format(item.price)}
+							</Text>
+						</View>
+
+						<View className="flex-row flex-wrap gap-2 mt-2">
+							<View className="bg-secondary/50 px-2 py-1 rounded-md">
+								<Text className="text-xs text-secondary-700">
+									{item.quantity} {item.unit}
+								</Text>
+							</View>
+							<View className="bg-primary/10 px-2 py-1 rounded-md">
+								<Text className="text-xs text-primary-700">
+									{item.waste_type === "RECYCLABLE" ? "Reciclável" : "Resíduo"}
+								</Text>
+							</View>
+						</View>
+
+						<Button
+							variant="outline"
+							size="sm"
+							className="mt-2"
+							onPress={() => handleEdit(item.id)}
+						>
+							<ButtonText>Editar</ButtonText>
+						</Button>
+					</Card>
+				)}
+				ListEmptyComponent={
+					<View className="items-center justify-center py-8">
+						<Text className="text-muted-foreground">
+							Nenhum serviço cadastrado.
 						</Text>
 					</View>
-
-					<View className="flex-row flex-wrap gap-2 mt-2">
-						<View className="bg-secondary/50 px-2 py-1 rounded-md">
-							<Text className="text-xs text-secondary-700">
-								{item.quantity} {item.unit}
-							</Text>
-						</View>
-						<View className="bg-primary/10 px-2 py-1 rounded-md">
-							<Text className="text-xs text-primary-700">
-								{item.waste_type === "RECYCLABLE" ? "Reciclável" : "Resíduo"}
-							</Text>
-						</View>
-					</View>
-
-					<Button
-						variant="outline"
-						size="sm"
-						className="mt-2"
-						onPress={() => handleEdit(item.id)}
-					>
-						<ButtonText>Editar</ButtonText>
-					</Button>
-				</Card>
-			)}
-			ListEmptyComponent={
-				<View className="items-center justify-center py-8">
-					<Text className="text-muted-foreground">
-						Nenhum serviço cadastrado.
-					</Text>
-				</View>
-			}
-		/>
+				}
+			/>
+		</ScrollView>
 	);
 }

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Clock8Icon } from "lucide-react-native";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -9,8 +10,10 @@ import {
 import { DayBusinessHourField } from "@/components/companies/business-hours/day-business-hour-field";
 import { BusinessHoursSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
+import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { daysOfWeek, defaultBusinessHours } from "@/libs/types/business-hour";
 
@@ -68,20 +71,16 @@ export default function CompanyBusinessHoursScreen() {
 	}, [businessHours, reset]);
 
 	const onSubmit = async (data: BusinessHoursFormValues) => {
-		try {
-			await saveBusinessHours({
-				business_hours: data.businessHours.map(bh => ({
-					day_of_week: bh.dayOfWeek as DayOfWeek,
-					is_open: bh.is_open,
-					time_slots: bh.timeSlots.map(ts => ({
-						start_time: ts.startTime,
-						end_time: ts.endTime,
-					})),
+		await saveBusinessHours({
+			business_hours: data.businessHours.map(bh => ({
+				day_of_week: bh.dayOfWeek as DayOfWeek,
+				is_open: bh.is_open,
+				time_slots: bh.timeSlots.map(ts => ({
+					start_time: ts.startTime,
+					end_time: ts.endTime,
 				})),
-			});
-		} catch {
-			// handled by context mutation's onError
-		}
+			})),
+		});
 	};
 
 	const getDayLabel = (dayOfWeek: string) => {
@@ -102,7 +101,21 @@ export default function CompanyBusinessHoursScreen() {
 				contentContainerClassName="p-4 pb-8"
 			>
 				<View className="gap-4">
-					<Heading size="xl">Horários de Funcionamento</Heading>
+					<Card className="bg-secondary shadow-none">
+						<View className="flex-row items-center justify-between gap-4">
+							<View className="size-15 items-center justify-center rounded-lg bg-primary">
+								<Clock8Icon color="white" size={20} />
+							</View>
+							<View className="flex-1 gap-1">
+								<Heading className="text-lg">Horário de Funcionamento</Heading>
+								<Text className="text-sm ">
+									Estes dados serão expostos na plataforma, o preenchimento com
+									informações reais trazem mais confiabilidade para os usuários
+									da plataforma.
+								</Text>
+							</View>
+						</View>
+					</Card>
 
 					{businessHoursWatch.map((businessHour, dayIndex) => (
 						<DayBusinessHourField

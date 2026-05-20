@@ -5,6 +5,7 @@ import {
 	ChevronDownIcon,
 	DollarSignIcon,
 	HashIcon,
+	WrenchIcon,
 	X,
 } from "lucide-react-native";
 import { useState } from "react";
@@ -56,7 +57,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { measurements } from "@/libs/types/measurement";
-import { waste_types } from "@/libs/types/waste";
+import { wasteTypes } from "@/libs/types/waste";
 
 export default function ServiceFormScreen() {
 	const router = useRouter();
@@ -171,23 +172,19 @@ export default function ServiceFormScreen() {
 	const handleRemove = async () => {
 		if (!initialData?.id) return;
 		const remaining = (services ?? []).filter(s => s.id !== initialData.id);
-		try {
-			await saveServices({
-				services: remaining.map(s => ({
-					name: s.name,
-					description: s.description ?? null,
-					price: s.price,
-					quantity: s.quantity,
-					unit: s.unit,
-					waste_type: s.waste_type,
-					sub_items: s.sub_items,
-					observations: s.observations ?? null,
-				})),
-			});
-			router.back();
-		} catch {
-			// handled by context mutation's onError
-		}
+		await saveServices({
+			services: remaining.map(s => ({
+				name: s.name,
+				description: s.description ?? null,
+				price: s.price,
+				quantity: s.quantity,
+				unit: s.unit,
+				waste_type: s.waste_type,
+				sub_items: s.sub_items,
+				observations: s.observations ?? null,
+			})),
+		});
+		router.back();
 	};
 
 	return (
@@ -199,15 +196,22 @@ export default function ServiceFormScreen() {
 				className="flex-1 bg-white"
 				contentContainerClassName="p-4 pb-8 gap-4"
 			>
-				<Card className="shadow-none gap-2">
-					<Heading size="xl">
-						{initialData ? "Editar serviço" : "Cadastro de serviços"}
-					</Heading>
-					<Text className="text-muted-foreground">
-						{initialData
-							? "Atualize as informações do seu serviço."
-							: "Cadastre os serviços que sua empresa oferece e relacione-os aos resíduos aceitos."}
-					</Text>
+				<Card className="bg-secondary shadow-none">
+					<View className="flex-row items-center justify-between gap-4">
+						<View className="size-15 items-center justify-center rounded-lg bg-primary">
+							<WrenchIcon color="white" size={20} />
+						</View>
+						<View className="flex-1 gap-1">
+							<Heading className="text-lg">
+								{initialData ? "Editar serviço" : "Cadastro de serviços"}
+							</Heading>
+							<Text className="text-sm ">
+								{initialData
+									? "Atualize as informações do seu serviço."
+									: "Cadastre os serviços que sua empresa oferece e relacione-os aos resíduos aceitos."}
+							</Text>
+						</View>
+					</View>
 				</Card>
 
 				<Card className="shadow-none gap-4">
@@ -361,7 +365,7 @@ export default function ServiceFormScreen() {
 													{measurements.map(measurement => (
 														<SelectItem
 															key={measurement.value}
-															label={`${measurement.value} (${measurement.label})`}
+															label={`${measurement.value} • ${measurement.label}`}
 															value={measurement.value}
 														/>
 													))}
@@ -410,16 +414,16 @@ export default function ServiceFormScreen() {
 						name="waste_type"
 						render={({ field: { value, onChange } }) => (
 							<View className="flex-row gap-2">
-								{waste_types.map(waste_type => {
-									const isSelected = waste_type.value === value;
+								{wasteTypes.map(wasteType => {
+									const isSelected = wasteType.value === value;
 									return (
 										<Button
-											key={waste_type.value}
+											key={wasteType.value}
 											variant={isSelected ? "default" : "outline"}
 											className="flex-1 will-change-variable"
-											onPress={() => onChange(waste_type.value)}
+											onPress={() => onChange(wasteType.value)}
 										>
-											<ButtonText>{waste_type.label}</ButtonText>
+											<ButtonText>{wasteType.label}</ButtonText>
 										</Button>
 									);
 								})}

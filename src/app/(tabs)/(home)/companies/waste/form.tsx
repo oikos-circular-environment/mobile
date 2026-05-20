@@ -5,6 +5,7 @@ import {
 	ChevronDownIcon,
 	DollarSignIcon,
 	HashIcon,
+	RecycleIcon,
 	X,
 } from "lucide-react-native";
 import { useState } from "react";
@@ -56,7 +57,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { measurements } from "@/libs/types/measurement";
-import { waste_types } from "@/libs/types/waste";
+import { wasteTypes } from "@/libs/types/waste";
 
 export default function WasteFormScreen() {
 	const router = useRouter();
@@ -197,15 +198,22 @@ export default function WasteFormScreen() {
 				className="flex-1 bg-white"
 				contentContainerClassName="p-4 pb-8 gap-4"
 			>
-				<Card className="shadow-none gap-2">
-					<Heading size="xl">
-						{initialData ? "Editar resíduo" : "Cadastro de resíduos"}
-					</Heading>
-					<Text className="text-muted-foreground">
-						{initialData
-							? "Atualize as informações do resíduo coletado."
-							: "Cadastre os resíduos que sua empresa coleta para vinculá-los ao seu perfil."}
-					</Text>
+				<Card className="bg-secondary shadow-none">
+					<View className="flex-row items-center justify-between gap-4">
+						<View className="size-15 items-center justify-center rounded-lg bg-primary">
+							<RecycleIcon color="white" size={20} />
+						</View>
+						<View className="flex-1 gap-1">
+							<Heading className="text-lg">
+								{initialData ? "Editar resíduo" : "Cadastro de resíduos"}
+							</Heading>
+							<Text className="text-sm ">
+								{initialData
+									? "Atualize as informações do resíduo coletado."
+									: "Cadastre os resíduos que sua empresa coleta para vinculá-los ao seu perfil."}
+							</Text>
+						</View>
+					</View>
 				</Card>
 
 				<Card className="shadow-none gap-4">
@@ -359,7 +367,7 @@ export default function WasteFormScreen() {
 													{measurements.map(measurement => (
 														<SelectItem
 															key={measurement.value}
-															label={`${measurement.value} (${measurement.label})`}
+															label={`${measurement.value} • ${measurement.label}`}
 															value={measurement.value}
 														/>
 													))}
@@ -378,16 +386,16 @@ export default function WasteFormScreen() {
 						name="waste_type"
 						render={({ field: { value, onChange } }) => (
 							<View className="flex-row gap-2">
-								{waste_types.map(waste_type => {
-									const isSelected = waste_type.value === value;
+								{wasteTypes.map(wasteType => {
+									const isSelected = wasteType.value === value;
 									return (
 										<Button
-											key={waste_type.value}
+											key={wasteType.value}
 											variant={isSelected ? "default" : "outline"}
 											className="flex-1 will-change-variable"
-											onPress={() => onChange(waste_type.value)}
+											onPress={() => onChange(wasteType.value)}
 										>
-											<ButtonText>{waste_type.label}</ButtonText>
+											<ButtonText>{wasteType.label}</ButtonText>
 										</Button>
 									);
 								})}

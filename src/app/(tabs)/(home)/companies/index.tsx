@@ -2,11 +2,11 @@ import type { Href } from "expo-router";
 import { Link } from "expo-router";
 import {
 	ArrowRightIcon,
-	Clock3Icon,
+	Clock8Icon,
 	FactoryIcon,
 	LockKeyholeIcon,
 	type LucideIcon,
-	MapPinIcon,
+	MapIcon,
 	RecycleIcon,
 	SettingsIcon,
 	WrenchIcon,
@@ -35,26 +35,26 @@ const companyOptions: CompanySetting[] = [
 	{
 		title: "Endereço",
 		description: "Informe seu endereço para que as pessoas te encontre.",
-		icon: MapPinIcon,
+		icon: MapIcon,
 		href: "/(tabs)/(home)/companies/address",
 	},
 	{
 		title: "Funcionamento",
 		description: "Informe os dias e horários em que sua empresa está aberta.",
-		icon: Clock3Icon,
+		icon: Clock8Icon,
 		href: "/(tabs)/(home)/companies/business-hours",
 	},
 	{
 		title: "Serviços",
 		description: "Descreva os serviços que sua empresa oferece ao publico.",
 		icon: WrenchIcon,
-		href: "/(tabs)/(home)/companies/services/",
+		href: "/(tabs)/(home)/companies/services",
 	},
 	{
 		title: "Gestão de resíduos",
 		description: "Configure como sua empresa lida com os tipos de resíduos.",
 		icon: RecycleIcon,
-		href: "/(tabs)/(home)/companies/waste/",
+		href: "/(tabs)/(home)/companies/waste",
 	},
 ];
 
