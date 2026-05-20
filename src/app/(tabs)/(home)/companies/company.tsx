@@ -358,7 +358,7 @@ export default function CompanyGeneralInfoScreen() {
 
 						<FormControl isInvalid={!!errors.company_type} className="gap-2">
 							<FormControlLabel>
-								<FormControlLabelText>Tipo de Empresa</FormControlLabelText>
+								<FormControlLabelText>Tipo de empresa</FormControlLabelText>
 							</FormControlLabel>
 							<Controller
 								control={control}
@@ -393,7 +393,7 @@ export default function CompanyGeneralInfoScreen() {
 						<FormControl isInvalid={!!errors.corporate_name} className="gap-2">
 							<FormControlLabel>
 								<FormControlLabelText>
-									{identity_type === "CNPJ" ? "Razão Social" : "Nome Completo"}
+									{identity_type === "CNPJ" ? "Razão social" : "Nome completo"}
 								</FormControlLabelText>
 							</FormControlLabel>
 							<Controller
@@ -430,7 +430,7 @@ export default function CompanyGeneralInfoScreen() {
 						{identity_type === "CNPJ" && (
 							<FormControl isInvalid={!!errors.business_name} className="gap-2">
 								<FormControlLabel>
-									<FormControlLabelText>Nome Fantasia</FormControlLabelText>
+									<FormControlLabelText>Nome fantasia</FormControlLabelText>
 								</FormControlLabel>
 								<Controller
 									control={control}
@@ -485,7 +485,7 @@ export default function CompanyGeneralInfoScreen() {
 
 						<FormControl isInvalid={!!errors.phones} className="gap-2">
 							<FormControlLabel>
-								<FormControlLabelText>Telefone Principal</FormControlLabelText>
+								<FormControlLabelText>Telefone principal</FormControlLabelText>
 							</FormControlLabel>
 							<Controller
 								control={control}
