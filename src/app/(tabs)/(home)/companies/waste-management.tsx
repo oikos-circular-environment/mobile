@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack } from "expo-router";
-import { AlertCircle, X } from "lucide-react-native";
+import { AlertCircle, DollarSignIcon, HashIcon, X } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -10,15 +10,20 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { WasteListSkeleton } from "@/components/companies/skeletons";
 import {
 	type WasteManagementFormInput,
 	type WasteManagementFormValues,
 	wasteManagementFormSchema,
 } from "@/components/companies/waste/waste-form-schema";
-import { WasteListSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/ui/card";
+import {
+	DecimalInput,
+	DecimalInputField,
+	DecimalInputIcon,
+	DecimalInputSlot,
+} from "@/components/ui/decimal-input";
 import {
 	FormControl,
 	FormControlError,
@@ -28,10 +33,24 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { ChevronDownIcon } from "@/components/ui/icon";
 import { Input, InputField } from "@/components/ui/input";
+import {
+	Select,
+	SelectBackdrop,
+	SelectContent,
+	SelectDragIndicator,
+	SelectDragIndicatorWrapper,
+	SelectIcon,
+	SelectInput,
+	SelectItem,
+	SelectPortal,
+	SelectTrigger,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
-import { mask } from "@/libs/mask";
 import { type Measurement, measurements } from "@/libs/types/measurement";
 import { type WasteType, wasteTypes } from "@/libs/types/waste";
 
@@ -49,12 +68,17 @@ export default function CompanyWasteManagementScreen() {
 
 	const [subItemDraft, setSubItemDraft] = useState("");
 
-	const form = useForm<WasteManagementFormInput, undefined, WasteManagementFormValues>({
+	const form = useForm<
+		WasteManagementFormInput,
+		undefined,
+		WasteManagementFormValues
+	>({
 		resolver: zodResolver(wasteManagementFormSchema),
 		defaultValues: {
 			name: "",
 			description: "",
-			price: 0,
+			price: "0,00",
+			quantity: "1,00",
 			unit: "KG",
 			wasteType: "RECYCLABLE",
 			subItems: [],
@@ -68,17 +92,28 @@ export default function CompanyWasteManagementScreen() {
 	const wasteType = watch("wasteType");
 
 	const onAddSubItem = () => {
-		const nextSubItem = subItemDraft.trim();
-		if (!nextSubItem) return;
+		const draft = subItemDraft.trim();
+		if (!draft) return;
+
+		const newItems = draft
+			.split(",")
+			.map(item => item.trim())
+			.filter(item => item !== "");
+
+		if (newItems.length === 0) return;
+
 		const currentSubItems = getValues("subItems") ?? [];
-		if (currentSubItems.includes(nextSubItem)) {
-			setSubItemDraft("");
-			return;
+		const uniqueNewItems = newItems.filter(
+			item => !currentSubItems.includes(item),
+		);
+
+		if (uniqueNewItems.length > 0) {
+			setValue("subItems", [...currentSubItems, ...uniqueNewItems], {
+				shouldDirty: true,
+				shouldValidate: true,
+			});
 		}
-		setValue("subItems", [...currentSubItems, nextSubItem], {
-			shouldDirty: true,
-			shouldValidate: true,
-		});
+
 		setSubItemDraft("");
 	};
 
@@ -256,31 +291,31 @@ export default function CompanyWasteManagementScreen() {
 								</FormControlError>
 							) : null}
 						</FormControl>
-
 						<FormControl isInvalid={!!formState.errors.price} className="gap-2">
 							<FormControlLabel>
 								<FormControlLabelText className="text-sm">
-									Preço por unidade
+									Preço
 								</FormControlLabelText>
 							</FormControlLabel>
 							<Controller
 								control={control}
 								name="price"
 								render={({ field: { value, onChange, onBlur } }) => (
-									<Input>
-										<InputField
-											value={mask.formatDecimal(value)}
+									<DecimalInput mode="price">
+										<DecimalInputSlot className="bg-accent p-1 rounded-md">
+											<DecimalInputIcon as={DollarSignIcon} />
+										</DecimalInputSlot>
+										<DecimalInputField
+											value={value}
+											onChangeText={onChange}
 											onBlur={onBlur}
-											onChangeText={text => onChange(mask.parseDecimal(mask.price(text)))}
 											placeholder="0,00"
-											placeholderTextColor="#94a3b8"
-											keyboardType="decimal-pad"
 										/>
-									</Input>
+									</DecimalInput>
 								)}
 							/>
 							<Text className="text-xs text-muted-foreground">
-								Preencha com o valor cobrado para o resíduo selecionado.
+								Informe o valor cobrado pelo serviço.
 							</Text>
 							{formState.errors.price?.message ? (
 								<FormControlError>
@@ -291,40 +326,99 @@ export default function CompanyWasteManagementScreen() {
 								</FormControlError>
 							) : null}
 						</FormControl>
-					</Card>
 
-					<Card className="shadow-none gap-3">
-						<Heading size="sm">Unidade de medida</Heading>
-						<Text className="text-muted-foreground">
-							Escolha a unidade usada para cobrança e controle:{" "}
-							{measurementLabelByValue[unit]}.
-						</Text>
+						<HStack className="gap-2">
+							<FormControl
+								isInvalid={!!formState.errors.quantity}
+								className="gap-2"
+							>
+								<FormControlLabel>
+									<FormControlLabelText className="text-sm">
+										Quantidade
+									</FormControlLabelText>
+								</FormControlLabel>
+								<Controller
+									control={control}
+									name="quantity"
+									render={({ field: { value, onChange, onBlur } }) => (
+										<DecimalInput mode="decimal" className="h-10">
+											<DecimalInputSlot className="bg-accent p-1 rounded-md">
+												<DecimalInputIcon as={HashIcon} />
+											</DecimalInputSlot>
+											<DecimalInputField
+												value={value}
+												onChangeText={onChange}
+												onBlur={onBlur}
+												placeholder="1"
+											/>
+										</DecimalInput>
+									)}
+								/>
+								<Text className="text-xs text-muted-foreground">
+									Defina a quantidade padrão vinculada ao serviço.
+								</Text>
+								{formState.errors.quantity?.message ? (
+									<FormControlError>
+										<FormControlErrorIcon as={AlertCircle} />
+										<FormControlErrorText>
+											{formState.errors.quantity.message}
+										</FormControlErrorText>
+									</FormControlError>
+								) : null}
+							</FormControl>
 
-						<Controller
-							control={control}
-							name="unit"
-							render={({ field: { value, onChange } }) => (
-								<View className="flex-row flex-wrap gap-2">
-									{measurements.map(measurement => {
-										const isSelected = measurement.value === value;
-										return (
-											<Button
-												key={measurement.value}
-												variant={isSelected ? "secondary" : "outline"}
-												size="sm"
-												className="min-w-24"
-												onPress={() => onChange(measurement.value)}
-											>
-												<ButtonText>{measurement.label}</ButtonText>
-											</Button>
-										);
-									})}
-								</View>
-							)}
-						/>
-					</Card>
+							<FormControl className="flex-1 gap-2">
+								<FormControlLabel>
+									<FormControlLabelText className="text-sm">
+										Unidade
+									</FormControlLabelText>
+								</FormControlLabel>
+								<Controller
+									control={control}
+									name="unit"
+									render={({ field: { value, onChange } }) => (
+										<Select selectedValue={value} onValueChange={onChange}>
+											<SelectTrigger>
+												<SelectInput
+													placeholder="Selecione a unidade"
+													className="flex-1"
+												/>
+												<SelectIcon className="mr-3" as={ChevronDownIcon} />
+											</SelectTrigger>
+											<SelectPortal>
+												<SelectBackdrop />
+												<SelectContent>
+													<SelectDragIndicatorWrapper>
+														<SelectDragIndicator />
+													</SelectDragIndicatorWrapper>
+													<ScrollView className="w-full max-h-80">
+														{measurements.length > 0 ? (
+															measurements.map(measurement => (
+																<SelectItem
+																	key={measurement.value}
+																	label={`${measurement.value} (${measurement.label})`}
+																	value={measurement.value}
+																/>
+															))
+														) : (
+															<SelectItem label="Não há dados" value="" />
+														)}
+													</ScrollView>
+												</SelectContent>
+											</SelectPortal>
+										</Select>
+									)}
+								/>
+								{formState.errors.unit?.message ? (
+									<FormControlError>
+										<FormControlErrorText>
+											{formState.errors.unit?.message}
+										</FormControlErrorText>
+									</FormControlError>
+								) : null}
+							</FormControl>
+						</HStack>
 
-					<Card className="shadow-none gap-3">
 						<Heading size="sm">Categoria do resíduo</Heading>
 						<Text className="text-muted-foreground">
 							Vincule o cadastro à categoria que representa o tipo de coleta.
@@ -340,8 +434,8 @@ export default function CompanyWasteManagementScreen() {
 										return (
 											<Button
 												key={wasteType.value}
-												variant={isSelected ? "secondary" : "outline"}
-												className="flex-1"
+												variant={isSelected ? "default" : "outline"}
+												className="flex-1 will-change-variable"
 												onPress={() => onChange(wasteType.value)}
 											>
 												<ButtonText>{wasteType.label}</ButtonText>
@@ -355,9 +449,7 @@ export default function CompanyWasteManagementScreen() {
 						<Text className="text-xs text-muted-foreground">
 							Selecionado: {wasteTypeLabelByValue[wasteType]}.
 						</Text>
-					</Card>
 
-					<Card className="shadow-none gap-4">
 						<View className="gap-2">
 							<Heading size="sm">Materiais vinculados</Heading>
 							<Text className="text-muted-foreground">
@@ -409,14 +501,14 @@ export default function CompanyWasteManagementScreen() {
 					<View className="flex-row gap-2 mt-1">
 						<Button
 							variant="outline"
-							className="flex-1"
+							className="flex-1 will-change-variable"
 							onPress={() => form.reset()}
 							isDisabled={!formState.isDirty || isSavingWastes}
 						>
 							<ButtonText>Limpar</ButtonText>
 						</Button>
 						<Button
-							className="flex-1"
+							className="flex-1 will-change-variable"
 							onPress={handleSubmit(onSubmit)}
 							isDisabled={
 								!formState.isValid || formState.isSubmitting || isSavingWastes
