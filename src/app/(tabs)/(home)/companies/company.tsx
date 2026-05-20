@@ -9,7 +9,7 @@ import {
 	FactoryIcon,
 	Search,
 } from "lucide-react-native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
@@ -284,7 +284,7 @@ export default function CompanyGeneralInfoScreen() {
 					/>
 
 					<Card className="shadow-none gap-3">
-						<FormControl isInvalid={!!errors.identity} className="gap-2">
+						<FormControl isInvalid={!!errors.identity_type} className="gap-2">
 							<FormControlLabel>
 								<FormControlLabelText>Tipo de identidade</FormControlLabelText>
 							</FormControlLabel>
@@ -313,7 +313,7 @@ export default function CompanyGeneralInfoScreen() {
 							<FormControlError>
 								<FormControlErrorIcon as={AlertCircle} className="size-4" />
 								<FormControlErrorText>
-									{errors.identity?.message}
+									{errors.identity_type?.message}
 								</FormControlErrorText>
 							</FormControlError>
 						</FormControl>
