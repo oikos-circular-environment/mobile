@@ -795,6 +795,8 @@ export type GetV1CompaniesWastesResponses = {
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
+			quantity: number;
+			observations?: string | null;
 			sub_items: Array<string> | null;
 			id: string;
 			created_at: Date;
@@ -814,6 +816,8 @@ export type PutV1CompaniesWastesData = {
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
+			quantity: number;
+			observations?: string | null;
 			sub_items?: Array<string> | null;
 		}>;
 	};
@@ -863,6 +867,8 @@ export type PutV1CompaniesWastesResponses = {
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
+			quantity: number;
+			observations?: string | null;
 			sub_items: Array<string> | null;
 			id: string;
 			created_at: Date;
@@ -914,9 +920,9 @@ export type GetV1CompaniesServicesResponses = {
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
-			sub_items: Array<string> | null;
 			quantity: number;
 			observations?: string | null;
+			sub_items: Array<string> | null;
 			id: string;
 			created_at: Date;
 			updated_at: Date;
@@ -935,9 +941,9 @@ export type PutV1CompaniesServicesData = {
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
-			sub_items?: Array<string> | null;
 			quantity: number;
 			observations?: string | null;
+			sub_items?: Array<string> | null;
 		}>;
 	};
 	path?: never;
@@ -986,9 +992,9 @@ export type PutV1CompaniesServicesResponses = {
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
-			sub_items: Array<string> | null;
 			quantity: number;
 			observations?: string | null;
+			sub_items: Array<string> | null;
 			id: string;
 			created_at: Date;
 			updated_at: Date;

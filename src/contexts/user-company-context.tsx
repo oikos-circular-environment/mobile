@@ -33,12 +33,12 @@ import {
 	putV1CompaniesWastes,
 } from "@/libs/oikos-sdk";
 
-type Company = NonNullable<GetV1CompaniesResponse["company"]>;
-type Address = GetV1CompaniesAddressesResponse["address"];
-type BusinessHour =
+export type Company = NonNullable<GetV1CompaniesResponse["company"]>;
+export type Address = GetV1CompaniesAddressesResponse["address"];
+export type BusinessHour =
 	GetV1CompaniesBusinessHoursResponse["business_hours"][number];
-type Service = GetV1CompaniesServicesResponse["services"][number];
-type Waste = GetV1CompaniesWastesResponse["wastes"][number];
+export type Service = GetV1CompaniesServicesResponse["services"][number];
+export type Waste = GetV1CompaniesWastesResponse["wastes"][number];
 
 type CompanyPayload = PostV1CompaniesData["body"];
 type AddressPayload = PutV1CompaniesAddressesData["body"];

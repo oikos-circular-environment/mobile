@@ -48,13 +48,13 @@ const companyOptions: CompanySetting[] = [
 		title: "Serviços",
 		description: "Descreva os serviços que sua empresa oferece ao publico.",
 		icon: WrenchIcon,
-		href: "/(tabs)/(home)/companies/services",
+		href: "/(tabs)/(home)/companies/services/",
 	},
 	{
 		title: "Gestão de resíduos",
 		description: "Configure como sua empresa lida com os tipos de resíduos.",
 		icon: RecycleIcon,
-		href: "/(tabs)/(home)/companies/waste",
+		href: "/(tabs)/(home)/companies/waste/",
 	},
 ];
 

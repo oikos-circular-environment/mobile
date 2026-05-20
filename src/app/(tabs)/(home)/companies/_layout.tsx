@@ -52,7 +52,7 @@ export default function CompaniesLayout() {
 				}}
 			/>
 			<Stack.Screen
-				name="waste-management"
+				name="waste"
 				options={{
 					title: "Gestão de resíduos",
 					headerShown: true,
