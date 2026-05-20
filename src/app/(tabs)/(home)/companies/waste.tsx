@@ -10,7 +10,6 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
-import { WasteListSkeleton } from "@/components/companies/skeletons";
 import {
 	type WasteManagementFormInput,
 	type WasteManagementFormValues,
@@ -191,34 +190,6 @@ export default function CompanyWasteManagementScreen() {
 							seu perfil e facilitar o entendimento dos materiais aceitos.
 						</Text>
 					</Card>
-
-					{isLoadingWastes ? (
-						<WasteListSkeleton />
-					) : wastes && wastes.length > 0 ? (
-						<Card className="shadow-none gap-3">
-							<Heading size="sm">Resíduos cadastrados</Heading>
-							{wastes.map(waste => (
-								<View
-									key={waste.id}
-									className="flex-row items-center justify-between gap-3"
-								>
-									<View className="flex-1">
-										<Text className="font-semibold">{waste.name}</Text>
-										<Text className="text-sm text-muted-foreground">
-											R$ {waste.price} / {waste.unit}
-										</Text>
-									</View>
-									<Pressable
-										onPress={() => handleRemoveWaste(waste.id)}
-										disabled={isSavingWastes}
-										className="p-1"
-									>
-										<X size={18} className="text-muted-foreground" />
-									</Pressable>
-								</View>
-							))}
-						</Card>
-					) : null}
 
 					<Card className="shadow-none gap-4">
 						<Heading size="sm">Informações principais</Heading>

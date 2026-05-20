@@ -21,7 +21,6 @@ import {
 	type ServiceFormValues,
 	serviceFormSchema,
 } from "@/components/companies/services/services-form-schema";
-import { ServicesListSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -186,34 +185,6 @@ export default function CompanyServicesScreen() {
 							resíduos aceitos para deixar a oferta mais clara para clientes.
 						</Text>
 					</Card>
-
-					{isLoadingServices ? (
-						<ServicesListSkeleton />
-					) : services && services.length > 0 ? (
-						<Card className="shadow-none gap-3">
-							<Heading size="sm">Serviços cadastrados</Heading>
-							{services.map(service => (
-								<View
-									key={service.id}
-									className="flex-row items-center justify-between gap-3"
-								>
-									<View className="flex-1">
-										<Text className="font-semibold">{service.name}</Text>
-										<Text className="text-sm text-muted-foreground">
-											R$ {service.price} / {service.unit}
-										</Text>
-									</View>
-									<Pressable
-										onPress={() => handleRemoveService(service.id)}
-										disabled={isSavingServices}
-										className="p-1"
-									>
-										<X size={18} className="text-muted-foreground" />
-									</Pressable>
-								</View>
-							))}
-						</Card>
-					) : null}
 
 					<Card className="shadow-none gap-4">
 						<Heading size="sm">Informações principais</Heading>

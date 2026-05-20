@@ -4,8 +4,8 @@ import {
 	ArrowRightIcon,
 	Clock3Icon,
 	FactoryIcon,
-	type LucideIcon,
 	LockKeyholeIcon,
+	type LucideIcon,
 	MapPinIcon,
 	RecycleIcon,
 	SettingsIcon,
@@ -54,7 +54,7 @@ const companyOptions: CompanySetting[] = [
 		title: "Gestão de resíduos",
 		description: "Configure como sua empresa lida com os tipos de resíduos.",
 		icon: RecycleIcon,
-		href: "/(tabs)/(home)/companies/waste-management",
+		href: "/(tabs)/(home)/companies/waste",
 	},
 ];
 
@@ -119,7 +119,9 @@ export default function CompaniesHomeScreen() {
 											<option.icon
 												size={28}
 												strokeWidth={1.5}
-												className={isLocked ? "text-muted-foreground" : undefined}
+												className={
+													isLocked ? "text-muted-foreground" : undefined
+												}
 											/>
 										</View>
 
@@ -135,7 +137,10 @@ export default function CompaniesHomeScreen() {
 										</View>
 
 										{isLocked ? (
-											<LockKeyholeIcon size={18} className="text-muted-foreground" />
+											<LockKeyholeIcon
+												size={18}
+												className="text-muted-foreground"
+											/>
 										) : (
 											<ArrowRightIcon size={18} />
 										)}
