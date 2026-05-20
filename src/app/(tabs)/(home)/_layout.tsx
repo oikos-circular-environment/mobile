@@ -38,10 +38,6 @@ export default function HomeStackLayout() {
 				options={{ title: "Empresa", headerShown: false }}
 			/>
 			<Stack.Screen
-				name="collectors"
-				options={{ title: "Para coletores", headerShown: false }}
-			/>
-			<Stack.Screen
 				name="sponsors"
 				options={{ title: "Patrocinadores", headerShown: false }}
 			/>

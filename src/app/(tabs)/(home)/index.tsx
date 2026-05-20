@@ -120,7 +120,7 @@ export default function HomeScreen() {
 				)}
 
 				<View className="flex flex-col gap-4">
-					<Heading>Pontos de coleta</Heading>
+					<Heading>Pontos de coleta próximo a você</Heading>
 					{marketCompanies.map(company => (
 						<Card
 							key={company.id}
