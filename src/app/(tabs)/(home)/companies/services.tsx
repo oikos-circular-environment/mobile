@@ -84,17 +84,28 @@ export default function CompanyServicesScreen() {
 	const subItems = watch("subItems") ?? [];
 
 	const onAddSubItem = () => {
-		const nextSubItem = subItemDraft.trim();
-		if (!nextSubItem) return;
+		const draft = subItemDraft.trim();
+		if (!draft) return;
+
+		const newItems = draft
+			.split(",")
+			.map(item => item.trim())
+			.filter(item => item !== "");
+
+		if (newItems.length === 0) return;
+
 		const currentSubItems = getValues("subItems") ?? [];
-		if (currentSubItems.includes(nextSubItem)) {
-			setSubItemDraft("");
-			return;
+		const uniqueNewItems = newItems.filter(
+			item => !currentSubItems.includes(item),
+		);
+
+		if (uniqueNewItems.length > 0) {
+			setValue("subItems", [...currentSubItems, ...uniqueNewItems], {
+				shouldDirty: true,
+				shouldValidate: true,
+			});
 		}
-		setValue("subItems", [...currentSubItems, nextSubItem], {
-			shouldDirty: true,
-			shouldValidate: true,
-		});
+
 		setSubItemDraft("");
 	};
 
@@ -441,13 +452,16 @@ export default function CompanyServicesScreen() {
 							) : null}
 						</FormControl>
 
-						<Heading size="sm">Unidade e categoria</Heading>
-						<Text className="text-muted-foreground">
-							O serviço pode ser vinculado a um tipo de resíduo para orientar a
-							oferta de coleta.
+						<Heading size="sm">Categoria de resíduo</Heading>
+						<Text className="text-muted-foreground text-justify">
+							Este campo refere-se à reciclabilidade efetiva do serviço. Mesmo
+							que um resíduo (como o RCC) seja classificado como reciclável por
+							norma, limitações logísticas, falta de infraestrutura municipal ou
+							de recursos para processamento podem impedir que ele seja
+							reaproveitado. Se o destino final for inevitavelmente o aterro, o
+							resíduo perde seu caráter reciclável na prática.
 						</Text>
 						<View className="gap-2">
-							<Text className="text-sm font-medium">Categoria de resíduo</Text>
 							<Controller
 								control={control}
 								name="wasteType"
@@ -459,7 +473,7 @@ export default function CompanyServicesScreen() {
 												<Button
 													key={wasteType.value}
 													variant={isSelected ? "default" : "outline"}
-													className="flex-1"
+													className="flex-1 will-change-variable"
 													onPress={() => onChange(wasteType.value)}
 												>
 													<ButtonText>{wasteType.label}</ButtonText>
@@ -475,7 +489,9 @@ export default function CompanyServicesScreen() {
 							<Heading size="sm">Materiais vinculados</Heading>
 							<Text className="text-muted-foreground">
 								Adicione os materiais aceitos por este serviço. Eles ajudam a
-								explicar o escopo da coleta.
+								explicar o escopo da coleta. Caso haja mais de um item, separe
+								por virgola, exemplo: gesso, concreto, torneiras de alumínio,
+								madeira.
 							</Text>
 						</View>
 
@@ -484,7 +500,7 @@ export default function CompanyServicesScreen() {
 								<InputField
 									value={subItemDraft}
 									onChangeText={setSubItemDraft}
-									placeholder="Ex.: concreto"
+									placeholder="Ex.: concreto, madeira, gesso"
 									placeholderTextColor="#94a3b8"
 									returnKeyType="done"
 									onSubmitEditing={onAddSubItem}
@@ -521,14 +537,14 @@ export default function CompanyServicesScreen() {
 						<View className="flex-row gap-2 mt-1">
 							<Button
 								variant="outline"
-								className="flex-1"
+								className="flex-1 will-change-variable"
 								onPress={() => form.reset()}
 								isDisabled={!formState.isDirty || isSavingServices}
 							>
 								<ButtonText>Cancelar</ButtonText>
 							</Button>
 							<Button
-								className="flex-1"
+								className="flex-1 will-change-variable"
 								onPress={handleSubmit(onSubmit)}
 								isDisabled={
 									!formState.isValid ||

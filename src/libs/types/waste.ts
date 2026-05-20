@@ -7,7 +7,7 @@ export type WasteType = "RECYCLABLE" | "GARBAGE";
 
 export const wasteTypes: ValueMapping<WasteType>[] = [
 	{ value: "RECYCLABLE", label: "Reciclável" },
-	{ value: "GARBAGE", label: "Resíduo" },
+	{ value: "GARBAGE", label: "Não Reciclável" },
 ];
 
 export type Waste = Item;
