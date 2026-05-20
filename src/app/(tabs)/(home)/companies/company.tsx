@@ -2,7 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { format, parse, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AlertCircle, Search } from "lucide-react-native";
+import {
+	AlertCircle,
+	Check,
+	ChevronDown,
+	FactoryIcon,
+	Search,
+} from "lucide-react-native";
 import { useEffect } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
@@ -11,6 +17,12 @@ import { CompanyFormSkeleton } from "@/components/companies/skeletons";
 import { toast } from "@/components/toast";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+	Checkbox,
+	CheckboxIcon,
+	CheckboxIndicator,
+	CheckboxLabel,
+} from "@/components/ui/checkbox";
 import {
 	FormControl,
 	FormControlError,
@@ -21,46 +33,79 @@ import {
 	FormControlLabel,
 	FormControlLabelText,
 } from "@/components/ui/form-control";
+import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import {
+	Select,
+	SelectBackdrop,
+	SelectContent,
+	SelectDragIndicator,
+	SelectDragIndicatorWrapper,
+	SelectIcon,
+	SelectInput,
+	SelectItem,
+	SelectPortal,
+	SelectTrigger,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
+import { useAuthContext } from "@/contexts/auth-context";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { getCnpj } from "@/libs/brasil-api-sdk";
-import { mask } from "@/libs/mask";
+import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
+import { identityTypeOptions } from "@/libs/types/companies";
 
-const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
-const phoneRegex = /^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/;
-
-const companySchema = z.object({
-	identity: z
-		.string()
-		.min(1, "Documento é obrigatório")
-		.regex(cnpjRegex, "CNPJ deve estar no formato: 00.000.000/0000-00"),
-	corporateName: z.string().min(1, "Razão social é obrigatória"),
-	businessName: z.string().min(1, "Nome fantasia é obrigatório"),
-	email: z.email("E-mail deve ser válido"),
-	phones: z
-		.union([z.array(z.string()), z.null()])
-		.optional()
-		.refine(
-			v => !v?.length || phoneRegex.test(v[0] || ""),
-			"Telefone deve estar no formato: (00) 0 0000-0000",
-		),
-	startedActivityIn: z
-		.date()
-		.refine(d => d <= new Date(), "Data não pode ser no futuro"),
-	companyType: z
-		.enum(["ONG", "COMPANY", "GOVERNMENT", "COLLECTOR"])
-		.default("COMPANY"),
-	identityType: z.enum(["CPF", "CNPJ"]).default("CNPJ"),
-	status: z.boolean(),
-	isHeadquarters: z.boolean(),
-	acceptAppointments: z.boolean(),
-});
+const companySchema = z
+	.object({
+		identity: z.string().min(1, "Documento é obrigatório"),
+		corporate_name: z.string().min(1, "Razão social é obrigatória"),
+		business_name: z.string().nullable(),
+		email: z.string().email("E-mail deve ser válido"),
+		phones: z
+			.union([z.array(z.string()), z.null()])
+			.optional()
+			.refine(
+				v => !v?.length || phoneRegex.test(v[0] || ""),
+				"Telefone deve estar no formato: (00) 0 0000-0000",
+			),
+		started_activity_in: z
+			.date()
+			.nullable()
+			.refine(d => !d || d <= new Date(), "Data não pode ser no futuro"),
+		company_type: z
+			.enum(["ONG", "COMPANY", "GOVERNMENT", "COLLECTOR"])
+			.default("COMPANY"),
+		identity_type: z.enum(["CPF", "CNPJ"]).default("CNPJ"),
+		status: z.boolean(),
+		isHeadquarters: z.boolean(),
+		accept_appointments: z.boolean(),
+		useProfileData: z.boolean().default(false),
+	})
+	.superRefine((data, ctx) => {
+		if (data.identity_type === "CNPJ") {
+			if (!cnpjRegex.test(data.identity)) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: "CNPJ deve estar no formato: 00.000.000/0000-00",
+					path: ["identity"],
+				});
+			}
+		} else if (data.identity_type === "CPF") {
+			if (!cpfRegex.test(data.identity)) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: "CPF deve estar no formato: 000.000.000-00",
+					path: ["identity"],
+				});
+			}
+		}
+	});
 
 type CompanyFormData = z.infer<typeof companySchema>;
 
 export default function CompanyGeneralInfoScreen() {
+	const { user } = useAuthContext();
 	const { company, isLoadingCompany, saveCompany, isSavingCompany } =
 		useUserCompanyContext();
 
@@ -69,23 +114,28 @@ export default function CompanyGeneralInfoScreen() {
 		handleSubmit,
 		reset,
 		setValue,
+		watch,
 		formState: { errors, isDirty },
 	} = useForm({
 		resolver: zodResolver(companySchema),
 		defaultValues: {
 			identity: "",
-			corporateName: "",
-			businessName: "",
+			corporate_name: "",
+			business_name: "",
 			email: "",
 			phones: [""],
-			startedActivityIn: new Date(),
-			companyType: "COMPANY" as const,
-			identityType: "CNPJ" as const,
+			started_activity_in: new Date(),
+			company_type: "COMPANY" as const,
+			identity_type: "CNPJ" as const,
 			status: true,
 			isHeadquarters: true,
-			acceptAppointments: false,
+			accept_appointments: false,
+			useProfileData: false,
 		},
 	});
+
+	const identity_type = watch("identity_type");
+	const useProfileData = watch("useProfileData");
 
 	const getCnpjMutation = useMutation({
 		mutationKey: ["get", "cnpj", "brasil-api"],
@@ -95,14 +145,14 @@ export default function CompanyGeneralInfoScreen() {
 		},
 		onSuccess: data => {
 			if (!data) return;
-			if (data.razao_social) setValue("corporateName", data.razao_social);
-			if (data.nome_fantasia) setValue("businessName", data.nome_fantasia);
+			if (data.razao_social) setValue("corporate_name", data.razao_social);
+			if (data.nome_fantasia) setValue("business_name", data.nome_fantasia);
 			if (data.email) setValue("email", data.email);
 			if (data.ddd_telefone_1) {
 				setValue("phones", [mask.phoneBr(data.ddd_telefone_1)]);
 			}
 			if (data.data_inicio_atividade) {
-				setValue("startedActivityIn", parseISO(data.data_inicio_atividade));
+				setValue("started_activity_in", parseISO(data.data_inicio_atividade));
 			}
 		},
 		onError: () => {
@@ -114,6 +164,7 @@ export default function CompanyGeneralInfoScreen() {
 	});
 
 	const onPressSearchCnpj = () => {
+		if (identity_type !== "CNPJ") return;
 		const digits = (control._formValues.identity as string).replace(/\D/g, "");
 		if (digits.length !== 14) {
 			toast.error("CNPJ inválido", "O CNPJ deve conter 14 dígitos.");
@@ -126,38 +177,53 @@ export default function CompanyGeneralInfoScreen() {
 		if (company) {
 			reset({
 				identity: company.identity,
-				corporateName: company.corporate_name,
-				businessName: company.business_name ?? "",
+				corporate_name: company.corporate_name,
+				business_name: company.business_name ?? "",
 				email: company.email ?? "",
 				phones: company.phones ?? [""],
-				startedActivityIn: new Date(company.started_activity_in),
-				companyType: company.company_type,
-				identityType: company.identity_type,
+				started_activity_in: company.started_activity_in
+					? new Date(company.started_activity_in)
+					: null,
+				company_type: company.company_type,
+				identity_type: company.identity_type,
 				status: company.status,
 				isHeadquarters: company.is_headquarters,
-				acceptAppointments: company.accept_appointments,
+				accept_appointments: company.accept_appointments,
+				useProfileData: false,
 			});
 		}
 	}, [company, reset]);
 
-	const handleFormSubmit: SubmitHandler<CompanyFormData> = async data => {
-		try {
-			await saveCompany({
-				identity: data.identity,
-				identity_type: data.identityType,
-				corporate_name: data.corporateName,
-				business_name: data.businessName || null,
-				email: data.email || null,
-				phones: data.phones ?? [],
-				started_activity_in: data.startedActivityIn,
-				company_type: data.companyType,
-				status: data.status,
-				is_headquarters: data.isHeadquarters,
-				accept_appointments: data.acceptAppointments,
-			});
-		} catch {
-			// handled by context mutation's onError
+	useEffect(() => {
+		if (useProfileData && user?.profile) {
+			setValue("identity_type", "CPF");
+			setValue("identity", mask.cpf(user.profile.cpf));
+			setValue("corporate_name", user.profile.full_name);
+			setValue("business_name", user.profile.full_name);
+			if (user.profile.phone) {
+				setValue("phones", [mask.phoneBr(user.profile.phone)]);
+			}
 		}
+	}, [useProfileData, user, setValue]);
+
+	const handleFormSubmit: SubmitHandler<CompanyFormData> = async data => {
+		const corporate_name = data.corporate_name;
+		const business_name =
+			data.identity_type === "CPF" ? data.corporate_name : data.business_name;
+
+		await saveCompany({
+			identity: data.identity,
+			identity_type: data.identity_type,
+			corporate_name: corporate_name,
+			business_name: business_name || null,
+			email: data.email || null,
+			phones: data.phones ?? [],
+			started_activity_in: data.started_activity_in,
+			company_type: data.company_type,
+			status: data.status,
+			is_headquarters: data.isHeadquarters,
+			accept_appointments: data.accept_appointments,
+		});
 	};
 
 	if (isLoadingCompany) {
@@ -171,11 +237,92 @@ export default function CompanyGeneralInfoScreen() {
 				contentContainerClassName="p-4 pb-8"
 			>
 				<View className="gap-4">
+					<Card className="bg-secondary shadow-none">
+						<View className="flex-row items-center justify-between gap-4">
+							<View className="size-15 items-center justify-center rounded-lg bg-primary">
+								<FactoryIcon color="white" size={20} />
+							</View>
+							<View className="flex-1 gap-1">
+								<Heading className="text-lg">Empresas</Heading>
+								<Text className="text-sm ">
+									Estes dados serão expostos na plataforma, o preenchimento com
+									informações reais trazem mais confiabilidade para os usuários
+									da plataforma.
+								</Text>
+							</View>
+						</View>
+					</Card>
+
+					<Controller
+						control={control}
+						name="useProfileData"
+						render={({ field: { value, onChange } }) => (
+							<Card className="shadow-none">
+								<FormControl>
+									<Checkbox
+										value="useProfile"
+										id="use-profile"
+										isChecked={value}
+										onChange={onChange}
+									>
+										<CheckboxIndicator>
+											<CheckboxIcon as={Check} />
+										</CheckboxIndicator>
+										<CheckboxLabel className="flex-1">
+											Utilizar os dados do meu perfil
+										</CheckboxLabel>
+									</Checkbox>
+									<FormControlHelper className="ml-7">
+										<FormControlHelperText>
+											O seu CPF não será exposto publicamente. Garantimos a
+											privacidade dos seus dados pessoais.
+										</FormControlHelperText>
+									</FormControlHelper>
+								</FormControl>
+							</Card>
+						)}
+					/>
+
 					<Card className="shadow-none gap-3">
 						<FormControl isInvalid={!!errors.identity} className="gap-2">
 							<FormControlLabel>
-								<FormControlLabelText>CNPJ</FormControlLabelText>
+								<FormControlLabelText>Tipo de identidade</FormControlLabelText>
 							</FormControlLabel>
+							<Controller
+								control={control}
+								name="identity_type"
+								render={({ field: { value, onChange } }) => (
+									<View className="flex-row gap-2">
+										{identityTypeOptions.map(identity_type => {
+											const isSelected = identity_type.value === value;
+											return (
+												<Button
+													key={identity_type.value}
+													variant={isSelected ? "default" : "outline"}
+													className="flex-1 will-change-variable"
+													onPress={() => onChange(identity_type.value)}
+												>
+													<ButtonText>{identity_type.label}</ButtonText>
+												</Button>
+											);
+										})}
+									</View>
+								)}
+							/>
+
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.identity?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
+
+						<FormControl isInvalid={!!errors.identity} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>Identidade</FormControlLabelText>
+							</FormControlLabel>
+
 							<Controller
 								control={control}
 								name="identity"
@@ -184,15 +331,28 @@ export default function CompanyGeneralInfoScreen() {
 										<InputField
 											value={value}
 											onBlur={onBlur}
-											onChangeText={text => onChange(mask.cnpj(text))}
+											onChangeText={text =>
+												onChange(
+													identity_type === "CNPJ"
+														? mask.cnpj(text)
+														: mask.cpf(text),
+												)
+											}
 											keyboardType="number-pad"
-											placeholder="00.000.000/0000-00"
+											placeholder={
+												identity_type === "CNPJ"
+													? "00.000.000/0000-00"
+													: "000.000.000-00"
+											}
 										/>
-										<InputSlot className="pr-3" onPress={onPressSearchCnpj}>
-											<InputIcon
-												as={getCnpjMutation.isPending ? Spinner : Search}
-											/>
-										</InputSlot>
+
+										{identity_type === "CNPJ" && (
+											<InputSlot className="pr-3" onPress={onPressSearchCnpj}>
+												<InputIcon
+													as={getCnpjMutation.isPending ? Spinner : Search}
+												/>
+											</InputSlot>
+										)}
 									</Input>
 								)}
 							/>
@@ -204,20 +364,65 @@ export default function CompanyGeneralInfoScreen() {
 							</FormControlError>
 						</FormControl>
 
-						<FormControl isInvalid={!!errors.corporateName} className="gap-2">
+						<FormControl isInvalid={!!errors.company_type} className="gap-2">
 							<FormControlLabel>
-								<FormControlLabelText>Razão Social</FormControlLabelText>
+								<FormControlLabelText>Tipo de Empresa</FormControlLabelText>
 							</FormControlLabel>
 							<Controller
 								control={control}
-								name="corporateName"
+								name="company_type"
+								render={({ field: { value, onChange } }) => (
+									<Select onValueChange={onChange} selectedValue={value}>
+										<SelectTrigger
+											variant="outline"
+											size="md"
+											className="justify-between"
+										>
+											<SelectInput placeholder="Selecione o tipo" />
+											<SelectIcon className="mr-3" as={ChevronDown} />
+										</SelectTrigger>
+										<SelectPortal>
+											<SelectBackdrop />
+											<SelectContent>
+												<SelectDragIndicatorWrapper>
+													<SelectDragIndicator />
+												</SelectDragIndicatorWrapper>
+												<SelectItem label="Empresa" value="COMPANY" />
+												<SelectItem label="ONG" value="ONG" />
+												<SelectItem label="Governo" value="GOVERNMENT" />
+												<SelectItem label="Coletor" value="COLLECTOR" />
+											</SelectContent>
+										</SelectPortal>
+									</Select>
+								)}
+							/>
+						</FormControl>
+
+						<FormControl isInvalid={!!errors.corporate_name} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>
+									{identity_type === "CNPJ" ? "Razão Social" : "Nome Completo"}
+								</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="corporate_name"
 								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
 											value={value}
 											onBlur={onBlur}
-											onChangeText={onChange}
-											placeholder="Nome completo da empresa"
+											onChangeText={text => {
+												onChange(text);
+												if (identity_type === "CPF") {
+													setValue("business_name", text);
+												}
+											}}
+											placeholder={
+												identity_type === "CNPJ"
+													? "Nome completo da empresa"
+													: "Seu nome completo"
+											}
 										/>
 									</Input>
 								)}
@@ -225,36 +430,38 @@ export default function CompanyGeneralInfoScreen() {
 							<FormControlError>
 								<FormControlErrorIcon as={AlertCircle} className="size-4" />
 								<FormControlErrorText>
-									{errors.corporateName?.message}
+									{errors.corporate_name?.message}
 								</FormControlErrorText>
 							</FormControlError>
 						</FormControl>
 
-						<FormControl isInvalid={!!errors.businessName} className="gap-2">
-							<FormControlLabel>
-								<FormControlLabelText>Nome Fantasia</FormControlLabelText>
-							</FormControlLabel>
-							<Controller
-								control={control}
-								name="businessName"
-								render={({ field: { value, onChange, onBlur } }) => (
-									<Input>
-										<InputField
-											value={value ?? ""}
-											onBlur={onBlur}
-											onChangeText={onChange}
-											placeholder="Nome fantasia (opcional)"
-										/>
-									</Input>
-								)}
-							/>
-							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
-								<FormControlErrorText>
-									{errors.businessName?.message}
-								</FormControlErrorText>
-							</FormControlError>
-						</FormControl>
+						{identity_type === "CNPJ" && (
+							<FormControl isInvalid={!!errors.business_name} className="gap-2">
+								<FormControlLabel>
+									<FormControlLabelText>Nome Fantasia</FormControlLabelText>
+								</FormControlLabel>
+								<Controller
+									control={control}
+									name="business_name"
+									render={({ field: { value, onChange, onBlur } }) => (
+										<Input>
+											<InputField
+												value={value ?? ""}
+												onBlur={onBlur}
+												onChangeText={onChange}
+												placeholder="Nome fantasia (opcional)"
+											/>
+										</Input>
+									)}
+								/>
+								<FormControlError>
+									<FormControlErrorIcon as={AlertCircle} className="size-4" />
+									<FormControlErrorText>
+										{errors.business_name?.message}
+									</FormControlErrorText>
+								</FormControlError>
+							</FormControl>
+						)}
 
 						<FormControl isInvalid={!!errors.email} className="gap-2">
 							<FormControlLabel>
@@ -314,7 +521,7 @@ export default function CompanyGeneralInfoScreen() {
 						</FormControl>
 
 						<FormControl
-							isInvalid={!!errors.startedActivityIn}
+							isInvalid={!!errors.started_activity_in}
 							className="gap-2"
 						>
 							<FormControlLabel>
@@ -324,11 +531,15 @@ export default function CompanyGeneralInfoScreen() {
 							</FormControlLabel>
 							<Controller
 								control={control}
-								name="startedActivityIn"
+								name="started_activity_in"
 								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
-											value={format(value, "dd/MM/yyyy", { locale: ptBR })}
+											value={
+												value
+													? format(value, "dd/MM/yyyy", { locale: ptBR })
+													: ""
+											}
 											onBlur={onBlur}
 											onChangeText={dateStr => {
 												try {
@@ -359,7 +570,7 @@ export default function CompanyGeneralInfoScreen() {
 							<FormControlError>
 								<FormControlErrorIcon as={AlertCircle} className="size-4" />
 								<FormControlErrorText>
-									{errors.startedActivityIn?.message}
+									{errors.started_activity_in?.message}
 								</FormControlErrorText>
 							</FormControlError>
 						</FormControl>

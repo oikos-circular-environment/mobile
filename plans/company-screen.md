@@ -7,7 +7,7 @@ Conectar o formulário de informações gerais da empresa aos endpoints `getV1Co
 - Formulário completo com `react-hook-form` + `zod`
 - `defaultValues` todos em branco (sem carga de dados reais)
 - `handleFormSubmit` apenas faz `console.log`
-- Campos: `identity`, `corporateName`, `businessName`, `email`, `phones`, `startedActivityIn`, `companyType`, `identityType`, `status`, `isHeadquarters`, `acceptAppointments`
+- Campos: `identity`, `corporate_name`, `business_name`, `email`, `phones`, `started_activity_in`, `company_type`, `identity_type`, `status`, `isHeadquarters`, `accept_appointments`
 
 ## Análise do SDK (shape atualizado)
 
@@ -37,16 +37,16 @@ Retorna: `{ company: {...} | null }`
 | Campo do form        | Campo da API            |
 |----------------------|-------------------------|
 | `identity`           | `identity`              |
-| `identityType`       | `identity_type`         |
-| `corporateName`      | `corporate_name`        |
-| `businessName`       | `business_name`         |
+| `identity_type`       | `identity_type`         |
+| `corporate_name`      | `corporate_name`        |
+| `business_name`       | `business_name`         |
 | `email`              | `email`                 |
 | `phones`             | `phones` (array)        |
-| `startedActivityIn`  | `started_activity_in`   |
-| `companyType`        | `company_type`          |
+| `started_activity_in`  | `started_activity_in`   |
+| `company_type`        | `company_type`          |
 | `status`             | `status`                |
 | `isHeadquarters`     | `is_headquarters`       |
-| `acceptAppointments` | `accept_appointments`   |
+| `accept_appointments` | `accept_appointments`   |
 
 ## Mudanças necessárias
 
@@ -63,16 +63,16 @@ useEffect(() => {
   if (company) {
     reset({
       identity: company.identity,
-      corporateName: company.corporate_name,
-      businessName: company.business_name ?? "",
+      corporate_name: company.corporate_name,
+      business_name: company.business_name ?? "",
       email: company.email ?? "",
       phones: company.phones ?? [""],
-      startedActivityIn: new Date(company.started_activity_in),
-      companyType: company.company_type,
-      identityType: company.identity_type,
+      started_activity_in: new Date(company.started_activity_in),
+      company_type: company.company_type,
+      identity_type: company.identity_type,
       status: company.status,
       isHeadquarters: company.is_headquarters,
-      acceptAppointments: company.accept_appointments,
+      accept_appointments: company.accept_appointments,
     });
   }
 }, [company, reset]);
@@ -83,16 +83,16 @@ useEffect(() => {
 const handleFormSubmit: SubmitHandler<CompanyFormData> = async (data) => {
   await saveCompany({
     identity: data.identity,
-    identity_type: data.identityType,
-    corporate_name: data.corporateName,
-    business_name: data.businessName || null,
+    identity_type: data.identity_type,
+    corporate_name: data.corporate_name,
+    business_name: data.business_name || null,
     email: data.email || null,
     phones: data.phones ?? [],
-    started_activity_in: data.startedActivityIn,
-    company_type: data.companyType,
+    started_activity_in: data.started_activity_in,
+    company_type: data.company_type,
     status: data.status,
     is_headquarters: data.isHeadquarters,
-    accept_appointments: data.acceptAppointments,
+    accept_appointments: data.accept_appointments,
   });
 };
 ```

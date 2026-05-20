@@ -12,11 +12,11 @@ Requer: `{ path: { cnpj: string } }` — aceita com ou sem formatação.
 ### Campos da resposta `Cnpj` relevantes para o formulário
 | Campo API (`Cnpj`)         | Campo do form         | Obs                                                      |
 |----------------------------|-----------------------|----------------------------------------------------------|
-| `razao_social`             | `corporateName`       |                                                          |
-| `nome_fantasia`            | `businessName`        | pode ser `""` ou `undefined`                             |
+| `razao_social`             | `corporate_name`       |                                                          |
+| `nome_fantasia`            | `business_name`        | pode ser `""` ou `undefined`                             |
 | `email`                    | `email`               | pode ser `null`                                          |
 | `ddd_telefone_1`           | `phones[0]`           | formato "XX XXXXX-XXXX" ou "XX XXXX-XXXX" — passar por `mask.phoneBr` após strip |
-| `data_inicio_atividade`    | `startedActivityIn`   | string `"YYYY-MM-DD"` — converter com `parseISO` (date-fns) |
+| `data_inicio_atividade`    | `started_activity_in`   | string `"YYYY-MM-DD"` — converter com `parseISO` (date-fns) |
 
 ### Padrão de referência
 `getCepMutation` em `profile.tsx`:
@@ -54,14 +54,14 @@ const getCnpjMutation = useMutation({
   },
   onSuccess: data => {
     if (!data) return;
-    if (data.razao_social) setValue("corporateName", data.razao_social);
-    if (data.nome_fantasia) setValue("businessName", data.nome_fantasia);
+    if (data.razao_social) setValue("corporate_name", data.razao_social);
+    if (data.nome_fantasia) setValue("business_name", data.nome_fantasia);
     if (data.email) setValue("email", data.email);
     if (data.ddd_telefone_1) {
       setValue("phones", [mask.phoneBr(data.ddd_telefone_1)]);
     }
     if (data.data_inicio_atividade) {
-      setValue("startedActivityIn", parseISO(data.data_inicio_atividade));
+      setValue("started_activity_in", parseISO(data.data_inicio_atividade));
     }
   },
   onError: () => {

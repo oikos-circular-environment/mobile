@@ -47,7 +47,7 @@ Remover = PUT com lista filtrada: `wastes.filter(w => w.id !== id)`.
 | `description` | `description` |
 | `price`       | `price`       |
 | `unit`        | `unit`        |
-| `wasteType`   | `waste_type`  |
+| `waste_type`   | `waste_type`  |
 | `subItems`    | `sub_items`   |
 
 ## Mudanças necessárias
@@ -118,7 +118,7 @@ const onSubmit = async (data: WasteManagementFormValues) => {
         description: data.description.trim() || null,
         price: data.price,
         unit: data.unit,
-        waste_type: data.wasteType,
+        waste_type: data.waste_type,
         sub_items: data.subItems.length > 0 ? data.subItems : null,
       },
     ],

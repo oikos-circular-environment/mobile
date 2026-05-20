@@ -51,7 +51,7 @@ Remover = PUT com lista filtrada: `services.filter(s => s.id !== id)`.
 | `price`          | `price`        |
 | `quantity`       | `quantity`     |
 | `unit`           | `unit`         |
-| `wasteType`      | `waste_type`   |
+| `waste_type`      | `waste_type`   |
 | `subItems`       | `sub_items`    |
 | `observations`   | `observations` |
 
@@ -128,7 +128,7 @@ const onSubmit = async (data: ServiceFormValues) => {
         price: data.price,
         quantity: data.quantity,
         unit: data.unit,
-        waste_type: data.wasteType,
+        waste_type: data.waste_type,
         sub_items: data.subItems.length > 0 ? data.subItems : null,
         observations: data.observations.trim() || null,
       },

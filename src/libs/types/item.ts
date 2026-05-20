@@ -1,5 +1,5 @@
 import type { Measurement } from "./measurement";
-import type { WasteType } from "./waste";
+import type { waste_type } from "./waste";
 
 export type Item = {
 	id: string;
@@ -9,6 +9,6 @@ export type Item = {
 	unit: Measurement;
 	quantity: number;
 	observations: string | null;
-	wasteType: WasteType;
+	waste_type: waste_type;
 	sub_items: string[] | null; // Subitens relacionados ao resíduo, como os materiais que compõem o resíduo
 };

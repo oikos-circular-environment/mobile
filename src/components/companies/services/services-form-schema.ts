@@ -24,7 +24,7 @@ export const serviceFormSchema = z.object({
 		.transform(parseDecimalInput)
 		.pipe(z.number().min(0.001, "Informe uma quantidade maior que zero.")),
 	unit: z.enum(measurementValues),
-	wasteType: z.enum(["RECYCLABLE", "GARBAGE"] as const),
+	waste_type: z.enum(["RECYCLABLE", "GARBAGE"] as const),
 	subItems: z.array(z.string().min(1)).default([]),
 	observations: z
 		.string()

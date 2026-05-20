@@ -14,7 +14,7 @@ const wasteItems: Waste[] = [
 		description: "Lata, aerossol, panelas, garrafas",
 		price: 8,
 		unit: "KG",
-		wasteType: "RECYCLABLE",
+		waste_type: "RECYCLABLE",
 		sub_items: ["lata", "aerossol", "panelas", "garrafas"],
 	},
 	{
@@ -23,7 +23,7 @@ const wasteItems: Waste[] = [
 		description: "Panela de pressão, ferramentas, peças automotivas",
 		price: 0.4,
 		unit: "KG",
-		wasteType: "RECYCLABLE",
+		waste_type: "RECYCLABLE",
 		sub_items: ["panela de pressão", "ferramentas", "peças automotivas"],
 	},
 	{
@@ -32,7 +32,7 @@ const wasteItems: Waste[] = [
 		description: "Fios",
 		price: 40,
 		unit: "KG",
-		wasteType: "RECYCLABLE",
+		waste_type: "RECYCLABLE",
 		sub_items: ["fios"],
 	},
 ];
@@ -47,7 +47,7 @@ const serviceItems: Service[] = [
 		unit: "M2",
 		observations: null,
 		sub_items: ["capina", "retirada de resíduos leves"],
-		wasteType: "GARBAGE",
+		waste_type: "GARBAGE",
 	},
 	{
 		id: "service-jardinagem",
@@ -58,7 +58,7 @@ const serviceItems: Service[] = [
 		unit: "M2",
 		observations: null,
 		sub_items: ["capina", "podas pequenas"],
-		wasteType: "GARBAGE",
+		waste_type: "GARBAGE",
 	},
 ];
 
@@ -108,13 +108,13 @@ export const marketCompaniesMock: Company[] = [
 	{
 		id: "grupo-alemao",
 		identity: "09438591000158",
-		identityType: "CNPJ",
-		companyType: "COMPANY",
+		identity_type: "CNPJ",
+		company_type: "COMPANY",
 		status: true,
 		isHeadquarters: true,
-		businessName: "Sucatão do Alemão Allan Ramos Thurow",
-		corporateName: "Grupo Alemão",
-		acceptAppointments: true,
+		business_name: "Sucatão do Alemão Allan Ramos Thurow",
+		corporate_name: "Grupo Alemão",
+		accept_appointments: true,
 		email: "contato@grupoalemao.com",
 		phones: ["(66) 3427-1510"],
 		address: {
@@ -130,7 +130,7 @@ export const marketCompaniesMock: Company[] = [
 			latitude: -16.482,
 			longitude: -54.65,
 		},
-		startedActivityIn: new Date("2016-02-09"),
+		started_activity_in: new Date("2016-02-09"),
 		businessHours: buildBusinessHours("grupo-alemao", {
 			MONDAY: {
 				is_open: true,
@@ -182,13 +182,13 @@ export const marketCompaniesMock: Company[] = [
 	{
 		id: "sucatao-do-dinao",
 		identity: "26723876000103",
-		identityType: "CNPJ",
-		companyType: "COMPANY",
+		identity_type: "CNPJ",
+		company_type: "COMPANY",
 		status: true,
 		isHeadquarters: true,
-		businessName: "Sucatão do Dinão",
-		corporateName: "Sucatão do Dinão",
-		acceptAppointments: false,
+		business_name: "Sucatão do Dinão",
+		corporate_name: "Sucatão do Dinão",
+		accept_appointments: false,
 		email: "contato@sucataododinao.com",
 		phones: ["(66) 99999-8899"],
 		address: {
@@ -204,7 +204,7 @@ export const marketCompaniesMock: Company[] = [
 			latitude: -16.48,
 			longitude: -54.62,
 		},
-		startedActivityIn: new Date("2018-05-18"),
+		started_activity_in: new Date("2018-05-18"),
 		businessHours: buildBusinessHours("sucatao-do-dinao", {
 			MONDAY: {
 				is_open: true,
@@ -241,13 +241,13 @@ export const marketCompaniesMock: Company[] = [
 	{
 		id: "henrique-flores",
 		identity: "08479942111",
-		identityType: "CPF",
-		companyType: "COLLECTOR",
+		identity_type: "CPF",
+		company_type: "COLLECTOR",
 		status: true,
 		isHeadquarters: true,
-		businessName: "Henrique Flores",
-		corporateName: "Henrique Flores",
-		acceptAppointments: true,
+		business_name: "Henrique Flores",
+		corporate_name: "Henrique Flores",
+		accept_appointments: true,
 		email: "henrique.flores@oikos.com",
 		phones: ["(66) 99666-4444"],
 		address: {
@@ -263,7 +263,7 @@ export const marketCompaniesMock: Company[] = [
 			latitude: -16.47,
 			longitude: -54.64,
 		},
-		startedActivityIn: new Date("2021-03-10"),
+		started_activity_in: new Date("2021-03-10"),
 		businessHours: buildBusinessHours("henrique-flores", {
 			MONDAY: {
 				is_open: true,

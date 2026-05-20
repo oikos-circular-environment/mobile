@@ -1,13 +1,13 @@
+import { useRouter } from "expo-router";
+import { PlusIcon } from "lucide-react-native";
+import { useEffect } from "react";
+import { FlatList, View } from "react-native";
+import { ServiceSkeleton } from "@/components/companies/services/service-skeleton";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
-import { PlusIcon } from "lucide-react-native";
-import { FlatList, View } from "react-native";
-import { useRouter } from "expo-router";
-import { ServiceSkeleton } from "@/components/companies/services/service-skeleton";
-import { useEffect } from "react";
 
 export default function ServicesIndexScreen() {
 	const { services, isLoadingServices } = useUserCompanyContext();
@@ -64,7 +64,11 @@ export default function ServicesIndexScreen() {
 						<View className="flex-1">
 							<Heading size="sm">{item.name}</Heading>
 							{item.description ? (
-								<Text size="sm" className="text-muted-foreground" numberOfLines={2}>
+								<Text
+									size="sm"
+									className="text-muted-foreground"
+									numberOfLines={2}
+								>
 									{item.description}
 								</Text>
 							) : null}
@@ -76,7 +80,7 @@ export default function ServicesIndexScreen() {
 							}).format(item.price)}
 						</Text>
 					</View>
-					
+
 					<View className="flex-row flex-wrap gap-2 mt-2">
 						<View className="bg-secondary/50 px-2 py-1 rounded-md">
 							<Text className="text-xs text-secondary-700">
@@ -102,7 +106,9 @@ export default function ServicesIndexScreen() {
 			)}
 			ListEmptyComponent={
 				<View className="items-center justify-center py-8">
-					<Text className="text-muted-foreground">Nenhum serviço cadastrado.</Text>
+					<Text className="text-muted-foreground">
+						Nenhum serviço cadastrado.
+					</Text>
 				</View>
 			}
 		/>

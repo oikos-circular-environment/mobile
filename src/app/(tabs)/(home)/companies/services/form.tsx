@@ -56,7 +56,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { measurements } from "@/libs/types/measurement";
-import { wasteTypes } from "@/libs/types/waste";
+import { waste_types } from "@/libs/types/waste";
 
 export default function ServiceFormScreen() {
 	const router = useRouter();
@@ -74,7 +74,7 @@ export default function ServiceFormScreen() {
 			price: initialData?.price ?? "0,00",
 			quantity: initialData?.quantity ?? "1,00",
 			unit: initialData?.unit ?? "KG",
-			wasteType: initialData?.waste_type ?? "RECYCLABLE",
+			waste_type: initialData?.waste_type ?? "RECYCLABLE",
 			subItems: initialData?.sub_items ?? [],
 			observations: initialData?.observations ?? "",
 		},
@@ -126,7 +126,7 @@ export default function ServiceFormScreen() {
 			price: data.price,
 			quantity: data.quantity,
 			unit: data.unit,
-			waste_type: data.wasteType,
+			waste_type: data.waste_type,
 			sub_items: data.subItems.length > 0 ? data.subItems : null,
 			observations: data.observations.trim() || null,
 		};
@@ -407,19 +407,19 @@ export default function ServiceFormScreen() {
 					<Heading size="sm">Categoria de resíduo</Heading>
 					<Controller
 						control={control}
-						name="wasteType"
+						name="waste_type"
 						render={({ field: { value, onChange } }) => (
 							<View className="flex-row gap-2">
-								{wasteTypes.map(wasteType => {
-									const isSelected = wasteType.value === value;
+								{waste_types.map(waste_type => {
+									const isSelected = waste_type.value === value;
 									return (
 										<Button
-											key={wasteType.value}
+											key={waste_type.value}
 											variant={isSelected ? "default" : "outline"}
 											className="flex-1 will-change-variable"
-											onPress={() => onChange(wasteType.value)}
+											onPress={() => onChange(waste_type.value)}
 										>
-											<ButtonText>{wasteType.label}</ButtonText>
+											<ButtonText>{waste_type.label}</ButtonText>
 										</Button>
 									);
 								})}

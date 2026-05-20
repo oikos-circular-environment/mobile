@@ -132,7 +132,7 @@ export default function HomeScreen() {
 								</Card>
 
 								<View className="flex flex-col flex-1">
-									<Heading numberOfLines={1}>{company.corporateName}</Heading>
+									<Heading numberOfLines={1}>{company.corporate_name}</Heading>
 									<Text numberOfLines={2}>
 										{company.address?.street}, {company.address?.number},{" "}
 										{company.address?.district}

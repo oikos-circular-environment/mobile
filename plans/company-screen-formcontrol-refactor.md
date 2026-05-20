@@ -31,19 +31,19 @@ O `Controller` deve gerenciar **apenas** o componente interativo que precisa de 
 | Campo             | Situação atual                              | Ação                                   |
 |-------------------|---------------------------------------------|----------------------------------------|
 | `identity`        | Correto (FormControl fora, Controller no Input) | Nenhuma                            |
-| `corporateName`   | Controller envolve FormControl inteiro      | Extrair FormControl para fora do Controller |
-| `businessName`    | Controller envolve FormControl inteiro      | Extrair FormControl para fora do Controller |
+| `corporate_name`   | Controller envolve FormControl inteiro      | Extrair FormControl para fora do Controller |
+| `business_name`    | Controller envolve FormControl inteiro      | Extrair FormControl para fora do Controller |
 | `email`           | Controller envolve FormControl inteiro      | Extrair FormControl para fora do Controller |
 | `phones`          | Controller envolve FormControl inteiro      | Extrair FormControl para fora do Controller |
-| `startedActivityIn` | Controller envolve FormControl inteiro    | Extrair FormControl para fora do Controller |
+| `started_activity_in` | Controller envolve FormControl inteiro    | Extrair FormControl para fora do Controller |
 
 ## Mudanças por campo
 
-### corporateName
-- Mover `<FormControl isInvalid={!!errors.corporateName}>` para fora do Controller
+### corporate_name
+- Mover `<FormControl isInvalid={!!errors.corporate_name}>` para fora do Controller
 - Controller envolve apenas `<Input><InputField .../></Input>`
 
-### businessName
+### business_name
 - Mesmo padrão acima
 
 ### email
@@ -53,7 +53,7 @@ O `Controller` deve gerenciar **apenas** o componente interativo que precisa de 
 - Mesmo padrão acima
 - `onChangeText` mantém a lógica: `v => onChange(v.length ? [v] : null)`
 
-### startedActivityIn
+### started_activity_in
 - Mesmo padrão acima
 - `onChangeText` mantém o parse de data
 - `FormControlHelper` fica como irmão do Controller (não dentro do render prop)
