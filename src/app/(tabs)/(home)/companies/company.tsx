@@ -54,7 +54,10 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { getCnpj } from "@/libs/brasil-api-sdk";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
-import { identityTypeOptions } from "@/libs/types/companies";
+import {
+	companyTypeOptions,
+	identityTypeOptions,
+} from "@/libs/types/companies";
 
 const companySchema = z
 	.object({
@@ -376,7 +379,13 @@ export default function CompanyGeneralInfoScreen() {
 								control={control}
 								name="company_type"
 								render={({ field: { value, onChange } }) => (
-									<Select onValueChange={onChange} selectedValue={value}>
+									<Select
+										onValueChange={onChange}
+										selectedValue={
+											companyTypeOptions.find(c => c.value === value)?.label ||
+											value
+										}
+									>
 										<SelectTrigger
 											variant="outline"
 											size="md"
@@ -391,10 +400,13 @@ export default function CompanyGeneralInfoScreen() {
 												<SelectDragIndicatorWrapper>
 													<SelectDragIndicator />
 												</SelectDragIndicatorWrapper>
-												<SelectItem label="Empresa" value="COMPANY" />
-												<SelectItem label="ONG" value="ONG" />
-												<SelectItem label="Governo" value="GOVERNMENT" />
-												<SelectItem label="Coletor" value="COLLECTOR" />
+												{companyTypeOptions.map(companyType => (
+													<SelectItem
+														key={companyType.value}
+														value={companyType.value}
+														label={companyType.label}
+													/>
+												))}
 											</SelectContent>
 										</SelectPortal>
 									</Select>
