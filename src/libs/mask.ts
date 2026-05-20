@@ -41,9 +41,48 @@ export function maskPhoneBr(value: string) {
 		.replace(/(\d{1})(\d{4})(\d{1,4})$/, "$1 $2-$3");
 }
 
+export function maskPrice(value: string) {
+	const cleaned = value.replace(/[^\d,]/g, "");
+	const commaIdx = cleaned.indexOf(",");
+	if (commaIdx === -1) return cleaned;
+	return (
+		cleaned.slice(0, commaIdx + 1) +
+		cleaned
+			.slice(commaIdx + 1)
+			.replace(/,/g, "")
+			.slice(0, 2)
+	);
+}
+
+export function maskDecimal(value: string) {
+	const cleaned = value.replace(/[^\d,]/g, "");
+	const commaIdx = cleaned.indexOf(",");
+	if (commaIdx === -1) return cleaned;
+	return (
+		cleaned.slice(0, commaIdx + 1) +
+		cleaned
+			.slice(commaIdx + 1)
+			.replace(/,/g, "")
+			.slice(0, 3)
+	);
+}
+
+export function formatDecimal(value: number) {
+	return String(value).replace(".", ",");
+}
+
+export function parseDecimalInput(value: string) {
+	const parsed = Number(value.replace(",", "."));
+	return Number.isNaN(parsed) ? 0 : parsed;
+}
+
 export const mask = {
 	cpf: maskCpf,
 	cnpj: maskCnpj,
 	cep: maskCep,
 	phoneBr: maskPhoneBr,
+	price: maskPrice,
+	decimal: maskDecimal,
+	formatDecimal,
+	parseDecimal: parseDecimalInput,
 };

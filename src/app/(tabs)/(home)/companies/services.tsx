@@ -1,6 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack } from "expo-router";
-import { AlertCircle, X } from "lucide-react-native";
+import {
+	AlertCircle,
+	ChevronDownIcon,
+	DollarSignIcon,
+	HashIcon,
+	X,
+} from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -17,8 +23,8 @@ import {
 } from "@/components/companies/services/services-form-schema";
 import { ServicesListSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/ui/card";
+import { DecimalInput } from "@/components/ui/decimal-input";
 import {
 	FormControl,
 	FormControlError,
@@ -28,30 +34,25 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
 import { Input, InputField } from "@/components/ui/input";
+import {
+	Select,
+	SelectBackdrop,
+	SelectContent,
+	SelectDragIndicator,
+	SelectDragIndicatorWrapper,
+	SelectIcon,
+	SelectInput,
+	SelectItem,
+	SelectPortal,
+	SelectTrigger,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
-import { type Measurement, measurements } from "@/libs/types/measurement";
-import { type WasteType, wasteTypes } from "@/libs/types/waste";
-
-const measurementLabelByValue = Object.fromEntries(
-	measurements.map(measurement => [measurement.value, measurement.label]),
-) as Record<Measurement, string>;
-
-const wasteTypeLabelByValue = Object.fromEntries(
-	wasteTypes.map(wasteType => [wasteType.value, wasteType.label]),
-) as Record<WasteType, string>;
-
-function parsePrice(value: string) {
-	const normalized = value.replace(",", ".");
-	const parsed = Number(normalized);
-	return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function parseQuantity(value: string) {
-	const parsed = Number.parseInt(value, 10);
-	return Number.isNaN(parsed) ? 0 : parsed;
-}
+import { measurements } from "@/libs/types/measurement";
+import { wasteTypes } from "@/libs/types/waste";
 
 export default function CompanyServicesScreen() {
 	const { services, isLoadingServices, saveServices, isSavingServices } =
@@ -64,8 +65,8 @@ export default function CompanyServicesScreen() {
 		defaultValues: {
 			name: "",
 			description: "",
-			price: 0,
-			quantity: 1,
+			price: "0,00",
+			quantity: "1,00",
 			unit: "KG",
 			wasteType: "RECYCLABLE",
 			subItems: [],
@@ -76,8 +77,6 @@ export default function CompanyServicesScreen() {
 
 	const { control, formState, getValues, handleSubmit, setValue, watch } = form;
 	const subItems = watch("subItems") ?? [];
-	const unit = watch("unit");
-	const wasteType = watch("wasteType");
 
 	const onAddSubItem = () => {
 		const nextSubItem = subItemDraft.trim();
@@ -104,22 +103,19 @@ export default function CompanyServicesScreen() {
 
 	const handleRemoveService = async (serviceId: string) => {
 		const remaining = (services ?? []).filter(s => s.id !== serviceId);
-		try {
-			await saveServices({
-				services: remaining.map(s => ({
-					name: s.name,
-					description: s.description ?? null,
-					price: s.price,
-					quantity: s.quantity,
-					unit: s.unit,
-					waste_type: s.waste_type,
-					sub_items: s.sub_items,
-					observations: s.observations ?? null,
-				})),
-			});
-		} catch {
-			// handled by context mutation's onError
-		}
+
+		await saveServices({
+			services: remaining.map(s => ({
+				name: s.name,
+				description: s.description ?? null,
+				price: s.price,
+				quantity: s.quantity,
+				unit: s.unit,
+				waste_type: s.waste_type,
+				sub_items: s.sub_items,
+				observations: s.observations ?? null,
+			})),
+		});
 	};
 
 	const onSubmit = async (data: ServiceFormValues) => {
@@ -285,16 +281,14 @@ export default function CompanyServicesScreen() {
 								control={control}
 								name="price"
 								render={({ field: { value, onChange, onBlur } }) => (
-									<Input>
-										<InputField
-											value={String(value)}
-											onBlur={onBlur}
-											onChangeText={text => onChange(parsePrice(text))}
-											placeholder="0,00"
-											placeholderTextColor="#94a3b8"
-											keyboardType="decimal-pad"
-										/>
-									</Input>
+									<DecimalInput
+										value={value}
+										onChange={onChange}
+										onBlur={onBlur}
+										mode="price"
+										icon={DollarSignIcon}
+										placeholder="0,00"
+									/>
 								)}
 							/>
 							<Text className="text-xs text-muted-foreground">
@@ -310,44 +304,95 @@ export default function CompanyServicesScreen() {
 							) : null}
 						</FormControl>
 
-						<FormControl
-							isInvalid={!!formState.errors.quantity}
-							className="gap-2"
-						>
-							<FormControlLabel>
-								<FormControlLabelText className="text-sm">
-									Quantidade
-								</FormControlLabelText>
-							</FormControlLabel>
-							<Controller
-								control={control}
-								name="quantity"
-								render={({ field: { value, onChange, onBlur } }) => (
-									<Input>
-										<InputField
-											value={String(value)}
+						<HStack className="gap-2">
+							<FormControl
+								isInvalid={!!formState.errors.quantity}
+								className="gap-2"
+							>
+								<FormControlLabel>
+									<FormControlLabelText className="text-sm">
+										Quantidade
+									</FormControlLabelText>
+								</FormControlLabel>
+								<Controller
+									control={control}
+									name="quantity"
+									render={({ field: { value, onChange, onBlur } }) => (
+										<DecimalInput
+											value={value}
+											onChange={onChange}
 											onBlur={onBlur}
-											onChangeText={text => onChange(parseQuantity(text))}
+											mode="decimal"
+											icon={HashIcon}
 											placeholder="1"
-											placeholderTextColor="#94a3b8"
-											keyboardType="number-pad"
+											className="h-10"
 										/>
-									</Input>
-								)}
-							/>
-							<Text className="text-xs text-muted-foreground">
-								Defina a quantidade padrão vinculada ao serviço.
-							</Text>
-							{formState.errors.quantity?.message ? (
-								<FormControlError>
-									<FormControlErrorIcon as={AlertCircle} />
-									<FormControlErrorText>
-										{formState.errors.quantity.message}
-									</FormControlErrorText>
-								</FormControlError>
-							) : null}
-						</FormControl>
+									)}
+								/>
+								<Text className="text-xs text-muted-foreground">
+									Defina a quantidade padrão vinculada ao serviço.
+								</Text>
+								{formState.errors.quantity?.message ? (
+									<FormControlError>
+										<FormControlErrorIcon as={AlertCircle} />
+										<FormControlErrorText>
+											{formState.errors.quantity.message}
+										</FormControlErrorText>
+									</FormControlError>
+								) : null}
+							</FormControl>
 
+							<FormControl className="flex-1 gap-2">
+								<FormControlLabel>
+									<FormControlLabelText className="text-sm">
+										Unidade
+									</FormControlLabelText>
+								</FormControlLabel>
+								<Controller
+									control={control}
+									name="unit"
+									render={({ field: { value, onChange } }) => (
+										<Select selectedValue={value} onValueChange={onChange}>
+											<SelectTrigger>
+												<SelectInput
+													placeholder="Selecione a unidade"
+													className="flex-1"
+												/>
+												<SelectIcon className="mr-3" as={ChevronDownIcon} />
+											</SelectTrigger>
+											<SelectPortal>
+												<SelectBackdrop />
+												<SelectContent>
+													<SelectDragIndicatorWrapper>
+														<SelectDragIndicator />
+													</SelectDragIndicatorWrapper>
+													<ScrollView className="w-full max-h-80">
+														{measurements.length > 0 ? (
+															measurements.map(measurement => (
+																<SelectItem
+																	key={measurement.value}
+																	label={`${measurement.value} (${measurement.label})`}
+																	value={measurement.value}
+																/>
+															))
+														) : (
+															<SelectItem label="Não há dados" value="" />
+														)}
+													</ScrollView>
+												</SelectContent>
+											</SelectPortal>
+										</Select>
+									)}
+								/>
+								{formState.errors.unit?.message ? (
+									<FormControlError>
+										<FormControlErrorText>
+											{formState.errors.unit?.message}
+										</FormControlErrorText>
+									</FormControlError>
+								) : null}
+							</FormControl>
+						</HStack>
 						<FormControl
 							isInvalid={!!formState.errors.observations}
 							className="gap-2"
@@ -385,75 +430,37 @@ export default function CompanyServicesScreen() {
 								</FormControlError>
 							) : null}
 						</FormControl>
-					</Card>
 
-					<Card className="shadow-none gap-3">
 						<Heading size="sm">Unidade e categoria</Heading>
 						<Text className="text-muted-foreground">
 							O serviço pode ser vinculado a um tipo de resíduo para orientar a
 							oferta de coleta.
 						</Text>
-
-						<View className="gap-3">
-							<View className="gap-2">
-								<Text className="text-sm font-medium">Unidade</Text>
-								<Controller
-									control={control}
-									name="unit"
-									render={({ field: { value, onChange } }) => (
-										<View className="flex-row flex-wrap gap-2">
-											{measurements.map(measurement => {
-												const isSelected = measurement.value === value;
-												return (
-													<Button
-														key={measurement.value}
-														variant={isSelected ? "secondary" : "outline"}
-														size="sm"
-														className="min-w-24"
-														onPress={() => onChange(measurement.value)}
-													>
-														<ButtonText>{measurement.label}</ButtonText>
-													</Button>
-												);
-											})}
-										</View>
-									)}
-								/>
-							</View>
-
-							<View className="gap-2">
-								<Text className="text-sm font-medium">Categoria de resíduo</Text>
-								<Controller
-									control={control}
-									name="wasteType"
-									render={({ field: { value, onChange } }) => (
-										<View className="flex-row gap-2">
-											{wasteTypes.map(wasteType => {
-												const isSelected = wasteType.value === value;
-												return (
-													<Button
-														key={wasteType.value}
-														variant={isSelected ? "secondary" : "outline"}
-														className="flex-1"
-														onPress={() => onChange(wasteType.value)}
-													>
-														<ButtonText>{wasteType.label}</ButtonText>
-													</Button>
-												);
-											})}
-										</View>
-									)}
-								/>
-							</View>
+						<View className="gap-2">
+							<Text className="text-sm font-medium">Categoria de resíduo</Text>
+							<Controller
+								control={control}
+								name="wasteType"
+								render={({ field: { value, onChange } }) => (
+									<View className="flex-row gap-2">
+										{wasteTypes.map(wasteType => {
+											const isSelected = wasteType.value === value;
+											return (
+												<Button
+													key={wasteType.value}
+													variant={isSelected ? "default" : "outline"}
+													className="flex-1"
+													onPress={() => onChange(wasteType.value)}
+												>
+													<ButtonText>{wasteType.label}</ButtonText>
+												</Button>
+											);
+										})}
+									</View>
+								)}
+							/>
 						</View>
 
-						<Text className="text-xs text-muted-foreground">
-							Selecionado: {measurementLabelByValue[unit]} e{" "}
-							{wasteTypeLabelByValue[wasteType]}.
-						</Text>
-					</Card>
-
-					<Card className="shadow-none gap-4">
 						<View className="gap-2">
 							<Heading size="sm">Materiais vinculados</Heading>
 							<Text className="text-muted-foreground">
@@ -500,28 +507,30 @@ export default function CompanyServicesScreen() {
 								</Text>
 							)}
 						</View>
-					</Card>
 
-					<View className="flex-row gap-2 mt-1">
-						<Button
-							variant="outline"
-							className="flex-1"
-							onPress={() => form.reset()}
-							isDisabled={!formState.isDirty || isSavingServices}
-						>
-							<ButtonText>Limpar</ButtonText>
-						</Button>
-						<Button
-							className="flex-1"
-							onPress={handleSubmit(onSubmit)}
-							isDisabled={
-								!formState.isValid || formState.isSubmitting || isSavingServices
-							}
-						>
-							<ButtonText>Cadastrar</ButtonText>
-							{isSavingServices && <ButtonIcon as={Spinner} />}
-						</Button>
-					</View>
+						<View className="flex-row gap-2 mt-1">
+							<Button
+								variant="outline"
+								className="flex-1"
+								onPress={() => form.reset()}
+								isDisabled={!formState.isDirty || isSavingServices}
+							>
+								<ButtonText>Cancelar</ButtonText>
+							</Button>
+							<Button
+								className="flex-1"
+								onPress={handleSubmit(onSubmit)}
+								isDisabled={
+									!formState.isValid ||
+									formState.isSubmitting ||
+									isSavingServices
+								}
+							>
+								<ButtonText>Cadastrar</ButtonText>
+								{isSavingServices && <ButtonIcon as={Spinner} />}
+							</Button>
+						</View>
+					</Card>
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</>

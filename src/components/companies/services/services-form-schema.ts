@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { parseDecimalInput } from "@/libs/mask";
 import type { Measurement } from "@/libs/types/measurement";
 
 const measurementValues = [
@@ -14,8 +15,16 @@ const measurementValues = [
 export const serviceFormSchema = z.object({
 	name: z.string().min(1, "Nome é obrigatório."),
 	description: z.string().max(240, "A descrição deve ter até 240 caracteres."),
-	price: z.number().min(0, "O valor não pode ser negativo."),
-	quantity: z.number().min(1, "Informe uma quantidade maior que zero."),
+	price: z
+		.string()
+		.min(1, "Informe o preço.")
+		.transform(parseDecimalInput)
+		.pipe(z.number().min(0, "O valor não pode ser negativo.")),
+	quantity: z
+		.string()
+		.min(1, "Informe a quantidade.")
+		.transform(parseDecimalInput)
+		.pipe(z.number().min(0.001, "Informe uma quantidade maior que zero.")),
 	unit: z.enum(measurementValues),
 	wasteType: z.enum(["RECYCLABLE", "GARBAGE"] as const),
 	subItems: z.array(z.string().min(1)).default([]),

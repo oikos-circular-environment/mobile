@@ -31,6 +31,7 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
+import { mask } from "@/libs/mask";
 import { type Measurement, measurements } from "@/libs/types/measurement";
 import { type WasteType, wasteTypes } from "@/libs/types/waste";
 
@@ -41,12 +42,6 @@ const measurementLabelByValue = Object.fromEntries(
 const wasteTypeLabelByValue = Object.fromEntries(
 	wasteTypes.map(wasteType => [wasteType.value, wasteType.label]),
 ) as Record<WasteType, string>;
-
-function parsePrice(value: string) {
-	const normalized = value.replace(",", ".");
-	const parsed = Number(normalized);
-	return Number.isNaN(parsed) ? 0 : parsed;
-}
 
 export default function CompanyWasteManagementScreen() {
 	const { wastes, isLoadingWastes, saveWastes, isSavingWastes } =
@@ -274,9 +269,9 @@ export default function CompanyWasteManagementScreen() {
 								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
-											value={String(value)}
+											value={mask.formatDecimal(value)}
 											onBlur={onBlur}
-											onChangeText={text => onChange(parsePrice(text))}
+											onChangeText={text => onChange(mask.parseDecimal(mask.price(text)))}
 											placeholder="0,00"
 											placeholderTextColor="#94a3b8"
 											keyboardType="decimal-pad"
