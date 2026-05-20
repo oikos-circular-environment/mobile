@@ -71,12 +71,8 @@ export default function ServiceFormScreen() {
 		defaultValues: {
 			name: initialData?.name ?? "",
 			description: initialData?.description ?? "",
-			price: initialData?.price
-				? String(initialData.price).replace(".", ",")
-				: "0,00",
-			quantity: initialData?.quantity
-				? String(initialData.quantity).replace(".", ",")
-				: "1,00",
+			price: initialData?.price ?? "0,00",
+			quantity: initialData?.quantity ?? "1,00",
 			unit: initialData?.unit ?? "KG",
 			wasteType: initialData?.waste_type ?? "RECYCLABLE",
 			subItems: initialData?.sub_items ?? [],

@@ -14,8 +14,14 @@ export const parseToMinorUnits = (value: string | number): number => {
 		return Math.round(Number(value.toFixed(2)) * 100);
 	}
 
-	const cleanValue = value.replace(/\D/g, "");
-	return Number(cleanValue) || 0;
+	// String PT-BR formatada (ex: "120,00", "1.200,00") — remove não-dígitos e trata como centavos
+	if (value.includes(",")) {
+		const cleanValue = value.replace(/\D/g, "");
+		return Number(cleanValue) || 0;
+	}
+
+	// Notação decimal da API (ex: "120.00", "0.2", "120") — converte para centavos
+	return Math.round(parseFloat(value) * 100) || 0;
 };
 
 /**

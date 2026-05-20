@@ -75,10 +75,8 @@ export default function WasteFormScreen() {
 		defaultValues: {
 			name: initialData?.name ?? "",
 			description: initialData?.description ?? "",
-			price: initialData?.price
-				? String(initialData.price).replace(".", ",")
-				: "0,00",
-			quantity: "1,00",
+			price: initialData?.price ?? "0,00",
+			quantity: initialData?.quantity ?? "1,00",
 			unit: initialData?.unit ?? "KG",
 			wasteType: initialData?.waste_type ?? "RECYCLABLE",
 			subItems: initialData?.sub_items ?? [],
@@ -446,16 +444,7 @@ export default function WasteFormScreen() {
 						>
 							<ButtonText>Cancelar</ButtonText>
 						</Button>
-						{initialData && (
-							<Button
-								variant="outline"
-								className="flex-1 border-error-300"
-								onPress={handleRemove}
-								isDisabled={isSavingWastes}
-							>
-								<ButtonText className="text-error-600">Excluir</ButtonText>
-							</Button>
-						)}
+
 						<Button
 							className="flex-1"
 							onPress={handleSubmit(onSubmit)}

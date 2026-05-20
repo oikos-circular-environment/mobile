@@ -42,9 +42,10 @@ const DecimalInput = React.forwardRef<
 // 3. Componente de Campo (DecimalInputField)
 type IDecimalInputFieldProps = Omit<
 	React.ComponentProps<typeof InputField>,
-	"onChangeText"
+	"onChangeText" | "value"
 > & {
 	onChangeText?: (text: string) => void;
+	value?: string | number;
 };
 
 const DecimalInputField = React.forwardRef<
