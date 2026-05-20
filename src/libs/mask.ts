@@ -71,8 +71,10 @@ export function formatDecimal(value: number) {
 	return String(value).replace(".", ",");
 }
 
-export function parseDecimalInput(value: string) {
-	const parsed = Number(value.replace(",", "."));
+export function parseDecimalInput(value: string | number) {
+	if (typeof value === "number") return value;
+	const cleaned = value.replace(/[^\d,]/g, "").replace(",", ".");
+	const parsed = Number(cleaned);
 	return Number.isNaN(parsed) ? 0 : parsed;
 }
 

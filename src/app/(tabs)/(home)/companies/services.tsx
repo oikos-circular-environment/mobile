@@ -24,7 +24,12 @@ import {
 import { ServicesListSkeleton } from "@/components/companies/skeletons";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { DecimalInput } from "@/components/ui/decimal-input";
+import {
+	DecimalInput,
+	DecimalInputField,
+	DecimalInputIcon,
+	DecimalInputSlot,
+} from "@/components/ui/decimal-input";
 import {
 	FormControl,
 	FormControlError,
@@ -281,14 +286,17 @@ export default function CompanyServicesScreen() {
 								control={control}
 								name="price"
 								render={({ field: { value, onChange, onBlur } }) => (
-									<DecimalInput
-										value={value}
-										onChange={onChange}
-										onBlur={onBlur}
-										mode="price"
-										icon={DollarSignIcon}
-										placeholder="0,00"
-									/>
+									<DecimalInput mode="price">
+										<DecimalInputSlot className="bg-accent p-1 rounded-md">
+											<DecimalInputIcon as={DollarSignIcon} />
+										</DecimalInputSlot>
+										<DecimalInputField
+											value={value}
+											onChangeText={onChange}
+											onBlur={onBlur}
+											placeholder="0,00"
+										/>
+									</DecimalInput>
 								)}
 							/>
 							<Text className="text-xs text-muted-foreground">
@@ -318,15 +326,17 @@ export default function CompanyServicesScreen() {
 									control={control}
 									name="quantity"
 									render={({ field: { value, onChange, onBlur } }) => (
-										<DecimalInput
-											value={value}
-											onChange={onChange}
-											onBlur={onBlur}
-											mode="decimal"
-											icon={HashIcon}
-											placeholder="1"
-											className="h-10"
-										/>
+										<DecimalInput mode="decimal" className="h-10">
+											<DecimalInputSlot className="bg-accent p-1 rounded-md">
+												<DecimalInputIcon as={HashIcon} />
+											</DecimalInputSlot>
+											<DecimalInputField
+												value={value}
+												onChangeText={onChange}
+												onBlur={onBlur}
+												placeholder="1"
+											/>
+										</DecimalInput>
 									)}
 								/>
 								<Text className="text-xs text-muted-foreground">
