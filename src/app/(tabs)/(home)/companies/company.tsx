@@ -63,12 +63,24 @@ const companySchema = z
 		business_name: z.string().nullable(),
 		email: z.string().email("E-mail deve ser válido"),
 		phones: z
-			.union([z.array(z.string()), z.null()])
-			.optional()
-			.refine(
-				v => !v?.length || phoneRegex.test(v[0] || ""),
-				"Telefone deve estar no formato: (00) 0 0000-0000",
-			),
+			.array(z.string())
+			.min(1, "Telefone principal é obrigatório")
+			.superRefine((val, ctx) => {
+				if (!val[0] || !phoneRegex.test(val[0])) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: "Telefone principal inválido",
+						path: [0],
+					});
+				}
+				if (val[1] && !phoneRegex.test(val[1])) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: "Telefone secundário inválido",
+						path: [1],
+					});
+				}
+			}),
 		started_activity_in: z
 			.date()
 			.nullable()
@@ -123,7 +135,7 @@ export default function CompanyGeneralInfoScreen() {
 			corporate_name: "",
 			business_name: "",
 			email: "",
-			phones: [""],
+			phones: ["", ""],
 			started_activity_in: new Date(),
 			company_type: "COMPANY" as const,
 			identity_type: "CNPJ" as const,
@@ -178,7 +190,7 @@ export default function CompanyGeneralInfoScreen() {
 				corporate_name: company.corporate_name,
 				business_name: company.business_name ?? "",
 				email: company.email ?? "",
-				phones: company.phones ?? [""],
+				phones: [company.phones?.[0] ?? "", company.phones?.[1] ?? ""],
 				started_activity_in: company.started_activity_in
 					? new Date(company.started_activity_in)
 					: null,
@@ -199,7 +211,7 @@ export default function CompanyGeneralInfoScreen() {
 			setValue("corporate_name", user.profile.full_name);
 			setValue("business_name", user.profile.full_name);
 			if (user.profile.phone) {
-				setValue("phones", [mask.phoneBr(user.profile.phone)]);
+				setValue("phones", [mask.phoneBr(user.profile.phone), ""]);
 			}
 		}
 	}, [useProfileData, user, setValue]);
@@ -215,7 +227,7 @@ export default function CompanyGeneralInfoScreen() {
 			corporate_name: corporate_name,
 			business_name: business_name || null,
 			email: data.email || null,
-			phones: data.phones ?? [],
+			phones: data.phones.filter(p => !!p),
 			started_activity_in: data.started_activity_in,
 			company_type: data.company_type,
 			status: data.status,
@@ -483,21 +495,19 @@ export default function CompanyGeneralInfoScreen() {
 							</FormControlError>
 						</FormControl>
 
-						<FormControl isInvalid={!!errors.phones} className="gap-2">
+						<FormControl isInvalid={!!errors.phones?.[0]} className="gap-2">
 							<FormControlLabel>
-								<FormControlLabelText>Telefone principal</FormControlLabelText>
+								<FormControlLabelText>Telefone Principal</FormControlLabelText>
 							</FormControlLabel>
 							<Controller
 								control={control}
-								name="phones"
+								name="phones.0"
 								render={({ field: { value, onChange, onBlur } }) => (
 									<Input>
 										<InputField
-											value={value?.[0] ?? ""}
+											value={value ?? ""}
 											onBlur={onBlur}
-											onChangeText={v =>
-												onChange(v.length ? [mask.phoneBr(v)] : null)
-											}
+											onChangeText={v => onChange(mask.phoneBr(v))}
 											placeholder="(00) 00000-0000"
 											keyboardType="phone-pad"
 										/>
@@ -507,7 +517,34 @@ export default function CompanyGeneralInfoScreen() {
 							<FormControlError>
 								<FormControlErrorIcon as={AlertCircle} className="size-4" />
 								<FormControlErrorText>
-									{errors.phones?.message}
+									{errors.phones?.[0]?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
+
+						<FormControl isInvalid={!!errors.phones?.[1]} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>Telefone Secundário</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="phones.1"
+								render={({ field: { value, onChange, onBlur } }) => (
+									<Input>
+										<InputField
+											value={value ?? ""}
+											onBlur={onBlur}
+											onChangeText={v => onChange(mask.phoneBr(v))}
+											placeholder="(00) 00000-0000 (opcional)"
+											keyboardType="phone-pad"
+										/>
+									</Input>
+								)}
+							/>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.phones?.[1]?.message}
 								</FormControlErrorText>
 							</FormControlError>
 						</FormControl>
