@@ -129,6 +129,7 @@ export default function WasteFormScreen() {
 			name: data.name.trim(),
 			description: data.description.trim() || null,
 			price: data.price,
+			quantity: data.quantity,
 			unit: data.unit,
 			waste_type: data.wasteType,
 			sub_items: data.subItems.length > 0 ? data.subItems : null,
@@ -142,6 +143,8 @@ export default function WasteFormScreen() {
 							name: w.name,
 							description: w.description ?? null,
 							price: w.price,
+							quantity: w.quantity,
+							observations: w.observations,
 							unit: w.unit,
 							waste_type: w.waste_type,
 							sub_items: w.sub_items,
@@ -153,18 +156,16 @@ export default function WasteFormScreen() {
 				description: w.description ?? null,
 				price: w.price,
 				unit: w.unit,
+				quantity: w.quantity,
+				observations: w.observations,
 				waste_type: w.waste_type,
 				sub_items: w.sub_items,
 			}));
 			updatedWastes = [...existing, payload];
 		}
 
-		try {
-			await saveWastes({ wastes: updatedWastes });
-			router.back();
-		} catch {
-			// handled by context mutation's onError
-		}
+		await saveWastes({ wastes: updatedWastes });
+		router.back();
 	};
 
 	const handleRemove = async () => {
@@ -177,6 +178,8 @@ export default function WasteFormScreen() {
 					description: w.description ?? null,
 					price: w.price,
 					unit: w.unit,
+					quantity: w.quantity,
+					observations: w.observations,
 					waste_type: w.waste_type,
 					sub_items: w.sub_items,
 				})),

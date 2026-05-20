@@ -7,6 +7,8 @@ export type Item = {
 	description: string | null;
 	price: number;
 	unit: Measurement;
+	quantity: number;
+	observations: string | null;
 	wasteType: WasteType;
 	sub_items: string[] | null; // Subitens relacionados ao resíduo, como os materiais que compõem o resíduo
 };

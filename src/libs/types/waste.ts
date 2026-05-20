@@ -11,16 +11,3 @@ export const wasteTypes: ValueMapping<WasteType>[] = [
 ];
 
 export type Waste = Item;
-
-export const wastes: Waste[] = [
-	{
-		id: "b70cd448-6a2c-4f8d-931d-692cdc1e082d",
-		name: "Plástico",
-		description:
-			"Serviço de coleta de resíduos plásticos, como garrafas, sacolas e embalagens.",
-		price: 0.2,
-		unit: "KG",
-		wasteType: "RECYCLABLE",
-		sub_items: ["garrafas", "sacolas", "embalagens"],
-	},
-];
