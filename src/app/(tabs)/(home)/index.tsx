@@ -87,7 +87,7 @@ export default function HomeScreen() {
 										</View>
 									</Pressable>
 								</Link>
-								<View className="flex flex-row gap-2 items-start">
+								<View className="flex flex-row gap-2 items-center">
 									{/* <Link href="/(tabs)/(home)/notifications" asChild>
 										<Button variant="secondary" size="icon">
 											<BellIcon size={12} />
@@ -95,7 +95,7 @@ export default function HomeScreen() {
 									</Link> */}
 									<Link href="/(tabs)/(home)/settings" asChild>
 										<Button variant="secondary" size="icon">
-											<SettingsIcon size={12} />
+											<SettingsIcon size={18} />
 										</Button>
 									</Link>
 								</View>

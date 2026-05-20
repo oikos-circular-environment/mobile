@@ -80,7 +80,6 @@ const companySchema = z
 		status: z.boolean(),
 		isHeadquarters: z.boolean(),
 		accept_appointments: z.boolean(),
-		useProfileData: z.boolean().default(false),
 	})
 	.superRefine((data, ctx) => {
 		if (data.identity_type === "CNPJ") {
@@ -106,6 +105,7 @@ type CompanyFormData = z.infer<typeof companySchema>;
 
 export default function CompanyGeneralInfoScreen() {
 	const { user } = useAuthContext();
+	const [useProfileData, setUseProfileData] = useState(false);
 	const { company, isLoadingCompany, saveCompany, isSavingCompany } =
 		useUserCompanyContext();
 
@@ -130,12 +130,10 @@ export default function CompanyGeneralInfoScreen() {
 			status: true,
 			isHeadquarters: true,
 			accept_appointments: false,
-			useProfileData: false,
 		},
 	});
 
 	const identity_type = watch("identity_type");
-	const useProfileData = watch("useProfileData");
 
 	const getCnpjMutation = useMutation({
 		mutationKey: ["get", "cnpj", "brasil-api"],
@@ -189,8 +187,8 @@ export default function CompanyGeneralInfoScreen() {
 				status: company.status,
 				isHeadquarters: company.is_headquarters,
 				accept_appointments: company.accept_appointments,
-				useProfileData: false,
 			});
+			setUseProfileData(false);
 		}
 	}, [company, reset]);
 
@@ -253,35 +251,29 @@ export default function CompanyGeneralInfoScreen() {
 						</View>
 					</Card>
 
-					<Controller
-						control={control}
-						name="useProfileData"
-						render={({ field: { value, onChange } }) => (
-							<Card className="shadow-none">
-								<FormControl>
-									<Checkbox
-										value="useProfile"
-										id="use-profile"
-										isChecked={value}
-										onChange={onChange}
-									>
-										<CheckboxIndicator>
-											<CheckboxIcon as={Check} />
-										</CheckboxIndicator>
-										<CheckboxLabel className="flex-1">
-											Utilizar os dados do meu perfil
-										</CheckboxLabel>
-									</Checkbox>
-									<FormControlHelper className="ml-7">
-										<FormControlHelperText>
-											O seu CPF não será exposto publicamente. Garantimos a
-											privacidade dos seus dados pessoais.
-										</FormControlHelperText>
-									</FormControlHelper>
-								</FormControl>
-							</Card>
-						)}
-					/>
+					<Card className="shadow-none">
+						<FormControl>
+							<Checkbox
+								value="useProfile"
+								id="use-profile"
+								isChecked={useProfileData}
+								onChange={setUseProfileData}
+							>
+								<CheckboxIndicator>
+									<CheckboxIcon as={Check} />
+								</CheckboxIndicator>
+								<CheckboxLabel className="flex-1">
+									Utilizar os dados do meu perfil
+								</CheckboxLabel>
+							</Checkbox>
+							<FormControlHelper className="ml-7">
+								<FormControlHelperText>
+									O seu CPF não será exposto publicamente. Garantimos a
+									privacidade dos seus dados pessoais.
+								</FormControlHelperText>
+							</FormControlHelper>
+						</FormControl>
+					</Card>
 
 					<Card className="shadow-none gap-3">
 						<FormControl isInvalid={!!errors.identity_type} className="gap-2">
