@@ -1,17 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { router } from "expo-router";
 import { ShieldAlert, TriangleAlertIcon } from "lucide-react-native";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { ComplaintCarousel } from "@/components/complaints/complaint-carousel";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
-import { toast } from "@/components/toast";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
 	FormControl,
@@ -26,21 +24,13 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import {
-	COMPLAINTS_QUERY_KEY,
-	DASHBOARD_QUERY_KEY,
-} from "@/contexts/complaints-context";
 import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
+import { useSubmitComplaints } from "@/hooks/use-submit-complaints";
 import {
 	formatHeading,
 	formatMeters,
 	formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
-import type { PostV1ComplaintsAttachmentsData } from "@/libs/oikos-sdk";
-import {
-	postV1Complaints,
-	postV1ComplaintsAttachments,
-} from "@/libs/oikos-sdk";
 import {
 	type ComplaintCapture,
 	type ComplaintType,
@@ -109,8 +99,8 @@ export default function ComplaintReviewScreen() {
 
 	const complaintTypeValue = watch("type");
 
-	const queryClient = useQueryClient();
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { mutateAsync: submitComplaints, isPending: isSubmitting } =
+		useSubmitComplaints();
 
 	const previousSelectedCaptureId = useRef(selectedCapture?.id ?? "");
 
@@ -131,8 +121,14 @@ export default function ComplaintReviewScreen() {
 		});
 	}, [selectedCapture, reset]);
 
+	useEffect(() => {
+		if (captures.length === 0 || !selectedCapture) {
+			router.replace("/(tabs)/complaints/(create)/camera");
+		}
+	}, [captures.length, selectedCapture]);
+
 	if (captures.length === 0 || !selectedCapture) {
-		return router.replace("/(tabs)/complaints/(create)/camera");
+		return null;
 	}
 
 	const handleBack = () => {
@@ -181,91 +177,13 @@ export default function ComplaintReviewScreen() {
 		},
 	);
 
-	const onSubmit = handleSubmit(async () => {
-		setIsSubmitting(true);
-		try {
-			for (const capture of captures) {
-				const res = await postV1Complaints({
-					body: {
-						date: capture.date,
-						type: capture.type,
-						observations: capture.observation || null,
-						geospatial: {
-							heading: {
-								trueHeading: capture.geospatial.heading.trueHeading,
-								magHeading: capture.geospatial.heading.magHeading,
-								accuracy: capture.geospatial.heading.accuracy,
-							},
-							location: {
-								coords: {
-									latitude: capture.geospatial.location.coords.latitude,
-									longitude: capture.geospatial.location.coords.longitude,
-									altitude: capture.geospatial.location.coords.altitude,
-									accuracy: capture.geospatial.location.coords.accuracy,
-									altitudeAccuracy:
-										capture.geospatial.location.coords.altitudeAccuracy,
-									heading: capture.geospatial.location.coords.heading,
-									speed: capture.geospatial.location.coords.speed,
-								},
-								timestamp: capture.geospatial.location.timestamp,
-								mocked: capture.geospatial.location.mocked,
-							},
-							addresses: {
-								city: capture.geospatial.addresses.city,
-								district: capture.geospatial.addresses.district,
-								streetNumber: capture.geospatial.addresses.streetNumber,
-								street: capture.geospatial.addresses.street,
-								region: capture.geospatial.addresses.region,
-								subregion: capture.geospatial.addresses.subregion,
-								country: capture.geospatial.addresses.country,
-								postalCode: capture.geospatial.addresses.postalCode,
-								name: capture.geospatial.addresses.name,
-								isoCountryCode: capture.geospatial.addresses.isoCountryCode,
-								timezone: capture.geospatial.addresses.timezone,
-								formattedAddress: capture.geospatial.addresses.formattedAddress,
-							},
-						},
-					},
-				});
-
-				const complaintId = (
-					res.data as unknown as { complaint: { id: string } }
-				).complaint.id;
-
-				const uri = capture.capture.object?.uri;
-				if (uri) {
-					const isPhoto = capture.capture.type === "photo";
-					await postV1ComplaintsAttachments({
-						body: {
-							complaint_id: complaintId,
-							file: {
-								uri,
-								name: `complaint_${complaintId}.${isPhoto ? "jpg" : "mp4"}`,
-								type: isPhoto ? "image/jpeg" : "video/mp4",
-							},
-						} as unknown as PostV1ComplaintsAttachmentsData["body"],
-					});
-				}
-			}
-
-			await queryClient.invalidateQueries({ queryKey: COMPLAINTS_QUERY_KEY });
-			await queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
-			clearDraft();
-			toast.success(
-				"Denúncia registrada",
-				captures.length > 1
-					? `${captures.length} denúncias enviadas com sucesso.`
-					: "Sua denúncia foi enviada com sucesso.",
-			);
-			router.replace("/(tabs)/complaints");
-		} catch {
-			toast.error(
-				"Erro ao enviar",
-				"Não foi possível registrar a denúncia. Tente novamente.",
-			);
-		} finally {
-			setIsSubmitting(false);
-		}
+	const onSubmit = handleSubmit(() => {
+		submitComplaints(captures, {
+			onSuccess: () => {
+				clearDraft();
+				router.replace("/(tabs)/complaints");
+			},
+		});
 	});
 
 	return (
@@ -471,9 +389,8 @@ export default function ComplaintReviewScreen() {
 						onPress={onSubmit}
 						disabled={isSubmitting}
 					>
-						<ButtonText className="text-white">
-							{isSubmitting ? "Enviando..." : "Confirmar"}
-						</ButtonText>
+						<ButtonText className="text-white">Enviar</ButtonText>
+						{isSubmitting && <ButtonSpinner />}
 					</Button>
 				</View>
 			</ScrollView>

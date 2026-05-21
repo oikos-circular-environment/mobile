@@ -1,5 +1,6 @@
 import type { CameraCapturedPicture } from "expo-camera";
 import type { ValueMapping } from "./value-mapping";
+// import type * as Location from "expo-location";
 
 export type ComplaintType =
 	| "IRREGULAR_DISPOSAL"
