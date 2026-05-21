@@ -87,7 +87,7 @@ export default function HomeScreen() {
 										</View>
 									</Pressable>
 								</Link>
-								<View className="flex flex-row gap-2 items-start">
+								<View className="flex flex-row gap-2 items-center">
 									{/* <Link href="/(tabs)/(home)/notifications" asChild>
 										<Button variant="secondary" size="icon">
 											<BellIcon size={12} />
@@ -95,7 +95,7 @@ export default function HomeScreen() {
 									</Link> */}
 									<Link href="/(tabs)/(home)/settings" asChild>
 										<Button variant="secondary" size="icon">
-											<SettingsIcon size={12} />
+											<SettingsIcon size={18} />
 										</Button>
 									</Link>
 								</View>
@@ -120,7 +120,7 @@ export default function HomeScreen() {
 				)}
 
 				<View className="flex flex-col gap-4">
-					<Heading>Pontos de coleta</Heading>
+					<Heading>Pontos de coleta próximo a você</Heading>
 					{marketCompanies.map(company => (
 						<Card
 							key={company.id}
@@ -132,7 +132,7 @@ export default function HomeScreen() {
 								</Card>
 
 								<View className="flex flex-col flex-1">
-									<Heading numberOfLines={1}>{company.corporateName}</Heading>
+									<Heading numberOfLines={1}>{company.corporate_name}</Heading>
 									<Text numberOfLines={2}>
 										{company.address?.street}, {company.address?.number},{" "}
 										{company.address?.district}

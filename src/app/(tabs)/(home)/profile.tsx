@@ -10,7 +10,7 @@ import {
 	PencilIcon,
 	Search,
 } from "lucide-react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	Animated,
@@ -63,11 +63,10 @@ import { VStack } from "@/components/ui/vstack";
 import WrapperMapper from "@/components/wrapper-mapper";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
-	type GetCepV2BrasilApiParams,
-	getAllStatesV1BrasilApi,
-	getCepV2BrasilApi,
-	getCitiesByStateV1BrasilApi,
-} from "@/libs/brasil-api/client";
+	getCepV2,
+	listIbgeMunicipios,
+	listIbgeUfs,
+} from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
 import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
 
@@ -106,6 +105,7 @@ export default function ProfileScreen() {
 	const { user, updateUserProfile } = useAuthContext();
 	const router = useRouter();
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
+	const [selectedCity, setSelectedCity] = useState<string | null>(null);
 	const contentOpacity = useRef(new Animated.Value(0)).current;
 
 	const {
@@ -156,8 +156,11 @@ export default function ProfileScreen() {
 	const { data: states, isPending: isPendingStates } = useQuery({
 		queryKey: ["states"],
 		queryFn: async () => {
-			const response = await getAllStatesV1BrasilApi();
-			return response.data.sort((a, b) => a.nome.localeCompare(b.nome));
+			// const response = await getAllStatesV1BrasilApi();
+			const response = await listIbgeUfs();
+			return response.data
+				? response.data.sort((a, b) => a.nome.localeCompare(b.nome))
+				: [];
 		},
 		staleTime: 1000 * 60 * 60 * 24, // 24 hours
 	});
@@ -165,10 +168,14 @@ export default function ProfileScreen() {
 	const { data: cities, isPending: isPendingCities } = useQuery({
 		queryKey: ["cities", selectedStateCode],
 		queryFn: async () => {
-			const response = await getCitiesByStateV1BrasilApi({
-				code: selectedStateCode,
+			const response = await listIbgeMunicipios({
+				path: {
+					siglaUF: selectedStateCode,
+				},
 			});
-			return response.data.sort((a, b) => a.nome.localeCompare(b.nome));
+			return response.data
+				? response.data.sort((a, b) => a.nome.localeCompare(b.nome))
+				: [];
 		},
 		enabled: !!selectedStateCode && selectedStateCode.length === 2,
 	});
@@ -210,6 +217,13 @@ export default function ProfileScreen() {
 		}
 	}, [user, reset]);
 
+	useEffect(() => {
+		if (selectedCity) {
+			const city = cities?.find(c => c.nome === selectedCity);
+			if (city) setValue("address.city_ibge_id", Number(city.codigo_ibge));
+		}
+	}, [cities, selectedCity, setValue]);
+
 	const profileMutation = useMutation({
 		mutationFn: async (data: ProfileFormValues) => {
 			const profileData = {
@@ -241,8 +255,7 @@ export default function ProfileScreen() {
 				updateUserProfile({ profile: response.data.profile });
 			}
 		},
-		onError: error => {
-			console.log("Error Profile:", error);
+		onError: () => {
 			toast.error(
 				"Erro ao salvar",
 				"Ocorreu um problema ao atualizar seu perfil.",
@@ -275,8 +288,7 @@ export default function ProfileScreen() {
 				},
 			} as any);
 		},
-		onError: error => {
-			console.log("Error Image:", error);
+		onError: () => {
 			toast.error(
 				"Erro ao salvar imagem",
 				"Ocorreu um problema ao atualizar sua foto.",
@@ -286,44 +298,33 @@ export default function ProfileScreen() {
 
 	const getCepMutation = useMutation({
 		mutationKey: ["get", "cep", "brasil-api"],
-		mutationFn: async ({ cep }: GetCepV2BrasilApiParams) => {
-			const response = await getCepV2BrasilApi({ cep });
+		mutationFn: async ({ cep }: { cep: string }) => {
+			const response = await getCepV2({ path: { cep } });
 			return response.data;
 		},
 		onSuccess: data => {
-			if (data) {
-				const currentValues = control._formValues as ProfileFormValues;
-				reset(
-					{
-						...currentValues,
-						address: {
-							...currentValues.address,
-							zip_code: data.cep
-								? mask.cep(data.cep)
-								: currentValues.address.zip_code,
-							street: data.street || currentValues.address.street,
-							district: data.neighborhood || currentValues.address.district,
-							city: data.city || currentValues.address.city,
-							state: data.state || currentValues.address.state,
-							state_code: data.state || currentValues.address.state_code,
-							state_ibge_id: currentValues.address.state_ibge_id,
-							city_ibge_id: currentValues.address.city_ibge_id,
-						},
+			if (!data) return;
+			const current = control._formValues as ProfileFormValues;
+			reset(
+				{
+					...current,
+					address: {
+						...current.address,
+						zip_code: data.cep ? mask.cep(data.cep) : current.address.zip_code,
+						street: data.street || current.address.street,
+						district: data.neighborhood || current.address.district,
+						city: data.city || current.address.city,
+						state_code: data.state || current.address.state_code,
 					},
-					{ keepDefaultValues: true },
-				);
-
-				// Se o estado mudou via CEP, precisamos atualizar o nome do estado se possível
-				if (data.state) {
-					getAllStatesV1BrasilApi().then(res => {
-						const state = res.data.find(s => s.sigla === data.state);
-						if (state) {
-							setValue("address.state", state.nome);
-							setValue("address.state_ibge_id", Number(state.id));
-						}
-					});
-				}
+				},
+				{ keepDefaultValues: true },
+			);
+			const uf = states?.find(s => s.sigla === data.state);
+			if (uf) {
+				setValue("address.state", uf.nome);
+				setValue("address.state_ibge_id", Number(uf.id));
 			}
+			setSelectedCity(data.city || null);
 		},
 		onError: () => {
 			toast.error("Erro ao buscar cep", "Confira o cep e tente novamente");
@@ -352,7 +353,7 @@ export default function ProfileScreen() {
 		}
 	};
 
-	const onPressSearchCep = async ({ cep }: GetCepV2BrasilApiParams) => {
+	const onPressSearchCep = async ({ cep }: { cep: string }) => {
 		const cleanCep = cep.replace(/\D/g, "");
 		if (cleanCep.length !== 8) {
 			toast.error("CEP inválido", "O CEP deve conter 8 dígitos.");

@@ -11,17 +11,17 @@ export type CompanyType = "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 export type Company = {
 	id: string;
 	identity: string;
-	identityType: IdentityType;
-	companyType: CompanyType;
+	identity_type: IdentityType;
+	company_type: CompanyType;
 	status: boolean; // Ativo ou Inativo
 	isHeadquarters: boolean; // Matriz ou Filial
-	businessName: string | null; // Nome Fantasia
-	corporateName: string; // Razão Social
-	acceptAppointments: boolean; // Aceita agendamentos
+	business_name: string | null; // Nome Fantasia
+	corporate_name: string; // Razão Social
+	accept_appointments: boolean; // Aceita agendamentos
 	email: string | null;
 	phones: string[] | null;
 	address: Address | null;
-	startedActivityIn: Date;
+	started_activity_in: Date;
 	businessHours: BusinessHour[] | null; // Horário de funcionamento
 	waste: Waste[] | null; // Resíduos que a empresa trabalha
 	services: Service[] | null; // Serviços que a empresa oferece

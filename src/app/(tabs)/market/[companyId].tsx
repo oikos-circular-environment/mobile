@@ -27,8 +27,8 @@ type SelectedSimulationItem = {
 	itemId: string;
 };
 
-const formatIdentity = (identity: string, identityType: "CPF" | "CNPJ") => {
-	if (identityType === "CNPJ") {
+const formatIdentity = (identity: string, identity_type: "CPF" | "CNPJ") => {
+	if (identity_type === "CNPJ") {
 		return identity.replace(
 			/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
 			"$1.$2.$3/$4-$5",
@@ -173,7 +173,7 @@ export default function MarketCompanyDetailScreen() {
 	return (
 		<>
 			<Stack.Screen
-				options={{ title: company.corporateName, headerShown: false }}
+				options={{ title: company.corporate_name, headerShown: false }}
 			/>
 
 			<KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">
@@ -187,7 +187,7 @@ export default function MarketCompanyDetailScreen() {
 						<View className="flex-row gap-2 items-center">
 							<View className="h-16 w-16 items-center justify-center rounded-[5px] bg-slate-950">
 								<Text className="text-sm font-semibold text-white">
-									{company.corporateName
+									{company.corporate_name
 										.split(" ")
 										.slice(0, 2)
 										.map(word => word[0]?.toUpperCase() ?? "")
@@ -197,13 +197,13 @@ export default function MarketCompanyDetailScreen() {
 
 							<View className="min-w-0 flex-1 justify-center gap-0.5">
 								<Heading className="text-xl text-gray-950">
-									{company.corporateName}
+									{company.corporate_name}
 								</Heading>
 								<Text className="text-xs text-gray-500">
-									{company.businessName}
+									{company.business_name}
 								</Text>
 								<Text className="text-xs text-gray-500">
-									{formatIdentity(company.identity, company.identityType)}
+									{formatIdentity(company.identity, company.identity_type)}
 								</Text>
 							</View>
 						</View>

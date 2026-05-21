@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Clock8Icon } from "lucide-react-native";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -7,17 +8,38 @@ import {
 	businessHoursFormSchema,
 } from "@/components/companies/business-hours/business-hours-form-schema";
 import { DayBusinessHourField } from "@/components/companies/business-hours/day-business-hour-field";
-import { Button, ButtonText } from "@/components/ui/button";
+import { BusinessHoursSkeleton } from "@/components/companies/skeletons";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
+import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { daysOfWeek, defaultBusinessHours } from "@/libs/types/business-hour";
 
+type DayOfWeek =
+	| "SUNDAY"
+	| "MONDAY"
+	| "TUESDAY"
+	| "WEDNESDAY"
+	| "THURSDAY"
+	| "FRIDAY"
+	| "SATURDAY";
+
 export default function CompanyBusinessHoursScreen() {
+	const {
+		businessHours,
+		isLoadingBusinessHours,
+		saveBusinessHours,
+		isSavingBusinessHours,
+	} = useUserCompanyContext();
+
 	const {
 		control,
 		handleSubmit,
 		watch,
 		reset,
-		formState: { errors },
+		formState: { errors, isDirty },
 	} = useForm<BusinessHoursFormValues>({
 		resolver: zodResolver(businessHoursFormSchema),
 		defaultValues: {
@@ -28,16 +50,46 @@ export default function CompanyBusinessHoursScreen() {
 	const businessHoursWatch = watch("businessHours");
 
 	useEffect(() => {
-		reset({ businessHours: defaultBusinessHours });
-	}, [reset]);
+		if (businessHours === undefined) return;
 
-	const onSubmit = (data: BusinessHoursFormValues) => {
-		console.log("Business hours:", data);
+		if (businessHours.length > 0) {
+			reset({
+				businessHours: businessHours.map(bh => ({
+					id: bh.id,
+					dayOfWeek: bh.day_of_week,
+					is_open: bh.is_open,
+					timeSlots: bh.time_slots.map(ts => ({
+						id: ts.id,
+						startTime: ts.start_time,
+						endTime: ts.end_time,
+					})),
+				})),
+			});
+		} else {
+			reset({ businessHours: defaultBusinessHours });
+		}
+	}, [businessHours, reset]);
+
+	const onSubmit = async (data: BusinessHoursFormValues) => {
+		await saveBusinessHours({
+			business_hours: data.businessHours.map(bh => ({
+				day_of_week: bh.dayOfWeek as DayOfWeek,
+				is_open: bh.is_open,
+				time_slots: bh.timeSlots.map(ts => ({
+					start_time: ts.startTime,
+					end_time: ts.endTime,
+				})),
+			})),
+		});
 	};
 
 	const getDayLabel = (dayOfWeek: string) => {
 		return daysOfWeek.find(day => day.value === dayOfWeek)?.label || dayOfWeek;
 	};
+
+	if (isLoadingBusinessHours) {
+		return <BusinessHoursSkeleton />;
+	}
 
 	return (
 		<KeyboardAvoidingView
@@ -49,7 +101,21 @@ export default function CompanyBusinessHoursScreen() {
 				contentContainerClassName="p-4 pb-8"
 			>
 				<View className="gap-4">
-					<Heading size="xl">Horários de Funcionamento</Heading>
+					<Card className="bg-secondary shadow-none">
+						<View className="flex-row items-center justify-between gap-4">
+							<View className="size-15 items-center justify-center rounded-lg bg-primary">
+								<Clock8Icon color="white" size={20} />
+							</View>
+							<View className="flex-1 gap-1">
+								<Heading className="text-lg">Horário de Funcionamento</Heading>
+								<Text className="text-sm ">
+									Estes dados serão expostos na plataforma, o preenchimento com
+									informações reais trazem mais confiabilidade para os usuários
+									da plataforma.
+								</Text>
+							</View>
+						</View>
+					</Card>
 
 					{businessHoursWatch.map((businessHour, dayIndex) => (
 						<DayBusinessHourField
@@ -62,8 +128,21 @@ export default function CompanyBusinessHoursScreen() {
 					))}
 
 					<View className="flex-row gap-2 pt-4">
-						<Button className="flex-1" onPress={handleSubmit(onSubmit)}>
+						<Button
+							variant="outline"
+							className="flex-1"
+							onPress={() => reset()}
+							isDisabled={!isDirty || isSavingBusinessHours}
+						>
+							<ButtonText>Cancelar</ButtonText>
+						</Button>
+						<Button
+							className="flex-1"
+							onPress={handleSubmit(onSubmit)}
+							isDisabled={!isDirty || isSavingBusinessHours}
+						>
 							<ButtonText>Salvar</ButtonText>
+							{isSavingBusinessHours && <ButtonIcon as={Spinner} />}
 						</Button>
 					</View>
 				</View>

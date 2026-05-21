@@ -19,10 +19,7 @@ import {
 	patchV1ComplaintsByIdCanceledResponseTransformer,
 	patchV1ComplaintsByIdResolvedResponseTransformer,
 	patchV1ComplaintsByIdResponseTransformer,
-	postV1CompaniesAddressesResponseTransformer,
 	postV1CompaniesResponseTransformer,
-	postV1CompaniesServicesResponseTransformer,
-	postV1CompaniesWastesResponseTransformer,
 	postV1ComplaintsAttachmentsResponseTransformer,
 	postV1ComplaintsResponseTransformer,
 	putV1CompaniesAddressesResponseTransformer,
@@ -81,21 +78,9 @@ import type {
 	PostV1AuthLoginData,
 	PostV1AuthLoginErrors,
 	PostV1AuthLoginResponses,
-	PostV1CompaniesAddressesData,
-	PostV1CompaniesAddressesErrors,
-	PostV1CompaniesAddressesResponses,
-	PostV1CompaniesBusinessHoursData,
-	PostV1CompaniesBusinessHoursErrors,
-	PostV1CompaniesBusinessHoursResponses,
 	PostV1CompaniesData,
 	PostV1CompaniesErrors,
 	PostV1CompaniesResponses,
-	PostV1CompaniesServicesData,
-	PostV1CompaniesServicesErrors,
-	PostV1CompaniesServicesResponses,
-	PostV1CompaniesWastesData,
-	PostV1CompaniesWastesErrors,
-	PostV1CompaniesWastesResponses,
 	PostV1ComplaintsAttachmentsData,
 	PostV1ComplaintsAttachmentsErrors,
 	PostV1ComplaintsAttachmentsResponses,
@@ -405,34 +390,9 @@ export const getV1CompaniesBusinessHours = <
 	});
 
 /**
- * Create company business hours
+ * Upsert company business hours
  *
  * Creates or updates business hours for the authenticated user's company.
- */
-export const postV1CompaniesBusinessHours = <
-	ThrowOnError extends boolean = false,
->(
-	options: Options<PostV1CompaniesBusinessHoursData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1CompaniesBusinessHoursResponses,
-		PostV1CompaniesBusinessHoursErrors,
-		ThrowOnError
-	>({
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/business-hours",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Update company business hours
- *
- * Upserts business hours for the authenticated user's company allowing partial payload.
  */
 export const putV1CompaniesBusinessHours = <
 	ThrowOnError extends boolean = false,
@@ -475,33 +435,9 @@ export const getV1CompaniesWastes = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Create company wastes
+ * Upsert company wastes
  *
  * Creates or replaces the wastes linked to the authenticated user's company.
- */
-export const postV1CompaniesWastes = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1CompaniesWastesData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1CompaniesWastesResponses,
-		PostV1CompaniesWastesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1CompaniesWastesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/wastes",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Update company wastes
- *
- * Replaces the wastes linked to the authenticated user's company.
  */
 export const putV1CompaniesWastes = <ThrowOnError extends boolean = false>(
 	options: Options<PutV1CompaniesWastesData, ThrowOnError>,
@@ -543,33 +479,9 @@ export const getV1CompaniesServices = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Create company services
+ * Upsert company services
  *
  * Creates or replaces the services linked to the authenticated user's company.
- */
-export const postV1CompaniesServices = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1CompaniesServicesData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1CompaniesServicesResponses,
-		PostV1CompaniesServicesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1CompaniesServicesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/services",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Update company services
- *
- * Replaces the services linked to the authenticated user's company.
  */
 export const putV1CompaniesServices = <ThrowOnError extends boolean = false>(
 	options: Options<PutV1CompaniesServicesData, ThrowOnError>,
@@ -611,33 +523,9 @@ export const getV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Create company address
+ * Upsert company address
  *
- * Creates an address for the authenticated user's company.
- */
-export const postV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1CompaniesAddressesData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1CompaniesAddressesResponses,
-		PostV1CompaniesAddressesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1CompaniesAddressesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/addresses",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Update company address
- *
- * Updates only address data for the authenticated user's company.
+ * Creates or updates the address for the authenticated user's company.
  */
 export const putV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
 	options: Options<PutV1CompaniesAddressesData, ThrowOnError>,

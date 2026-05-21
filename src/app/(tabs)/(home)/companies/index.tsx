@@ -1,11 +1,12 @@
 import type { Href } from "expo-router";
 import { Link } from "expo-router";
 import {
-	ArrowRight,
-	Clock3Icon,
+	ArrowRightIcon,
+	Clock8Icon,
 	FactoryIcon,
+	LockKeyholeIcon,
 	type LucideIcon,
-	MapPinIcon,
+	MapIcon,
 	RecycleIcon,
 	SettingsIcon,
 	WrenchIcon,
@@ -13,7 +14,9 @@ import {
 import { Pressable, ScrollView, View } from "react-native";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { Text } from "@/components/ui/text";
+import { useUserCompanyContext } from "@/contexts/user-company-context";
 
 type CompanySetting = {
 	title: string;
@@ -22,15 +25,7 @@ type CompanySetting = {
 	href: Href;
 };
 
-type PremiumResource = {
-	title: string;
-	description: string;
-	icon: LucideIcon;
-};
-
-const completionRate = 70;
-
-const settings: CompanySetting[] = [
+const companyOptions: CompanySetting[] = [
 	{
 		title: "Empresa",
 		description: "Informações cadastrais gerais sobre a sua empresa.",
@@ -40,21 +35,15 @@ const settings: CompanySetting[] = [
 	{
 		title: "Endereço",
 		description: "Informe seu endereço para que as pessoas te encontre.",
-		icon: MapPinIcon,
+		icon: MapIcon,
 		href: "/(tabs)/(home)/companies/address",
 	},
 	{
 		title: "Funcionamento",
 		description: "Informe os dias e horários em que sua empresa está aberta.",
-		icon: Clock3Icon,
+		icon: Clock8Icon,
 		href: "/(tabs)/(home)/companies/business-hours",
 	},
-	// {
-	//   title: "Métodos financeiros",
-	//   description: "Cadastre as formas de pagamento e recebimento aceitas.",
-	//   icon: BanknoteIcon,
-	//   href: "/(tabs)/(home)/companies/financial-methods",
-	// },
 	{
 		title: "Serviços",
 		description: "Descreva os serviços que sua empresa oferece ao publico.",
@@ -65,7 +54,7 @@ const settings: CompanySetting[] = [
 		title: "Gestão de resíduos",
 		description: "Configure como sua empresa lida com os tipos de resíduos.",
 		icon: RecycleIcon,
-		href: "/(tabs)/(home)/companies/waste-management",
+		href: "/(tabs)/(home)/companies/waste",
 	},
 ];
 
@@ -84,6 +73,9 @@ const settings: CompanySetting[] = [
 // ];
 
 export default function CompaniesHomeScreen() {
+	const { company, completionRate } = useUserCompanyContext();
+	const isCompanyRegistered = company != null;
+
 	return (
 		<ScrollView
 			className="flex-1 bg-white"
@@ -112,38 +104,60 @@ export default function CompaniesHomeScreen() {
 						<Text className="text-xs">{completionRate}%</Text>
 					</View>
 
-					<View className="h-2 rounded-full bg-muted overflow-hidden">
-						<View
-							className="h-2 rounded-full bg-lime-500"
-							style={{ width: "26%" }}
-						/>
-					</View>
+					<Progress value={completionRate} className="h-2">
+						<ProgressFilledTrack className="bg-lime-500" />
+					</Progress>
 
 					<View className="gap-2 pt-1">
-						{settings.map(setting => (
-							<Link key={setting.title} href={setting.href} asChild>
-								<Pressable>
-									<Card className="shadow-none">
-										<View className="flex-row items-center gap-3">
-											<View className="size-8 items-center justify-center">
-												<setting.icon size={28} strokeWidth={1.5} />
-											</View>
+						{companyOptions.map((option, index) => {
+							const isLocked = index !== 0 && !isCompanyRegistered;
 
-											<View className="flex-1">
-												<Text className="text-lg text-foreground font-semibold">
-													{setting.title}
-												</Text>
-												<Text className="text-muted-foreground">
-													{setting.description}
-												</Text>
-											</View>
-
-											<ArrowRight size={18} />
+							const cardContent = (
+								<Card className="shadow-none">
+									<View className="flex-row items-center gap-3">
+										<View className="size-8 items-center justify-center">
+											<option.icon
+												size={28}
+												strokeWidth={1.5}
+												className={
+													isLocked ? "text-muted-foreground" : undefined
+												}
+											/>
 										</View>
-									</Card>
-								</Pressable>
-							</Link>
-						))}
+
+										<View className="flex-1">
+											<Text
+												className={`text-lg font-semibold ${isLocked ? "text-muted-foreground" : "text-foreground"}`}
+											>
+												{option.title}
+											</Text>
+											<Text className="text-muted-foreground">
+												{option.description}
+											</Text>
+										</View>
+
+										{isLocked ? (
+											<LockKeyholeIcon
+												size={18}
+												className="text-muted-foreground"
+											/>
+										) : (
+											<ArrowRightIcon size={18} />
+										)}
+									</View>
+								</Card>
+							);
+
+							if (isLocked) {
+								return <View key={option.title}>{cardContent}</View>;
+							}
+
+							return (
+								<Link key={option.title} href={option.href} asChild>
+									<Pressable>{cardContent}</Pressable>
+								</Link>
+							);
+						})}
 					</View>
 				</View>
 

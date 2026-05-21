@@ -5,7 +5,6 @@ import {
 	FactoryIcon,
 	LogOutIcon,
 	type LucideIcon,
-	RecycleIcon,
 	SproutIcon,
 } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
@@ -38,21 +37,12 @@ export default function SettingsScreen() {
 			link: "/plans",
 		},
 		{
-			title: "Para empresas",
+			title: "Minhas empresas",
 			description: "Gerencie suas empresas, produtos e serviços",
 			icon: FactoryIcon,
 			is_premium: true,
 			highlight: false,
 			link: "/(tabs)/(home)/companies",
-		},
-		{
-			title: "Para coletores",
-			description:
-				"Para coletores independentes, gerencie suas coletas e ganhos",
-			icon: RecycleIcon,
-			is_premium: false,
-			highlight: false,
-			link: "/(tabs)/(home)/collectors",
 		},
 		{
 			title: "Seja um patrocinador",
