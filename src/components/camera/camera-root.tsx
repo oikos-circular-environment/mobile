@@ -39,6 +39,7 @@ export function CameraRoot({
 
 	const [mode, setMode] = useState<ComplaintCaptureMode>(defaultMode);
 	const [isRecording, setIsRecording] = useState(false);
+	const [isCapturing, setIsCapturing] = useState(false);
 	const [isModeTransitioning, setIsModeTransitioning] = useState(false);
 	const [flash, setFlash] = useState<FlashMode>("off");
 	const [zoom, setZoomRaw] = useState(0);
@@ -100,6 +101,8 @@ export function CameraRoot({
 		if (!cameraRef.current || isModeTransitioning) return;
 
 		if (mode === "photo") {
+			if (isCapturing) return;
+			setIsCapturing(true);
 			try {
 				const picture = await cameraRef.current.takePictureAsync({
 					quality: 0.8,
@@ -107,6 +110,8 @@ export function CameraRoot({
 				if (picture?.uri) onCapture(picture, "photo");
 			} catch (err) {
 				console.error("[Camera] takePictureAsync failed:", err);
+			} finally {
+				setIsCapturing(false);
 			}
 			return;
 		}
@@ -138,6 +143,7 @@ export function CameraRoot({
 				cameraRef,
 				mode,
 				isRecording,
+				isCapturing,
 				isModeTransitioning,
 				flash,
 				zoom,

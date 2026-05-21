@@ -15,11 +15,9 @@ import type {
 } from "@/libs/types/complaint";
 
 export default function ComplaintCameraScreen() {
-	const { addCapture, captures } = useComplaintCreateContext();
+	const { addCapture, captures, deleteCapture } = useComplaintCreateContext();
 	const { addresses, location, heading } = useGeospatial();
 	const insets = useSafeAreaInsets();
-
-	const latestCapture = captures[0] ?? null;
 
 	function saveInMemory(
 		captureObject: CameraCapturedPicture | CameraCapturedVideo,
@@ -143,11 +141,7 @@ export default function ComplaintCameraScreen() {
 				style={{ bottom: insets.bottom + 10 }}
 			>
 				<View className="flex-row items-end justify-between">
-					<Camera.MediaPreview
-						type={latestCapture?.capture.type}
-						uri={latestCapture?.capture.object?.uri}
-						hasMore={captures.length > 1}
-					/>
+					<Camera.MediaPreview captures={captures} onDelete={deleteCapture} />
 
 					<Camera.CaptureButton />
 

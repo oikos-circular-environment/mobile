@@ -6,6 +6,7 @@ export type CameraContextValue = {
 	cameraRef: RefObject<CameraView | null>;
 	mode: ComplaintCaptureMode;
 	isRecording: boolean;
+	isCapturing: boolean;
 	isModeTransitioning: boolean;
 	flash: FlashMode;
 	zoom: number;

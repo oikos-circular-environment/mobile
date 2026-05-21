@@ -3,7 +3,7 @@ import { Text } from "@/components/ui/text";
 import { useCameraContext } from "./context";
 
 export function CameraCaptureButton() {
-	const { mode, isRecording, isModeTransitioning, handleCapture } =
+	const { mode, isRecording, isCapturing, isModeTransitioning, handleCapture } =
 		useCameraContext();
 
 	return (
@@ -12,7 +12,7 @@ export function CameraCaptureButton() {
 				mode === "video" && isRecording ? "bg-red-600" : "bg-white"
 			}`}
 			onPress={handleCapture}
-			disabled={isModeTransitioning}
+			disabled={isModeTransitioning || isCapturing}
 		>
 			<View className="h-18 w-18 rounded-full border-2 border-white/50" />
 		</TouchableOpacity>
