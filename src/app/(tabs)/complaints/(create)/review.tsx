@@ -10,6 +10,7 @@ import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { ComplaintCarousel } from "@/components/complaints/complaint-carousel";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
+import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -25,19 +26,21 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { toast } from "@/components/toast";
-import { COMPLAINTS_QUERY_KEY, DASHBOARD_QUERY_KEY } from "@/contexts/complaints-context";
-import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
 import {
-	postV1Complaints,
-	postV1ComplaintsAttachments,
-} from "@/libs/oikos-sdk";
-import type { PostV1ComplaintsAttachmentsData } from "@/libs/oikos-sdk";
+	COMPLAINTS_QUERY_KEY,
+	DASHBOARD_QUERY_KEY,
+} from "@/contexts/complaints-context";
+import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
 import {
 	formatHeading,
 	formatMeters,
 	formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
+import type { PostV1ComplaintsAttachmentsData } from "@/libs/oikos-sdk";
+import {
+	postV1Complaints,
+	postV1ComplaintsAttachments,
+} from "@/libs/oikos-sdk";
 import {
 	type ComplaintCapture,
 	type ComplaintType,
@@ -164,7 +167,10 @@ export default function ComplaintReviewScreen() {
 	const longitude = selectedCapture.geospatial.location.coords.longitude;
 
 	const latitudeFormatted = formatSexagesimalCoordinate(latitude, "latitude");
-	const longitudeFormatted = formatSexagesimalCoordinate(longitude, "longitude");
+	const longitudeFormatted = formatSexagesimalCoordinate(
+		longitude,
+		"longitude",
+	);
 	const altitudeFormatted = formatMeters(
 		selectedCapture.geospatial.location.coords.altitude,
 	);

@@ -61,7 +61,7 @@ export default function ComplaintsScreen() {
 				<Heading>Dashboard</Heading>
 				<Text>
 					Os campos abaixo servem como filtros, clique sobre eles para filtrar
-					suas consultas
+					sua lista.
 				</Text>
 			</View>
 

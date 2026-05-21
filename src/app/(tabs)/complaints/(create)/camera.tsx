@@ -155,10 +155,6 @@ export default function ComplaintCameraScreen() {
 						<ArrowRight size={34} color="#3d6300" strokeWidth={2.2} />
 					</TouchableOpacity>
 				</View>
-
-				<View className="mt-2 items-center">
-					<Camera.CaptureHint />
-				</View>
 			</View>
 		</Camera>
 	);
