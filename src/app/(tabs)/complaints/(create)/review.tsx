@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -162,23 +160,16 @@ export default function ComplaintReviewScreen() {
 		? format(captureDate, "EEEE", { locale: ptBR })
 		: "-";
 
-	const latitude = selectedCapture.geospatial.location?.coords.latitude ?? null;
-	const longitude =
-		selectedCapture.geospatial.location?.coords.longitude ?? null;
+	const latitude = selectedCapture.geospatial.location.coords.latitude;
+	const longitude = selectedCapture.geospatial.location.coords.longitude;
 
-	const latitudeFormatted =
-		latitude != null
-			? formatSexagesimalCoordinate(latitude, "latitude")
-			: "indisponivel";
-	const longitudeFormatted =
-		longitude != null
-			? formatSexagesimalCoordinate(longitude, "longitude")
-			: "indisponivel";
+	const latitudeFormatted = formatSexagesimalCoordinate(latitude, "latitude");
+	const longitudeFormatted = formatSexagesimalCoordinate(longitude, "longitude");
 	const altitudeFormatted = formatMeters(
-		selectedCapture.geospatial.location?.coords.altitude,
+		selectedCapture.geospatial.location.coords.altitude,
 	);
 	const headingFormatted = formatHeading(
-		selectedCapture.geospatial.heading?.magHeading,
+		selectedCapture.geospatial.heading.magHeading,
 		{
 			includeCompass: true,
 		},
@@ -214,20 +205,18 @@ export default function ComplaintReviewScreen() {
 								mocked: capture.geospatial.location.mocked,
 							},
 							addresses: {
-								city: capture.geospatial.addresses.city ?? null,
-								district: capture.geospatial.addresses.district ?? null,
-								streetNumber: capture.geospatial.addresses.streetNumber ?? null,
-								street: capture.geospatial.addresses.street ?? null,
-								region: capture.geospatial.addresses.region ?? null,
-								subregion: capture.geospatial.addresses.subregion ?? null,
-								country: capture.geospatial.addresses.country ?? null,
-								postalCode: capture.geospatial.addresses.postalCode ?? null,
-								name: capture.geospatial.addresses.name ?? null,
-								isoCountryCode:
-									capture.geospatial.addresses.isoCountryCode ?? null,
-								timezone: capture.geospatial.addresses.timezone ?? null,
-								formattedAddress:
-									capture.geospatial.addresses.formattedAddress ?? null,
+								city: capture.geospatial.addresses.city,
+								district: capture.geospatial.addresses.district,
+								streetNumber: capture.geospatial.addresses.streetNumber,
+								street: capture.geospatial.addresses.street,
+								region: capture.geospatial.addresses.region,
+								subregion: capture.geospatial.addresses.subregion,
+								country: capture.geospatial.addresses.country,
+								postalCode: capture.geospatial.addresses.postalCode,
+								name: capture.geospatial.addresses.name,
+								isoCountryCode: capture.geospatial.addresses.isoCountryCode,
+								timezone: capture.geospatial.addresses.timezone,
+								formattedAddress: capture.geospatial.addresses.formattedAddress,
 							},
 						},
 					},

@@ -1,6 +1,4 @@
-"use client";
-
-import { faker } from "@faker-js/faker";
+import * as Crypto from "expo-crypto";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import {
@@ -10,11 +8,11 @@ import {
 	useMicrophonePermissions,
 } from "expo-camera";
 import { Image } from "expo-image";
-import type * as Location from "expo-location";
 import { router } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -29,6 +27,7 @@ import type {
 	CameraCapturedVideo,
 	ComplaintCapture,
 	ComplaintCaptureMode,
+	Geospatial,
 } from "@/libs/types/complaint";
 
 const overlayTextStrokeStyle = {
@@ -52,6 +51,7 @@ export default function ComplaintCameraScreen() {
 		useMicrophonePermissions();
 
 	const { addresses, currentDate, location, heading } = useGeospatial();
+	const insets = useSafeAreaInsets();
 
 	const latestCapture = captures[0] ?? null;
 	const previousCapture = captures[1] ?? null;
@@ -75,7 +75,16 @@ export default function ComplaintCameraScreen() {
 		}
 
 		const address = addresses[0];
-		return `${address.street}, ${address.streetNumber}, ${address.district}, ${address.city}, ${address.region} - ${address.postalCode}`;
+		const parts = [
+			address.street,
+			address.streetNumber,
+			address.district,
+			address.city,
+			address.region,
+			address.postalCode,
+		].filter(Boolean);
+
+		return parts.length > 0 ? parts.join(", ") : "indisponivel";
 	}, [addresses]);
 
 	const headingFormatted = useMemo(
@@ -150,54 +159,59 @@ export default function ComplaintCameraScreen() {
 		captureObject: CameraCapturedPicture | CameraCapturedVideo,
 		captureType: ComplaintCaptureMode,
 	) {
-		const fallbackHeading: Location.LocationHeadingObject = {
-			magHeading: 0,
-			trueHeading: 0,
-			accuracy: 0,
-		};
-
-		const fallbackLocation: Location.LocationObject = {
-			coords: {
-				latitude: 0,
-				longitude: 0,
-				altitude: null,
-				accuracy: null,
-				altitudeAccuracy: null,
-				heading: null,
-				speed: null,
-			},
-			timestamp: Date.now(),
-		};
-
-		const fallbackAddress: Location.LocationGeocodedAddress = {
-			city: "",
-			country: "",
-			district: "",
-			formattedAddress: "",
-			isoCountryCode: "",
-			name: "",
-			postalCode: "",
-			region: "",
-			street: "",
-			streetNumber: "",
-			subregion: "",
-			timezone: "",
-		};
-
 		const nowIso = new Date().toISOString();
 
+		const geospatial: Geospatial = {
+			heading: heading
+				? { trueHeading: heading.trueHeading, magHeading: heading.magHeading, accuracy: heading.accuracy }
+				: { trueHeading: 0, magHeading: 0, accuracy: 0 },
+			location: location
+				? {
+						coords: {
+							latitude: location.coords.latitude,
+							longitude: location.coords.longitude,
+							altitude: location.coords.altitude,
+							accuracy: location.coords.accuracy,
+							altitudeAccuracy: location.coords.altitudeAccuracy,
+							heading: location.coords.heading,
+							speed: location.coords.speed,
+						},
+						timestamp: location.timestamp,
+					}
+				: {
+						coords: { latitude: 0, longitude: 0, altitude: null, accuracy: null, altitudeAccuracy: null, heading: null, speed: null },
+						timestamp: Date.now(),
+					},
+			addresses: addresses[0]
+				? {
+						city: addresses[0].city,
+						district: addresses[0].district,
+						streetNumber: addresses[0].streetNumber,
+						street: addresses[0].street,
+						region: addresses[0].region,
+						subregion: addresses[0].subregion,
+						country: addresses[0].country,
+						postalCode: addresses[0].postalCode,
+						name: addresses[0].name,
+						isoCountryCode: addresses[0].isoCountryCode,
+						timezone: addresses[0].timezone,
+						formattedAddress: addresses[0].formattedAddress,
+					}
+				: {
+						city: null, district: null, streetNumber: null, street: null,
+						region: null, subregion: null, country: null, postalCode: null,
+						name: null, isoCountryCode: null, timezone: null, formattedAddress: null,
+					},
+		};
+
 		const snapshot: ComplaintCapture = {
-			id: faker.database.mongodbObjectId(),
+			id: Crypto.randomUUID(),
 			capture: {
 				type: captureType,
 				object: captureObject,
 			},
 			date: nowIso,
-			geospatial: {
-				heading: heading ?? fallbackHeading,
-				location: location ?? fallbackLocation,
-				addresses: addresses[0] ?? fallbackAddress,
-			},
+			geospatial,
 			type: "IRREGULAR_DISPOSAL",
 			observation: "",
 			created_at: nowIso,
@@ -308,7 +322,7 @@ export default function ComplaintCameraScreen() {
 				</TouchableOpacity>
 			</View>
 
-			<View className="absolute bottom-70 left-0 right-0 px-4">
+			<View className="absolute left-0 right-0 px-4" style={{ bottom: insets.bottom + 280 }}>
 				<View className="rounded-2xl bg-black/35 p-3">
 					<Heading
 						className="text-white text-4xl"
@@ -341,7 +355,7 @@ export default function ComplaintCameraScreen() {
 				</View>
 			</View>
 
-			<View className="absolute bottom-46 left-0 right-0 px-4">
+			<View className="absolute left-0 right-0 px-4" style={{ bottom: insets.bottom + 184 }}>
 				<View className="flex-row rounded-2xl bg-white/90 p-1">
 					<TouchableOpacity
 						className={`flex-1 items-center rounded-xl py-3 ${
@@ -373,7 +387,7 @@ export default function ComplaintCameraScreen() {
 				</View>
 			</View>
 
-			<View className="absolute bottom-10 left-0 right-0 px-4">
+			<View className="absolute left-0 right-0 px-4" style={{ bottom: insets.bottom + 40 }}>
 				<View className="flex-row items-end justify-between">
 					<TouchableOpacity
 						className="h-20 w-20 overflow-hidden rounded-xl"
@@ -413,7 +427,7 @@ export default function ComplaintCameraScreen() {
 						onPress={handleCapture}
 						disabled={isModeTransitioning}
 					>
-						<View className="h-24 w-24 rounded-full border-2 border-white/50" />
+						<View className="h-18 w-18 rounded-full border-2 border-white/50" />
 					</TouchableOpacity>
 
 					<TouchableOpacity
