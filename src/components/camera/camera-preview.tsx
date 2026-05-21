@@ -9,6 +9,7 @@ export function CameraPreview() {
 		cameraRef,
 		mode,
 		flash,
+		zoom,
 		isModeTransitioning,
 		handleCameraReady,
 		cameraPermission,
@@ -31,12 +32,13 @@ export function CameraPreview() {
 	}
 
 	return (
-		<>
+		<View style={{ flex: 1 }}>
 			<CameraView
 				ref={cameraRef}
 				style={{ flex: 1 }}
 				mode={mode === "photo" ? "picture" : "video"}
 				flash={flash}
+				zoom={zoom}
 				onCameraReady={handleCameraReady}
 			/>
 			{isModeTransitioning && (
@@ -47,6 +49,6 @@ export function CameraPreview() {
 					</View>
 				</View>
 			)}
-		</>
+		</View>
 	);
 }

@@ -8,6 +8,7 @@ import { CameraModeSelector } from "./camera-mode-selector";
 import { CameraPreview } from "./camera-preview";
 import { CameraRecordingTimer } from "./camera-recording-timer";
 import { CameraRoot } from "./camera-root";
+import { CameraZoomControls } from "./camera-zoom-controls";
 
 export { useCameraContext } from "./context";
 
@@ -19,4 +20,5 @@ export const Camera = Object.assign(CameraRoot, {
 	CaptureHint: CameraCaptureHint,
 	MediaPreview: CameraMediaPreview,
 	RecordingTimer: CameraRecordingTimer,
+	ZoomControls: CameraZoomControls,
 });

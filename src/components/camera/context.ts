@@ -8,10 +8,12 @@ export type CameraContextValue = {
 	isRecording: boolean;
 	isModeTransitioning: boolean;
 	flash: FlashMode;
+	zoom: number;
 	handleModeChange: (mode: ComplaintCaptureMode) => void;
 	handleCameraReady: () => void;
 	handleCapture: () => Promise<void>;
 	toggleFlash: () => void;
+	setZoom: (value: number) => void;
 	cameraPermission: PermissionResponse | null;
 	requestCameraPermission: () => Promise<PermissionResponse>;
 	microphonePermission: PermissionResponse | null;

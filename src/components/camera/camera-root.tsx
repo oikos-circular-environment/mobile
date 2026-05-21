@@ -5,7 +5,13 @@ import {
 	useCameraPermissions,
 	useMicrophonePermissions,
 } from "expo-camera";
-import { type PropsWithChildren, useEffect, useRef, useState } from "react";
+import {
+	type PropsWithChildren,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { View } from "react-native";
 import type {
 	CameraCapturedVideo,
@@ -35,6 +41,7 @@ export function CameraRoot({
 	const [isRecording, setIsRecording] = useState(false);
 	const [isModeTransitioning, setIsModeTransitioning] = useState(false);
 	const [flash, setFlash] = useState<FlashMode>("off");
+	const [zoom, setZoomRaw] = useState(0);
 
 	const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 	const [microphonePermission, requestMicrophonePermission] =
@@ -79,6 +86,10 @@ export function CameraRoot({
 		setFlash(current => (current === "off" ? "on" : "off"));
 	};
 
+	const setZoom = useCallback((value: number) => {
+		setZoomRaw(Math.max(0, Math.min(1, value)));
+	}, []);
+
 	async function ensureMicrophonePermission() {
 		if (microphonePermission?.granted) return true;
 		const permission = await requestMicrophonePermission();
@@ -121,10 +132,12 @@ export function CameraRoot({
 				isRecording,
 				isModeTransitioning,
 				flash,
+				zoom,
 				handleModeChange,
 				handleCameraReady,
 				handleCapture,
 				toggleFlash,
+				setZoom,
 				cameraPermission,
 				requestCameraPermission,
 				microphonePermission,

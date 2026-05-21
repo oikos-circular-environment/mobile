@@ -130,6 +130,8 @@ export default function ComplaintCameraScreen() {
 
 			<Camera.GeospatialOverlay />
 
+			<Camera.ZoomControls style={{ bottom: insets.bottom + 184 }} />
+
 			<Camera.ModeSelector style={{ bottom: insets.bottom + 120 }} />
 
 			<View

@@ -6,6 +6,7 @@ import { UserProvider } from "@/contexts/auth-context";
 import { GeospatialProvider } from "@/contexts/geospatial-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
@@ -27,6 +28,7 @@ export default function RootLayout() {
 				<GeospatialProvider>
 					<NotificationProvider>
 						<GluestackUIProvider mode="light">
+							<GestureHandlerRootView style={{ flex: 1 }}>
 							<SafeAreaProvider>
 								<Toaster />
 								<SafeAreaView
@@ -42,6 +44,7 @@ export default function RootLayout() {
 									<StatusBar style="dark" animated />
 								</SafeAreaView>
 							</SafeAreaProvider>
+						</GestureHandlerRootView>
 						</GluestackUIProvider>
 					</NotificationProvider>
 				</GeospatialProvider>
