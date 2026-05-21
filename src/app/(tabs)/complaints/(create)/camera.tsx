@@ -257,7 +257,7 @@ export default function ComplaintCameraScreen() {
 			return;
 		}
 
-		router.push("/complaints/review" as never);
+		router.push("/(tabs)/complaints/(create)/review");
 	};
 
 	if (!cameraPermission) {

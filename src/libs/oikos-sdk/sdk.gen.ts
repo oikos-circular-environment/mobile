@@ -549,7 +549,7 @@ export const putV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
 /**
  * List complaints
  *
- * Returns all complaints from the authenticated user.
+ * Returns a paginated list of complaints for the authenticated user. Use `cursor` (the `next_cursor` from the previous response) for infinite scroll. Filter by `type` and/or `status` as needed.
  */
 export const getV1Complaints = <ThrowOnError extends boolean = false>(
 	options?: Options<GetV1ComplaintsData, ThrowOnError>,

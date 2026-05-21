@@ -120,8 +120,7 @@ export default function ComplaintReviewScreen() {
 	}, [selectedCapture, reset]);
 
 	if (captures.length === 0 || !selectedCapture) {
-		// return router.replace("/(tabs)/complaints/(create)/camera");
-		return router.back();
+		return router.replace("/(tabs)/complaints/(create)/camera");
 	}
 
 	const handleBack = () => {
@@ -180,10 +179,7 @@ export default function ComplaintReviewScreen() {
 	});
 
 	return (
-		<KeyboardAvoidingView
-			behavior={process.env.EXPO_OS === "ios" ? "padding" : "height"}
-			className="flex-1 bg-white"
-		>
+		<KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">
 			<ScrollView
 				className="flex-1 bg-white"
 				contentInsetAdjustmentBehavior="automatic"

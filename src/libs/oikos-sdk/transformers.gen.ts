@@ -180,7 +180,7 @@ export const putV1CompaniesAddressesResponseTransformer = async (
 export const getV1ComplaintsResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ComplaintsResponse> => {
-	data = data.map((item: any) => {
+	data.complaints = data.complaints.map((item: any) => {
 		item.date = new Date(item.date);
 		if (item.attachment) {
 			item.attachment.created_at = new Date(item.attachment.created_at);
@@ -188,71 +188,86 @@ export const getV1ComplaintsResponseTransformer = async (
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
+	if (data.next_cursor) {
+		data.next_cursor = new Date(data.next_cursor);
+	}
 	return data;
 };
 
 export const postV1ComplaintsResponseTransformer = async (
 	data: any,
 ): Promise<PostV1ComplaintsResponse> => {
-	data.date = new Date(data.date);
-	if (data.attachment) {
-		data.attachment.created_at = new Date(data.attachment.created_at);
+	data.complaint.date = new Date(data.complaint.date);
+	if (data.complaint.attachment) {
+		data.complaint.attachment.created_at = new Date(
+			data.complaint.attachment.created_at,
+		);
 	}
-	data.created_at = new Date(data.created_at);
+	data.complaint.created_at = new Date(data.complaint.created_at);
 	return data;
 };
 
 export const getV1ComplaintsByIdResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ComplaintsByIdResponse> => {
-	data.date = new Date(data.date);
-	if (data.attachment) {
-		data.attachment.created_at = new Date(data.attachment.created_at);
+	data.complaint.date = new Date(data.complaint.date);
+	if (data.complaint.attachment) {
+		data.complaint.attachment.created_at = new Date(
+			data.complaint.attachment.created_at,
+		);
 	}
-	data.created_at = new Date(data.created_at);
+	data.complaint.created_at = new Date(data.complaint.created_at);
 	return data;
 };
 
 export const patchV1ComplaintsByIdResponseTransformer = async (
 	data: any,
 ): Promise<PatchV1ComplaintsByIdResponse> => {
-	data.date = new Date(data.date);
-	if (data.attachment) {
-		data.attachment.created_at = new Date(data.attachment.created_at);
+	data.complaint.date = new Date(data.complaint.date);
+	if (data.complaint.attachment) {
+		data.complaint.attachment.created_at = new Date(
+			data.complaint.attachment.created_at,
+		);
 	}
-	data.created_at = new Date(data.created_at);
+	data.complaint.created_at = new Date(data.complaint.created_at);
 	return data;
 };
 
 export const patchV1ComplaintsByIdResolvedResponseTransformer = async (
 	data: any,
 ): Promise<PatchV1ComplaintsByIdResolvedResponse> => {
-	data.date = new Date(data.date);
-	if (data.attachment) {
-		data.attachment.created_at = new Date(data.attachment.created_at);
+	data.complaint.date = new Date(data.complaint.date);
+	if (data.complaint.attachment) {
+		data.complaint.attachment.created_at = new Date(
+			data.complaint.attachment.created_at,
+		);
 	}
-	data.created_at = new Date(data.created_at);
+	data.complaint.created_at = new Date(data.complaint.created_at);
 	return data;
 };
 
 export const patchV1ComplaintsByIdCanceledResponseTransformer = async (
 	data: any,
 ): Promise<PatchV1ComplaintsByIdCanceledResponse> => {
-	data.date = new Date(data.date);
-	if (data.attachment) {
-		data.attachment.created_at = new Date(data.attachment.created_at);
+	data.complaint.date = new Date(data.complaint.date);
+	if (data.complaint.attachment) {
+		data.complaint.attachment.created_at = new Date(
+			data.complaint.attachment.created_at,
+		);
 	}
-	data.created_at = new Date(data.created_at);
+	data.complaint.created_at = new Date(data.complaint.created_at);
 	return data;
 };
 
 export const postV1ComplaintsAttachmentsResponseTransformer = async (
 	data: any,
 ): Promise<PostV1ComplaintsAttachmentsResponse> => {
-	data.date = new Date(data.date);
-	if (data.attachment) {
-		data.attachment.created_at = new Date(data.attachment.created_at);
+	data.complaint.date = new Date(data.complaint.date);
+	if (data.complaint.attachment) {
+		data.complaint.attachment.created_at = new Date(
+			data.complaint.attachment.created_at,
+		);
 	}
-	data.created_at = new Date(data.created_at);
+	data.complaint.created_at = new Date(data.complaint.created_at);
 	return data;
 };

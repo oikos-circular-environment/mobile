@@ -131,8 +131,8 @@ export default function MarketScreen() {
 
 					<View className="gap-4">
 						<View className="gap-1">
-							<Heading className="text-xl text-black">Lista</Heading>
-							<Text className="text-xs leading-4 text-gray-400">
+							<Heading>Ecossitema</Heading>
+							<Text>
 								A listagem irá oferecer a ocorrencia de acordo com sua pesquisa,
 								clique na empresa para obter mais informações.
 							</Text>
