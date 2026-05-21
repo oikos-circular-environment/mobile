@@ -66,10 +66,13 @@ function ComplaintCardContent() {
 			.filter(Boolean)
 			.join(", ");
 
-	const createdAtLabel = new Date(complaint.created_at).toLocaleString("pt-BR", {
-		dateStyle: "short",
-		timeStyle: "medium",
-	});
+	const createdAtLabel = new Date(complaint.created_at).toLocaleString(
+		"pt-BR",
+		{
+			dateStyle: "short",
+			timeStyle: "medium",
+		},
+	);
 	const coordinatesLabel = `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`;
 	const isMutating = isResolvingComplaint || isCancelingComplaint;
 
@@ -84,6 +87,14 @@ function ComplaintCardContent() {
 		>
 			<View className="gap-2">
 				<View className="flex-row items-center gap-2">
+					{complaint.attachment?.url &&
+					complaint.attachment.type === "PHOTO" ? (
+						<Image
+							source={{ uri: complaint.attachment.url }}
+							contentFit="cover"
+							style={{ width: 48, height: 48, borderRadius: 8 }}
+						/>
+					) : null}
 					<View className="flex-1 justify-center">
 						<Heading numberOfLines={1}>
 							{address || "Endereço não informado"}
@@ -183,15 +194,6 @@ function ComplaintCardContent() {
 					</View>
 				</View>
 
-				{complaint.attachment?.url &&
-				complaint.attachment.type === "PHOTO" ? (
-					<Image
-						source={{ uri: complaint.attachment.url }}
-						contentFit="cover"
-						style={{ width: "100%", height: 160, borderRadius: 8 }}
-					/>
-				) : null}
-
 				<ComplaintMap latitude={coords.latitude} longitude={coords.longitude} />
 			</View>
 		</Card>
@@ -211,10 +213,7 @@ export function ComplaintCardSkeleton() {
 						<Skeleton startColor="bg-gray-200" className="h-3 w-1/2 rounded" />
 						<Skeleton startColor="bg-gray-200" className="h-3 w-1/3 rounded" />
 					</View>
-					<Skeleton
-						startColor="bg-gray-200"
-						className="size-16 rounded-md"
-					/>
+					<Skeleton startColor="bg-gray-200" className="size-16 rounded-md" />
 				</View>
 				<Skeleton startColor="bg-gray-200" className="h-32 w-full rounded" />
 			</View>
