@@ -1,77 +1,30 @@
 "use client";
 
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { Plus, ShieldIcon } from "lucide-react-native";
+import { useCallback } from "react";
 import { ScrollView, View } from "react-native";
-import { ComplaintCard } from "@/components/complaints/complaint-card";
+import {
+	ComplaintCard,
+	ComplaintCardSkeleton,
+} from "@/components/complaints/complaint-card";
 import { ComplaintPainel } from "@/components/complaints/complaint-painel";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import type { Complaint } from "@/libs/types/complaint";
-
-const complaintPainelValues = {
-	total: 10,
-	resolved: 4,
-	pending: 5,
-	canceled: 1,
-};
-
-const complaint: Complaint[] = [
-	{
-		id: "complaint-1",
-		capture: {
-			type: "photo",
-			object: {
-				uri: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=960&q=80",
-			},
-		},
-		date: "2026-04-09T14:50:26.000Z",
-		geospatial: {
-			heading: {
-				accuracy: 3,
-				trueHeading: 124.5,
-				magHeading: 120.3,
-			},
-			location: {
-				coords: {
-					accuracy: 5,
-					altitude: 320,
-					latitude: -16.4708,
-					longitude: -54.6354,
-					altitudeAccuracy: 8,
-					heading: 124.5,
-					speed: 0,
-				},
-				timestamp: 1744210226000,
-				mocked: true,
-			},
-			addresses: {
-				streetNumber: "144",
-				street: "Rua A",
-				city: "Rondonópolis",
-				country: "Brasil",
-				postalCode: "78700-000",
-				region: "Mato Grosso",
-				subregion: "Centro-Sul Mato-grossense",
-				district: "São Cristóvão",
-				formattedAddress:
-					"Rua A, 144, São Cristóvão, Rondonópolis - MT, 78700-000",
-				isoCountryCode: "BR",
-				name: "Ponto de descarte irregular",
-				timezone: "America/Cuiaba",
-			},
-		},
-		type: "irregular_disposal",
-		observation: "Acúmulo de entulho e resíduos em via pública.",
-		created_at: "2026-04-09T14:50:26.000Z",
-		updated_at: "2026-04-09T14:50:26.000Z",
-		status: "pending",
-	},
-];
+import { useComplaintsContext } from "@/contexts/complaints-context";
 
 export default function ComplaintsScreen() {
+	const { filteredComplaints, isLoadingComplaints, refetchAll } =
+		useComplaintsContext();
+
+	useFocusEffect(
+		useCallback(() => {
+			refetchAll();
+		}, [refetchAll]),
+	);
+
 	return (
 		<ScrollView
 			className="flex-1 bg-white"
@@ -105,19 +58,38 @@ export default function ComplaintsScreen() {
 			</Button>
 
 			<View className="justify-center">
-				<Heading>Painel de Denúncias</Heading>
+				<Heading>Dashboard</Heading>
+				<Text>
+					Os campos abaixo servem como filtros, clique sobre eles para filtrar
+					suas consultas
+				</Text>
 			</View>
 
-			<ComplaintPainel panel={complaintPainelValues} />
+			<ComplaintPainel />
 
 			<View>
 				<Heading>Denúncias</Heading>
 			</View>
 
 			<View className="gap-4">
-				{complaint.map((item, index) => (
-					<ComplaintCard key={index} complaint={item} />
-				))}
+				{isLoadingComplaints ? (
+					<>
+						<ComplaintCardSkeleton />
+						<ComplaintCardSkeleton />
+						<ComplaintCardSkeleton />
+					</>
+				) : filteredComplaints.length === 0 ? (
+					<Card className="items-center gap-2 border-gray-100 p-6 shadow-none">
+						<ShieldIcon size={32} color="#9CA3AF" strokeWidth={1.5} />
+						<Text className="text-center text-sm text-gray-500">
+							Nenhuma denúncia encontrada.
+						</Text>
+					</Card>
+				) : (
+					filteredComplaints.map(complaint => (
+						<ComplaintCard key={complaint.id} complaint={complaint} />
+					))
+				)}
 			</View>
 		</ScrollView>
 	);

@@ -1,34 +1,33 @@
 import type { CameraCapturedPicture } from "expo-camera";
-import type * as Location from "expo-location";
 import type { ValueMapping } from "./value-mapping";
 
 export type ComplaintType =
-	| "irregular_disposal"
-	| "deforestation"
-	| "burning"
-	| "vacant_lot";
+	| "IRREGULAR_DISPOSAL"
+	| "DEFORESTATION"
+	| "BURNING"
+	| "VACANT_LOT";
 
 export const complaintTypeValues: ValueMapping<ComplaintType>[] = [
 	{
-		value: "irregular_disposal",
+		value: "IRREGULAR_DISPOSAL",
 		label: "Descarte Irregular",
 		description:
 			"Denúncias relacionadas ao descarte inadequado de resíduos, como lixo, entulho, pneus, animais mortos, entre outros.",
 	},
 	{
-		value: "deforestation",
+		value: "DEFORESTATION",
 		label: "Desmatamento",
 		description:
 			"Denúncias relacionadas à remoção ilegal de vegetação, como corte de árvores, desmatamento de áreas protegidas, entre outros.",
 	},
 	{
-		value: "burning",
+		value: "BURNING",
 		label: "Queimadas",
 		description:
 			"Denúncias relacionadas a incêndios florestais, queimadas ilegais, entre outros.",
 	},
 	{
-		value: "vacant_lot",
+		value: "VACANT_LOT",
 		label: "Terreno Baldio",
 		description:
 			"Denúncias relacionadas à área urbana ou rural sem construções, edificações ou uso ativo, caracterizada pelo abandono, falta de manutenção, vegetação alta e, frequentemente, acúmulo de lixo ou entulho.",
@@ -50,24 +49,25 @@ export type ComplaintCapture = {
 		object: CameraCapturedPicture | CameraCapturedVideo;
 	};
 	date: string;
-	geospatial: {
-		heading: Location.LocationHeadingObject;
-		location: Location.LocationObject;
-		addresses: Location.LocationGeocodedAddress;
-	};
+	geospatial: Geospatial;
 	type: ComplaintType;
 	observation: string;
 	created_at: string;
 	updated_at: string;
 };
 
-export type ComplaintStatus = "pending" | "resolved" | "canceled";
+export type ComplaintStatus =
+	| "OPEN"
+	| "IN_PROGRESS"
+	| "RESOLVED"
+	| "REJECTED"
+	| "CANCELED";
 
 export type Complaint = ComplaintCapture & {
 	status: ComplaintStatus;
 };
 
-type Geospatial = {
+export type Geospatial = {
 	heading: {
 		trueHeading: number;
 		magHeading: number;

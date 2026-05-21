@@ -198,7 +198,7 @@ export default function ComplaintCameraScreen() {
 				location: location ?? fallbackLocation,
 				addresses: addresses[0] ?? fallbackAddress,
 			},
-			type: "irregular_disposal",
+			type: "IRREGULAR_DISPOSAL",
 			observation: "",
 			created_at: nowIso,
 			updated_at: nowIso,

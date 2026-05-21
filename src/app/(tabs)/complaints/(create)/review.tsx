@@ -1,11 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { router } from "expo-router";
 import { ShieldAlert, TriangleAlertIcon } from "lucide-react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
@@ -26,7 +27,14 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { toast } from "@/components/toast";
+import { COMPLAINTS_QUERY_KEY, DASHBOARD_QUERY_KEY } from "@/contexts/complaints-context";
 import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
+import {
+	postV1Complaints,
+	postV1ComplaintsAttachments,
+} from "@/libs/oikos-sdk";
+import type { PostV1ComplaintsAttachmentsData } from "@/libs/oikos-sdk";
 import {
 	formatHeading,
 	formatMeters,
@@ -39,10 +47,10 @@ import {
 } from "@/libs/types/complaint";
 
 const complaintTypeSchema = z.enum([
-	"irregular_disposal",
-	"deforestation",
-	"burning",
-	"vacant_lot",
+	"IRREGULAR_DISPOSAL",
+	"DEFORESTATION",
+	"BURNING",
+	"VACANT_LOT",
 ]);
 
 const reviewSchema = z.object({
@@ -93,12 +101,15 @@ export default function ComplaintReviewScreen() {
 	} = useForm<ReviewFormValues>({
 		resolver: zodResolver(reviewSchema),
 		defaultValues: {
-			type: selectedCapture?.type ?? "irregular_disposal",
+			type: selectedCapture?.type ?? "IRREGULAR_DISPOSAL",
 			observation: selectedCapture?.observation ?? "",
 		},
 	});
 
 	const complaintTypeValue = watch("type");
+
+	const queryClient = useQueryClient();
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const previousSelectedCaptureId = useRef(selectedCapture?.id ?? "");
 
@@ -173,9 +184,93 @@ export default function ComplaintReviewScreen() {
 		},
 	);
 
-	const onSubmit = handleSubmit(() => {
-		clearDraft();
-		router.replace("/(tabs)/complaints");
+	const onSubmit = handleSubmit(async () => {
+		setIsSubmitting(true);
+		try {
+			for (const capture of captures) {
+				const res = await postV1Complaints({
+					body: {
+						date: capture.date,
+						type: capture.type,
+						observations: capture.observation || null,
+						geospatial: {
+							heading: {
+								trueHeading: capture.geospatial.heading.trueHeading,
+								magHeading: capture.geospatial.heading.magHeading,
+								accuracy: capture.geospatial.heading.accuracy,
+							},
+							location: {
+								coords: {
+									latitude: capture.geospatial.location.coords.latitude,
+									longitude: capture.geospatial.location.coords.longitude,
+									altitude: capture.geospatial.location.coords.altitude,
+									accuracy: capture.geospatial.location.coords.accuracy,
+									altitudeAccuracy:
+										capture.geospatial.location.coords.altitudeAccuracy,
+									heading: capture.geospatial.location.coords.heading,
+									speed: capture.geospatial.location.coords.speed,
+								},
+								timestamp: capture.geospatial.location.timestamp,
+								mocked: capture.geospatial.location.mocked,
+							},
+							addresses: {
+								city: capture.geospatial.addresses.city ?? null,
+								district: capture.geospatial.addresses.district ?? null,
+								streetNumber: capture.geospatial.addresses.streetNumber ?? null,
+								street: capture.geospatial.addresses.street ?? null,
+								region: capture.geospatial.addresses.region ?? null,
+								subregion: capture.geospatial.addresses.subregion ?? null,
+								country: capture.geospatial.addresses.country ?? null,
+								postalCode: capture.geospatial.addresses.postalCode ?? null,
+								name: capture.geospatial.addresses.name ?? null,
+								isoCountryCode:
+									capture.geospatial.addresses.isoCountryCode ?? null,
+								timezone: capture.geospatial.addresses.timezone ?? null,
+								formattedAddress:
+									capture.geospatial.addresses.formattedAddress ?? null,
+							},
+						},
+					},
+				});
+
+				const complaintId = (
+					res.data as unknown as { complaint: { id: string } }
+				).complaint.id;
+
+				const uri = capture.capture.object?.uri;
+				if (uri) {
+					const isPhoto = capture.capture.type === "photo";
+					await postV1ComplaintsAttachments({
+						body: {
+							complaint_id: complaintId,
+							file: {
+								uri,
+								name: `complaint_${complaintId}.${isPhoto ? "jpg" : "mp4"}`,
+								type: isPhoto ? "image/jpeg" : "video/mp4",
+							},
+						} as unknown as PostV1ComplaintsAttachmentsData["body"],
+					});
+				}
+			}
+
+			await queryClient.invalidateQueries({ queryKey: COMPLAINTS_QUERY_KEY });
+			await queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
+			clearDraft();
+			toast.success(
+				"Denúncia registrada",
+				captures.length > 1
+					? `${captures.length} denúncias enviadas com sucesso.`
+					: "Sua denúncia foi enviada com sucesso.",
+			);
+			router.replace("/(tabs)/complaints");
+		} catch {
+			toast.error(
+				"Erro ao enviar",
+				"Não foi possível registrar a denúncia. Tente novamente.",
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
 	});
 
 	return (
@@ -368,11 +463,22 @@ export default function ComplaintReviewScreen() {
 				</View>
 
 				<View className="flex-row gap-3 pt-2">
-					<Button variant="outline" className="flex-1" onPress={handleBack}>
+					<Button
+						variant="outline"
+						className="flex-1"
+						onPress={handleBack}
+						disabled={isSubmitting}
+					>
 						<ButtonText>Voltar</ButtonText>
 					</Button>
-					<Button className="flex-1 bg-lime-800" onPress={onSubmit}>
-						<ButtonText className="text-white">Confirmar</ButtonText>
+					<Button
+						className="flex-1 bg-lime-800"
+						onPress={onSubmit}
+						disabled={isSubmitting}
+					>
+						<ButtonText className="text-white">
+							{isSubmitting ? "Enviando..." : "Confirmar"}
+						</ButtonText>
 					</Button>
 				</View>
 			</ScrollView>
