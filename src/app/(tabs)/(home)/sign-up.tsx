@@ -1,10 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
-import { toast } from "@/components/toast";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
 	FormControlError,
@@ -14,18 +13,17 @@ import {
 } from "@/components/ui/form-control";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import { useUserContext } from "@/contexts/user-context";
+import { useAuthContext } from "@/contexts/auth-context";
 
 const signUpSchema = z.object({
-	email: z.string().email("Digite um e-mail válido."),
+	email: z.email("Digite um e-mail válido."),
 	password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
 });
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpScreen() {
-	const router = useRouter();
-	const { signUp, isLoading } = useUserContext();
+	const { signUp, isLoading } = useAuthContext();
 
 	const {
 		control,
@@ -40,14 +38,7 @@ export default function SignUpScreen() {
 	});
 
 	const onSubmit = async (data: SignUpFormValues) => {
-		try {
-			await signUp(data);
-			router.push({
-				pathname: "/sign-in",
-			});
-		} catch {
-			toast.error("Erro seu registro", "Verifique os dados e tente novamente");
-		}
+		await signUp(data);
 	};
 
 	return (
@@ -126,6 +117,7 @@ export default function SignUpScreen() {
 				isDisabled={isLoading}
 			>
 				<ButtonText className="text-base font-semibold">Criar conta</ButtonText>
+				{isLoading && <ButtonSpinner />}
 			</Button>
 		</AuthScreenLayout>
 	);

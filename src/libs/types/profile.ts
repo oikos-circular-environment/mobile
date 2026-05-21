@@ -7,7 +7,6 @@ export type Profile = {
 	display_name: string;
 	cpf: string;
 	phone: string;
-	email: string;
 	is_collector: boolean;
 	id: string;
 	created_at: Date;

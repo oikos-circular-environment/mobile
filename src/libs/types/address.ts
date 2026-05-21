@@ -4,7 +4,9 @@ export type Address = {
 	number: string;
 	complement: string | null;
 	district: string;
+	city_ibge_id: number;
 	city: string;
+	state_ibge_id: number;
 	state: string;
 	state_code: string;
 	zip_code: string;

@@ -1,6 +1,7 @@
 "use client";
 
 import * as Location from "expo-location";
+import { LocateFixedIcon } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import MapView, {
@@ -9,7 +10,7 @@ import MapView, {
 	PROVIDER_GOOGLE,
 	type Region,
 } from "react-native-maps";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 
@@ -180,7 +181,8 @@ export default function WrapperMapper({
 					</View>
 
 					<Button variant="outline" size="sm" onPress={handleUseDeviceLocation}>
-						<ButtonText>Usar meu local</ButtonText>
+						<ButtonText>Usar minha localização</ButtonText>
+						<ButtonIcon as={LocateFixedIcon} />
 					</Button>
 				</View>
 

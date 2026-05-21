@@ -25,14 +25,11 @@ import {
 	postV1CompaniesWastesResponseTransformer,
 	postV1ComplaintsAttachmentsResponseTransformer,
 	postV1ComplaintsResponseTransformer,
-	postV1ProfilesAddressesResponseTransformer,
-	postV1ProfilesImagesResponseTransformer,
-	postV1ProfilesResponseTransformer,
 	putV1CompaniesAddressesResponseTransformer,
 	putV1CompaniesResponseTransformer,
 	putV1CompaniesServicesResponseTransformer,
 	putV1CompaniesWastesResponseTransformer,
-	putV1ProfilesAddressesResponseTransformer,
+	putV1ProfilesAvatarResponseTransformer,
 	putV1ProfilesResponseTransformer,
 } from "./transformers.gen";
 import type {
@@ -69,6 +66,9 @@ import type {
 	GetV1ProfilesData,
 	GetV1ProfilesErrors,
 	GetV1ProfilesResponses,
+	PatchV1AuthRefreshData,
+	PatchV1AuthRefreshErrors,
+	PatchV1AuthRefreshResponses,
 	PatchV1ComplaintsByIdCanceledData,
 	PatchV1ComplaintsByIdCanceledErrors,
 	PatchV1ComplaintsByIdCanceledResponses,
@@ -78,6 +78,9 @@ import type {
 	PatchV1ComplaintsByIdResolvedErrors,
 	PatchV1ComplaintsByIdResolvedResponses,
 	PatchV1ComplaintsByIdResponses,
+	PostV1AuthLoginData,
+	PostV1AuthLoginErrors,
+	PostV1AuthLoginResponses,
 	PostV1CompaniesAddressesData,
 	PostV1CompaniesAddressesErrors,
 	PostV1CompaniesAddressesResponses,
@@ -99,17 +102,6 @@ import type {
 	PostV1ComplaintsData,
 	PostV1ComplaintsErrors,
 	PostV1ComplaintsResponses,
-	PostV1ProfilesAddressesData,
-	PostV1ProfilesAddressesErrors,
-	PostV1ProfilesAddressesResponses,
-	PostV1ProfilesData,
-	PostV1ProfilesErrors,
-	PostV1ProfilesImagesData,
-	PostV1ProfilesImagesErrors,
-	PostV1ProfilesImagesResponses,
-	PostV1ProfilesResponses,
-	PostV1UsersAuthData,
-	PostV1UsersAuthResponses,
 	PostV1UsersRegisterData,
 	PostV1UsersRegisterErrors,
 	PostV1UsersRegisterResponses,
@@ -128,9 +120,9 @@ import type {
 	PutV1CompaniesWastesData,
 	PutV1CompaniesWastesErrors,
 	PutV1CompaniesWastesResponses,
-	PutV1ProfilesAddressesData,
-	PutV1ProfilesAddressesErrors,
-	PutV1ProfilesAddressesResponses,
+	PutV1ProfilesAvatarData,
+	PutV1ProfilesAvatarErrors,
+	PutV1ProfilesAvatarResponses,
 	PutV1ProfilesData,
 	PutV1ProfilesErrors,
 	PutV1ProfilesResponses,
@@ -155,6 +147,50 @@ export type Options<
 };
 
 /**
+ * Authenticate a user
+ *
+ * Authenticates a user and returns an access token.
+ */
+export const postV1AuthLogin = <ThrowOnError extends boolean = false>(
+	options: Options<PostV1AuthLoginData, ThrowOnError>,
+) =>
+	(options.client ?? client).post<
+		PostV1AuthLoginResponses,
+		PostV1AuthLoginErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		url: "/v1/auth/login",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
+ * Refresh access token
+ *
+ * Issues a new access token and a rotated refresh token. Accepts the refresh token from the request body (mobile) or from the httpOnly cookie (web). Body takes precedence.
+ */
+export const patchV1AuthRefresh = <ThrowOnError extends boolean = false>(
+	options: Options<PatchV1AuthRefreshData, ThrowOnError>,
+) =>
+	(options.client ?? client).patch<
+		PatchV1AuthRefreshResponses,
+		PatchV1AuthRefreshErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		url: "/v1/auth/refresh",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
  * Register a new user
  *
  * Creates a new user account with the provided information.
@@ -169,28 +205,6 @@ export const postV1UsersRegister = <ThrowOnError extends boolean = false>(
 	>({
 		responseType: "json",
 		url: "/v1/users/register",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Authenticate a user
- *
- * Authenticates a user and returns a token.
- */
-export const postV1UsersAuth = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1UsersAuthData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1UsersAuthResponses,
-		unknown,
-		ThrowOnError
-	>({
-		responseType: "json",
-		url: "/v1/users/auth",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
@@ -219,33 +233,9 @@ export const getV1Profiles = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Create user profile
+ * Upsert user profile
  *
- * Creates a profile for the authenticated user.
- */
-export const postV1Profiles = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1ProfilesData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1ProfilesResponses,
-		PostV1ProfilesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1ProfilesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/profiles",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Update user profile
- *
- * Updates only profile data for the authenticated user. Address fields are not handled by this route.
+ * Creates or updates the profile for the authenticated user. Optionally creates or updates the address in the same request.
  */
 export const putV1Profiles = <ThrowOnError extends boolean = false>(
 	options: Options<PutV1ProfilesData, ThrowOnError>,
@@ -267,6 +257,26 @@ export const putV1Profiles = <ThrowOnError extends boolean = false>(
 	});
 
 /**
+ * Upsert profile avatar
+ *
+ * Creates or replaces the authenticated user's profile image. Accepted types: `image/jpeg`, `image/png`. Maximum size: 10MB.
+ */
+export const putV1ProfilesAvatar = <ThrowOnError extends boolean = false>(
+	options?: Options<PutV1ProfilesAvatarData, ThrowOnError>,
+) =>
+	(options?.client ?? client).put<
+		PutV1ProfilesAvatarResponses,
+		PutV1ProfilesAvatarErrors,
+		ThrowOnError
+	>({
+		responseTransformer: putV1ProfilesAvatarResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/profiles/avatar",
+		...options,
+	});
+
+/**
  * Delete profile image
  *
  * Deletes the authenticated user's profile image.
@@ -279,26 +289,6 @@ export const deleteV1ProfilesImages = <ThrowOnError extends boolean = false>(
 		DeleteV1ProfilesImagesErrors,
 		ThrowOnError
 	>({
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/profiles/images",
-		...options,
-	});
-
-/**
- * Create profile image
- *
- * Creates or updates the authenticated user's profile image. Only jpeg and png files are accepted up to 10MB.
- */
-export const postV1ProfilesImages = <ThrowOnError extends boolean = false>(
-	options?: Options<PostV1ProfilesImagesData, ThrowOnError>,
-) =>
-	(options?.client ?? client).post<
-		PostV1ProfilesImagesResponses,
-		PostV1ProfilesImagesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1ProfilesImagesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/images",
@@ -323,54 +313,6 @@ export const getV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/profiles/addresses",
 		...options,
-	});
-
-/**
- * Create profile address
- *
- * Creates an address for the authenticated user's profile.
- */
-export const postV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1ProfilesAddressesData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1ProfilesAddressesResponses,
-		PostV1ProfilesAddressesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1ProfilesAddressesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/profiles/addresses",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Update profile address
- *
- * Updates only address data for the authenticated user's profile.
- */
-export const putV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
-	options: Options<PutV1ProfilesAddressesData, ThrowOnError>,
-) =>
-	(options.client ?? client).put<
-		PutV1ProfilesAddressesResponses,
-		PutV1ProfilesAddressesErrors,
-		ThrowOnError
-	>({
-		responseTransformer: putV1ProfilesAddressesResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/profiles/addresses",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
 	});
 
 /**

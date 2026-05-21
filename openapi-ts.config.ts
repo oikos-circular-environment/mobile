@@ -3,7 +3,7 @@ import { defineConfig } from "@hey-api/openapi-ts";
 export default defineConfig({
 	input: "http://localhost:3333/docs/openapi.json",
 	output: {
-		path: "./src/libs/client",
+		path: "./src/libs/oikos-sdk",
 		postProcess: ["biome:format"],
 	},
 	plugins: [
