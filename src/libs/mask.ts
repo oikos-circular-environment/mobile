@@ -1,3 +1,7 @@
+export const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
+export const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+export const phoneRegex = /^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/;
+
 function onlyDigits(value: string) {
 	return value.replace(/\D/g, "");
 }
@@ -41,9 +45,50 @@ export function maskPhoneBr(value: string) {
 		.replace(/(\d{1})(\d{4})(\d{1,4})$/, "$1 $2-$3");
 }
 
+export function maskPrice(value: string) {
+	const cleaned = value.replace(/[^\d,]/g, "");
+	const commaIdx = cleaned.indexOf(",");
+	if (commaIdx === -1) return cleaned;
+	return (
+		cleaned.slice(0, commaIdx + 1) +
+		cleaned
+			.slice(commaIdx + 1)
+			.replace(/,/g, "")
+			.slice(0, 2)
+	);
+}
+
+export function maskDecimal(value: string) {
+	const cleaned = value.replace(/[^\d,]/g, "");
+	const commaIdx = cleaned.indexOf(",");
+	if (commaIdx === -1) return cleaned;
+	return (
+		cleaned.slice(0, commaIdx + 1) +
+		cleaned
+			.slice(commaIdx + 1)
+			.replace(/,/g, "")
+			.slice(0, 3)
+	);
+}
+
+export function formatDecimal(value: number) {
+	return String(value).replace(".", ",");
+}
+
+export function parseDecimalInput(value: string | number) {
+	if (typeof value === "number") return value;
+	const cleaned = value.replace(/[^\d,]/g, "").replace(",", ".");
+	const parsed = Number(cleaned);
+	return Number.isNaN(parsed) ? 0 : parsed;
+}
+
 export const mask = {
 	cpf: maskCpf,
 	cnpj: maskCnpj,
 	cep: maskCep,
 	phoneBr: maskPhoneBr,
+	price: maskPrice,
+	decimal: maskDecimal,
+	formatDecimal,
+	parseDecimal: parseDecimalInput,
 };

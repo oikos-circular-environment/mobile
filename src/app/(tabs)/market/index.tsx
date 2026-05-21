@@ -58,7 +58,7 @@ export default function MarketScreen() {
 				item.services?.map(service => service.name).join(" ") ?? "";
 
 			const searchableText =
-				`${item.corporateName} ${item.businessName ?? ""} ${wasteNames} ${serviceNames}`.toLowerCase();
+				`${item.corporate_name} ${item.business_name ?? ""} ${wasteNames} ${serviceNames}`.toLowerCase();
 
 			return searchableText.includes(normalizedQuery);
 		});
@@ -155,13 +155,13 @@ export default function MarketScreen() {
 										>
 											<View className="flex-row items-center gap-3">
 												<View
-													className={`h-8 w-8 items-center justify-center overflow-hidden rounded-[5px] ${item.companyType === "COLLECTOR" ? "bg-gray-200" : item.id === "sucatao-do-dinao" ? "bg-blue-600" : "bg-slate-950"}`}
+													className={`h-8 w-8 items-center justify-center overflow-hidden rounded-[5px] ${item.company_type === "COLLECTOR" ? "bg-gray-200" : item.id === "sucatao-do-dinao" ? "bg-blue-600" : "bg-slate-950"}`}
 												>
-													{item.companyType === "COLLECTOR" ? (
+													{item.company_type === "COLLECTOR" ? (
 														<Sprout size={16} color="#111827" />
 													) : (
 														<Text className="text-[10px] font-semibold text-white">
-															{item.corporateName
+															{item.corporate_name
 																.split(" ")
 																.slice(0, 2)
 																.map(word => word[0]?.toUpperCase() ?? "")
@@ -173,10 +173,10 @@ export default function MarketScreen() {
 												<View className="min-w-0 flex-1 gap-1">
 													<View className="flex-row items-center gap-2">
 														<Text className="flex-1 text-sm font-semibold text-gray-950">
-															{item.corporateName}
+															{item.corporate_name}
 														</Text>
 
-														{item.companyType === "COLLECTOR" ? (
+														{item.company_type === "COLLECTOR" ? (
 															<View className="rounded-[5px] bg-primary px-3 py-1">
 																<Text className="text-[8px] text-white">
 																	Coletor independente

@@ -456,22 +456,24 @@ export type GetV1CompaniesResponses = {
 	 * Default Response
 	 */
 	200: {
-		user_id: string;
-		identity: string;
-		identity_type: "CPF" | "CNPJ";
-		company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
-		status: boolean;
-		is_headquarters: boolean;
-		business_name?: string | null;
-		corporate_name: string;
-		accept_appointments: boolean;
-		email?: string | null;
-		phones: Array<string>;
-		started_activity_in: Date;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-	} | null;
+		company: {
+			user_id: string;
+			identity: string;
+			identity_type: "CPF" | "CNPJ";
+			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
+			status: boolean;
+			is_headquarters: boolean;
+			business_name?: string | null;
+			corporate_name: string;
+			accept_appointments: boolean;
+			email?: string | null;
+			phones: Array<string>;
+			started_activity_in: Date;
+			id: string;
+			created_at: Date;
+			updated_at: Date;
+		} | null;
+	};
 };
 
 export type GetV1CompaniesResponse =
@@ -523,21 +525,23 @@ export type PostV1CompaniesResponses = {
 	 * Default Response
 	 */
 	200: {
-		user_id: string;
-		identity: string;
-		identity_type: "CPF" | "CNPJ";
-		company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
-		status: boolean;
-		is_headquarters: boolean;
-		business_name?: string | null;
-		corporate_name: string;
-		accept_appointments: boolean;
-		email?: string | null;
-		phones: Array<string>;
-		started_activity_in: Date;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
+		company: {
+			user_id: string;
+			identity: string;
+			identity_type: "CPF" | "CNPJ";
+			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
+			status: boolean;
+			is_headquarters: boolean;
+			business_name?: string | null;
+			corporate_name: string;
+			accept_appointments: boolean;
+			email?: string | null;
+			phones: Array<string>;
+			started_activity_in: Date;
+			id: string;
+			created_at: Date;
+			updated_at: Date;
+		};
 	};
 };
 
@@ -590,22 +594,24 @@ export type PutV1CompaniesResponses = {
 	 * Default Response
 	 */
 	200: {
-		user_id: string;
-		identity: string;
-		identity_type: "CPF" | "CNPJ";
-		company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
-		status: boolean;
-		is_headquarters: boolean;
-		business_name?: string | null;
-		corporate_name: string;
-		accept_appointments: boolean;
-		email?: string | null;
-		phones: Array<string>;
-		started_activity_in: Date;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-	} | null;
+		company: {
+			user_id: string;
+			identity: string;
+			identity_type: "CPF" | "CNPJ";
+			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
+			status: boolean;
+			is_headquarters: boolean;
+			business_name?: string | null;
+			corporate_name: string;
+			accept_appointments: boolean;
+			email?: string | null;
+			phones: Array<string>;
+			started_activity_in: Date;
+			id: string;
+			created_at: Date;
+			updated_at: Date;
+		} | null;
+	};
 };
 
 export type PutV1CompaniesResponse =
@@ -644,31 +650,9 @@ export type GetV1CompaniesBusinessHoursResponses = {
 	/**
 	 * Default Response
 	 */
-	200: Array<{
-		id: string;
-		day_of_week:
-			| "SUNDAY"
-			| "MONDAY"
-			| "TUESDAY"
-			| "WEDNESDAY"
-			| "THURSDAY"
-			| "FRIDAY"
-			| "SATURDAY";
-		is_open: boolean;
-		time_slots: Array<{
-			id: string;
-			start_time: string;
-			end_time: string;
-		}>;
-	}>;
-};
-
-export type GetV1CompaniesBusinessHoursResponse =
-	GetV1CompaniesBusinessHoursResponses[keyof GetV1CompaniesBusinessHoursResponses];
-
-export type PostV1CompaniesBusinessHoursData = {
-	body: {
+	200: {
 		business_hours: Array<{
+			id: string;
 			day_of_week:
 				| "SUNDAY"
 				| "MONDAY"
@@ -679,71 +663,16 @@ export type PostV1CompaniesBusinessHoursData = {
 				| "SATURDAY";
 			is_open: boolean;
 			time_slots: Array<{
+				id: string;
 				start_time: string;
 				end_time: string;
 			}>;
 		}>;
 	};
-	path?: never;
-	query?: never;
-	url: "/v1/companies/business-hours";
 };
 
-export type PostV1CompaniesBusinessHoursErrors = {
-	/**
-	 * Default Response
-	 */
-	400: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PostV1CompaniesBusinessHoursError =
-	PostV1CompaniesBusinessHoursErrors[keyof PostV1CompaniesBusinessHoursErrors];
-
-export type PostV1CompaniesBusinessHoursResponses = {
-	/**
-	 * Default Response
-	 */
-	200: Array<{
-		id: string;
-		day_of_week:
-			| "SUNDAY"
-			| "MONDAY"
-			| "TUESDAY"
-			| "WEDNESDAY"
-			| "THURSDAY"
-			| "FRIDAY"
-			| "SATURDAY";
-		is_open: boolean;
-		time_slots: Array<{
-			id: string;
-			start_time: string;
-			end_time: string;
-		}>;
-	}>;
-};
-
-export type PostV1CompaniesBusinessHoursResponse =
-	PostV1CompaniesBusinessHoursResponses[keyof PostV1CompaniesBusinessHoursResponses];
+export type GetV1CompaniesBusinessHoursResponse =
+	GetV1CompaniesBusinessHoursResponses[keyof GetV1CompaniesBusinessHoursResponses];
 
 export type PutV1CompaniesBusinessHoursData = {
 	body: {
@@ -802,23 +731,25 @@ export type PutV1CompaniesBusinessHoursResponses = {
 	/**
 	 * Default Response
 	 */
-	200: Array<{
-		id: string;
-		day_of_week:
-			| "SUNDAY"
-			| "MONDAY"
-			| "TUESDAY"
-			| "WEDNESDAY"
-			| "THURSDAY"
-			| "FRIDAY"
-			| "SATURDAY";
-		is_open: boolean;
-		time_slots: Array<{
+	200: {
+		business_hours: Array<{
 			id: string;
-			start_time: string;
-			end_time: string;
+			day_of_week:
+				| "SUNDAY"
+				| "MONDAY"
+				| "TUESDAY"
+				| "WEDNESDAY"
+				| "THURSDAY"
+				| "FRIDAY"
+				| "SATURDAY";
+			is_open: boolean;
+			time_slots: Array<{
+				id: string;
+				start_time: string;
+				end_time: string;
+			}>;
 		}>;
-	}>;
+	};
 };
 
 export type PutV1CompaniesBusinessHoursResponse =
@@ -857,87 +788,25 @@ export type GetV1CompaniesWastesResponses = {
 	/**
 	 * Default Response
 	 */
-	200: Array<{
-		name: string;
-		description?: string | null;
-		price: number;
-		unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-		waste_type: "RECYCLABLE" | "GARBAGE";
-		sub_items: Array<string> | null;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-	}>;
-};
-
-export type GetV1CompaniesWastesResponse =
-	GetV1CompaniesWastesResponses[keyof GetV1CompaniesWastesResponses];
-
-export type PostV1CompaniesWastesData = {
-	body: {
+	200: {
 		wastes: Array<{
 			name: string;
 			description?: string | null;
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
-			sub_items?: Array<string> | null;
+			quantity: number;
+			observations?: string | null;
+			sub_items: Array<string> | null;
+			id: string;
+			created_at: Date;
+			updated_at: Date;
 		}>;
 	};
-	path?: never;
-	query?: never;
-	url: "/v1/companies/wastes";
 };
 
-export type PostV1CompaniesWastesErrors = {
-	/**
-	 * Default Response
-	 */
-	400: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PostV1CompaniesWastesError =
-	PostV1CompaniesWastesErrors[keyof PostV1CompaniesWastesErrors];
-
-export type PostV1CompaniesWastesResponses = {
-	/**
-	 * Default Response
-	 */
-	200: Array<{
-		name: string;
-		description?: string | null;
-		price: number;
-		unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-		waste_type: "RECYCLABLE" | "GARBAGE";
-		sub_items: Array<string> | null;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-	}>;
-};
-
-export type PostV1CompaniesWastesResponse =
-	PostV1CompaniesWastesResponses[keyof PostV1CompaniesWastesResponses];
+export type GetV1CompaniesWastesResponse =
+	GetV1CompaniesWastesResponses[keyof GetV1CompaniesWastesResponses];
 
 export type PutV1CompaniesWastesData = {
 	body: {
@@ -947,6 +816,8 @@ export type PutV1CompaniesWastesData = {
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
+			quantity: number;
+			observations?: string | null;
 			sub_items?: Array<string> | null;
 		}>;
 	};
@@ -989,17 +860,21 @@ export type PutV1CompaniesWastesResponses = {
 	/**
 	 * Default Response
 	 */
-	200: Array<{
-		name: string;
-		description?: string | null;
-		price: number;
-		unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-		waste_type: "RECYCLABLE" | "GARBAGE";
-		sub_items: Array<string> | null;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-	}>;
+	200: {
+		wastes: Array<{
+			name: string;
+			description?: string | null;
+			price: number;
+			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			waste_type: "RECYCLABLE" | "GARBAGE";
+			quantity: number;
+			observations?: string | null;
+			sub_items: Array<string> | null;
+			id: string;
+			created_at: Date;
+			updated_at: Date;
+		}>;
+	};
 };
 
 export type PutV1CompaniesWastesResponse =
@@ -1038,93 +913,25 @@ export type GetV1CompaniesServicesResponses = {
 	/**
 	 * Default Response
 	 */
-	200: Array<{
-		name: string;
-		description?: string | null;
-		price: number;
-		unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-		waste_type: "RECYCLABLE" | "GARBAGE";
-		sub_items: Array<string> | null;
-		quantity: number;
-		observations?: string | null;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-	}>;
-};
-
-export type GetV1CompaniesServicesResponse =
-	GetV1CompaniesServicesResponses[keyof GetV1CompaniesServicesResponses];
-
-export type PostV1CompaniesServicesData = {
-	body: {
+	200: {
 		services: Array<{
 			name: string;
 			description?: string | null;
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
-			sub_items?: Array<string> | null;
 			quantity: number;
 			observations?: string | null;
+			sub_items: Array<string> | null;
+			id: string;
+			created_at: Date;
+			updated_at: Date;
 		}>;
 	};
-	path?: never;
-	query?: never;
-	url: "/v1/companies/services";
 };
 
-export type PostV1CompaniesServicesErrors = {
-	/**
-	 * Default Response
-	 */
-	400: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PostV1CompaniesServicesError =
-	PostV1CompaniesServicesErrors[keyof PostV1CompaniesServicesErrors];
-
-export type PostV1CompaniesServicesResponses = {
-	/**
-	 * Default Response
-	 */
-	200: Array<{
-		name: string;
-		description?: string | null;
-		price: number;
-		unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-		waste_type: "RECYCLABLE" | "GARBAGE";
-		sub_items: Array<string> | null;
-		quantity: number;
-		observations?: string | null;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-	}>;
-};
-
-export type PostV1CompaniesServicesResponse =
-	PostV1CompaniesServicesResponses[keyof PostV1CompaniesServicesResponses];
+export type GetV1CompaniesServicesResponse =
+	GetV1CompaniesServicesResponses[keyof GetV1CompaniesServicesResponses];
 
 export type PutV1CompaniesServicesData = {
 	body: {
@@ -1134,9 +941,9 @@ export type PutV1CompaniesServicesData = {
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_type: "RECYCLABLE" | "GARBAGE";
-			sub_items?: Array<string> | null;
 			quantity: number;
 			observations?: string | null;
+			sub_items?: Array<string> | null;
 		}>;
 	};
 	path?: never;
@@ -1178,19 +985,21 @@ export type PutV1CompaniesServicesResponses = {
 	/**
 	 * Default Response
 	 */
-	200: Array<{
-		name: string;
-		description?: string | null;
-		price: number;
-		unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-		waste_type: "RECYCLABLE" | "GARBAGE";
-		sub_items: Array<string> | null;
-		quantity: number;
-		observations?: string | null;
-		id: string;
-		created_at: Date;
-		updated_at: Date;
-	}>;
+	200: {
+		services: Array<{
+			name: string;
+			description?: string | null;
+			price: number;
+			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			waste_type: "RECYCLABLE" | "GARBAGE";
+			quantity: number;
+			observations?: string | null;
+			sub_items: Array<string> | null;
+			id: string;
+			created_at: Date;
+			updated_at: Date;
+		}>;
+	};
 };
 
 export type PutV1CompaniesServicesResponse =
@@ -1230,115 +1039,41 @@ export type GetV1CompaniesAddressesResponses = {
 	 * Default Response
 	 */
 	200: {
-		id: string;
-		zip_code: string;
-		street: string;
-		number: string;
-		complement: string | null;
-		district: string;
-		city_ibge_id: number;
-		city: string;
-		state_ibge_id: number;
-		state: string;
-		state_code: string;
-		latitude: number | null;
-		longitude: number | null;
-		created_at: Date;
-		updated_at: Date;
-	} | null;
+		address: {
+			id: string;
+			zip_code: string;
+			street: string;
+			number: string;
+			complement: string | null;
+			district: string;
+			city_ibge_id: number;
+			city: string;
+			state_ibge_id: number;
+			state: string;
+			state_code: string;
+			latitude: number | null;
+			longitude: number | null;
+			created_at: Date;
+			updated_at: Date;
+		} | null;
+	};
 };
 
 export type GetV1CompaniesAddressesResponse =
 	GetV1CompaniesAddressesResponses[keyof GetV1CompaniesAddressesResponses];
 
-export type PostV1CompaniesAddressesData = {
-	body: {
-		zip_code: string;
-		street: string;
-		number: string;
-		complement?: string | null;
-		district: string;
-		city_ibge_id: number;
-		city: string;
-		state_ibge_id: number;
-		state: string;
-		state_code: string;
-		latitude?: number | null;
-		longitude?: number | null;
-	};
-	path?: never;
-	query?: never;
-	url: "/v1/companies/addresses";
-};
-
-export type PostV1CompaniesAddressesErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	409: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PostV1CompaniesAddressesError =
-	PostV1CompaniesAddressesErrors[keyof PostV1CompaniesAddressesErrors];
-
-export type PostV1CompaniesAddressesResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		id: string;
-		zip_code: string;
-		street: string;
-		number: string;
-		complement: string | null;
-		district: string;
-		city_ibge_id: number;
-		city: string;
-		state_ibge_id: number;
-		state: string;
-		state_code: string;
-		latitude: number | null;
-		longitude: number | null;
-		created_at: Date;
-		updated_at: Date;
-	};
-};
-
-export type PostV1CompaniesAddressesResponse =
-	PostV1CompaniesAddressesResponses[keyof PostV1CompaniesAddressesResponses];
-
 export type PutV1CompaniesAddressesData = {
 	body: {
-		zip_code?: string;
-		street?: string;
-		number?: string;
+		zip_code: string;
+		street: string;
+		number: string;
 		complement?: string | null;
-		district?: string;
-		city_ibge_id?: number;
-		city?: string;
-		state_ibge_id?: number;
-		state?: string;
-		state_code?: string;
+		district: string;
+		city_ibge_id: number;
+		city: string;
+		state_ibge_id: number;
+		state: string;
+		state_code: string;
 		latitude?: number | null;
 		longitude?: number | null;
 	};
@@ -1374,22 +1109,24 @@ export type PutV1CompaniesAddressesResponses = {
 	 * Default Response
 	 */
 	200: {
-		id: string;
-		zip_code: string;
-		street: string;
-		number: string;
-		complement: string | null;
-		district: string;
-		city_ibge_id: number;
-		city: string;
-		state_ibge_id: number;
-		state: string;
-		state_code: string;
-		latitude: number | null;
-		longitude: number | null;
-		created_at: Date;
-		updated_at: Date;
-	} | null;
+		address: {
+			id: string;
+			zip_code: string;
+			street: string;
+			number: string;
+			complement: string | null;
+			district: string;
+			city_ibge_id: number;
+			city: string;
+			state_ibge_id: number;
+			state: string;
+			state_code: string;
+			latitude: number | null;
+			longitude: number | null;
+			created_at: Date;
+			updated_at: Date;
+		};
+	};
 };
 
 export type PutV1CompaniesAddressesResponse =

@@ -1,11 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Stack } from "expo-router";
-import { Search } from "lucide-react-native";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ChevronDown, MapIcon, Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
-import { Button, ButtonText } from "@/components/ui/button";
+import { AddressFormSkeleton } from "@/components/companies/skeletons";
+import { toast } from "@/components/toast";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
 	FormControl,
 	FormControlError,
@@ -15,10 +18,28 @@ import {
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import {
+	Select,
+	SelectBackdrop,
+	SelectContent,
+	SelectDragIndicator,
+	SelectDragIndicatorWrapper,
+	SelectIcon,
+	SelectInput,
+	SelectItem,
+	SelectPortal,
+	SelectTrigger,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import WrapperMapper from "@/components/wrapper-mapper";
+import { useUserCompanyContext } from "@/contexts/user-company-context";
+import {
+	getCepV2,
+	listIbgeMunicipios,
+	listIbgeUfs,
+} from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
-import type { Address } from "@/libs/types/address";
 
 const addressSchema = z.object({
 	zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP válido."),
@@ -29,6 +50,8 @@ const addressSchema = z.object({
 	city: z.string().min(2, "Informe a cidade."),
 	state: z.string().min(2, "Informe o estado."),
 	state_code: z.string().length(2, "Use a sigla com 2 letras."),
+	state_ibge_id: z.number().min(1, "Selecione um estado."),
+	city_ibge_id: z.number().min(1, "Selecione uma cidade."),
 	latitude: z.number().nullable().optional(),
 	longitude: z.number().nullable().optional(),
 });
@@ -36,29 +59,23 @@ const addressSchema = z.object({
 type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function CompanyAddressScreen() {
-	const [address] = useState<Partial<Address>>({
-		zip_code: "",
-		street: "",
-		number: "",
-		complement: null,
-		district: "",
-		city: "",
-		state: "",
-		state_code: "",
-	});
-
+	const { address, isLoadingAddress, saveAddress, isSavingAddress } =
+		useUserCompanyContext();
+	const [selectedCity, setSelectedCity] = useState<string | null>(null);
 	const defaultValues = useMemo<AddressFormValues>(
 		() => ({
-			zip_code: address.zip_code ?? "",
-			street: address.street ?? "",
-			number: address.number ?? "",
-			complement: address.complement ?? null,
-			district: address.district ?? "",
-			city: address.city ?? "",
-			state: address.state ?? "",
-			state_code: address.state_code ?? "",
-			latitude: address.latitude ?? null,
-			longitude: address.longitude ?? null,
+			zip_code: address?.zip_code ?? "",
+			street: address?.street ?? "",
+			number: address?.number ?? "",
+			complement: address?.complement ?? null,
+			district: address?.district ?? "",
+			city: address?.city ?? "",
+			state: address?.state ?? "",
+			state_code: address?.state_code ?? "",
+			state_ibge_id: address?.state_ibge_id ?? 0,
+			city_ibge_id: address?.city_ibge_id ?? 0,
+			latitude: address?.latitude ?? null,
+			longitude: address?.longitude ?? null,
 		}),
 		[address],
 	);
@@ -69,7 +86,7 @@ export default function CompanyAddressScreen() {
 		reset,
 		setValue,
 		watch,
-		formState: { errors, isSubmitting },
+		formState: { errors, isDirty },
 	} = useForm<AddressFormValues>({
 		resolver: zodResolver(addressSchema),
 		defaultValues,
@@ -77,13 +94,47 @@ export default function CompanyAddressScreen() {
 
 	const latitude = watch("latitude");
 	const longitude = watch("longitude");
+	const selectedStateCode = watch("state_code");
 
-	useEffect(() => {
-		reset(defaultValues);
-	}, [defaultValues, reset]);
+	const { data: states, isPending: isPendingStates } = useQuery({
+		queryKey: ["states"],
+		queryFn: async () => {
+			const res = await listIbgeUfs();
+			return res.data
+				? res.data.sort((a, b) => a.nome.localeCompare(b.nome))
+				: [];
+		},
+		staleTime: 1000 * 60 * 60 * 24,
+	});
 
-	const onSubmit = (data: AddressFormValues) => {
-		console.log("Company address values", data);
+	const { data: cities, isPending: isPendingCities } = useQuery({
+		queryKey: ["cities", selectedStateCode],
+		queryFn: async () => {
+			const res = await listIbgeMunicipios({
+				path: { siglaUF: selectedStateCode },
+			});
+			return res.data
+				? res.data.sort((a, b) => a.nome.localeCompare(b.nome))
+				: [];
+		},
+		enabled: !!selectedStateCode && selectedStateCode.length === 2,
+	});
+
+	const onSubmit = async (data: AddressFormValues) => {
+		await saveAddress({
+			zip_code: data.zip_code,
+			street: data.street,
+			number: data.number,
+			complement: data.complement ?? null,
+			district: data.district,
+			city: data.city,
+			state: data.state,
+			state_code: data.state_code,
+			latitude: data.latitude ?? null,
+			longitude: data.longitude ?? null,
+			city_ibge_id: data.city_ibge_id,
+			state_ibge_id: data.state_ibge_id,
+		});
 	};
 
 	const onCancel = () => {
@@ -98,17 +149,94 @@ export default function CompanyAddressScreen() {
 		setValue("longitude", location.longitude, { shouldDirty: true });
 	};
 
-	return (
-		<>
-			<Stack.Screen options={{ title: "Endereço da Empresa" }} />
-			<KeyboardAvoidingView
-				className="flex-1"
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
-			>
-				<ScrollView className="flex-1 bg-white p-4">
-					<View className="flex gap-4 pb-8">
-						<Heading size="xl">Endereço da Empresa</Heading>
+	const getCepMutation = useMutation({
+		mutationKey: ["get", "cep", "brasil-api"],
+		mutationFn: async ({ cep }: { cep: string }) => {
+			const response = await getCepV2({ path: { cep } });
+			return response.data;
+		},
+		onSuccess: data => {
+			if (!data) return;
+			const current = control._formValues as AddressFormValues;
+			reset(
+				{
+					...current,
+					zip_code: mask.cep(data.cep),
+					street: data.street ?? current.street,
+					district: data.neighborhood ?? current.district,
+					city: data.city,
+					state_code: data.state,
+				},
+				{ keepDefaultValues: true },
+			);
 
+			const uf = states?.find(state => state.sigla === data.state);
+			if (uf) {
+				setValue("state", uf.nome);
+				setValue("state_code", uf.sigla);
+				setValue("state_ibge_id", uf.id);
+			}
+
+			setSelectedCity(data.city);
+		},
+		onError: () => {
+			toast.error(
+				"CEP não encontrado",
+				"Verifique o número e tente novamente.",
+			);
+		},
+	});
+
+	const onPressSearchCep = () => {
+		const digits = (control._formValues.zip_code as string).replace(/\D/g, "");
+		if (digits.length !== 8) {
+			toast.error("CEP inválido", "O CEP deve conter 8 dígitos.");
+			return;
+		}
+		getCepMutation.mutate({ cep: digits });
+	};
+
+	useEffect(() => {
+		reset(defaultValues);
+	}, [defaultValues, reset]);
+
+	useEffect(() => {
+		if (selectedCity) {
+			const city = cities?.find(c => c.nome === selectedCity);
+			if (city) {
+				setValue("city_ibge_id", Number(city.codigo_ibge));
+			}
+		}
+	}, [cities, selectedCity, setValue]);
+
+	if (isLoadingAddress) {
+		return <AddressFormSkeleton />;
+	}
+
+	return (
+		<KeyboardAvoidingView behavior="padding" className="flex-1">
+			<ScrollView
+				className="flex-1 bg-white"
+				contentContainerClassName="p-4 pb-8"
+			>
+				<View className="gap-4">
+					<Card className="bg-secondary shadow-none">
+						<View className="flex-row items-center justify-between gap-4">
+							<View className="size-15 items-center justify-center rounded-lg bg-primary">
+								<MapIcon color="white" size={20} />
+							</View>
+							<View className="flex-1 gap-1">
+								<Heading className="text-lg">Endereço</Heading>
+								<Text className="text-sm ">
+									Estes dados serão expostos na plataforma, o preenchimento com
+									informações reais trazem mais confiabilidade para os usuários
+									da plataforma.
+								</Text>
+							</View>
+						</View>
+					</Card>
+
+					<Card className="shadow-none">
 						<View className="gap-3">
 							<FormControl isInvalid={!!errors.zip_code} className="gap-2">
 								<FormControlLabel>
@@ -128,8 +256,10 @@ export default function CompanyAddressScreen() {
 												keyboardType="number-pad"
 												maxLength={9}
 											/>
-											<InputSlot>
-												<InputIcon as={Search} />
+											<InputSlot className="pr-3" onPress={onPressSearchCep}>
+												<InputIcon
+													as={getCepMutation.isPending ? Spinner : Search}
+												/>
 											</InputSlot>
 										</Input>
 									)}
@@ -260,37 +390,9 @@ export default function CompanyAddressScreen() {
 								) : null}
 							</FormControl>
 
-							<FormControl isInvalid={!!errors.city} className="gap-2">
-								<FormControlLabel>
-									<FormControlLabelText className="text-sm">
-										Cidade
-									</FormControlLabelText>
-								</FormControlLabel>
-								<Controller
-									control={control}
-									name="city"
-									render={({ field: { onChange, onBlur, value } }) => (
-										<Input>
-											<InputField
-												value={value}
-												onBlur={onBlur}
-												onChangeText={onChange}
-											/>
-										</Input>
-									)}
-								/>
-								{errors.city?.message ? (
-									<FormControlError>
-										<FormControlErrorText>
-											{errors.city.message}
-										</FormControlErrorText>
-									</FormControlError>
-								) : null}
-							</FormControl>
-
-							<View className="flex flex-row gap-2">
+							<View className="flex-row gap-2">
 								<FormControl
-									isInvalid={!!errors.state}
+									isInvalid={!!errors.state || !!errors.state_ibge_id}
 									className="flex-1 gap-2"
 								>
 									<FormControlLabel>
@@ -301,29 +403,63 @@ export default function CompanyAddressScreen() {
 									<Controller
 										control={control}
 										name="state"
-										render={({ field: { onChange, onBlur, value } }) => (
-											<Input>
-												<InputField
-													value={value}
-													onBlur={onBlur}
-													onChangeText={onChange}
-												/>
-											</Input>
+										render={({ field: { value, onChange } }) => (
+											<Select
+												selectedValue={value}
+												onValueChange={val => {
+													onChange(val);
+													const uf = states?.find(s => s.nome === val);
+													if (uf) {
+														setValue("state_code", uf.sigla);
+														setValue("state_ibge_id", Number(uf.id));
+														setValue("state", uf.nome);
+													}
+												}}
+											>
+												<SelectTrigger>
+													<SelectInput
+														placeholder="Selecione o estado"
+														className="flex-1"
+													/>
+													<SelectIcon
+														className="mr-3"
+														as={isPendingStates ? Spinner : ChevronDown}
+													/>
+												</SelectTrigger>
+												<SelectPortal>
+													<SelectBackdrop />
+													<SelectContent>
+														<SelectDragIndicatorWrapper>
+															<SelectDragIndicator />
+														</SelectDragIndicatorWrapper>
+														<ScrollView className="w-full max-h-80">
+															{states ? (
+																states.map(s => (
+																	<SelectItem
+																		key={s.id}
+																		label={s.nome}
+																		value={s.nome}
+																	/>
+																))
+															) : (
+																<SelectItem label="Não há dados" value="" />
+															)}
+														</ScrollView>
+													</SelectContent>
+												</SelectPortal>
+											</Select>
 										)}
 									/>
-									{errors.state?.message ? (
+									{errors.state?.message || errors.state_ibge_id?.message ? (
 										<FormControlError>
 											<FormControlErrorText>
-												{errors.state.message}
+												{errors.state?.message ?? errors.state_ibge_id?.message}
 											</FormControlErrorText>
 										</FormControlError>
 									) : null}
 								</FormControl>
 
-								<FormControl
-									isInvalid={!!errors.state_code}
-									className="w-16 gap-2"
-								>
+								<FormControl isReadOnly className="w-16 gap-2">
 									<FormControlLabel>
 										<FormControlLabelText className="text-sm">
 											Sigla
@@ -332,27 +468,85 @@ export default function CompanyAddressScreen() {
 									<Controller
 										control={control}
 										name="state_code"
-										render={({ field: { onChange, onBlur, value } }) => (
-											<Input>
-												<InputField
-													value={value}
-													onBlur={onBlur}
-													onChangeText={onChange}
-													maxLength={2}
-													autoCapitalize="characters"
-												/>
+										render={({ field: { value } }) => (
+											<Input isReadOnly>
+												<InputField value={value} />
 											</Input>
 										)}
 									/>
-									{errors.state_code?.message ? (
-										<FormControlError>
-											<FormControlErrorText>
-												{errors.state_code.message}
-											</FormControlErrorText>
-										</FormControlError>
-									) : null}
 								</FormControl>
 							</View>
+
+							<FormControl
+								isInvalid={!!errors.city || !!errors.city_ibge_id}
+								className="gap-2"
+							>
+								<FormControlLabel>
+									<FormControlLabelText className="text-sm">
+										Cidade
+									</FormControlLabelText>
+								</FormControlLabel>
+								<Controller
+									control={control}
+									name="city"
+									render={({ field: { value, onChange } }) => (
+										<Select
+											selectedValue={value}
+											onValueChange={val => {
+												onChange(val);
+												const city = cities?.find(c => c.nome === val);
+												if (city) {
+													setValue("city_ibge_id", Number(city.codigo_ibge));
+													setValue("city", city.nome);
+												}
+											}}
+										>
+											<SelectTrigger>
+												<SelectInput
+													placeholder="Selecione a cidade"
+													className="flex-1 capitalize"
+												/>
+												<SelectIcon
+													className="mr-3"
+													as={isPendingCities ? Spinner : ChevronDown}
+												/>
+											</SelectTrigger>
+											<SelectPortal>
+												<SelectBackdrop />
+												<SelectContent>
+													<SelectDragIndicatorWrapper>
+														<SelectDragIndicator />
+													</SelectDragIndicatorWrapper>
+													<ScrollView className="w-full max-h-80">
+														{cities ? (
+															cities.map(c => (
+																<SelectItem
+																	key={c.codigo_ibge}
+																	label={c.nome}
+																	value={c.nome}
+																	className="capitalize"
+																/>
+															))
+														) : (
+															<SelectItem
+																label="Selecione um estado primeiro"
+																value=""
+															/>
+														)}
+													</ScrollView>
+												</SelectContent>
+											</SelectPortal>
+										</Select>
+									)}
+								/>
+								{errors.city?.message || errors.city_ibge_id?.message ? (
+									<FormControlError>
+										<FormControlErrorText>
+											{errors.city?.message ?? errors.city_ibge_id?.message}
+										</FormControlErrorText>
+									</FormControlError>
+								) : null}
+							</FormControl>
 
 							<View className="gap-2">
 								<Text className="text-sm">Mapa</Text>
@@ -370,20 +564,26 @@ export default function CompanyAddressScreen() {
 						</View>
 
 						<View className="flex flex-row gap-2 pt-4">
-							<Button variant="outline" className="flex-1" onPress={onCancel}>
+							<Button
+								variant="outline"
+								className="flex-1"
+								onPress={onCancel}
+								isDisabled={!isDirty || isSavingAddress}
+							>
 								<ButtonText>Cancelar</ButtonText>
 							</Button>
 							<Button
 								className="flex-1"
 								onPress={handleSubmit(onSubmit)}
-								isDisabled={isSubmitting}
+								isDisabled={!isDirty || isSavingAddress}
 							>
-								<ButtonText>Confirmar</ButtonText>
+								<ButtonText>Salvar</ButtonText>
+								{isSavingAddress && <ButtonIcon as={Spinner} />}
 							</Button>
 						</View>
-					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</>
+					</Card>
+				</View>
+			</ScrollView>
+		</KeyboardAvoidingView>
 	);
 }
