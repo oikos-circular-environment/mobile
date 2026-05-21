@@ -1,6 +1,6 @@
+import { BlurView } from "expo-blur";
 import { CameraView } from "expo-camera";
 import { Button, View } from "react-native";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useCameraContext } from "./context";
 
@@ -42,12 +42,12 @@ export function CameraPreview() {
 				onCameraReady={handleCameraReady}
 			/>
 			{isModeTransitioning && (
-				<View className="absolute inset-0 items-center justify-center bg-black/30">
-					<View className="items-center gap-2 rounded-xl bg-black/55 px-5 py-4">
-						<Spinner className="text-white" size="small" />
-						<Text className="text-sm text-white">Alternando modo...</Text>
-					</View>
-				</View>
+				<BlurView
+					intensity={70}
+					tint="dark"
+					experimentalBlurMethod="dimezisBlurView"
+					style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+				/>
 			)}
 		</View>
 	);
