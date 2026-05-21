@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import type { VideoThumbnail } from "expo-video";
-import { createVideoPlayer } from "expo-video";
-import { useEffect, useState } from "react";
+import { useVideoPlayer } from "expo-video";
+import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -24,53 +24,58 @@ export function MediaThumbnail({
 	const [thumbnail, setThumbnail] = useState<MediaThumbnailState | undefined>(
 		undefined,
 	);
+	const isMountedRef = useRef(true);
+
+	// useVideoPlayer gerencia o ciclo de vida e libera o player automaticamente no unmount.
+	// Passa null para fotos para não criar player desnecessariamente.
+	const player = useVideoPlayer(mediaType === "video" && uri ? { uri } : null);
 
 	useEffect(() => {
-		let isMounted = true;
+		isMountedRef.current = true;
+		return () => {
+			isMountedRef.current = false;
+		};
+	}, []);
 
-		if (mediaType === "photo") {
+	useEffect(() => {
+		if (mediaType !== "video" || !uri) {
 			setThumbnail(undefined);
-			return () => {
-				isMounted = false;
-			};
+			return;
 		}
 
-		if (!uri) {
-			setThumbnail(undefined);
-			return () => {
-				isMounted = false;
-			};
-		}
+		setThumbnail(undefined);
 
-		const generateVideoThumbnail = async () => {
-			setThumbnail(undefined);
-
+		const generateThumbnail = async () => {
 			try {
-				const player = createVideoPlayer({ uri });
-				const [result] = await player.generateThumbnailsAsync(0.5, {
+				const results = await player.generateThumbnailsAsync([0.5], {
 					maxHeight: 240,
 				});
-
-				if (!isMounted) {
-					return;
+				if (isMountedRef.current) {
+					setThumbnail(results[0] ?? "failed");
 				}
-
-				setThumbnail(result ?? "failed");
 			} catch {
-				if (!isMounted) {
-					return;
+				if (isMountedRef.current) {
+					setThumbnail("failed");
 				}
-
-				setThumbnail("failed");
 			}
 		};
 
-		void generateVideoThumbnail();
+		// Escuta transições de status — generateThumbnailsAsync só funciona em readyToPlay.
+		const subscription = player.addListener("statusChange", ({ status }) => {
+			if (status === "readyToPlay") {
+				void generateThumbnail();
+			}
+		});
+
+		// Caso o player já esteja pronto (ex: fonte em cache).
+		if (player.status === "readyToPlay") {
+			void generateThumbnail();
+		}
 
 		return () => {
-			isMounted = false;
+			subscription.remove();
 		};
-	}, [mediaType, uri]);
+	}, [mediaType, uri, player]);
 
 	if (mediaType === "photo") {
 		if (!uri) {
@@ -90,7 +95,7 @@ export function MediaThumbnail({
 		);
 	}
 
-	if (!uri || !thumbnail) {
+	if (!uri || thumbnail === undefined) {
 		return (
 			<View className="flex-1 items-center justify-center bg-zinc-700">
 				<Spinner size="small" color="grey" />

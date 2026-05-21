@@ -100,10 +100,14 @@ export function CameraRoot({
 		if (!cameraRef.current || isModeTransitioning) return;
 
 		if (mode === "photo") {
-			const picture = await cameraRef.current.takePictureAsync({
-				quality: 0.8,
-			});
-			if (picture?.uri) onCapture(picture, "photo");
+			try {
+				const picture = await cameraRef.current.takePictureAsync({
+					quality: 0.8,
+				});
+				if (picture?.uri) onCapture(picture, "photo");
+			} catch (err) {
+				console.error("[Camera] takePictureAsync failed:", err);
+			}
 			return;
 		}
 
@@ -118,7 +122,11 @@ export function CameraRoot({
 		try {
 			setIsRecording(true);
 			const video = await cameraRef.current.recordAsync();
-			if (video?.uri) onCapture(video, "video");
+			if (video?.uri) {
+				onCapture(video, "video");
+			}
+		} catch (err) {
+			console.error("[Camera] recordAsync failed:", err);
 		} finally {
 			setIsRecording(false);
 		}
