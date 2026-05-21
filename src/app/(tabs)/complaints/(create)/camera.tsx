@@ -121,10 +121,10 @@ export default function ComplaintCameraScreen() {
 				style={{ top: insets.top + 16 }}
 			>
 				<TouchableOpacity
-					className="rounded-xl bg-white/90 p-3"
+					className="rounded-xl p-3"
 					onPress={() => router.back()}
 				>
-					<ArrowLeft size={20} color="#4B5563" strokeWidth={2.2} />
+					<ArrowLeft size={20} color="white" strokeWidth={2.2} />
 				</TouchableOpacity>
 			</View>
 
