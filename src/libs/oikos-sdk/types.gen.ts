@@ -1199,7 +1199,7 @@ export type GetV1ComplaintsResponses = {
 					name: string | null;
 					isoCountryCode: string | null;
 					timezone: string | null;
-					formattedAddress: string | null;
+					formattedAddress?: string | null;
 				};
 			};
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
@@ -1257,7 +1257,7 @@ export type PostV1ComplaintsData = {
 				name: string | null;
 				isoCountryCode: string | null;
 				timezone: string | null;
-				formattedAddress: string | null;
+				formattedAddress?: string | null;
 			};
 		};
 	};
@@ -1329,7 +1329,7 @@ export type PostV1ComplaintsResponses = {
 					name: string | null;
 					isoCountryCode: string | null;
 					timezone: string | null;
-					formattedAddress: string | null;
+					formattedAddress?: string | null;
 				};
 			};
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
@@ -1462,7 +1462,7 @@ export type GetV1ComplaintsByIdResponses = {
 					name: string | null;
 					isoCountryCode: string | null;
 					timezone: string | null;
-					formattedAddress: string | null;
+					formattedAddress?: string | null;
 				};
 			};
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
@@ -1558,7 +1558,7 @@ export type PatchV1ComplaintsByIdResponses = {
 					name: string | null;
 					isoCountryCode: string | null;
 					timezone: string | null;
-					formattedAddress: string | null;
+					formattedAddress?: string | null;
 				};
 			};
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
@@ -1651,7 +1651,7 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 					name: string | null;
 					isoCountryCode: string | null;
 					timezone: string | null;
-					formattedAddress: string | null;
+					formattedAddress?: string | null;
 				};
 			};
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
@@ -1744,7 +1744,7 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 					name: string | null;
 					isoCountryCode: string | null;
 					timezone: string | null;
-					formattedAddress: string | null;
+					formattedAddress?: string | null;
 				};
 			};
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
@@ -1765,16 +1765,16 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 export type PatchV1ComplaintsByIdCanceledResponse =
 	PatchV1ComplaintsByIdCanceledResponses[keyof PatchV1ComplaintsByIdCanceledResponses];
 
-export type PostV1ComplaintsAttachmentsData = {
-	body: {
-		complaint_id: string;
+export type PostV1ComplaintsByIdAttachmentsData = {
+	body?: never;
+	path: {
+		id: string;
 	};
-	path?: never;
 	query?: never;
-	url: "/v1/complaints/attachments";
+	url: "/v1/complaints/{id}/attachments";
 };
 
-export type PostV1ComplaintsAttachmentsErrors = {
+export type PostV1ComplaintsByIdAttachmentsErrors = {
 	/**
 	 * Default Response
 	 */
@@ -1817,10 +1817,10 @@ export type PostV1ComplaintsAttachmentsErrors = {
 	};
 };
 
-export type PostV1ComplaintsAttachmentsError =
-	PostV1ComplaintsAttachmentsErrors[keyof PostV1ComplaintsAttachmentsErrors];
+export type PostV1ComplaintsByIdAttachmentsError =
+	PostV1ComplaintsByIdAttachmentsErrors[keyof PostV1ComplaintsByIdAttachmentsErrors];
 
-export type PostV1ComplaintsAttachmentsResponses = {
+export type PostV1ComplaintsByIdAttachmentsResponses = {
 	/**
 	 * Default Response
 	 */
@@ -1861,7 +1861,7 @@ export type PostV1ComplaintsAttachmentsResponses = {
 					name: string | null;
 					isoCountryCode: string | null;
 					timezone: string | null;
-					formattedAddress: string | null;
+					formattedAddress?: string | null;
 				};
 			};
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
@@ -1879,5 +1879,5 @@ export type PostV1ComplaintsAttachmentsResponses = {
 	};
 };
 
-export type PostV1ComplaintsAttachmentsResponse =
-	PostV1ComplaintsAttachmentsResponses[keyof PostV1ComplaintsAttachmentsResponses];
+export type PostV1ComplaintsByIdAttachmentsResponse =
+	PostV1ComplaintsByIdAttachmentsResponses[keyof PostV1ComplaintsByIdAttachmentsResponses];

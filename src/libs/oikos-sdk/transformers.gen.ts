@@ -13,7 +13,7 @@ import type {
 	PatchV1ComplaintsByIdResolvedResponse,
 	PatchV1ComplaintsByIdResponse,
 	PostV1CompaniesResponse,
-	PostV1ComplaintsAttachmentsResponse,
+	PostV1ComplaintsByIdAttachmentsResponse,
 	PostV1ComplaintsResponse,
 	PutV1CompaniesAddressesResponse,
 	PutV1CompaniesResponse,
@@ -259,9 +259,9 @@ export const patchV1ComplaintsByIdCanceledResponseTransformer = async (
 	return data;
 };
 
-export const postV1ComplaintsAttachmentsResponseTransformer = async (
+export const postV1ComplaintsByIdAttachmentsResponseTransformer = async (
 	data: any,
-): Promise<PostV1ComplaintsAttachmentsResponse> => {
+): Promise<PostV1ComplaintsByIdAttachmentsResponse> => {
 	data.complaint.date = new Date(data.complaint.date);
 	if (data.complaint.attachment) {
 		data.complaint.attachment.created_at = new Date(
