@@ -1,6 +1,7 @@
 import {
 	type CameraCapturedPicture,
 	type CameraView,
+	type FlashMode,
 	useCameraPermissions,
 	useMicrophonePermissions,
 } from "expo-camera";
@@ -33,6 +34,7 @@ export function CameraRoot({
 	const [mode, setMode] = useState<ComplaintCaptureMode>(defaultMode);
 	const [isRecording, setIsRecording] = useState(false);
 	const [isModeTransitioning, setIsModeTransitioning] = useState(false);
+	const [flash, setFlash] = useState<FlashMode>("off");
 
 	const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 	const [microphonePermission, requestMicrophonePermission] =
@@ -71,6 +73,10 @@ export function CameraRoot({
 		}
 
 		setIsModeTransitioning(false);
+	};
+
+	const toggleFlash = () => {
+		setFlash(current => (current === "off" ? "on" : "off"));
 	};
 
 	async function ensureMicrophonePermission() {
@@ -114,16 +120,26 @@ export function CameraRoot({
 				mode,
 				isRecording,
 				isModeTransitioning,
+				flash,
 				handleModeChange,
 				handleCameraReady,
 				handleCapture,
+				toggleFlash,
 				cameraPermission,
 				requestCameraPermission,
 				microphonePermission,
 				requestMicrophonePermission,
 			}}
 		>
-			<View className="flex-1 bg-black">{children}</View>
+			<View className="flex-1 bg-black">
+				{children}
+				{isModeTransitioning && (
+					<View
+						className="absolute inset-0"
+						onStartShouldSetResponder={() => true}
+					/>
+				)}
+			</View>
 		</CameraContext.Provider>
 	);
 }

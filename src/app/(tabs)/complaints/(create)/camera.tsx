@@ -1,12 +1,10 @@
 import type { CameraCapturedPicture } from "expo-camera";
 import * as Crypto from "expo-crypto";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Camera } from "@/components/camera";
-import { Text } from "@/components/ui/text";
 import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import type {
@@ -22,7 +20,6 @@ export default function ComplaintCameraScreen() {
 	const insets = useSafeAreaInsets();
 
 	const latestCapture = captures[0] ?? null;
-	const previousCapture = captures[1] ?? null;
 
 	function saveInMemory(
 		captureObject: CameraCapturedPicture | CameraCapturedVideo,
@@ -129,6 +126,8 @@ export default function ComplaintCameraScreen() {
 				</TouchableOpacity>
 			</View>
 
+			<Camera.RecordingTimer />
+
 			<Camera.GeospatialOverlay />
 
 			<Camera.ModeSelector style={{ bottom: insets.bottom + 120 }} />
@@ -138,36 +137,11 @@ export default function ComplaintCameraScreen() {
 				style={{ bottom: insets.bottom + 10 }}
 			>
 				<View className="flex-row items-end justify-between">
-					<TouchableOpacity
-						className="h-20 w-20 overflow-hidden rounded-xl"
-						disabled
-					>
-						{latestCapture ? (
-							<>
-								{previousCapture && (
-									<View className="absolute -left-1 -top-1 h-full w-full rounded-xl bg-zinc-700/70" />
-								)}
-								{latestCapture.capture.type === "photo" &&
-								latestCapture.capture.object?.uri ? (
-									<Image
-										source={{ uri: latestCapture.capture.object.uri }}
-										contentFit="cover"
-										style={{ flex: 1 }}
-									/>
-								) : (
-									<View className="flex-1 items-center justify-center bg-zinc-800">
-										<Text className="text-[10px] font-semibold text-white">
-											VIDEO
-										</Text>
-									</View>
-								)}
-							</>
-						) : (
-							<View className="flex-1 items-center justify-center bg-zinc-700/80">
-								<Text className="text-[10px] text-white/70">Sem mídia</Text>
-							</View>
-						)}
-					</TouchableOpacity>
+					<Camera.MediaPreview
+						type={latestCapture?.capture.type}
+						uri={latestCapture?.capture.object?.uri}
+						hasMore={captures.length > 1}
+					/>
 
 					<Camera.CaptureButton />
 

@@ -8,6 +8,7 @@ export function CameraPreview() {
 	const {
 		cameraRef,
 		mode,
+		flash,
 		isModeTransitioning,
 		handleCameraReady,
 		cameraPermission,
@@ -35,6 +36,7 @@ export function CameraPreview() {
 				ref={cameraRef}
 				style={{ flex: 1 }}
 				mode={mode === "photo" ? "picture" : "video"}
+				flash={flash}
 				onCameraReady={handleCameraReady}
 			/>
 			{isModeTransitioning && (

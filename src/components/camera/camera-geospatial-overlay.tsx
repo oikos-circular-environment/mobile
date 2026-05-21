@@ -1,6 +1,11 @@
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
-import { LocateIcon, LocateOffIcon } from "lucide-react-native";
+import {
+	LocateIcon,
+	LocateOffIcon,
+	ZapIcon,
+	ZapOffIcon,
+} from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -12,6 +17,7 @@ import {
 	formatMeters,
 	formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
+import { useCameraContext } from "./context";
 
 const textStrokeStyle = {
 	textShadowColor: "rgba(0, 0, 0, 0.92)",
@@ -30,6 +36,7 @@ export function CameraGeospatialOverlay({
 }: CameraGeospatialOverlayProps) {
 	const [isVisible, setIsVisible] = useState(defaultVisible);
 	const { addresses, currentDate, location, heading } = useGeospatial();
+	const { flash, toggleFlash } = useCameraContext();
 	const insets = useSafeAreaInsets();
 
 	const date = useMemo(
@@ -85,16 +92,28 @@ export function CameraGeospatialOverlay({
 		[location?.coords.altitude],
 	);
 
-	const ToggleIcon = isVisible ? LocateIcon : LocateOffIcon;
+	const LocateToggleIcon = isVisible ? LocateIcon : LocateOffIcon;
+	const FlashToggleIcon = flash === "on" ? ZapIcon : ZapOffIcon;
 
 	return (
 		<>
-			<View className="absolute right-5" style={{ top: insets.top + 16 }}>
+			<View className="absolute right-5 gap-2" style={{ top: insets.top + 16 }}>
+				<TouchableOpacity
+					className="rounded-xl bg-white/90 p-3"
+					onPress={toggleFlash}
+				>
+					<FlashToggleIcon
+						size={20}
+						color={flash === "on" ? "#3d6300" : "#4B5563"}
+						strokeWidth={2.2}
+					/>
+				</TouchableOpacity>
+
 				<TouchableOpacity
 					className="rounded-xl bg-white/90 p-3"
 					onPress={() => setIsVisible(v => !v)}
 				>
-					<ToggleIcon
+					<LocateToggleIcon
 						size={20}
 						color={isVisible ? "#3d6300" : "#4B5563"}
 						strokeWidth={2.2}
