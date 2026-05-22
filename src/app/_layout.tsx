@@ -10,7 +10,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
-import { FloatingDevTools } from "@buoy-gg/core";
 import { Toaster } from "@/components/toast";
 
 export const unstable_settings = {
@@ -23,34 +22,34 @@ export default function RootLayout() {
 	const isDevelopmentMode = process.env.NODE_ENV === "development";
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<UserProvider>
-				<GeospatialProvider>
-					<NotificationProvider>
-						<GluestackUIProvider mode="light">
+		<GluestackUIProvider mode="light">
+			<QueryClientProvider client={queryClient}>
+				<UserProvider>
+					<GeospatialProvider>
+						<NotificationProvider>
 							<GestureHandlerRootView style={{ flex: 1 }}>
-							<SafeAreaProvider>
-								<Toaster />
-								<SafeAreaView
-									style={{ flex: 1 }}
-									edges={["top", "left", "right"]}
-								>
-									<Stack>
-										<Stack.Screen
-											name="(tabs)"
-											options={{ headerShown: false }}
-										/>
-									</Stack>
+								<SafeAreaProvider>
+									<Toaster />
 									<StatusBar style="dark" animated />
-								</SafeAreaView>
-							</SafeAreaProvider>
-						</GestureHandlerRootView>
-						</GluestackUIProvider>
-					</NotificationProvider>
-				</GeospatialProvider>
-			</UserProvider>
-			{isDevelopmentMode && <FloatingDevTools />}
-			{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
-		</QueryClientProvider>
+									<SafeAreaView
+										style={{ flex: 1, backgroundColor: "#ffffff" }}
+										edges={["top", "left", "right"]}
+									>
+										<Stack>
+											<Stack.Screen
+												name="(tabs)"
+												options={{ headerShown: false }}
+											/>
+										</Stack>
+									</SafeAreaView>
+								</SafeAreaProvider>
+							</GestureHandlerRootView>
+						</NotificationProvider>
+					</GeospatialProvider>
+				</UserProvider>
+				{/* {isDevelopmentMode && <FloatingDevTools />} */}
+				{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
+			</QueryClientProvider>
+		</GluestackUIProvider>
 	);
 }

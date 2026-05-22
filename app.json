@@ -6,13 +6,18 @@
     "orientation": "portrait",
     "icon": "./src/assets/icons/icon.png",
     "scheme": "oikos",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "com.oikos",
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
+      },
+      "infoPlist": {
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
+        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -27,7 +32,17 @@
         "googleMaps": {
           "apiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
         }
-      }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -56,14 +71,6 @@
         }
       ],
       [
-        "react-native-vision-camera",
-        {
-          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
-          "enableMicrophonePermission": true,
-          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
-        }
-      ],
-      [
         "expo-video",
         {
           "supportsBackgroundPlayback": true,
@@ -79,8 +86,19 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "4d7f8122-2f77-41c9-8ef3-63000041bc61"
+        "projectId": "1ec73321-5c0d-469a-ae1d-407bf5345183"
       }
+    },
+    "owner": "oikos-circular-environment",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1ec73321-5c0d-469a-ae1d-407bf5345183"
     }
   }
 }

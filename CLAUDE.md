@@ -62,7 +62,7 @@ These rules are enforced project-wide (`.github/copilot-instructions.md`):
 | Forms | `react-hook-form` + `zod` |
 | Date utilities | `date-fns` |
 | Maps | `react-native-maps` + Google Maps API |
-| Camera | `expo-camera` + `react-native-vision-camera` |
+| Camera | `expo-camera` |
 | Location | `expo-location` (background tracking) |
 | Animation | `react-native-reanimated` + `@legendapp/motion` |
 | Haptics | `expo-haptics` |
