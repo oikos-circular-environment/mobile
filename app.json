@@ -15,8 +15,6 @@
         "googleMapsApiKey": "AIzaSyDK-xJGj3ft4SPPHLgbFJ41aaSTSOebz7w"
       },
       "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
-        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -37,10 +35,6 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ]
     },
@@ -58,15 +52,16 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Permitir $(PRODUCT_NAME) usar sua localização?"
+          "locationAlwaysAndWhenInUsePermission": "$(PRODUCT_NAME) usa sua localização para registrar onde as ocorrências ambientais acontecem.",
+        "locationWhenInUsePermission": "$(PRODUCT_NAME) usa sua localização para registrar onde as ocorrências ambientais acontecem."
         }
       ],
       "expo-localization",
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "cameraPermission": "$(PRODUCT_NAME) usa a câmera para registrar ocorrências ambientais com fotos e vídeos.",
+          "microphonePermission": "$(PRODUCT_NAME) usa o microfone para gravar vídeos das ocorrências ambientais.",
           "recordAudioAndroid": true
         }
       ],
