@@ -46,12 +46,12 @@ export function CameraPreview() {
 	}));
 
 	if (!cameraPermission) {
-		return <View className="flex-1 bg-black" />;
+		return <View className="absolute inset-0 z-50 bg-black" />;
 	}
 
 	if (!cameraPermission.granted) {
 		return (
-			<View className="flex-1 items-center justify-center gap-3 bg-black px-6">
+			<View className="absolute inset-0 z-50 items-center justify-center gap-3 bg-black px-6">
 				<Text className="text-center text-white">
 					Precisamos da permissão de câmera para continuar.
 				</Text>
