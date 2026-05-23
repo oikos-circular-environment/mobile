@@ -7,7 +7,7 @@ import {
 	useContext,
 	useMemo,
 } from "react";
-import { ActionSheetIOS, Alert, Linking, Platform } from "react-native";
+import { Alert, Linking, Platform } from "react-native";
 import { toast } from "@/components/toast";
 import {
 	patchV1ComplaintsByIdCanceled,
@@ -71,52 +71,19 @@ export function ComplaintCardProvider({
 	const value = useMemo<ComplaintCardContextValue>(() => {
 		const { latitude, longitude } = complaint.geospatial.location.coords;
 
-		const googleMapsNative = `comgooglemaps://?q=${latitude},${longitude}`;
-		const wazeNative = `waze://?ll=${latitude},${longitude}`;
-		const appleMapsUrl = `http://maps.apple.com/?ll=${latitude},${longitude}`;
-		const googleMapsWeb = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-		const wazeWeb = `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`;
+		const mapsUrl =
+			Platform.OS === "ios"
+				? `maps://?ll=${latitude},${longitude}`
+				: `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
 
-		const openInMaps = () => {
-			if (Platform.OS === "ios") {
-				ActionSheetIOS.showActionSheetWithOptions(
-					{
-						options: [
-							"Cancelar",
-							"Google Maps",
-							"Waze",
-							"Apple Maps",
-							"Abrir no navegador",
-						],
-						cancelButtonIndex: 0,
-					},
-					async buttonIndex => {
-						try {
-							if (buttonIndex === 1) {
-								const canOpen = await Linking.canOpenURL(googleMapsNative);
-								await Linking.openURL(canOpen ? googleMapsNative : googleMapsWeb);
-							} else if (buttonIndex === 2) {
-								const canOpen = await Linking.canOpenURL(wazeNative);
-								await Linking.openURL(canOpen ? wazeNative : wazeWeb);
-							} else if (buttonIndex === 3) {
-								await Linking.openURL(appleMapsUrl);
-							} else if (buttonIndex === 4) {
-								await Linking.openURL(googleMapsWeb);
-							}
-						} catch {
-							Alert.alert("Maps", "Não foi possível abrir o aplicativo de mapas.");
-						}
-					},
-				);
-			} else {
-				const geoUri = `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
-				Linking.canOpenURL(geoUri)
-					.then(canOpen =>
-						Linking.openURL(canOpen ? geoUri : googleMapsWeb),
-					)
-					.catch(() => {
-						Alert.alert("Maps", "Não foi possível abrir o aplicativo de mapas.");
-					});
+		const fallbackUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+
+		const openInMaps = async () => {
+			try {
+				const canOpen = await Linking.canOpenURL(mapsUrl);
+				await Linking.openURL(canOpen ? mapsUrl : fallbackUrl);
+			} catch {
+				Alert.alert("Maps", "Não foi possível abrir o aplicativo de mapas.");
 			}
 		};
 
