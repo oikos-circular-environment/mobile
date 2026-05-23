@@ -208,12 +208,12 @@ export function ComplaintCardSkeleton() {
 		>
 			<View className="gap-2">
 				<View className="flex-row items-center gap-2">
-					<View className="flex-1 gap-2">
-						<Skeleton startColor="bg-gray-200" className="h-5 w-3/4 rounded" />
-						<Skeleton startColor="bg-gray-200" className="h-3 w-1/2 rounded" />
-						<Skeleton startColor="bg-gray-200" className="h-3 w-1/3 rounded" />
-					</View>
-					<Skeleton startColor="bg-gray-200" className="size-16 rounded-md" />
+					<Skeleton startColor="bg-gray-200" className="w-16 h-16 rounded-md" />
+					<Skeleton
+						startColor="bg-gray-200"
+						className="flex-1 h-16 rounded-md"
+					/>
+					<Skeleton startColor="bg-gray-200" className="w-4 h-16 rounded-md" />
 				</View>
 				<Skeleton startColor="bg-gray-200" className="h-32 w-full rounded" />
 			</View>

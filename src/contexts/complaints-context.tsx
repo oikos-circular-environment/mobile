@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
 	createContext,
 	type PropsWithChildren,
@@ -26,6 +26,8 @@ export type ApiComplaintStatus = ApiComplaint["status"];
 export const COMPLAINTS_QUERY_KEY = ["complaints"] as const;
 export const DASHBOARD_QUERY_KEY = ["complaints", "dashboard"] as const;
 
+const PAGE_LIMIT = 15;
+
 type ComplaintsContextValue = {
 	complaints: ApiComplaint[];
 	dashboard: ComplaintDashboard | undefined;
@@ -34,6 +36,9 @@ type ComplaintsContextValue = {
 	filteredComplaints: ApiComplaint[];
 	isLoadingComplaints: boolean;
 	isLoadingDashboard: boolean;
+	fetchNextPage: () => void;
+	hasNextPage: boolean;
+	isFetchingNextPage: boolean;
 	refetchAll: () => void;
 };
 
@@ -48,12 +53,19 @@ export function ComplaintsProvider({ children }: PropsWithChildren) {
 		data: complaintsData,
 		isLoading: isLoadingComplaints,
 		refetch: refetchComplaints,
-	} = useQuery({
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery({
 		queryKey: COMPLAINTS_QUERY_KEY,
-		queryFn: async () => {
-			const res = await getV1Complaints();
-			return res.data?.complaints ?? [];
+		queryFn: async ({ pageParam }) => {
+			const res = await getV1Complaints({
+				query: { cursor: pageParam, limit: PAGE_LIMIT },
+			});
+			return res.data;
 		},
+		initialPageParam: undefined as Date | undefined,
+		getNextPageParam: lastPage => lastPage?.next_cursor ?? undefined,
 	});
 
 	const {
@@ -68,7 +80,10 @@ export function ComplaintsProvider({ children }: PropsWithChildren) {
 		},
 	});
 
-	const complaints = complaintsData ?? [];
+	const complaints = useMemo(
+		() => complaintsData?.pages.flatMap(page => page?.complaints ?? []) ?? [],
+		[complaintsData],
+	);
 
 	const filteredComplaints = useMemo(() => {
 		if (!activeFilter) return complaints;
@@ -89,6 +104,9 @@ export function ComplaintsProvider({ children }: PropsWithChildren) {
 			filteredComplaints,
 			isLoadingComplaints,
 			isLoadingDashboard,
+			fetchNextPage,
+			hasNextPage,
+			isFetchingNextPage,
 			refetchAll,
 		}),
 		[
@@ -98,6 +116,9 @@ export function ComplaintsProvider({ children }: PropsWithChildren) {
 			filteredComplaints,
 			isLoadingComplaints,
 			isLoadingDashboard,
+			fetchNextPage,
+			hasNextPage,
+			isFetchingNextPage,
 			refetchAll,
 		],
 	);
