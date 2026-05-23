@@ -9,8 +9,24 @@ export default function TabsNavigator() {
 	return (
 		<Tabs
 			screenOptions={{
-				tabBarActiveTintColor: "#3d6300",
+				tabBarActiveTintColor: "#f5f5f5",
+				tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
 				headerShown: false,
+				tabBarBackground: () => null,
+				tabBarStyle: {
+					paddingTop: 4,
+					marginHorizontal: 16,
+					marginBottom: 20,
+					borderRadius: 30,
+					height: 64,
+					backgroundColor: "rgba(61, 99, 0, 0.75)",
+					borderTopWidth: 0,
+					elevation: 0,
+					shadowColor: "#000",
+					shadowOffset: { width: 0, height: 4 },
+					shadowOpacity: 0.12,
+					shadowRadius: 8,
+				},
 			}}
 		>
 			<Tabs.Screen
