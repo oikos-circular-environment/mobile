@@ -13,8 +13,7 @@ import {
 	type MarketSimulationItemType,
 	saveMarketCheckoutDraft,
 } from "@/libs/memory/market-simulations";
-import type { Company } from "@/libs/types/companies";
-import type { Measurement } from "@/libs/types/measurement";
+import type { MarketCompany } from "@/libs/types/market";
 
 type SimulationSelection = {
 	itemType: MarketSimulationItemType;
@@ -22,11 +21,11 @@ type SimulationSelection = {
 };
 
 type CompanyDetailSimulationTabProps = {
-	company: Company;
+	company: MarketCompany;
 	selectedItem: SimulationSelection | null;
 };
 
-const measurementSymbol: Record<Measurement, string> = {
+const measurementSymbol: Record<string, string> = {
 	KG: "kg",
 	L: "L",
 	UNIT: "un",
@@ -72,11 +71,11 @@ export function CompanyDetailSimulationTab({
 
 	const catalogItems = useMemo(() => {
 		if (activeItemType === "waste") {
-			return company.waste ?? [];
+			return company.wastes ?? [];
 		}
 
 		return company.services ?? [];
-	}, [activeItemType, company.services, company.waste]);
+	}, [activeItemType, company.services, company.wastes]);
 
 	const selectedCatalogItem = useMemo(() => {
 		if (!selectedCatalogItemId) {
@@ -136,7 +135,7 @@ export function CompanyDetailSimulationTab({
 			itemId: selectedCatalogItem.id,
 			itemType: activeItemType,
 			itemName: selectedCatalogItem.name,
-			unit: measurementSymbol[selectedCatalogItem.unit],
+			unit: measurementSymbol[selectedCatalogItem.unit] ?? selectedCatalogItem.unit,
 			unitPrice,
 			quantity: parsedQuantity,
 			note,
@@ -212,7 +211,7 @@ export function CompanyDetailSimulationTab({
 										</View>
 										<Text className="text-xs font-semibold text-gray-800">
 											{formatCurrency(item.price)} /{" "}
-											{measurementSymbol[item.unit]}
+											{measurementSymbol[item.unit] ?? item.unit}
 										</Text>
 									</View>
 								</Pressable>
@@ -247,7 +246,7 @@ export function CompanyDetailSimulationTab({
 							<InputField
 								value={
 									selectedCatalogItem
-										? measurementSymbol[selectedCatalogItem.unit]
+										? (measurementSymbol[selectedCatalogItem.unit] ?? selectedCatalogItem.unit)
 										: ""
 								}
 								className="text-sm"
@@ -338,7 +337,9 @@ export function CompanyDetailSimulationTab({
 							</View>
 
 							{item.note ? (
-								<Text className="text-xs text-gray-500">Obs.: {item.note}</Text>
+								<Text className="text-xs text-gray-500">
+									Obs.: {item.note}
+								</Text>
 							) : null}
 						</Card>
 					))

@@ -12,12 +12,13 @@ import {
 } from "@/components/ui/modal";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { type BusinessHour, daysOfWeek } from "@/libs/types/business-hour";
+import { daysOfWeek } from "@/libs/types/business-hour";
+import type { MarketBusinessHour } from "@/libs/types/market";
 
 type BusinessHoursModalProps = {
 	isOpen: boolean;
 	onClose: () => void;
-	businessHours: BusinessHour[] | null;
+	businessHours: MarketBusinessHour[] | null;
 };
 
 const getDayLabel = (day: string) =>
@@ -52,14 +53,14 @@ export function BusinessHoursModal({
 							<Card className="shadow-none mt-1 mb-1">
 								<View className="flex-row items-center justify-between">
 									<Text className="text-sm font-semibold text-gray-900">
-										{getDayLabel(item.dayOfWeek)}
+										{getDayLabel(item.day_of_week)}
 									</Text>
 									<View>
-										{item.timeSlots.length ? (
+										{item.time_slots.length ? (
 											<View className="mt-1 gap-0.5">
-												{item.timeSlots.map(slot => (
+												{item.time_slots.map(slot => (
 													<Text key={slot.id} className="text-xs text-gray-700">
-														{slot.startTime} - {slot.endTime}
+														{slot.start_time} - {slot.end_time}
 													</Text>
 												))}
 											</View>
