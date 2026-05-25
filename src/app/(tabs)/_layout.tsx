@@ -1,17 +1,16 @@
 import { Tabs } from "expo-router";
 import { Leaf, MapPin, Shield } from "lucide-react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const TAB_BAR_HEIGHT = 64;
-const TAB_BAR_MARGIN_BOTTOM = 0;
+// const TAB_BAR_HEIGHT = 64;
+// const TAB_BAR_MARGIN_BOTTOM = 0;
 
 export const unstable_settings = {
 	initialRouteName: "(home)",
 };
 
 export default function TabsNavigator() {
-	const { bottom } = useSafeAreaInsets();
-	const tabBarBottom = bottom + TAB_BAR_MARGIN_BOTTOM;
+	// const { bottom } = useSafeAreaInsets();
+	// const tabBarBottom = bottom + TAB_BAR_MARGIN_BOTTOM;
 
 	return (
 		<Tabs

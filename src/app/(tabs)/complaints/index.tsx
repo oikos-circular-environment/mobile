@@ -121,8 +121,8 @@ export default function ComplaintsScreen() {
 
 	return (
 		<FlatList<ApiComplaint>
-			className="flex-1 bg-white"
-			contentContainerClassName="gap-4 px-4 py-4 pb-8"
+			className="flex-1 "
+			contentContainerClassName="gap-4 px-4 py-4 pb-8 bg-white"
 			data={filteredComplaints}
 			keyExtractor={item => item.id}
 			renderItem={renderItem}

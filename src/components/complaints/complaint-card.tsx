@@ -1,14 +1,15 @@
 "use client";
 
-import { Image } from "expo-image";
 import {
 	EllipsisVertical,
 	EyeIcon,
 	MapPinned,
+	PlayCircleIcon,
 	ShieldCheckIcon,
 	ShieldXIcon,
 } from "lucide-react-native";
 import { View } from "react-native";
+import { MediaThumbnail } from "@/components/common/media-thumbnail";
 import { toast } from "@/components/toast";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -87,13 +88,22 @@ function ComplaintCardContent() {
 		>
 			<View className="gap-2">
 				<View className="flex-row items-center gap-2">
-					{complaint.attachment?.url &&
-					complaint.attachment.type === "PHOTO" ? (
-						<Image
-							source={{ uri: complaint.attachment.url }}
-							contentFit="cover"
-							style={{ width: 48, height: 48, borderRadius: 8 }}
-						/>
+					{complaint.attachment?.url ? (
+						<View style={{ width: 48, height: 48, borderRadius: 8, overflow: "hidden" }}>
+							<MediaThumbnail
+								mediaType={complaint.attachment.type === "VIDEO" ? "video" : "photo"}
+								uri={complaint.attachment.url}
+								fallbackLabel={complaint.attachment.type === "VIDEO" ? "VIDEO" : "FOTO"}
+							/>
+							{complaint.attachment.type === "VIDEO" ? (
+								<View
+									className="absolute inset-0 items-center justify-center"
+									style={{ backgroundColor: "rgba(0,0,0,0.25)" }}
+								>
+									<PlayCircleIcon size={20} color="white" strokeWidth={1.8} />
+								</View>
+							) : null}
+						</View>
 					) : null}
 					<View className="flex-1 justify-center">
 						<Heading numberOfLines={1}>

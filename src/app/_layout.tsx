@@ -32,7 +32,7 @@ export default function RootLayout() {
 									<Toaster />
 									<StatusBar style="dark" animated />
 									<SafeAreaView
-										style={{ flex: 1, backgroundColor: "#ffffff" }}
+										style={{ flex: 1 }}
 										edges={["top", "left", "right"]}
 									>
 										<Stack>
