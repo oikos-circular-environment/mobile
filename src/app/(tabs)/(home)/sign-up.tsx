@@ -46,7 +46,7 @@ export default function SignUpScreen() {
 			title="Criar conta"
 			subtitle="Preencha seus dados para começar na Oikos."
 			footer={
-				<Text className="text-xs/70">
+				<Text>
 					Já possui conta?{" "}
 					<Link href="/sign-in" className="font-semibold">
 						Entrar

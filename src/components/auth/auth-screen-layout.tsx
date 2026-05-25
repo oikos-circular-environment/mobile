@@ -19,7 +19,11 @@ export function AuthScreenLayout({
 	footer,
 }: AuthScreenLayoutProps) {
 	return (
-		<ScrollView className="flex-1" contentInsetAdjustmentBehavior="automatic">
+		<ScrollView
+			className="flex-1"
+			contentInsetAdjustmentBehavior="automatic"
+			contentContainerClassName="bg-white flex-1"
+		>
 			<View className="relative min-h-full flex-1  px-5 py-10">
 				<Card className="z-10 w-full self-center max-w-md gap-6 rounded-2xl p-5 shadow-none">
 					<View className="gap-6">

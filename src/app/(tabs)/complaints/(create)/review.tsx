@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
@@ -11,7 +9,7 @@ import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { ComplaintCarousel } from "@/components/complaints/complaint-carousel";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
 	FormControl,
@@ -27,6 +25,7 @@ import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
+import { useSubmitComplaints } from "@/hooks/use-submit-complaints";
 import {
 	formatHeading,
 	formatMeters,
@@ -39,10 +38,10 @@ import {
 } from "@/libs/types/complaint";
 
 const complaintTypeSchema = z.enum([
-	"irregular_disposal",
-	"deforestation",
-	"burning",
-	"vacant_lot",
+	"IRREGULAR_DISPOSAL",
+	"DEFORESTATION",
+	"BURNING",
+	"VACANT_LOT",
 ]);
 
 const reviewSchema = z.object({
@@ -93,12 +92,15 @@ export default function ComplaintReviewScreen() {
 	} = useForm<ReviewFormValues>({
 		resolver: zodResolver(reviewSchema),
 		defaultValues: {
-			type: selectedCapture?.type ?? "irregular_disposal",
+			type: selectedCapture?.type ?? "IRREGULAR_DISPOSAL",
 			observation: selectedCapture?.observation ?? "",
 		},
 	});
 
 	const complaintTypeValue = watch("type");
+
+	const { mutateAsync: submitComplaints, isPending: isSubmitting } =
+		useSubmitComplaints();
 
 	const previousSelectedCaptureId = useRef(selectedCapture?.id ?? "");
 
@@ -119,9 +121,14 @@ export default function ComplaintReviewScreen() {
 		});
 	}, [selectedCapture, reset]);
 
+	useEffect(() => {
+		if (captures.length === 0 || !selectedCapture) {
+			router.replace("/(tabs)/complaints/(create)/camera");
+		}
+	}, [captures.length, selectedCapture]);
+
 	if (captures.length === 0 || !selectedCapture) {
-		// return router.replace("/(tabs)/complaints/(create)/camera");
-		return router.back();
+		return null;
 	}
 
 	const handleBack = () => {
@@ -152,38 +159,35 @@ export default function ComplaintReviewScreen() {
 		? format(captureDate, "EEEE", { locale: ptBR })
 		: "-";
 
-	const latitude = selectedCapture.geospatial.location?.coords.latitude ?? null;
-	const longitude =
-		selectedCapture.geospatial.location?.coords.longitude ?? null;
+	const latitude = selectedCapture.geospatial.location.coords.latitude;
+	const longitude = selectedCapture.geospatial.location.coords.longitude;
 
-	const latitudeFormatted =
-		latitude != null
-			? formatSexagesimalCoordinate(latitude, "latitude")
-			: "indisponivel";
-	const longitudeFormatted =
-		longitude != null
-			? formatSexagesimalCoordinate(longitude, "longitude")
-			: "indisponivel";
+	const latitudeFormatted = formatSexagesimalCoordinate(latitude, "latitude");
+	const longitudeFormatted = formatSexagesimalCoordinate(
+		longitude,
+		"longitude",
+	);
 	const altitudeFormatted = formatMeters(
-		selectedCapture.geospatial.location?.coords.altitude,
+		selectedCapture.geospatial.location.coords.altitude,
 	);
 	const headingFormatted = formatHeading(
-		selectedCapture.geospatial.heading?.magHeading,
+		selectedCapture.geospatial.heading.magHeading,
 		{
 			includeCompass: true,
 		},
 	);
 
 	const onSubmit = handleSubmit(() => {
-		clearDraft();
-		router.replace("/(tabs)/complaints");
+		submitComplaints(captures, {
+			onSuccess: () => {
+				clearDraft();
+				router.replace("/(tabs)/complaints");
+			},
+		});
 	});
 
 	return (
-		<KeyboardAvoidingView
-			behavior={process.env.EXPO_OS === "ios" ? "padding" : "height"}
-			className="flex-1 bg-white"
-		>
+		<KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">
 			<ScrollView
 				className="flex-1 bg-white"
 				contentInsetAdjustmentBehavior="automatic"
@@ -372,11 +376,21 @@ export default function ComplaintReviewScreen() {
 				</View>
 
 				<View className="flex-row gap-3 pt-2">
-					<Button variant="outline" className="flex-1" onPress={handleBack}>
+					<Button
+						variant="outline"
+						className="flex-1"
+						onPress={handleBack}
+						disabled={isSubmitting}
+					>
 						<ButtonText>Voltar</ButtonText>
 					</Button>
-					<Button className="flex-1 bg-lime-800" onPress={onSubmit}>
-						<ButtonText className="text-white">Confirmar</ButtonText>
+					<Button
+						className="flex-1 bg-lime-800"
+						onPress={onSubmit}
+						disabled={isSubmitting}
+					>
+						<ButtonText className="text-white">Enviar</ButtonText>
+						{isSubmitting && <ButtonSpinner />}
 					</Button>
 				</View>
 			</ScrollView>

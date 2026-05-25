@@ -46,7 +46,7 @@ export default function SignInScreen() {
 			title="Entrar na sua conta"
 			subtitle="Bem-vindo de volta. Preencha seus dados."
 			footer={
-				<Text className="text-sm">
+				<Text>
 					Não tem uma conta?{" "}
 					<Link href="/sign-up" className="font-semibold">
 						Registrar-se

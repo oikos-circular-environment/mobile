@@ -11,10 +11,15 @@ import {
 	saveRefreshToken,
 } from "../storage";
 
+// Development
 const baseURL = Platform.select({
 	ios: "http://192.168.18.44:3333",
 	android: "http://10.0.2.2:3333",
 });
+
+// Production / ngrok
+// const baseURL =
+// 	"https://d0a7-2804-250c-1049-6500-8680-5e29-2a6b-ba24.ngrok-free.app";
 
 client.setConfig({ baseURL, throwOnError: true });
 
