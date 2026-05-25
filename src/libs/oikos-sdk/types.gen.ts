@@ -1881,3 +1881,104 @@ export type PostV1ComplaintsByIdAttachmentsResponses = {
 
 export type PostV1ComplaintsByIdAttachmentsResponse =
 	PostV1ComplaintsByIdAttachmentsResponses[keyof PostV1ComplaintsByIdAttachmentsResponses];
+
+export type GetV1MarketData = {
+	body?: never;
+	path?: never;
+	query: {
+		lat: number;
+		lon: number;
+		radius?: number;
+		q?: string;
+		category?: "services" | "waste";
+		cursor?: string;
+		limit?: number;
+	};
+	url: "/v1/market";
+};
+
+export type GetV1MarketErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1MarketError = GetV1MarketErrors[keyof GetV1MarketErrors];
+
+export type GetV1MarketResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		companies: Array<{
+			id: string;
+			business_name: string | null;
+			corporate_name: string;
+			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
+			accept_appointments: boolean;
+			status: boolean;
+			address: {
+				id: string;
+				zip_code: string;
+				street: string;
+				number: string;
+				complement: string | null;
+				district: string;
+				city: string;
+				state: string;
+				state_code: string;
+				latitude: number | null;
+				longitude: number | null;
+			};
+			services: Array<{
+				id: string;
+				name: string;
+				description: string | null;
+				price: number;
+				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				waste_type: "RECYCLABLE" | "GARBAGE";
+				quantity: number;
+				observations: string | null;
+				sub_items: Array<string> | null;
+			}>;
+			wastes: Array<{
+				id: string;
+				name: string;
+				description: string | null;
+				price: number;
+				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				waste_type: "RECYCLABLE" | "GARBAGE";
+				quantity: number;
+				observations: string | null;
+				sub_items: Array<string> | null;
+			}>;
+			business_hours: Array<{
+				id: string;
+				day_of_week:
+					| "SUNDAY"
+					| "MONDAY"
+					| "TUESDAY"
+					| "WEDNESDAY"
+					| "THURSDAY"
+					| "FRIDAY"
+					| "SATURDAY";
+				is_open: boolean;
+				time_slots: Array<{
+					id: string;
+					start_time: string;
+					end_time: string;
+				}>;
+			}>;
+			distance_in_meters: number;
+		}>;
+		next_cursor: string | null;
+	};
+};
+
+export type GetV1MarketResponse =
+	GetV1MarketResponses[keyof GetV1MarketResponses];

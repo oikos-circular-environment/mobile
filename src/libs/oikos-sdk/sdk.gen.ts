@@ -52,6 +52,9 @@ import type {
 	GetV1ComplaintsData,
 	GetV1ComplaintsErrors,
 	GetV1ComplaintsResponses,
+	GetV1MarketData,
+	GetV1MarketErrors,
+	GetV1MarketResponses,
 	GetV1ProfilesAddressesData,
 	GetV1ProfilesAddressesErrors,
 	GetV1ProfilesAddressesResponses,
@@ -711,5 +714,24 @@ export const postV1ComplaintsByIdAttachments = <
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}/attachments",
+		...options,
+	});
+
+/**
+ * List market companies
+ *
+ * Returns companies near the given coordinates, sorted by distance.
+ */
+export const getV1Market = <ThrowOnError extends boolean = false>(
+	options: Options<GetV1MarketData, ThrowOnError>,
+) =>
+	(options.client ?? client).get<
+		GetV1MarketResponses,
+		GetV1MarketErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/market",
 		...options,
 	});
