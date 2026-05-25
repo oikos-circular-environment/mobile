@@ -1922,6 +1922,7 @@ export type GetV1MarketResponses = {
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 			accept_appointments: boolean;
 			status: boolean;
+			phones: Array<string>;
 			address: {
 				id: string;
 				zip_code: string;

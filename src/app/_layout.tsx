@@ -22,12 +22,12 @@ export default function RootLayout() {
 	const isDevelopmentMode = process.env.NODE_ENV === "development";
 
 	return (
-		<GluestackUIProvider mode="light">
-			<QueryClientProvider client={queryClient}>
-				<UserProvider>
-					<GeospatialProvider>
-						<NotificationProvider>
-							<GestureHandlerRootView style={{ flex: 1 }}>
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<GluestackUIProvider mode="light">
+				<QueryClientProvider client={queryClient}>
+					<UserProvider>
+						<GeospatialProvider>
+							<NotificationProvider>
 								<SafeAreaProvider>
 									<Toaster />
 									<StatusBar style="dark" animated />
@@ -43,13 +43,13 @@ export default function RootLayout() {
 										</Stack>
 									</SafeAreaView>
 								</SafeAreaProvider>
-							</GestureHandlerRootView>
-						</NotificationProvider>
-					</GeospatialProvider>
-				</UserProvider>
-				{/* {isDevelopmentMode && <FloatingDevTools />} */}
-				{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
-			</QueryClientProvider>
-		</GluestackUIProvider>
+							</NotificationProvider>
+						</GeospatialProvider>
+					</UserProvider>
+					{/* {isDevelopmentMode && <FloatingDevTools />} */}
+					{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
+				</QueryClientProvider>
+			</GluestackUIProvider>
+		</GestureHandlerRootView>
 	);
 }

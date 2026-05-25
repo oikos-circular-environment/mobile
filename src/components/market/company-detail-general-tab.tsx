@@ -90,13 +90,18 @@ export function CompanyDetailGeneralTab({
 							</View>
 						</Card>
 					</Pressable>
-
-					<Card className="flex-row items-center gap-2 shadow-none">
-						<Text className="flex-1 text-md">Telefone não informado</Text>
-						<View className="size-10 items-center justify-center rounded-[5px] bg-gray-100">
-							<MessageCircle size={12} color="#111827" />
-						</View>
-					</Card>
+					{company.phones.length > 0 &&
+						company.phones.map(phone => (
+							<Card
+								key={phone}
+								className="flex-row items-center gap-2 shadow-none"
+							>
+								<Text className="flex-1 text-md">{phone}</Text>
+								<View className="size-10 items-center justify-center rounded-[5px] bg-gray-100">
+									<MessageCircle size={12} color="#111827" />
+								</View>
+							</Card>
+						))}
 				</View>
 			</View>
 
