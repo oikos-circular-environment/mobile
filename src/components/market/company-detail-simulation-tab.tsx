@@ -1,8 +1,21 @@
-import { Calculator } from "lucide-react-native";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Calculator, Trash2 } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import type { SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { z } from "zod";
+import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DecimalInput, DecimalInputField } from "@/components/ui/decimal-input";
+import {
+	FormControl,
+	FormControlError,
+	FormControlErrorText,
+} from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
@@ -11,9 +24,10 @@ import {
 	getMarketCheckoutDraft,
 	type MarketCheckoutItemDraft,
 	type MarketSimulationItemType,
-	saveMarketCheckoutDraft,
 } from "@/libs/memory/market-simulations";
 import type { MarketCompany } from "@/libs/types/market";
+import { HStack } from "../ui/hstack";
+import { VStack } from "../ui/vstack";
 
 type SimulationSelection = {
 	itemType: MarketSimulationItemType;
@@ -45,13 +59,49 @@ const formatCurrency = (value: number) =>
 const parseNumber = (rawValue: string) => {
 	const normalized = rawValue.replace(",", ".").trim();
 	const value = Number(normalized);
-
-	if (Number.isNaN(value) || value < 0) {
-		return 0;
-	}
-
+	if (Number.isNaN(value) || value < 0) return 0;
 	return value;
 };
+
+const SWIPE_ACTION_WIDTH = 72;
+
+function SwipeDeleteAction({
+	translation,
+	onDelete,
+}: {
+	translation: SharedValue<number>;
+	onDelete: () => void;
+}) {
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: translation.value + SWIPE_ACTION_WIDTH }],
+	}));
+
+	return (
+		<Animated.View
+			style={[animatedStyle, { width: SWIPE_ACTION_WIDTH }]}
+			className="overflow-hidden rounded-r-lg"
+		>
+			<Pressable
+				className="flex-1 items-center justify-center gap-1 bg-red-500"
+				onPress={onDelete}
+			>
+				<Trash2 size={16} color="white" />
+				<Text className="text-[10px] font-semibold text-white">Remover</Text>
+			</Pressable>
+		</Animated.View>
+	);
+}
+
+const simulationSchema = z.object({
+	quantity: z
+		.string()
+		.refine(
+			val => parseNumber(val) > 0,
+			"Informe uma quantidade maior que zero.",
+		),
+});
+
+type SimulationFormValues = z.infer<typeof simulationSchema>;
 
 export function CompanyDetailSimulationTab({
 	company,
@@ -62,40 +112,40 @@ export function CompanyDetailSimulationTab({
 	const [selectedCatalogItemId, setSelectedCatalogItemId] = useState(
 		selectedItem?.itemId ?? "",
 	);
-	const [quantity, setQuantity] = useState("1");
-	const [note, setNote] = useState("");
 	const [checkoutItems, setCheckoutItems] = useState<MarketCheckoutItemDraft[]>(
 		[],
 	);
-	const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+	const {
+		control,
+		handleSubmit,
+		reset,
+		watch,
+		formState: { errors },
+	} = useForm<SimulationFormValues>({
+		resolver: zodResolver(simulationSchema),
+		defaultValues: { quantity: "1" },
+	});
+
+	const watchedQuantity = watch("quantity");
 
 	const catalogItems = useMemo(() => {
-		if (activeItemType === "waste") {
-			return company.wastes ?? [];
-		}
-
+		if (activeItemType === "waste") return company.wastes ?? [];
 		return company.services ?? [];
 	}, [activeItemType, company.services, company.wastes]);
 
 	const selectedCatalogItem = useMemo(() => {
-		if (!selectedCatalogItemId) {
-			return catalogItems[0] ?? null;
-		}
-
+		if (!selectedCatalogItemId) return catalogItems[0] ?? null;
 		return catalogItems.find(item => item.id === selectedCatalogItemId) ?? null;
 	}, [catalogItems, selectedCatalogItemId]);
 
 	useEffect(() => {
 		const draft = getMarketCheckoutDraft(company.id);
 		setCheckoutItems(draft?.items ?? []);
-		setStatusMessage(null);
 	}, [company.id]);
 
 	useEffect(() => {
-		if (!selectedItem) {
-			return;
-		}
-
+		if (!selectedItem) return;
 		setActiveItemType(selectedItem.itemType);
 		setSelectedCatalogItemId(selectedItem.itemId);
 	}, [selectedItem]);
@@ -105,24 +155,20 @@ export function CompanyDetailSimulationTab({
 			setSelectedCatalogItemId("");
 			return;
 		}
-
-		if (catalogItems.some(item => item.id === selectedCatalogItemId)) {
-			return;
-		}
-
+		if (catalogItems.some(item => item.id === selectedCatalogItemId)) return;
 		setSelectedCatalogItemId(catalogItems[0].id);
 	}, [catalogItems, selectedCatalogItemId]);
 
-	const parsedQuantity = parseNumber(quantity);
+	const parsedQuantity = parseNumber(watchedQuantity ?? "");
 	const unitPrice = selectedCatalogItem?.price ?? 0;
 	const total = parsedQuantity * unitPrice;
 	const orderTotal = checkoutItems.reduce((acc, item) => acc + item.total, 0);
 
-	const addItemToCheckout = () => {
-		if (!selectedCatalogItem || parsedQuantity <= 0) {
-			setStatusMessage("Informe uma quantidade maior que zero para adicionar.");
-			return;
-		}
+	const onSubmit = (data: SimulationFormValues) => {
+		if (!selectedCatalogItem) return;
+
+		const qty = parseNumber(data.quantity);
+		const itemTotal = qty * unitPrice;
 
 		const nextItems = [...checkoutItems];
 		const existingIndex = nextItems.findIndex(
@@ -135,11 +181,12 @@ export function CompanyDetailSimulationTab({
 			itemId: selectedCatalogItem.id,
 			itemType: activeItemType,
 			itemName: selectedCatalogItem.name,
-			unit: measurementSymbol[selectedCatalogItem.unit] ?? selectedCatalogItem.unit,
+			unit:
+				measurementSymbol[selectedCatalogItem.unit] ?? selectedCatalogItem.unit,
 			unitPrice,
-			quantity: parsedQuantity,
-			note,
-			total,
+			quantity: qty,
+			note: "",
+			total: itemTotal,
 		};
 
 		if (existingIndex >= 0) {
@@ -149,9 +196,8 @@ export function CompanyDetailSimulationTab({
 		}
 
 		setCheckoutItems(nextItems);
-		setQuantity("1");
-		setNote("");
-		setStatusMessage("Item adicionado a simulação.");
+		reset({ quantity: "1" });
+		toast.success("Item adicionado à simulação.");
 	};
 
 	return (
@@ -174,7 +220,7 @@ export function CompanyDetailSimulationTab({
 						<Text
 							className={`text-xs font-semibold ${activeItemType === "waste" ? "text-white" : "text-gray-700"}`}
 						>
-							Produtos
+							Resíduos
 						</Text>
 					</Pressable>
 					<Pressable
@@ -193,7 +239,6 @@ export function CompanyDetailSimulationTab({
 					{catalogItems.length ? (
 						catalogItems.map(item => {
 							const isSelected = item.id === selectedCatalogItem?.id;
-
 							return (
 								<Pressable
 									key={item.id}
@@ -227,44 +272,42 @@ export function CompanyDetailSimulationTab({
 
 			<Card className="gap-3 rounded-lg border-gray-200 p-3 shadow-none">
 				<View className="flex-row gap-4">
-					<View className="flex-1 gap-1">
-						<Text className="text-xs text-gray-500">Quantidade</Text>
-						<Input className="rounded-md border-gray-200 bg-white">
-							<InputField
-								value={quantity}
-								onChangeText={setQuantity}
-								keyboardType="decimal-pad"
-								placeholder="1"
-								className="text-sm"
-							/>
-						</Input>
-					</View>
+					<Controller
+						control={control}
+						name="quantity"
+						render={({ field: { value, onChange } }) => (
+							<FormControl className="flex-1" isInvalid={!!errors.quantity}>
+								<Text className="text-xs text-gray-500 mb-1">Quantidade</Text>
+								<DecimalInput mode="decimal">
+									<DecimalInputField
+										value={value}
+										onChangeText={onChange}
+										className="text-sm"
+									/>
+								</DecimalInput>
+								<FormControlError>
+									<FormControlErrorText>
+										{errors.quantity?.message}
+									</FormControlErrorText>
+								</FormControlError>
+							</FormControl>
+						)}
+					/>
 
 					<View className="gap-1">
 						<Text className="text-xs text-gray-500">Unidade</Text>
-						<Input className="rounded-md border-gray-200 bg-white" isDisabled>
+						<Input className="w-18" isDisabled>
 							<InputField
 								value={
 									selectedCatalogItem
-										? (measurementSymbol[selectedCatalogItem.unit] ?? selectedCatalogItem.unit)
+										? (measurementSymbol[selectedCatalogItem.unit] ??
+											selectedCatalogItem.unit)
 										: ""
 								}
 								className="text-sm"
 							/>
 						</Input>
 					</View>
-				</View>
-
-				<View className="gap-1">
-					<Text className="text-xs text-gray-500">Observação</Text>
-					<Input className="rounded-md border-gray-200 bg-white">
-						<InputField
-							value={note}
-							onChangeText={setNote}
-							placeholder="Ex.: retirada aos sábados"
-							className="text-sm"
-						/>
-					</Input>
 				</View>
 
 				<Card className="border-0 bg-lime-800/10 p-3 shadow-none">
@@ -279,45 +322,31 @@ export function CompanyDetailSimulationTab({
 					</View>
 				</Card>
 
-				<Button className="rounded-md bg-lime-800" onPress={addItemToCheckout}>
+				<Button
+					className="rounded-md bg-lime-800"
+					onPress={handleSubmit(onSubmit)}
+				>
 					<ButtonText>Adicionar a simulação</ButtonText>
 				</Button>
 			</Card>
 
-			<Card className="gap-3 rounded-lg border-gray-200 p-3 shadow-none">
-				<Heading size="md" className="text-base text-gray-950">
-					Lista
-				</Heading>
+			<VStack className="gap-3 rounded-lg border-gray-200">
+				<VStack>
+					<Heading size="md">Lista</Heading>
+					<Text className="text-muted-foreground text-sm">
+						Deslize o card para a esquerda para deletar um item da lista.
+					</Text>
+				</VStack>
 
 				{checkoutItems.length ? (
 					checkoutItems.map(item => (
-						<Card
+						<ReanimatedSwipeable
 							key={`${item.itemType}-${item.itemId}`}
-							className="gap-2 border-gray-200 p-2 shadow-none"
-						>
-							<View className="flex-row items-center justify-between gap-2">
-								<View className="min-w-0 flex-1">
-									<Text className="text-sm font-semibold text-gray-900">
-										{item.itemName}
-									</Text>
-									<Text className="text-xs text-gray-500">
-										{item.itemType === "waste" ? "Produto" : "Serviço"}
-									</Text>
-								</View>
-
-								<Text className="text-sm font-semibold text-gray-900">
-									{formatCurrency(item.total)}
-								</Text>
-							</View>
-
-							<View className="flex-row items-center justify-between">
-								<Text className="text-xs text-gray-500">
-									{item.quantity} x {formatCurrency(item.unitPrice)} /{" "}
-									{item.unit}
-								</Text>
-
-								<Pressable
-									onPress={() => {
+							renderRightActions={(_, translation, swipeable) => (
+								<SwipeDeleteAction
+									translation={translation}
+									onDelete={() => {
+										swipeable.close();
 										setCheckoutItems(prev =>
 											prev.filter(
 												current =>
@@ -327,26 +356,48 @@ export function CompanyDetailSimulationTab({
 													),
 											),
 										);
-										setStatusMessage("Item removido da simulação.");
+										toast.success("Item removido da simulação.");
 									}}
-								>
-									<Text className="text-xs font-semibold text-red-500">
-										Remover
-									</Text>
-								</Pressable>
-							</View>
+								/>
+							)}
+							overshootRight={false}
+							friction={2}
+						>
+							<Card className="rounded-r-none shadow-none">
+								<VStack className="gap-1">
+									<HStack className="flex-1 justify-between">
+										<Text className="font-semibold text-gray-900">
+											{item.itemName}
+										</Text>
+										<Text className="font-semibold text-gray-900">
+											{formatCurrency(item.total)}
+										</Text>
+									</HStack>
+									<HStack className="flex-1 justify-between">
+										<Text className="text-xs text-gray-500">
+											{item.itemType === "waste" ? "Resíduo" : "Serviço"}
+										</Text>
+										<Text className="text-xs text-gray-500">
+											{item.quantity} x {formatCurrency(item.unitPrice)} /{" "}
+											{item.unit}
+										</Text>
+									</HStack>
+								</VStack>
 
-							{item.note ? (
-								<Text className="text-xs text-gray-500">
-									Obs.: {item.note}
-								</Text>
-							) : null}
-						</Card>
+								{item.note ? (
+									<Text className="text-xs text-gray-500">
+										Obs.: {item.note}
+									</Text>
+								) : null}
+							</Card>
+						</ReanimatedSwipeable>
 					))
 				) : (
-					<Text className="text-sm text-gray-500">
-						Nenhum item adicionado a simulação.
-					</Text>
+					<Card className="shadow-none">
+						<Text className="text-sm text-gray-500">
+							Nenhum item adicionado a simulação.
+						</Text>
+					</Card>
 				)}
 
 				<Card className="border-0 bg-lime-800/10 p-3 shadow-none">
@@ -360,27 +411,7 @@ export function CompanyDetailSimulationTab({
 						</Text>
 					</View>
 				</Card>
-
-				<Button
-					className="rounded-md bg-lime-800"
-					onPress={() => {
-						saveMarketCheckoutDraft({
-							companyId: company.id,
-							items: checkoutItems,
-							updatedAt: Date.now(),
-						});
-
-						setStatusMessage("Orçamento salvo em memória no dispositivo.");
-					}}
-					isDisabled={!checkoutItems.length}
-				>
-					<ButtonText>Salvar orçamento</ButtonText>
-				</Button>
-
-				{statusMessage ? (
-					<Text className="text-xs text-lime-800">{statusMessage}</Text>
-				) : null}
-			</Card>
+			</VStack>
 		</View>
 	);
 }

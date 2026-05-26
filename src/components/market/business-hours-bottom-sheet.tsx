@@ -4,10 +4,10 @@ import { Badge, BadgeText } from "@/components/ui/badge";
 import {
 	BottomSheet,
 	BottomSheetBackdrop,
-	BottomSheetContent,
 	BottomSheetDragIndicator,
 	BottomSheetPortal,
 	type BottomSheetRef,
+	BottomSheetScrollView,
 } from "@/components/ui/bottomsheet";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -15,7 +15,7 @@ import { Text } from "@/components/ui/text";
 import { daysOfWeek } from "@/libs/types/business-hour";
 import type { MarketBusinessHour } from "@/libs/types/market";
 
-type BusinessHoursModalProps = {
+type BusinessHoursBottomSheetProps = {
 	isOpen: boolean;
 	onClose: () => void;
 	businessHours: MarketBusinessHour[] | null;
@@ -24,11 +24,11 @@ type BusinessHoursModalProps = {
 const getDayLabel = (day: string) =>
 	daysOfWeek.find(item => item.value === day)?.label ?? "Dia não informado";
 
-export function BusinessHoursModal({
+export function BusinessHoursBottomSheet({
 	isOpen,
 	onClose,
 	businessHours,
-}: BusinessHoursModalProps) {
+}: BusinessHoursBottomSheetProps) {
 	const ref = useRef<BottomSheetRef>(null);
 
 	useEffect(() => {
@@ -46,7 +46,13 @@ export function BusinessHoursModal({
 				backdropComponent={BottomSheetBackdrop}
 				handleComponent={BottomSheetDragIndicator}
 			>
-				<BottomSheetContent className="gap-4 pb-8">
+				<BottomSheetScrollView
+					contentContainerStyle={{
+						gap: 16,
+						paddingHorizontal: 16,
+						paddingBottom: 32,
+					}}
+				>
 					<View className="gap-1">
 						<Heading size="md" className="text-base text-gray-950">
 							Horários de funcionamento
@@ -55,7 +61,6 @@ export function BusinessHoursModal({
 							Confira os horários de funcionamento para planejar sua visita.
 						</Text>
 					</View>
-
 					<View className="gap-2">
 						{(businessHours ?? []).map(item => (
 							<Card key={item.id} className="shadow-none">
@@ -82,7 +87,7 @@ export function BusinessHoursModal({
 							</Card>
 						))}
 					</View>
-				</BottomSheetContent>
+				</BottomSheetScrollView>
 			</BottomSheetPortal>
 		</BottomSheet>
 	);

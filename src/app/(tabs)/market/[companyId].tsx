@@ -7,7 +7,6 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
-import { BusinessHoursModal } from "@/components/market/business-hours-modal";
 import { CompanyDetailGeneralTab } from "@/components/market/company-detail-general-tab";
 import { CompanyDetailSimulationTab } from "@/components/market/company-detail-simulation-tab";
 import { Card } from "@/components/ui/card";
@@ -48,8 +47,6 @@ export default function MarketCompanyDetailScreen() {
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const { getCompanyById, isPending, isLocationReady } = useMarket();
 	const { currentDate } = useGeospatial();
-	const [isBusinessHoursModalOpen, setIsBusinessHoursModalOpen] =
-		useState(false);
 	const [activeTab, setActiveTab] = useState<MarketDetailTab>("general");
 	const [selectedSimulationItem, setSelectedSimulationItem] =
 		useState<SelectedSimulationItem | null>(null);
@@ -135,7 +132,7 @@ export default function MarketCompanyDetailScreen() {
 					keyboardShouldPersistTaps="handled"
 				>
 					<View className="gap-4">
-						<View className="flex-row gap-2 items-center">
+						<Card className="flex-row gap-2 items-center shadow-none">
 							<View className="h-16 w-16 items-center justify-center rounded-[5px] bg-slate-950">
 								<Text className="text-sm font-semibold text-white">
 									{company.corporate_name
@@ -156,7 +153,7 @@ export default function MarketCompanyDetailScreen() {
 									</Text>
 								) : null}
 							</View>
-						</View>
+						</Card>
 
 						<Card className="gap-2 rounded-lg border-gray-200 p-1 shadow-none">
 							<View className="flex-row gap-1">
@@ -191,9 +188,6 @@ export default function MarketCompanyDetailScreen() {
 								currentTimeLabel={currentTimeLabel}
 								isOpenNow={isOpenNow}
 								currentBusinessHour={currentBusinessHour}
-								onOpenBusinessHoursModal={() =>
-									setIsBusinessHoursModalOpen(true)
-								}
 								onSelectSimulationItem={(itemType, itemId) => {
 									setSelectedSimulationItem({ itemType, itemId });
 									setActiveTab("simulation");
@@ -208,12 +202,6 @@ export default function MarketCompanyDetailScreen() {
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-
-			<BusinessHoursModal
-				isOpen={isBusinessHoursModalOpen}
-				onClose={() => setIsBusinessHoursModalOpen(false)}
-				businessHours={company.business_hours}
-			/>
 		</>
 	);
 }
