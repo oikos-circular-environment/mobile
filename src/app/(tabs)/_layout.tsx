@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
 import { Leaf, MapPin, Shield } from "lucide-react-native";
 import { colors } from "@/components/style/colors";
+import { useAuthContext } from "@/contexts/auth-context";
 
 // const TAB_BAR_HEIGHT = 64;
 // const TAB_BAR_MARGIN_BOTTOM = 0;
@@ -12,7 +13,7 @@ export const unstable_settings = {
 export default function TabsNavigator() {
 	// const { bottom } = useSafeAreaInsets();
 	// const tabBarBottom = bottom + TAB_BAR_MARGIN_BOTTOM;
-
+	const { isAuthenticated } = useAuthContext();
 	return (
 		<Tabs
 			// sceneStyle={{ paddingBottom: TAB_BAR_HEIGHT + tabBarBottom }}
@@ -70,6 +71,7 @@ export default function TabsNavigator() {
 					tabBarIcon: ({ color, size }) => <Shield color={color} size={size} />,
 				}}
 			/>
+
 			<Tabs.Screen
 				name="learn"
 				options={{

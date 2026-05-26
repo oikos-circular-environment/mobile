@@ -44,7 +44,7 @@ export default function SignInScreen() {
 	return (
 		<AuthScreenLayout
 			title="Entrar na sua conta"
-			subtitle="Bem-vindo de volta. Preencha seus dados."
+			subtitle="Bem-vindo de volta."
 			footer={
 				<Text>
 					Não tem uma conta?{" "}

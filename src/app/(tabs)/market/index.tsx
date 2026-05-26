@@ -9,9 +9,10 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
-import { colors } from "@/components/style/colors";
 import { CategoryToggle } from "@/components/market/category-toggle";
+import { LocationSourceSelect } from "@/components/market/location-source-select";
 import { RadiusToggle } from "@/components/market/radius-toggle";
+import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
@@ -45,7 +46,9 @@ export default function MarketScreen() {
 	const { currentDate } = useGeospatial();
 	const {
 		setAppliedFilters,
+		locationSource,
 		isLocationReady,
+		isResolvingLocation,
 		companies,
 		isPending,
 		isFetchingNextPage,
@@ -71,8 +74,7 @@ export default function MarketScreen() {
 			className="flex-1 bg-white"
 		>
 			<ScrollView
-				className="flex-1 bg-white"
-				contentContainerClassName="p-4 pb-8"
+				contentContainerClassName="p-4 pb-8 bg-white"
 				keyboardShouldPersistTaps="handled"
 				contentInsetAdjustmentBehavior="automatic"
 			>
@@ -91,10 +93,8 @@ export default function MarketScreen() {
 										</View>
 										<Heading>Pontos de coletas</Heading>
 									</View>
-									<Text className="text-sm text-gray-500" selectable>
-										Os resultados são exibidos conforme a sua geolocalização,
-										mantendo você como centro. Ajuste os filtros para obter
-										melhores resultados.
+									<Text className="text-sm text-muted-foreground" selectable>
+										Pesquise pontos de coletas que estão próximo a você.
 									</Text>
 								</View>
 							</View>
@@ -134,6 +134,8 @@ export default function MarketScreen() {
 								</FormControlError>
 							) : null}
 						</FormControl>
+
+						<LocationSourceSelect />
 
 						<View className="gap-4">
 							<FormControl className="gap-2">
@@ -177,15 +179,27 @@ export default function MarketScreen() {
 						</View>
 
 						{!isLocationReady ? (
-							<Card className="shadow-none bg-gray-50 p-4 gap-1">
-								<Text className="text-sm font-semibold text-gray-900">
-									Endereço não configurado
-								</Text>
-								<Text className="text-xs text-gray-500">
-									Adicione um endereço no seu perfil para ver empresas próximas
-									a você.
-								</Text>
-							</Card>
+							isResolvingLocation ? (
+								<Card className="items-center p-6 shadow-none bg-gray-50">
+									<ActivityIndicator size="small" color={colors.lime[800]} />
+									<Text className="mt-2 text-sm text-gray-500">
+										Obtendo localização…
+									</Text>
+								</Card>
+							) : (
+								<Card className="shadow-none bg-gray-50 p-4 gap-1">
+									<Text className="text-sm font-semibold text-gray-900">
+										{locationSource === "current"
+											? "Localização indisponível"
+											: "Endereço não configurado"}
+									</Text>
+									<Text className="text-xs text-gray-500">
+										{locationSource === "current"
+											? "Permita o acesso à localização nas configurações do dispositivo."
+											: "Adicione um endereço no seu perfil para ver empresas próximas a você."}
+									</Text>
+								</Card>
+							)
 						) : isPending ? (
 							<Card className="items-center p-6 shadow-none bg-gray-50">
 								<ActivityIndicator size="small" color={colors.lime[800]} />
@@ -301,7 +315,10 @@ export default function MarketScreen() {
 										disabled={isFetchingNextPage}
 									>
 										{isFetchingNextPage ? (
-											<ActivityIndicator size="small" color={colors.lime[800]} />
+											<ActivityIndicator
+												size="small"
+												color={colors.lime[800]}
+											/>
 										) : (
 											<Text className="text-sm font-semibold text-lime-800">
 												Carregar mais

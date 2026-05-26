@@ -4,11 +4,13 @@ import {
 	type PropsWithChildren,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useState,
 } from "react";
 import { z } from "zod";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 import { getV1Market } from "@/libs/oikos-sdk";
 import type { MarketCompany } from "@/libs/types/market";
 
@@ -23,6 +25,8 @@ export const marketFilterSchema = z.object({
 
 export type MarketFilterValues = z.infer<typeof marketFilterSchema>;
 
+export type LocationSource = "current" | "profile";
+
 const defaultFilters: MarketFilterValues = {
 	query: "",
 	radius: "2000",
@@ -32,7 +36,10 @@ const defaultFilters: MarketFilterValues = {
 type MarketContextValue = {
 	appliedFilters: MarketFilterValues;
 	setAppliedFilters: (filters: MarketFilterValues) => void;
+	locationSource: LocationSource;
+	setLocationSource: (source: LocationSource) => void;
 	isLocationReady: boolean;
+	isResolvingLocation: boolean;
 	companies: MarketCompany[];
 	isPending: boolean;
 	isFetchingNextPage: boolean;
@@ -45,13 +52,33 @@ type MarketContextValue = {
 const MarketContext = createContext<MarketContextValue | null>(null);
 
 export function MarketProvider({ children }: PropsWithChildren) {
-	const { user } = useAuthContext();
+	const { user, isAuthenticated } = useAuthContext();
+	const { location, isResolving } = useGeospatial();
 	const [appliedFilters, setAppliedFilters] =
 		useState<MarketFilterValues>(defaultFilters);
+	const [locationSource, setLocationSource] = useState<LocationSource>("current");
 
-	const lat = user?.profile?.address?.latitude ?? undefined;
-	const lon = user?.profile?.address?.longitude ?? undefined;
+	const profileLat = user?.profile?.address?.latitude ?? undefined;
+	const profileLon = user?.profile?.address?.longitude ?? undefined;
+
+	const lat =
+		locationSource === "current"
+			? (location?.coords.latitude ?? undefined)
+			: profileLat;
+	const lon =
+		locationSource === "current"
+			? (location?.coords.longitude ?? undefined)
+			: profileLon;
+
 	const isLocationReady = lat != null && lon != null;
+	const isResolvingLocation = locationSource === "current" && isResolving;
+
+	useEffect(() => {
+		const profileHasCoords = profileLat != null && profileLon != null;
+		if (locationSource === "profile" && (!isAuthenticated || !profileHasCoords)) {
+			setLocationSource("current");
+		}
+	}, [isAuthenticated, locationSource, profileLat, profileLon]);
 
 	const {
 		data,
@@ -93,7 +120,10 @@ export function MarketProvider({ children }: PropsWithChildren) {
 		() => ({
 			appliedFilters,
 			setAppliedFilters,
+			locationSource,
+			setLocationSource,
 			isLocationReady,
+			isResolvingLocation,
 			companies,
 			isPending,
 			isFetchingNextPage,
@@ -104,7 +134,9 @@ export function MarketProvider({ children }: PropsWithChildren) {
 		}),
 		[
 			appliedFilters,
+			locationSource,
 			isLocationReady,
+			isResolvingLocation,
 			companies,
 			isPending,
 			isFetchingNextPage,

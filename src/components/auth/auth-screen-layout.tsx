@@ -33,7 +33,7 @@ export function AuthScreenLayout({
 						</View>
 						<View className="gap-1">
 							<Heading className="text-2xl">{title}</Heading>
-							<Text className="text-sm text-muted">{subtitle}</Text>
+							<Text className="text-sm text-muted-foreground">{subtitle}</Text>
 						</View>
 					</View>
 

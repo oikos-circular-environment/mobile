@@ -9,6 +9,7 @@ import {
 import { useEffect, useRef } from "react";
 import { Animated, Pressable, ScrollView, View } from "react-native";
 import OikosLogo from "@/assets/icons/icon.png";
+import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -16,7 +17,6 @@ import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
-import { colors } from "@/components/style/colors";
 import { useAuthContext } from "@/contexts/auth-context";
 import { createCompanies } from "@/libs/factories/create-companies";
 
@@ -134,7 +134,7 @@ export default function HomeScreen() {
 
 								<View className="flex flex-col flex-1">
 									<Heading numberOfLines={1}>{company.corporate_name}</Heading>
-									<Text numberOfLines={2}>
+									<Text numberOfLines={1}>
 										{company.address?.street}, {company.address?.number},{" "}
 										{company.address?.district}
 									</Text>

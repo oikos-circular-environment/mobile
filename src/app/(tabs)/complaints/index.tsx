@@ -1,68 +1,20 @@
 "use client";
 
-import { router, useFocusEffect } from "expo-router";
-import { Plus, ShieldIcon } from "lucide-react-native";
+import { useFocusEffect } from "expo-router";
+import { ShieldIcon } from "lucide-react-native";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
 import {
 	ComplaintCard,
 	ComplaintCardSkeleton,
 } from "@/components/complaints/complaint-card";
-import { ComplaintPainel } from "@/components/complaints/complaint-painel";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { ComplaintListHeader } from "@/components/complaints/complaint-list-header";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
-import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { colors } from "@/components/style/colors";
 import type { ApiComplaint } from "@/contexts/complaints-context";
 import { useComplaintsContext } from "@/contexts/complaints-context";
-
-function ListHeader() {
-	return (
-		<View className="gap-4">
-			<Card className="bg-gray-100 p-4 shadow-none">
-				<View className="flex-row items-center gap-4">
-					<View className="flex-1 gap-1">
-						<Heading>Denunciar</Heading>
-						<Text className="text-sm text-gray-500" selectable>
-							Faça a sua denúncia anônima e gratuita. Ajude a manter o meio
-							ambiente livre do descarte irregular.
-						</Text>
-					</View>
-
-					<View className="size-14 items-center justify-center rounded-lg bg-lime-800">
-						<ShieldIcon size={24} color={colors.white} strokeWidth={2.25} />
-					</View>
-				</View>
-			</Card>
-
-			<Button
-				size="lg"
-				onPress={() => router.push("/(tabs)/complaints/(create)/camera")}
-			>
-				<ButtonText className="flex-1 text-center font-semibold text-white">
-					Nova Denúncia
-				</ButtonText>
-				<ButtonIcon as={Plus} className="text-white" height={18} width={18} />
-			</Button>
-
-			<View className="justify-center">
-				<Heading>Dashboard</Heading>
-				<Text>
-					Os campos abaixo servem como filtros, clique sobre eles para filtrar
-					sua lista.
-				</Text>
-			</View>
-
-			<ComplaintPainel />
-
-			<View>
-				<Heading>Denúncias</Heading>
-			</View>
-		</View>
-	);
-}
 
 export default function ComplaintsScreen() {
 	const {
@@ -121,17 +73,18 @@ export default function ComplaintsScreen() {
 	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	return (
-		<FlatList<ApiComplaint>
-			className="flex-1 "
-			contentContainerClassName="gap-4 px-4 py-4 pb-8 bg-white"
-			data={filteredComplaints}
-			keyExtractor={item => item.id}
-			renderItem={renderItem}
-			ListHeaderComponent={ListHeader}
-			ListEmptyComponent={ListEmpty}
-			ListFooterComponent={ListFooter}
-			onEndReached={handleEndReached}
-			onEndReachedThreshold={0.3}
-		/>
+		<View className="flex-1 bg-white">
+			<FlatList<ApiComplaint>
+				contentContainerClassName="gap-4 px-4 py-4 pb-8"
+				data={filteredComplaints}
+				keyExtractor={item => item.id}
+				renderItem={renderItem}
+				ListHeaderComponent={ComplaintListHeader}
+				ListEmptyComponent={ListEmpty}
+				ListFooterComponent={ListFooter}
+				onEndReached={handleEndReached}
+				onEndReachedThreshold={0.3}
+			/>
+		</View>
 	);
 }
