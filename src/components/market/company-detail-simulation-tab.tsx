@@ -190,14 +190,21 @@ export function CompanyDetailSimulationTab({
 		};
 
 		if (existingIndex >= 0) {
-			nextItems[existingIndex] = nextItem;
+			const existing = nextItems[existingIndex];
+			const accumulatedQty = existing.quantity + qty;
+			nextItems[existingIndex] = {
+				...existing,
+				quantity: accumulatedQty,
+				total: accumulatedQty * unitPrice,
+			};
+			toast.success("Quantidade atualizada na simulação.");
 		} else {
 			nextItems.push(nextItem);
+			toast.success("Item adicionado à simulação.");
 		}
 
 		setCheckoutItems(nextItems);
 		reset({ quantity: "1" });
-		toast.success("Item adicionado à simulação.");
 	};
 
 	return (
