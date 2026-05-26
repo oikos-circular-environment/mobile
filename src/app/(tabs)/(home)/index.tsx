@@ -9,6 +9,7 @@ import {
 import { useEffect, useRef } from "react";
 import { Animated, Pressable, ScrollView, View } from "react-native";
 import OikosLogo from "@/assets/icons/icon.png";
+import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -111,7 +112,7 @@ export default function HomeScreen() {
 										</Text>
 									</View>
 									<Card className="bg-primary items-center justify-center">
-										<ArrowUpRightIcon color="white" />
+										<ArrowUpRightIcon color={colors.white} />
 									</Card>
 								</Card>
 							</Link>
@@ -133,7 +134,7 @@ export default function HomeScreen() {
 
 								<View className="flex flex-col flex-1">
 									<Heading numberOfLines={1}>{company.corporate_name}</Heading>
-									<Text numberOfLines={2}>
+									<Text numberOfLines={1}>
 										{company.address?.street}, {company.address?.number},{" "}
 										{company.address?.district}
 									</Text>

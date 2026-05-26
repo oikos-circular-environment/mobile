@@ -1,41 +1,83 @@
-import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
+import { Tabs } from "expo-router";
+import { Leaf, MapPin, Shield } from "lucide-react-native";
+import { colors } from "@/components/style/colors";
+import { useAuthContext } from "@/contexts/auth-context";
+
+// const TAB_BAR_HEIGHT = 64;
+// const TAB_BAR_MARGIN_BOTTOM = 0;
 
 export const unstable_settings = {
 	initialRouteName: "(home)",
 };
 
 export default function TabsNavigator() {
+	// const { bottom } = useSafeAreaInsets();
+	// const tabBarBottom = bottom + TAB_BAR_MARGIN_BOTTOM;
+	const { isAuthenticated } = useAuthContext();
 	return (
-		<NativeTabs tintColor="#3d6300">
-			<NativeTabs.Trigger name="market">
-				<Icon
-					sf={{
-						default: "mappin.and.ellipse.circle",
-						selected: "mappin.and.ellipse.circle.fill",
-					}}
-				/>
-				<Label>Pontos de coleta</Label>
-			</NativeTabs.Trigger>
+		<Tabs
+			// sceneStyle={{ paddingBottom: TAB_BAR_HEIGHT + tabBarBottom }}
+			// screenOptions={{
+			// 	tabBarActiveTintColor: "#f5f5f5",
+			// 	tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
+			// 	headerShown: false,
+			// 	tabBarBackground: () => null,
+			// 	tabBarStyle: {
+			// 		paddingTop: 4,
+			// 		position: "absolute",
+			// 		bottom: tabBarBottom,
+			// 		// left: 16,
+			// 		// right: 16,
+			// 		marginLeft: 16,
+			// 		marginRight: 16,
+			// 		borderRadius: 30,
+			// 		height: TAB_BAR_HEIGHT,
+			// 		backgroundColor: "#3d6300",
+			// 		borderTopWidth: 0,
+			// 		elevation: 0,
+			// 		shadowColor: "#000",
+			// 		shadowOffset: { width: 0, height: 4 },
+			// 		shadowOpacity: 0.12,
+			// 		shadowRadius: 8,
+			// 	},
+			// }}
+			screenOptions={{
+				headerShown: false,
+				tabBarActiveTintColor: colors.gray[100],
+				tabBarInactiveTintColor: colors.overlay.white50,
+				tabBarStyle: {
+					backgroundColor: colors.lime[800],
+				},
+			}}
+		>
+			<Tabs.Screen
+				name="market"
+				options={{
+					title: "Pontos de coleta",
+					tabBarIcon: ({ color, size }) => <MapPin color={color} size={size} />,
+				}}
+			/>
+			<Tabs.Screen
+				name="(home)"
+				options={{
+					title: "Home",
+					tabBarIcon: ({ color, size }) => <Leaf color={color} size={size} />,
+				}}
+			/>
+			<Tabs.Screen
+				name="complaints"
+				options={{
+					title: "Denunciar",
+					tabBarIcon: ({ color, size }) => <Shield color={color} size={size} />,
+				}}
+			/>
 
-			<NativeTabs.Trigger name="(home)">
-				<Icon sf={{ default: "leaf", selected: "leaf.fill" }} />
-				<Label>Home</Label>
-			</NativeTabs.Trigger>
-
-			<NativeTabs.Trigger name="complaints">
-				<Icon sf={{ default: "shield", selected: "shield.fill" }} />
-				<Label>Denunciar</Label>
-			</NativeTabs.Trigger>
-
-			{/* <NativeTabs.Trigger name="donations">
-        <Icon sf={{ default: "globe", selected: "globe" }} />
-        <Label>Doações</Label>
-        </NativeTabs.Trigger> */}
-
-			{/* <NativeTabs.Trigger name="learn">
-        <Icon sf={{ default: "book", selected: "book.fill" }} />
-        <Label>Aprender</Label>
-        </NativeTabs.Trigger> */}
-		</NativeTabs>
+			<Tabs.Screen
+				name="learn"
+				options={{
+					href: null,
+				}}
+			/>
+		</Tabs>
 	);
 }

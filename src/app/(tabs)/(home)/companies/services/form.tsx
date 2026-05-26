@@ -22,6 +22,7 @@ import {
 	type ServiceFormValues,
 	serviceFormSchema,
 } from "@/components/companies/services/services-form-schema";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -199,7 +200,7 @@ export default function ServiceFormScreen() {
 				<Card className="bg-secondary shadow-none">
 					<View className="flex-row items-center justify-between gap-4">
 						<View className="size-15 items-center justify-center rounded-lg bg-primary">
-							<WrenchIcon color="white" size={20} />
+							<WrenchIcon color={colors.white} size={20} />
 						</View>
 						<View className="flex-1 gap-1">
 							<Heading className="text-lg">
@@ -233,7 +234,6 @@ export default function ServiceFormScreen() {
 										onBlur={onBlur}
 										onChangeText={onChange}
 										placeholder="Ex.: Coleta de RCC"
-										placeholderTextColor="#94a3b8"
 									/>
 								</Input>
 							)}
@@ -267,7 +267,6 @@ export default function ServiceFormScreen() {
 										onBlur={onBlur}
 										onChangeText={onChange}
 										placeholder="Descreva o serviço e o que ele cobre"
-										placeholderTextColor="#94a3b8"
 										multiline
 										numberOfLines={4}
 										textAlignVertical="top"
@@ -397,7 +396,6 @@ export default function ServiceFormScreen() {
 										onBlur={onBlur}
 										onChangeText={onChange}
 										placeholder="Observações adicionais do serviço"
-										placeholderTextColor="#94a3b8"
 										multiline
 										numberOfLines={4}
 										textAlignVertical="top"
@@ -438,7 +436,6 @@ export default function ServiceFormScreen() {
 								value={subItemDraft}
 								onChangeText={setSubItemDraft}
 								placeholder="Ex.: concreto, madeira, gesso"
-								placeholderTextColor="#94a3b8"
 								returnKeyType="done"
 								onSubmitEditing={onAddSubItem}
 							/>

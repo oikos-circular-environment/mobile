@@ -12,6 +12,7 @@ import {
 	WrenchIcon,
 } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
@@ -93,7 +94,7 @@ export default function CompaniesHomeScreen() {
 						</View>
 
 						<View className="size-12 items-center justify-center rounded-lg bg-primary">
-							<SettingsIcon color="white" size={20} />
+							<SettingsIcon color={colors.white} size={20} />
 						</View>
 					</View>
 				</Card>
@@ -165,7 +166,7 @@ export default function CompaniesHomeScreen() {
           <View className="flex-row items-center justify-between">
             <Heading className="text-base">Recursos premium</Heading>
             <View className="size-8 items-center justify-center rounded-md bg-primary/10">
-              <CrownIcon color="#3f6212" size={16} />
+              <CrownIcon color={colors.lime[800]} size={16} />
             </View>
           </View>
 
@@ -186,7 +187,7 @@ export default function CompaniesHomeScreen() {
                     </Text>
                   </View>
 
-                  <CrownIcon color="#3f6212" size={16} />
+                  <CrownIcon color={colors.lime[800]} size={16} />
                 </View>
               </Card>
             ))}

@@ -1,8 +1,9 @@
+import * as Crypto from "expo-crypto";
 import type { ComplaintCapture } from "../types/complaint";
 
 export function createComplaint(): ComplaintCapture {
 	return {
-		id: crypto.randomUUID(),
+		id: Crypto.randomUUID(),
 		capture: {
 			type: "photo",
 			object: {
@@ -44,6 +45,7 @@ export function createComplaint(): ComplaintCapture {
 				timezone: null,
 			},
 		},
+		type: "IRREGULAR_DISPOSAL",
 		observation: "",
 		created_at: new Date().toISOString(),
 		updated_at: new Date().toISOString(),

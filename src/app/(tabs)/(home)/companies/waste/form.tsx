@@ -22,6 +22,7 @@ import {
 	type WasteManagementFormValues,
 	wasteManagementFormSchema,
 } from "@/components/companies/waste/waste-form-schema";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -201,7 +202,7 @@ export default function WasteFormScreen() {
 				<Card className="bg-secondary shadow-none">
 					<View className="flex-row items-center justify-between gap-4">
 						<View className="size-15 items-center justify-center rounded-lg bg-primary">
-							<RecycleIcon color="white" size={20} />
+							<RecycleIcon color={colors.white} size={20} />
 						</View>
 						<View className="flex-1 gap-1">
 							<Heading className="text-lg">
@@ -235,7 +236,6 @@ export default function WasteFormScreen() {
 										onBlur={onBlur}
 										onChangeText={onChange}
 										placeholder="Ex.: Plástico"
-										placeholderTextColor="#94a3b8"
 									/>
 								</Input>
 							)}
@@ -269,7 +269,6 @@ export default function WasteFormScreen() {
 										onBlur={onBlur}
 										onChangeText={onChange}
 										placeholder="Explique como esse resíduo é coletado ou separado"
-										placeholderTextColor="#94a3b8"
 										multiline
 										numberOfLines={4}
 										textAlignVertical="top"
@@ -410,7 +409,6 @@ export default function WasteFormScreen() {
 								value={subItemDraft}
 								onChangeText={setSubItemDraft}
 								placeholder="Ex.: garrafas PET"
-								placeholderTextColor="#94a3b8"
 								returnKeyType="done"
 								onSubmitEditing={onAddSubItem}
 							/>
