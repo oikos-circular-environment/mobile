@@ -1,8 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { ArrowLeftIcon, Eye, EyeOff } from "lucide-react-native";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, ScrollView, View } from "react-native";
+import {
+	KeyboardAvoidingView,
+	Pressable,
+	ScrollView,
+	StyleSheet,
+	useWindowDimensions,
+	View,
+} from "react-native";
+import { Defs, RadialGradient, Rect, Stop, Svg } from "react-native-svg";
 import { z } from "zod";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -11,7 +22,7 @@ import {
 	FormControlLabel,
 	FormControlLabelText,
 } from "@/components/ui/form-control";
-import { Input, InputField } from "@/components/ui/input";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 
@@ -24,6 +35,9 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignInScreen() {
 	const { signIn, isLoading } = useAuthContext();
+	const router = useRouter();
+	const { width: screenWidth } = useWindowDimensions();
+	const [showPassword, setShowPassword] = useState(false);
 
 	const {
 		control,
@@ -48,19 +62,52 @@ export default function SignInScreen() {
 				showsVerticalScrollIndicator={false}
 			>
 				{/* Header Section */}
-				<View className="h-72 bg-primary p-8 rounded-b-4xl justify-center gap-2">
-					<Text
-						className="text-white text-4xl"
-						style={{ fontFamily: "Oswald_700Bold" }}
+				<View className="h-72 rounded-b-4xl overflow-hidden">
+					<Svg
+						style={StyleSheet.absoluteFillObject}
+						width={screenWidth}
+						height={288}
 					>
-						SEJA BEM VINDO NOVAMENTE!
-					</Text>
-					<Text
-						className="text-white text-lg opacity-90"
-						style={{ fontFamily: "SpaceGrotesk_400Regular" }}
-					>
-						Continue a contribuir com a Economia Circular.
-					</Text>
+						<Defs>
+							<RadialGradient
+								id="headerGradient"
+								cx={screenWidth * 0.5}
+								cy={-10}
+								r={200}
+								gradientUnits="userSpaceOnUse"
+							>
+								<Stop offset="0%" stopColor={colors.lime[500]} />
+								<Stop offset="100%" stopColor={colors.lime[800]} />
+							</RadialGradient>
+						</Defs>
+						<Rect
+							width={screenWidth}
+							height={288}
+							fill="url(#headerGradient)"
+						/>
+					</Svg>
+					<View className="flex-1 p-8 justify-between">
+						<Pressable
+							onPress={router.back}
+							className="w-10 h-10 rounded-full bg-white items-center justify-center"
+						>
+							<ArrowLeftIcon size={18} color={colors.lime[800]} />
+						</Pressable>
+						<View className="gap-2">
+							<Text
+								className="text-white text-4xl"
+								style={{ fontFamily: "Oswald_700Bold" }}
+							>
+								SEJA BEM VINDO NOVAMENTE!
+							</Text>
+							<Text
+								className="text-white text-lg opacity-90"
+								style={{ fontFamily: "SpaceGrotesk_400Regular" }}
+							>
+								Continue a contribuir com a Economia Circular.
+							</Text>
+						</View>
+					</View>
 				</View>
 
 				{/* Form Section */}
@@ -113,9 +160,18 @@ export default function SignInScreen() {
 										onBlur={onBlur}
 										onChangeText={onChange}
 										placeholder="••••••••"
-										secureTextEntry
+										secureTextEntry={!showPassword}
 										className="text-base"
 									/>
+									<InputSlot
+										onPress={() => setShowPassword(prev => !prev)}
+										className="pr-1"
+									>
+										<InputIcon
+											as={showPassword ? Eye : EyeOff}
+											className="text-muted-foreground"
+										/>
+									</InputSlot>
 								</Input>
 							)}
 						/>
