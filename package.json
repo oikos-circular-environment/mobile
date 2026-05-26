@@ -12,6 +12,8 @@
 		"generate:api": "openapi-ts"
 	},
 	"dependencies": {
+		"@expo-google-fonts/oswald": "^0.4.2",
+		"@expo-google-fonts/space-grotesk": "^0.4.1",
 		"@expo/html-elements": "^0.12.5",
 		"@expo/vector-icons": "^15.0.3",
 		"@gluestack-ui/core": "^5.0.0-alpha.0",

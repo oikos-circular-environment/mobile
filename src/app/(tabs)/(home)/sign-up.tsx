@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
-import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -16,7 +16,7 @@ import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 
 const signUpSchema = z.object({
-	email: z.email("Digite um e-mail válido."),
+	email: z.string().email("Digite um e-mail válido."),
 	password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
 });
 
@@ -42,83 +42,108 @@ export default function SignUpScreen() {
 	};
 
 	return (
-		<AuthScreenLayout
-			title="Criar conta"
-			subtitle="Preencha seus dados para começar na Oikos."
-			footer={
-				<Text>
-					Já possui conta?{" "}
-					<Link href="/sign-in" className="font-semibold">
-						Entrar
-					</Link>
-				</Text>
-			}
-		>
-			<FormControl isInvalid={!!errors.email} className="gap-2">
-				<FormControlLabel>
-					<FormControlLabelText>E-mail</FormControlLabelText>
-				</FormControlLabel>
-				<Controller
-					control={control}
-					name="email"
-					render={({ field: { onChange, onBlur, value } }) => (
-						<Input>
-							<InputField
-								value={value}
-								onBlur={onBlur}
-								onChangeText={onChange}
-								placeholder="Digite seu e-mail"
-								keyboardType="email-address"
-								autoCapitalize="none"
-								className="text-base"
-							/>
-						</Input>
-					)}
-				/>
-				{errors.email?.message ? (
-					<FormControlError>
-						<FormControlErrorText>{errors.email.message}</FormControlErrorText>
-					</FormControlError>
-				) : null}
-			</FormControl>
-
-			<FormControl isInvalid={!!errors.password} className="gap-2">
-				<FormControlLabel>
-					<FormControlLabelText>Senha</FormControlLabelText>
-				</FormControlLabel>
-				<Controller
-					control={control}
-					name="password"
-					render={({ field: { onChange, onBlur, value } }) => (
-						<Input>
-							<InputField
-								value={value}
-								onBlur={onBlur}
-								onChangeText={onChange}
-								placeholder="Crie sua senha"
-								secureTextEntry
-								className="text-base"
-							/>
-						</Input>
-					)}
-				/>
-				{errors.password?.message ? (
-					<FormControlError>
-						<FormControlErrorText>
-							{errors.password.message}
-						</FormControlErrorText>
-					</FormControlError>
-				) : null}
-			</FormControl>
-
-			<Button
-				className="mt-1 bg-primary"
-				onPress={handleSubmit(onSubmit)}
-				isDisabled={isLoading}
+		<KeyboardAvoidingView behavior="padding" className="flex-1">
+			<ScrollView
+				contentContainerClassName="flex-grow bg-white"
+				showsVerticalScrollIndicator={false}
 			>
-				<ButtonText className="text-base font-semibold">Criar conta</ButtonText>
-				{isLoading && <ButtonSpinner />}
-			</Button>
-		</AuthScreenLayout>
+				{/* Header Section */}
+				<View className="h-72 bg-primary p-8 rounded-b-4xl justify-center gap-2">
+					<Text
+						className="text-white text-4xl"
+						style={{ fontFamily: "Oswald_700Bold" }}
+					>
+						VAMOS CONSTRUIR O FUTURO JUNTOS!
+					</Text>
+					<Text
+						className="text-white text-lg opacity-90"
+						style={{ fontFamily: "SpaceGrotesk_400Regular" }}
+					>
+						Crie sua conta e comece a contribuir.
+					</Text>
+				</View>
+
+				<View className="px-8 pt-10 pb-8 gap-6">
+					<FormControl isInvalid={!!errors.email} className="gap-2">
+						<FormControlLabel>
+							<FormControlLabelText className="text-gray-500 font-medium">
+								E-mail
+							</FormControlLabelText>
+						</FormControlLabel>
+						<Controller
+							control={control}
+							name="email"
+							render={({ field: { onChange, onBlur, value } }) => (
+								<Input>
+									<InputField
+										value={value}
+										onBlur={onBlur}
+										onChangeText={onChange}
+										placeholder="seu@email.com"
+										keyboardType="email-address"
+										autoCapitalize="none"
+										className="text-base"
+									/>
+								</Input>
+							)}
+						/>
+						{errors.email?.message && (
+							<FormControlError>
+								<FormControlErrorText>
+									{errors.email.message}
+								</FormControlErrorText>
+							</FormControlError>
+						)}
+					</FormControl>
+
+					<FormControl isInvalid={!!errors.password} className="gap-2">
+						<FormControlLabel>
+							<FormControlLabelText className="text-gray-500 font-medium">
+								Senha
+							</FormControlLabelText>
+						</FormControlLabel>
+						<Controller
+							control={control}
+							name="password"
+							render={({ field: { onChange, onBlur, value } }) => (
+								<Input>
+									<InputField
+										value={value}
+										onBlur={onBlur}
+										onChangeText={onChange}
+										placeholder="••••••••"
+										secureTextEntry
+										className="text-base"
+									/>
+								</Input>
+							)}
+						/>
+						{errors.password?.message && (
+							<FormControlError>
+								<FormControlErrorText>
+									{errors.password.message}
+								</FormControlErrorText>
+							</FormControlError>
+						)}
+					</FormControl>
+
+					<Button
+						size="lg"
+						onPress={handleSubmit(onSubmit)}
+						isDisabled={isLoading}
+					>
+						<ButtonText>Criar Conta</ButtonText>
+						{isLoading && <ButtonSpinner />}
+					</Button>
+
+					<View className="flex-row justify-center gap-1 mt-4">
+						<Text className="text-gray-500">Já tem uma conta?</Text>
+						<Link href="/sign-in">
+							<Text className="text-gray-900 font-bold">Entrar</Text>
+						</Link>
+					</View>
+				</View>
+			</ScrollView>
+		</KeyboardAvoidingView>
 	);
 }

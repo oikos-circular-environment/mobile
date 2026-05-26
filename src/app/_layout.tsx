@@ -10,7 +10,13 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
+import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
+import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 import { Toaster } from "@/components/toast";
+
+SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
 	anchor: "(tabs)",
@@ -19,6 +25,21 @@ export const unstable_settings = {
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
+	const [loaded, error] = useFonts({
+		Oswald_700Bold,
+		SpaceGrotesk_400Regular,
+	});
+
+	useEffect(() => {
+		if (loaded || error) {
+			SplashScreen.hideAsync();
+		}
+	}, [loaded, error]);
+
+	if (!loaded && !error) {
+		return null;
+	}
+
 	const isDevelopmentMode = process.env.NODE_ENV === "development";
 
 	return (
