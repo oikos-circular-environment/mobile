@@ -2,6 +2,7 @@ import {
 	CornerUpRight,
 	Hammer,
 	MessageCircle,
+	Phone,
 	Recycle,
 	TriangleAlert,
 } from "lucide-react-native";
@@ -16,7 +17,13 @@ import { Text } from "@/components/ui/text";
 import type { MarketSimulationItemType } from "@/libs/memory/market-simulations";
 import type { MarketBusinessHour, MarketCompany } from "@/libs/types/market";
 import { Divider } from "../ui/divider";
-import { HStack } from "../ui/hstack";
+
+const openWhatsAppOrSms = async (phone: string) => {
+	const cleanPhone = phone.replace(/\D/g, "");
+	const whatsappUrl = `whatsapp://send?phone=${cleanPhone}`;
+	const canOpenWhatsApp = await Linking.canOpenURL(whatsappUrl);
+	Linking.openURL(canOpenWhatsApp ? whatsappUrl : `sms:${phone}`);
+};
 
 const measurementSymbol: Record<string, string> = {
 	KG: "kg",
@@ -94,21 +101,28 @@ export function CompanyDetailGeneralTab({
 								</View>
 							</Card>
 						</Pressable>
-						<HStack className="gap-2">
-							{company.phones.length > 0 &&
-								company.phones.map(phone => (
-									<Card
-										key={phone}
-										className="flex-1 flex-row items-center gap-2 shadow-none"
-										size="sm"
+						{company.phones.length > 0 &&
+							company.phones.map(phone => (
+								<Card
+									key={phone}
+									className="flex-row items-center gap-2 shadow-none"
+									size="sm"
+								>
+									<Text className="flex-1 text-md">{phone}</Text>
+									<Pressable
+										className="size-10 items-center justify-center rounded-[5px] bg-gray-100"
+										onPress={() => Linking.openURL(`tel:${phone}`)}
 									>
-										<Text className="flex-1 text-md">{phone}</Text>
-										<View className="size-10 items-center justify-center rounded-[5px] bg-gray-100">
-											<MessageCircle size={12} color="#111827" />
-										</View>
-									</Card>
-								))}
-						</HStack>
+										<Phone size={12} color="#111827" />
+									</Pressable>
+									<Pressable
+										className="size-10 items-center justify-center rounded-[5px] bg-gray-100"
+										onPress={() => openWhatsAppOrSms(phone)}
+									>
+										<MessageCircle size={12} color="#111827" />
+									</Pressable>
+								</Card>
+							))}
 					</View>
 				</View>
 
@@ -116,7 +130,7 @@ export function CompanyDetailGeneralTab({
 					<Heading size="md" className="text-sm text-gray-950">
 						Horário de funcionamento
 					</Heading>
-					<Text className="text-sm text-gray-700">
+					<Text className="text-sm ">
 						O horário de funcionamento pode variar, clique sobre o horário para
 						mais detalhes.
 					</Text>
@@ -126,7 +140,7 @@ export function CompanyDetailGeneralTab({
 							<View className="flex-row items-center justify-between gap-2">
 								<View>
 									<View className="flex flex-row gap-2 items-center">
-										<Text className="text-md font-bold text-gray-700">
+										<Text className="text-md font-bold ">
 											{currentDayLabel}
 										</Text>
 										<Badge variant={isOpenNow ? "default" : "destructive"}>
@@ -138,17 +152,12 @@ export function CompanyDetailGeneralTab({
 								<View className="items-end gap-1">
 									{currentBusinessHour?.time_slots?.length ? (
 										currentBusinessHour.time_slots.map(slot => (
-											<Text
-												key={slot.id}
-												className="text-xs font-bold text-gray-700"
-											>
+											<Text key={slot.id} className="text-xs font-bold ">
 												{slot.start_time} - {slot.end_time}
 											</Text>
 										))
 									) : (
-										<Text className="text-xs font-bold text-gray-700">
-											Fechado
-										</Text>
+										<Text className="text-xs font-bold ">Fechado</Text>
 									)}
 								</View>
 							</View>
@@ -164,7 +173,7 @@ export function CompanyDetailGeneralTab({
 					</View>
 					<View className="flex-1">
 						<Text className="text-sm font-semibold text-gray-900">Atenção</Text>
-						<Text className="text-xs text-gray-700">
+						<Text className="text-xs ">
 							Sempre faça separação e higienização do item, a qualidade impacta
 							no valor do resíduo!
 						</Text>
@@ -205,9 +214,7 @@ export function CompanyDetailGeneralTab({
 										</View>
 
 										{waste.description ? (
-											<Text className="text-sm text-gray-700">
-												{waste.description}
-											</Text>
+											<Text className="text-sm ">{waste.description}</Text>
 										) : null}
 
 										{waste.sub_items?.length ? (
@@ -266,9 +273,7 @@ export function CompanyDetailGeneralTab({
 										</View>
 
 										{service.description ? (
-											<Text className="text-sm text-gray-700">
-												{service.description}
-											</Text>
+											<Text className="text-sm ">{service.description}</Text>
 										) : null}
 
 										{service.sub_items?.length ? (
