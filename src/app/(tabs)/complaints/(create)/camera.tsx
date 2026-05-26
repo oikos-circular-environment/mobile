@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Camera } from "@/components/camera";
+import { colors } from "@/components/style/colors";
 import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import type {
@@ -124,7 +125,7 @@ export default function ComplaintCameraScreen() {
 					className="rounded-xl p-3"
 					onPress={() => router.back()}
 				>
-					<ArrowLeft size={20} color="white" strokeWidth={2.2} />
+					<ArrowLeft size={20} color={colors.white} strokeWidth={2.2} />
 				</TouchableOpacity>
 			</View>
 
@@ -152,7 +153,7 @@ export default function ComplaintCameraScreen() {
 						onPress={handleAdvance}
 						disabled={captures.length === 0}
 					>
-						<ArrowRight size={34} color="#3d6300" strokeWidth={2.2} />
+						<ArrowRight size={34} color={colors.lime[800]} strokeWidth={2.2} />
 					</TouchableOpacity>
 				</View>
 			</View>

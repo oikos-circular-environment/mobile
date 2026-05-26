@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
+import { colors } from "@/components/style/colors";
 import { ComplaintCarousel } from "@/components/complaints/complaint-carousel";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
@@ -196,7 +197,7 @@ export default function ComplaintReviewScreen() {
 			>
 				<Card className="flex-row items-center gap-3 bg-gray-100 p-3 shadow-none">
 					<View className="size-14 items-center justify-center rounded-lg bg-lime-800">
-						<ShieldAlert size={24} color="#FFFFFF" strokeWidth={2.2} />
+						<ShieldAlert size={24} color={colors.white} strokeWidth={2.2} />
 					</View>
 					<View className="flex-1">
 						<Heading size="md">Atenção</Heading>
@@ -209,7 +210,7 @@ export default function ComplaintReviewScreen() {
 
 				<View className="gap-2">
 					<Card className="flex-row items-center shadow-none bg-amber-100 border-amber-400">
-						<TriangleAlertIcon size={20} color="#ffba00" />
+						<TriangleAlertIcon size={20} color={colors.amber[400]} />
 						<View className="flex-1">
 							<Text className="text-sm text-gray-700">
 								Revise as informações da denúncia e adicione observações para

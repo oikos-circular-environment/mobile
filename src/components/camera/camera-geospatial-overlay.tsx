@@ -17,10 +17,11 @@ import {
 	formatMeters,
 	formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
+import { colors } from "@/components/style/colors";
 import { useCameraContext } from "./context";
 
 const textStrokeStyle = {
-	textShadowColor: "rgba(0, 0, 0, 0.92)",
+	textShadowColor: colors.overlay.black92,
 	textShadowOffset: { width: 0, height: 1 },
 	textShadowRadius: 6,
 };
@@ -104,7 +105,7 @@ export function CameraGeospatialOverlay({
 				>
 					<FlashToggleIcon
 						size={20}
-						color={flash === "on" ? "#3d6300" : "#4B5563"}
+						color={flash === "on" ? colors.lime[800] : colors.gray[600]}
 						strokeWidth={2.2}
 					/>
 				</TouchableOpacity>
@@ -115,7 +116,7 @@ export function CameraGeospatialOverlay({
 				>
 					<LocateToggleIcon
 						size={20}
-						color={isVisible ? "#3d6300" : "#4B5563"}
+						color={isVisible ? colors.lime[800] : colors.gray[600]}
 						strokeWidth={2.2}
 					/>
 				</TouchableOpacity>

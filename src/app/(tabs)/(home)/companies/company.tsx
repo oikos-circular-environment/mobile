@@ -15,6 +15,7 @@ import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { CompanyFormSkeleton } from "@/components/companies/skeletons";
 import { toast } from "@/components/toast";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -253,7 +254,7 @@ export default function CompanyGeneralInfoScreen() {
 					<Card className="bg-secondary shadow-none">
 						<View className="flex-row items-center justify-between gap-4">
 							<View className="size-15 items-center justify-center rounded-lg bg-primary">
-								<FactoryIcon color="white" size={20} />
+								<FactoryIcon color={colors.white} size={20} />
 							</View>
 							<View className="flex-1 gap-1">
 								<Heading className="text-lg">Empresas</Heading>

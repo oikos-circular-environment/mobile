@@ -3,6 +3,7 @@ import { PlusIcon, WrenchIcon } from "lucide-react-native";
 import { useEffect } from "react";
 import { FlatList, View } from "react-native";
 import { ServiceSkeleton } from "@/components/companies/services/service-skeleton";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -48,7 +49,7 @@ export default function ServicesIndexScreen() {
 				<Card className="shadow-none ">
 					<View className="flex-row items-center justify-between gap-4">
 						<View className="size-15 items-center justify-center rounded-lg bg-secondary">
-							<WrenchIcon color="#3d6300" size={20} />
+							<WrenchIcon color={colors.lime[800]} size={20} />
 						</View>
 						<View className="flex-1">
 							<Heading className="text-lg">Serviços</Heading>
@@ -60,7 +61,7 @@ export default function ServicesIndexScreen() {
 					</View>
 
 					<Button className="w-full gap-2" onPress={handleCreate}>
-						<PlusIcon size={16} color="white" />
+						<PlusIcon size={16} color={colors.white} />
 						<ButtonText>Novo serviço</ButtonText>
 					</Button>
 				</Card>

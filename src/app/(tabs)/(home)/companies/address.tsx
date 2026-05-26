@@ -7,6 +7,7 @@ import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { AddressFormSkeleton } from "@/components/companies/skeletons";
 import { toast } from "@/components/toast";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -223,7 +224,7 @@ export default function CompanyAddressScreen() {
 					<Card className="bg-secondary shadow-none">
 						<View className="flex-row items-center justify-between gap-4">
 							<View className="size-15 items-center justify-center rounded-lg bg-primary">
-								<MapIcon color="white" size={20} />
+								<MapIcon color={colors.white} size={20} />
 							</View>
 							<View className="flex-1 gap-1">
 								<Heading className="text-lg">Endereço</Heading>

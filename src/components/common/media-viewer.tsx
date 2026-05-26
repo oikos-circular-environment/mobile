@@ -2,6 +2,7 @@ import { ArrowLeft, Trash2 } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Modal, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import type { ComplaintCapture } from "@/libs/types/complaint";
 import { ImagePreviewViewer } from "./image-preview-viewer";
@@ -74,7 +75,7 @@ export function MediaViewer({
 						className="rounded-xl bg-black/50 p-3"
 						onPress={handleClose}
 					>
-						<ArrowLeft size={20} color="white" strokeWidth={2.2} />
+						<ArrowLeft size={20} color={colors.white} strokeWidth={2.2} />
 					</TouchableOpacity>
 
 					{onDelete && (
@@ -82,7 +83,7 @@ export function MediaViewer({
 							className="rounded-xl bg-black/50 p-3"
 							onPress={() => setConfirmingDelete(true)}
 						>
-							<Trash2 size={20} color="white" strokeWidth={2.2} />
+							<Trash2 size={20} color={colors.white} strokeWidth={2.2} />
 						</TouchableOpacity>
 					)}
 				</View>

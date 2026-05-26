@@ -9,6 +9,7 @@ import {
 } from "@/components/companies/business-hours/business-hours-form-schema";
 import { DayBusinessHourField } from "@/components/companies/business-hours/day-business-hour-field";
 import { BusinessHoursSkeleton } from "@/components/companies/skeletons";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -104,7 +105,7 @@ export default function CompanyBusinessHoursScreen() {
 					<Card className="bg-secondary shadow-none">
 						<View className="flex-row items-center justify-between gap-4">
 							<View className="size-15 items-center justify-center rounded-lg bg-primary">
-								<Clock8Icon color="white" size={20} />
+								<Clock8Icon color={colors.white} size={20} />
 							</View>
 							<View className="flex-1 gap-1">
 								<Heading className="text-lg">Horário de Funcionamento</Heading>

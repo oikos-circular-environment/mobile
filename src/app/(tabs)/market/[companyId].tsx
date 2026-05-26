@@ -1,41 +1,34 @@
-import {
-	addDays,
-	format,
-	getDay,
-	isBefore,
-	isWithinInterval,
-	parse,
-} from "date-fns";
+import { format, getDay } from "date-fns";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
-import { KeyboardAvoidingView, ScrollView, View } from "react-native";
-import { BusinessHoursModal } from "@/components/market/business-hours-modal";
+import { useMemo, useState } from "react";
+import {
+	ActivityIndicator,
+	KeyboardAvoidingView,
+	ScrollView,
+	View,
+} from "react-native";
+import { colors } from "@/components/style/colors";
 import { CompanyDetailGeneralTab } from "@/components/market/company-detail-general-tab";
 import { CompanyDetailSimulationTab } from "@/components/market/company-detail-simulation-tab";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
-import { Pressable as GPressable } from "@/components/ui/pressable";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useGeospatial } from "@/contexts/geospatial-context";
+import { useMarket } from "@/contexts/market-context";
+import {
+	getCurrentBusinessHour,
+	isCompanyOpenNow,
+} from "@/libs/market/is-company-open";
 import type { MarketSimulationItemType } from "@/libs/memory/market-simulations";
-import { getMarketCompanyById } from "@/libs/mocks/market-companies";
 import { daysOfWeek } from "@/libs/types/business-hour";
+import type { MarketBusinessHour } from "@/libs/types/market";
 
 type MarketDetailTab = "general" | "simulation";
 
 type SelectedSimulationItem = {
 	itemType: MarketSimulationItemType;
 	itemId: string;
-};
-
-const formatIdentity = (identity: string, identity_type: "CPF" | "CNPJ") => {
-	if (identity_type === "CNPJ") {
-		return identity.replace(
-			/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
-			"$1.$2.$3/$4-$5",
-		);
-	}
-
-	return identity.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
 };
 
 const getDayLabel = (day: string) =>
@@ -51,104 +44,60 @@ const dayOfWeekByIndex = [
 	"SATURDAY",
 ] as const;
 
-const isTimeInsideSlot = (
-	currentDate: Date,
-	slot: { startTime: string; endTime: string },
-) => {
-	const slotStart = parse(slot.startTime, "HH:mm", currentDate);
-	const parsedSlotEnd = parse(slot.endTime, "HH:mm", currentDate);
-
-	if (
-		Number.isNaN(slotStart.getTime()) ||
-		Number.isNaN(parsedSlotEnd.getTime())
-	) {
-		return false;
-	}
-
-	const slotEnd = isBefore(parsedSlotEnd, slotStart)
-		? addDays(parsedSlotEnd, 1)
-		: parsedSlotEnd;
-
-	return isWithinInterval(currentDate, {
-		start: slotStart,
-		end: slotEnd,
-	});
-};
-
 export default function MarketCompanyDetailScreen() {
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
-	const company = getMarketCompanyById(companyId ?? "");
-	const [isBusinessHoursModalOpen, setIsBusinessHoursModalOpen] =
-		useState(false);
+	const { getCompanyById, isPending, isLocationReady } = useMarket();
+	const { currentDate } = useGeospatial();
 	const [activeTab, setActiveTab] = useState<MarketDetailTab>("general");
 	const [selectedSimulationItem, setSelectedSimulationItem] =
 		useState<SelectedSimulationItem | null>(null);
-	const [currentDate, setCurrentDate] = useState(() => new Date());
 
-	useEffect(() => {
-		const syncClock = () => setCurrentDate(new Date());
-
-		syncClock();
-		const intervalId = setInterval(syncClock, 60_000);
-
-		return () => clearInterval(intervalId);
-	}, []);
+	const company = companyId ? getCompanyById(companyId) : undefined;
 
 	const currentDayOfWeek = dayOfWeekByIndex[getDay(currentDate)];
-	const currentBusinessHour =
-		company?.businessHours?.find(item => item.dayOfWeek === currentDayOfWeek) ??
-		null;
-	const isOpenNow = Boolean(
-		currentBusinessHour?.is_open &&
-			currentBusinessHour.timeSlots.some(slot =>
-				isTimeInsideSlot(currentDate, slot),
-			),
+
+	const currentBusinessHour = useMemo<MarketBusinessHour | null>(
+		() =>
+			company
+				? getCurrentBusinessHour(company.business_hours, currentDate)
+				: null,
+		[company, currentDate],
 	);
+
+	const isOpenNow = company
+		? isCompanyOpenNow(company.business_hours, currentDate)
+		: false;
+
 	const currentTimeLabel = format(currentDate, "HH:mm");
 
 	const defaultSimulationItem = useMemo<SelectedSimulationItem | null>(() => {
-		const firstWaste = company?.waste?.[0];
+		if (!company) return null;
+
+		const firstWaste = company.wastes[0];
 		if (firstWaste) {
 			return { itemType: "waste", itemId: firstWaste.id };
 		}
 
-		const firstService = company?.services?.[0];
+		const firstService = company.services[0];
 		if (firstService) {
 			return { itemType: "service", itemId: firstService.id };
 		}
 
 		return null;
-	}, [company?.services, company?.waste]);
-
-	useEffect(() => {
-		if (!company) {
-			return;
-		}
-
-		if (!selectedSimulationItem) {
-			setSelectedSimulationItem(defaultSimulationItem);
-			return;
-		}
-
-		const isValidWaste =
-			selectedSimulationItem.itemType === "waste" &&
-			company.waste?.some(item => item.id === selectedSimulationItem.itemId);
-		const isValidService =
-			selectedSimulationItem.itemType === "service" &&
-			company.services?.some(item => item.id === selectedSimulationItem.itemId);
-
-		if (!isValidWaste && !isValidService) {
-			setSelectedSimulationItem(defaultSimulationItem);
-		}
-	}, [
-		company,
-		company?.services,
-		company?.waste,
-		defaultSimulationItem,
-		selectedSimulationItem,
-	]);
+	}, [company]);
 
 	const currentSimulationItem = selectedSimulationItem ?? defaultSimulationItem;
+
+	if (!isLocationReady || isPending) {
+		return (
+			<>
+				<Stack.Screen options={{ title: "Empresa", headerShown: true }} />
+				<View className="flex-1 items-center justify-center bg-white">
+					<ActivityIndicator size="small" color={colors.lime[800]} />
+				</View>
+			</>
+		);
+	}
 
 	if (!company) {
 		return (
@@ -184,7 +133,7 @@ export default function MarketCompanyDetailScreen() {
 					keyboardShouldPersistTaps="handled"
 				>
 					<View className="gap-4">
-						<View className="flex-row gap-2 items-center">
+						<Card className="flex-row gap-2 items-center shadow-none">
 							<View className="h-16 w-16 items-center justify-center rounded-[5px] bg-slate-950">
 								<Text className="text-sm font-semibold text-white">
 									{company.corporate_name
@@ -199,18 +148,17 @@ export default function MarketCompanyDetailScreen() {
 								<Heading className="text-xl text-gray-950">
 									{company.corporate_name}
 								</Heading>
-								<Text className="text-xs text-gray-500">
-									{company.business_name}
-								</Text>
-								<Text className="text-xs text-gray-500">
-									{formatIdentity(company.identity, company.identity_type)}
-								</Text>
+								{company.business_name ? (
+									<Text className="text-xs text-gray-500">
+										{company.business_name}
+									</Text>
+								) : null}
 							</View>
-						</View>
+						</Card>
 
 						<Card className="gap-2 rounded-lg border-gray-200 p-1 shadow-none">
 							<View className="flex-row gap-1">
-								<GPressable
+								<Pressable
 									className={`flex-1 items-center rounded-md px-3 py-2 ${activeTab === "general" ? "bg-lime-800" : "bg-transparent"}`}
 									onPress={() => setActiveTab("general")}
 								>
@@ -219,9 +167,9 @@ export default function MarketCompanyDetailScreen() {
 									>
 										Geral
 									</Text>
-								</GPressable>
+								</Pressable>
 
-								<GPressable
+								<Pressable
 									className={`flex-1 items-center rounded-md px-3 py-2 ${activeTab === "simulation" ? "bg-lime-800" : "bg-transparent"}`}
 									onPress={() => setActiveTab("simulation")}
 								>
@@ -230,7 +178,7 @@ export default function MarketCompanyDetailScreen() {
 									>
 										Simulação
 									</Text>
-								</GPressable>
+								</Pressable>
 							</View>
 						</Card>
 
@@ -241,9 +189,6 @@ export default function MarketCompanyDetailScreen() {
 								currentTimeLabel={currentTimeLabel}
 								isOpenNow={isOpenNow}
 								currentBusinessHour={currentBusinessHour}
-								onOpenBusinessHoursModal={() =>
-									setIsBusinessHoursModalOpen(true)
-								}
 								onSelectSimulationItem={(itemType, itemId) => {
 									setSelectedSimulationItem({ itemType, itemId });
 									setActiveTab("simulation");
@@ -258,12 +203,6 @@ export default function MarketCompanyDetailScreen() {
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-
-			<BusinessHoursModal
-				isOpen={isBusinessHoursModalOpen}
-				onClose={() => setIsBusinessHoursModalOpen(false)}
-				businessHours={company.businessHours}
-			/>
 		</>
 	);
 }

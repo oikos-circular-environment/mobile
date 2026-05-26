@@ -1,5 +1,6 @@
 import { ArrowUpRightIcon } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -84,7 +85,7 @@ export default function PlansScreen() {
 						<View className="flex flex-col gap-2">
 							{plan.options.map(option => (
 								<View key={option} className="flex flex-row items-center gap-2">
-									<ArrowUpRightIcon color="#3d6300" />
+									<ArrowUpRightIcon color={colors.lime[800]} />
 									<Text>{option}</Text>
 								</View>
 							))}

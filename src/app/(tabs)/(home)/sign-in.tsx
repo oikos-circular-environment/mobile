@@ -1,8 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { ArrowLeftIcon, Eye, EyeOff } from "lucide-react-native";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import {
+	KeyboardAvoidingView,
+	Pressable,
+	ScrollView,
+	StyleSheet,
+	useWindowDimensions,
+	View,
+} from "react-native";
+import { Defs, RadialGradient, Rect, Stop, Svg } from "react-native-svg";
 import { z } from "zod";
-import { AuthScreenLayout } from "@/components/auth/auth-screen-layout";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -11,12 +22,12 @@ import {
 	FormControlLabel,
 	FormControlLabelText,
 } from "@/components/ui/form-control";
-import { Input, InputField } from "@/components/ui/input";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 
 const signInSchema = z.object({
-	email: z.email("Digite um e-mail válido."),
+	email: z.string().email("Digite um e-mail válido."),
 	password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
 });
 
@@ -24,6 +35,9 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignInScreen() {
 	const { signIn, isLoading } = useAuthContext();
+	const router = useRouter();
+	const { width: screenWidth } = useWindowDimensions();
+	const [showPassword, setShowPassword] = useState(false);
 
 	const {
 		control,
@@ -42,82 +56,155 @@ export default function SignInScreen() {
 	};
 
 	return (
-		<AuthScreenLayout
-			title="Entrar na sua conta"
-			subtitle="Bem-vindo de volta. Preencha seus dados."
-			footer={
-				<Text>
-					Não tem uma conta?{" "}
-					<Link href="/sign-up" className="font-semibold">
-						Registrar-se
-					</Link>
-				</Text>
-			}
-		>
-			<FormControl isInvalid={!!errors.email} className="gap-2">
-				<FormControlLabel>
-					<FormControlLabelText>E-mail</FormControlLabelText>
-				</FormControlLabel>
-				<Controller
-					control={control}
-					name="email"
-					render={({ field: { onChange, onBlur, value } }) => (
-						<Input>
-							<InputField
-								value={value}
-								onBlur={onBlur}
-								onChangeText={onChange}
-								placeholder="Digite seu e-mail"
-								keyboardType="email-address"
-								autoCapitalize="none"
-							/>
-						</Input>
-					)}
-				/>
-				{errors.email?.message && (
-					<FormControlError>
-						<FormControlErrorText>{errors.email.message}</FormControlErrorText>
-					</FormControlError>
-				)}
-			</FormControl>
-
-			<FormControl isInvalid={!!errors.password} className="gap-2">
-				<FormControlLabel>
-					<FormControlLabelText>Senha</FormControlLabelText>
-				</FormControlLabel>
-				<Controller
-					control={control}
-					name="password"
-					render={({ field: { onChange, onBlur, value } }) => (
-						<Input>
-							<InputField
-								value={value}
-								onBlur={onBlur}
-								onChangeText={onChange}
-								placeholder="Digite sua senha"
-								secureTextEntry
-							/>
-						</Input>
-					)}
-				/>
-				{errors.password?.message && (
-					<FormControlError>
-						<FormControlErrorText>
-							{errors.password.message}
-						</FormControlErrorText>
-					</FormControlError>
-				)}
-			</FormControl>
-
-			<Button
-				size="lg"
-				className="mt-1 bg-primary"
-				onPress={handleSubmit(onSubmit)}
-				isDisabled={isLoading}
+		<KeyboardAvoidingView behavior="padding" className="flex-1">
+			<ScrollView
+				contentContainerClassName="flex-grow bg-white"
+				showsVerticalScrollIndicator={false}
 			>
-				<ButtonText>Entrar</ButtonText>
-				{isLoading && <ButtonSpinner />}
-			</Button>
-		</AuthScreenLayout>
+				{/* Header Section */}
+				<View className="h-72 rounded-b-4xl overflow-hidden">
+					<Svg
+						style={StyleSheet.absoluteFillObject}
+						width={screenWidth}
+						height={288}
+					>
+						<Defs>
+							<RadialGradient
+								id="headerGradient"
+								cx={screenWidth * 0.5}
+								cy={-10}
+								r={200}
+								gradientUnits="userSpaceOnUse"
+							>
+								<Stop offset="0%" stopColor={colors.lime[500]} />
+								<Stop offset="100%" stopColor={colors.lime[800]} />
+							</RadialGradient>
+						</Defs>
+						<Rect
+							width={screenWidth}
+							height={288}
+							fill="url(#headerGradient)"
+						/>
+					</Svg>
+					<View className="flex-1 p-8 justify-between">
+						<Pressable
+							onPress={router.back}
+							className="w-10 h-10 rounded-full bg-white items-center justify-center"
+						>
+							<ArrowLeftIcon size={18} color={colors.lime[800]} />
+						</Pressable>
+						<View className="gap-2">
+							<Text
+								className="text-white text-4xl"
+								style={{ fontFamily: "Oswald_700Bold" }}
+							>
+								SEJA BEM VINDO NOVAMENTE!
+							</Text>
+							<Text
+								className="text-white text-lg opacity-90"
+								style={{ fontFamily: "SpaceGrotesk_400Regular" }}
+							>
+								Continue a contribuir com a Economia Circular.
+							</Text>
+						</View>
+					</View>
+				</View>
+
+				{/* Form Section */}
+				<View className="px-8 pt-10 pb-8 gap-6">
+					<FormControl isInvalid={!!errors.email} className="gap-2">
+						<FormControlLabel>
+							<FormControlLabelText className="text-gray-500 font-medium">
+								E-mail
+							</FormControlLabelText>
+						</FormControlLabel>
+						<Controller
+							control={control}
+							name="email"
+							render={({ field: { onChange, onBlur, value } }) => (
+								<Input>
+									<InputField
+										value={value}
+										onBlur={onBlur}
+										onChangeText={onChange}
+										placeholder="seu@email.com"
+										keyboardType="email-address"
+										autoCapitalize="none"
+										className="text-base"
+									/>
+								</Input>
+							)}
+						/>
+						{errors.email?.message && (
+							<FormControlError>
+								<FormControlErrorText>
+									{errors.email.message}
+								</FormControlErrorText>
+							</FormControlError>
+						)}
+					</FormControl>
+
+					<FormControl isInvalid={!!errors.password} className="gap-2">
+						<FormControlLabel>
+							<FormControlLabelText className="text-gray-500 font-medium">
+								Senha
+							</FormControlLabelText>
+						</FormControlLabel>
+						<Controller
+							control={control}
+							name="password"
+							render={({ field: { onChange, onBlur, value } }) => (
+								<Input>
+									<InputField
+										value={value}
+										onBlur={onBlur}
+										onChangeText={onChange}
+										placeholder="••••••••"
+										secureTextEntry={!showPassword}
+										className="text-base"
+									/>
+									<InputSlot
+										onPress={() => setShowPassword(prev => !prev)}
+										className="pr-1"
+									>
+										<InputIcon
+											as={showPassword ? Eye : EyeOff}
+											className="text-muted-foreground"
+										/>
+									</InputSlot>
+								</Input>
+							)}
+						/>
+						{errors.password?.message && (
+							<FormControlError>
+								<FormControlErrorText>
+									{errors.password.message}
+								</FormControlErrorText>
+							</FormControlError>
+						)}
+					</FormControl>
+
+					{/* <Text className="text-right text-gray-900 font-semibold text-sm">
+						Esqueceu a senha?
+					</Text> */}
+
+					<Button
+						size="lg"
+						onPress={handleSubmit(onSubmit)}
+						isDisabled={isLoading}
+					>
+						<ButtonText>Entrar</ButtonText>
+						{isLoading && <ButtonSpinner />}
+					</Button>
+
+					<View className="flex-row justify-center gap-1 mt-4">
+						<Text className="text-gray-500">Não tem uma conta?</Text>
+						<Link href="/sign-up">
+							<Text className="text-gray-900 font-bold">Cadastre-se</Text>
+						</Link>
+					</View>
+				</View>
+			</ScrollView>
+		</KeyboardAvoidingView>
 	);
 }

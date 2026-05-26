@@ -1,5 +1,6 @@
 import { Check } from "lucide-react-native";
 import { Pressable, View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 
@@ -18,7 +19,7 @@ export function FlagCard({ label, isChecked, onChange }: FlagCardProps) {
 						isChecked ? "bg-lime-800 border-lime-800" : "border-zinc-300"
 					}`}
 				>
-					{isChecked && <Check size={10} color="white" />}
+					{isChecked && <Check size={10} color={colors.white} />}
 				</View>
 				<Text className="flex-1">{label}</Text>
 			</Card>

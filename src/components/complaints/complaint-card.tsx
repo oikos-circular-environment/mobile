@@ -9,6 +9,7 @@ import {
 	ShieldXIcon,
 } from "lucide-react-native";
 import { View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { MediaThumbnail } from "@/components/common/media-thumbnail";
 import { toast } from "@/components/toast";
 import { Card } from "@/components/ui/card";
@@ -98,9 +99,9 @@ function ComplaintCardContent() {
 							{complaint.attachment.type === "VIDEO" ? (
 								<View
 									className="absolute inset-0 items-center justify-center"
-									style={{ backgroundColor: "rgba(0,0,0,0.25)" }}
+									style={{ backgroundColor: colors.overlay.black25 }}
 								>
-									<PlayCircleIcon size={20} color="white" strokeWidth={1.8} />
+									<PlayCircleIcon size={20} color={colors.white} strokeWidth={1.8} />
 								</View>
 							) : null}
 						</View>
@@ -133,7 +134,7 @@ function ComplaintCardContent() {
 										) : (
 											<EllipsisVertical
 												size={12}
-												color="#030712"
+												color={colors.gray[950]}
 												strokeWidth={2.2}
 											/>
 										)}
@@ -164,7 +165,7 @@ function ComplaintCardContent() {
 									) : (
 										<ShieldCheckIcon
 											size={14}
-											color="#3F6212"
+											color={colors.lime[800]}
 											strokeWidth={2.2}
 										/>
 									)}
@@ -182,7 +183,7 @@ function ComplaintCardContent() {
 									{isCancelingComplaint ? (
 										<Spinner size="small" />
 									) : (
-										<ShieldXIcon size={14} color="#B91C1C" strokeWidth={2.2} />
+										<ShieldXIcon size={14} color={colors.red[700]} strokeWidth={2.2} />
 									)}
 									<MenuItemLabel>Cancelar denúncia</MenuItemLabel>
 								</View>

@@ -9,6 +9,7 @@ import {
 } from "lucide-react-native";
 import type { ComponentType } from "react";
 import { View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Grid, GridItem } from "@/components/ui/grid";
 import { Heading } from "@/components/ui/heading";
@@ -55,7 +56,7 @@ export function ComplaintPainel() {
 			status: null,
 			label: "Total de denúncias",
 			count: dashboard?.total ?? 0,
-			iconColor: "#99a1af",
+			iconColor: colors.gray[400],
 			iconBgColor: "bg-gray-100",
 			activeBg: "bg-gray-100",
 			activeBorder: "border-gray-400",
@@ -65,7 +66,7 @@ export function ComplaintPainel() {
 			status: "OPEN",
 			label: "Abertas",
 			count: dashboard?.open ?? 0,
-			iconColor: "#0EA5E9",
+			iconColor: colors.sky[500],
 			iconBgColor: "bg-sky-100",
 			activeBg: "bg-sky-100",
 			activeBorder: "border-sky-300",
@@ -75,7 +76,7 @@ export function ComplaintPainel() {
 			status: "IN_PROGRESS",
 			label: "Em andamento",
 			count: dashboard?.pending ?? 0,
-			iconColor: "#FE9A00",
+			iconColor: colors.amber[400],
 			iconBgColor: "bg-amber-100",
 			activeBg: "bg-amber-100",
 			activeBorder: "border-amber-300",
@@ -85,7 +86,7 @@ export function ComplaintPainel() {
 			status: "RESOLVED",
 			label: "Resolvidas",
 			count: dashboard?.resolved ?? 0,
-			iconColor: "#3F6212",
+			iconColor: colors.lime[800],
 			iconBgColor: "bg-lime-100",
 			activeBg: "bg-lime-100",
 			activeBorder: "border-lime-600",
@@ -95,7 +96,7 @@ export function ComplaintPainel() {
 			status: "CANCELED",
 			label: "Canceladas",
 			count: dashboard?.canceled ?? 0,
-			iconColor: "#B91C1C",
+			iconColor: colors.red[700],
 			iconBgColor: "bg-red-100",
 			activeBg: "bg-red-100",
 			activeBorder: "border-red-300",
@@ -105,7 +106,7 @@ export function ComplaintPainel() {
 			status: "REJECTED",
 			label: "Rejeitadas",
 			count: dashboard?.rejected ?? 0,
-			iconColor: "#EA580C",
+			iconColor: colors.orange[600],
 			iconBgColor: "bg-orange-100",
 			activeBg: "bg-orange-100",
 			activeBorder: "border-orange-300",
