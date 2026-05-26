@@ -16,6 +16,7 @@ import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
+import { colors } from "@/components/style/colors";
 import { useAuthContext } from "@/contexts/auth-context";
 import { createCompanies } from "@/libs/factories/create-companies";
 
@@ -111,7 +112,7 @@ export default function HomeScreen() {
 										</Text>
 									</View>
 									<Card className="bg-primary items-center justify-center">
-										<ArrowUpRightIcon color="white" />
+										<ArrowUpRightIcon color={colors.white} />
 									</Card>
 								</Card>
 							</Link>

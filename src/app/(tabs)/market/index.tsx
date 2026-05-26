@@ -9,6 +9,7 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { colors } from "@/components/style/colors";
 import { CategoryToggle } from "@/components/market/category-toggle";
 import { RadiusToggle } from "@/components/market/radius-toggle";
 import { Badge, BadgeText } from "@/components/ui/badge";
@@ -84,7 +85,7 @@ export default function MarketScreen() {
 										<View className="p-2 items-center justify-center rounded-lg bg-lime-800">
 											<MapPinIcon
 												size={12}
-												color="#FFFFFF"
+												color={colors.white}
 												strokeWidth={2.25}
 											/>
 										</View>
@@ -118,7 +119,6 @@ export default function MarketScreen() {
 											onSubmitEditing={onSubmit}
 											returnKeyType="search"
 											placeholder="Exemplo: garrafa plástica"
-											placeholderTextColor="#9CA3AF"
 										/>
 										<InputSlot onPress={onSubmit}>
 											<InputIcon as={Search} className="text-gray-400" />
@@ -188,7 +188,7 @@ export default function MarketScreen() {
 							</Card>
 						) : isPending ? (
 							<Card className="items-center p-6 shadow-none bg-gray-50">
-								<ActivityIndicator size="small" color="#3F6212" />
+								<ActivityIndicator size="small" color={colors.lime[800]} />
 								<Text className="mt-2 text-sm text-gray-500">
 									Buscando empresas…
 								</Text>
@@ -235,7 +235,7 @@ export default function MarketScreen() {
 															className={`h-8 w-8 items-center justify-center overflow-hidden rounded-[5px] ${item.company_type === "COLLECTOR" ? "bg-gray-200" : "bg-slate-950"}`}
 														>
 															{item.company_type === "COLLECTOR" ? (
-																<Sprout size={16} color="#111827" />
+																<Sprout size={16} color={colors.gray[900]} />
 															) : (
 																<Text className="text-[10px] font-semibold text-white">
 																	{item.corporate_name
@@ -286,7 +286,7 @@ export default function MarketScreen() {
 															</View>
 														</View>
 
-														<ArrowRight size={16} color="#111827" />
+														<ArrowRight size={16} color={colors.gray[900]} />
 													</View>
 												</Card>
 											</Pressable>
@@ -301,7 +301,7 @@ export default function MarketScreen() {
 										disabled={isFetchingNextPage}
 									>
 										{isFetchingNextPage ? (
-											<ActivityIndicator size="small" color="#3F6212" />
+											<ActivityIndicator size="small" color={colors.lime[800]} />
 										) : (
 											<Text className="text-sm font-semibold text-lime-800">
 												Carregar mais

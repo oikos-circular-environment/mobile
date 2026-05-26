@@ -4,6 +4,7 @@ import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ImagePreviewViewer, VideoPreviewPlayer } from "@/components/common";
+import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
 
@@ -47,7 +48,7 @@ export default function ComplaintPreviewScreen() {
 					className="rounded-xl bg-black/50 p-3"
 					onPress={() => router.back()}
 				>
-					<ArrowLeft size={20} color="white" strokeWidth={2.2} />
+					<ArrowLeft size={20} color={colors.white} strokeWidth={2.2} />
 				</TouchableOpacity>
 
 				{previewCapture && (
@@ -55,7 +56,7 @@ export default function ComplaintPreviewScreen() {
 						className="rounded-xl bg-black/50 p-3"
 						onPress={() => setConfirmingDelete(true)}
 					>
-						<Trash2 size={20} color="white" strokeWidth={2.2} />
+						<Trash2 size={20} color={colors.white} strokeWidth={2.2} />
 					</TouchableOpacity>
 				)}
 			</View>

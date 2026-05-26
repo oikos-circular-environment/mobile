@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { colors } from "@/components/style/colors";
 import type { ApiComplaint } from "@/contexts/complaints-context";
 import { useComplaintsContext } from "@/contexts/complaints-context";
 
@@ -31,7 +32,7 @@ function ListHeader() {
 					</View>
 
 					<View className="size-14 items-center justify-center rounded-lg bg-lime-800">
-						<ShieldIcon size={24} color="#FFFFFF" strokeWidth={2.25} />
+						<ShieldIcon size={24} color={colors.white} strokeWidth={2.25} />
 					</View>
 				</View>
 			</Card>
@@ -96,7 +97,7 @@ export default function ComplaintsScreen() {
 		}
 		return (
 			<Card className="items-center gap-2 border-gray-100 p-6 shadow-none">
-				<ShieldIcon size={32} color="#9CA3AF" strokeWidth={1.5} />
+				<ShieldIcon size={32} color={colors.gray[400]} strokeWidth={1.5} />
 				<Text className="text-center text-sm text-gray-500">
 					Nenhuma denúncia encontrada.
 				</Text>

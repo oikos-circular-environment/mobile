@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import { Leaf, MapPin, Shield } from "lucide-react-native";
+import { colors } from "@/components/style/colors";
 
 // const TAB_BAR_HEIGHT = 64;
 // const TAB_BAR_MARGIN_BOTTOM = 0;
@@ -41,10 +42,10 @@ export default function TabsNavigator() {
 			// }}
 			screenOptions={{
 				headerShown: false,
-				tabBarActiveTintColor: "#f5f5f5",
-				tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
+				tabBarActiveTintColor: colors.gray[100],
+				tabBarInactiveTintColor: colors.overlay.white50,
 				tabBarStyle: {
-					backgroundColor: "#3d6300",
+					backgroundColor: colors.lime[800],
 				},
 			}}
 		>

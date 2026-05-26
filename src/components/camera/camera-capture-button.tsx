@@ -9,6 +9,7 @@ import Animated, {
 	withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
+import { colors } from "@/components/style/colors";
 import { useCameraContext } from "./context";
 
 const SPINNER_SIZE = 74;
@@ -43,8 +44,8 @@ function ArcSpinner() {
 			>
 				<Defs>
 					<LinearGradient id="arcGrad" x1="1" y1="0" x2="0" y2="1">
-						<Stop offset="0%" stopColor="#3f6212" stopOpacity={1} />
-						<Stop offset="100%" stopColor="#3f6212" stopOpacity={0.08} />
+						<Stop offset="0%" stopColor={colors.lime[800]} stopOpacity={1} />
+						<Stop offset="100%" stopColor={colors.lime[800]} stopOpacity={0.08} />
 					</LinearGradient>
 				</Defs>
 				<Circle

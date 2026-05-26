@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { Linking, View } from "react-native";
 import { BusinessHoursBottomSheet } from "@/components/market/business-hours-bottom-sheet";
+import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -97,7 +98,7 @@ export function CompanyDetailGeneralTab({
 								</Text>
 
 								<View className="size-10 items-center justify-center rounded-[5px] bg-gray-100">
-									<CornerUpRight size={12} color="#111827" />
+									<CornerUpRight size={12} color={colors.gray[900]} />
 								</View>
 							</Card>
 						</Pressable>
@@ -113,13 +114,13 @@ export function CompanyDetailGeneralTab({
 										className="size-10 items-center justify-center rounded-[5px] bg-gray-100"
 										onPress={() => Linking.openURL(`tel:${phone}`)}
 									>
-										<Phone size={12} color="#111827" />
+										<Phone size={12} color={colors.gray[900]} />
 									</Pressable>
 									<Pressable
 										className="size-10 items-center justify-center rounded-[5px] bg-gray-100"
 										onPress={() => openWhatsAppOrSms(phone)}
 									>
-										<MessageCircle size={12} color="#111827" />
+										<MessageCircle size={12} color={colors.gray[900]} />
 									</Pressable>
 								</Card>
 							))}
@@ -169,7 +170,7 @@ export function CompanyDetailGeneralTab({
 
 				<Card className="flex-row items-center gap-2 border-0 bg-amber-100 p-2 shadow-none">
 					<View className="h-10 w-10 items-center justify-center rounded-[5px]">
-						<TriangleAlert size={16} color="#6B7280" />
+						<TriangleAlert size={16} color={colors.gray[500]} />
 					</View>
 					<View className="flex-1">
 						<Text className="text-sm font-semibold text-gray-900">Atenção</Text>
@@ -195,7 +196,7 @@ export function CompanyDetailGeneralTab({
 									<Card className="gap-2 shadow-none">
 										<View className="flex-row items-center gap-2">
 											<View className="bg-muted rounded-md h-10 w-10 items-center justify-center">
-												<Recycle size={18} color="#111827" />
+												<Recycle size={18} color={colors.gray[900]} />
 											</View>
 
 											<View className="min-w-0 flex-1 flex-row items-center justify-between gap-2">
@@ -254,7 +255,7 @@ export function CompanyDetailGeneralTab({
 									<Card className="gap-2 shadow-none">
 										<View className="flex-row items-center gap-2">
 											<View className="bg-muted rounded-md size-10 items-center justify-center">
-												<Hammer size={18} color="#111827" />
+												<Hammer size={18} color={colors.gray[900]} />
 											</View>
 
 											<View className="min-w-0 flex-1 flex-row items-center justify-between gap-2">

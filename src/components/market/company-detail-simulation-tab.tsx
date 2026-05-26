@@ -7,6 +7,7 @@ import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeabl
 import type { SharedValue } from "react-native-reanimated";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { z } from "zod";
+import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -85,7 +86,7 @@ function SwipeDeleteAction({
 				className="flex-1 items-center justify-center gap-1 bg-red-500"
 				onPress={onDelete}
 			>
-				<Trash2 size={16} color="white" />
+				<Trash2 size={16} color={colors.white} />
 				<Text className="text-[10px] font-semibold text-white">Remover</Text>
 			</Pressable>
 		</Animated.View>
@@ -320,7 +321,7 @@ export function CompanyDetailSimulationTab({
 				<Card className="border-0 bg-lime-800/10 p-3 shadow-none">
 					<View className="flex-row items-center justify-between">
 						<View className="flex-row items-center gap-2">
-							<Calculator size={16} color="#3F6212" />
+							<Calculator size={16} color={colors.lime[800]} />
 							<Text className="text-sm text-lime-800">Total do item</Text>
 						</View>
 						<Text className="text-base font-bold text-lime-800">
@@ -410,7 +411,7 @@ export function CompanyDetailSimulationTab({
 				<Card className="border-0 bg-lime-800/10 p-3 shadow-none">
 					<View className="flex-row items-center justify-between">
 						<View className="flex-row items-center gap-2">
-							<Calculator size={16} color="#3F6212" />
+							<Calculator size={16} color={colors.lime[800]} />
 							<Text className="text-sm text-lime-800">Total geral</Text>
 						</View>
 						<Text className="text-base font-bold text-lime-800">

@@ -7,6 +7,7 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { colors } from "@/components/style/colors";
 import { CompanyDetailGeneralTab } from "@/components/market/company-detail-general-tab";
 import { CompanyDetailSimulationTab } from "@/components/market/company-detail-simulation-tab";
 import { Card } from "@/components/ui/card";
@@ -92,7 +93,7 @@ export default function MarketCompanyDetailScreen() {
 			<>
 				<Stack.Screen options={{ title: "Empresa", headerShown: true }} />
 				<View className="flex-1 items-center justify-center bg-white">
-					<ActivityIndicator size="small" color="#3F6212" />
+					<ActivityIndicator size="small" color={colors.lime[800]} />
 				</View>
 			</>
 		);

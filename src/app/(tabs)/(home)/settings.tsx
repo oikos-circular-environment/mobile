@@ -8,6 +8,7 @@ import {
 	SproutIcon,
 } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
@@ -71,7 +72,7 @@ export default function SettingsScreen() {
 								>
 									<View className="flex justify-center items-center p-2">
 										<option.icon
-											color={cn(option.highlight ? "white" : "black")}
+											color={option.highlight ? colors.white : colors.black}
 											size={32}
 											strokeWidth={1}
 										/>
@@ -97,7 +98,7 @@ export default function SettingsScreen() {
 									<View className="flex items-center p-2">
 										<ArrowRight
 											className="self-end"
-											color={cn(option.highlight ? "white" : "black")}
+											color={option.highlight ? colors.white : colors.black}
 										/>
 									</View>
 								</Card>

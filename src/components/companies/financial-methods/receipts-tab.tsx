@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
+import { colors } from "@/components/style/colors";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import {
@@ -89,7 +90,7 @@ export function ReceiptsTab({ form, fieldArray }: ReceiptsTabProps) {
 										<Switch
 											value={value}
 											onValueChange={onChange}
-											trackColor={{ false: "#d1d5db", true: "#84cc16" }}
+											trackColor={{ false: colors.gray[300], true: colors.lime[500] }}
 										/>
 									)}
 								/>
