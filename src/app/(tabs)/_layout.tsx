@@ -16,31 +16,6 @@ export default function TabsNavigator() {
 	const { isAuthenticated } = useAuthContext();
 	return (
 		<Tabs
-			// sceneStyle={{ paddingBottom: TAB_BAR_HEIGHT + tabBarBottom }}
-			// screenOptions={{
-			// 	tabBarActiveTintColor: "#f5f5f5",
-			// 	tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
-			// 	headerShown: false,
-			// 	tabBarBackground: () => null,
-			// 	tabBarStyle: {
-			// 		paddingTop: 4,
-			// 		position: "absolute",
-			// 		bottom: tabBarBottom,
-			// 		// left: 16,
-			// 		// right: 16,
-			// 		marginLeft: 16,
-			// 		marginRight: 16,
-			// 		borderRadius: 30,
-			// 		height: TAB_BAR_HEIGHT,
-			// 		backgroundColor: "#3d6300",
-			// 		borderTopWidth: 0,
-			// 		elevation: 0,
-			// 		shadowColor: "#000",
-			// 		shadowOffset: { width: 0, height: 4 },
-			// 		shadowOpacity: 0.12,
-			// 		shadowRadius: 8,
-			// 	},
-			// }}
 			screenOptions={{
 				headerShown: false,
 				tabBarActiveTintColor: colors.gray[100],
@@ -69,13 +44,6 @@ export default function TabsNavigator() {
 				options={{
 					title: "Denunciar",
 					tabBarIcon: ({ color, size }) => <Shield color={color} size={size} />,
-				}}
-			/>
-
-			<Tabs.Screen
-				name="learn"
-				options={{
-					href: null,
 				}}
 			/>
 		</Tabs>
