@@ -6,7 +6,7 @@ import {
 } from "@/contexts/complaints-context";
 import {
 	postV1Complaints,
-	postV1ComplaintsByIdAttachments,
+	postV1ComplaintsByIdCapturesByCaptureIdAttachments,
 } from "@/libs/oikos-sdk";
 import type { ComplaintCapture } from "@/libs/types/complaint";
 
@@ -60,20 +60,19 @@ export function useSubmitComplaints() {
 				});
 
 				const complaintId = res.data?.complaint.id;
+				const captureId = res.data?.complaint.captures[0]?.id;
 
 				const uri = capture.capture.object?.uri;
-				if (uri && complaintId) {
+				if (uri && complaintId && captureId) {
 					const isPhoto = capture.capture.type === "photo";
 					const formData = new FormData();
-					formData.append("complaint_id", complaintId);
 					formData.append("file", {
 						uri,
 						name: `complaint_${complaintId}.${isPhoto ? "jpg" : "mp4"}`,
 						type: isPhoto ? "image/jpeg" : "video/mp4",
 					} as unknown as Blob);
-					await postV1ComplaintsByIdAttachments({
-						path: { id: complaintId },
-
+					await postV1ComplaintsByIdCapturesByCaptureIdAttachments({
+						path: { id: complaintId, captureId },
 						body: formData as any,
 					});
 				}

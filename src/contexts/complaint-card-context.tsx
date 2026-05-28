@@ -17,11 +17,17 @@ import {
 	DASHBOARD_QUERY_KEY,
 } from "./complaints-context";
 
+export type ResolveComplaintData = {
+	description: string;
+	resolver: string;
+	rating: number;
+};
+
 type ComplaintCardContextValue = {
 	complaint: ApiComplaint;
 	isResolvingComplaint: boolean;
 	isCancelingComplaint: boolean;
-	resolveComplaint: () => void;
+	resolveComplaint: (data: ResolveComplaintData) => void;
 	cancelComplaint: () => void;
 	openInMaps: () => void;
 };
@@ -41,8 +47,11 @@ export function ComplaintCardProvider({
 	const queryClient = useQueryClient();
 
 	const resolveMutation = useMutation({
-		mutationFn: () =>
-			patchV1ComplaintsByIdResolved({ path: { id: complaint.id } }),
+		mutationFn: (data: ResolveComplaintData) =>
+			patchV1ComplaintsByIdResolved({
+				path: { id: complaint.id },
+				body: { description: data.description, resolver: data.resolver, rating: data.rating },
+			}),
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: COMPLAINTS_QUERY_KEY });
 			void queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
@@ -67,7 +76,9 @@ export function ComplaintCardProvider({
 	});
 
 	const value = useMemo<ComplaintCardContextValue>(() => {
-		const { latitude, longitude } = complaint.geospatial.location.coords;
+		const coords = complaint.captures[0]?.geospatial.location.coords;
+		const latitude = coords?.latitude ?? 0;
+		const longitude = coords?.longitude ?? 0;
 
 		const mapsUrl =
 			Platform.OS === "ios"
@@ -89,7 +100,7 @@ export function ComplaintCardProvider({
 			complaint,
 			isResolvingComplaint: resolveMutation.isPending,
 			isCancelingComplaint: cancelMutation.isPending,
-			resolveComplaint: () => resolveMutation.mutate(),
+			resolveComplaint: (data: ResolveComplaintData) => resolveMutation.mutate(data),
 			cancelComplaint: () => cancelMutation.mutate(),
 			openInMaps,
 		};

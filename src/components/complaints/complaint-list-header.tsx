@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Plus, ShieldIcon } from "lucide-react-native";
+import { CameraIcon, ImagePlusIcon, ShieldIcon } from "lucide-react-native";
 import { useState } from "react";
 import { View } from "react-native";
 import { ComplaintPainel } from "@/components/complaints/complaint-painel";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { HStack } from "../ui/hstack";
 
 export function ComplaintListHeader() {
 	const { isAuthenticated } = useAuthContext();
@@ -49,12 +50,26 @@ export function ComplaintListHeader() {
 					</View>
 				</Card>
 
-				<Button size="lg" onPress={handleNewComplaint}>
-					<ButtonText className="flex-1 text-center font-semibold text-white">
-						Nova Denúncia
-					</ButtonText>
-					<ButtonIcon as={Plus} className="text-white" height={18} width={18} />
-				</Button>
+				<HStack className="flex-1 gap-2">
+					<Button size="lg" className="flex-1" onPress={handleNewComplaint}>
+						<ButtonIcon as={CameraIcon} className="text-white" />
+						<ButtonText className="flex-1 text-center font-semibold text-white">
+							Nova Denúncia{" "}
+						</ButtonText>
+					</Button>
+
+					<Button
+						size="lg"
+						className="flex-1"
+						variant="secondary"
+						onPress={handleNewComplaint}
+					>
+						<ButtonIcon as={ImagePlusIcon} />
+						<ButtonText className="flex-1 text-center font-semibold ">
+							Denúncia Manual
+						</ButtonText>
+					</Button>
+				</HStack>
 
 				<View className="justify-center">
 					<Heading>Dashboard</Heading>
