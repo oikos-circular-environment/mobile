@@ -3,57 +3,70 @@
 import type { Client, Options as Options2, TDataShape } from "./client";
 import { client } from "./client.gen";
 import {
-	getV1CompaniesAddressesResponseTransformer,
+	getV1CompaniesByIdAddressesResponseTransformer,
+	getV1CompaniesByIdServicesResponseTransformer,
+	getV1CompaniesByIdWastesResponseTransformer,
 	getV1CompaniesResponseTransformer,
-	getV1CompaniesServicesResponseTransformer,
-	getV1CompaniesWastesResponseTransformer,
+	getV1ComplaintsByIdPublicResponseTransformer,
 	getV1ComplaintsByIdResponseTransformer,
+	getV1ComplaintsMapResponseTransformer,
 	getV1ComplaintsResponseTransformer,
 	getV1ProfilesAddressesResponseTransformer,
 	getV1ProfilesResponseTransformer,
 	patchV1ComplaintsByIdCanceledResponseTransformer,
 	patchV1ComplaintsByIdResolvedResponseTransformer,
 	patchV1ComplaintsByIdResponseTransformer,
+	postV1CompaniesByIdAvatarResponseTransformer,
 	postV1CompaniesResponseTransformer,
-	postV1ComplaintsByIdAttachmentsResponseTransformer,
+	postV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponseTransformer,
+	postV1ComplaintsByIdVotesResponseTransformer,
+	postV1ComplaintsManualResponseTransformer,
 	postV1ComplaintsResponseTransformer,
-	putV1CompaniesAddressesResponseTransformer,
-	putV1CompaniesResponseTransformer,
-	putV1CompaniesServicesResponseTransformer,
-	putV1CompaniesWastesResponseTransformer,
+	putV1CompaniesByIdAddressesResponseTransformer,
+	putV1CompaniesByIdResponseTransformer,
+	putV1CompaniesByIdServicesResponseTransformer,
+	putV1CompaniesByIdWastesResponseTransformer,
 	putV1ProfilesAvatarResponseTransformer,
 	putV1ProfilesResponseTransformer,
 } from "./transformers.gen";
 import type {
+	DeleteV1ComplaintsByIdVotesData,
+	DeleteV1ComplaintsByIdVotesErrors,
+	DeleteV1ComplaintsByIdVotesResponses,
 	DeleteV1ProfilesImagesData,
 	DeleteV1ProfilesImagesErrors,
 	DeleteV1ProfilesImagesResponses,
-	GetV1CompaniesAddressesData,
-	GetV1CompaniesAddressesErrors,
-	GetV1CompaniesAddressesResponses,
-	GetV1CompaniesBusinessHoursData,
-	GetV1CompaniesBusinessHoursErrors,
-	GetV1CompaniesBusinessHoursResponses,
+	GetV1CompaniesByIdAddressesData,
+	GetV1CompaniesByIdAddressesErrors,
+	GetV1CompaniesByIdAddressesResponses,
+	GetV1CompaniesByIdBusinessHoursData,
+	GetV1CompaniesByIdBusinessHoursErrors,
+	GetV1CompaniesByIdBusinessHoursResponses,
+	GetV1CompaniesByIdServicesData,
+	GetV1CompaniesByIdServicesErrors,
+	GetV1CompaniesByIdServicesResponses,
+	GetV1CompaniesByIdWastesData,
+	GetV1CompaniesByIdWastesErrors,
+	GetV1CompaniesByIdWastesResponses,
 	GetV1CompaniesData,
 	GetV1CompaniesErrors,
 	GetV1CompaniesResponses,
-	GetV1CompaniesServicesData,
-	GetV1CompaniesServicesErrors,
-	GetV1CompaniesServicesResponses,
-	GetV1CompaniesWastesData,
-	GetV1CompaniesWastesErrors,
-	GetV1CompaniesWastesResponses,
 	GetV1ComplaintsByIdData,
 	GetV1ComplaintsByIdErrors,
+	GetV1ComplaintsByIdPublicData,
+	GetV1ComplaintsByIdPublicErrors,
+	GetV1ComplaintsByIdPublicResponses,
 	GetV1ComplaintsByIdResponses,
 	GetV1ComplaintsDashboardData,
 	GetV1ComplaintsDashboardErrors,
 	GetV1ComplaintsDashboardResponses,
 	GetV1ComplaintsData,
 	GetV1ComplaintsErrors,
+	GetV1ComplaintsMapData,
+	GetV1ComplaintsMapErrors,
+	GetV1ComplaintsMapResponses,
 	GetV1ComplaintsResponses,
 	GetV1MarketData,
-	GetV1MarketErrors,
 	GetV1MarketResponses,
 	GetV1ProfilesAddressesData,
 	GetV1ProfilesAddressesErrors,
@@ -69,6 +82,9 @@ import type {
 	PatchV1ComplaintsByIdCanceledResponses,
 	PatchV1ComplaintsByIdData,
 	PatchV1ComplaintsByIdErrors,
+	PatchV1ComplaintsByIdResolutionsData,
+	PatchV1ComplaintsByIdResolutionsErrors,
+	PatchV1ComplaintsByIdResolutionsResponses,
 	PatchV1ComplaintsByIdResolvedData,
 	PatchV1ComplaintsByIdResolvedErrors,
 	PatchV1ComplaintsByIdResolvedResponses,
@@ -76,33 +92,45 @@ import type {
 	PostV1AuthLoginData,
 	PostV1AuthLoginErrors,
 	PostV1AuthLoginResponses,
+	PostV1CompaniesByIdAvatarData,
+	PostV1CompaniesByIdAvatarErrors,
+	PostV1CompaniesByIdAvatarResponses,
 	PostV1CompaniesData,
 	PostV1CompaniesErrors,
 	PostV1CompaniesResponses,
-	PostV1ComplaintsByIdAttachmentsData,
-	PostV1ComplaintsByIdAttachmentsErrors,
-	PostV1ComplaintsByIdAttachmentsResponses,
+	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsData,
+	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors,
+	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses,
+	PostV1ComplaintsByIdResolutionsData,
+	PostV1ComplaintsByIdResolutionsErrors,
+	PostV1ComplaintsByIdResolutionsResponses,
+	PostV1ComplaintsByIdVotesData,
+	PostV1ComplaintsByIdVotesErrors,
+	PostV1ComplaintsByIdVotesResponses,
 	PostV1ComplaintsData,
 	PostV1ComplaintsErrors,
+	PostV1ComplaintsManualData,
+	PostV1ComplaintsManualErrors,
+	PostV1ComplaintsManualResponses,
 	PostV1ComplaintsResponses,
 	PostV1UsersRegisterData,
 	PostV1UsersRegisterErrors,
 	PostV1UsersRegisterResponses,
-	PutV1CompaniesAddressesData,
-	PutV1CompaniesAddressesErrors,
-	PutV1CompaniesAddressesResponses,
-	PutV1CompaniesBusinessHoursData,
-	PutV1CompaniesBusinessHoursErrors,
-	PutV1CompaniesBusinessHoursResponses,
-	PutV1CompaniesData,
-	PutV1CompaniesErrors,
-	PutV1CompaniesResponses,
-	PutV1CompaniesServicesData,
-	PutV1CompaniesServicesErrors,
-	PutV1CompaniesServicesResponses,
-	PutV1CompaniesWastesData,
-	PutV1CompaniesWastesErrors,
-	PutV1CompaniesWastesResponses,
+	PutV1CompaniesByIdAddressesData,
+	PutV1CompaniesByIdAddressesErrors,
+	PutV1CompaniesByIdAddressesResponses,
+	PutV1CompaniesByIdBusinessHoursData,
+	PutV1CompaniesByIdBusinessHoursErrors,
+	PutV1CompaniesByIdBusinessHoursResponses,
+	PutV1CompaniesByIdData,
+	PutV1CompaniesByIdErrors,
+	PutV1CompaniesByIdResponses,
+	PutV1CompaniesByIdServicesData,
+	PutV1CompaniesByIdServicesErrors,
+	PutV1CompaniesByIdServicesResponses,
+	PutV1CompaniesByIdWastesData,
+	PutV1CompaniesByIdWastesErrors,
+	PutV1CompaniesByIdWastesResponses,
 	PutV1ProfilesAvatarData,
 	PutV1ProfilesAvatarErrors,
 	PutV1ProfilesAvatarResponses,
@@ -299,9 +327,9 @@ export const getV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Get user company
+ * Get user companies
  *
- * Returns the company of the authenticated user.
+ * Returns all companies of the authenticated user.
  */
 export const getV1Companies = <ThrowOnError extends boolean = false>(
 	options?: Options<GetV1CompaniesData, ThrowOnError>,
@@ -347,18 +375,18 @@ export const postV1Companies = <ThrowOnError extends boolean = false>(
  *
  * Updates only company data for the authenticated user. Related entities are not handled by this route.
  */
-export const putV1Companies = <ThrowOnError extends boolean = false>(
-	options: Options<PutV1CompaniesData, ThrowOnError>,
+export const putV1CompaniesById = <ThrowOnError extends boolean = false>(
+	options: Options<PutV1CompaniesByIdData, ThrowOnError>,
 ) =>
 	(options.client ?? client).put<
-		PutV1CompaniesResponses,
-		PutV1CompaniesErrors,
+		PutV1CompaniesByIdResponses,
+		PutV1CompaniesByIdErrors,
 		ThrowOnError
 	>({
-		responseTransformer: putV1CompaniesResponseTransformer,
+		responseTransformer: putV1CompaniesByIdResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies",
+		url: "/v1/companies/{id}",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
@@ -367,44 +395,64 @@ export const putV1Companies = <ThrowOnError extends boolean = false>(
 	});
 
 /**
+ * Upload company avatar
+ *
+ * Uploads an avatar image for a company.
+ */
+export const postV1CompaniesByIdAvatar = <ThrowOnError extends boolean = false>(
+	options: Options<PostV1CompaniesByIdAvatarData, ThrowOnError>,
+) =>
+	(options.client ?? client).post<
+		PostV1CompaniesByIdAvatarResponses,
+		PostV1CompaniesByIdAvatarErrors,
+		ThrowOnError
+	>({
+		responseTransformer: postV1CompaniesByIdAvatarResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/companies/{id}/avatar",
+		...options,
+	});
+
+/**
  * Get company business hours
  *
- * Returns business hours from Sunday to Saturday for the authenticated user's company.
+ * Returns business hours from Sunday to Saturday for the specified company.
  */
-export const getV1CompaniesBusinessHours = <
+export const getV1CompaniesByIdBusinessHours = <
 	ThrowOnError extends boolean = false,
 >(
-	options?: Options<GetV1CompaniesBusinessHoursData, ThrowOnError>,
+	options: Options<GetV1CompaniesByIdBusinessHoursData, ThrowOnError>,
 ) =>
-	(options?.client ?? client).get<
-		GetV1CompaniesBusinessHoursResponses,
-		GetV1CompaniesBusinessHoursErrors,
+	(options.client ?? client).get<
+		GetV1CompaniesByIdBusinessHoursResponses,
+		GetV1CompaniesByIdBusinessHoursErrors,
 		ThrowOnError
 	>({
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/business-hours",
+		url: "/v1/companies/{id}/business-hours",
 		...options,
 	});
 
 /**
  * Upsert company business hours
  *
- * Creates or updates business hours for the authenticated user's company.
+ * Creates or updates business hours for the specified company.
  */
-export const putV1CompaniesBusinessHours = <
+export const putV1CompaniesByIdBusinessHours = <
 	ThrowOnError extends boolean = false,
 >(
-	options: Options<PutV1CompaniesBusinessHoursData, ThrowOnError>,
+	options: Options<PutV1CompaniesByIdBusinessHoursData, ThrowOnError>,
 ) =>
 	(options.client ?? client).put<
-		PutV1CompaniesBusinessHoursResponses,
-		PutV1CompaniesBusinessHoursErrors,
+		PutV1CompaniesByIdBusinessHoursResponses,
+		PutV1CompaniesByIdBusinessHoursErrors,
 		ThrowOnError
 	>({
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/business-hours",
+		url: "/v1/companies/{id}/business-hours",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
@@ -415,40 +463,40 @@ export const putV1CompaniesBusinessHours = <
 /**
  * Get company wastes
  *
- * Returns all wastes linked to the authenticated user's company.
+ * Returns all wastes linked to the specified company.
  */
-export const getV1CompaniesWastes = <ThrowOnError extends boolean = false>(
-	options?: Options<GetV1CompaniesWastesData, ThrowOnError>,
+export const getV1CompaniesByIdWastes = <ThrowOnError extends boolean = false>(
+	options: Options<GetV1CompaniesByIdWastesData, ThrowOnError>,
 ) =>
-	(options?.client ?? client).get<
-		GetV1CompaniesWastesResponses,
-		GetV1CompaniesWastesErrors,
+	(options.client ?? client).get<
+		GetV1CompaniesByIdWastesResponses,
+		GetV1CompaniesByIdWastesErrors,
 		ThrowOnError
 	>({
-		responseTransformer: getV1CompaniesWastesResponseTransformer,
+		responseTransformer: getV1CompaniesByIdWastesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/wastes",
+		url: "/v1/companies/{id}/wastes",
 		...options,
 	});
 
 /**
  * Upsert company wastes
  *
- * Creates or replaces the wastes linked to the authenticated user's company.
+ * Creates or replaces the wastes linked to the specified company.
  */
-export const putV1CompaniesWastes = <ThrowOnError extends boolean = false>(
-	options: Options<PutV1CompaniesWastesData, ThrowOnError>,
+export const putV1CompaniesByIdWastes = <ThrowOnError extends boolean = false>(
+	options: Options<PutV1CompaniesByIdWastesData, ThrowOnError>,
 ) =>
 	(options.client ?? client).put<
-		PutV1CompaniesWastesResponses,
-		PutV1CompaniesWastesErrors,
+		PutV1CompaniesByIdWastesResponses,
+		PutV1CompaniesByIdWastesErrors,
 		ThrowOnError
 	>({
-		responseTransformer: putV1CompaniesWastesResponseTransformer,
+		responseTransformer: putV1CompaniesByIdWastesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/wastes",
+		url: "/v1/companies/{id}/wastes",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
@@ -459,40 +507,44 @@ export const putV1CompaniesWastes = <ThrowOnError extends boolean = false>(
 /**
  * Get company services
  *
- * Returns all services linked to the authenticated user's company.
+ * Returns all services linked to the specified company.
  */
-export const getV1CompaniesServices = <ThrowOnError extends boolean = false>(
-	options?: Options<GetV1CompaniesServicesData, ThrowOnError>,
+export const getV1CompaniesByIdServices = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<GetV1CompaniesByIdServicesData, ThrowOnError>,
 ) =>
-	(options?.client ?? client).get<
-		GetV1CompaniesServicesResponses,
-		GetV1CompaniesServicesErrors,
+	(options.client ?? client).get<
+		GetV1CompaniesByIdServicesResponses,
+		GetV1CompaniesByIdServicesErrors,
 		ThrowOnError
 	>({
-		responseTransformer: getV1CompaniesServicesResponseTransformer,
+		responseTransformer: getV1CompaniesByIdServicesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/services",
+		url: "/v1/companies/{id}/services",
 		...options,
 	});
 
 /**
  * Upsert company services
  *
- * Creates or replaces the services linked to the authenticated user's company.
+ * Creates or replaces the services linked to the specified company.
  */
-export const putV1CompaniesServices = <ThrowOnError extends boolean = false>(
-	options: Options<PutV1CompaniesServicesData, ThrowOnError>,
+export const putV1CompaniesByIdServices = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<PutV1CompaniesByIdServicesData, ThrowOnError>,
 ) =>
 	(options.client ?? client).put<
-		PutV1CompaniesServicesResponses,
-		PutV1CompaniesServicesErrors,
+		PutV1CompaniesByIdServicesResponses,
+		PutV1CompaniesByIdServicesErrors,
 		ThrowOnError
 	>({
-		responseTransformer: putV1CompaniesServicesResponseTransformer,
+		responseTransformer: putV1CompaniesByIdServicesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/services",
+		url: "/v1/companies/{id}/services",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
@@ -503,40 +555,44 @@ export const putV1CompaniesServices = <ThrowOnError extends boolean = false>(
 /**
  * Get company address
  *
- * Returns the address of the authenticated user's company.
+ * Returns the address of the specified company.
  */
-export const getV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
-	options?: Options<GetV1CompaniesAddressesData, ThrowOnError>,
+export const getV1CompaniesByIdAddresses = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<GetV1CompaniesByIdAddressesData, ThrowOnError>,
 ) =>
-	(options?.client ?? client).get<
-		GetV1CompaniesAddressesResponses,
-		GetV1CompaniesAddressesErrors,
+	(options.client ?? client).get<
+		GetV1CompaniesByIdAddressesResponses,
+		GetV1CompaniesByIdAddressesErrors,
 		ThrowOnError
 	>({
-		responseTransformer: getV1CompaniesAddressesResponseTransformer,
+		responseTransformer: getV1CompaniesByIdAddressesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/addresses",
+		url: "/v1/companies/{id}/addresses",
 		...options,
 	});
 
 /**
  * Upsert company address
  *
- * Creates or updates the address for the authenticated user's company.
+ * Creates or updates the address for the specified company.
  */
-export const putV1CompaniesAddresses = <ThrowOnError extends boolean = false>(
-	options: Options<PutV1CompaniesAddressesData, ThrowOnError>,
+export const putV1CompaniesByIdAddresses = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<PutV1CompaniesByIdAddressesData, ThrowOnError>,
 ) =>
 	(options.client ?? client).put<
-		PutV1CompaniesAddressesResponses,
-		PutV1CompaniesAddressesErrors,
+		PutV1CompaniesByIdAddressesResponses,
+		PutV1CompaniesByIdAddressesErrors,
 		ThrowOnError
 	>({
-		responseTransformer: putV1CompaniesAddressesResponseTransformer,
+		responseTransformer: putV1CompaniesByIdAddressesResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/companies/addresses",
+		url: "/v1/companies/{id}/addresses",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
@@ -608,6 +664,42 @@ export const getV1ComplaintsDashboard = <ThrowOnError extends boolean = false>(
 	});
 
 /**
+ * Get complaints on map
+ */
+export const getV1ComplaintsMap = <ThrowOnError extends boolean = false>(
+	options: Options<GetV1ComplaintsMapData, ThrowOnError>,
+) =>
+	(options.client ?? client).get<
+		GetV1ComplaintsMapResponses,
+		GetV1ComplaintsMapErrors,
+		ThrowOnError
+	>({
+		responseTransformer: getV1ComplaintsMapResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/map",
+		...options,
+	});
+
+/**
+ * Get public complaint detail
+ */
+export const getV1ComplaintsByIdPublic = <ThrowOnError extends boolean = false>(
+	options: Options<GetV1ComplaintsByIdPublicData, ThrowOnError>,
+) =>
+	(options.client ?? client).get<
+		GetV1ComplaintsByIdPublicResponses,
+		GetV1ComplaintsByIdPublicErrors,
+		ThrowOnError
+	>({
+		responseTransformer: getV1ComplaintsByIdPublicResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/public",
+		...options,
+	});
+
+/**
  * Get complaint by id
  *
  * Returns the full complaint data for the authenticated user.
@@ -630,7 +722,7 @@ export const getV1ComplaintsById = <ThrowOnError extends boolean = false>(
 /**
  * Update complaint
  *
- * Updates only the basic complaint fields: type and observations.
+ * Updates only the basic complaint fields: observations.
  */
 export const patchV1ComplaintsById = <ThrowOnError extends boolean = false>(
 	options: Options<PatchV1ComplaintsByIdData, ThrowOnError>,
@@ -652,9 +744,33 @@ export const patchV1ComplaintsById = <ThrowOnError extends boolean = false>(
 	});
 
 /**
+ * Create manual complaint
+ *
+ * Creates a complaint from existing media with address provided by the user.
+ */
+export const postV1ComplaintsManual = <ThrowOnError extends boolean = false>(
+	options: Options<PostV1ComplaintsManualData, ThrowOnError>,
+) =>
+	(options.client ?? client).post<
+		PostV1ComplaintsManualResponses,
+		PostV1ComplaintsManualErrors,
+		ThrowOnError
+	>({
+		responseTransformer: postV1ComplaintsManualResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/manual",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
  * Resolve complaint
  *
- * Marks the authenticated user's complaint as resolved.
+ * Marks the authenticated user's complaint as resolved. Requires a resolution description.
  */
 export const patchV1ComplaintsByIdResolved = <
 	ThrowOnError extends boolean = false,
@@ -671,6 +787,94 @@ export const patchV1ComplaintsByIdResolved = <
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}/resolved",
 		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
+ * Remove vote from complaint
+ */
+export const deleteV1ComplaintsByIdVotes = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<DeleteV1ComplaintsByIdVotesData, ThrowOnError>,
+) =>
+	(options.client ?? client).delete<
+		DeleteV1ComplaintsByIdVotesResponses,
+		DeleteV1ComplaintsByIdVotesErrors,
+		ThrowOnError
+	>({
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/votes",
+		...options,
+	});
+
+/**
+ * Vote on complaint
+ */
+export const postV1ComplaintsByIdVotes = <ThrowOnError extends boolean = false>(
+	options: Options<PostV1ComplaintsByIdVotesData, ThrowOnError>,
+) =>
+	(options.client ?? client).post<
+		PostV1ComplaintsByIdVotesResponses,
+		PostV1ComplaintsByIdVotesErrors,
+		ThrowOnError
+	>({
+		responseTransformer: postV1ComplaintsByIdVotesResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/votes",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
+ * Update resolution
+ */
+export const patchV1ComplaintsByIdResolutions = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<PatchV1ComplaintsByIdResolutionsData, ThrowOnError>,
+) =>
+	(options.client ?? client).patch<
+		PatchV1ComplaintsByIdResolutionsResponses,
+		PatchV1ComplaintsByIdResolutionsErrors,
+		ThrowOnError
+	>({
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/resolutions",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
+ * Submit resolution
+ */
+export const postV1ComplaintsByIdResolutions = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<PostV1ComplaintsByIdResolutionsData, ThrowOnError>,
+) =>
+	(options.client ?? client).post<
+		PostV1ComplaintsByIdResolutionsResponses,
+		PostV1ComplaintsByIdResolutionsErrors,
+		ThrowOnError
+	>({
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/resolutions",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
 	});
 
 /**
@@ -696,24 +900,28 @@ export const patchV1ComplaintsByIdCanceled = <
 	});
 
 /**
- * Create complaint attachment
+ * Create complaint capture attachment
  *
- * Uploads and attaches a file to an existing complaint.
+ * Uploads and attaches a file to an existing complaint capture.
  */
-export const postV1ComplaintsByIdAttachments = <
+export const postV1ComplaintsByIdCapturesByCaptureIdAttachments = <
 	ThrowOnError extends boolean = false,
 >(
-	options: Options<PostV1ComplaintsByIdAttachmentsData, ThrowOnError>,
+	options: Options<
+		PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsData,
+		ThrowOnError
+	>,
 ) =>
 	(options.client ?? client).post<
-		PostV1ComplaintsByIdAttachmentsResponses,
-		PostV1ComplaintsByIdAttachmentsErrors,
+		PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses,
+		PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors,
 		ThrowOnError
 	>({
-		responseTransformer: postV1ComplaintsByIdAttachmentsResponseTransformer,
+		responseTransformer:
+			postV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/complaints/{id}/attachments",
+		url: "/v1/complaints/{id}/captures/{captureId}/attachments",
 		...options,
 	});
 
@@ -725,13 +933,8 @@ export const postV1ComplaintsByIdAttachments = <
 export const getV1Market = <ThrowOnError extends boolean = false>(
 	options: Options<GetV1MarketData, ThrowOnError>,
 ) =>
-	(options.client ?? client).get<
-		GetV1MarketResponses,
-		GetV1MarketErrors,
-		ThrowOnError
-	>({
+	(options.client ?? client).get<GetV1MarketResponses, unknown, ThrowOnError>({
 		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/market",
 		...options,
 	});

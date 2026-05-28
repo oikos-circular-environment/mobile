@@ -14,8 +14,8 @@ import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { CompanyFormSkeleton } from "@/components/companies/skeletons";
-import { toast } from "@/components/toast";
 import { colors } from "@/components/style/colors";
+import { toast } from "@/components/toast";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
