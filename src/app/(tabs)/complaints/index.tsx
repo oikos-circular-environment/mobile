@@ -1,5 +1,3 @@
-"use client";
-
 import { useFocusEffect } from "expo-router";
 import { ShieldIcon } from "lucide-react-native";
 import { useCallback } from "react";

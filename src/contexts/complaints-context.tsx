@@ -1,5 +1,3 @@
-"use client";
-
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
 	createContext,
@@ -13,14 +11,13 @@ import type {
 	GetV1ComplaintsDashboardResponse,
 	GetV1ComplaintsResponse,
 } from "@/libs/oikos-sdk";
-import {
-	getV1Complaints,
-	getV1ComplaintsDashboard,
-} from "@/libs/oikos-sdk";
+import { getV1Complaints, getV1ComplaintsDashboard } from "@/libs/oikos-sdk";
 
-export type ApiComplaint = NonNullable<GetV1ComplaintsResponse>["complaints"][number];
+export type ApiComplaint =
+	NonNullable<GetV1ComplaintsResponse>["complaints"][number];
 
-export type ComplaintDashboard = NonNullable<GetV1ComplaintsDashboardResponse>["dashboard"];
+export type ComplaintDashboard =
+	NonNullable<GetV1ComplaintsDashboardResponse>["dashboard"];
 export type ApiComplaintStatus = ApiComplaint["status"];
 
 export const COMPLAINTS_QUERY_KEY = ["complaints"] as const;
