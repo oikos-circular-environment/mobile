@@ -6329,7 +6329,10 @@
                 {
                   "type": "frame",
                   "id": "IFKi5",
-                  "width": "fill_container",
+                  "x": 0,
+                  "y": 62,
+                  "enabled": false,
+                  "width": "fill_container(430)",
                   "height": 56,
                   "stroke": {
                     "thickness": {

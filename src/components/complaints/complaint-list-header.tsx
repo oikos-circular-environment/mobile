@@ -31,6 +31,14 @@ export function ComplaintListHeader() {
 		router.push("/(tabs)/complaints/(create)/camera");
 	};
 
+	const handleManualComplaint = () => {
+		if (!isAuthenticated) {
+			setShowAuthModal(true);
+			return;
+		}
+		router.push("/(tabs)/complaints/(create)/manual");
+	};
+
 	return (
 		<>
 			<View className="gap-4">
@@ -62,7 +70,7 @@ export function ComplaintListHeader() {
 						size="lg"
 						className="flex-1"
 						variant="secondary"
-						onPress={handleNewComplaint}
+						onPress={handleManualComplaint}
 					>
 						<ButtonIcon as={ImagePlusIcon} />
 						<ButtonText className="flex-1 text-center font-semibold ">
