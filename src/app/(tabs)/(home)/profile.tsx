@@ -68,7 +68,8 @@ import {
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
-import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
+import { putV1Profiles } from "@/libs/oikos-sdk";
+import { client } from "@/libs/oikos-sdk/client.gen";
 
 const profileSchema = z.object({
 	fullName: z.string().min(3, "Informe seu nome completo."),
@@ -273,9 +274,11 @@ export default function ProfileScreen() {
 			} as unknown as Blob;
 			formData.append("file", file);
 
-			const response = await putV1ProfilesAvatar({
-				body: formData as any,
-			});
+			const response = await client.instance.put(
+				"/v1/profiles/avatar",
+				formData,
+				{ headers: { "Content-Type": "multipart/form-data" } },
+			);
 
 			return response.data;
 		},
