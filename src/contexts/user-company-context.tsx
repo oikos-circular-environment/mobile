@@ -8,43 +8,55 @@ import {
 } from "react";
 import { toast } from "@/components/toast";
 import type {
-	GetV1CompaniesAddressesResponse,
-	GetV1CompaniesBusinessHoursResponse,
+	GetV1CompaniesByIdAddressesResponse,
+	GetV1CompaniesByIdBusinessHoursResponse,
+	GetV1CompaniesByIdServicesResponse,
+	GetV1CompaniesByIdWastesResponse,
 	GetV1CompaniesResponse,
-	GetV1CompaniesServicesResponse,
-	GetV1CompaniesWastesResponse,
-	PostV1CompaniesData,
-	PutV1CompaniesAddressesData,
-	PutV1CompaniesBusinessHoursData,
-	PutV1CompaniesServicesData,
-	PutV1CompaniesWastesData,
+	PutV1CompaniesByIdAddressesData,
+	PutV1CompaniesByIdBusinessHoursData,
+	PutV1CompaniesByIdServicesData,
+	PutV1CompaniesByIdWastesData,
 } from "@/libs/oikos-sdk";
 import {
 	getV1Companies,
-	getV1CompaniesAddresses,
-	getV1CompaniesBusinessHours,
-	getV1CompaniesServices,
-	getV1CompaniesWastes,
-	postV1Companies,
-	putV1Companies,
-	putV1CompaniesAddresses,
-	putV1CompaniesBusinessHours,
-	putV1CompaniesServices,
-	putV1CompaniesWastes,
+	getV1CompaniesByIdAddresses,
+	getV1CompaniesByIdBusinessHours,
+	getV1CompaniesByIdServices,
+	getV1CompaniesByIdWastes,
+	putV1CompaniesById,
+	putV1CompaniesByIdAddresses,
+	putV1CompaniesByIdBusinessHours,
+	putV1CompaniesByIdServices,
+	putV1CompaniesByIdWastes,
 } from "@/libs/oikos-sdk";
 
-export type Company = NonNullable<GetV1CompaniesResponse["company"]>;
-export type Address = GetV1CompaniesAddressesResponse["address"];
+export type Company = GetV1CompaniesResponse["companies"][number];
+export type Address = GetV1CompaniesByIdAddressesResponse["address"];
 export type BusinessHour =
-	GetV1CompaniesBusinessHoursResponse["business_hours"][number];
-export type Service = GetV1CompaniesServicesResponse["services"][number];
-export type Waste = GetV1CompaniesWastesResponse["wastes"][number];
+	GetV1CompaniesByIdBusinessHoursResponse["business_hours"][number];
+export type Service = GetV1CompaniesByIdServicesResponse["services"][number];
+export type Waste = GetV1CompaniesByIdWastesResponse["wastes"][number];
 
-type CompanyPayload = PostV1CompaniesData["body"];
-type AddressPayload = PutV1CompaniesAddressesData["body"];
-type BusinessHoursPayload = PutV1CompaniesBusinessHoursData["body"];
-type ServicesPayload = PutV1CompaniesServicesData["body"];
-type WastesPayload = PutV1CompaniesWastesData["body"];
+type AddressPayload = PutV1CompaniesByIdAddressesData["body"];
+type BusinessHoursPayload = PutV1CompaniesByIdBusinessHoursData["body"];
+type ServicesPayload = PutV1CompaniesByIdServicesData["body"];
+type WastesPayload = PutV1CompaniesByIdWastesData["body"];
+
+type CompanyPayload = {
+	identity?: string;
+	identity_type?: "CPF" | "CNPJ";
+	company_type?: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
+	status?: boolean;
+	is_headquarters?: boolean;
+	business_name?: string | null;
+	corporate_name?: string;
+	accept_appointments?: boolean;
+	email?: string | null;
+	phones?: string[];
+	started_activity_in?: unknown;
+	description?: string | null;
+};
 
 type UserCompanyContextValue = {
 	company: Company | null | undefined;
@@ -77,89 +89,105 @@ type UserCompanyContextValue = {
 
 const UserCompanyContext = createContext<UserCompanyContextValue | null>(null);
 
-export function UserCompanyProvider({ children }: PropsWithChildren) {
+export function UserCompanyProvider({
+	children,
+	companyId,
+}: PropsWithChildren<{ companyId: string }>) {
 	const queryClient = useQueryClient();
 
-	const { data: companyData, isLoading: isLoadingCompany } = useQuery({
-		queryKey: ["company"],
+	const { data: companiesData, isLoading: isLoadingCompany } = useQuery({
+		queryKey: ["companies"],
 		queryFn: async () => {
 			const res = await getV1Companies();
 			return res.data;
 		},
 	});
 
+	const company = useMemo(
+		() => companiesData?.companies?.find(c => c.id === companyId) ?? null,
+		[companiesData, companyId],
+	);
+
 	const { data: addressData, isLoading: isLoadingAddress } = useQuery({
-		queryKey: ["company", "address"],
+		queryKey: ["companies", companyId, "address"],
 		queryFn: async () => {
 			try {
-				const res = await getV1CompaniesAddresses();
+				const res = await getV1CompaniesByIdAddresses({
+					path: { id: companyId },
+				});
 				return res.data;
 			} catch (error) {
 				if (error instanceof AxiosError && error.response?.status === 404) {
-					return { address: null } as GetV1CompaniesAddressesResponse;
+					return { address: null } as GetV1CompaniesByIdAddressesResponse;
 				}
 				throw error;
 			}
 		},
+		enabled: !!companyId,
 	});
 
 	const { data: businessHoursData, isLoading: isLoadingBusinessHours } =
 		useQuery({
-			queryKey: ["company", "business-hours"],
+			queryKey: ["companies", companyId, "business-hours"],
 			queryFn: async () => {
 				try {
-					const res = await getV1CompaniesBusinessHours();
+					const res = await getV1CompaniesByIdBusinessHours({
+						path: { id: companyId },
+					});
 					return res.data;
 				} catch (error) {
 					if (error instanceof AxiosError && error.response?.status === 404) {
 						return {
 							business_hours: [],
-						} as GetV1CompaniesBusinessHoursResponse;
+						} as GetV1CompaniesByIdBusinessHoursResponse;
 					}
 					throw error;
 				}
 			},
+			enabled: !!companyId,
 		});
 
 	const { data: servicesData, isLoading: isLoadingServices } = useQuery({
-		queryKey: ["company", "services"],
+		queryKey: ["companies", companyId, "services"],
 		queryFn: async () => {
 			try {
-				const res = await getV1CompaniesServices();
+				const res = await getV1CompaniesByIdServices({
+					path: { id: companyId },
+				});
 				return res.data;
 			} catch (error) {
 				if (error instanceof AxiosError && error.response?.status === 404) {
-					return { services: [] } as GetV1CompaniesServicesResponse;
+					return { services: [] } as GetV1CompaniesByIdServicesResponse;
 				}
 				throw error;
 			}
 		},
+		enabled: !!companyId,
 	});
 
 	const { data: wastesData, isLoading: isLoadingWastes } = useQuery({
-		queryKey: ["company", "wastes"],
+		queryKey: ["companies", companyId, "wastes"],
 		queryFn: async () => {
 			try {
-				const res = await getV1CompaniesWastes();
+				const res = await getV1CompaniesByIdWastes({
+					path: { id: companyId },
+				});
 				return res.data;
 			} catch (error) {
 				if (error instanceof AxiosError && error.response?.status === 404) {
-					return { wastes: [] } as GetV1CompaniesWastesResponse;
+					return { wastes: [] } as GetV1CompaniesByIdWastesResponse;
 				}
 				throw error;
 			}
 		},
+		enabled: !!companyId,
 	});
 
 	const companyMutation = useMutation({
-		mutationFn: async (payload: CompanyPayload) => {
-			if (companyData?.company == null) {
-				return postV1Companies({ body: payload });
-			}
-			return putV1Companies({ body: payload });
-		},
+		mutationFn: async (payload: CompanyPayload) =>
+			putV1CompaniesById({ path: { id: companyId }, body: payload }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["company"] });
+			queryClient.invalidateQueries({ queryKey: ["companies"] });
 			toast.success("Empresa salva com sucesso!");
 		},
 		onError: () => {
@@ -169,9 +197,11 @@ export function UserCompanyProvider({ children }: PropsWithChildren) {
 
 	const addressMutation = useMutation({
 		mutationFn: (payload: AddressPayload) =>
-			putV1CompaniesAddresses({ body: payload }),
+			putV1CompaniesByIdAddresses({ path: { id: companyId }, body: payload }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["company", "address"] });
+			queryClient.invalidateQueries({
+				queryKey: ["companies", companyId, "address"],
+			});
 			toast.success("Endereço salvo com sucesso!");
 		},
 		onError: () => {
@@ -181,10 +211,13 @@ export function UserCompanyProvider({ children }: PropsWithChildren) {
 
 	const businessHoursMutation = useMutation({
 		mutationFn: (payload: BusinessHoursPayload) =>
-			putV1CompaniesBusinessHours({ body: payload }),
+			putV1CompaniesByIdBusinessHours({
+				path: { id: companyId },
+				body: payload,
+			}),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["company", "business-hours"],
+				queryKey: ["companies", companyId, "business-hours"],
 			});
 			toast.success("Horários salvos com sucesso!");
 		},
@@ -195,9 +228,11 @@ export function UserCompanyProvider({ children }: PropsWithChildren) {
 
 	const servicesMutation = useMutation({
 		mutationFn: (payload: ServicesPayload) =>
-			putV1CompaniesServices({ body: payload }),
+			putV1CompaniesByIdServices({ path: { id: companyId }, body: payload }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["company", "services"] });
+			queryClient.invalidateQueries({
+				queryKey: ["companies", companyId, "services"],
+			});
 			toast.success("Serviços salvos com sucesso!");
 		},
 		onError: () => {
@@ -207,9 +242,11 @@ export function UserCompanyProvider({ children }: PropsWithChildren) {
 
 	const wastesMutation = useMutation({
 		mutationFn: (payload: WastesPayload) =>
-			putV1CompaniesWastes({ body: payload }),
+			putV1CompaniesByIdWastes({ path: { id: companyId }, body: payload }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["company", "wastes"] });
+			queryClient.invalidateQueries({
+				queryKey: ["companies", companyId, "wastes"],
+			});
 			toast.success("Resíduos salvos com sucesso!");
 		},
 		onError: () => {
@@ -219,17 +256,17 @@ export function UserCompanyProvider({ children }: PropsWithChildren) {
 
 	const completionRate = useMemo(() => {
 		let rate = 0;
-		if (companyData?.company != null) rate += 20;
+		if (company != null) rate += 20;
 		if (addressData?.address != null) rate += 20;
 		if ((businessHoursData?.business_hours?.length ?? 0) > 0) rate += 20;
 		if ((servicesData?.services?.length ?? 0) > 0) rate += 20;
 		if ((wastesData?.wastes?.length ?? 0) > 0) rate += 20;
 		return rate;
-	}, [companyData, addressData, businessHoursData, servicesData, wastesData]);
+	}, [company, addressData, businessHoursData, servicesData, wastesData]);
 
 	const value = useMemo<UserCompanyContextValue>(
 		() => ({
-			company: companyData?.company,
+			company,
 			isLoadingCompany,
 			saveCompany: async data => {
 				await companyMutation.mutateAsync(data);
@@ -267,7 +304,7 @@ export function UserCompanyProvider({ children }: PropsWithChildren) {
 			completionRate,
 		}),
 		[
-			companyData,
+			company,
 			isLoadingCompany,
 			companyMutation,
 			addressData,
