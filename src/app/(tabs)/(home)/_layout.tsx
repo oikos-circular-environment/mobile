@@ -55,13 +55,6 @@ export default function HomeStackLayout() {
 					headerShown: false,
 				}}
 			/>
-			<Stack.Screen
-				name="verify-code"
-				options={{
-					title: "Confirmar e-mail",
-					headerShown: false,
-				}}
-			/>
 		</Stack>
 	);
 }

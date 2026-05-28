@@ -44,7 +44,6 @@ import {
 	FormControlLabel,
 	FormControlLabelText,
 } from "@/components/ui/form-control";
-import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import {
@@ -60,7 +59,6 @@ import {
 	SelectTrigger,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { getCnpj } from "@/libs/brasil-api-sdk";
@@ -284,7 +282,7 @@ export default function CompanyGeneralInfoScreen() {
 			setValue("identity_type", "CPF");
 			setValue("identity", mask.cpf(user.profile.cpf));
 			setValue("corporate_name", user.profile.full_name);
-			setValue("business_name", user.profile.full_name);
+			setValue("business_name", user.profile.display_name);
 			if (user.profile.phone) {
 				setValue("phones", [mask.phoneBr(user.profile.phone), ""]);
 			}
@@ -322,7 +320,7 @@ export default function CompanyGeneralInfoScreen() {
 				contentContainerClassName="p-4 pb-8"
 			>
 				<View className="gap-4">
-					<View className="relative mb-8">
+					<View className="relative mb-12">
 						<View className="h-28 items-center justify-center rounded-md bg-primary" />
 
 						<Animated.View
@@ -333,7 +331,7 @@ export default function CompanyGeneralInfoScreen() {
 								<TouchableOpacity
 									activeOpacity={0.7}
 									onPress={onPickAvatar}
-									className="rounded-md shadow-lg shadow-black/40"
+									className="rounded-md shadow-lg "
 								>
 									{company?.avatar ? (
 										<Image
@@ -550,33 +548,35 @@ export default function CompanyGeneralInfoScreen() {
 							</FormControlError>
 						</FormControl>
 
-						{identity_type === "CNPJ" && (
-							<FormControl isInvalid={!!errors.business_name} className="gap-2">
-								<FormControlLabel>
-									<FormControlLabelText>Nome fantasia</FormControlLabelText>
-								</FormControlLabel>
-								<Controller
-									control={control}
-									name="business_name"
-									render={({ field: { value, onChange, onBlur } }) => (
-										<Input>
-											<InputField
-												value={value ?? ""}
-												onBlur={onBlur}
-												onChangeText={onChange}
-												placeholder="Nome fantasia (opcional)"
-											/>
-										</Input>
-									)}
-								/>
-								<FormControlError>
-									<FormControlErrorIcon as={AlertCircle} className="size-4" />
-									<FormControlErrorText>
-										{errors.business_name?.message}
-									</FormControlErrorText>
-								</FormControlError>
-							</FormControl>
-						)}
+						<FormControl isInvalid={!!errors.business_name} className="gap-2">
+							<FormControlLabel>
+								<FormControlLabelText>
+									{identity_type === "CNPJ"
+										? "Nome fantasia"
+										: "Como quer ser chamado"}
+								</FormControlLabelText>
+							</FormControlLabel>
+							<Controller
+								control={control}
+								name="business_name"
+								render={({ field: { value, onChange, onBlur } }) => (
+									<Input>
+										<InputField
+											value={value ?? ""}
+											onBlur={onBlur}
+											onChangeText={onChange}
+											placeholder="Nome fantasia (opcional)"
+										/>
+									</Input>
+								)}
+							/>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorText>
+									{errors.business_name?.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
 
 						<FormControl isInvalid={!!errors.email} className="gap-2">
 							<FormControlLabel>

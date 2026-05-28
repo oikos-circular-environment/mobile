@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parse, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useRouter } from "expo-router";
 import {
 	AlertCircle,
 	Check,
@@ -9,7 +10,7 @@ import {
 	FactoryIcon,
 	Search,
 } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
@@ -58,8 +59,6 @@ import {
 	companyTypeOptions,
 	identityTypeOptions,
 } from "@/libs/types/companies";
-import { useRouter } from "expo-router";
-import { useEffect } from "react";
 
 const companySchema = z
 	.object({
@@ -255,8 +254,8 @@ export default function CreateCompanyScreen() {
 							<View className="flex-1 gap-1">
 								<Heading className="text-lg">Cadastrar Empresa</Heading>
 								<Text className="text-sm">
-									Preencha as informações da sua empresa. Dados reais trazem mais
-									confiabilidade na plataforma.
+									Preencha as informações da sua empresa. Dados reais trazem
+									mais confiabilidade na plataforma.
 								</Text>
 							</View>
 						</View>
@@ -327,7 +326,7 @@ export default function CreateCompanyScreen() {
 								control={control}
 								name="identity"
 								render={({ field: { value, onChange, onBlur } }) => (
-									<Input className="h-8">
+									<Input>
 										<InputField
 											value={value}
 											onBlur={onBlur}
