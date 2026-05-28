@@ -59,6 +59,7 @@ import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { measurements } from "@/libs/types/measurement";
 import { wasteTypes } from "@/libs/types/waste";
+import { cn } from "@/libs/utils";
 
 export default function ServiceFormScreen() {
 	const router = useRouter();
@@ -350,9 +351,14 @@ export default function ServiceFormScreen() {
 								name="unit"
 								render={({ field: { value, onChange } }) => (
 									<Select selectedValue={value} onValueChange={onChange}>
-										<SelectTrigger>
+										<SelectTrigger
+											className={cn(
+												"justify-between",
+												Platform.OS === "android" && "px-3",
+											)}
+										>
 											<SelectInput placeholder="Selecione a unidade" />
-											<SelectIcon className="mr-3" as={ChevronDownIcon} />
+											<SelectIcon as={ChevronDownIcon} />
 										</SelectTrigger>
 										<SelectPortal>
 											<SelectBackdrop />

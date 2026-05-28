@@ -3,16 +3,16 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { BuildingIcon } from "lucide-react-native";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
-import { CompanyCard, CompanyCardSkeleton } from "@/components/companies/company-card";
+import { CompanyCard } from "@/components/companies/company-card";
+import { CompanyCardSkeleton } from "@/components/companies/company-card-skeleton";
 import { CompanyListHeader } from "@/components/companies/company-list-header";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import type { GetV1CompaniesResponses } from "@/libs/oikos-sdk";
 import { getV1Companies } from "@/libs/oikos-sdk";
 
-type Company = Awaited<
-	ReturnType<typeof getV1Companies>
->["data"]["companies"][number];
+type Company = GetV1CompaniesResponses[200]["companies"][number];
 
 export default function CompaniesListScreen() {
 	const router = useRouter();
@@ -45,7 +45,10 @@ export default function CompaniesListScreen() {
 
 	const renderItem = useCallback(
 		({ item }: { item: Company }) => (
-			<CompanyCard company={item} onPress={() => handleSelectCompany(item.id)} />
+			<CompanyCard
+				company={item}
+				onPress={() => handleSelectCompany(item.id)}
+			/>
 		),
 		[handleSelectCompany],
 	);

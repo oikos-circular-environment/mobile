@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { BuildingIcon, Plus } from "lucide-react-native";
+import { FactoryIcon, Plus } from "lucide-react-native";
 import { View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export function CompanyListHeader() {
 					</View>
 
 					<View className="size-14 items-center justify-center rounded-lg bg-lime-800">
-						<BuildingIcon size={24} color={colors.white} strokeWidth={2.25} />
+						<FactoryIcon size={24} color={colors.white} strokeWidth={2.25} />
 					</View>
 				</View>
 			</Card>

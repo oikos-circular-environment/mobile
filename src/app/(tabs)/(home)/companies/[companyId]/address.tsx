@@ -3,11 +3,11 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronDown, MapIcon, Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { AddressFormSkeleton } from "@/components/companies/skeletons";
-import { toast } from "@/components/toast";
 import { colors } from "@/components/style/colors";
+import { toast } from "@/components/toast";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -41,6 +41,7 @@ import {
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
+import { cn } from "@/libs/utils";
 
 const addressSchema = z.object({
 	zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP válido."),
@@ -417,13 +418,17 @@ export default function CompanyAddressScreen() {
 													}
 												}}
 											>
-												<SelectTrigger>
+												<SelectTrigger
+													className={cn(
+														"justify-between",
+														Platform.OS === "android" && "px-3",
+													)}
+												>
 													<SelectInput
 														placeholder="Selecione o estado"
 														className="flex-1"
 													/>
 													<SelectIcon
-														className="mr-3"
 														as={isPendingStates ? Spinner : ChevronDown}
 													/>
 												</SelectTrigger>

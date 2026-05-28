@@ -18,6 +18,7 @@ import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import {
 	Animated,
 	KeyboardAvoidingView,
+	Platform,
 	ScrollView,
 	TouchableOpacity,
 	View,
@@ -69,6 +70,7 @@ import {
 	companyTypeOptions,
 	identityTypeOptions,
 } from "@/libs/types/companies";
+import { cn } from "@/libs/utils";
 
 const companySchema = z
 	.object({
@@ -489,12 +491,13 @@ export default function CompanyGeneralInfoScreen() {
 										}
 									>
 										<SelectTrigger
-											variant="outline"
-											size="md"
-											className="justify-between"
+											className={cn(
+												"justify-between",
+												Platform.OS === "android" && "px-3",
+											)}
 										>
 											<SelectInput placeholder="Selecione o tipo" />
-											<SelectIcon className="mr-3" as={ChevronDown} />
+											<SelectIcon as={ChevronDown} />
 										</SelectTrigger>
 										<SelectPortal>
 											<SelectBackdrop />

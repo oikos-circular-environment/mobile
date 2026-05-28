@@ -70,6 +70,7 @@ import {
 import { mask } from "@/libs/mask";
 import { putV1Profiles } from "@/libs/oikos-sdk";
 import { client } from "@/libs/oikos-sdk/client.gen";
+import { cn } from "@/libs/utils";
 
 const profileSchema = z.object({
 	fullName: z.string().min(3, "Informe seu nome completo."),
@@ -807,13 +808,17 @@ export default function ProfileScreen() {
 																}
 															}}
 														>
-															<SelectTrigger>
+															<SelectTrigger
+																className={cn(
+																	"justify-between",
+																	Platform.OS === "android" && "px-3",
+																)}
+															>
 																<SelectInput
 																	placeholder="Selecione o estado"
 																	className="flex-1"
 																/>
 																<SelectIcon
-																	className="mr-3"
 																	as={isPendingStates ? Spinner : ChevronDown}
 																/>
 															</SelectTrigger>
