@@ -809,6 +809,7 @@ export default function ProfileScreen() {
 															}}
 														>
 															<SelectTrigger
+																size="sm"
 																className={cn(
 																	"justify-between",
 																	Platform.OS === "android" && "px-3",
@@ -915,13 +916,18 @@ export default function ProfileScreen() {
 															}
 														}}
 													>
-														<SelectTrigger>
+														<SelectTrigger
+															size="sm"
+															className={cn(
+																"justify-between",
+																Platform.OS === "android" && "px-3",
+															)}
+														>
 															<SelectInput
 																placeholder="Selecione a cidade"
 																className="flex-1 capitalize"
 															/>
 															<SelectIcon
-																className="mr-3"
 																as={isPendingCities ? Spinner : ChevronDown}
 															/>
 														</SelectTrigger>
