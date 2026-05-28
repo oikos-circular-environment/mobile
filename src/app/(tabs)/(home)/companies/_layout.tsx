@@ -14,14 +14,7 @@ export default function CompaniesLayout() {
 					headerShown: false,
 				}}
 			/>
-			<Stack.Screen
-				name="create"
-				options={{
-					title: "Cadastrar Empresa",
-					headerShown: false,
-				}}
-			/>
-			<Stack.Screen
+	<Stack.Screen
 				name="[companyId]"
 				options={{
 					headerShown: false,

@@ -108,6 +108,8 @@ export function UserCompanyProvider({
 		[companiesData, companyId],
 	);
 
+	const isExistingCompany = !!companyId && companyId !== "new-company";
+
 	const { data: addressData, isLoading: isLoadingAddress } = useQuery({
 		queryKey: ["companies", companyId, "address"],
 		queryFn: async () => {
@@ -123,7 +125,7 @@ export function UserCompanyProvider({
 				throw error;
 			}
 		},
-		enabled: !!companyId,
+		enabled: isExistingCompany,
 	});
 
 	const { data: businessHoursData, isLoading: isLoadingBusinessHours } =
@@ -144,7 +146,7 @@ export function UserCompanyProvider({
 					throw error;
 				}
 			},
-			enabled: !!companyId,
+			enabled: isExistingCompany,
 		});
 
 	const { data: servicesData, isLoading: isLoadingServices } = useQuery({
@@ -162,7 +164,7 @@ export function UserCompanyProvider({
 				throw error;
 			}
 		},
-		enabled: !!companyId,
+		enabled: isExistingCompany,
 	});
 
 	const { data: wastesData, isLoading: isLoadingWastes } = useQuery({
@@ -180,7 +182,7 @@ export function UserCompanyProvider({
 				throw error;
 			}
 		},
-		enabled: !!companyId,
+		enabled: isExistingCompany,
 	});
 
 	const companyMutation = useMutation({

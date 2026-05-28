@@ -35,7 +35,10 @@ export default function CompaniesListScreen() {
 	const companies = data?.companies ?? [];
 
 	const handleCreate = () => {
-		router.push("/(tabs)/(home)/companies/create");
+		router.push({
+			pathname: "/(tabs)/(home)/companies/[companyId]/company",
+			params: { companyId: "new-company" },
+		});
 	};
 
 	const handleSelectCompany = (companyId: string) => {

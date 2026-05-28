@@ -4,7 +4,7 @@ import { format, parse, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircle,
 	Check,
@@ -63,7 +63,8 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { getCnpj } from "@/libs/brasil-api-sdk";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
-import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
+import { postV1Companies } from "@/libs/oikos-sdk";
+import { client } from "@/libs/oikos-sdk/client.gen";
 import {
 	companyTypeOptions,
 	identityTypeOptions,
@@ -131,10 +132,13 @@ type CompanyFormData = z.infer<typeof companySchema>;
 export default function CompanyGeneralInfoScreen() {
 	const { user } = useAuthContext();
 	const [useProfileData, setUseProfileData] = useState(false);
+	const [avatarPreviewUri, setAvatarPreviewUri] = useState<string | null>(null);
 	const { company, isLoadingCompany, saveCompany, isSavingCompany } =
 		useUserCompanyContext();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
+	const isNewCompany = companyId === "new-company";
 	const queryClient = useQueryClient();
+	const router = useRouter();
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
 	const contentOpacity = useRef(new Animated.Value(0)).current;
 
@@ -144,7 +148,7 @@ export default function CompanyGeneralInfoScreen() {
 		reset,
 		setValue,
 		watch,
-		formState: { errors, isDirty },
+		formState: { errors, isDirty, isSubmitting },
 	} = useForm({
 		resolver: zodResolver(companySchema),
 		defaultValues: {
@@ -190,36 +194,17 @@ export default function CompanyGeneralInfoScreen() {
 		},
 	});
 
-	const avatarMutation = useMutation({
-		mutationFn: async (asset: ImagePicker.ImagePickerAsset) => {
-			const formData = new FormData();
-			const file = {
-				uri: asset.uri,
-				name: asset.fileName ?? "image.jpg",
-				type: asset.mimeType ?? "image/jpeg",
-			} as unknown as Blob;
-
-			formData.append("file", file);
-
-			const res = await postV1CompaniesByIdAvatar({
-				path: { id: companyId },
-				body: formData as any,
-				headers: { "Content-Type": "multipart/form-data" },
-			});
-			return res.data;
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["companies"] });
-			toast.success("Imagem salva com sucesso!");
-		},
-		onError: error => {
-			console.log(error);
-			toast.error(
-				"Erro ao salvar imagem",
-				"Ocorreu um problema ao atualizar a foto.",
-			);
-		},
-	});
+	const uploadAvatar = async (id: string, asset: ImagePicker.ImagePickerAsset) => {
+		const formData = new FormData();
+		formData.append("file", {
+			uri: asset.uri,
+			name: asset.fileName ?? "image.jpg",
+			type: asset.mimeType ?? "image/jpeg",
+		} as unknown as Blob);
+		await client.instance.post(`/v1/companies/${id}/avatar`, formData, {
+			headers: { "Content-Type": "multipart/form-data" },
+		});
+	};
 
 	const onPickAvatar = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
@@ -230,21 +215,17 @@ export default function CompanyGeneralInfoScreen() {
 		});
 		if (!result.canceled && result.assets[0]) {
 			selectedAsset.current = result.assets[0];
-			avatarMutation.mutate(result.assets[0]);
+			setAvatarPreviewUri(result.assets[0].uri);
 		}
 	};
 
 	useEffect(() => {
-		if (!avatarMutation.isPending) {
-			Animated.timing(contentOpacity, {
-				toValue: 1,
-				duration: 400,
-				useNativeDriver: true,
-			}).start();
-		} else {
-			contentOpacity.setValue(0);
-		}
-	}, [avatarMutation.isPending, contentOpacity]);
+		Animated.timing(contentOpacity, {
+			toValue: 1,
+			duration: 400,
+			useNativeDriver: true,
+		}).start();
+	}, [contentOpacity]);
 
 	const onPressSearchCnpj = () => {
 		if (identity_type !== "CNPJ") return;
@@ -294,10 +275,10 @@ export default function CompanyGeneralInfoScreen() {
 		const business_name =
 			data.identity_type === "CPF" ? data.corporate_name : data.business_name;
 
-		await saveCompany({
+		const payload = {
 			identity: data.identity,
 			identity_type: data.identity_type,
-			corporate_name: corporate_name,
+			corporate_name,
 			business_name: business_name || null,
 			email: data.email || null,
 			phones: data.phones.filter(p => !!p),
@@ -306,10 +287,31 @@ export default function CompanyGeneralInfoScreen() {
 			status: data.status,
 			is_headquarters: data.isHeadquarters,
 			accept_appointments: data.accept_appointments,
-		});
+		};
+
+		if (isNewCompany) {
+			const res = await postV1Companies({ body: payload });
+			const newId = res.data?.company?.id;
+			if (newId && selectedAsset.current) {
+				await uploadAvatar(newId, selectedAsset.current);
+			}
+			queryClient.invalidateQueries({ queryKey: ["companies"] });
+			toast.success("Empresa cadastrada com sucesso!");
+			router.replace({
+				pathname: "/(tabs)/(home)/companies/[companyId]",
+				params: { companyId: newId },
+			});
+		} else {
+			await saveCompany(payload);
+			if (selectedAsset.current) {
+				await uploadAvatar(companyId, selectedAsset.current);
+				selectedAsset.current = null;
+				queryClient.invalidateQueries({ queryKey: ["companies"] });
+			}
+		}
 	};
 
-	if (isLoadingCompany) {
+	if (!isNewCompany && isLoadingCompany) {
 		return <CompanyFormSkeleton />;
 	}
 
@@ -333,9 +335,9 @@ export default function CompanyGeneralInfoScreen() {
 									onPress={onPickAvatar}
 									className="rounded-md shadow-lg "
 								>
-									{company?.avatar ? (
+									{avatarPreviewUri ?? company?.avatar?.url ? (
 										<Image
-											source={{ uri: company.avatar.url }}
+											source={{ uri: avatarPreviewUri ?? company!.avatar!.url }}
 											style={{ width: 80, height: 80, borderRadius: 6 }}
 										/>
 									) : (
@@ -720,18 +722,18 @@ export default function CompanyGeneralInfoScreen() {
 								variant="outline"
 								className="flex-1"
 								onPress={() => reset()}
-								isDisabled={!isDirty || isSavingCompany}
+								isDisabled={isSubmitting}
 							>
-								<ButtonText>Cancelar</ButtonText>
+								<ButtonText>{isNewCompany ? "Limpar" : "Cancelar"}</ButtonText>
 							</Button>
 
 							<Button
 								className="flex-1"
 								onPress={handleSubmit(handleFormSubmit)}
-								isDisabled={!isDirty || isSavingCompany}
+								isDisabled={isSubmitting || (!isNewCompany && !isDirty && !selectedAsset.current)}
 							>
-								<ButtonText>Salvar</ButtonText>
-								{isSavingCompany && <ButtonIcon as={Spinner} />}
+								<ButtonText>{isNewCompany ? "Cadastrar" : "Salvar"}</ButtonText>
+								{isSubmitting && <ButtonIcon as={Spinner} />}
 							</Button>
 						</HStack>
 					</Card>
