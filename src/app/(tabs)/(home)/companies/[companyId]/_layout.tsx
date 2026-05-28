@@ -1,5 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { UserCompanyProvider } from "@/contexts/user-company-context";
 
 export default function CompanyLayout() {
@@ -37,13 +36,6 @@ export default function CompanyLayout() {
 					name="business-hours"
 					options={{
 						title: "Funcionamento",
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="financial-methods"
-					options={{
-						title: "Métodos financeiros",
 						headerShown: false,
 					}}
 				/>

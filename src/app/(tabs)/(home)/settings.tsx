@@ -107,15 +107,13 @@ export default function SettingsScreen() {
 						<Pressable onPress={signOut}>
 							<Card
 								className={cn(
-									"flex flex-row flex-1 gap-2 items-center shadow-none bg-red-100 border-red-100 mt-6",
+									"flex flex-row flex-1 gap-2 items-center justify-center shadow-none",
 								)}
 							>
 								<View className="flex justify-center items-center">
-									<LogOutIcon color={"red"} size={18} />
+									<LogOutIcon size={18} />
 								</View>
-								<Heading className="text-xl font-semibold text-red-500">
-									Desconectar
-								</Heading>
+								<Heading className="text-xl font-semibold">Desconectar</Heading>
 							</Card>
 						</Pressable>
 					</View>

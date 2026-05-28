@@ -1,5 +1,5 @@
 import type { Href } from "expo-router";
-import { useLocalSearchParams, Link } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import {
 	ArrowRightIcon,
 	Clock8Icon,

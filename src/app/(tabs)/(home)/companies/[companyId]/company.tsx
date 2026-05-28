@@ -194,7 +194,10 @@ export default function CompanyGeneralInfoScreen() {
 		},
 	});
 
-	const uploadAvatar = async (id: string, asset: ImagePicker.ImagePickerAsset) => {
+	const uploadAvatar = async (
+		id: string,
+		asset: ImagePicker.ImagePickerAsset,
+	) => {
 		const formData = new FormData();
 		formData.append("file", {
 			uri: asset.uri,
@@ -299,7 +302,7 @@ export default function CompanyGeneralInfoScreen() {
 			toast.success("Empresa cadastrada com sucesso!");
 			router.replace({
 				pathname: "/(tabs)/(home)/companies/[companyId]",
-				params: { companyId: newId },
+				params: { companyId: newId ?? "new-company" },
 			});
 		} else {
 			await saveCompany(payload);
@@ -335,7 +338,7 @@ export default function CompanyGeneralInfoScreen() {
 									onPress={onPickAvatar}
 									className="rounded-md shadow-lg "
 								>
-									{avatarPreviewUri ?? company?.avatar?.url ? (
+									{(avatarPreviewUri ?? company?.avatar?.url) ? (
 										<Image
 											source={{ uri: avatarPreviewUri ?? company!.avatar!.url }}
 											style={{ width: 80, height: 80, borderRadius: 6 }}
@@ -730,7 +733,10 @@ export default function CompanyGeneralInfoScreen() {
 							<Button
 								className="flex-1"
 								onPress={handleSubmit(handleFormSubmit)}
-								isDisabled={isSubmitting || (!isNewCompany && !isDirty && !selectedAsset.current)}
+								isDisabled={
+									isSubmitting ||
+									(!isNewCompany && !isDirty && !selectedAsset.current)
+								}
 							>
 								<ButtonText>{isNewCompany ? "Cadastrar" : "Salvar"}</ButtonText>
 								{isSubmitting && <ButtonIcon as={Spinner} />}
