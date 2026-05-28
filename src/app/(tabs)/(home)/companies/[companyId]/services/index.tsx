@@ -1,8 +1,8 @@
-import { useRouter } from "expo-router";
-import { PlusIcon, RecycleIcon } from "lucide-react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { PlusIcon, WrenchIcon } from "lucide-react-native";
 import { useEffect } from "react";
 import { FlatList, View } from "react-native";
-import { WasteSkeleton } from "@/components/companies/waste/waste-skeleton";
+import { ServiceSkeleton } from "@/components/companies/services/service-skeleton";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,58 +10,66 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 
-export default function WasteIndexScreen() {
-	const { wastes, isLoadingWastes } = useUserCompanyContext();
+export default function ServicesIndexScreen() {
+	const { services, isLoadingServices } = useUserCompanyContext();
 	const router = useRouter();
+	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 
 	useEffect(() => {
-		if (!isLoadingWastes && wastes && wastes.length === 0) {
-			router.replace("/(tabs)/(home)/companies/waste/form");
+		if (!isLoadingServices && services && services.length === 0) {
+			router.replace({
+				pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
+				params: { companyId },
+			});
 		}
-	}, [wastes, isLoadingWastes, router]);
+	}, [services, isLoadingServices, router, companyId]);
 
-	if (isLoadingWastes) {
+	if (isLoadingServices) {
 		return (
 			<View className="flex-1 bg-white p-4">
-				<WasteSkeleton />
+				<ServiceSkeleton />
 			</View>
 		);
 	}
 
 	const handleEdit = (id: string) => {
 		router.push({
-			pathname: "/(tabs)/(home)/companies/waste/form",
-			params: { id },
+			pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
+			params: { companyId, id },
 		});
 	};
 
 	const handleCreate = () => {
-		router.push("/(tabs)/(home)/companies/waste/form");
+		router.push({
+			pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
+			params: { companyId },
+		});
 	};
 
 	return (
 		// <ScrollView className="flex-1 bg-white" contentContainerClassName="p-4">
 		<FlatList
-			data={wastes}
+			data={services}
 			keyExtractor={item => item.id}
 			contentContainerClassName="flex-1 gap-4 p-4 bg-white"
 			ListHeaderComponent={
 				<Card className="shadow-none ">
 					<View className="flex-row items-center justify-between gap-4">
 						<View className="size-15 items-center justify-center rounded-lg bg-secondary">
-							<RecycleIcon color={colors.lime[800]} size={20} />
+							<WrenchIcon color={colors.lime[800]} size={20} />
 						</View>
 						<View className="flex-1">
-							<Heading className="text-lg">Resíduos</Heading>
+							<Heading className="text-lg">Serviços</Heading>
 							<Text className="text-sm ">
-								Gerencie os resíduos que a sua empresa coleta.
+								Gerencie seus serviços, você pode criar, editar ou deletar da
+								maneira que quiser.
 							</Text>
 						</View>
 					</View>
 
 					<Button className="w-full gap-2" onPress={handleCreate}>
 						<PlusIcon size={16} color={colors.white} />
-						<ButtonText>Novo resíduo</ButtonText>
+						<ButtonText>Novo serviço</ButtonText>
 					</Button>
 				</Card>
 			}
@@ -90,11 +98,13 @@ export default function WasteIndexScreen() {
 
 					<View className="flex-row flex-wrap gap-2 mt-2">
 						<View className="bg-secondary/50 px-2 py-1 rounded-md">
-							<Text className="text-xs text-secondary-700">{item.unit}</Text>
+							<Text className="text-xs text-secondary-700">
+								{item.quantity} {item.unit}
+							</Text>
 						</View>
 						<View className="bg-primary/10 px-2 py-1 rounded-md">
 							<Text className="text-xs text-primary-700">
-								{item.waste_type === "RECYCLABLE" ? "Reciclável" : "Rejeito"}
+								{item.waste_type === "RECYCLABLE" ? "Reciclável" : "Resíduo"}
 							</Text>
 						</View>
 					</View>
@@ -112,7 +122,7 @@ export default function WasteIndexScreen() {
 			ListEmptyComponent={
 				<View className="items-center justify-center py-8">
 					<Text className="text-muted-foreground">
-						Nenhum resíduo cadastrado.
+						Nenhum serviço cadastrado.
 					</Text>
 				</View>
 			}
