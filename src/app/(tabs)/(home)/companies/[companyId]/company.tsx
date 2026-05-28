@@ -1,17 +1,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parse, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams } from "expo-router";
 import {
 	AlertCircle,
 	Check,
 	ChevronDown,
 	FactoryIcon,
+	PencilIcon,
 	Search,
 } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, TouchableOpacity, View } from "react-native";
 import { z } from "zod";
 import { CompanyFormSkeleton } from "@/components/companies/skeletons";
 import { colors } from "@/components/style/colors";
@@ -55,6 +59,7 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { getCnpj } from "@/libs/brasil-api-sdk";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
+import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import {
 	companyTypeOptions,
 	identityTypeOptions,
@@ -124,6 +129,9 @@ export default function CompanyGeneralInfoScreen() {
 	const [useProfileData, setUseProfileData] = useState(false);
 	const { company, isLoadingCompany, saveCompany, isSavingCompany } =
 		useUserCompanyContext();
+	const { companyId } = useLocalSearchParams<{ companyId: string }>();
+	const queryClient = useQueryClient();
+	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
 
 	const {
 		control,
@@ -176,6 +184,42 @@ export default function CompanyGeneralInfoScreen() {
 			);
 		},
 	});
+
+	const avatarMutation = useMutation({
+		mutationFn: async (asset: ImagePicker.ImagePickerAsset) => {
+			const formData = new FormData();
+			const file = {
+				uri: asset.uri,
+				name: asset.fileName ?? "image.jpg",
+				type: asset.mimeType ?? "image/jpeg",
+			} as unknown as Blob;
+			formData.append("file", file);
+			const res = await postV1CompaniesByIdAvatar({
+				path: { id: companyId },
+				body: formData as any,
+			});
+			return res.data;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["companies"] });
+		},
+		onError: () => {
+			toast.error("Erro ao salvar imagem", "Ocorreu um problema ao atualizar a foto.");
+		},
+	});
+
+	const onPickAvatar = async () => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ["images"],
+			allowsEditing: true,
+			aspect: [1, 1],
+			quality: 0.8,
+		});
+		if (!result.canceled && result.assets[0]) {
+			selectedAsset.current = result.assets[0];
+			avatarMutation.mutate(result.assets[0]);
+		}
+	};
 
 	const onPressSearchCnpj = () => {
 		if (identity_type !== "CNPJ") return;
@@ -251,6 +295,31 @@ export default function CompanyGeneralInfoScreen() {
 				contentContainerClassName="p-4 pb-8"
 			>
 				<View className="gap-4">
+					<View className="items-center py-2">
+						<TouchableOpacity onPress={onPickAvatar} activeOpacity={0.8}>
+							<View className="relative">
+								{avatarMutation.isPending ? (
+									<View className="size-24 rounded-full bg-secondary items-center justify-center">
+										<Spinner />
+									</View>
+								) : company?.avatar ? (
+									<Image
+										source={{ uri: company.avatar.url }}
+										className="size-24 rounded-full"
+										contentFit="cover"
+									/>
+								) : (
+									<View className="size-24 rounded-full bg-secondary items-center justify-center">
+										<FactoryIcon size={36} color={colors.lime[800]} strokeWidth={1.5} />
+									</View>
+								)}
+								<View className="absolute bottom-0 right-0 size-7 rounded-full bg-primary items-center justify-center">
+									<PencilIcon size={14} color={colors.white} />
+								</View>
+							</View>
+						</TouchableOpacity>
+					</View>
+
 					<Card className="bg-secondary shadow-none">
 						<View className="flex-row items-center justify-between gap-4">
 							<View className="size-15 items-center justify-center rounded-lg bg-primary">
