@@ -16,6 +16,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import {
+	Animated,
 	KeyboardAvoidingView,
 	ScrollView,
 	TouchableOpacity,
@@ -64,7 +65,7 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { getCnpj } from "@/libs/brasil-api-sdk";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
-import { client } from "@/libs/oikos-sdk/client.gen";
+import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import {
 	companyTypeOptions,
 	identityTypeOptions,
@@ -137,6 +138,7 @@ export default function CompanyGeneralInfoScreen() {
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const queryClient = useQueryClient();
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
+	const contentOpacity = useRef(new Animated.Value(0)).current;
 
 	const {
 		control,
@@ -198,17 +200,22 @@ export default function CompanyGeneralInfoScreen() {
 				name: asset.fileName ?? "image.jpg",
 				type: asset.mimeType ?? "image/jpeg",
 			} as unknown as Blob;
+
 			formData.append("file", file);
-			await client.instance.post(
-				`/v1/companies/${companyId}/avatar`,
-				formData,
-				{ headers: { "Content-Type": "multipart/form-data" } },
-			);
+
+			const res = await postV1CompaniesByIdAvatar({
+				path: { id: companyId },
+				body: formData as any,
+				headers: { "Content-Type": "multipart/form-data" },
+			});
+			return res.data;
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["companies"] });
+			toast.success("Imagem salva com sucesso!");
 		},
-		onError: () => {
+		onError: error => {
+			console.log(error);
 			toast.error(
 				"Erro ao salvar imagem",
 				"Ocorreu um problema ao atualizar a foto.",
@@ -228,6 +235,18 @@ export default function CompanyGeneralInfoScreen() {
 			avatarMutation.mutate(result.assets[0]);
 		}
 	};
+
+	useEffect(() => {
+		if (!avatarMutation.isPending) {
+			Animated.timing(contentOpacity, {
+				toValue: 1,
+				duration: 400,
+				useNativeDriver: true,
+			}).start();
+		} else {
+			contentOpacity.setValue(0);
+		}
+	}, [avatarMutation.isPending, contentOpacity]);
 
 	const onPressSearchCnpj = () => {
 		if (identity_type !== "CNPJ") return;
@@ -303,49 +322,47 @@ export default function CompanyGeneralInfoScreen() {
 				contentContainerClassName="p-4 pb-8"
 			>
 				<View className="gap-4">
-					<Card className="bg-secondary shadow-none">
-						<View className="flex-row items-center justify-between gap-4">
-							<View className="size-15 items-center justify-center rounded-lg bg-primary">
-								<FactoryIcon color={colors.white} size={20} />
-							</View>
-							<View className="flex-1 gap-1">
-								<Heading className="text-lg">Empresas</Heading>
-								<Text className="text-sm ">
-									Estes dados serão expostos na plataforma, o preenchimento com
-									informações reais trazem mais confiabilidade para os usuários
-									da plataforma.
-								</Text>
-							</View>
-						</View>
-					</Card>
+					<View className="relative mb-8">
+						<View className="h-28 items-center justify-center rounded-md bg-primary" />
 
-					<View className="items-center py-2">
-						<TouchableOpacity onPress={onPickAvatar} activeOpacity={0.8}>
-							<View className="relative">
-								{avatarMutation.isPending ? (
-									<View className="size-24 rounded-full bg-secondary items-center justify-center">
-										<Spinner />
-									</View>
-								) : company?.avatar ? (
-									<Image
-										source={{ uri: company.avatar.url }}
-										className="size-24 rounded-full"
-										contentFit="cover"
-									/>
-								) : (
-									<View className="size-24 rounded-full bg-secondary items-center justify-center">
-										<FactoryIcon
-											size={36}
-											color={colors.lime[800]}
-											strokeWidth={1.5}
+						<Animated.View
+							style={{ opacity: contentOpacity }}
+							className="absolute left-1/2 top-24 -ml-8 -mt-8"
+						>
+							<View>
+								<TouchableOpacity
+									activeOpacity={0.7}
+									onPress={onPickAvatar}
+									className="rounded-md shadow-lg shadow-black/40"
+								>
+									{company?.avatar ? (
+										<Image
+											source={{ uri: company.avatar.url }}
+											style={{ width: 80, height: 80, borderRadius: 6 }}
 										/>
-									</View>
-								)}
-								<View className="absolute bottom-0 right-0 size-7 rounded-full bg-primary items-center justify-center">
-									<PencilIcon size={14} color={colors.white} />
-								</View>
+									) : (
+										<View
+											style={{ width: 80, height: 80, borderRadius: 6 }}
+											className="bg-secondary items-center justify-center"
+										>
+											<FactoryIcon
+												size={36}
+												color={colors.lime[800]}
+												strokeWidth={1.5}
+											/>
+										</View>
+									)}
+								</TouchableOpacity>
+								<Button
+									size="sm"
+									variant="secondary"
+									className="absolute bottom-0 right-0"
+									onPress={onPickAvatar}
+								>
+									<ButtonIcon as={PencilIcon} />
+								</Button>
 							</View>
-						</TouchableOpacity>
+						</Animated.View>
 					</View>
 
 					<Card className="shadow-none">
