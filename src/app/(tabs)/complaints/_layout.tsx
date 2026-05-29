@@ -5,7 +5,7 @@ export default function ComplaintsStackLayout() {
 	return (
 		<ComplaintsProvider>
 			<Stack>
-			<Stack.Screen name="index" options={{ headerShown: false }} />
+				<Stack.Screen name="index" options={{ headerShown: false }} />
 				<Stack.Screen name="list" options={{ headerShown: false }} />
 				<Stack.Screen
 					name="(create)"

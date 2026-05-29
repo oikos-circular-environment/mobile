@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { ComplaintCreateProvider } from "../../../../contexts/create-complaint-context";
+import { ComplaintCreateProvider } from "@/contexts/create-complaint-context";
 
 export default function ComplaintsCreateStackLayout() {
 	return (

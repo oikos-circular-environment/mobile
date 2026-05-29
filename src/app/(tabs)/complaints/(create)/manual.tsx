@@ -13,15 +13,13 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
-import {
-	type GooglePlacesAddressFields,
-	GooglePlacesInput,
-} from "@/components/google-places-input";
+import { GooglePlacesInput } from "@/components/google-places-input";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Divider } from "@/components/ui/divider";
 import {
 	FormControl,
 	FormControlError,
@@ -40,6 +38,10 @@ import {
 	DASHBOARD_QUERY_KEY,
 } from "@/contexts/complaints-context";
 import { getCepV2 } from "@/libs/brasil-api-sdk";
+import {
+	type GoogleAddressFields,
+	reverseGeocode,
+} from "@/libs/google/reverse-geocode";
 import { mask } from "@/libs/mask";
 import {
 	postV1ComplaintsByIdCapturesByCaptureIdAttachments,
@@ -120,6 +122,7 @@ export default function ManualComplaintScreen() {
 		ImagePicker.ImagePickerAsset[]
 	>([]);
 	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
+	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const selectedType = watch("type");
@@ -127,7 +130,7 @@ export default function ManualComplaintScreen() {
 	const lonValue = watch("longitude");
 
 	const handleAddressSelect = useCallback(
-		(fields: GooglePlacesAddressFields) => {
+		(fields: GoogleAddressFields) => {
 			if (fields.street)
 				setValue("street", fields.street, { shouldValidate: true });
 			if (fields.streetNumber)
@@ -141,6 +144,36 @@ export default function ManualComplaintScreen() {
 				setValue("postalCode", fields.postalCode, { shouldValidate: true });
 			setValue("latitude", fields.latitude, { shouldValidate: true });
 			setValue("longitude", fields.longitude, { shouldValidate: true });
+		},
+		[setValue],
+	);
+
+	const handleMapChange = useCallback(
+		async (loc: { latitude: number; longitude: number }) => {
+			setValue("latitude", String(loc.latitude), { shouldValidate: true });
+			setValue("longitude", String(loc.longitude), { shouldValidate: true });
+
+			setIsReverseGeocoding(true);
+			try {
+				const address = await reverseGeocode(loc.latitude, loc.longitude);
+				if (!address) return;
+				if (address.street)
+					setValue("street", address.street, { shouldValidate: true });
+				if (address.streetNumber)
+					setValue("streetNumber", address.streetNumber, {
+						shouldValidate: true,
+					});
+				if (address.district)
+					setValue("district", address.district, { shouldValidate: true });
+				if (address.city)
+					setValue("city", address.city, { shouldValidate: true });
+				if (address.region)
+					setValue("region", address.region, { shouldValidate: true });
+				if (address.postalCode)
+					setValue("postalCode", address.postalCode, { shouldValidate: true });
+			} finally {
+				setIsReverseGeocoding(false);
+			}
 		},
 		[setValue],
 	);
@@ -447,11 +480,36 @@ export default function ManualComplaintScreen() {
 				<View className="gap-1 pt-1">
 					<Heading size="md">Localização do ocorrido</Heading>
 					<Text className="text-sm text-gray-500">
-						Busque pelo endereço ou preencha os campos manualmente.
+						Busque pelo endereço ou toque no mapa, ambas ações preenchem o
+						endereço automaticamente.
 					</Text>
 				</View>
 
 				<GooglePlacesInput onSelect={handleAddressSelect} />
+
+				{/* Mapa */}
+				<WrapperMap
+					latitude={latValue ? parseFloat(latValue) : null}
+					longitude={lonValue ? parseFloat(lonValue) : null}
+					onChange={handleMapChange}
+				/>
+				{isReverseGeocoding && (
+					<View className="flex-row items-center gap-2">
+						<Spinner size="small" />
+						<Text className="text-xs text-muted-foreground">
+							Buscando endereço...
+						</Text>
+					</View>
+				)}
+				{(errors.latitude?.message ?? errors.longitude?.message) && (
+					<FormControlError>
+						<FormControlErrorText>
+							{errors.latitude?.message ?? errors.longitude?.message}
+						</FormControlErrorText>
+					</FormControlError>
+				)}
+
+				<Divider />
 
 				{/* CEP */}
 				<FormControl isInvalid={!!errors.postalCode} className="gap-1">
@@ -635,27 +693,6 @@ export default function ManualComplaintScreen() {
 						</FormControlError>
 					)}
 				</FormControl>
-
-				{/* Mapa */}
-				<WrapperMap
-					latitude={latValue ? parseFloat(latValue) : null}
-					longitude={lonValue ? parseFloat(lonValue) : null}
-					onChange={loc => {
-						setValue("latitude", String(loc.latitude), {
-							shouldValidate: true,
-						});
-						setValue("longitude", String(loc.longitude), {
-							shouldValidate: true,
-						});
-					}}
-				/>
-				{(errors.latitude?.message ?? errors.longitude?.message) && (
-					<FormControlError>
-						<FormControlErrorText>
-							{errors.latitude?.message ?? errors.longitude?.message}
-						</FormControlErrorText>
-					</FormControlError>
-				)}
 
 				{/* Mídias */}
 				<View className="gap-2 pt-1">

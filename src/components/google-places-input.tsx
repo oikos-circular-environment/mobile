@@ -6,25 +6,15 @@ import {
 } from "react-native-google-places-autocomplete";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
-
-export type GooglePlacesAddressFields = {
-	street: string;
-	streetNumber: string;
-	district: string;
-	city: string;
-	region: string;
-	postalCode: string;
-	latitude: string;
-	longitude: string;
-};
+import type { GoogleAddressFields } from "@/libs/google/reverse-geocode";
 
 type Props = {
-	onSelect: (fields: GooglePlacesAddressFields) => void;
+	onSelect: (fields: GoogleAddressFields) => void;
 };
 
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-function parseDetail(detail: GooglePlaceDetail): GooglePlacesAddressFields {
+function parseDetail(detail: GooglePlaceDetail): GoogleAddressFields {
 	const get = (
 		type: string,
 		nameType: "long_name" | "short_name" = "long_name",
@@ -63,14 +53,10 @@ export function GooglePlacesInput({ onSelect }: Props) {
 					setApiError(null);
 					onSelect(parseDetail(detail));
 				}}
-				// onFail={error => {
-				// 	const msg = typeof error === "string" ? error : JSON.stringify(error);
-				// 	console.error("[GooglePlacesInput] onFail:", msg);
-				// 	setApiError(msg);
-				// }}
-				// onNotFound={() => {
-				// 	console.warn("[GooglePlacesInput] onNotFound: nenhum resultado");
-				// }}
+				onFail={error => {
+					const msg = typeof error === "string" ? error : JSON.stringify(error);
+					setApiError(msg);
+				}}
 				query={{
 					key: API_KEY,
 					language: "pt-BR",
