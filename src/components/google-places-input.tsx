@@ -53,13 +53,6 @@ function parseDetail(detail: GooglePlaceDetail): GooglePlacesAddressFields {
 export function GooglePlacesInput({ onSelect }: Props) {
 	const [apiError, setApiError] = useState<string | null>(null);
 
-	if (__DEV__) {
-		console.log(
-			"[GooglePlacesInput] API_KEY:",
-			API_KEY ? `${API_KEY.slice(0, 8)}…` : "MISSING",
-		);
-	}
-
 	return (
 		<View className="gap-1">
 			<GooglePlacesAutocomplete
@@ -70,14 +63,14 @@ export function GooglePlacesInput({ onSelect }: Props) {
 					setApiError(null);
 					onSelect(parseDetail(detail));
 				}}
-				onFail={error => {
-					const msg = typeof error === "string" ? error : JSON.stringify(error);
-					console.error("[GooglePlacesInput] onFail:", msg);
-					setApiError(msg);
-				}}
-				onNotFound={() => {
-					console.warn("[GooglePlacesInput] onNotFound: nenhum resultado");
-				}}
+				// onFail={error => {
+				// 	const msg = typeof error === "string" ? error : JSON.stringify(error);
+				// 	console.error("[GooglePlacesInput] onFail:", msg);
+				// 	setApiError(msg);
+				// }}
+				// onNotFound={() => {
+				// 	console.warn("[GooglePlacesInput] onNotFound: nenhum resultado");
+				// }}
 				query={{
 					key: API_KEY,
 					language: "pt-BR",
