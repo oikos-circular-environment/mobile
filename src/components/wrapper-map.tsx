@@ -19,7 +19,7 @@ type LocationPoint = {
 	longitude: number;
 };
 
-type WrapperMapperProps = {
+type WrapperMapProps = {
 	latitude?: number | null;
 	longitude?: number | null;
 	onChange?: (location: LocationPoint) => void;
@@ -30,11 +30,11 @@ const FALLBACK_COORDINATES: LocationPoint = {
 	longitude: -46.633308,
 };
 
-export default function WrapperMapper({
+export default function WrapperMap({
 	latitude,
 	longitude,
 	onChange,
-}: WrapperMapperProps) {
+}: WrapperMapProps) {
 	const [selectedLocation, setSelectedLocation] =
 		useState<LocationPoint | null>(
 			latitude != null && longitude != null ? { latitude, longitude } : null,

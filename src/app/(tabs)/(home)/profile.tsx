@@ -60,7 +60,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { VStack } from "@/components/ui/vstack";
-import WrapperMapper from "@/components/wrapper-mapper";
+import WrapperMap from "@/components/wrapper-map";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
 	getCepV2,
@@ -985,7 +985,7 @@ export default function ProfileScreen() {
 											control={control}
 											name="address"
 											render={({ field: { value } }) => (
-												<WrapperMapper
+												<WrapperMap
 													latitude={value.latitude}
 													longitude={value.longitude}
 													onChange={loc => {

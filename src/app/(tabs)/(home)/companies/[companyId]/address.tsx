@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import WrapperMapper from "@/components/wrapper-mapper";
+import WrapperMap from "@/components/wrapper-map";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import {
 	getCepV2,
@@ -556,7 +556,7 @@ export default function CompanyAddressScreen() {
 
 							<View className="gap-2">
 								<Text className="text-sm">Mapa</Text>
-								<WrapperMapper
+								<WrapperMap
 									latitude={latitude}
 									longitude={longitude}
 									onChange={handleLocationChange}
