@@ -3,8 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { ShieldAlertIcon, X } from "lucide-react-native";
-import WrapperMap from "@/components/wrapper-map";
+import { Camera, ShieldAlertIcon, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -13,11 +12,10 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
 import { z } from "zod";
 import {
-	GooglePlacesInput,
 	type GooglePlacesAddressFields,
+	GooglePlacesInput,
 } from "@/components/google-places-input";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
@@ -36,6 +34,7 @@ import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import WrapperMap from "@/components/wrapper-map";
 import {
 	COMPLAINTS_QUERY_KEY,
 	DASHBOARD_QUERY_KEY,
@@ -129,12 +128,17 @@ export default function ManualComplaintScreen() {
 
 	const handleAddressSelect = useCallback(
 		(fields: GooglePlacesAddressFields) => {
-			if (fields.street) setValue("street", fields.street, { shouldValidate: true });
-			if (fields.streetNumber) setValue("streetNumber", fields.streetNumber, { shouldValidate: true });
-			if (fields.district) setValue("district", fields.district, { shouldValidate: true });
+			if (fields.street)
+				setValue("street", fields.street, { shouldValidate: true });
+			if (fields.streetNumber)
+				setValue("streetNumber", fields.streetNumber, { shouldValidate: true });
+			if (fields.district)
+				setValue("district", fields.district, { shouldValidate: true });
 			if (fields.city) setValue("city", fields.city, { shouldValidate: true });
-			if (fields.region) setValue("region", fields.region, { shouldValidate: true });
-			if (fields.postalCode) setValue("postalCode", fields.postalCode, { shouldValidate: true });
+			if (fields.region)
+				setValue("region", fields.region, { shouldValidate: true });
+			if (fields.postalCode)
+				setValue("postalCode", fields.postalCode, { shouldValidate: true });
 			setValue("latitude", fields.latitude, { shouldValidate: true });
 			setValue("longitude", fields.longitude, { shouldValidate: true });
 		},
@@ -636,9 +640,13 @@ export default function ManualComplaintScreen() {
 				<WrapperMap
 					latitude={latValue ? parseFloat(latValue) : null}
 					longitude={lonValue ? parseFloat(lonValue) : null}
-					onChange={(loc) => {
-						setValue("latitude", String(loc.latitude), { shouldValidate: true });
-						setValue("longitude", String(loc.longitude), { shouldValidate: true });
+					onChange={loc => {
+						setValue("latitude", String(loc.latitude), {
+							shouldValidate: true,
+						});
+						setValue("longitude", String(loc.longitude), {
+							shouldValidate: true,
+						});
 					}}
 				/>
 				{(errors.latitude?.message ?? errors.longitude?.message) && (
@@ -654,47 +662,45 @@ export default function ManualComplaintScreen() {
 					<Heading size="md">Fotos e vídeos</Heading>
 					<Text className="text-sm text-gray-500">
 						Selecione as imagens ou vídeos da galeria que registram o ocorrido.
-						Todos serão vinculados a esta denúncia.
 					</Text>
 
-					<Button
-						variant="outline"
-						className="border-dashed border-gray-300"
-						onPress={handlePickMedia}
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						contentContainerClassName="gap-2 py-2"
+						nestedScrollEnabled
+						keyboardShouldPersistTaps="always"
 					>
-						<ButtonText className="text-gray-600">
-							Adicionar da galeria
-						</ButtonText>
-					</Button>
+						<Pressable
+							onPress={handlePickMedia}
+							className="items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50"
+							style={{ width: 80, height: 80 }}
+						>
+							<Camera size={24} color={colors.gray[400]} />
+						</Pressable>
 
-					{selectedAssets.length > 0 && (
-						<View className="flex-row flex-wrap gap-2 pt-1">
-							{selectedAssets.map(asset => (
-								<View key={asset.uri} className="relative">
-									<View
-										style={{
-											width: 80,
-											height: 80,
-											borderRadius: 8,
-											overflow: "hidden",
-										}}
-									>
-										<MediaThumbnail
-											mediaType={asset.type === "video" ? "video" : "photo"}
-											uri={asset.uri}
-											fallbackLabel={asset.type === "video" ? "VÍD" : "IMG"}
-										/>
-									</View>
-									<TouchableOpacity
-										className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
-										onPress={() => handleRemoveAsset(asset.uri)}
-									>
-										<X size={12} color={colors.white} strokeWidth={2.5} />
-									</TouchableOpacity>
+						{selectedAssets.map(asset => (
+							<View
+								key={asset.uri}
+								className="relative"
+								style={{ width: 80, height: 80 }}
+							>
+								<View className="flex-1 overflow-hidden rounded-xl">
+									<MediaThumbnail
+										mediaType={asset.type === "video" ? "video" : "photo"}
+										uri={asset.uri}
+										fallbackLabel={asset.type === "video" ? "VÍD" : "IMG"}
+									/>
 								</View>
-							))}
-						</View>
-					)}
+								<TouchableOpacity
+									className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
+									onPress={() => handleRemoveAsset(asset.uri)}
+								>
+									<X size={12} color={colors.white} strokeWidth={2.5} />
+								</TouchableOpacity>
+							</View>
+						))}
+					</ScrollView>
 				</View>
 
 				{/* Actions */}
