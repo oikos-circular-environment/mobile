@@ -282,10 +282,15 @@ export default function ComplaintsMapScreen() {
 			>
 				{complaints.map(complaint => {
 					if (!complaint.location) return null;
+					const typeInfo = complaintTypeValues.find(
+						t => t.value === complaint.type,
+					);
 					const pinColor =
 						COMPLAINT_COLORS[complaint.type as ComplaintType] ??
 						colors.gray[500];
 					const isSelected = selectedComplaint?.id === complaint.id;
+					const Icon = typeInfo?.icon;
+					const size = isSelected ? 38 : 32;
 					return (
 						<Marker
 							key={complaint.id}
@@ -294,22 +299,33 @@ export default function ComplaintsMapScreen() {
 								longitude: complaint.location.lon,
 							}}
 							onPress={() => handleMarkerPress(complaint)}
+							tracksViewChanges={false}
 						>
 							<View
 								style={{
-									width: isSelected ? 18 : 14,
-									height: isSelected ? 18 : 14,
-									borderRadius: 8,
+									width: size,
+									height: size,
+									borderRadius: 999,
 									backgroundColor: pinColor,
 									borderWidth: isSelected ? 3 : 2,
 									borderColor: colors.white,
+									alignItems: "center",
+									justifyContent: "center",
 									shadowColor: colors.black,
-									shadowOffset: { width: 0, height: 1 },
-									shadowOpacity: 0.3,
-									shadowRadius: 2,
-									elevation: 3,
+									shadowOffset: { width: 0, height: 2 },
+									shadowOpacity: 0.35,
+									shadowRadius: 3,
+									elevation: 4,
 								}}
-							/>
+							>
+								{Icon && (
+									<Icon
+										size={isSelected ? 18 : 15}
+										color={colors.white}
+										strokeWidth={2.5}
+									/>
+								)}
+							</View>
 						</Marker>
 					);
 				})}
