@@ -2,9 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import * as ImagePicker from "expo-image-picker";
-import * as Location from "expo-location";
 import { router } from "expo-router";
-import { LocateFixed, ShieldAlertIcon, X } from "lucide-react-native";
+import { ShieldAlertIcon, X } from "lucide-react-native";
+import WrapperMap from "@/components/wrapper-map";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -15,7 +15,11 @@ import {
 } from "react-native";
 
 import { z } from "zod";
-import { MediaThumbnail } from "@/components/common/media-thumbnail";
+import {
+	GooglePlacesInput,
+	type GooglePlacesAddressFields,
+} from "@/components/google-places-input";
+import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
@@ -117,10 +121,25 @@ export default function ManualComplaintScreen() {
 		ImagePicker.ImagePickerAsset[]
 	>([]);
 	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
-	const [isFetchingLocation, setIsFetchingLocation] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const selectedType = watch("type");
+	const latValue = watch("latitude");
+	const lonValue = watch("longitude");
+
+	const handleAddressSelect = useCallback(
+		(fields: GooglePlacesAddressFields) => {
+			if (fields.street) setValue("street", fields.street, { shouldValidate: true });
+			if (fields.streetNumber) setValue("streetNumber", fields.streetNumber, { shouldValidate: true });
+			if (fields.district) setValue("district", fields.district, { shouldValidate: true });
+			if (fields.city) setValue("city", fields.city, { shouldValidate: true });
+			if (fields.region) setValue("region", fields.region, { shouldValidate: true });
+			if (fields.postalCode) setValue("postalCode", fields.postalCode, { shouldValidate: true });
+			setValue("latitude", fields.latitude, { shouldValidate: true });
+			setValue("longitude", fields.longitude, { shouldValidate: true });
+		},
+		[setValue],
+	);
 
 	const handleCepLookup = useCallback(
 		async (rawValue: string) => {
@@ -152,30 +171,6 @@ export default function ManualComplaintScreen() {
 		},
 		[setValue],
 	);
-
-	const handleUseCurrentLocation = async () => {
-		setIsFetchingLocation(true);
-		try {
-			const { status } = await Location.requestForegroundPermissionsAsync();
-			if (status !== "granted") {
-				toast.error("Permissão negada", "Permita o acesso à localização.");
-				return;
-			}
-			const loc = await Location.getCurrentPositionAsync({
-				accuracy: Location.Accuracy.High,
-			});
-			setValue("latitude", String(loc.coords.latitude), {
-				shouldValidate: true,
-			});
-			setValue("longitude", String(loc.coords.longitude), {
-				shouldValidate: true,
-			});
-		} catch {
-			toast.error("Erro", "Não foi possível obter a localização atual.");
-		} finally {
-			setIsFetchingLocation(false);
-		}
-	};
 
 	const handlePickMedia = async () => {
 		const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -296,7 +291,7 @@ export default function ManualComplaintScreen() {
 			<ScrollView
 				className="flex-1"
 				contentContainerClassName="gap-4 px-4 py-4 pb-8"
-				keyboardShouldPersistTaps="handled"
+				keyboardShouldPersistTaps="always"
 			>
 				{/* Info card */}
 				<Card className="flex-row items-start gap-3 bg-gray-100 p-3 shadow-none">
@@ -448,9 +443,11 @@ export default function ManualComplaintScreen() {
 				<View className="gap-1 pt-1">
 					<Heading size="md">Localização do ocorrido</Heading>
 					<Text className="text-sm text-gray-500">
-						Informe o endereço. Digite o CEP para preenchimento automático.
+						Busque pelo endereço ou preencha os campos manualmente.
 					</Text>
 				</View>
+
+				<GooglePlacesInput onSelect={handleAddressSelect} />
 
 				{/* CEP */}
 				<FormControl isInvalid={!!errors.postalCode} className="gap-1">
@@ -635,91 +632,22 @@ export default function ManualComplaintScreen() {
 					)}
 				</FormControl>
 
-				{/* Coordenadas */}
-				<View className="gap-2">
-					<View className="flex-row items-end justify-between">
-						<Text className="text-sm font-medium text-gray-700">
-							Coordenadas *
-						</Text>
-						<TouchableOpacity
-							className="flex-row items-center gap-1"
-							onPress={handleUseCurrentLocation}
-							disabled={isFetchingLocation}
-						>
-							{isFetchingLocation ? (
-								<Spinner size="small" />
-							) : (
-								<LocateFixed
-									size={14}
-									color={colors.lime[800]}
-									strokeWidth={2.2}
-								/>
-							)}
-							<Text className="text-sm text-lime-800">
-								Usar localização atual
-							</Text>
-						</TouchableOpacity>
-					</View>
-
-					<View className="flex-row gap-3">
-						<FormControl isInvalid={!!errors.latitude} className="flex-1 gap-1">
-							<FormControlLabel>
-								<FormControlLabelText>Latitude</FormControlLabelText>
-							</FormControlLabel>
-							<Controller
-								control={control}
-								name="latitude"
-								render={({ field: { value, onChange } }) => (
-									<Input>
-										<InputField
-											placeholder="-15.7801"
-											keyboardType="numbers-and-punctuation"
-											value={value}
-											onChangeText={onChange}
-										/>
-									</Input>
-								)}
-							/>
-							{errors.latitude?.message && (
-								<FormControlError>
-									<FormControlErrorText>
-										{errors.latitude.message}
-									</FormControlErrorText>
-								</FormControlError>
-							)}
-						</FormControl>
-
-						<FormControl
-							isInvalid={!!errors.longitude}
-							className="flex-1 gap-1"
-						>
-							<FormControlLabel>
-								<FormControlLabelText>Longitude</FormControlLabelText>
-							</FormControlLabel>
-							<Controller
-								control={control}
-								name="longitude"
-								render={({ field: { value, onChange } }) => (
-									<Input>
-										<InputField
-											placeholder="-47.9292"
-											keyboardType="numbers-and-punctuation"
-											value={value}
-											onChangeText={onChange}
-										/>
-									</Input>
-								)}
-							/>
-							{errors.longitude?.message && (
-								<FormControlError>
-									<FormControlErrorText>
-										{errors.longitude.message}
-									</FormControlErrorText>
-								</FormControlError>
-							)}
-						</FormControl>
-					</View>
-				</View>
+				{/* Mapa */}
+				<WrapperMap
+					latitude={latValue ? parseFloat(latValue) : null}
+					longitude={lonValue ? parseFloat(lonValue) : null}
+					onChange={(loc) => {
+						setValue("latitude", String(loc.latitude), { shouldValidate: true });
+						setValue("longitude", String(loc.longitude), { shouldValidate: true });
+					}}
+				/>
+				{(errors.latitude?.message ?? errors.longitude?.message) && (
+					<FormControlError>
+						<FormControlErrorText>
+							{errors.latitude?.message ?? errors.longitude?.message}
+						</FormControlErrorText>
+					</FormControlError>
+				)}
 
 				{/* Mídias */}
 				<View className="gap-2 pt-1">

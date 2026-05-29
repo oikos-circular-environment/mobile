@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import {
@@ -19,13 +19,17 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE, type Region } from "react-native-maps";
+import MapView, {
+	Marker,
+	PROVIDER_GOOGLE,
+	type Region,
+} from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
-import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
 	deleteV1ComplaintsByIdVotes,
@@ -204,8 +208,8 @@ export default function ComplaintsMapScreen() {
 		if (!selectedComplaint?.location) return;
 		const { lat, lon } = selectedComplaint.location;
 		const label = encodeURIComponent(
-			complaintTypeValues.find(t => t.value === selectedComplaint.type)?.label ??
-				"Denúncia",
+			complaintTypeValues.find(t => t.value === selectedComplaint.type)
+				?.label ?? "Denúncia",
 		);
 		const url =
 			Platform.OS === "ios"
@@ -237,7 +241,8 @@ export default function ComplaintsMapScreen() {
 		selectedComplaint &&
 		complaintTypeValues.find(t => t.value === selectedComplaint.type)?.label;
 	const typeColor =
-		selectedComplaint && COMPLAINT_COLORS[selectedComplaint.type as ComplaintType];
+		selectedComplaint &&
+		COMPLAINT_COLORS[selectedComplaint.type as ComplaintType];
 	const statusLabel =
 		selectedComplaint && STATUS_LABELS[selectedComplaint.status];
 	const statusColor =
@@ -267,7 +272,8 @@ export default function ComplaintsMapScreen() {
 				{complaints.map(complaint => {
 					if (!complaint.location) return null;
 					const pinColor =
-						COMPLAINT_COLORS[complaint.type as ComplaintType] ?? colors.gray[500];
+						COMPLAINT_COLORS[complaint.type as ComplaintType] ??
+						colors.gray[500];
 					const isSelected = selectedComplaint?.id === complaint.id;
 					return (
 						<Marker
@@ -319,9 +325,7 @@ export default function ComplaintsMapScreen() {
 							paddingVertical: 7,
 							borderRadius: 999,
 							backgroundColor:
-								activeTypeFilter === null
-									? colors.lime[800]
-									: colors.white,
+								activeTypeFilter === null ? colors.lime[800] : colors.white,
 							shadowColor: colors.black,
 							shadowOffset: { width: 0, height: 1 },
 							shadowOpacity: 0.15,
@@ -333,7 +337,8 @@ export default function ComplaintsMapScreen() {
 							style={{
 								fontSize: 13,
 								fontWeight: "600",
-								color: activeTypeFilter === null ? colors.white : colors.gray[800],
+								color:
+									activeTypeFilter === null ? colors.white : colors.gray[800],
 							}}
 						>
 							Todos
@@ -436,7 +441,10 @@ export default function ComplaintsMapScreen() {
 					activeOpacity={0.9}
 					onPress={() => {
 						if (!isAuthenticated) {
-							toast.info("Login necessário", "Entre para registrar uma denúncia.");
+							toast.info(
+								"Login necessário",
+								"Entre para registrar uma denúncia.",
+							);
 							return;
 						}
 						router.push("/(tabs)/complaints/(create)/camera");
@@ -558,22 +566,33 @@ export default function ComplaintsMapScreen() {
 
 							{/* Complaint heading */}
 							<Heading size="md" style={{ marginBottom: 4 }}>
-								{complaintTypeValues.find(t => t.value === selectedComplaint.type)
+								{complaintTypeValues
+									.find(t => t.value === selectedComplaint.type)
 									?.label?.toUpperCase() ?? "Denúncia"}
 							</Heading>
 
 							{/* Meta row */}
-							<View
-								style={{ flexDirection: "row", gap: 16, marginBottom: 14 }}
-							>
-								<View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-									<ThumbsUpIcon size={13} color={colors.gray[400]} strokeWidth={2} />
+							<View style={{ flexDirection: "row", gap: 16, marginBottom: 14 }}>
+								<View
+									style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+								>
+									<ThumbsUpIcon
+										size={13}
+										color={colors.gray[400]}
+										strokeWidth={2}
+									/>
 									<Text style={{ fontSize: 12, color: colors.gray[500] }}>
 										{selectedComplaint.vote_counts.resolved} resolvida
 									</Text>
 								</View>
-								<View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-									<ThumbsDownIcon size={13} color={colors.gray[400]} strokeWidth={2} />
+								<View
+									style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+								>
+									<ThumbsDownIcon
+										size={13}
+										color={colors.gray[400]}
+										strokeWidth={2}
+									/>
 									<Text style={{ fontSize: 12, color: colors.gray[500] }}>
 										{selectedComplaint.vote_counts.not_resolved} não resolvida
 									</Text>
