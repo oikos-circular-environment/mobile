@@ -1292,40 +1292,71 @@ export type GetV1ComplaintsResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
@@ -1436,40 +1467,71 @@ export type PostV1ComplaintsResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
@@ -1646,40 +1708,71 @@ export type GetV1ComplaintsByIdPublicResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
@@ -1774,40 +1867,71 @@ export type GetV1ComplaintsByIdResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
@@ -1883,40 +2007,71 @@ export type PatchV1ComplaintsByIdResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
@@ -2022,40 +2177,71 @@ export type PostV1ComplaintsManualResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
@@ -2141,40 +2327,71 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
@@ -2447,40 +2664,71 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
@@ -2579,40 +2827,71 @@ export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses = {
 				id: string;
 				date: Date;
 				observations: string | null;
-				geospatial: {
-					heading: {
-						trueHeading: number;
-						magHeading: number;
-						accuracy: number;
-					};
-					location: {
-						coords: {
-							latitude: number;
-							longitude: number;
-							altitude: number | null;
-							accuracy: number | null;
-							altitudeAccuracy: number | null;
-							heading: number | null;
-							speed: number | null;
-						};
-						timestamp: number;
-						mocked?: boolean;
-					};
-					addresses: {
-						city: string | null;
-						district: string | null;
-						streetNumber: string | null;
-						street: string | null;
-						region: string | null;
-						subregion: string | null;
-						country: string | null;
-						postalCode: string | null;
-						name: string | null;
-						isoCountryCode: string | null;
-						timezone: string | null;
-						formattedAddress?: string | null;
-					};
-				};
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
 				attachments: Array<{
 					id: string;
 					url: string;
