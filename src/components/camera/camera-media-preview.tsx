@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
-import { MediaThumbnail, MediaViewer } from "@/components/common";
+import { MediaThumbnail, MediaViewer } from "@/components/medias-preview";
 import { Text } from "@/components/ui/text";
 import type { ComplaintCapture } from "@/libs/types/complaint";
 

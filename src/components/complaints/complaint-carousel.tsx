@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { MediaThumbnail, MediaViewer } from "@/components/common";
+import { MediaThumbnail, MediaViewer } from "@/components/medias-preview";
 import { Pressable } from "@/components/ui/pressable";
 import type { ComplaintCapture } from "@/libs/types/complaint";
 import { cn } from "@/libs/utils";
