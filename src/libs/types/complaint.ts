@@ -1,4 +1,15 @@
 import type { CameraCapturedPicture } from "expo-camera";
+import {
+	FlameIcon,
+	ShieldAlertIcon,
+	ShieldCheckIcon,
+	ShieldIcon,
+	ShieldQuestionMarkIcon,
+	ShieldXIcon,
+	ShrubIcon,
+	TractorIcon,
+	Trash2Icon,
+} from "lucide-react-native";
 import type { ValueMapping } from "./value-mapping";
 // import type * as Location from "expo-location";
 
@@ -14,24 +25,28 @@ export const complaintTypeValues: ValueMapping<ComplaintType>[] = [
 		label: "Descarte Irregular",
 		description:
 			"Denúncias relacionadas ao descarte inadequado de resíduos, como lixo, entulho, pneus, animais mortos, entre outros.",
+		icon: Trash2Icon,
 	},
 	{
 		value: "DEFORESTATION",
 		label: "Desmatamento",
 		description:
 			"Denúncias relacionadas à remoção ilegal de vegetação, como corte de árvores, desmatamento de áreas protegidas, entre outros.",
+		icon: TractorIcon,
 	},
 	{
 		value: "BURNING",
 		label: "Queimadas",
 		description:
 			"Denúncias relacionadas a incêndios florestais, queimadas ilegais, entre outros.",
+		icon: FlameIcon,
 	},
 	{
 		value: "VACANT_LOT",
 		label: "Terreno Baldio",
 		description:
 			"Denúncias relacionadas à área urbana ou rural sem construções, edificações ou uso ativo, caracterizada pelo abandono, falta de manutenção, vegetação alta e, frequentemente, acúmulo de lixo ou entulho.",
+		icon: ShrubIcon,
 	},
 ];
 
@@ -67,6 +82,34 @@ export type ComplaintStatus =
 export type Complaint = ComplaintCapture & {
 	status: ComplaintStatus;
 };
+
+export const complaintStatuses: ValueMapping<ComplaintStatus>[] = [
+	{
+		value: "OPEN",
+		label: "Aberto",
+		icon: ShieldIcon,
+	},
+	{
+		value: "IN_PROGRESS",
+		label: "Em andamento",
+		icon: ShieldQuestionMarkIcon,
+	},
+	{
+		value: "RESOLVED",
+		label: "Resolvidos",
+		icon: ShieldCheckIcon,
+	},
+	{
+		value: "CANCELED",
+		label: "Aberto",
+		icon: ShieldXIcon,
+	},
+	{
+		value: "REJECTED",
+		label: "Aberto",
+		icon: ShieldAlertIcon,
+	},
+];
 
 export type Geospatial = {
 	heading: {

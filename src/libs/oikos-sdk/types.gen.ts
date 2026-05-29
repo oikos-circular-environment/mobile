@@ -1607,11 +1607,7 @@ export type GetV1ComplaintsMapData = {
 		lon: number;
 		radius?: number;
 		type?: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-		status?: Array<
-			"OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED"
-		>;
-		from?: Date;
-		to?: Date;
+		status?: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 	};
 	url: "/v1/complaints/map";
 };

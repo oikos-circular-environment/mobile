@@ -37,7 +37,9 @@ import {
 	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
 import {
+	type ComplaintStatus,
 	type ComplaintType,
+	complaintStatuses,
 	complaintTypeValues,
 } from "@/libs/types/complaint";
 
@@ -75,8 +77,12 @@ const DEFAULT_REGION: Region = {
 	longitudeDelta: 0.05,
 };
 
-const MAP_QUERY_KEY = (lat: number, lon: number, type: ComplaintType | null) =>
-	["complaints", "map", lat, lon, type] as const;
+const MAP_QUERY_KEY = (
+	lat: number,
+	lon: number,
+	type: ComplaintType | null,
+	status: ComplaintStatus | null,
+) => ["complaints", "map", lat, lon, type, status] as const;
 
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
@@ -90,7 +96,9 @@ export default function ComplaintsMapScreen() {
 		lon: number;
 	} | null>(null);
 	const [activeTypeFilter, setActiveTypeFilter] =
-		useState<ComplaintType | null>(null);
+		useState<ComplaintType | null>("IRREGULAR_DISPOSAL");
+	const [activeStatusFilter, setActiveStatusFilter] =
+		useState<ComplaintStatus | null>("OPEN");
 	const [selectedComplaint, setSelectedComplaint] =
 		useState<MapComplaint | null>(null);
 	const [userVotes, setUserVotes] = useState<
@@ -138,6 +146,7 @@ export default function ComplaintsMapScreen() {
 			userLocation?.lat ?? 0,
 			userLocation?.lon ?? 0,
 			activeTypeFilter,
+			activeStatusFilter,
 		),
 		queryFn: async () => {
 			const res = await getV1ComplaintsMap({
@@ -146,6 +155,7 @@ export default function ComplaintsMapScreen() {
 					lon: userLocation?.lon ?? 0,
 					radius: 10000,
 					...(activeTypeFilter ? { type: activeTypeFilter } : {}),
+					...(activeStatusFilter ? { status: activeStatusFilter } : {}),
 				},
 			});
 			return res.data;
@@ -186,6 +196,7 @@ export default function ComplaintsMapScreen() {
 					userLocation?.lat ?? 0,
 					userLocation?.lon ?? 0,
 					activeTypeFilter,
+					activeStatusFilter,
 				),
 			});
 		},
@@ -288,7 +299,7 @@ export default function ComplaintsMapScreen() {
 								style={{
 									width: isSelected ? 18 : 14,
 									height: isSelected ? 18 : 14,
-									borderRadius: 999,
+									borderRadius: 8,
 									backgroundColor: pinColor,
 									borderWidth: isSelected ? 3 : 2,
 									borderColor: colors.white,
@@ -304,7 +315,7 @@ export default function ComplaintsMapScreen() {
 				})}
 			</MapView>
 
-			{/* Top bar: filter chips */}
+			{/* Type filter chips */}
 			<View
 				className="absolute left-0 right-0"
 				style={{ top: insets.top + 8 }}
@@ -316,52 +327,81 @@ export default function ComplaintsMapScreen() {
 					contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}
 					pointerEvents="auto"
 				>
-					{/* All chip */}
-					<TouchableOpacity
-						activeOpacity={0.8}
-						onPress={() => setActiveTypeFilter(null)}
-						style={{
-							paddingHorizontal: 14,
-							paddingVertical: 7,
-							borderRadius: 999,
-							backgroundColor:
-								activeTypeFilter === null ? colors.lime[800] : colors.white,
-							shadowColor: colors.black,
-							shadowOffset: { width: 0, height: 1 },
-							shadowOpacity: 0.15,
-							shadowRadius: 3,
-							elevation: 3,
-						}}
-					>
-						<Text
-							style={{
-								fontSize: 13,
-								fontWeight: "600",
-								color:
-									activeTypeFilter === null ? colors.white : colors.gray[800],
-							}}
-						>
-							Todos
-						</Text>
-					</TouchableOpacity>
-
-					{complaintTypeValues.map(opt => {
-						const isActive = activeTypeFilter === opt.value;
+					{complaintTypeValues.map(({ value, label, icon: Icon }) => {
+						const isActive = activeTypeFilter === value;
+						const color = COMPLAINT_COLORS[value as ComplaintType];
 						return (
 							<TouchableOpacity
-								key={opt.value}
+								key={value}
 								activeOpacity={0.8}
-								onPress={() =>
-									setActiveTypeFilter(
-										isActive ? null : (opt.value as ComplaintType),
-									)
-								}
+								onPress={() => setActiveTypeFilter(value as ComplaintType)}
 								style={{
+									flexDirection: "row",
+									alignItems: "center",
+									gap: 5,
 									paddingHorizontal: 14,
 									paddingVertical: 7,
-									borderRadius: 999,
+									borderRadius: 8,
+									backgroundColor: isActive ? color : colors.white,
+									shadowColor: colors.black,
+									shadowOffset: { width: 0, height: 1 },
+									shadowOpacity: 0.15,
+									shadowRadius: 3,
+									elevation: 3,
+								}}
+							>
+								{Icon && (
+									<Icon
+										size={13}
+										color={isActive ? colors.white : colors.gray[600]}
+										strokeWidth={2}
+									/>
+								)}
+								<Text
+									style={{
+										fontSize: 13,
+										fontWeight: "600",
+										color: isActive ? colors.white : colors.gray[800],
+									}}
+								>
+									{label}
+								</Text>
+							</TouchableOpacity>
+						);
+					})}
+				</ScrollView>
+			</View>
+
+			{/* Status filter chips */}
+			<View
+				className="absolute left-0 right-0"
+				style={{ top: insets.top + 46 }}
+				pointerEvents="box-none"
+			>
+				<ScrollView
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}
+					pointerEvents="auto"
+				>
+					{complaintStatuses.map(({ value, icon: Icon }) => {
+						if (!Icon) return null;
+						const isActive = activeStatusFilter === value;
+						const label = STATUS_LABELS[value];
+						return (
+							<TouchableOpacity
+								key={value}
+								activeOpacity={0.8}
+								onPress={() => setActiveStatusFilter(isActive ? null : value)}
+								style={{
+									flexDirection: "row",
+									alignItems: "center",
+									gap: 5,
+									paddingHorizontal: 14,
+									paddingVertical: 7,
+									borderRadius: 8,
 									backgroundColor: isActive
-										? COMPLAINT_COLORS[opt.value as ComplaintType]
+										? STATUS_COLORS[value]
 										: colors.white,
 									shadowColor: colors.black,
 									shadowOffset: { width: 0, height: 1 },
@@ -370,6 +410,11 @@ export default function ComplaintsMapScreen() {
 									elevation: 3,
 								}}
 							>
+								<Icon
+									size={13}
+									color={isActive ? colors.white : colors.gray[600]}
+									strokeWidth={2}
+								/>
 								<Text
 									style={{
 										fontSize: 13,
@@ -377,7 +422,7 @@ export default function ComplaintsMapScreen() {
 										color: isActive ? colors.white : colors.gray[800],
 									}}
 								>
-									{opt.label}
+									{label}
 								</Text>
 							</TouchableOpacity>
 						);
@@ -395,7 +440,7 @@ export default function ComplaintsMapScreen() {
 					<View
 						style={{
 							backgroundColor: colors.white,
-							borderRadius: 999,
+							borderRadius: 8,
 							padding: 8,
 							shadowColor: colors.black,
 							shadowOffset: { width: 0, height: 1 },
@@ -409,10 +454,10 @@ export default function ComplaintsMapScreen() {
 				</View>
 			)}
 
-			{/* FABs: top-right */}
+			{/* FABs: bottom-right */}
 			<View
-				className="absolute right-4 gap-2"
-				style={{ top: insets.top + 8 }}
+				className="absolute bottom-4 right-4 flex-row gap-2 items-center"
+				style={{ bottom: insets.bottom }}
 				pointerEvents="box-none"
 			>
 				{/* My complaints list */}
@@ -420,8 +465,8 @@ export default function ComplaintsMapScreen() {
 					activeOpacity={0.9}
 					onPress={() => router.push("/(tabs)/complaints/list")}
 					style={{
-						width: 44,
-						height: 44,
+						width: 50,
+						height: 50,
 						borderRadius: 12,
 						backgroundColor: colors.white,
 						alignItems: "center",
@@ -450,9 +495,9 @@ export default function ComplaintsMapScreen() {
 						router.push("/(tabs)/complaints/(create)/camera");
 					}}
 					style={{
-						width: 44,
-						height: 44,
-						borderRadius: 12,
+						width: 50,
+						height: 50,
+						borderRadius: 14,
 						backgroundColor: colors.lime[800],
 						alignItems: "center",
 						justifyContent: "center",
@@ -463,7 +508,7 @@ export default function ComplaintsMapScreen() {
 						elevation: 4,
 					}}
 				>
-					<PlusIcon size={22} color={colors.white} strokeWidth={2.2} />
+					<PlusIcon size={24} color={colors.white} strokeWidth={2.2} />
 				</TouchableOpacity>
 			</View>
 
@@ -508,7 +553,7 @@ export default function ComplaintsMapScreen() {
 										flex: 1,
 										height: 4,
 										backgroundColor: colors.gray[200],
-										borderRadius: 999,
+										borderRadius: 8,
 										marginHorizontal: 60,
 									}}
 								/>
@@ -530,7 +575,7 @@ export default function ComplaintsMapScreen() {
 									style={{
 										width: 10,
 										height: 10,
-										borderRadius: 999,
+										borderRadius: 8,
 										backgroundColor: typeColor ?? colors.gray[400],
 									}}
 								/>
@@ -549,7 +594,7 @@ export default function ComplaintsMapScreen() {
 									style={{
 										width: 3,
 										height: 3,
-										borderRadius: 999,
+										borderRadius: 8,
 										backgroundColor: colors.gray[400],
 									}}
 								/>
