@@ -104,6 +104,7 @@ export default function ComplaintsMapScreen() {
 	const [userVotes, setUserVotes] = useState<
 		Record<string, "RESOLVED" | "NOT_RESOLVED">
 	>({});
+	const [markersReady, setMarkersReady] = useState(false);
 
 	const panelAnim = useRef(new Animated.Value(0)).current;
 
@@ -164,6 +165,14 @@ export default function ComplaintsMapScreen() {
 	});
 
 	const complaints = mapData?.complaints ?? [];
+
+	// Switch tracksViewChanges to false after SVG icons finish rendering
+	useEffect(() => {
+		if (complaints.length === 0) return;
+		setMarkersReady(false);
+		const t = setTimeout(() => setMarkersReady(true), 300);
+		return () => clearTimeout(t);
+	}, [complaints]);
 
 	const voteMutation = useMutation({
 		mutationFn: async ({
@@ -235,13 +244,22 @@ export default function ComplaintsMapScreen() {
 			);
 	}, [selectedComplaint]);
 
+	const suppressMapPressRef = useRef(false);
+
 	const handleMarkerPress = (complaint: MapComplaint) => {
+		suppressMapPressRef.current = true;
 		setSelectedComplaint(prev =>
 			prev?.id === complaint.id ? null : complaint,
 		);
+		setTimeout(() => {
+			suppressMapPressRef.current = false;
+		}, 100);
 	};
 
-	const handleClosePanel = () => setSelectedComplaint(null);
+	const handleClosePanel = () => {
+		if (suppressMapPressRef.current) return;
+		setSelectedComplaint(null);
+	};
 
 	const panelTranslate = panelAnim.interpolate({
 		inputRange: [0, 1],
@@ -299,7 +317,7 @@ export default function ComplaintsMapScreen() {
 								longitude: complaint.location.lon,
 							}}
 							onPress={() => handleMarkerPress(complaint)}
-							tracksViewChanges={false}
+							tracksViewChanges={!markersReady || isSelected}
 						>
 							<View
 								style={{

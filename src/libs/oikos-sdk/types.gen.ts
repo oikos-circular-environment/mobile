@@ -1635,17 +1635,100 @@ export type GetV1ComplaintsMapResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			complaint_method: "AUTOMATIC" | "MANUAL";
 			event_group_id: string | null;
 			location: {
 				lat: number;
 				lon: number;
 			} | null;
+			captures: Array<{
+				id: string;
+				date: Date;
+				observations: string | null;
+				geospatial:
+					| {
+							heading: {
+								trueHeading: number;
+								magHeading: number;
+								accuracy: number;
+							};
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string | null;
+								district: string | null;
+								streetNumber: string | null;
+								street: string | null;
+								region: string | null;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string | null;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  }
+					| {
+							heading: null;
+							location: {
+								coords: {
+									latitude: number;
+									longitude: number;
+									altitude: number | null;
+									accuracy: number | null;
+									altitudeAccuracy: number | null;
+									heading: number | null;
+									speed: number | null;
+								};
+								timestamp: number;
+								mocked?: boolean;
+							};
+							addresses: {
+								city: string;
+								district: string;
+								streetNumber: string;
+								street: string;
+								region: string;
+								subregion: string | null;
+								country: string | null;
+								postalCode: string;
+								name: string | null;
+								isoCountryCode: string | null;
+								timezone: string | null;
+								formattedAddress?: string | null;
+							};
+					  };
+				attachments: Array<{
+					id: string;
+					url: string;
+					file_name: string;
+					path: string;
+					base64: string;
+					metadata: {
+						[key: string]: unknown;
+					} | null;
+					type: "PHOTO" | "VIDEO";
+					created_at: Date;
+				}>;
+				created_at: Date;
+			}>;
 			vote_counts: {
 				resolved: number;
 				not_resolved: number;
 			};
 			resolution_count: number;
-			capture_count: number;
 			created_at: Date;
 		}>;
 	};

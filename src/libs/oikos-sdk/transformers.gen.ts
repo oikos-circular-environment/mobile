@@ -244,6 +244,15 @@ export const getV1ComplaintsMapResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ComplaintsMapResponse> => {
 	data.complaints = data.complaints.map((item: any) => {
+		item.captures = item.captures.map((item: any) => {
+			item.date = new Date(item.date);
+			item.attachments = item.attachments.map((item: any) => {
+				item.created_at = new Date(item.created_at);
+				return item;
+			});
+			item.created_at = new Date(item.created_at);
+			return item;
+		});
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
