@@ -1,26 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import * as Location from "expo-location";
 import { router } from "expo-router";
 import { ListIcon, PlusIcon } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
-import MapView, {
-	Marker,
-	PROVIDER_GOOGLE,
-	type Region,
-} from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
-import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
-import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/tokens";
 import {
 	ComplaintBottomSheet,
 	type MapComplaint,
 } from "@/components/complaints/complaint-bottom-sheet";
+import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
+import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
+import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/tokens";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 import {
 	deleteV1ComplaintsByIdVotes,
 	getV1ComplaintsMap,
@@ -33,13 +32,6 @@ import {
 	complaintTypeValues,
 } from "@/libs/types/complaint";
 
-const DEFAULT_REGION: Region = {
-	latitude: -15.7801,
-	longitude: -47.9292,
-	latitudeDelta: 0.05,
-	longitudeDelta: 0.05,
-};
-
 const MAP_QUERY_KEY = (
 	lat: number,
 	lon: number,
@@ -50,14 +42,16 @@ const MAP_QUERY_KEY = (
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
 	const { isAuthenticated } = useAuthContext();
+	const { location } = useGeospatial();
 	const queryClient = useQueryClient();
 	const mapRef = useRef<MapView>(null);
+	const hasAnimatedRef = useRef(false);
+	const suppressMapPressRef = useRef(false);
 
-	const [region, setRegion] = useState<Region>(DEFAULT_REGION);
-	const [userLocation, setUserLocation] = useState<{
-		lat: number;
-		lon: number;
-	} | null>(null);
+	const userLocation = location
+		? { lat: location.coords.latitude, lon: location.coords.longitude }
+		: null;
+
 	const [activeTypeFilter, setActiveTypeFilter] =
 		useState<ComplaintType | null>("IRREGULAR_DISPOSAL");
 	const [activeStatusFilter, setActiveStatusFilter] =
@@ -67,31 +61,19 @@ export default function ComplaintsMapScreen() {
 	const [userVotes, setUserVotes] = useState<
 		Record<string, "RESOLVED" | "NOT_RESOLVED">
 	>({});
-	const [markersReady, setMarkersReady] = useState(false);
-
-	// Get user location on mount
 	useEffect(() => {
-		void (async () => {
-			const { status } = await Location.requestForegroundPermissionsAsync();
-			if (status !== "granted") return;
-			const loc = await Location.getCurrentPositionAsync({
-				accuracy: Location.Accuracy.Balanced,
-			});
-			const pos = {
-				lat: loc.coords.latitude,
-				lon: loc.coords.longitude,
-			};
-			setUserLocation(pos);
-			const newRegion: Region = {
-				latitude: pos.lat,
-				longitude: pos.lon,
+		if (!location || hasAnimatedRef.current) return;
+		hasAnimatedRef.current = true;
+		mapRef.current?.animateToRegion(
+			{
+				latitude: location.coords.latitude,
+				longitude: location.coords.longitude,
 				latitudeDelta: 0.04,
 				longitudeDelta: 0.04,
-			};
-			setRegion(newRegion);
-			mapRef.current?.animateToRegion(newRegion, 600);
-		})();
-	}, []);
+			},
+			600,
+		);
+	}, [location]);
 
 	const { data: mapData, isLoading: isLoadingMap } = useQuery({
 		queryKey: MAP_QUERY_KEY(
@@ -116,14 +98,6 @@ export default function ComplaintsMapScreen() {
 	});
 
 	const complaints = mapData?.complaints ?? [];
-
-	// Switch tracksViewChanges to false after SVG icons finish rendering
-	useEffect(() => {
-		if (complaints.length === 0) return;
-		setMarkersReady(false);
-		const t = setTimeout(() => setMarkersReady(true), 300);
-		return () => clearTimeout(t);
-	}, [complaints]);
 
 	const voteMutation = useMutation({
 		mutationFn: async ({
@@ -175,8 +149,6 @@ export default function ComplaintsMapScreen() {
 		voteMutation.mutate({ complaintId: selectedComplaint.id, voteType: next });
 	};
 
-	const suppressMapPressRef = useRef(false);
-
 	const handleMarkerPress = (complaint: MapComplaint) => {
 		suppressMapPressRef.current = true;
 		setSelectedComplaint(prev =>
@@ -203,7 +175,6 @@ export default function ComplaintsMapScreen() {
 				ref={mapRef}
 				style={{ flex: 1 }}
 				provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-				initialRegion={region}
 				showsUserLocation
 				showsMyLocationButton={false}
 				onPress={handleClosePanel}
@@ -218,7 +189,6 @@ export default function ComplaintsMapScreen() {
 						colors.gray[500];
 					const isSelected = selectedComplaint?.id === complaint.id;
 					const Icon = typeInfo?.icon;
-					const size = isSelected ? 38 : 32;
 					return (
 						<Marker
 							key={complaint.id}
@@ -227,21 +197,17 @@ export default function ComplaintsMapScreen() {
 								longitude: complaint.location.lon,
 							}}
 							onPress={() => handleMarkerPress(complaint)}
-							tracksViewChanges={!markersReady || isSelected}
+							tracksViewChanges={false}
 						>
 							<View
-								className="rounded-full items-center justify-center"
+								className="w-12 h-12 rounded-full items-center justify-center border-white"
 								style={{
-									width: size,
-									height: size,
 									backgroundColor: pinColor,
-									borderWidth: isSelected ? 3 : 2,
-									borderColor: colors.white,
+									borderWidth: isSelected ? 2 : 1,
 									shadowColor: colors.black,
 									shadowOffset: { width: 0, height: 2 },
 									shadowOpacity: 0.35,
 									shadowRadius: 3,
-									elevation: 4,
 								}}
 							>
 								{Icon && (
@@ -308,25 +274,19 @@ export default function ComplaintsMapScreen() {
 				</ScrollView>
 			</View>
 
-			{/* Loading indicator */}
+			{/* Loading indicator*/}
 			{isLoadingMap && (
 				<View
 					className="absolute self-center items-center justify-center"
-					style={{ top: insets.top + 56 }}
+					style={{ top: insets.top + 100 }}
 					pointerEvents="none"
 				>
-					<View
-						className="rounded-lg bg-white p-2"
-						style={{
-							shadowColor: colors.black,
-							shadowOffset: { width: 0, height: 1 },
-							shadowOpacity: 0.15,
-							shadowRadius: 3,
-							elevation: 3,
-						}}
-					>
-						<Spinner size="small" />
-					</View>
+					<Card>
+						<HStack className="gap-2">
+							<Heading>Carregando denúncias</Heading>
+							<Spinner size="small" />
+						</HStack>
+					</Card>
 				</View>
 			)}
 
