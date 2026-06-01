@@ -177,6 +177,7 @@ export default function ComplaintsMapScreen() {
 				provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
 				showsUserLocation
 				showsMyLocationButton={false}
+				showsCompass={false}
 				onPress={handleClosePanel}
 			>
 				{complaints.map(complaint => {
@@ -223,40 +224,32 @@ export default function ComplaintsMapScreen() {
 				})}
 			</MapView>
 
-			{/* Type filter chips */}
+			{/* Filters */}
 			<View
-				className="absolute left-0 right-0"
-				style={{ top: insets.top + 8 }}
+				className="absolute left-0 right-0 gap-2 pl-4"
+				style={{ top: 24 }}
 				pointerEvents="box-none"
 			>
 				<ScrollView
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					contentContainerClassName="px-3 gap-2"
+					contentContainerClassName="gap-2"
 					pointerEvents="auto"
 				>
 					{complaintTypeValues.map(({ value }) => (
 						<ComplaintTypeChip.Pressable
 							key={value}
 							type={value}
-							size="md"
+							size="lg"
 							active={activeTypeFilter === value}
 							onPress={() => setActiveTypeFilter(value)}
 						/>
 					))}
 				</ScrollView>
-			</View>
-
-			{/* Status filter chips */}
-			<View
-				className="absolute left-0 right-0"
-				style={{ top: insets.top + 46 }}
-				pointerEvents="box-none"
-			>
 				<ScrollView
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					contentContainerClassName="px-3 gap-2"
+					contentContainerClassName="gap-2"
 					pointerEvents="auto"
 				>
 					{complaintStatuses.map(({ value }) => {
@@ -265,7 +258,7 @@ export default function ComplaintsMapScreen() {
 							<ComplaintStatusChip.Pressable
 								key={value}
 								status={value}
-								size="md"
+								size="lg"
 								active={isActive}
 								onPress={() => setActiveStatusFilter(isActive ? null : value)}
 							/>
