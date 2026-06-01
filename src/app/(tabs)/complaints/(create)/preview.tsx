@@ -9,7 +9,7 @@ import {
 } from "@/components/medias-preview";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
-import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
+import { useComplaintCreateContext } from "@/contexts/complaint-create-context";
 
 export default function ComplaintPreviewScreen() {
 	const { captureId } = useLocalSearchParams<{ captureId?: string }>();

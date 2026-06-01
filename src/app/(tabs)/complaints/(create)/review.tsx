@@ -7,9 +7,9 @@ import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
-import { colors } from "@/components/style/colors";
 import { ComplaintCarousel } from "@/components/complaints/complaint-carousel";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -25,7 +25,7 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
+import { useComplaintCreateContext } from "@/contexts/complaint-create-context";
 import { useSubmitComplaints } from "@/hooks/use-submit-complaints";
 import {
 	formatHeading,

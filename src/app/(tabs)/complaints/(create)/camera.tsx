@@ -6,7 +6,7 @@ import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Camera } from "@/components/camera";
 import { colors } from "@/components/style/colors";
-import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
+import { useComplaintCreateContext } from "@/contexts/complaint-create-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import type {
 	CameraCapturedVideo,
