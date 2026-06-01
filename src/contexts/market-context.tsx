@@ -56,7 +56,8 @@ export function MarketProvider({ children }: PropsWithChildren) {
 	const { location, isResolving } = useGeospatial();
 	const [appliedFilters, setAppliedFilters] =
 		useState<MarketFilterValues>(defaultFilters);
-	const [locationSource, setLocationSource] = useState<LocationSource>("current");
+	const [locationSource, setLocationSource] =
+		useState<LocationSource>("current");
 
 	const profileLat = user?.profile?.address?.latitude ?? undefined;
 	const profileLon = user?.profile?.address?.longitude ?? undefined;
@@ -75,7 +76,10 @@ export function MarketProvider({ children }: PropsWithChildren) {
 
 	useEffect(() => {
 		const profileHasCoords = profileLat != null && profileLon != null;
-		if (locationSource === "profile" && (!isAuthenticated || !profileHasCoords)) {
+		if (
+			locationSource === "profile" &&
+			(!isAuthenticated || !profileHasCoords)
+		) {
 			setLocationSource("current");
 		}
 	}, [isAuthenticated, locationSource, profileLat, profileLon]);

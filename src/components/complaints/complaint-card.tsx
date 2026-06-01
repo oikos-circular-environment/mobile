@@ -139,18 +139,33 @@ function ComplaintCardContent() {
 				<View className="gap-2">
 					<View className="flex-row items-center gap-2">
 						{firstAttachment?.url ? (
-							<View style={{ width: 48, height: 48, borderRadius: 8, overflow: "hidden" }}>
+							<View
+								style={{
+									width: 48,
+									height: 48,
+									borderRadius: 8,
+									overflow: "hidden",
+								}}
+							>
 								<MediaThumbnail
-									mediaType={firstAttachment.type === "VIDEO" ? "video" : "photo"}
+									mediaType={
+										firstAttachment.type === "VIDEO" ? "video" : "photo"
+									}
 									uri={firstAttachment.url}
-									fallbackLabel={firstAttachment.type === "VIDEO" ? "VIDEO" : "FOTO"}
+									fallbackLabel={
+										firstAttachment.type === "VIDEO" ? "VIDEO" : "FOTO"
+									}
 								/>
 								{firstAttachment.type === "VIDEO" ? (
 									<View
 										className="absolute inset-0 items-center justify-center"
 										style={{ backgroundColor: colors.overlay.black25 }}
 									>
-										<PlayCircleIcon size={20} color={colors.white} strokeWidth={1.8} />
+										<PlayCircleIcon
+											size={20}
+											color={colors.white}
+											strokeWidth={1.8}
+										/>
 									</View>
 								) : null}
 							</View>
@@ -232,7 +247,11 @@ function ComplaintCardContent() {
 										{isCancelingComplaint ? (
 											<Spinner size="small" />
 										) : (
-											<ShieldXIcon size={14} color={colors.red[700]} strokeWidth={2.2} />
+											<ShieldXIcon
+												size={14}
+												color={colors.red[700]}
+												strokeWidth={2.2}
+											/>
 										)}
 										<MenuItemLabel>Cancelar denúncia</MenuItemLabel>
 									</View>
@@ -273,12 +292,15 @@ function ComplaintCardContent() {
 							Registrar resolução
 						</Heading>
 						<Text className="text-sm text-gray-500">
-							Informe como a denúncia foi resolvida. Seu voto de "resolvida" será registrado com peso maior por ser o dono.
+							Informe como a denúncia foi resolvida. Seu voto de "resolvida"
+							será registrado com peso maior por ser o dono.
 						</Text>
 					</ModalHeader>
 					<ModalBody className="gap-4">
 						<View className="gap-1">
-							<Text className="text-sm font-medium text-gray-700">Descrição *</Text>
+							<Text className="text-sm font-medium text-gray-700">
+								Descrição *
+							</Text>
 							<Input>
 								<InputField
 									multiline
@@ -292,7 +314,9 @@ function ComplaintCardContent() {
 						</View>
 
 						<View className="gap-1">
-							<Text className="text-sm font-medium text-gray-700">Quem resolveu *</Text>
+							<Text className="text-sm font-medium text-gray-700">
+								Quem resolveu *
+							</Text>
 							<Input>
 								<InputField
 									placeholder="Nome da pessoa ou órgão responsável."
@@ -303,14 +327,22 @@ function ComplaintCardContent() {
 						</View>
 
 						<View className="gap-1">
-							<Text className="text-sm font-medium text-gray-700">Avaliação</Text>
+							<Text className="text-sm font-medium text-gray-700">
+								Avaliação
+							</Text>
 							<View className="flex-row gap-2">
 								{[1, 2, 3, 4, 5].map(star => (
 									<Pressable key={star} onPress={() => setResolveRating(star)}>
 										<StarIcon
 											size={28}
-											color={star <= resolveRating ? colors.lime[800] : colors.gray[300]}
-											fill={star <= resolveRating ? colors.lime[800] : "transparent"}
+											color={
+												star <= resolveRating
+													? colors.lime[800]
+													: colors.gray[300]
+											}
+											fill={
+												star <= resolveRating ? colors.lime[800] : "transparent"
+											}
 											strokeWidth={1.5}
 										/>
 									</Pressable>

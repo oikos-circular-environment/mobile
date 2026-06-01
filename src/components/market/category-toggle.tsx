@@ -8,7 +8,10 @@ type CategoryToggleProps = {
 	onChange: (value: MarketFilterValues["category"]) => void;
 };
 
-const options: { label: string; value: NonNullable<MarketFilterValues["category"]> }[] = [
+const options: {
+	label: string;
+	value: NonNullable<MarketFilterValues["category"]>;
+}[] = [
 	{ label: "Resíduos", value: "waste" },
 	{ label: "Serviços", value: "services" },
 ];

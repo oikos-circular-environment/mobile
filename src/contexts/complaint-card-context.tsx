@@ -50,7 +50,11 @@ export function ComplaintCardProvider({
 		mutationFn: (data: ResolveComplaintData) =>
 			patchV1ComplaintsByIdResolved({
 				path: { id: complaint.id },
-				body: { description: data.description, resolver: data.resolver, rating: data.rating },
+				body: {
+					description: data.description,
+					resolver: data.resolver,
+					rating: data.rating,
+				},
 			}),
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: COMPLAINTS_QUERY_KEY });
@@ -100,7 +104,8 @@ export function ComplaintCardProvider({
 			complaint,
 			isResolvingComplaint: resolveMutation.isPending,
 			isCancelingComplaint: cancelMutation.isPending,
-			resolveComplaint: (data: ResolveComplaintData) => resolveMutation.mutate(data),
+			resolveComplaint: (data: ResolveComplaintData) =>
+				resolveMutation.mutate(data),
 			cancelComplaint: () => cancelMutation.mutate(),
 			openInMaps,
 		};

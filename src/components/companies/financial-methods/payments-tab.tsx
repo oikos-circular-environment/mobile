@@ -90,7 +90,10 @@ export function PaymentsTab({ form, fieldArray }: PaymentsTabProps) {
 										<Switch
 											value={value}
 											onValueChange={onChange}
-											trackColor={{ false: colors.gray[300], true: colors.lime[500] }}
+											trackColor={{
+												false: colors.gray[300],
+												true: colors.lime[500],
+											}}
 										/>
 									)}
 								/>

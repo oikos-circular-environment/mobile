@@ -11,8 +11,14 @@ export function CompanyCardSkeleton() {
 					<Skeleton startColor="bg-gray-200" className="h-4 w-3/4 rounded-md" />
 					<Skeleton startColor="bg-gray-200" className="h-3 w-1/2 rounded-md" />
 					<View className="flex-row gap-1.5">
-						<Skeleton startColor="bg-gray-200" className="h-5 w-16 rounded-md" />
-						<Skeleton startColor="bg-gray-200" className="h-5 w-12 rounded-md" />
+						<Skeleton
+							startColor="bg-gray-200"
+							className="h-5 w-16 rounded-md"
+						/>
+						<Skeleton
+							startColor="bg-gray-200"
+							className="h-5 w-12 rounded-md"
+						/>
 					</View>
 					<Skeleton startColor="bg-gray-200" className="h-3 w-20 rounded-md" />
 				</View>
