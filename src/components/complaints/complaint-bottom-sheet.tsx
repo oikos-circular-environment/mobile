@@ -30,10 +30,12 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import type { GetV1ComplaintsMapResponses } from "@/libs/oikos-sdk";
 import {
+	type ComplaintStatus,
 	type ComplaintType,
-	complaintStatuses,
 	complaintTypeValues,
 } from "@/libs/types/complaint";
+import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
+import { ComplaintTypeChip } from "./complaint-chip/complaint-type-chip";
 import { Badge, BadgeText } from "../ui/badge";
 import { Divider } from "../ui/divider";
 import { Heading } from "../ui/heading";
@@ -43,29 +45,6 @@ import { VStack } from "../ui/vstack";
 export type MapComplaint =
 	GetV1ComplaintsMapResponses[200]["complaints"][number];
 type Attachment = MapComplaint["captures"][number]["attachments"][number];
-
-const COMPLAINT_COLORS: Record<ComplaintType, string> = {
-	IRREGULAR_DISPOSAL: colors.amber[500],
-	DEFORESTATION: colors.lime[600],
-	BURNING: colors.red[500],
-	VACANT_LOT: colors.gray[500],
-};
-
-const STATUS_LABELS: Record<string, string> = {
-	OPEN: "Aberta",
-	IN_PROGRESS: "Em andamento",
-	RESOLVED: "Resolvida",
-	REJECTED: "Rejeitada",
-	CANCELED: "Cancelada",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-	OPEN: colors.sky[500],
-	IN_PROGRESS: colors.amber[500],
-	RESOLVED: colors.lime[600],
-	REJECTED: colors.orange[600],
-	CANCELED: colors.red[600],
-};
 
 function haversineKm(
 	lat1: number,
@@ -168,11 +147,6 @@ export function ComplaintBottomSheet({
 	if (!complaint) return null;
 
 	const typeInfo = complaintTypeValues.find(t => t.value === complaint.type);
-	const typeColor =
-		COMPLAINT_COLORS[complaint.type as ComplaintType] ?? colors.gray[400];
-	const statusInfo = complaintStatuses.find(s => s.value === complaint.status);
-	const statusLabel = STATUS_LABELS[complaint.status] ?? complaint.status;
-	const statusColor = STATUS_COLORS[complaint.status] ?? colors.gray[500];
 
 	const allAttachments = complaint.captures.flatMap(c => c.attachments);
 	const address = getAddress(complaint);
@@ -265,45 +239,14 @@ export function ComplaintBottomSheet({
 							{/* Badges + distance */}
 							<HStack className="w-full items-center justify-between">
 								<View className="flex-row items-center gap-1.5">
-									{/* Type badge — bg usa hex dinâmico */}
-									<View
-										className="flex-row items-center gap-1 rounded-md px-2 py-1"
-										style={{ backgroundColor: `${typeColor}20` }}
-									>
-										{typeInfo?.icon && (
-											<typeInfo.icon
-												size={11}
-												color={typeColor}
-												strokeWidth={2.5}
-											/>
-										)}
-										<Text
-											className="text-[11px] font-semibold"
-											style={{ color: typeColor }}
-										>
-											{typeInfo?.label ?? complaint.type}
-										</Text>
-									</View>
-
-									{/* Status badge — bg usa hex dinâmico */}
-									<View
-										className="flex-row items-center gap-1 rounded-md px-2 py-1"
-										style={{ backgroundColor: `${statusColor}20` }}
-									>
-										{statusInfo?.icon && (
-											<statusInfo.icon
-												size={11}
-												color={statusColor}
-												strokeWidth={2.5}
-											/>
-										)}
-										<Text
-											className="text-[11px] font-semibold"
-											style={{ color: statusColor }}
-										>
-											{statusLabel}
-										</Text>
-									</View>
+									<ComplaintTypeChip
+										type={complaint.type as ComplaintType}
+										size="sm"
+									/>
+									<ComplaintStatusChip
+										status={complaint.status as ComplaintStatus}
+										size="sm"
+									/>
 								</View>
 
 								{/* Distance chip */}

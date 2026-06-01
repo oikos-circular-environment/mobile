@@ -42,8 +42,8 @@ import {
 } from "@/contexts/complaint-card-context";
 import type { ResolveComplaintData } from "@/contexts/complaint-card-context";
 import type { ApiComplaint } from "@/contexts/complaints-context";
+import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
 import { ComplaintMap } from "./complaint-map";
-import { ComplaintStatusComponent } from "./complaint-status";
 
 interface ComplaintCardProps {
 	complaint: ApiComplaint;
@@ -191,7 +191,7 @@ function ComplaintCardContent() {
 										className="flex flex-col flex-1 items-center justify-between"
 										{...triggerProps}
 									>
-										<ComplaintStatusComponent status={complaint.status} />
+										<ComplaintStatusChip status={complaint.status} size="sm" iconOnly />
 										<View className="size-5 items-center justify-center">
 											{isMutating ? (
 												<Spinner size="small" />

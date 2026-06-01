@@ -3,7 +3,10 @@ import { ArrowLeft, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ImagePreviewViewer, VideoPreviewPlayer } from "@/components/medias-preview";
+import {
+	ImagePreviewViewer,
+	VideoPreviewPlayer,
+} from "@/components/medias-preview";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import { useComplaintCreateContext } from "@/contexts/create-complaint-context";

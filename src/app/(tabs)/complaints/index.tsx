@@ -10,6 +10,9 @@ import MapView, {
 	type Region,
 } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
+import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
+import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/tokens";
 import {
 	ComplaintBottomSheet,
 	type MapComplaint,
@@ -17,7 +20,6 @@ import {
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Spinner } from "@/components/ui/spinner";
-import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
 	deleteV1ComplaintsByIdVotes,
@@ -30,29 +32,6 @@ import {
 	complaintStatuses,
 	complaintTypeValues,
 } from "@/libs/types/complaint";
-
-const COMPLAINT_COLORS: Record<ComplaintType, string> = {
-	IRREGULAR_DISPOSAL: colors.amber[500],
-	DEFORESTATION: colors.lime[600],
-	BURNING: colors.red[500],
-	VACANT_LOT: colors.gray[500],
-};
-
-const STATUS_LABELS: Record<string, string> = {
-	OPEN: "Aberta",
-	IN_PROGRESS: "Em andamento",
-	RESOLVED: "Resolvida",
-	REJECTED: "Rejeitada",
-	CANCELED: "Cancelada",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-	OPEN: colors.sky[500],
-	IN_PROGRESS: colors.amber[500],
-	RESOLVED: colors.lime[600],
-	REJECTED: colors.orange[600],
-	CANCELED: colors.red[600],
-};
 
 const DEFAULT_REGION: Region = {
 	latitude: -15.7801,
@@ -235,7 +214,7 @@ export default function ComplaintsMapScreen() {
 						t => t.value === complaint.type,
 					);
 					const pinColor =
-						COMPLAINT_COLORS[complaint.type as ComplaintType] ??
+						COMPLAINT_TYPE_COLORS[complaint.type as ComplaintType] ??
 						colors.gray[500];
 					const isSelected = selectedComplaint?.id === complaint.id;
 					const Icon = typeInfo?.icon;
@@ -290,40 +269,15 @@ export default function ComplaintsMapScreen() {
 					contentContainerClassName="px-3 gap-2"
 					pointerEvents="auto"
 				>
-					{complaintTypeValues.map(({ value, label, icon: Icon }) => {
-						const isActive = activeTypeFilter === value;
-						const color = COMPLAINT_COLORS[value as ComplaintType];
-						return (
-							<TouchableOpacity
-								key={value}
-								activeOpacity={0.8}
-								onPress={() => setActiveTypeFilter(value as ComplaintType)}
-								className="flex-row items-center gap-[5px] rounded-lg px-3.5 py-[7px]"
-								style={{
-									backgroundColor: isActive ? color : colors.white,
-									shadowColor: colors.black,
-									shadowOffset: { width: 0, height: 1 },
-									shadowOpacity: 0.15,
-									shadowRadius: 3,
-									elevation: 3,
-								}}
-							>
-								{Icon && (
-									<Icon
-										size={13}
-										color={isActive ? colors.white : colors.gray[600]}
-										strokeWidth={2}
-									/>
-								)}
-								<Text
-									className="text-[13px] font-semibold"
-									style={{ color: isActive ? colors.white : colors.gray[800] }}
-								>
-									{label}
-								</Text>
-							</TouchableOpacity>
-						);
-					})}
+					{complaintTypeValues.map(({ value }) => (
+						<ComplaintTypeChip.Pressable
+							key={value}
+							type={value}
+							size="md"
+							active={activeTypeFilter === value}
+							onPress={() => setActiveTypeFilter(value)}
+						/>
+					))}
 				</ScrollView>
 			</View>
 
@@ -339,39 +293,16 @@ export default function ComplaintsMapScreen() {
 					contentContainerClassName="px-3 gap-2"
 					pointerEvents="auto"
 				>
-					{complaintStatuses.map(({ value, icon: Icon }) => {
-						if (!Icon) return null;
+					{complaintStatuses.map(({ value }) => {
 						const isActive = activeStatusFilter === value;
-						const label = STATUS_LABELS[value];
 						return (
-							<TouchableOpacity
+							<ComplaintStatusChip.Pressable
 								key={value}
-								activeOpacity={0.8}
+								status={value}
+								size="md"
+								active={isActive}
 								onPress={() => setActiveStatusFilter(isActive ? null : value)}
-								className="flex-row items-center gap-[5px] rounded-lg px-3.5 py-[7px]"
-								style={{
-									backgroundColor: isActive
-										? STATUS_COLORS[value]
-										: colors.white,
-									shadowColor: colors.black,
-									shadowOffset: { width: 0, height: 1 },
-									shadowOpacity: 0.15,
-									shadowRadius: 3,
-									elevation: 3,
-								}}
-							>
-								<Icon
-									size={13}
-									color={isActive ? colors.white : colors.gray[600]}
-									strokeWidth={2}
-								/>
-								<Text
-									className="text-[13px] font-semibold"
-									style={{ color: isActive ? colors.white : colors.gray[800] }}
-								>
-									{label}
-								</Text>
-							</TouchableOpacity>
+							/>
 						);
 					})}
 				</ScrollView>

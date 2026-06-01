@@ -25,32 +25,12 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { getV1ComplaintsByIdPublic } from "@/libs/oikos-sdk";
 import {
+	type ComplaintStatus,
 	type ComplaintType,
 	complaintTypeValues,
 } from "@/libs/types/complaint";
-
-const COMPLAINT_COLORS: Record<ComplaintType, string> = {
-	IRREGULAR_DISPOSAL: colors.amber[500],
-	DEFORESTATION: colors.lime[600],
-	BURNING: colors.red[500],
-	VACANT_LOT: colors.gray[500],
-};
-
-const STATUS_LABELS: Record<string, string> = {
-	OPEN: "Aberta",
-	IN_PROGRESS: "Em andamento",
-	RESOLVED: "Resolvida",
-	REJECTED: "Rejeitada",
-	CANCELED: "Cancelada",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-	OPEN: colors.sky[500],
-	IN_PROGRESS: colors.amber[500],
-	RESOLVED: colors.lime[600],
-	REJECTED: colors.orange[600],
-	CANCELED: colors.red[600],
-};
+import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
+import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
 
 function getAddress(geo: {
 	addresses: {
@@ -95,15 +75,6 @@ export default function ComplaintDetailScreen() {
 	const typeInfo = complaint
 		? complaintTypeValues.find(t => t.value === complaint.type)
 		: null;
-	const typeColor = complaint
-		? (COMPLAINT_COLORS[complaint.type as ComplaintType] ?? colors.gray[400])
-		: colors.gray[400];
-	const statusLabel = complaint
-		? (STATUS_LABELS[complaint.status] ?? complaint.status)
-		: "";
-	const statusColor = complaint
-		? (STATUS_COLORS[complaint.status] ?? colors.gray[500])
-		: colors.gray[500];
 
 	const allAttachments = complaint?.captures.flatMap(c => c.attachments) ?? [];
 	const observations = complaint?.captures
@@ -152,34 +123,14 @@ export default function ComplaintDetailScreen() {
 
 					{/* Badges */}
 					<View className="flex-row gap-2">
-						{/* Type badge — bg usa hex dinâmico */}
-						<View
-							className="flex-row items-center gap-1 rounded-md px-2.5 py-[5px]"
-							style={{ backgroundColor: `${typeColor}20` }}
-						>
-							{typeInfo?.icon && (
-								<typeInfo.icon size={12} color={typeColor} strokeWidth={2.5} />
-							)}
-							<Text
-								className="text-xs font-semibold"
-								style={{ color: typeColor }}
-							>
-								{typeInfo?.label ?? complaint.type}
-							</Text>
-						</View>
-
-						{/* Status badge — bg usa hex dinâmico */}
-						<View
-							className="rounded-md px-2.5 py-[5px]"
-							style={{ backgroundColor: `${statusColor}20` }}
-						>
-							<Text
-								className="text-xs font-semibold"
-								style={{ color: statusColor }}
-							>
-								{statusLabel}
-							</Text>
-						</View>
+						<ComplaintTypeChip
+							type={complaint.type as ComplaintType}
+							size="sm"
+						/>
+						<ComplaintStatusChip
+							status={complaint.status as ComplaintStatus}
+							size="sm"
+						/>
 					</View>
 
 					{/* Meta */}
