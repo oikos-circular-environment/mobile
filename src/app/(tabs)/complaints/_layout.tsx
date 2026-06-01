@@ -14,6 +14,7 @@ export default function ComplaintsStackLayout() {
 						presentation: "fullScreenModal",
 					}}
 				/>
+				<Stack.Screen name="[id]" options={{ headerShown: false }} />
 			</Stack>
 		</ComplaintsProvider>
 	);

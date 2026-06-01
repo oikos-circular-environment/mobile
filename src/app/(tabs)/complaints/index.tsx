@@ -1,33 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Location from "expo-location";
 import { router } from "expo-router";
-import {
-	ListIcon,
-	MapPinIcon,
-	PlusIcon,
-	ThumbsDownIcon,
-	ThumbsUpIcon,
-	XIcon,
-} from "lucide-react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-	Alert,
-	Animated,
-	Linking,
-	Platform,
-	ScrollView,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { ListIcon, PlusIcon } from "lucide-react-native";
+import { useEffect, useRef, useState } from "react";
+import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import MapView, {
 	Marker,
 	PROVIDER_GOOGLE,
 	type Region,
 } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+	ComplaintBottomSheet,
+	type MapComplaint,
+} from "@/components/complaints/complaint-bottom-sheet";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
-import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
@@ -42,10 +30,6 @@ import {
 	complaintStatuses,
 	complaintTypeValues,
 } from "@/libs/types/complaint";
-
-type MapComplaint = NonNullable<
-	Awaited<ReturnType<typeof getV1ComplaintsMap>>["data"]
->["complaints"][number];
 
 const COMPLAINT_COLORS: Record<ComplaintType, string> = {
 	IRREGULAR_DISPOSAL: colors.amber[500],
@@ -106,8 +90,6 @@ export default function ComplaintsMapScreen() {
 	>({});
 	const [markersReady, setMarkersReady] = useState(false);
 
-	const panelAnim = useRef(new Animated.Value(0)).current;
-
 	// Get user location on mount
 	useEffect(() => {
 		void (async () => {
@@ -131,16 +113,6 @@ export default function ComplaintsMapScreen() {
 			mapRef.current?.animateToRegion(newRegion, 600);
 		})();
 	}, []);
-
-	// Animate bottom panel in/out
-	useEffect(() => {
-		Animated.spring(panelAnim, {
-			toValue: selectedComplaint ? 1 : 0,
-			useNativeDriver: true,
-			tension: 80,
-			friction: 12,
-		}).start();
-	}, [selectedComplaint, panelAnim]);
 
 	const { data: mapData, isLoading: isLoadingMap } = useQuery({
 		queryKey: MAP_QUERY_KEY(
@@ -224,26 +196,6 @@ export default function ComplaintsMapScreen() {
 		voteMutation.mutate({ complaintId: selectedComplaint.id, voteType: next });
 	};
 
-	const handleOpenInMaps = useCallback(() => {
-		if (!selectedComplaint?.location) return;
-		const { lat, lon } = selectedComplaint.location;
-		const label = encodeURIComponent(
-			complaintTypeValues.find(t => t.value === selectedComplaint.type)
-				?.label ?? "Denúncia",
-		);
-		const url =
-			Platform.OS === "ios"
-				? `maps://?ll=${lat},${lon}&q=${label}`
-				: `geo:${lat},${lon}?q=${lat},${lon}(${label})`;
-		const fallback = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-
-		Linking.canOpenURL(url)
-			.then(can => Linking.openURL(can ? url : fallback))
-			.catch(() =>
-				Alert.alert("Erro", "Não foi possível abrir o aplicativo de mapas."),
-			);
-	}, [selectedComplaint]);
-
 	const suppressMapPressRef = useRef(false);
 
 	const handleMarkerPress = (complaint: MapComplaint) => {
@@ -261,30 +213,9 @@ export default function ComplaintsMapScreen() {
 		setSelectedComplaint(null);
 	};
 
-	const panelTranslate = panelAnim.interpolate({
-		inputRange: [0, 1],
-		outputRange: [240, 0],
-	});
-
-	const typeLabel =
-		selectedComplaint &&
-		complaintTypeValues.find(t => t.value === selectedComplaint.type)?.label;
-	const typeColor =
-		selectedComplaint &&
-		COMPLAINT_COLORS[selectedComplaint.type as ComplaintType];
-	const statusLabel =
-		selectedComplaint && STATUS_LABELS[selectedComplaint.status];
-	const statusColor =
-		selectedComplaint && STATUS_COLORS[selectedComplaint.status];
 	const currentVote = selectedComplaint
 		? userVotes[selectedComplaint.id]
 		: undefined;
-
-	const createdAtLabel =
-		selectedComplaint &&
-		new Date(selectedComplaint.created_at).toLocaleDateString("pt-BR", {
-			dateStyle: "short",
-		});
 
 	return (
 		<View className="flex-1">
@@ -320,15 +251,13 @@ export default function ComplaintsMapScreen() {
 							tracksViewChanges={!markersReady || isSelected}
 						>
 							<View
+								className="rounded-full items-center justify-center"
 								style={{
 									width: size,
 									height: size,
-									borderRadius: 999,
 									backgroundColor: pinColor,
 									borderWidth: isSelected ? 3 : 2,
 									borderColor: colors.white,
-									alignItems: "center",
-									justifyContent: "center",
 									shadowColor: colors.black,
 									shadowOffset: { width: 0, height: 2 },
 									shadowOpacity: 0.35,
@@ -358,7 +287,7 @@ export default function ComplaintsMapScreen() {
 				<ScrollView
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}
+					contentContainerClassName="px-3 gap-2"
 					pointerEvents="auto"
 				>
 					{complaintTypeValues.map(({ value, label, icon: Icon }) => {
@@ -369,13 +298,8 @@ export default function ComplaintsMapScreen() {
 								key={value}
 								activeOpacity={0.8}
 								onPress={() => setActiveTypeFilter(value as ComplaintType)}
+								className="flex-row items-center gap-[5px] rounded-lg px-3.5 py-[7px]"
 								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									gap: 5,
-									paddingHorizontal: 14,
-									paddingVertical: 7,
-									borderRadius: 8,
 									backgroundColor: isActive ? color : colors.white,
 									shadowColor: colors.black,
 									shadowOffset: { width: 0, height: 1 },
@@ -392,11 +316,8 @@ export default function ComplaintsMapScreen() {
 									/>
 								)}
 								<Text
-									style={{
-										fontSize: 13,
-										fontWeight: "600",
-										color: isActive ? colors.white : colors.gray[800],
-									}}
+									className="text-[13px] font-semibold"
+									style={{ color: isActive ? colors.white : colors.gray[800] }}
 								>
 									{label}
 								</Text>
@@ -415,7 +336,7 @@ export default function ComplaintsMapScreen() {
 				<ScrollView
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}
+					contentContainerClassName="px-3 gap-2"
 					pointerEvents="auto"
 				>
 					{complaintStatuses.map(({ value, icon: Icon }) => {
@@ -427,13 +348,8 @@ export default function ComplaintsMapScreen() {
 								key={value}
 								activeOpacity={0.8}
 								onPress={() => setActiveStatusFilter(isActive ? null : value)}
+								className="flex-row items-center gap-[5px] rounded-lg px-3.5 py-[7px]"
 								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									gap: 5,
-									paddingHorizontal: 14,
-									paddingVertical: 7,
-									borderRadius: 8,
 									backgroundColor: isActive
 										? STATUS_COLORS[value]
 										: colors.white,
@@ -450,11 +366,8 @@ export default function ComplaintsMapScreen() {
 									strokeWidth={2}
 								/>
 								<Text
-									style={{
-										fontSize: 13,
-										fontWeight: "600",
-										color: isActive ? colors.white : colors.gray[800],
-									}}
+									className="text-[13px] font-semibold"
+									style={{ color: isActive ? colors.white : colors.gray[800] }}
 								>
 									{label}
 								</Text>
@@ -472,10 +385,8 @@ export default function ComplaintsMapScreen() {
 					pointerEvents="none"
 				>
 					<View
+						className="rounded-lg bg-white p-2"
 						style={{
-							backgroundColor: colors.white,
-							borderRadius: 8,
-							padding: 8,
 							shadowColor: colors.black,
 							shadowOffset: { width: 0, height: 1 },
 							shadowOpacity: 0.15,
@@ -498,13 +409,8 @@ export default function ComplaintsMapScreen() {
 				<TouchableOpacity
 					activeOpacity={0.9}
 					onPress={() => router.push("/(tabs)/complaints/list")}
+					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
 					style={{
-						width: 50,
-						height: 50,
-						borderRadius: 12,
-						backgroundColor: colors.white,
-						alignItems: "center",
-						justifyContent: "center",
 						shadowColor: colors.black,
 						shadowOffset: { width: 0, height: 2 },
 						shadowOpacity: 0.18,
@@ -528,13 +434,8 @@ export default function ComplaintsMapScreen() {
 						}
 						router.push("/(tabs)/complaints/(create)/camera");
 					}}
+					className="h-[50px] w-[50px] items-center justify-center rounded-[14px] bg-lime-800"
 					style={{
-						width: 50,
-						height: 50,
-						borderRadius: 14,
-						backgroundColor: colors.lime[800],
-						alignItems: "center",
-						justifyContent: "center",
 						shadowColor: colors.black,
 						shadowOffset: { width: 0, height: 2 },
 						shadowOpacity: 0.25,
@@ -546,271 +447,15 @@ export default function ComplaintsMapScreen() {
 				</TouchableOpacity>
 			</View>
 
-			{/* Bottom complaint panel */}
-			<Animated.View
-				style={{
-					position: "absolute",
-					left: 0,
-					right: 0,
-					bottom: 0,
-					transform: [{ translateY: panelTranslate }],
-				}}
-				pointerEvents={selectedComplaint ? "auto" : "none"}
-			>
-				<View
-					style={{
-						backgroundColor: colors.white,
-						borderTopLeftRadius: 20,
-						borderTopRightRadius: 20,
-						paddingTop: 16,
-						paddingHorizontal: 20,
-						paddingBottom: insets.bottom + 16,
-						shadowColor: colors.black,
-						shadowOffset: { width: 0, height: -3 },
-						shadowOpacity: 0.12,
-						shadowRadius: 8,
-						elevation: 8,
-					}}
-				>
-					{selectedComplaint && (
-						<>
-							{/* Drag handle + close */}
-							<View
-								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									marginBottom: 12,
-								}}
-							>
-								<View
-									style={{
-										flex: 1,
-										height: 4,
-										backgroundColor: colors.gray[200],
-										borderRadius: 8,
-										marginHorizontal: 60,
-									}}
-								/>
-								<TouchableOpacity onPress={handleClosePanel}>
-									<XIcon size={18} color={colors.gray[500]} strokeWidth={2} />
-								</TouchableOpacity>
-							</View>
-
-							{/* Type + status row */}
-							<View
-								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									gap: 8,
-									marginBottom: 6,
-								}}
-							>
-								<View
-									style={{
-										width: 10,
-										height: 10,
-										borderRadius: 8,
-										backgroundColor: typeColor ?? colors.gray[400],
-									}}
-								/>
-								<Text
-									style={{
-										fontSize: 12,
-										fontWeight: "600",
-										color: typeColor ?? colors.gray[600],
-										textTransform: "uppercase",
-										letterSpacing: 0.5,
-									}}
-								>
-									{typeLabel}
-								</Text>
-								<View
-									style={{
-										width: 3,
-										height: 3,
-										borderRadius: 8,
-										backgroundColor: colors.gray[400],
-									}}
-								/>
-								<Text
-									style={{
-										fontSize: 12,
-										fontWeight: "600",
-										color: statusColor ?? colors.gray[600],
-									}}
-								>
-									{statusLabel}
-								</Text>
-							</View>
-
-							{/* Complaint heading */}
-							<Heading size="md" style={{ marginBottom: 4 }}>
-								{complaintTypeValues
-									.find(t => t.value === selectedComplaint.type)
-									?.label?.toUpperCase() ?? "Denúncia"}
-							</Heading>
-
-							{/* Meta row */}
-							<View style={{ flexDirection: "row", gap: 16, marginBottom: 14 }}>
-								<View
-									style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-								>
-									<ThumbsUpIcon
-										size={13}
-										color={colors.gray[400]}
-										strokeWidth={2}
-									/>
-									<Text style={{ fontSize: 12, color: colors.gray[500] }}>
-										{selectedComplaint.vote_counts.resolved} resolvida
-									</Text>
-								</View>
-								<View
-									style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-								>
-									<ThumbsDownIcon
-										size={13}
-										color={colors.gray[400]}
-										strokeWidth={2}
-									/>
-									<Text style={{ fontSize: 12, color: colors.gray[500] }}>
-										{selectedComplaint.vote_counts.not_resolved} não resolvida
-									</Text>
-								</View>
-								{createdAtLabel && (
-									<Text style={{ fontSize: 12, color: colors.gray[400] }}>
-										{createdAtLabel}
-									</Text>
-								)}
-							</View>
-
-							{/* Action buttons */}
-							<View style={{ flexDirection: "row", gap: 10 }}>
-								{/* Abrir no mapa */}
-								<TouchableOpacity
-									onPress={handleOpenInMaps}
-									activeOpacity={0.8}
-									style={{
-										flexDirection: "row",
-										alignItems: "center",
-										gap: 6,
-										paddingHorizontal: 14,
-										paddingVertical: 10,
-										borderRadius: 10,
-										borderWidth: 1,
-										borderColor: colors.gray[200],
-										backgroundColor: colors.gray[50],
-									}}
-								>
-									<MapPinIcon
-										size={15}
-										color={colors.gray[600]}
-										strokeWidth={2}
-									/>
-									<Text
-										style={{
-											fontSize: 13,
-											fontWeight: "600",
-											color: colors.gray[700],
-										}}
-									>
-										Navegar
-									</Text>
-								</TouchableOpacity>
-
-								{/* Não Resolvida */}
-								<TouchableOpacity
-									onPress={() => handleVote("NOT_RESOLVED")}
-									disabled={voteMutation.isPending}
-									activeOpacity={0.8}
-									style={{
-										flex: 1,
-										flexDirection: "row",
-										alignItems: "center",
-										justifyContent: "center",
-										gap: 6,
-										paddingVertical: 10,
-										borderRadius: 10,
-										borderWidth: 1,
-										borderColor:
-											currentVote === "NOT_RESOLVED"
-												? colors.red[500]
-												: colors.gray[200],
-										backgroundColor:
-											currentVote === "NOT_RESOLVED"
-												? colors.red[50]
-												: colors.white,
-									}}
-								>
-									{voteMutation.isPending ? (
-										<Spinner size="small" />
-									) : (
-										<ThumbsDownIcon
-											size={15}
-											color={
-												currentVote === "NOT_RESOLVED"
-													? colors.red[500]
-													: colors.gray[500]
-											}
-											strokeWidth={2}
-										/>
-									)}
-									<Text
-										style={{
-											fontSize: 13,
-											fontWeight: "600",
-											color:
-												currentVote === "NOT_RESOLVED"
-													? colors.red[600]
-													: colors.gray[600],
-										}}
-									>
-										Não Resolvida
-									</Text>
-								</TouchableOpacity>
-
-								{/* Resolvida */}
-								<TouchableOpacity
-									onPress={() => handleVote("RESOLVED")}
-									disabled={voteMutation.isPending}
-									activeOpacity={0.8}
-									style={{
-										flex: 1,
-										flexDirection: "row",
-										alignItems: "center",
-										justifyContent: "center",
-										gap: 6,
-										paddingVertical: 10,
-										borderRadius: 10,
-										backgroundColor:
-											currentVote === "RESOLVED"
-												? colors.lime[700]
-												: colors.lime[800],
-									}}
-								>
-									{voteMutation.isPending ? (
-										<Spinner size="small" />
-									) : (
-										<ThumbsUpIcon
-											size={15}
-											color={colors.white}
-											strokeWidth={2}
-										/>
-									)}
-									<Text
-										style={{
-											fontSize: 13,
-											fontWeight: "600",
-											color: colors.white,
-										}}
-									>
-										Resolvida
-									</Text>
-								</TouchableOpacity>
-							</View>
-						</>
-					)}
-				</View>
-			</Animated.View>
+			<ComplaintBottomSheet
+				isOpen={!!selectedComplaint}
+				onClose={() => setSelectedComplaint(null)}
+				complaint={selectedComplaint}
+				currentVote={currentVote}
+				onVote={handleVote}
+				isPendingVote={voteMutation.isPending}
+				userLocation={userLocation}
+			/>
 		</View>
 	);
 }
