@@ -37,11 +37,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import {
-	ComplaintCardProvider,
-	useComplaintCardContext,
-} from "@/contexts/complaint-card-context";
-import type { ResolveComplaintData } from "@/contexts/complaint-card-context";
-import type { ApiComplaint } from "@/contexts/complaints-context";
+	type ResolveComplaintData,
+	useComplaintCard,
+} from "@/components/complaints/hooks/use-complaint-card";
+import type { ApiComplaint } from "@/stores/complaints-store";
 import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
 import { ComplaintMap } from "./complaint-map";
 
@@ -50,22 +49,17 @@ interface ComplaintCardProps {
 }
 
 export function ComplaintCard({ complaint }: ComplaintCardProps) {
-	return (
-		<ComplaintCardProvider complaint={complaint}>
-			<ComplaintCardContent />
-		</ComplaintCardProvider>
-	);
+	return <ComplaintCardContent complaint={complaint} />;
 }
 
-function ComplaintCardContent() {
+function ComplaintCardContent({ complaint }: { complaint: ApiComplaint }) {
 	const {
-		complaint,
 		resolveComplaint,
 		cancelComplaint,
 		openInMaps,
 		isResolvingComplaint,
 		isCancelingComplaint,
-	} = useComplaintCardContext();
+	} = useComplaintCard(complaint);
 
 	const [showResolveModal, setShowResolveModal] = useState(false);
 	const [resolveDescription, setResolveDescription] = useState("");

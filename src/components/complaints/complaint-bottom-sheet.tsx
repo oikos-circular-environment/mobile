@@ -33,10 +33,7 @@ import {
 } from "@/components/ui/bottomsheet";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import {
-	type GetV1ComplaintsMapResponses,
-	getV1ComplaintsByIdPublic,
-} from "@/libs/oikos-sdk";
+import { getV1ComplaintsByIdPublic } from "@/libs/oikos-sdk";
 import {
 	type ComplaintStatus,
 	type ComplaintType,
@@ -51,8 +48,7 @@ import { VStack } from "../ui/vstack";
 import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "./complaint-chip/complaint-type-chip";
 
-export type MapComplaint =
-	GetV1ComplaintsMapResponses[200]["complaints"][number];
+export type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 type Attachment = MapComplaint["captures"][number]["attachments"][number];
 
 function haversineKm(
@@ -509,9 +505,10 @@ export function ComplaintBottomSheet({
 								<TouchableOpacity
 									activeOpacity={0.85}
 									onPress={() => {
-										router.push(
-											`/(tabs)/complaints/${complaint.id}/resolution`,
-										);
+										router.push({
+											pathname: "/(tabs)/complaints/resolution",
+											params: { id: complaint.id },
+										});
 										onClose();
 									}}
 									className="h-11 flex-row items-center justify-center gap-1.5 rounded-[10px] border border-gray-200 bg-white"

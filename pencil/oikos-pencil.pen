@@ -5560,32 +5560,6 @@
                               "fontWeight": "normal"
                             }
                           ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "kmN6H",
-                          "width": "fill_container",
-                          "cornerRadius": 6,
-                          "stroke": "$border",
-                          "strokeWidth": 1,
-                          "strokeAlignment": "inner",
-                          "layout": "vertical",
-                          "gap": 4,
-                          "padding": 8,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "fXWRK",
-                              "fill": "$foreground",
-                              "textGrowth": "fixed-width",
-                              "width": "fill_container",
-                              "content": "Descarte irregular de entulho e resíduos sólidos nas proximidades do cruzamento.",
-                              "lineHeight": 1.4,
-                              "fontFamily": "Inter",
-                              "fontSize": 13,
-                              "fontWeight": "normal"
-                            }
-                          ]
                         }
                       ]
                     },
@@ -5793,7 +5767,7 @@
                                   "fill": "#374151",
                                   "textGrowth": "fixed-width",
                                   "width": "fill_container",
-                                  "content": "As resoluções serão públicas, utilize este local apenas para postagens integras que levara a resolução da denúncia.",
+                                  "content": "As resoluções serão públicas, utilize este local apenas para postagens integras que levaram a resolução da denúncia.",
                                   "lineHeight": 1.4,
                                   "fontFamily": "Inter",
                                   "fontSize": 12,
@@ -6242,6 +6216,216 @@
                   "children": [
                     {
                       "type": "frame",
+                      "id": "JUWvS",
+                      "width": "fill_container",
+                      "fill": {
+                        "type": "color",
+                        "color": "$card",
+                        "enabled": false
+                      },
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "type": "color",
+                        "color": "$border",
+                        "enabled": false
+                      },
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
+                      "layout": "vertical",
+                      "gap": 10,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "B78se",
+                          "name": "Frame 18",
+                          "width": "fit_content(366)",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "N9706",
+                              "fill": "#111827",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "DESCARTE DE ENTULHO EM VIA PÚBLICA",
+                              "fontFamily": "Oswald",
+                              "fontSize": 22,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Zw2V0",
+                          "gap": 8,
+                          "children": [
+                            {
+                              "id": "GquTh",
+                              "type": "ref",
+                              "ref": "qeuaX",
+                              "name": "Type Badge",
+                              "fill": "#fee2e2",
+                              "descendants": {
+                                "M3Qa8": {
+                                  "fill": "#dc2626",
+                                  "icon": "trash-2"
+                                },
+                                "fsKLJ": {
+                                  "content": "Descarte Irregular",
+                                  "fill": "#dc2626"
+                                }
+                              }
+                            },
+                            {
+                              "id": "QAc3m",
+                              "type": "ref",
+                              "ref": "V467uZ",
+                              "name": "Status Badge",
+                              "fill": "#fef9c3",
+                              "x": 136,
+                              "y": 0,
+                              "descendants": {
+                                "o8G9R": {
+                                  "fill": "#a16207"
+                                },
+                                "opPOV": {
+                                  "content": "Aberta",
+                                  "fill": "#a16207"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "cSXWk",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "mYtAy",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "map-pin",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
+                            },
+                            {
+                              "type": "text",
+                              "id": "iu3fB",
+                              "fill": "$muted-foreground",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Av. Paulista, 453 - Bela Vista, São Paulo",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "wxpE7",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "MKQHb",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "calendar",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
+                            },
+                            {
+                              "type": "text",
+                              "id": "A89vVm",
+                              "fill": "$muted-foreground",
+                              "content": "23 de maio de 2026, às 14:30",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "lN565",
+                      "width": "fill_container",
+                      "fill": "#f0f9ff",
+                      "cornerRadius": 8,
+                      "stroke": "#075985",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
+                      "gap": 10,
+                      "padding": 12,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "TSSJW",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "info",
+                          "library": "lucide",
+                          "fill": "#075985"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Q1GnX",
+                          "fill": "#075985",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Deixe a comunidade saber quem resolveu e como resolveu, assim conseguimos inspirar voluntários e orgãos competentes a ajudarem na solução de um ambiente mais limpo e seguro.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "VPVfs",
+                      "width": "fill_container",
+                      "fill": "#fef3c7",
+                      "cornerRadius": 8,
+                      "stroke": "#fcd34d",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
+                      "gap": 10,
+                      "padding": 12,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "rSPf4",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "triangle-alert",
+                          "library": "lucide",
+                          "fill": "#f59e0b"
+                        },
+                        {
+                          "type": "text",
+                          "id": "pUVAF",
+                          "fill": "#374151",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "As resoluções serão públicas, utilize este local apenas para postagens integras que levaram a resolução da denúncia.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
                       "id": "M3mId4",
                       "name": "Input",
                       "width": "fill_container",
@@ -6283,7 +6467,6 @@
                             0,
                             12
                           ],
-                          "alignItems": "center",
                           "children": [
                             {
                               "type": "frame",
@@ -6404,12 +6587,10 @@
                               "name": "Input Wrapper",
                               "clip": true,
                               "width": "fill_container",
-                              "height": "fill_container",
                               "padding": [
                                 8,
                                 0
                               ],
-                              "alignItems": "center",
                               "children": [
                                 {
                                   "type": "text",
@@ -6420,7 +6601,7 @@
                                   "width": "fill_container",
                                   "content": "Descreva como a denúncia foi resolvida...",
                                   "lineHeight": 1.5,
-                                  "fontFamily": "Space Grotesk",
+                                  "fontFamily": "Inter",
                                   "fontSize": 14,
                                   "fontWeight": "normal"
                                 }
@@ -6565,7 +6746,11 @@
                           "width": "fill_container",
                           "height": 96,
                           "cornerRadius": 12,
-                          "stroke": "$border",
+                          "stroke": {
+                            "type": "color",
+                            "color": "$border",
+                            "enabled": false
+                          },
                           "strokeWidth": 1.5,
                           "strokeAlignment": "inner",
                           "layout": "vertical",
@@ -6574,22 +6759,119 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "icon",
-                              "id": "zKfYa",
-                              "width": 28,
-                              "height": 28,
-                              "icon": "camera",
-                              "library": "lucide",
-                              "fill": "$muted-foreground"
-                            },
-                            {
-                              "type": "text",
-                              "id": "HsTLf",
-                              "fill": "$muted-foreground",
-                              "content": "Adicione fotos ou vídeos da resolução",
-                              "fontFamily": "Inter",
-                              "fontSize": 13,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "xLyg7",
+                              "width": "fill_container",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "EVtwh",
+                                  "width": 96,
+                                  "height": 96,
+                                  "fill": "$card",
+                                  "cornerRadius": 8,
+                                  "stroke": "$border",
+                                  "strokeWidth": 1,
+                                  "strokeAlignment": "inner",
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "ckSex",
+                                      "width": 24,
+                                      "height": 24,
+                                      "icon": "image",
+                                      "library": "lucide",
+                                      "fill": "$muted-foreground"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "mLi2i",
+                                  "width": 2,
+                                  "height": 96,
+                                  "fill": "$card",
+                                  "cornerRadius": 8,
+                                  "stroke": {
+                                    "type": "color",
+                                    "color": "$border",
+                                    "enabled": false
+                                  },
+                                  "strokeWidth": 1,
+                                  "strokeAlignment": "inner",
+                                  "justifyContent": "center",
+                                  "alignItems": "center"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "z0em7",
+                                  "name": "Frame 20",
+                                  "height": 96,
+                                  "fill": "$gray-100",
+                                  "cornerRadius": 6,
+                                  "gap": 8,
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "M3reaO",
+                                      "width": 96,
+                                      "height": "fill_container",
+                                      "fill": "$card",
+                                      "cornerRadius": 8,
+                                      "stroke": "$border",
+                                      "strokeWidth": 1,
+                                      "strokeAlignment": "inner",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "rectangle",
+                                          "cornerRadius": 8,
+                                          "id": "XsgmU",
+                                          "fill": {
+                                            "type": "image",
+                                            "enabled": true,
+                                            "url": "waste.png",
+                                            "mode": "fill"
+                                          },
+                                          "width": "fill_container",
+                                          "height": "fill_container"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "nJ0YP",
+                                      "width": 96,
+                                      "height": "fill_container",
+                                      "fill": "$card",
+                                      "cornerRadius": 8,
+                                      "stroke": "$border",
+                                      "strokeWidth": 1,
+                                      "strokeAlignment": "inner",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "rectangle",
+                                          "cornerRadius": 8,
+                                          "id": "Kc2lD",
+                                          "fill": {
+                                            "type": "image",
+                                            "enabled": true,
+                                            "url": "waste.png",
+                                            "mode": "fill"
+                                          },
+                                          "width": "fill_container",
+                                          "height": "fill_container"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
                             }
                           ]
                         }

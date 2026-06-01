@@ -1,4 +1,3 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ListIcon, PlusIcon } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
@@ -7,11 +6,12 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
 	ComplaintBottomSheet,
-	type MapComplaint,
 } from "@/components/complaints/complaint-bottom-sheet";
 import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
 import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/tokens";
+import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
+import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Card } from "@/components/ui/card";
@@ -21,29 +21,16 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import {
-	deleteV1ComplaintsByIdVotes,
-	getV1ComplaintsMap,
-	postV1ComplaintsByIdVotes,
-} from "@/libs/oikos-sdk";
-import {
 	type ComplaintStatus,
 	type ComplaintType,
 	complaintStatuses,
 	complaintTypeValues,
 } from "@/libs/types/complaint";
 
-const MAP_QUERY_KEY = (
-	lat: number,
-	lon: number,
-	type: ComplaintType | null,
-	status: ComplaintStatus | null,
-) => ["complaints", "map", lat, lon, type, status] as const;
-
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
 	const { isAuthenticated } = useAuthContext();
 	const { location } = useGeospatial();
-	const queryClient = useQueryClient();
 	const mapRef = useRef<MapView>(null);
 	const hasAnimatedRef = useRef(false);
 	const suppressMapPressRef = useRef(false);
@@ -56,11 +43,17 @@ export default function ComplaintsMapScreen() {
 		useState<ComplaintType | null>("IRREGULAR_DISPOSAL");
 	const [activeStatusFilter, setActiveStatusFilter] =
 		useState<ComplaintStatus | null>("OPEN");
-	const [selectedComplaint, setSelectedComplaint] =
-		useState<MapComplaint | null>(null);
-	const [userVotes, setUserVotes] = useState<
-		Record<string, "RESOLVED" | "NOT_RESOLVED">
-	>({});
+
+	const {
+		complaints,
+		isLoadingMap,
+		selectedComplaint,
+		setSelectedComplaint,
+		currentVote,
+		handleVote,
+		isPendingVote,
+	} = useComplaintsMap({ userLocation, activeTypeFilter, activeStatusFilter });
+
 	useEffect(() => {
 		if (!location || hasAnimatedRef.current) return;
 		hasAnimatedRef.current = true;
@@ -74,80 +67,6 @@ export default function ComplaintsMapScreen() {
 			600,
 		);
 	}, [location]);
-
-	const { data: mapData, isLoading: isLoadingMap } = useQuery({
-		queryKey: MAP_QUERY_KEY(
-			userLocation?.lat ?? 0,
-			userLocation?.lon ?? 0,
-			activeTypeFilter,
-			activeStatusFilter,
-		),
-		queryFn: async () => {
-			const res = await getV1ComplaintsMap({
-				query: {
-					lat: userLocation?.lat ?? 0,
-					lon: userLocation?.lon ?? 0,
-					radius: 10000,
-					...(activeTypeFilter ? { type: activeTypeFilter } : {}),
-					...(activeStatusFilter ? { status: activeStatusFilter } : {}),
-				},
-			});
-			return res.data;
-		},
-		enabled: !!userLocation,
-	});
-
-	const complaints = mapData?.complaints ?? [];
-
-	const voteMutation = useMutation({
-		mutationFn: async ({
-			complaintId,
-			voteType,
-		}: {
-			complaintId: string;
-			voteType: "RESOLVED" | "NOT_RESOLVED" | null;
-		}) => {
-			if (voteType === null) {
-				await deleteV1ComplaintsByIdVotes({ path: { id: complaintId } });
-			} else {
-				await postV1ComplaintsByIdVotes({
-					path: { id: complaintId },
-					body: { vote_type: voteType },
-				});
-			}
-		},
-		onSuccess: (_, { complaintId, voteType }) => {
-			setUserVotes(prev => {
-				if (voteType === null) {
-					const next = { ...prev };
-					delete next[complaintId];
-					return next;
-				}
-				return { ...prev, [complaintId]: voteType };
-			});
-			void queryClient.invalidateQueries({
-				queryKey: MAP_QUERY_KEY(
-					userLocation?.lat ?? 0,
-					userLocation?.lon ?? 0,
-					activeTypeFilter,
-					activeStatusFilter,
-				),
-			});
-		},
-		onError: () => toast.error("Erro", "Não foi possível registrar seu voto."),
-	});
-
-	const handleVote = (voteType: "RESOLVED" | "NOT_RESOLVED") => {
-		if (!isAuthenticated) {
-			toast.info("Login necessário", "Entre para votar em denúncias.");
-			return;
-		}
-		if (!selectedComplaint) return;
-
-		const current = userVotes[selectedComplaint.id];
-		const next = current === voteType ? null : voteType;
-		voteMutation.mutate({ complaintId: selectedComplaint.id, voteType: next });
-	};
 
 	const handleMarkerPress = (complaint: MapComplaint) => {
 		suppressMapPressRef.current = true;
@@ -164,13 +83,8 @@ export default function ComplaintsMapScreen() {
 		setSelectedComplaint(null);
 	};
 
-	const currentVote = selectedComplaint
-		? userVotes[selectedComplaint.id]
-		: undefined;
-
 	return (
 		<View className="flex-1">
-			{/* Full-screen map */}
 			<MapView
 				ref={mapRef}
 				style={{ flex: 1 }}
@@ -227,7 +141,7 @@ export default function ComplaintsMapScreen() {
 			{/* Filters */}
 			<View
 				className="absolute left-0 right-0 gap-2 pl-4"
-				style={{ top: 24 }}
+				style={{ top: 32 }}
 				pointerEvents="box-none"
 			>
 				<ScrollView
@@ -267,7 +181,7 @@ export default function ComplaintsMapScreen() {
 				</ScrollView>
 			</View>
 
-			{/* Loading indicator*/}
+			{/* Loading indicator */}
 			{isLoadingMap && (
 				<View
 					className="absolute self-center items-center justify-center"
@@ -283,13 +197,12 @@ export default function ComplaintsMapScreen() {
 				</View>
 			)}
 
-			{/* FABs: bottom-right */}
+			{/* FABs */}
 			<View
 				className="absolute bottom-4 right-4 flex-row gap-2 items-center"
 				style={{ bottom: insets.bottom }}
 				pointerEvents="box-none"
 			>
-				{/* My complaints list */}
 				<TouchableOpacity
 					activeOpacity={0.9}
 					onPress={() => router.push("/(tabs)/complaints/list")}
@@ -305,15 +218,11 @@ export default function ComplaintsMapScreen() {
 					<ListIcon size={20} color={colors.gray[700]} strokeWidth={2} />
 				</TouchableOpacity>
 
-				{/* New complaint */}
 				<TouchableOpacity
 					activeOpacity={0.9}
 					onPress={() => {
 						if (!isAuthenticated) {
-							toast.info(
-								"Login necessário",
-								"Entre para registrar uma denúncia.",
-							);
+							toast.info("Login necessário", "Entre para registrar uma denúncia.");
 							return;
 						}
 						router.push("/(tabs)/complaints/(create)/camera");
@@ -337,7 +246,7 @@ export default function ComplaintsMapScreen() {
 				complaint={selectedComplaint}
 				currentVote={currentVote}
 				onVote={handleVote}
-				isPendingVote={voteMutation.isPending}
+				isPendingVote={isPendingVote}
 				userLocation={userLocation}
 			/>
 		</View>

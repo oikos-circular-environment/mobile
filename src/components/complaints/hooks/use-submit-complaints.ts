@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
 import {
-	COMPLAINTS_QUERY_KEY,
-	DASHBOARD_QUERY_KEY,
-} from "@/contexts/complaints-context";
-import {
 	postV1Complaints,
 	postV1ComplaintsByIdCapturesByCaptureIdAttachments,
 } from "@/libs/oikos-sdk";
 import type { ComplaintCapture } from "@/libs/types/complaint";
+import {
+	COMPLAINTS_QUERY_KEY,
+	DASHBOARD_QUERY_KEY,
+} from "./use-complaints-list";
 
 export function useSubmitComplaints() {
 	const queryClient = useQueryClient();
@@ -73,7 +73,7 @@ export function useSubmitComplaints() {
 					} as unknown as Blob);
 					await postV1ComplaintsByIdCapturesByCaptureIdAttachments({
 						path: { id: complaintId, captureId },
-						body: formData as any,
+						body: formData as unknown as undefined,
 					});
 				}
 			}

@@ -6,7 +6,7 @@ import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Camera } from "@/components/camera";
 import { colors } from "@/components/style/colors";
-import { useComplaintCreateContext } from "@/contexts/complaint-create-context";
+import { useComplaintCreate } from "@/components/complaints/hooks/use-complaint-create";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import type {
 	CameraCapturedVideo,
@@ -16,7 +16,7 @@ import type {
 } from "@/libs/types/complaint";
 
 export default function ComplaintCameraScreen() {
-	const { addCapture, captures, deleteCapture } = useComplaintCreateContext();
+	const { addCapture, captures, deleteCapture } = useComplaintCreate();
 	const { addresses, location, heading } = useGeospatial();
 	const insets = useSafeAreaInsets();
 

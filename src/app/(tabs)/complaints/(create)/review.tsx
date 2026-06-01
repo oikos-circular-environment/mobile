@@ -25,8 +25,8 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { useComplaintCreateContext } from "@/contexts/complaint-create-context";
-import { useSubmitComplaints } from "@/hooks/use-submit-complaints";
+import { useComplaintCreate } from "@/components/complaints/hooks/use-complaint-create";
+import { useSubmitComplaints } from "@/components/complaints/hooks/use-submit-complaints";
 import {
 	formatHeading,
 	formatMeters,
@@ -82,7 +82,7 @@ export default function ComplaintReviewScreen() {
 		selectedCaptureId,
 		setSelectedCaptureId,
 		updateCapture,
-	} = useComplaintCreateContext();
+	} = useComplaintCreate();
 
 	const {
 		control,

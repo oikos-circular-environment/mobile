@@ -9,11 +9,11 @@ import {
 } from "@/components/medias-preview";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
-import { useComplaintCreateContext } from "@/contexts/complaint-create-context";
+import { useComplaintCreate } from "@/components/complaints/hooks/use-complaint-create";
 
 export default function ComplaintPreviewScreen() {
 	const { captureId } = useLocalSearchParams<{ captureId?: string }>();
-	const { captures, deleteCapture } = useComplaintCreateContext();
+	const { captures, deleteCapture } = useComplaintCreate();
 	const insets = useSafeAreaInsets();
 	const [confirmingDelete, setConfirmingDelete] = useState(false);
 

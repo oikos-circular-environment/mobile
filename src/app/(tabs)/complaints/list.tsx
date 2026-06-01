@@ -11,18 +11,22 @@ import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import type { ApiComplaint } from "@/contexts/complaints-context";
-import { useComplaintsContext } from "@/contexts/complaints-context";
+import { useComplaintsList } from "@/components/complaints/hooks/use-complaints-list";
+import {
+	type ApiComplaint,
+	selectFilteredComplaints,
+	useComplaintsStore,
+} from "@/stores/complaints-store";
 
 export default function ComplaintsScreen() {
+	const filteredComplaints = useComplaintsStore(selectFilteredComplaints);
 	const {
-		filteredComplaints,
 		isLoadingComplaints,
 		refetchAll,
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
-	} = useComplaintsContext();
+	} = useComplaintsList();
 
 	useFocusEffect(
 		useCallback(() => {

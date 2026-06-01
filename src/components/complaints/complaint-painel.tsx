@@ -16,8 +16,8 @@ import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
-import type { ApiComplaintStatus } from "@/contexts/complaints-context";
-import { useComplaintsContext } from "@/contexts/complaints-context";
+import type { ApiComplaintStatus } from "@/stores/complaints-store";
+import { useComplaintsStore } from "@/stores/complaints-store";
 
 type PanelItem = {
 	status: ApiComplaintStatus | null;
@@ -31,10 +31,11 @@ type PanelItem = {
 };
 
 export function ComplaintPainel() {
-	const { dashboard, isLoadingDashboard, activeFilter, setActiveFilter } =
-		useComplaintsContext();
+	const dashboard = useComplaintsStore(s => s.dashboard);
+	const activeFilter = useComplaintsStore(s => s.activeFilter);
+	const setActiveFilter = useComplaintsStore(s => s.setActiveFilter);
 
-	if (isLoadingDashboard) {
+	if (!dashboard) {
 		return (
 			<View className="gap-2">
 				<Skeleton startColor="bg-gray-200" className="w-full h-20 rounded-xl" />

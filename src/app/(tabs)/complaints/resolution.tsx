@@ -22,7 +22,6 @@ export default function ComplaintResolutionScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const insets = useSafeAreaInsets();
 	const { user, isAuthenticated } = useAuthContext();
-
 	const [description, setDescription] = useState("");
 
 	const mutation = useMutation({
@@ -30,11 +29,7 @@ export default function ComplaintResolutionScreen() {
 			if (!id || !user?.profile.id) throw new Error("Dados inválidos.");
 			await postV1ComplaintsByIdResolutions({
 				path: { id },
-				body: {
-					description,
-					resolver: user.profile.id,
-					rating: 5,
-				},
+				body: { description, resolver: user.profile.id, rating: 5 },
 			});
 		},
 		onSuccess: () => {
@@ -61,7 +56,6 @@ export default function ComplaintResolutionScreen() {
 					keyboardShouldPersistTaps="handled"
 					showsVerticalScrollIndicator={false}
 				>
-					{/* Description */}
 					<View className="gap-2">
 						<Text className="text-base font-bold text-gray-900">Descrição</Text>
 						<TextInput
@@ -81,7 +75,6 @@ export default function ComplaintResolutionScreen() {
 						</Text>
 					</View>
 
-					{/* Attachments placeholder */}
 					<View className="gap-2">
 						<Text className="text-sm font-bold text-gray-800">Anexos</Text>
 						<TouchableOpacity
@@ -105,7 +98,6 @@ export default function ComplaintResolutionScreen() {
 					)}
 				</ScrollView>
 
-				{/* Submit button */}
 				<View
 					className="absolute bottom-0 left-0 right-0 border-t border-gray-100 bg-white px-4 pt-3"
 					style={{ paddingBottom: insets.bottom + 12 }}

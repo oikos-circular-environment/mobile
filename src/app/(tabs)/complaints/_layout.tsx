@@ -1,21 +1,15 @@
 import { Stack } from "expo-router";
-import { ComplaintsProvider } from "@/contexts/complaints-context";
 
 export default function ComplaintsStackLayout() {
 	return (
-		<ComplaintsProvider>
-			<Stack>
-				<Stack.Screen name="index" options={{ headerShown: false }} />
-				<Stack.Screen name="list" options={{ headerShown: false }} />
-				<Stack.Screen
-					name="(create)"
-					options={{
-						headerShown: false,
-						presentation: "fullScreenModal",
-					}}
-				/>
-				<Stack.Screen name="[id]" options={{ headerShown: false }} />
-			</Stack>
-		</ComplaintsProvider>
+		<Stack>
+			<Stack.Screen name="index" options={{ headerShown: false }} />
+			<Stack.Screen name="list" options={{ headerShown: false }} />
+			<Stack.Screen
+				name="(create)"
+				options={{ headerShown: false, presentation: "fullScreenModal" }}
+			/>
+			<Stack.Screen name="resolution" options={{ headerShown: false }} />
+		</Stack>
 	);
 }
