@@ -7,6 +7,7 @@ import type {
 	GetV1CompaniesResponse,
 	GetV1ComplaintsByIdPublicResponse,
 	GetV1ComplaintsByIdResponse,
+	GetV1ComplaintsByIdVotesResponse,
 	GetV1ComplaintsMapResponse,
 	GetV1ComplaintsResponse,
 	GetV1ProfilesAddressesResponse,
@@ -340,6 +341,16 @@ export const patchV1ComplaintsByIdResolvedResponseTransformer = async (
 		return item;
 	});
 	data.complaint.created_at = new Date(data.complaint.created_at);
+	return data;
+};
+
+export const getV1ComplaintsByIdVotesResponseTransformer = async (
+	data: any,
+): Promise<GetV1ComplaintsByIdVotesResponse> => {
+	if (data.vote) {
+		data.vote.created_at = new Date(data.vote.created_at);
+		data.vote.updated_at = new Date(data.vote.updated_at);
+	}
 	return data;
 };
 

@@ -1287,7 +1287,6 @@ export type GetV1ComplaintsResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -1462,7 +1461,6 @@ export type PostV1ComplaintsResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -1636,7 +1634,6 @@ export type GetV1ComplaintsMapResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			location: {
 				lat: number;
 				lon: number;
@@ -1778,7 +1775,6 @@ export type GetV1ComplaintsByIdPublicResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			location: {
 				lat: number;
 				lon: number;
@@ -1941,7 +1937,6 @@ export type GetV1ComplaintsByIdResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2081,7 +2076,6 @@ export type PatchV1ComplaintsByIdResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2251,7 +2245,6 @@ export type PostV1ComplaintsManualResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2401,7 +2394,6 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2530,6 +2522,48 @@ export type DeleteV1ComplaintsByIdVotesResponses = {
 
 export type DeleteV1ComplaintsByIdVotesResponse =
 	DeleteV1ComplaintsByIdVotesResponses[keyof DeleteV1ComplaintsByIdVotesResponses];
+
+export type GetV1ComplaintsByIdVotesData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/votes";
+};
+
+export type GetV1ComplaintsByIdVotesErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1ComplaintsByIdVotesError =
+	GetV1ComplaintsByIdVotesErrors[keyof GetV1ComplaintsByIdVotesErrors];
+
+export type GetV1ComplaintsByIdVotesResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		vote: {
+			id: string;
+			complaint_id: string;
+			user_id: string;
+			vote_type: "RESOLVED" | "NOT_RESOLVED";
+			created_at: Date;
+			updated_at: Date;
+		} | null;
+	};
+};
+
+export type GetV1ComplaintsByIdVotesResponse =
+	GetV1ComplaintsByIdVotesResponses[keyof GetV1ComplaintsByIdVotesResponses];
 
 export type PostV1ComplaintsByIdVotesData = {
 	body: {
@@ -2738,7 +2772,6 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2901,7 +2934,6 @@ export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
-			event_group_id: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;

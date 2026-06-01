@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "@/components/toast";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
@@ -89,8 +89,10 @@ export function useComplaintsMap({
 			setSelectedComplaint(prev => {
 				if (!prev || prev.id !== complaintId) return prev;
 				const counts = { ...prev.vote_counts };
-				if (previousVote === "RESOLVED") counts.resolved = Math.max(0, counts.resolved - 1);
-				if (previousVote === "NOT_RESOLVED") counts.not_resolved = Math.max(0, counts.not_resolved - 1);
+				if (previousVote === "RESOLVED")
+					counts.resolved = Math.max(0, counts.resolved - 1);
+				if (previousVote === "NOT_RESOLVED")
+					counts.not_resolved = Math.max(0, counts.not_resolved - 1);
 				if (voteType === "RESOLVED") counts.resolved += 1;
 				if (voteType === "NOT_RESOLVED") counts.not_resolved += 1;
 				return { ...prev, vote_counts: counts };

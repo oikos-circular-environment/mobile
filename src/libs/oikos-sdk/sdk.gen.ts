@@ -9,6 +9,7 @@ import {
 	getV1CompaniesResponseTransformer,
 	getV1ComplaintsByIdPublicResponseTransformer,
 	getV1ComplaintsByIdResponseTransformer,
+	getV1ComplaintsByIdVotesResponseTransformer,
 	getV1ComplaintsMapResponseTransformer,
 	getV1ComplaintsResponseTransformer,
 	getV1ProfilesAddressesResponseTransformer,
@@ -57,6 +58,9 @@ import type {
 	GetV1ComplaintsByIdPublicErrors,
 	GetV1ComplaintsByIdPublicResponses,
 	GetV1ComplaintsByIdResponses,
+	GetV1ComplaintsByIdVotesData,
+	GetV1ComplaintsByIdVotesErrors,
+	GetV1ComplaintsByIdVotesResponses,
 	GetV1ComplaintsDashboardData,
 	GetV1ComplaintsDashboardErrors,
 	GetV1ComplaintsDashboardResponses,
@@ -806,6 +810,26 @@ export const deleteV1ComplaintsByIdVotes = <
 		DeleteV1ComplaintsByIdVotesErrors,
 		ThrowOnError
 	>({
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/votes",
+		...options,
+	});
+
+/**
+ * Get my vote on a complaint
+ *
+ * Returns the authenticated user's current vote on the given complaint, or null if they have not voted.
+ */
+export const getV1ComplaintsByIdVotes = <ThrowOnError extends boolean = false>(
+	options: Options<GetV1ComplaintsByIdVotesData, ThrowOnError>,
+) =>
+	(options.client ?? client).get<
+		GetV1ComplaintsByIdVotesResponses,
+		GetV1ComplaintsByIdVotesErrors,
+		ThrowOnError
+	>({
+		responseTransformer: getV1ComplaintsByIdVotesResponseTransformer,
+		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}/votes",
 		...options,

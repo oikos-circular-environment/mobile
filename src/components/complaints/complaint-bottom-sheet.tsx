@@ -19,6 +19,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { ImagePreviewViewer } from "@/components/medias-preview/image-preview-viewer";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { VideoPreviewPlayer } from "@/components/medias-preview/video-preview-player";
@@ -33,12 +34,17 @@ import {
 } from "@/components/ui/bottomsheet";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { getV1ComplaintsByIdPublic } from "@/libs/oikos-sdk";
+import { useAuthContext } from "@/contexts/auth-context";
+import {
+	getV1ComplaintsByIdPublic,
+	getV1ComplaintsByIdVotes,
+} from "@/libs/oikos-sdk";
 import {
 	type ComplaintStatus,
 	type ComplaintType,
 	complaintTypeValues,
 } from "@/libs/types/complaint";
+import { useComplaintsStore } from "@/stores/complaints-store";
 import { Alert, AlertIcon, AlertText } from "../ui/alert";
 import { Badge, BadgeIcon, BadgeText } from "../ui/badge";
 import { Divider } from "../ui/divider";
@@ -48,7 +54,6 @@ import { VStack } from "../ui/vstack";
 import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "./complaint-chip/complaint-type-chip";
 
-export type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 type Attachment = MapComplaint["captures"][number]["attachments"][number];
 
 function haversineKm(
@@ -140,6 +145,9 @@ export function ComplaintBottomSheet({
 	const [previewAttachment, setPreviewAttachment] = useState<Attachment | null>(
 		null,
 	);
+	const { isAuthenticated } = useAuthContext();
+	const setVote = useComplaintsStore(s => s.setVote);
+	const removeVote = useComplaintsStore(s => s.removeVote);
 
 	useEffect(() => {
 		if (isOpen) {
@@ -150,6 +158,7 @@ export function ComplaintBottomSheet({
 	}, [isOpen]);
 
 	const complaintId = complaint?.id ?? "";
+
 	const { data: detailData } = useQuery({
 		queryKey: ["complaint", "public", complaintId],
 		queryFn: async () => {
@@ -160,6 +169,24 @@ export function ComplaintBottomSheet({
 		},
 		enabled: isOpen && !!complaintId,
 	});
+
+	const { data: voteData } = useQuery({
+		queryKey: ["complaint", "vote", complaintId],
+		queryFn: async () => {
+			const res = await getV1ComplaintsByIdVotes({ path: { id: complaintId } });
+			return res.data;
+		},
+		enabled: isOpen && !!complaintId && isAuthenticated,
+	});
+
+	useEffect(() => {
+		if (!voteData || !complaintId) return;
+		if (voteData.vote) {
+			setVote(complaintId, voteData.vote.vote_type);
+		} else {
+			removeVote(complaintId);
+		}
+	}, [voteData, complaintId, setVote, removeVote]);
 
 	if (!complaint) return null;
 
@@ -507,7 +534,16 @@ export function ComplaintBottomSheet({
 									onPress={() => {
 										router.push({
 											pathname: "/(tabs)/complaints/resolution",
-											params: { id: complaint.id },
+											params: {
+												id: complaint.id,
+												type: complaint.type,
+												status: complaint.status,
+												address: getAddress(complaint) ?? "",
+												date:
+													complaint.created_at instanceof Date
+														? complaint.created_at.toISOString()
+														: String(complaint.created_at),
+											},
 										});
 										onClose();
 									}}
