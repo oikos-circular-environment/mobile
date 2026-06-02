@@ -8,6 +8,7 @@ import {
 	getV1CompaniesByIdWastesResponseTransformer,
 	getV1CompaniesResponseTransformer,
 	getV1ComplaintsByIdPublicResponseTransformer,
+	getV1ComplaintsByIdResolutionsResponseTransformer,
 	getV1ComplaintsByIdResponseTransformer,
 	getV1ComplaintsByIdVotesResponseTransformer,
 	getV1ComplaintsMapResponseTransformer,
@@ -20,6 +21,7 @@ import {
 	postV1CompaniesByIdAvatarResponseTransformer,
 	postV1CompaniesResponseTransformer,
 	postV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponseTransformer,
+	postV1ComplaintsByIdResolutionsAttachmentsResponseTransformer,
 	postV1ComplaintsByIdVotesResponseTransformer,
 	postV1ComplaintsManualResponseTransformer,
 	postV1ComplaintsResponseTransformer,
@@ -31,6 +33,12 @@ import {
 	putV1ProfilesResponseTransformer,
 } from "./transformers.gen";
 import type {
+	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdData,
+	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors,
+	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses,
+	DeleteV1ComplaintsByIdResolutionsData,
+	DeleteV1ComplaintsByIdResolutionsErrors,
+	DeleteV1ComplaintsByIdResolutionsResponses,
 	DeleteV1ComplaintsByIdVotesData,
 	DeleteV1ComplaintsByIdVotesErrors,
 	DeleteV1ComplaintsByIdVotesResponses,
@@ -57,6 +65,9 @@ import type {
 	GetV1ComplaintsByIdPublicData,
 	GetV1ComplaintsByIdPublicErrors,
 	GetV1ComplaintsByIdPublicResponses,
+	GetV1ComplaintsByIdResolutionsData,
+	GetV1ComplaintsByIdResolutionsErrors,
+	GetV1ComplaintsByIdResolutionsResponses,
 	GetV1ComplaintsByIdResponses,
 	GetV1ComplaintsByIdVotesData,
 	GetV1ComplaintsByIdVotesErrors,
@@ -67,7 +78,6 @@ import type {
 	GetV1ComplaintsData,
 	GetV1ComplaintsErrors,
 	GetV1ComplaintsMapData,
-	GetV1ComplaintsMapErrors,
 	GetV1ComplaintsMapResponses,
 	GetV1ComplaintsResponses,
 	GetV1MarketData,
@@ -105,6 +115,9 @@ import type {
 	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsData,
 	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors,
 	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses,
+	PostV1ComplaintsByIdResolutionsAttachmentsData,
+	PostV1ComplaintsByIdResolutionsAttachmentsErrors,
+	PostV1ComplaintsByIdResolutionsAttachmentsResponses,
 	PostV1ComplaintsByIdResolutionsData,
 	PostV1ComplaintsByIdResolutionsErrors,
 	PostV1ComplaintsByIdResolutionsResponses,
@@ -675,12 +688,11 @@ export const getV1ComplaintsMap = <ThrowOnError extends boolean = false>(
 ) =>
 	(options.client ?? client).get<
 		GetV1ComplaintsMapResponses,
-		GetV1ComplaintsMapErrors,
+		unknown,
 		ThrowOnError
 	>({
 		responseTransformer: getV1ComplaintsMapResponseTransformer,
 		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/map",
 		...options,
 	});
@@ -858,6 +870,48 @@ export const postV1ComplaintsByIdVotes = <ThrowOnError extends boolean = false>(
 	});
 
 /**
+ * Delete my resolution
+ *
+ * Deletes the authenticated user's resolution for this complaint.
+ */
+export const deleteV1ComplaintsByIdResolutions = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<DeleteV1ComplaintsByIdResolutionsData, ThrowOnError>,
+) =>
+	(options.client ?? client).delete<
+		DeleteV1ComplaintsByIdResolutionsResponses,
+		DeleteV1ComplaintsByIdResolutionsErrors,
+		ThrowOnError
+	>({
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/resolutions",
+		...options,
+	});
+
+/**
+ * List resolutions
+ *
+ * Returns all resolutions submitted for a complaint.
+ */
+export const getV1ComplaintsByIdResolutions = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<GetV1ComplaintsByIdResolutionsData, ThrowOnError>,
+) =>
+	(options.client ?? client).get<
+		GetV1ComplaintsByIdResolutionsResponses,
+		GetV1ComplaintsByIdResolutionsErrors,
+		ThrowOnError
+	>({
+		responseTransformer: getV1ComplaintsByIdResolutionsResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/resolutions",
+		...options,
+	});
+
+/**
  * Update resolution
  */
 export const patchV1ComplaintsByIdResolutions = <
@@ -899,6 +953,53 @@ export const postV1ComplaintsByIdResolutions = <
 			"Content-Type": "application/json",
 			...options.headers,
 		},
+	});
+
+/**
+ * Upload resolution attachment
+ *
+ * Uploads an image to the authenticated user's resolution for this complaint.
+ */
+export const postV1ComplaintsByIdResolutionsAttachments = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<
+		PostV1ComplaintsByIdResolutionsAttachmentsData,
+		ThrowOnError
+	>,
+) =>
+	(options.client ?? client).post<
+		PostV1ComplaintsByIdResolutionsAttachmentsResponses,
+		PostV1ComplaintsByIdResolutionsAttachmentsErrors,
+		ThrowOnError
+	>({
+		responseTransformer:
+			postV1ComplaintsByIdResolutionsAttachmentsResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/resolutions/attachments",
+		...options,
+	});
+
+/**
+ * Delete resolution attachment
+ */
+export const deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<
+		DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdData,
+		ThrowOnError
+	>,
+) =>
+	(options.client ?? client).delete<
+		DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses,
+		DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors,
+		ThrowOnError
+	>({
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/resolutions/attachments/{attachmentId}",
+		...options,
 	});
 
 /**

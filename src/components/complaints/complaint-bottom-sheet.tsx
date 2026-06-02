@@ -10,15 +10,17 @@ import {
 	CrosshairIcon,
 	InfoIcon,
 	MapPinIcon,
+	Pencil,
 	PlayIcon,
 	PlusIcon,
 	UserIcon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
+import { Image, Modal, ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
+import { ResolutionAttachmentsStack } from "@/components/complaints/resolution-attachments-stack";
 import { ImagePreviewViewer } from "@/components/medias-preview/image-preview-viewer";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { VideoPreviewPlayer } from "@/components/medias-preview/video-preview-player";
@@ -145,7 +147,7 @@ export function ComplaintBottomSheet({
 		null,
 	);
 	const [showAuthModal, setShowAuthModal] = useState(false);
-	const { isAuthenticated } = useAuthContext();
+	const { isAuthenticated, user } = useAuthContext();
 	const setVote = useComplaintsStore(s => s.setVote);
 	const removeVote = useComplaintsStore(s => s.removeVote);
 
@@ -435,52 +437,134 @@ export function ComplaintBottomSheet({
 										</AlertText>
 									</Alert>
 									{resolutions.length > 0 &&
-										resolutions.map(resolution => (
-											<View
-												key={resolution.id}
-												className="gap-1.5 rounded-[10px] border border-gray-100 p-3"
-											>
-												<View className="flex-row items-center justify-between">
-													<View className="flex-row items-center gap-1.5">
-														<View className="h-6 w-6 items-center justify-center rounded-full bg-gray-100">
-															{resolution.resolver.type === "company" ? (
-																<BuildingIcon
-																	size={13}
-																	color={colors.gray[500]}
-																	strokeWidth={2}
-																/>
-															) : (
-																<UserIcon
-																	size={13}
-																	color={colors.gray[500]}
-																	strokeWidth={2}
-																/>
-															)}
-														</View>
-														<Text className="font-semibold text-gray-800">
-															{resolution.resolver.type === "company"
-																? (resolution.resolver.business_name ??
-																	resolution.resolver.corporate_name)
-																: (resolution.resolver.display_name ??
-																	resolution.resolver.full_name)}
-														</Text>
-													</View>
-													<Text className=" text-gray-400">
-														{format(
-															new Date(resolution.created_at),
-															"d 'de' MMM",
-															{ locale: ptBR },
-														)}
-													</Text>
-												</View>
-												<Text
-													className="text-gray-600"
-													style={{ lineHeight: 18 }}
+										resolutions.map(resolution => {
+											const resolverName =
+												resolution.resolver.type === "company"
+													? (resolution.resolver.business_name ??
+														resolution.resolver.corporate_name)
+													: (resolution.resolver.display_name ??
+														resolution.resolver.full_name);
+											const avatarUrl = resolution.resolver.avatar_url ?? null;
+											const isCompany = resolution.resolver.type === "company";
+											const isOwnResolution =
+												isAuthenticated &&
+												resolution.resolver.type === "profile" &&
+												resolution.resolver.display_name ===
+													user?.profile.display_name;
+
+											return (
+												<View
+													key={resolution.id}
+													className="gap-2 rounded-[10px] border border-gray-100 p-3"
 												>
-													{resolution.description}
-												</Text>
-											</View>
-										))}
+													{/* Header: avatar + name + date + stack */}
+													<View className="flex-row items-center gap-2">
+														{/* Avatar */}
+														{avatarUrl ? (
+															<Image
+																source={{ uri: avatarUrl }}
+																style={{
+																	width: 32,
+																	height: 32,
+																	borderRadius: 16,
+																}}
+															/>
+														) : (
+															<View className="h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+																{isCompany ? (
+																	<BuildingIcon
+																		size={14}
+																		color={colors.gray[500]}
+																		strokeWidth={2}
+																	/>
+																) : (
+																	<UserIcon
+																		size={14}
+																		color={colors.gray[500]}
+																		strokeWidth={2}
+																	/>
+																)}
+															</View>
+														)}
+
+														{/* Name + date */}
+														<View className="flex-1">
+															<Text className="text-sm font-semibold text-gray-800">
+																{resolverName}
+															</Text>
+															<Text className="text-xs text-gray-400">
+																{format(
+																	new Date(resolution.created_at),
+																	"d 'de' MMM",
+																	{ locale: ptBR },
+																)}
+															</Text>
+														</View>
+
+														{/* Attachment stack on the right */}
+														{resolution.attachments.length > 0 && (
+															<ResolutionAttachmentsStack
+																attachments={resolution.attachments}
+															/>
+														)}
+													</View>
+
+													{/* Company badge */}
+													{isCompany && (
+														<View className="flex-row items-center gap-1 self-start rounded-full bg-gray-100 px-2 py-0.5">
+															<BuildingIcon
+																size={11}
+																color={colors.gray[500]}
+																strokeWidth={2}
+															/>
+															<Text className="text-xs text-gray-500">
+																Empresa responsável
+															</Text>
+														</View>
+													)}
+
+													{/* Description */}
+													<Text
+														className="text-gray-600"
+														style={{ lineHeight: 18 }}
+													>
+														{resolution.description}
+													</Text>
+
+													{/* Edit button for own resolutions */}
+													{isOwnResolution && (
+														<TouchableOpacity
+															className="flex-row items-center gap-1 self-start"
+															onPress={() => {
+																router.push({
+																	pathname: "/(tabs)/complaints/resolution",
+																	params: {
+																		id: complaint.id,
+																		type: complaint.type,
+																		status: complaint.status,
+																		address: getAddress(complaint) ?? "",
+																		date:
+																			complaint.created_at instanceof Date
+																				? complaint.created_at.toISOString()
+																				: String(complaint.created_at),
+																	},
+																});
+																onClose();
+															}}
+														>
+															<Pencil
+																size={12}
+																color={colors.lime[800]}
+																strokeWidth={2}
+															/>
+															<Text className="text-xs font-semibold text-lime-800">
+																Editar
+															</Text>
+														</TouchableOpacity>
+													)}
+												</View>
+											);
+										})}
 								</VStack>
 
 								{/* Adicionar Resolução */}

@@ -1610,20 +1610,6 @@ export type GetV1ComplaintsMapData = {
 	url: "/v1/complaints/map";
 };
 
-export type GetV1ComplaintsMapErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type GetV1ComplaintsMapError =
-	GetV1ComplaintsMapErrors[keyof GetV1ComplaintsMapErrors];
-
 export type GetV1ComplaintsMapResponses = {
 	/**
 	 * Default Response
@@ -1869,8 +1855,6 @@ export type GetV1ComplaintsByIdPublicResponses = {
 			resolutions: Array<{
 				id: string;
 				description: string;
-				resolver_name: string;
-				rating: number;
 				resolver:
 					| {
 							type: "company";
@@ -1885,7 +1869,12 @@ export type GetV1ComplaintsByIdPublicResponses = {
 							display_name: string;
 							avatar_url: string | null;
 					  };
-				attachment_count: number;
+				attachments: Array<{
+					id: string;
+					url: string;
+					file_name: string;
+					created_at: Date;
+				}>;
 				created_at: Date;
 			}>;
 			created_at: Date;
@@ -2344,8 +2333,7 @@ export type PostV1ComplaintsManualResponse =
 export type PatchV1ComplaintsByIdResolvedData = {
 	body: {
 		description: string;
-		resolver: string;
-		rating: number;
+		company_id?: string;
 	};
 	path: {
 		id: string;
@@ -2625,11 +2613,120 @@ export type PostV1ComplaintsByIdVotesResponses = {
 export type PostV1ComplaintsByIdVotesResponse =
 	PostV1ComplaintsByIdVotesResponses[keyof PostV1ComplaintsByIdVotesResponses];
 
+export type DeleteV1ComplaintsByIdResolutionsData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions";
+};
+
+export type DeleteV1ComplaintsByIdResolutionsErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	422: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type DeleteV1ComplaintsByIdResolutionsError =
+	DeleteV1ComplaintsByIdResolutionsErrors[keyof DeleteV1ComplaintsByIdResolutionsErrors];
+
+export type DeleteV1ComplaintsByIdResolutionsResponses = {
+	/**
+	 * Default Response
+	 */
+	204: void;
+};
+
+export type DeleteV1ComplaintsByIdResolutionsResponse =
+	DeleteV1ComplaintsByIdResolutionsResponses[keyof DeleteV1ComplaintsByIdResolutionsResponses];
+
+export type GetV1ComplaintsByIdResolutionsData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions";
+};
+
+export type GetV1ComplaintsByIdResolutionsErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1ComplaintsByIdResolutionsError =
+	GetV1ComplaintsByIdResolutionsErrors[keyof GetV1ComplaintsByIdResolutionsErrors];
+
+export type GetV1ComplaintsByIdResolutionsResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		resolutions: Array<{
+			id: string;
+			description: string;
+			company_id: string | null;
+			resolver:
+				| {
+						type: "company";
+						corporate_name: string;
+						business_name: string | null;
+						description: string | null;
+						avatar_url: string | null;
+				  }
+				| {
+						type: "profile";
+						full_name: string;
+						display_name: string;
+						avatar_url: string | null;
+				  };
+			attachments: Array<{
+				id: string;
+				url: string;
+				file_name: string;
+				created_at: Date;
+			}>;
+			created_at: Date;
+			updated_at: Date;
+		}>;
+	};
+};
+
+export type GetV1ComplaintsByIdResolutionsResponse =
+	GetV1ComplaintsByIdResolutionsResponses[keyof GetV1ComplaintsByIdResolutionsResponses];
+
 export type PatchV1ComplaintsByIdResolutionsData = {
 	body: {
 		description: string;
-		resolver: string;
-		rating: number;
+		company_id?: string;
 	};
 	path: {
 		id: string;
@@ -2681,8 +2778,7 @@ export type PatchV1ComplaintsByIdResolutionsResponse =
 export type PostV1ComplaintsByIdResolutionsData = {
 	body: {
 		description: string;
-		resolver: string;
-		rating: number;
+		company_id?: string;
 	};
 	path: {
 		id: string;
@@ -2730,6 +2826,113 @@ export type PostV1ComplaintsByIdResolutionsResponses = {
 
 export type PostV1ComplaintsByIdResolutionsResponse =
 	PostV1ComplaintsByIdResolutionsResponses[keyof PostV1ComplaintsByIdResolutionsResponses];
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions/attachments";
+};
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsErrors = {
+	/**
+	 * Default Response
+	 */
+	400: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	500: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsError =
+	PostV1ComplaintsByIdResolutionsAttachmentsErrors[keyof PostV1ComplaintsByIdResolutionsAttachmentsErrors];
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		attachment: {
+			id: string;
+			url: string;
+			file_name: string;
+			created_at: Date;
+		};
+	};
+};
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsResponse =
+	PostV1ComplaintsByIdResolutionsAttachmentsResponses[keyof PostV1ComplaintsByIdResolutionsAttachmentsResponses];
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdData = {
+	body?: never;
+	path: {
+		id: string;
+		attachmentId: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions/attachments/{attachmentId}";
+};
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdError =
+	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors[keyof DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors];
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses =
+	{
+		/**
+		 * Default Response
+		 */
+		204: void;
+	};
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponse =
+	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses[keyof DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses];
 
 export type PatchV1ComplaintsByIdCanceledData = {
 	body?: never;

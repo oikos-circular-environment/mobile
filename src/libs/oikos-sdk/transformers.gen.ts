@@ -6,6 +6,7 @@ import type {
 	GetV1CompaniesByIdWastesResponse,
 	GetV1CompaniesResponse,
 	GetV1ComplaintsByIdPublicResponse,
+	GetV1ComplaintsByIdResolutionsResponse,
 	GetV1ComplaintsByIdResponse,
 	GetV1ComplaintsByIdVotesResponse,
 	GetV1ComplaintsMapResponse,
@@ -18,6 +19,7 @@ import type {
 	PostV1CompaniesByIdAvatarResponse,
 	PostV1CompaniesResponse,
 	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponse,
+	PostV1ComplaintsByIdResolutionsAttachmentsResponse,
 	PostV1ComplaintsByIdVotesResponse,
 	PostV1ComplaintsManualResponse,
 	PostV1ComplaintsResponse,
@@ -273,6 +275,10 @@ export const getV1ComplaintsByIdPublicResponseTransformer = async (
 		return item;
 	});
 	data.complaint.resolutions = data.complaint.resolutions.map((item: any) => {
+		item.attachments = item.attachments.map((item: any) => {
+			item.created_at = new Date(item.created_at);
+			return item;
+		});
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
@@ -361,6 +367,29 @@ export const postV1ComplaintsByIdVotesResponseTransformer = async (
 	data.vote.updated_at = new Date(data.vote.updated_at);
 	return data;
 };
+
+export const getV1ComplaintsByIdResolutionsResponseTransformer = async (
+	data: any,
+): Promise<GetV1ComplaintsByIdResolutionsResponse> => {
+	data.resolutions = data.resolutions.map((item: any) => {
+		item.attachments = item.attachments.map((item: any) => {
+			item.created_at = new Date(item.created_at);
+			return item;
+		});
+		item.created_at = new Date(item.created_at);
+		item.updated_at = new Date(item.updated_at);
+		return item;
+	});
+	return data;
+};
+
+export const postV1ComplaintsByIdResolutionsAttachmentsResponseTransformer =
+	async (
+		data: any,
+	): Promise<PostV1ComplaintsByIdResolutionsAttachmentsResponse> => {
+		data.attachment.created_at = new Date(data.attachment.created_at);
+		return data;
+	};
 
 export const patchV1ComplaintsByIdCanceledResponseTransformer = async (
 	data: any,
