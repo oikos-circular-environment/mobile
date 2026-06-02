@@ -2694,20 +2694,19 @@ export type GetV1ComplaintsByIdResolutionsResponses = {
 			id: string;
 			description: string;
 			company_id: string | null;
-			resolver:
-				| {
-						type: "company";
-						corporate_name: string;
-						business_name: string | null;
-						description: string | null;
-						avatar_url: string | null;
-				  }
-				| {
-						type: "profile";
-						full_name: string;
-						display_name: string;
-						avatar_url: string | null;
-				  };
+			resolver_user_profile: {
+				type: "profile";
+				full_name: string;
+				display_name: string;
+				avatar_url: string | null;
+			};
+			resolver_company: {
+				type: "company";
+				corporate_name: string;
+				business_name: string | null;
+				description: string | null;
+				avatar_url: string | null;
+			} | null;
 			attachments: Array<{
 				id: string;
 				url: string;

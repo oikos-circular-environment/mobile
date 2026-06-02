@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { router } from "expo-router";
@@ -10,13 +10,17 @@ import {
 	CrosshairIcon,
 	InfoIcon,
 	MapPinIcon,
-	Pencil,
+	PencilIcon,
 	PlayIcon,
 	PlusIcon,
+	Trash2Icon,
 	UserIcon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Image, Modal, ScrollView, TouchableOpacity, View } from "react-native";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import type { SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
@@ -25,6 +29,7 @@ import { ImagePreviewViewer } from "@/components/medias-preview/image-preview-vi
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { VideoPreviewPlayer } from "@/components/medias-preview/video-preview-player";
 import { colors } from "@/components/style/colors";
+import { toast } from "@/components/toast";
 import {
 	BottomSheet,
 	BottomSheetBackdrop,
@@ -33,10 +38,13 @@ import {
 	type BottomSheetRef,
 	BottomSheetScrollView,
 } from "@/components/ui/bottomsheet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
+	deleteV1ComplaintsByIdResolutions,
 	getV1ComplaintsByIdPublic,
+	getV1ComplaintsByIdResolutions,
 	getV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
 import {
@@ -56,6 +64,8 @@ import { ComplaintTypeChip } from "./complaint-chip/complaint-type-chip";
 import { ComplaintVoteButtons } from "./complaint-vote-buttons";
 
 type Attachment = MapComplaint["captures"][number]["attachments"][number];
+
+const SWIPE_ACTION_WIDTH = 72;
 
 function haversineKm(
 	lat1: number,
@@ -123,6 +133,76 @@ function AttachmentPreview({
 	);
 }
 
+function ResolutionCardSkeleton() {
+	return (
+		<View className="gap-2 rounded-[10px] border border-gray-100 p-3">
+			<View className="flex-row items-center gap-2">
+				<Skeleton startColor="bg-gray-200" className="h-8 w-8 rounded-full" />
+				<View className="flex-1 gap-1.5">
+					<Skeleton startColor="bg-gray-200" className="h-3.5 w-1/2 rounded" />
+					<Skeleton startColor="bg-gray-200" className="h-3 w-1/3 rounded" />
+				</View>
+			</View>
+			<Skeleton startColor="bg-gray-200" className="h-3 w-full rounded" />
+			<Skeleton startColor="bg-gray-200" className="h-3 w-4/5 rounded" />
+		</View>
+	);
+}
+
+function SwipeEditAction({
+	translation,
+	onEdit,
+}: {
+	translation: SharedValue<number>;
+	onEdit: () => void;
+}) {
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: translation.value - SWIPE_ACTION_WIDTH }],
+	}));
+	return (
+		<Animated.View
+			style={[animatedStyle, { width: SWIPE_ACTION_WIDTH }]}
+			className="overflow-hidden rounded-l-[10px]"
+		>
+			<TouchableOpacity
+				activeOpacity={0.85}
+				onPress={onEdit}
+				className="flex-1 items-center justify-center gap-1 bg-lime-700"
+			>
+				<PencilIcon size={16} color={colors.white} strokeWidth={2} />
+				<Text className="text-[10px] font-semibold text-white">Editar</Text>
+			</TouchableOpacity>
+		</Animated.View>
+	);
+}
+
+function SwipeDeleteAction({
+	translation,
+	onDelete,
+}: {
+	translation: SharedValue<number>;
+	onDelete: () => void;
+}) {
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: translation.value + SWIPE_ACTION_WIDTH }],
+	}));
+	return (
+		<Animated.View
+			style={[animatedStyle, { width: SWIPE_ACTION_WIDTH }]}
+			className="overflow-hidden rounded-r-[10px]"
+		>
+			<TouchableOpacity
+				activeOpacity={0.85}
+				onPress={onDelete}
+				className="flex-1 items-center justify-center gap-1 bg-red-500"
+			>
+				<Trash2Icon size={16} color={colors.white} strokeWidth={2} />
+				<Text className="text-[10px] font-semibold text-white">Excluir</Text>
+			</TouchableOpacity>
+		</Animated.View>
+	);
+}
+
 export type ComplaintBottomSheetProps = {
 	isOpen: boolean;
 	onClose: () => void;
@@ -150,6 +230,7 @@ export function ComplaintBottomSheet({
 	const { isAuthenticated, user } = useAuthContext();
 	const setVote = useComplaintsStore(s => s.setVote);
 	const removeVote = useComplaintsStore(s => s.removeVote);
+	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		if (isOpen) {
@@ -172,6 +253,17 @@ export function ComplaintBottomSheet({
 		enabled: isOpen && !!complaintId,
 	});
 
+	const { data: resolutionsData, isLoading: isLoadingResolutions } = useQuery({
+		queryKey: ["complaint", "resolutions", complaintId],
+		queryFn: async () => {
+			const res = await getV1ComplaintsByIdResolutions({
+				path: { id: complaintId },
+			});
+			return res.data;
+		},
+		enabled: isOpen && !!complaintId,
+	});
+
 	const { data: voteData } = useQuery({
 		queryKey: ["complaint", "vote", complaintId],
 		queryFn: async () => {
@@ -179,6 +271,23 @@ export function ComplaintBottomSheet({
 			return res.data;
 		},
 		enabled: isOpen && !!complaintId && isAuthenticated,
+	});
+
+	const deleteMutation = useMutation({
+		mutationFn: () =>
+			deleteV1ComplaintsByIdResolutions({ path: { id: complaintId } }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["complaint", "resolutions", complaintId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["complaint", "public", complaintId],
+			});
+			toast.success("Resolução removida.", "Sua resolução foi excluída.");
+		},
+		onError: () => {
+			toast.error("Erro", "Não foi possível excluir a resolução.");
+		},
 	});
 
 	useEffect(() => {
@@ -193,7 +302,7 @@ export function ComplaintBottomSheet({
 	if (!complaint) return null;
 
 	const typeInfo = complaintTypeValues.find(t => t.value === complaint.type);
-	const resolutions = detailData?.complaint?.resolutions ?? [];
+	const resolutions = resolutionsData?.resolutions ?? [];
 	const observations =
 		detailData?.complaint?.captures
 			.map(c => c.observations)
@@ -251,6 +360,43 @@ export function ComplaintBottomSheet({
 					complaint.created_at instanceof Date
 						? complaint.created_at.toISOString()
 						: String(complaint.created_at),
+			},
+		});
+		onClose();
+	};
+
+	const handleEditResolution = (resolution: (typeof resolutions)[number]) => {
+		const companyJson = resolution.resolver_company
+			? JSON.stringify({
+					id: resolution.company_id,
+					corporate_name: resolution.resolver_company.corporate_name,
+					business_name: resolution.resolver_company.business_name ?? null,
+					company_type: "",
+					avatar: resolution.resolver_company.avatar_url
+						? {
+								id: "",
+								url: resolution.resolver_company.avatar_url,
+								file_name: "",
+								path: "",
+								created_at: new Date().toISOString(),
+							}
+						: null,
+				})
+			: undefined;
+
+		router.push({
+			pathname: "/(tabs)/complaints/resolution",
+			params: {
+				id: complaint.id,
+				type: complaint.type,
+				status: complaint.status,
+				address: getAddress(complaint) ?? "",
+				date:
+					complaint.created_at instanceof Date
+						? complaint.created_at.toISOString()
+						: String(complaint.created_at),
+				resolutionDescription: resolution.description,
+				...(companyJson ? { resolutionCompanyJson: companyJson } : {}),
 			},
 		});
 		onClose();
@@ -361,7 +507,6 @@ export function ComplaintBottomSheet({
 							)}
 
 							{/* Attachment gallery */}
-							{/* <VStack className="gap-2"> */}
 							<HStack className="gap-2">
 								<Heading size="sm">Anexos</Heading>
 								<Badge variant="outline">
@@ -400,7 +545,6 @@ export function ComplaintBottomSheet({
 									))}
 								</ScrollView>
 							)}
-							{/* </VStack> */}
 
 							<Divider />
 
@@ -441,27 +585,53 @@ export function ComplaintBottomSheet({
 											denúncia.
 										</AlertText>
 									</Alert>
-									{resolutions.length > 0 &&
+
+									{isLoadingResolutions ? (
+										<>
+											<ResolutionCardSkeleton />
+											<ResolutionCardSkeleton />
+										</>
+									) : (
 										resolutions.map(resolution => {
-											const resolverName =
-												resolution.resolver.type === "company"
-													? (resolution.resolver.business_name ??
-														resolution.resolver.corporate_name)
-													: (resolution.resolver.display_name ??
-														resolution.resolver.full_name);
-											const avatarUrl = resolution.resolver.avatar_url ?? null;
-											const isCompany = resolution.resolver.type === "company";
+											const isCompanyResolution =
+												resolution.resolver_company !== null;
+											const resolverName = isCompanyResolution
+												? (resolution.resolver_company?.business_name ??
+													resolution.resolver_company?.corporate_name)
+												: (resolution.resolver_user_profile.display_name ??
+													resolution.resolver_user_profile.full_name);
+											const avatarUrl = isCompanyResolution
+												? (resolution.resolver_company?.avatar_url ?? null)
+												: (resolution.resolver_user_profile.avatar_url ?? null);
 											const isOwnResolution =
 												isAuthenticated &&
-												resolution.resolver.type === "profile" &&
-												resolution.resolver.display_name ===
+												!isCompanyResolution &&
+												resolution.resolver_user_profile.display_name ===
 													user?.profile.display_name;
 
-											return (
+											const cardContent = (
 												<View
-													key={resolution.id}
 													className="gap-2 rounded-[10px] border border-gray-100 p-3"
+													style={
+														isOwnResolution
+															? { borderColor: colors.lime[200] }
+															: undefined
+													}
 												>
+													{/* Own resolution badge */}
+													{isOwnResolution && (
+														<View className="self-start">
+															<Badge
+																variant="outline"
+																className="border-lime-600 bg-lime-50"
+															>
+																<BadgeText className="text-[10px] font-semibold text-lime-700">
+																	Sua Resolução
+																</BadgeText>
+															</Badge>
+														</View>
+													)}
+
 													{/* Header: avatar + name + date + stack */}
 													<View className="flex-row items-center gap-2">
 														{/* Avatar */}
@@ -476,7 +646,7 @@ export function ComplaintBottomSheet({
 															/>
 														) : (
 															<View className="h-8 w-8 items-center justify-center rounded-full bg-gray-100">
-																{isCompany ? (
+																{isCompanyResolution ? (
 																	<BuildingIcon
 																		size={14}
 																		color={colors.gray[500]}
@@ -502,6 +672,11 @@ export function ComplaintBottomSheet({
 																	new Date(resolution.created_at),
 																	"d 'de' MMM",
 																	{ locale: ptBR },
+																)}{" "}
+																•{" "}
+																{formatDistanceToNowStrict(
+																	resolution.created_at,
+																	{ locale: ptBR },
 																)}
 															</Text>
 														</View>
@@ -515,7 +690,7 @@ export function ComplaintBottomSheet({
 													</View>
 
 													{/* Company badge */}
-													{isCompany && (
+													{isCompanyResolution && (
 														<View className="flex-row items-center gap-1 self-start rounded-full bg-gray-100 px-2 py-0.5">
 															<BuildingIcon
 																size={11}
@@ -535,41 +710,43 @@ export function ComplaintBottomSheet({
 													>
 														{resolution.description}
 													</Text>
-
-													{/* Edit button for own resolutions */}
-													{isOwnResolution && (
-														<TouchableOpacity
-															className="flex-row items-center gap-1 self-start"
-															onPress={() => {
-																router.push({
-																	pathname: "/(tabs)/complaints/resolution",
-																	params: {
-																		id: complaint.id,
-																		type: complaint.type,
-																		status: complaint.status,
-																		address: getAddress(complaint) ?? "",
-																		date:
-																			complaint.created_at instanceof Date
-																				? complaint.created_at.toISOString()
-																				: String(complaint.created_at),
-																	},
-																});
-																onClose();
-															}}
-														>
-															<Pencil
-																size={12}
-																color={colors.lime[800]}
-																strokeWidth={2}
-															/>
-															<Text className="text-xs font-semibold text-lime-800">
-																Editar
-															</Text>
-														</TouchableOpacity>
-													)}
 												</View>
 											);
-										})}
+
+											if (isOwnResolution) {
+												return (
+													<ReanimatedSwipeable
+														key={resolution.id}
+														friction={2}
+														overshootLeft={false}
+														overshootRight={false}
+														renderLeftActions={(_, translation, swipeable) => (
+															<SwipeEditAction
+																translation={translation}
+																onEdit={() => {
+																	swipeable.close();
+																	handleEditResolution(resolution);
+																}}
+															/>
+														)}
+														renderRightActions={(_, translation, swipeable) => (
+															<SwipeDeleteAction
+																translation={translation}
+																onDelete={() => {
+																	swipeable.close();
+																	deleteMutation.mutate();
+																}}
+															/>
+														)}
+													>
+														{cardContent}
+													</ReanimatedSwipeable>
+												);
+											}
+
+											return <View key={resolution.id}>{cardContent}</View>;
+										})
+									)}
 								</VStack>
 
 								{/* Adicionar Resolução */}

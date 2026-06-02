@@ -15,7 +15,7 @@ import {
 	X,
 	XIcon,
 } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	Image,
@@ -50,6 +50,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
+	patchV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
@@ -71,22 +72,37 @@ const resolutionSchema = z.object({
 type ResolutionFormValues = z.infer<typeof resolutionSchema>;
 
 export default function ComplaintResolutionScreen() {
-	const { id, type, status, address, date } = useLocalSearchParams<{
-		id: string;
-		type: string;
-		status: string;
-		address: string;
-		date: string;
-	}>();
+	const { id, type, status, address, date, resolutionDescription, resolutionCompanyJson } =
+		useLocalSearchParams<{
+			id: string;
+			type: string;
+			status: string;
+			address: string;
+			date: string;
+			resolutionDescription?: string;
+			resolutionCompanyJson?: string;
+		}>();
 	const insets = useSafeAreaInsets();
 	const { user, isAuthenticated } = useAuthContext();
 	const queryClient = useQueryClient();
+
+	const isEditMode = !!resolutionDescription;
 
 	const [selectedAssets, setSelectedAssets] = useState<
 		ImagePicker.ImagePickerAsset[]
 	>([]);
 	const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 	const [showCompanyPicker, setShowCompanyPicker] = useState(false);
+
+	useEffect(() => {
+		if (resolutionCompanyJson) {
+			try {
+				setSelectedCompany(JSON.parse(resolutionCompanyJson) as Company);
+			} catch {
+				// ignore malformed JSON
+			}
+		}
+	}, [resolutionCompanyJson]);
 
 	const {
 		control,
@@ -95,7 +111,7 @@ export default function ComplaintResolutionScreen() {
 		formState: { errors },
 	} = useForm<ResolutionFormValues>({
 		resolver: zodResolver(resolutionSchema),
-		defaultValues: { description: "" },
+		defaultValues: { description: resolutionDescription ?? "" },
 		mode: "onTouched",
 	});
 
@@ -148,13 +164,23 @@ export default function ComplaintResolutionScreen() {
 		mutationFn: async (data: ResolutionFormValues) => {
 			if (!id || !user?.profile.id) throw new Error("Dados inválidos.");
 
-			await postV1ComplaintsByIdResolutions({
-				path: { id },
-				body: {
-					description: data.description,
-					...(selectedCompany ? { company_id: selectedCompany.id } : {}),
-				},
-			});
+			if (isEditMode) {
+				await patchV1ComplaintsByIdResolutions({
+					path: { id },
+					body: {
+						description: data.description,
+						...(selectedCompany ? { company_id: selectedCompany.id } : {}),
+					},
+				});
+			} else {
+				await postV1ComplaintsByIdResolutions({
+					path: { id },
+					body: {
+						description: data.description,
+						...(selectedCompany ? { company_id: selectedCompany.id } : {}),
+					},
+				});
+			}
 
 			for (const asset of selectedAssets) {
 				const isPhoto = asset.type === "image";
@@ -173,22 +199,26 @@ export default function ComplaintResolutionScreen() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["complaint", "public", id] });
-			toast.success("Resolução publicada!", "Sua resolução foi registrada.");
+			queryClient.invalidateQueries({ queryKey: ["complaint", "resolutions", id] });
+			toast.success(
+				isEditMode ? "Resolução atualizada!" : "Resolução publicada!",
+				isEditMode ? "Sua resolução foi atualizada." : "Sua resolução foi registrada.",
+			);
 			router.back();
 		},
 		onError: () => {
-			toast.error("Erro", "Não foi possível publicar a resolução.");
+			toast.error("Erro", `Não foi possível ${isEditMode ? "atualizar" : "publicar"} a resolução.`);
 		},
 	});
 
 	const attachmentsMissing = MIN_ATTACHMENTS - selectedAssets.length;
 	const canSubmit =
 		isAuthenticated &&
-		selectedAssets.length >= MIN_ATTACHMENTS &&
+		(isEditMode || selectedAssets.length >= MIN_ATTACHMENTS) &&
 		!mutation.isPending;
 
 	const onSubmit = (data: ResolutionFormValues) => {
-		if (selectedAssets.length < MIN_ATTACHMENTS) {
+		if (!isEditMode && selectedAssets.length < MIN_ATTACHMENTS) {
 			toast.error(
 				"Anexos insuficientes",
 				`Adicione pelo menos ${MIN_ATTACHMENTS} anexos.`,
@@ -480,7 +510,7 @@ export default function ComplaintResolutionScreen() {
 							<Text
 								className={`text-[15px] font-bold ${canSubmit ? "text-white" : "text-gray-400"}`}
 							>
-								Confirmar Resolução
+								{isEditMode ? "Atualizar Resolução" : "Confirmar Resolução"}
 							</Text>
 						)}
 					</TouchableOpacity>
