@@ -1,11 +1,9 @@
 import { type Href, Link } from "expo-router";
 import {
 	ArrowRight,
-	CrownIcon,
 	FactoryIcon,
 	LogOutIcon,
 	type LucideIcon,
-	SproutIcon,
 } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
 import { colors } from "@/components/style/colors";
@@ -29,14 +27,14 @@ export default function SettingsScreen() {
 	const { signOut } = useAuthContext();
 
 	const settingsOptions: SettingsOption[] = [
-		{
-			title: "Planos",
-			description: "Descubra como podemos agregar valor ao seu negócio!",
-			icon: CrownIcon,
-			is_premium: false,
-			highlight: true,
-			link: "/plans",
-		},
+		// {
+		// 	title: "Planos",
+		// 	description: "Descubra como podemos agregar valor ao seu negócio!",
+		// 	icon: CrownIcon,
+		// 	is_premium: false,
+		// 	highlight: true,
+		// 	link: "/plans",
+		// },
 		{
 			title: "Minhas empresas",
 			description: "Gerencie suas empresas, produtos e serviços",
@@ -45,15 +43,15 @@ export default function SettingsScreen() {
 			highlight: false,
 			link: "/(tabs)/(home)/companies",
 		},
-		{
-			title: "Seja um patrocinador",
-			description:
-				"Patrocine a plataforma e ajude a manter os serviços gratuitos para todos os usuários",
-			icon: SproutIcon,
-			is_premium: false,
-			highlight: false,
-			link: "/(tabs)/(home)/sponsors",
-		},
+		// {
+		// 	title: "Seja um patrocinador",
+		// 	description:
+		// 		"Patrocine a plataforma e ajude a manter os serviços gratuitos para todos os usuários",
+		// 	icon: SproutIcon,
+		// 	is_premium: false,
+		// 	highlight: false,
+		// 	link: "/(tabs)/(home)/sponsors",
+		// },
 	];
 
 	return (

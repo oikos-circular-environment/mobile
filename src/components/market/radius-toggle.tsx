@@ -7,15 +7,10 @@ type RadiusToggleProps = {
 	onChange: (value: string) => void;
 };
 
-const radiusOptions = Array.from({ length: 39 }, (_, i) => {
-	const meters = 1000 + i * 500;
-	const km = meters / 1000;
-	const label = Number.isInteger(km)
-		? `${km} km`
-		: `${km.toFixed(1).replace(".", ",")} km`;
-
-	return { value: String(meters), label };
-});
+const radiusOptions = [2, 5, 10, 15, 20, 30, 40].map(km => ({
+	value: String(km * 1000),
+	label: `${km} km`,
+}));
 
 export function RadiusToggle({ value, onChange }: RadiusToggleProps) {
 	return (

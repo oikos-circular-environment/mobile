@@ -20,8 +20,7 @@ function Badge({
 		variant === "primary"
 			? "bg-primary/10 px-2 py-0.5 rounded-md"
 			: "bg-gray-100 px-2 py-0.5 rounded-md";
-	const textCls =
-		variant === "primary" ? "text-xs text-primary" : "text-xs text-gray-600";
+	const textCls = variant === "primary" ? "text-primary" : "text-gray-600";
 	return (
 		<View className={cls}>
 			<Text className={textCls}>{label}</Text>
@@ -54,15 +53,15 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 					)}
 
 					<View className="flex-1 gap-1">
-						<Heading className="font-semibold" numberOfLines={1}>
+						<Heading size="xl" className="font-semibold" numberOfLines={1}>
 							{company.business_name ?? company.corporate_name}
 						</Heading>
 						{company.business_name ? (
-							<Text className="text-xs text-muted-foreground" numberOfLines={1}>
+							<Text className="text-muted-foreground" numberOfLines={1}>
 								{company.corporate_name}
 							</Text>
 						) : null}
-						<Text className="text-xs text-muted-foreground" numberOfLines={1}>
+						<Text className="text-muted-foreground" numberOfLines={1}>
 							{company.identity}
 						</Text>
 					</View>

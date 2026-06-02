@@ -13,10 +13,8 @@ import { HStack } from "@/components/ui/hstack";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
-import { createCompanies } from "@/libs/factories/create-companies";
 
 export default function HomeScreen() {
-	const marketCompanies = createCompanies(5);
 	const { user, isAuthenticated, isLoading } = useAuthContext();
 	const router = useRouter();
 	const contentOpacity = useRef(new Animated.Value(0)).current;

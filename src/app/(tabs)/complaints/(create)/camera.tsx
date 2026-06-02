@@ -5,8 +5,8 @@ import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Camera } from "@/components/camera";
-import { colors } from "@/components/style/colors";
 import { useComplaintCreate } from "@/components/complaints/hooks/use-complaint-create";
+import { colors } from "@/components/style/colors";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import type {
 	CameraCapturedVideo,

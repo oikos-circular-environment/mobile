@@ -93,7 +93,7 @@ export default function MarketScreen() {
 										</View>
 										<Heading>Pontos de coletas</Heading>
 									</View>
-									<Text className="text-sm text-muted-foreground" selectable>
+									<Text className=" text-muted-foreground" selectable>
 										Pesquise pontos de coletas que estão próximo a você.
 									</Text>
 								</View>
@@ -140,9 +140,7 @@ export default function MarketScreen() {
 						<View className="gap-4">
 							<FormControl className="gap-2">
 								<FormControlLabel>
-									<FormControlLabelText className="text-sm">
-										Raio
-									</FormControlLabelText>
+									<FormControlLabelText className="">Raio</FormControlLabelText>
 								</FormControlLabel>
 								<Controller
 									control={control}
@@ -155,7 +153,7 @@ export default function MarketScreen() {
 
 							<FormControl className="gap-2">
 								<FormControlLabel>
-									<FormControlLabelText className="text-sm">
+									<FormControlLabelText className="">
 										Categoria
 									</FormControlLabelText>
 								</FormControlLabel>
@@ -173,7 +171,7 @@ export default function MarketScreen() {
 					<View className="gap-4">
 						<View className="gap-1">
 							<Heading>Ecossistema</Heading>
-							<Text className="text-sm text-gray-500">
+							<Text className=" text-gray-500">
 								Clique na empresa para obter mais informações.
 							</Text>
 						</View>
@@ -182,13 +180,13 @@ export default function MarketScreen() {
 							isResolvingLocation ? (
 								<Card className="items-center p-6 shadow-none bg-gray-50">
 									<ActivityIndicator size="small" color={colors.lime[800]} />
-									<Text className="mt-2 text-sm text-gray-500">
+									<Text className="mt-2  text-gray-500">
 										Obtendo localização…
 									</Text>
 								</Card>
 							) : (
 								<Card className="shadow-none bg-gray-50 p-4 gap-1">
-									<Text className="text-sm font-semibold text-gray-900">
+									<Text className=" font-semibold text-gray-900">
 										{locationSource === "current"
 											? "Localização indisponível"
 											: "Endereço não configurado"}
@@ -203,13 +201,11 @@ export default function MarketScreen() {
 						) : isPending ? (
 							<Card className="items-center p-6 shadow-none bg-gray-50">
 								<ActivityIndicator size="small" color={colors.lime[800]} />
-								<Text className="mt-2 text-sm text-gray-500">
-									Buscando empresas…
-								</Text>
+								<Text className="mt-2  text-gray-500">Buscando empresas…</Text>
 							</Card>
 						) : isError ? (
 							<Card className="shadow-none bg-gray-50 p-4 gap-1">
-								<Text className="text-sm font-semibold text-gray-900">
+								<Text className=" font-semibold text-gray-900">
 									Erro ao carregar
 								</Text>
 								<Text className="text-xs text-gray-500">
@@ -218,7 +214,7 @@ export default function MarketScreen() {
 							</Card>
 						) : companies.length === 0 ? (
 							<Card className="shadow-none bg-gray-50 p-4">
-								<Text className="text-sm text-gray-500">
+								<Text className=" text-gray-500">
 									Nenhuma empresa encontrada para os filtros aplicados.
 								</Text>
 							</Card>
@@ -245,9 +241,7 @@ export default function MarketScreen() {
 													className="border-0 bg-gray-100 shadow-none"
 												>
 													<View className="flex-row items-center gap-3">
-														<View
-															className={`h-8 w-8 items-center justify-center overflow-hidden rounded-[5px] ${item.company_type === "COLLECTOR" ? "bg-gray-200" : "bg-slate-950"}`}
-														>
+														<View className="h-12 w-12 items-center justify-center overflow-hidden rounded-[5px] bg-lime-800">
 															{item.company_type === "COLLECTOR" ? (
 																<Sprout size={16} color={colors.gray[900]} />
 															) : (
@@ -264,14 +258,14 @@ export default function MarketScreen() {
 														<View className="min-w-0 flex-1 gap-1">
 															<View className="flex-row items-center gap-2">
 																<View className="flex-row gap-2 flex-1">
-																	<Text className="text-sm font-semibold text-gray-950">
+																	<Text className=" font-semibold text-gray-950">
 																		{item.corporate_name}
 																	</Text>
 
 																	<Badge
 																		variant={isOpen ? "default" : "destructive"}
 																	>
-																		<BadgeText className="text-[8px]">
+																		<BadgeText>
 																			{isOpen ? "Aberto" : "Fechado"}
 																		</BadgeText>
 																	</Badge>
@@ -279,7 +273,7 @@ export default function MarketScreen() {
 
 																{item.company_type === "COLLECTOR" ? (
 																	<View className="rounded-[5px] bg-lime-800 px-3 py-1">
-																		<Text className="text-[8px] text-white">
+																		<Text className="text-white">
 																			Coletor independente
 																		</Text>
 																	</View>
@@ -320,7 +314,7 @@ export default function MarketScreen() {
 												color={colors.lime[800]}
 											/>
 										) : (
-											<Text className="text-sm font-semibold text-lime-800">
+											<Text className=" font-semibold text-lime-800">
 												Carregar mais
 											</Text>
 										)}
