@@ -14,40 +14,40 @@ type AuthModalProps = {
 	isOpen: boolean;
 	onClose: () => void;
 	description?: string;
-	onBeforeLogin?: () => void;
 };
 
 export function AuthModal({
 	isOpen,
 	onClose,
 	description = "Para acessar esta funcionalidade você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente.",
-	onBeforeLogin,
 }: AuthModalProps) {
 	const handleLogin = () => {
 		onClose();
-		onBeforeLogin?.();
 		router.push("/(tabs)/(home)/sign-in");
+	};
+
+	const handleRegister = () => {
+		onClose();
+		router.push("/(tabs)/(home)/sign-up");
 	};
 
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} useRNModal>
 			<ModalBackdrop />
-			<ModalContent>
+			<ModalContent className="gap-4">
 				<ModalHeader className="flex-col items-start gap-1">
-					<Heading size="md" className="text-base text-gray-950">
-						Colabore com o ecossistema
-					</Heading>
-					<Text className="text-sm text-gray-500">{description}</Text>
+					<Heading size="xl">Colabore com o ecossistema</Heading>
+					<Text>{description}</Text>
 				</ModalHeader>
 				<ModalFooter className="gap-2">
 					<Button
 						variant="outline"
-						className="flex-1 rounded-md border-gray-200"
-						onPress={onClose}
+						className="flex-1 border-gray-200"
+						onPress={handleRegister}
 					>
-						<ButtonText className="text-gray-700">Fechar</ButtonText>
+						<ButtonText className="text-gray-700">Registrar-se</ButtonText>
 					</Button>
-					<Button className="flex-1 rounded-md bg-lime-800" onPress={handleLogin}>
+					<Button className="flex-1 bg-lime-800" onPress={handleLogin}>
 						<ButtonText>Login</ButtonText>
 					</Button>
 				</ModalFooter>

@@ -17,6 +17,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AuthModal } from "@/components/auth/auth-modal";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { ImagePreviewViewer } from "@/components/medias-preview/image-preview-viewer";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
@@ -30,7 +31,6 @@ import {
 	type BottomSheetRef,
 	BottomSheetScrollView,
 } from "@/components/ui/bottomsheet";
-import { AuthModal } from "@/components/auth/auth-modal";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
@@ -508,7 +508,6 @@ export function ComplaintBottomSheet({
 				isOpen={showAuthModal}
 				onClose={() => setShowAuthModal(false)}
 				description="Para interagir com denúncias você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente."
-				onBeforeLogin={onClose}
 			/>
 		</>
 	);
