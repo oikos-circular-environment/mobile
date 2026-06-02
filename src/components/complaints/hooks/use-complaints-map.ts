@@ -17,12 +17,14 @@ type Params = {
 	userLocation: { lat: number; lon: number } | null;
 	activeTypeFilter: ComplaintType | null;
 	activeStatusFilter: ComplaintStatus | null;
+	radius: number;
 };
 
 export function useComplaintsMap({
 	userLocation,
 	activeTypeFilter,
 	activeStatusFilter,
+	radius,
 }: Params) {
 	const { isAuthenticated } = useAuthContext();
 	const userVotes = useComplaintsStore(s => s.userVotes);
@@ -44,13 +46,14 @@ export function useComplaintsMap({
 			userLocation?.lon ?? 0,
 			activeTypeFilter,
 			activeStatusFilter,
+			radius,
 		],
 		queryFn: async () => {
 			const res = await getV1ComplaintsMap({
 				query: {
 					lat: userLocation?.lat ?? 0,
 					lon: userLocation?.lon ?? 0,
-					radius: 10000,
+					radius,
 					...(activeTypeFilter ? { type: activeTypeFilter } : {}),
 					...(activeStatusFilter ? { status: activeStatusFilter } : {}),
 				},

@@ -3231,102 +3231,155 @@
             },
             {
               "type": "frame",
-              "id": "qdini",
+              "id": "cN3jE",
               "x": 388,
               "y": 200,
-              "width": 36,
-              "height": 84,
-              "fill": "#ffffff",
-              "cornerRadius": 8,
-              "effect": {
-                "type": "shadow",
-                "shadowType": "outer",
-                "color": "#00000020",
-                "offset": {
-                  "x": 0,
-                  "y": 2
-                },
-                "blur": 8
-              },
+              "name": "Control Map",
               "layout": "vertical",
-              "gap": 1,
+              "gap": 8,
               "children": [
                 {
                   "type": "frame",
-                  "id": "cN3jE",
-                  "name": "Frame 14",
+                  "id": "YTe2l",
+                  "name": "Zoom Map",
+                  "height": 82,
+                  "fill": "$white",
+                  "cornerRadius": 8,
                   "layout": "vertical",
-                  "gap": 8,
                   "children": [
                     {
                       "type": "frame",
-                      "id": "YTe2l",
-                      "name": "Frame 13",
-                      "height": 82,
-                      "layout": "vertical",
+                      "id": "IeU29",
+                      "width": 36,
+                      "height": 40,
+                      "cornerRadius": [
+                        8,
+                        8,
+                        0,
+                        0
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
                       "children": [
                         {
-                          "type": "frame",
-                          "id": "IeU29",
-                          "width": 36,
-                          "height": 40,
-                          "cornerRadius": [
-                            8,
-                            8,
-                            0,
-                            0
-                          ],
-                          "justifyContent": "center",
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "icon",
-                              "id": "yxU9W",
-                              "width": 16,
-                              "height": 16,
-                              "icon": "plus",
-                              "library": "lucide",
-                              "fill": "#374151"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "rectangle",
-                          "id": "IdvX9",
-                          "fill": "#e5e7eb",
-                          "width": 36,
-                          "height": 1
-                        },
-                        {
-                          "type": "frame",
-                          "id": "a966Z",
-                          "width": 36,
-                          "height": 40,
-                          "cornerRadius": [
-                            0,
-                            0,
-                            8,
-                            8
-                          ],
-                          "justifyContent": "center",
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "icon",
-                              "id": "hHf59",
-                              "width": 16,
-                              "height": 16,
-                              "icon": "minus",
-                              "library": "lucide",
-                              "fill": "#374151"
-                            }
-                          ]
+                          "type": "icon",
+                          "id": "yxU9W",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "plus",
+                          "library": "lucide",
+                          "fill": "#374151"
                         }
                       ]
                     },
                     {
+                      "type": "rectangle",
+                      "id": "IdvX9",
+                      "fill": "#e5e7eb",
+                      "width": 36,
+                      "height": 1
+                    },
+                    {
                       "type": "frame",
-                      "id": "DHjhV",
+                      "id": "a966Z",
+                      "width": 36,
+                      "height": 40,
+                      "cornerRadius": [
+                        0,
+                        0,
+                        8,
+                        8
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "hHf59",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "minus",
+                          "library": "lucide",
+                          "fill": "#374151"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "DHjhV",
+                  "name": "Compass Map",
+                  "width": 36,
+                  "height": 36,
+                  "fill": "#ffffff",
+                  "cornerRadius": 8,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000020",
+                    "offset": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "blur": 8
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "u4oIpX",
+                      "rotation": 46.088534793739356,
+                      "width": 18,
+                      "height": 18,
+                      "icon": "compass",
+                      "library": "lucide",
+                      "fill": "$primary"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "g6LRlO",
+                  "name": "Current Location",
+                  "width": 36,
+                  "height": 36,
+                  "fill": "#ffffff",
+                  "cornerRadius": 8,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000020",
+                    "offset": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "blur": 8
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "WpsKc",
+                      "width": 18,
+                      "height": 18,
+                      "icon": "locate-fixed",
+                      "library": "lucide",
+                      "fill": "$primary"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WwJ3f",
+                  "name": "Radar Map",
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "YjfbP",
                       "width": 36,
                       "height": 36,
                       "fill": "#ffffff",
@@ -3341,17 +3394,27 @@
                         },
                         "blur": 8
                       },
+                      "layout": "vertical",
                       "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "icon",
-                          "id": "u4oIpX",
+                          "id": "oWifN",
                           "width": 18,
                           "height": 18,
-                          "icon": "locate-fixed",
+                          "icon": "radar",
                           "library": "lucide",
                           "fill": "$primary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "S9e1yF",
+                          "fill": "$muted-foreground",
+                          "content": "10KM",
+                          "fontFamily": "Inter",
+                          "fontSize": 8,
+                          "fontWeight": "700"
                         }
                       ]
                     }
@@ -10716,6 +10779,32 @@
               ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "aYoSD",
+      "x": -842,
+      "y": 2369,
+      "name": "compass-custom",
+      "fill": {
+        "type": "color",
+        "color": "$green-800",
+        "enabled": false
+      },
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "W3PnJc",
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "../illustration-compass.png",
+            "mode": "fill"
+          },
+          "width": 2000,
+          "height": 2000
         }
       ]
     }

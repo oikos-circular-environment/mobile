@@ -1,7 +1,19 @@
 import { router } from "expo-router";
-import { ListIcon, PlusIcon } from "lucide-react-native";
+import {
+	ListIcon,
+	LocateFixedIcon,
+	MinusIcon,
+	PlusIcon,
+	RadarIcon,
+} from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+	Image,
+	Platform,
+	ScrollView,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
@@ -11,10 +23,19 @@ import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/to
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
 import { colors } from "@/components/style/colors";
+import {
+	BottomSheet,
+	BottomSheetBackdrop,
+	BottomSheetDragIndicator,
+	BottomSheetPortal,
+	type BottomSheetRef,
+	BottomSheetScrollView,
+} from "@/components/ui/bottomsheet";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import {
@@ -24,11 +45,30 @@ import {
 	complaintTypeValues,
 } from "@/libs/types/complaint";
 
+const RADIUS_OPTIONS = [
+	{ label: "2 km", value: 2000 },
+	{ label: "5 km", value: 5000 },
+	{ label: "10 km", value: 10000 },
+	{ label: "15 km", value: 15000 },
+	{ label: "20 km", value: 20000 },
+	{ label: "30 km", value: 30000 },
+	{ label: "40 km", value: 40000 },
+];
+
+const controlShadow = {
+	shadowColor: colors.black,
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.15,
+	shadowRadius: 3,
+	elevation: 3,
+};
+
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
 	const { isAuthenticated } = useAuthContext();
 	const { location } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
+	const radarSheetRef = useRef<BottomSheetRef>(null);
 	const hasAnimatedRef = useRef(false);
 	const suppressMapPressRef = useRef(false);
 
@@ -37,6 +77,8 @@ export default function ComplaintsMapScreen() {
 		: null;
 
 	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [mapHeading, setMapHeading] = useState(0);
+	const [activeRadius, setActiveRadius] = useState(10000);
 	const [activeTypeFilter, setActiveTypeFilter] =
 		useState<ComplaintType | null>("IRREGULAR_DISPOSAL");
 	const [activeStatusFilter, setActiveStatusFilter] =
@@ -47,7 +89,12 @@ export default function ComplaintsMapScreen() {
 		isLoadingMap,
 		selectedMapComplaint,
 		setSelectedMapComplaint,
-	} = useComplaintsMap({ userLocation, activeTypeFilter, activeStatusFilter });
+	} = useComplaintsMap({
+		userLocation,
+		activeTypeFilter,
+		activeStatusFilter,
+		radius: activeRadius,
+	});
 
 	useEffect(() => {
 		if (!location || hasAnimatedRef.current) return;
@@ -78,6 +125,57 @@ export default function ComplaintsMapScreen() {
 		setSelectedMapComplaint(null);
 	};
 
+	const handleZoomIn = async () => {
+		const camera = await mapRef.current?.getCamera();
+		if (!camera) return;
+		mapRef.current?.animateCamera({
+			zoom: (camera.zoom ?? 14) + 1,
+			altitude: (camera.altitude ?? 1000) / 2,
+		});
+	};
+
+	const handleZoomOut = async () => {
+		const camera = await mapRef.current?.getCamera();
+		if (!camera) return;
+		mapRef.current?.animateCamera({
+			zoom: (camera.zoom ?? 14) - 1,
+			altitude: (camera.altitude ?? 1000) * 2,
+		});
+	};
+
+	const handleGoToLocation = () => {
+		if (!location) return;
+		mapRef.current?.animateToRegion(
+			{
+				latitude: location.coords.latitude,
+				longitude: location.coords.longitude,
+				latitudeDelta: 0.02,
+				longitudeDelta: 0.02,
+			},
+			600,
+		);
+	};
+
+	const handleResetNorth = () => {
+		mapRef.current?.animateCamera({ heading: 0 }, { duration: 300 });
+		setMapHeading(0);
+	};
+
+	const handleRegionChangeComplete = async () => {
+		const camera = await mapRef.current?.getCamera();
+		if (camera?.heading !== undefined) {
+			setMapHeading(camera.heading);
+		}
+	};
+
+	const handleRadiusSelect = (value: number) => {
+		setActiveRadius(value);
+		radarSheetRef.current?.close();
+	};
+
+	const activeRadiusLabel =
+		RADIUS_OPTIONS.find(o => o.value === activeRadius)?.label ?? "10 km";
+
 	return (
 		<View className="flex-1">
 			<MapView
@@ -88,6 +186,7 @@ export default function ComplaintsMapScreen() {
 				showsMyLocationButton={false}
 				showsCompass={false}
 				onPress={handleClosePanel}
+				onRegionChangeComplete={handleRegionChangeComplete}
 			>
 				{complaints.map(complaint => {
 					if (!complaint.location) return null;
@@ -192,6 +291,75 @@ export default function ComplaintsMapScreen() {
 				</View>
 			)}
 
+			{/* Map controls — right side, vertically centered */}
+			<View
+				className="absolute right-4 gap-2 justify-center"
+				style={{
+					top: 0,
+					bottom: 0,
+				}}
+				pointerEvents="box-none"
+			>
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={handleZoomIn}
+					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+					style={controlShadow}
+				>
+					<PlusIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={handleZoomOut}
+					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+					style={controlShadow}
+				>
+					<MinusIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={handleResetNorth}
+					className="h-11 w-11 items-center justify-center rounded-xl bg-primary"
+					style={controlShadow}
+				>
+					<Image
+						source={require("@/assets/images/compass.png")}
+						style={{
+							width: 28,
+							height: 28,
+							transform: [{ rotate: `${-mapHeading}deg` }],
+						}}
+					/>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={handleGoToLocation}
+					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+					style={controlShadow}
+				>
+					<LocateFixedIcon
+						size={18}
+						color={colors.gray[700]}
+						strokeWidth={2.2}
+					/>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={() => radarSheetRef.current?.open()}
+					className="h-[52px] w-11 items-center justify-center rounded-xl bg-white gap-0.5"
+					style={controlShadow}
+				>
+					<RadarIcon size={16} color={colors.gray[700]} strokeWidth={2.2} />
+					<Text className="text-[9px] font-semibold text-gray-700 leading-none">
+						{activeRadiusLabel.replace(" ", "").toUpperCase()}
+					</Text>
+				</TouchableOpacity>
+			</View>
+
 			{/* FABs */}
 			<View
 				className="absolute bottom-4 right-4 flex-row gap-2 items-center"
@@ -245,6 +413,47 @@ export default function ComplaintsMapScreen() {
 				isOpen={showAuthModal}
 				onClose={() => setShowAuthModal(false)}
 			/>
+
+			{/* Radar bottom sheet */}
+			<BottomSheet ref={radarSheetRef}>
+				<BottomSheetPortal
+					snapPoints={["42%"]}
+					backdropComponent={BottomSheetBackdrop}
+					handleComponent={BottomSheetDragIndicator}
+				>
+					<BottomSheetScrollView
+						contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
+					>
+						<Heading size="md" className="mb-4 text-gray-900">
+							Raio de busca
+						</Heading>
+						{RADIUS_OPTIONS.map(({ label, value }) => {
+							const isActive = activeRadius === value;
+							return (
+								<TouchableOpacity
+									key={value}
+									activeOpacity={0.85}
+									onPress={() => handleRadiusSelect(value)}
+									className={`mb-2 h-12 flex-row items-center justify-between rounded-xl px-4 ${
+										isActive
+											? "bg-lime-800"
+											: "bg-gray-50 border border-gray-100"
+									}`}
+								>
+									<Text
+										className={`font-semibold ${isActive ? "text-white" : "text-gray-800"}`}
+									>
+										{label}
+									</Text>
+									{isActive && (
+										<View className="h-2 w-2 rounded-full bg-white" />
+									)}
+								</TouchableOpacity>
+							);
+						})}
+					</BottomSheetScrollView>
+				</BottomSheetPortal>
+			</BottomSheet>
 		</View>
 	);
 }
