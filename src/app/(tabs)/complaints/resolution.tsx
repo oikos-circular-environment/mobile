@@ -29,7 +29,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker-bottom-sheet";
-import { useComplaintsStore } from "@/stores/complaints-store";
 import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
@@ -58,6 +57,7 @@ import {
 } from "@/libs/oikos-sdk";
 import type { ComplaintStatus, ComplaintType } from "@/libs/types/complaint";
 import { complaintTypeValues } from "@/libs/types/complaint";
+import { useComplaintsStore } from "@/stores/complaints-store";
 
 const MIN_ATTACHMENTS = 2;
 const MIN_CHARS = 50;
@@ -279,7 +279,10 @@ export default function ComplaintResolutionScreen() {
 					showsVerticalScrollIndicator={false}
 				>
 					{/* Header — dados da denúncia */}
-					<View className="gap-2">
+					<View className="gap-2 mt-8">
+						<View className="flex-1 items-center justify-center">
+							<View className="w-8 h-1 bg-gray-500 rounded-sm" />
+						</View>
 						<Text
 							className="text-2xl font-bold text-gray-950"
 							style={{ fontFamily: "Oswald_700Bold" }}

@@ -638,7 +638,7 @@ export const getV1Complaints = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Create complaint
+ * Create automatic complaint
  *
  * Creates a complaint with raw geospatial data and no attachment.
  */

@@ -18,8 +18,6 @@ import { useEffect } from "react";
 import { AppSplashScreen } from "@/components/app-splash-screen";
 import { Toaster } from "@/components/toast";
 
-SplashScreen.preventAutoHideAsync().catch(() => {});
-
 export const unstable_settings = {
 	anchor: "(tabs)",
 };

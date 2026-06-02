@@ -1287,6 +1287,7 @@ export type GetV1ComplaintsResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -1461,6 +1462,7 @@ export type PostV1ComplaintsResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -1620,6 +1622,7 @@ export type GetV1ComplaintsMapResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			location: {
 				lat: number;
 				lon: number;
@@ -1761,6 +1764,7 @@ export type GetV1ComplaintsByIdPublicResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			location: {
 				lat: number;
 				lon: number;
@@ -1926,6 +1930,7 @@ export type GetV1ComplaintsByIdResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2065,6 +2070,7 @@ export type PatchV1ComplaintsByIdResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2234,6 +2240,7 @@ export type PostV1ComplaintsManualResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2382,6 +2389,7 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -2974,6 +2982,7 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;
@@ -3136,6 +3145,7 @@ export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses = {
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
 			complaint_method: "AUTOMATIC" | "MANUAL";
+			observations: string | null;
 			captures: Array<{
 				id: string;
 				date: Date;

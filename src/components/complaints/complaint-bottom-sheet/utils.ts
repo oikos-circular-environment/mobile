@@ -1,6 +1,7 @@
 import type { MapComplaint } from "@/libs/types/complaint";
 
-export type Attachment = MapComplaint["captures"][number]["attachments"][number];
+export type Attachment =
+	MapComplaint["captures"][number]["attachments"][number];
 
 export function haversineKm(
 	lat1: number,

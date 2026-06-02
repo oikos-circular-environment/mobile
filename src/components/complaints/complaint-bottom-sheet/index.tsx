@@ -37,7 +37,6 @@ import { useGeospatial } from "@/contexts/geospatial-context";
 import {
 	deleteV1ComplaintsByIdResolutions,
 	deleteV1ComplaintsByIdVotes,
-	getV1ComplaintsByIdPublic,
 	getV1ComplaintsByIdResolutions,
 	getV1ComplaintsByIdVotes,
 	postV1ComplaintsByIdVotes,
@@ -62,6 +61,9 @@ export function ComplaintBottomSheet() {
 	const [previewAttachment, setPreviewAttachment] = useState<Attachment | null>(
 		null,
 	);
+	const [selectedAttachmentId, setSelectedAttachmentId] = useState<
+		string | null
+	>(null);
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const { isAuthenticated, user } = useAuthContext();
 	const { location } = useGeospatial();
@@ -96,16 +98,9 @@ export function ComplaintBottomSheet() {
 
 	const complaintId = complaint?.id ?? "";
 
-	const { data: detailData } = useQuery({
-		queryKey: ["complaint", "public", complaintId],
-		queryFn: async () => {
-			const res = await getV1ComplaintsByIdPublic({
-				path: { id: complaintId },
-			});
-			return res.data;
-		},
-		enabled: isOpen && !!complaintId,
-	});
+	useEffect(() => {
+		setSelectedAttachmentId(null);
+	}, []);
 
 	const { data: resolutionsData, isLoading: isLoadingResolutions } = useQuery({
 		queryKey: ["complaint", "resolutions", complaintId],
@@ -185,11 +180,19 @@ export function ComplaintBottomSheet() {
 
 	const typeInfo = complaintTypeValues.find(t => t.value === complaint.type);
 	const resolutions = resolutionsData?.resolutions ?? [];
-	const observations =
-		detailData?.complaint?.captures
-			.map(c => c.observations)
-			.filter(Boolean)
-			.join(" ") ?? null;
+	const isManual = complaint.complaint_method === "MANUAL";
+
+	const attachmentObservationMap: Record<string, string | null> = isManual
+		? {}
+		: Object.fromEntries(
+				complaint.captures.flatMap(c =>
+					c.attachments.map(a => [a.id, c.observations]),
+				),
+			);
+
+	const selectedObservation = selectedAttachmentId
+		? (attachmentObservationMap[selectedAttachmentId] ?? null)
+		: null;
 
 	const allAttachments = complaint.captures.flatMap(c => c.attachments);
 	const address = getAddress(complaint);
@@ -249,7 +252,6 @@ export function ComplaintBottomSheet() {
 			pathname: "/(tabs)/complaints/resolution",
 			params: complaintRouteContext,
 		});
-		onClose();
 	};
 
 	const handleEditResolution = (resolution: (typeof resolutions)[number]) => {
@@ -292,7 +294,6 @@ export function ComplaintBottomSheet() {
 			pathname: "/(tabs)/complaints/resolution",
 			params: complaintRouteContext,
 		});
-		onClose();
 	};
 
 	return (
@@ -390,8 +391,10 @@ export function ComplaintBottomSheet() {
 								</View>
 							)}
 
-							{observations && (
-								<Text className="leading-5 text-gray-600">{observations}</Text>
+							{isManual && complaint.observations && (
+								<Text className="leading-5 text-gray-600">
+									{complaint.observations}
+								</Text>
 							)}
 
 							<HStack className="gap-2">
@@ -407,30 +410,53 @@ export function ComplaintBottomSheet() {
 									showsHorizontalScrollIndicator={false}
 									contentContainerClassName="gap-2"
 								>
-									{allAttachments.map(att => (
-										<TouchableOpacity
-											key={att.id}
-											activeOpacity={0.85}
-											onPress={() => setPreviewAttachment(att)}
-											className="h-[110px] w-[110px] overflow-hidden rounded-lg bg-gray-100"
-										>
-											<MediaThumbnail
-												mediaType={att.type === "PHOTO" ? "photo" : "video"}
-												uri={att.url}
-											/>
-											{att.type === "VIDEO" && (
-												<View className="absolute bottom-1.5 right-1.5 rounded-full bg-black/55 p-1">
-													<PlayIcon
-														size={12}
-														color={colors.white}
-														fill={colors.white}
-														strokeWidth={0}
-													/>
-												</View>
-											)}
-										</TouchableOpacity>
-									))}
+									{allAttachments.map(att => {
+										const isSelected =
+											!isManual && selectedAttachmentId === att.id;
+										return (
+											<TouchableOpacity
+												key={att.id}
+												activeOpacity={0.85}
+												onPress={() => {
+													setPreviewAttachment(att);
+													if (!isManual) setSelectedAttachmentId(att.id);
+												}}
+												className="h-[110px] w-[110px] overflow-hidden rounded-lg bg-gray-100"
+												style={
+													isSelected
+														? { borderWidth: 2, borderColor: colors.lime[700] }
+														: undefined
+												}
+											>
+												<MediaThumbnail
+													mediaType={att.type === "PHOTO" ? "photo" : "video"}
+													uri={att.url}
+												/>
+												{att.type === "VIDEO" && (
+													<View className="absolute bottom-1.5 right-1.5 rounded-full bg-black/55 p-1">
+														<PlayIcon
+															size={12}
+															color={colors.white}
+															fill={colors.white}
+															strokeWidth={0}
+														/>
+													</View>
+												)}
+											</TouchableOpacity>
+										);
+									})}
 								</ScrollView>
+							)}
+
+							{!isManual && (
+								<View className="gap-1">
+									<Heading size="sm">Observações</Heading>
+									<Text
+										className={`leading-5 ${selectedObservation ? "text-gray-600" : "text-gray-400"}`}
+									>
+										{selectedObservation ?? "Sem observações complementares"}
+									</Text>
+								</View>
 							)}
 
 							<Divider />

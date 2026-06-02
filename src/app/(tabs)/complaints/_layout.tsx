@@ -9,7 +9,10 @@ export default function ComplaintsStackLayout() {
 				name="(create)"
 				options={{ headerShown: false, presentation: "fullScreenModal" }}
 			/>
-			<Stack.Screen name="resolution" options={{ headerShown: false }} />
+			<Stack.Screen
+				name="resolution"
+				options={{ headerShown: false, presentation: "modal" }}
+			/>
 		</Stack>
 	);
 }

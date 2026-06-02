@@ -63,7 +63,11 @@ export function ResolutionCard({
 				) : (
 					<View className="h-8 w-8 items-center justify-center rounded-full bg-gray-100">
 						{isCompanyResolution ? (
-							<BuildingIcon size={14} color={colors.gray[500]} strokeWidth={2} />
+							<BuildingIcon
+								size={14}
+								color={colors.gray[500]}
+								strokeWidth={2}
+							/>
 						) : (
 							<UserIcon size={14} color={colors.gray[500]} strokeWidth={2} />
 						)}
