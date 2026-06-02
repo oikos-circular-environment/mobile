@@ -2,19 +2,12 @@ import { router } from "expo-router";
 import { CameraIcon, ImagePlusIcon, ShieldIcon } from "lucide-react-native";
 import { useState } from "react";
 import { View } from "react-native";
+import { AuthModal } from "@/components/auth/auth-modal";
 import { ComplaintPainel } from "@/components/complaints/complaint-painel";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
-import {
-	Modal,
-	ModalBackdrop,
-	ModalBody,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-} from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { HStack } from "../ui/hstack";
@@ -94,43 +87,11 @@ export function ComplaintListHeader() {
 				</View>
 			</View>
 
-			<Modal
+			<AuthModal
 				isOpen={showAuthModal}
 				onClose={() => setShowAuthModal(false)}
-				useRNModal
-			>
-				<ModalBackdrop />
-				<ModalContent>
-					<ModalHeader className="flex-col items-start gap-1">
-						<Heading size="md" className="text-base text-gray-950">
-							Colabore com o ecossistema
-						</Heading>
-						<Text className="text-sm text-gray-500">
-							Para registrar uma denúncia você precisa ter uma conta.
-							Cadastre-se gratuitamente e ajude a proteger o meio ambiente.
-						</Text>
-					</ModalHeader>
-					<ModalBody />
-					<ModalFooter className="gap-2">
-						<Button
-							variant="outline"
-							className="flex-1 rounded-md border-gray-200"
-							onPress={() => setShowAuthModal(false)}
-						>
-							<ButtonText className="text-gray-700">Fechar</ButtonText>
-						</Button>
-						<Button
-							className="flex-1 bg-lime-800 rounded-md"
-							onPress={() => {
-								setShowAuthModal(false);
-								router.push("/(tabs)/(home)/sign-in");
-							}}
-						>
-							<ButtonText>Login</ButtonText>
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+				description="Para registrar uma denúncia você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente."
+			/>
 		</>
 	);
 }

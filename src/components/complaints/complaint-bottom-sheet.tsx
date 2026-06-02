@@ -12,8 +12,6 @@ import {
 	MapPinIcon,
 	PlayIcon,
 	PlusIcon,
-	ThumbsDownIcon,
-	ThumbsUpIcon,
 	UserIcon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
@@ -32,7 +30,7 @@ import {
 	type BottomSheetRef,
 	BottomSheetScrollView,
 } from "@/components/ui/bottomsheet";
-import { Spinner } from "@/components/ui/spinner";
+import { AuthModal } from "@/components/auth/auth-modal";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
@@ -53,6 +51,7 @@ import { HStack } from "../ui/hstack";
 import { VStack } from "../ui/vstack";
 import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "./complaint-chip/complaint-type-chip";
+import { ComplaintVoteButtons } from "./complaint-vote-buttons";
 
 type Attachment = MapComplaint["captures"][number]["attachments"][number];
 
@@ -145,6 +144,7 @@ export function ComplaintBottomSheet({
 	const [previewAttachment, setPreviewAttachment] = useState<Attachment | null>(
 		null,
 	);
+	const [showAuthModal, setShowAuthModal] = useState(false);
 	const { isAuthenticated } = useAuthContext();
 	const setVote = useComplaintsStore(s => s.setVote);
 	const removeVote = useComplaintsStore(s => s.removeVote);
@@ -222,8 +222,37 @@ export function ComplaintBottomSheet({
 
 	const resolvedVotes = complaint.vote_counts.resolved;
 	const notResolvedVotes = complaint.vote_counts.not_resolved;
-	const isResolvedActive = currentVote === "RESOLVED";
-	const isNotResolvedActive = currentVote === "NOT_RESOLVED";
+	const isResolvedActive = isAuthenticated && currentVote === "RESOLVED";
+	const isNotResolvedActive = isAuthenticated && currentVote === "NOT_RESOLVED";
+
+	const handleVotePress = (vote: "RESOLVED" | "NOT_RESOLVED") => {
+		if (!isAuthenticated) {
+			setShowAuthModal(true);
+			return;
+		}
+		onVote(vote);
+	};
+
+	const handleAddResolution = () => {
+		if (!isAuthenticated) {
+			setShowAuthModal(true);
+			return;
+		}
+		router.push({
+			pathname: "/(tabs)/complaints/resolution",
+			params: {
+				id: complaint.id,
+				type: complaint.type,
+				status: complaint.status,
+				address: getAddress(complaint) ?? "",
+				date:
+					complaint.created_at instanceof Date
+						? complaint.created_at.toISOString()
+						: String(complaint.created_at),
+			},
+		});
+		onClose();
+	};
 
 	return (
 		<>
@@ -382,88 +411,14 @@ export function ComplaintBottomSheet({
 										</AlertText>
 									</Alert>
 								</VStack>
-								{/* Vote buttons */}
-								<HStack className="gap-2">
-									{/* Não Resolvida */}
-									<TouchableOpacity
-										onPress={() => onVote("NOT_RESOLVED")}
-										disabled={isPendingVote}
-										activeOpacity={0.8}
-										className={`h-14 flex-1 items-center justify-center rounded-[10px] ${isNotResolvedActive ? "bg-red-600" : "bg-white"}`}
-										style={
-											!isNotResolvedActive
-												? { borderWidth: 1.5, borderColor: colors.gray[200] }
-												: undefined
-										}
-									>
-										{isPendingVote ? (
-											<Spinner size="small" />
-										) : (
-											<>
-												<View className="flex-row items-center gap-1.5">
-													<ThumbsDownIcon
-														size={15}
-														color={
-															isNotResolvedActive
-																? colors.white
-																: colors.gray[500]
-														}
-														strokeWidth={2}
-													/>
-													<Text
-														className={`font-semibold ${isNotResolvedActive ? "text-white" : "text-gray-700"}`}
-													>
-														Não Resolvida
-													</Text>
-												</View>
-												<Text
-													className={`mt-0.5  ${isNotResolvedActive ? "text-red-100" : "text-gray-400"}`}
-												>
-													{notResolvedVotes} votos
-												</Text>
-											</>
-										)}
-									</TouchableOpacity>
-
-									{/* Resolvida */}
-									<TouchableOpacity
-										onPress={() => onVote("RESOLVED")}
-										disabled={isPendingVote}
-										activeOpacity={0.8}
-										className={`h-14 flex-1 items-center justify-center rounded-[10px] ${isResolvedActive ? "bg-lime-800" : "bg-white"}`}
-										style={
-											!isResolvedActive
-												? { borderWidth: 1.5, borderColor: colors.gray[200] }
-												: undefined
-										}
-									>
-										{isPendingVote ? (
-											<Spinner size="small" />
-										) : (
-											<>
-												<View className="flex-row items-center gap-1.5">
-													<ThumbsUpIcon
-														size={15}
-														color={
-															isResolvedActive ? colors.white : colors.gray[500]
-														}
-														strokeWidth={2}
-													/>
-													<Text
-														className={`font-semibold ${isResolvedActive ? "text-white" : "text-gray-700"}`}
-													>
-														Resolvida
-													</Text>
-												</View>
-												<Text
-													className={`mt-0.5  ${isResolvedActive ? "text-lime-100" : "text-gray-400"}`}
-												>
-													{resolvedVotes} votos
-												</Text>
-											</>
-										)}
-									</TouchableOpacity>
-								</HStack>
+								<ComplaintVoteButtons
+									resolvedVotes={resolvedVotes}
+									notResolvedVotes={notResolvedVotes}
+									isResolvedActive={isResolvedActive}
+									isNotResolvedActive={isNotResolvedActive}
+									isPendingVote={isPendingVote}
+									onVote={handleVotePress}
+								/>
 
 								{/* Resolutions list */}
 								<VStack className="w-full gap-2">
@@ -531,22 +486,7 @@ export function ComplaintBottomSheet({
 								{/* Adicionar Resolução */}
 								<TouchableOpacity
 									activeOpacity={0.85}
-									onPress={() => {
-										router.push({
-											pathname: "/(tabs)/complaints/resolution",
-											params: {
-												id: complaint.id,
-												type: complaint.type,
-												status: complaint.status,
-												address: getAddress(complaint) ?? "",
-												date:
-													complaint.created_at instanceof Date
-														? complaint.created_at.toISOString()
-														: String(complaint.created_at),
-											},
-										});
-										onClose();
-									}}
+									onPress={handleAddResolution}
 									className="h-11 flex-row items-center justify-center gap-1.5 rounded-[10px] border border-gray-200 bg-white"
 								>
 									<PlusIcon
@@ -563,6 +503,13 @@ export function ComplaintBottomSheet({
 					</BottomSheetScrollView>
 				</BottomSheetPortal>
 			</BottomSheet>
+
+			<AuthModal
+				isOpen={showAuthModal}
+				onClose={() => setShowAuthModal(false)}
+				description="Para interagir com denúncias você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente."
+				onBeforeLogin={onClose}
+			/>
 		</>
 	);
 }
