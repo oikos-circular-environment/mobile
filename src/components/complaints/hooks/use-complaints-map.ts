@@ -1,18 +1,15 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { toast } from "@/components/toast";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
 	deleteV1ComplaintsByIdVotes,
-	type GetV1ComplaintsMapResponses,
 	getV1ComplaintsMap,
 	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
-import type { ComplaintStatus, ComplaintType } from "@/libs/types/complaint";
+import type { ComplaintStatus, ComplaintType, MapComplaint } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
-export type MapComplaint =
-	GetV1ComplaintsMapResponses[200]["complaints"][number];
+export type { MapComplaint } from "@/libs/types/complaint";
 
 type VoteType = "RESOLVED" | "NOT_RESOLVED";
 
@@ -31,9 +28,11 @@ export function useComplaintsMap({
 	const userVotes = useComplaintsStore(s => s.userVotes);
 	const setVote = useComplaintsStore(s => s.setVote);
 	const removeVote = useComplaintsStore(s => s.removeVote);
-
-	const [selectedComplaint, setSelectedComplaint] =
-		useState<MapComplaint | null>(null);
+	const selectedMapComplaint = useComplaintsStore(s => s.selectedMapComplaint);
+	const setSelectedMapComplaint = useComplaintsStore(s => s.setSelectedMapComplaint);
+	const patchSelectedMapComplaintVoteCounts = useComplaintsStore(
+		s => s.patchSelectedMapComplaintVoteCounts,
+	);
 
 	const { data: mapData, isLoading: isLoadingMap } = useQuery({
 		queryKey: [
@@ -85,17 +84,9 @@ export function useComplaintsMap({
 			} else {
 				setVote(complaintId, voteType);
 			}
-
-			setSelectedComplaint(prev => {
-				if (!prev || prev.id !== complaintId) return prev;
-				const counts = { ...prev.vote_counts };
-				if (previousVote === "RESOLVED")
-					counts.resolved = Math.max(0, counts.resolved - 1);
-				if (previousVote === "NOT_RESOLVED")
-					counts.not_resolved = Math.max(0, counts.not_resolved - 1);
-				if (voteType === "RESOLVED") counts.resolved += 1;
-				if (voteType === "NOT_RESOLVED") counts.not_resolved += 1;
-				return { ...prev, vote_counts: counts };
+			patchSelectedMapComplaintVoteCounts({
+				previousVote,
+				nextVote: voteType,
 			});
 		},
 		onError: () => toast.error("Erro", "Não foi possível registrar seu voto."),
@@ -106,28 +97,23 @@ export function useComplaintsMap({
 			toast.info("Login necessário", "Entre para votar em denúncias.");
 			return;
 		}
-		if (!selectedComplaint) return;
+		if (!selectedMapComplaint) return;
 
-		const previous = userVotes[selectedComplaint.id] ?? null;
+		const previous = userVotes[selectedMapComplaint.id] ?? null;
 		const next = previous === voteType ? null : voteType;
 
 		voteMutation.mutate({
-			complaintId: selectedComplaint.id,
+			complaintId: selectedMapComplaint.id,
 			voteType: next,
 			previousVote: previous,
 		});
 	};
 
-	const currentVote = selectedComplaint
-		? userVotes[selectedComplaint.id]
-		: undefined;
-
 	return {
 		complaints,
 		isLoadingMap,
-		selectedComplaint,
-		setSelectedComplaint,
-		currentVote,
+		selectedMapComplaint,
+		setSelectedMapComplaint,
 		handleVote,
 		isPendingVote: voteMutation.isPending,
 	};

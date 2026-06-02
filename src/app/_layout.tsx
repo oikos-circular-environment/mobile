@@ -15,9 +15,10 @@ import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { AppSplashScreen } from "@/components/app-splash-screen";
 import { Toaster } from "@/components/toast";
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export const unstable_settings = {
 	anchor: "(tabs)",
@@ -33,18 +34,18 @@ export default function RootLayout() {
 
 	useEffect(() => {
 		if (loaded || error) {
-			SplashScreen.hideAsync();
+			SplashScreen.hideAsync().catch(() => {});
 		}
 	}, [loaded, error]);
 
 	if (!loaded && !error) {
-		return null;
+		return <AppSplashScreen />;
 	}
 
 	const isDevelopmentMode = process.env.NODE_ENV === "development";
 
 	return (
-		<GestureHandlerRootView style={{ flex: 1 }}>
+		<GestureHandlerRootView style={{ flex: 1, backgroundColor: "white" }}>
 			<GluestackUIProvider mode="light">
 				<QueryClientProvider client={queryClient}>
 					<UserProvider>
@@ -54,7 +55,7 @@ export default function RootLayout() {
 									<Toaster />
 									<StatusBar style="dark" animated />
 									<SafeAreaView
-										style={{ flex: 1 }}
+										style={{ flex: 1, backgroundColor: "white" }}
 										edges={["top", "left", "right"]}
 									>
 										<Stack>

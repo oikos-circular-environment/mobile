@@ -29,6 +29,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker-bottom-sheet";
+import { useComplaintsStore } from "@/stores/complaints-store";
 import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
@@ -80,30 +81,21 @@ const resolutionSchema = z.object({
 type ResolutionFormValues = z.infer<typeof resolutionSchema>;
 
 export default function ComplaintResolutionScreen() {
-	const {
-		id,
-		type,
-		status,
-		address,
-		date,
-		resolutionDescription,
-		resolutionCompanyJson,
-		resolutionAttachmentsJson,
-	} = useLocalSearchParams<{
+	const { id, type, status, address, date } = useLocalSearchParams<{
 		id: string;
 		type: string;
 		status: string;
 		address: string;
 		date: string;
-		resolutionDescription?: string;
-		resolutionCompanyJson?: string;
-		resolutionAttachmentsJson?: string;
 	}>();
 	const insets = useSafeAreaInsets();
 	const { user, isAuthenticated } = useAuthContext();
 	const queryClient = useQueryClient();
 
-	const isEditMode = !!resolutionDescription;
+	const resolutionDraft = useComplaintsStore(s => s.resolutionDraft);
+	const clearResolutionDraft = useComplaintsStore(s => s.clearResolutionDraft);
+
+	const isEditMode = !!resolutionDraft;
 
 	const [selectedAssets, setSelectedAssets] = useState<
 		ImagePicker.ImagePickerAsset[]
@@ -118,26 +110,25 @@ export default function ComplaintResolutionScreen() {
 	);
 
 	useEffect(() => {
-		if (resolutionCompanyJson) {
+		if (!resolutionDraft) return;
+		if (resolutionDraft.companyJson) {
 			try {
-				setSelectedCompany(JSON.parse(resolutionCompanyJson) as Company);
+				setSelectedCompany(JSON.parse(resolutionDraft.companyJson) as Company);
 			} catch {
 				// ignore malformed JSON
 			}
 		}
-	}, [resolutionCompanyJson]);
-
-	useEffect(() => {
-		if (resolutionAttachmentsJson) {
+		if (resolutionDraft.attachmentsJson) {
 			try {
 				setExistingAttachments(
-					JSON.parse(resolutionAttachmentsJson) as ExistingAttachment[],
+					JSON.parse(resolutionDraft.attachmentsJson) as ExistingAttachment[],
 				);
 			} catch {
 				// ignore malformed JSON
 			}
 		}
-	}, [resolutionAttachmentsJson]);
+		return () => clearResolutionDraft();
+	}, [resolutionDraft, clearResolutionDraft]);
 
 	const {
 		control,
@@ -146,7 +137,7 @@ export default function ComplaintResolutionScreen() {
 		formState: { errors },
 	} = useForm<ResolutionFormValues>({
 		resolver: zodResolver(resolutionSchema),
-		defaultValues: { description: resolutionDescription ?? "" },
+		defaultValues: { description: resolutionDraft?.description ?? "" },
 		mode: "onTouched",
 	});
 

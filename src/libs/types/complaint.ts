@@ -10,7 +10,10 @@ import {
 	TractorIcon,
 	Trash2Icon,
 } from "lucide-react-native";
+import type { GetV1ComplaintsMapResponses } from "@/libs/oikos-sdk";
 import type { ValueMapping } from "./value-mapping";
+
+export type MapComplaint = GetV1ComplaintsMapResponses[200]["complaints"][number];
 // import type * as Location from "expo-location";
 
 export type ComplaintType =

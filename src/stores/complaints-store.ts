@@ -3,7 +3,7 @@ import type {
 	GetV1ComplaintsDashboardResponse,
 	GetV1ComplaintsResponse,
 } from "@/libs/oikos-sdk";
-import type { ComplaintCapture } from "@/libs/types/complaint";
+import type { ComplaintCapture, MapComplaint } from "@/libs/types/complaint";
 
 export type ApiComplaint =
 	NonNullable<GetV1ComplaintsResponse>["complaints"][number];
@@ -58,6 +58,39 @@ type MapVotesActions = {
 	removeVote: (complaintId: string) => void;
 };
 
+// ─── Map Selection Slice ─────────────────────────────────────────────────────
+
+type VoteType = "RESOLVED" | "NOT_RESOLVED";
+
+type MapSelectionState = {
+	selectedMapComplaint: MapComplaint | null;
+};
+
+type MapSelectionActions = {
+	setSelectedMapComplaint: (complaint: MapComplaint | null) => void;
+	patchSelectedMapComplaintVoteCounts: (delta: {
+		previousVote: VoteType | null;
+		nextVote: VoteType | null;
+	}) => void;
+};
+
+// ─── Resolution Draft Slice ───────────────────────────────────────────────────
+
+export type ResolutionDraft = {
+	description: string;
+	companyJson?: string;
+	attachmentsJson?: string;
+};
+
+type ResolutionDraftState = {
+	resolutionDraft: ResolutionDraft | null;
+};
+
+type ResolutionDraftActions = {
+	setResolutionDraft: (draft: ResolutionDraft) => void;
+	clearResolutionDraft: () => void;
+};
+
 // ─── Store ───────────────────────────────────────────────────────────────────
 
 type ComplaintsStoreState = ListState &
@@ -65,7 +98,11 @@ type ComplaintsStoreState = ListState &
 	DraftState &
 	DraftActions &
 	MapVotesState &
-	MapVotesActions;
+	MapVotesActions &
+	MapSelectionState &
+	MapSelectionActions &
+	ResolutionDraftState &
+	ResolutionDraftActions;
 
 export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 	// ── List ──
@@ -168,6 +205,31 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 			delete next[complaintId];
 			return { userVotes: next };
 		}),
+
+	// ── Map Selection ──
+	selectedMapComplaint: null,
+
+	setSelectedMapComplaint: complaint => set({ selectedMapComplaint: complaint }),
+
+	patchSelectedMapComplaintVoteCounts: ({ previousVote, nextVote }) =>
+		set(state => {
+			if (!state.selectedMapComplaint) return {};
+			const counts = { ...state.selectedMapComplaint.vote_counts };
+			if (previousVote === "RESOLVED") counts.resolved = Math.max(0, counts.resolved - 1);
+			if (previousVote === "NOT_RESOLVED") counts.not_resolved = Math.max(0, counts.not_resolved - 1);
+			if (nextVote === "RESOLVED") counts.resolved += 1;
+			if (nextVote === "NOT_RESOLVED") counts.not_resolved += 1;
+			return {
+				selectedMapComplaint: { ...state.selectedMapComplaint, vote_counts: counts },
+			};
+		}),
+
+	// ── Resolution Draft ──
+	resolutionDraft: null,
+
+	setResolutionDraft: draft => set({ resolutionDraft: draft }),
+
+	clearResolutionDraft: () => set({ resolutionDraft: null }),
 }));
 
 // ─── Selectors ───────────────────────────────────────────────────────────────

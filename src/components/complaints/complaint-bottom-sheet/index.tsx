@@ -4,32 +4,21 @@ import { ptBR } from "date-fns/locale";
 import { router } from "expo-router";
 import {
 	AlertTriangleIcon,
-	ArrowLeftIcon,
-	BuildingIcon,
 	CalendarIcon,
 	CrosshairIcon,
 	InfoIcon,
 	MapPinIcon,
-	PencilIcon,
 	PlayIcon,
 	PlusIcon,
-	Trash2Icon,
-	UserIcon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Image, Modal, ScrollView, TouchableOpacity, View } from "react-native";
-import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import type { SharedValue } from "react-native-reanimated";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { AuthModal } from "@/components/auth/auth-modal";
-import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
-import { ResolutionAttachmentsStack } from "@/components/complaints/resolution-attachments-stack";
-import { ImagePreviewViewer } from "@/components/medias-preview/image-preview-viewer";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
-import { VideoPreviewPlayer } from "@/components/medias-preview/video-preview-player";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
+import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
+import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import {
 	BottomSheet,
 	BottomSheetBackdrop,
@@ -38,14 +27,20 @@ import {
 	type BottomSheetRef,
 	BottomSheetScrollView,
 } from "@/components/ui/bottomsheet";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Divider } from "@/components/ui/divider";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 import {
 	deleteV1ComplaintsByIdResolutions,
+	deleteV1ComplaintsByIdVotes,
 	getV1ComplaintsByIdPublic,
 	getV1ComplaintsByIdResolutions,
 	getV1ComplaintsByIdVotes,
+	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
 import {
 	type ComplaintStatus,
@@ -53,184 +48,43 @@ import {
 	complaintTypeValues,
 } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
-import { Alert, AlertIcon, AlertText } from "../ui/alert";
-import { Badge, BadgeIcon, BadgeText } from "../ui/badge";
-import { Divider } from "../ui/divider";
-import { Heading } from "../ui/heading";
-import { HStack } from "../ui/hstack";
-import { VStack } from "../ui/vstack";
-import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
-import { ComplaintTypeChip } from "./complaint-chip/complaint-type-chip";
-import { ComplaintVoteButtons } from "./complaint-vote-buttons";
+import { ComplaintStatusChip } from "../complaint-chip/complaint-status-chip";
+import { ComplaintTypeChip } from "../complaint-chip/complaint-type-chip";
+import { ComplaintVoteButtons } from "../complaint-vote-buttons";
+import { AttachmentPreview } from "./attachment-preview";
+import { ResolutionCard } from "./resolution-card";
+import { ResolutionCardSkeleton } from "./resolution-card-skeleton";
+import type { Attachment } from "./utils";
+import { formatDistance, getAddress, haversineKm } from "./utils";
 
-type Attachment = MapComplaint["captures"][number]["attachments"][number];
-
-const SWIPE_ACTION_WIDTH = 72;
-
-function haversineKm(
-	lat1: number,
-	lon1: number,
-	lat2: number,
-	lon2: number,
-): number {
-	const R = 6371;
-	const dLat = ((lat2 - lat1) * Math.PI) / 180;
-	const dLon = ((lon2 - lon1) * Math.PI) / 180;
-	const a =
-		Math.sin(dLat / 2) ** 2 +
-		Math.cos((lat1 * Math.PI) / 180) *
-			Math.cos((lat2 * Math.PI) / 180) *
-			Math.sin(dLon / 2) ** 2;
-	return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function formatDistance(km: number): string {
-	return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`;
-}
-
-function getAddress(complaint: MapComplaint): string | null {
-	const geo = complaint.captures[0]?.geospatial;
-	if (!geo) return null;
-	const { street, streetNumber, district } = geo.addresses;
-	const streetPart = [street, streetNumber].filter(Boolean).join(", ");
-	return [streetPart, district].filter(Boolean).join(" — ") || null;
-}
-
-type AttachmentPreviewProps = {
-	visible: boolean;
-	attachment: Attachment | null;
-	onClose: () => void;
-};
-
-function AttachmentPreview({
-	visible,
-	attachment,
-	onClose,
-}: AttachmentPreviewProps) {
-	const insets = useSafeAreaInsets();
-	return (
-		<Modal
-			visible={visible}
-			animationType="fade"
-			statusBarTranslucent
-			onRequestClose={onClose}
-		>
-			<View className="flex-1 bg-black">
-				{attachment?.type === "PHOTO" ? (
-					<ImagePreviewViewer uri={attachment.url} />
-				) : attachment?.type === "VIDEO" ? (
-					<VideoPreviewPlayer uri={attachment.url} />
-				) : null}
-				<TouchableOpacity
-					className="absolute left-4 rounded-xl bg-black/50 p-3"
-					style={{ top: insets.top + 8 }}
-					onPress={onClose}
-				>
-					<ArrowLeftIcon size={20} color={colors.white} strokeWidth={2.2} />
-				</TouchableOpacity>
-			</View>
-		</Modal>
-	);
-}
-
-function ResolutionCardSkeleton() {
-	return (
-		<View className="gap-2 rounded-[10px] border border-gray-100 p-3">
-			<View className="flex-row items-center gap-2">
-				<Skeleton startColor="bg-gray-200" className="h-8 w-8 rounded-full" />
-				<View className="flex-1 gap-1.5">
-					<Skeleton startColor="bg-gray-200" className="h-3.5 w-1/2 rounded" />
-					<Skeleton startColor="bg-gray-200" className="h-3 w-1/3 rounded" />
-				</View>
-			</View>
-			<Skeleton startColor="bg-gray-200" className="h-3 w-full rounded" />
-			<Skeleton startColor="bg-gray-200" className="h-3 w-4/5 rounded" />
-		</View>
-	);
-}
-
-function SwipeEditAction({
-	translation,
-	onEdit,
-}: {
-	translation: SharedValue<number>;
-	onEdit: () => void;
-}) {
-	const animatedStyle = useAnimatedStyle(() => ({
-		transform: [{ translateX: translation.value - SWIPE_ACTION_WIDTH }],
-	}));
-	return (
-		<Animated.View
-			style={[animatedStyle, { width: SWIPE_ACTION_WIDTH }]}
-			className="overflow-hidden rounded-l-[10px]"
-		>
-			<TouchableOpacity
-				activeOpacity={0.85}
-				onPress={onEdit}
-				className="flex-1 items-center justify-center gap-1 bg-lime-700"
-			>
-				<PencilIcon size={16} color={colors.white} strokeWidth={2} />
-				<Text className="text-[10px] font-semibold text-white">Editar</Text>
-			</TouchableOpacity>
-		</Animated.View>
-	);
-}
-
-function SwipeDeleteAction({
-	translation,
-	onDelete,
-}: {
-	translation: SharedValue<number>;
-	onDelete: () => void;
-}) {
-	const animatedStyle = useAnimatedStyle(() => ({
-		transform: [{ translateX: translation.value + SWIPE_ACTION_WIDTH }],
-	}));
-	return (
-		<Animated.View
-			style={[animatedStyle, { width: SWIPE_ACTION_WIDTH }]}
-			className="overflow-hidden rounded-r-[10px]"
-		>
-			<TouchableOpacity
-				activeOpacity={0.85}
-				onPress={onDelete}
-				className="flex-1 items-center justify-center gap-1 bg-red-500"
-			>
-				<Trash2Icon size={16} color={colors.white} strokeWidth={2} />
-				<Text className="text-[10px] font-semibold text-white">Excluir</Text>
-			</TouchableOpacity>
-		</Animated.View>
-	);
-}
-
-export type ComplaintBottomSheetProps = {
-	isOpen: boolean;
-	onClose: () => void;
-	complaint: MapComplaint | null;
-	currentVote?: "RESOLVED" | "NOT_RESOLVED";
-	onVote: (vote: "RESOLVED" | "NOT_RESOLVED") => void;
-	isPendingVote?: boolean;
-	userLocation?: { lat: number; lon: number } | null;
-};
-
-export function ComplaintBottomSheet({
-	isOpen,
-	onClose,
-	complaint,
-	currentVote,
-	onVote,
-	isPendingVote = false,
-	userLocation,
-}: ComplaintBottomSheetProps) {
+export function ComplaintBottomSheet() {
 	const ref = useRef<BottomSheetRef>(null);
 	const [previewAttachment, setPreviewAttachment] = useState<Attachment | null>(
 		null,
 	);
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const { isAuthenticated, user } = useAuthContext();
+	const { location } = useGeospatial();
+
+	const complaint = useComplaintsStore(s => s.selectedMapComplaint);
+	const setSelectedMapComplaint = useComplaintsStore(
+		s => s.setSelectedMapComplaint,
+	);
+	const userVotes = useComplaintsStore(s => s.userVotes);
 	const setVote = useComplaintsStore(s => s.setVote);
 	const removeVote = useComplaintsStore(s => s.removeVote);
+	const patchSelectedMapComplaintVoteCounts = useComplaintsStore(
+		s => s.patchSelectedMapComplaintVoteCounts,
+	);
+	const setResolutionDraft = useComplaintsStore(s => s.setResolutionDraft);
+
 	const queryClient = useQueryClient();
+	const isOpen = !!complaint;
+	const onClose = () => setSelectedMapComplaint(null);
+
+	const userLocation = location
+		? { lat: location.coords.latitude, lon: location.coords.longitude }
+		: null;
 
 	useEffect(() => {
 		if (isOpen) {
@@ -290,6 +144,34 @@ export function ComplaintBottomSheet({
 		},
 	});
 
+	const voteMutation = useMutation({
+		mutationFn: async ({
+			voteType,
+		}: {
+			voteType: "RESOLVED" | "NOT_RESOLVED" | null;
+			previousVote: "RESOLVED" | "NOT_RESOLVED" | null;
+		}) => {
+			if (!complaintId) return;
+			if (voteType === null) {
+				await deleteV1ComplaintsByIdVotes({ path: { id: complaintId } });
+			} else {
+				await postV1ComplaintsByIdVotes({
+					path: { id: complaintId },
+					body: { vote_type: voteType },
+				});
+			}
+		},
+		onSuccess: (_, { voteType, previousVote }) => {
+			if (voteType === null) {
+				removeVote(complaintId);
+			} else {
+				setVote(complaintId, voteType);
+			}
+			patchSelectedMapComplaintVoteCounts({ previousVote, nextVote: voteType });
+		},
+		onError: () => toast.error("Erro", "Não foi possível registrar seu voto."),
+	});
+
 	useEffect(() => {
 		if (!voteData || !complaintId) return;
 		if (voteData.vote) {
@@ -331,6 +213,7 @@ export function ComplaintBottomSheet({
 				)
 			: null;
 
+	const currentVote = userVotes[complaintId];
 	const resolvedVotes = complaint.vote_counts.resolved;
 	const notResolvedVotes = complaint.vote_counts.not_resolved;
 	const isResolvedActive = isAuthenticated && currentVote === "RESOLVED";
@@ -341,7 +224,20 @@ export function ComplaintBottomSheet({
 			setShowAuthModal(true);
 			return;
 		}
-		onVote(vote);
+		const previous = userVotes[complaintId] ?? null;
+		const next = previous === vote ? null : vote;
+		voteMutation.mutate({ voteType: next, previousVote: previous });
+	};
+
+	const complaintRouteContext = {
+		id: complaint.id,
+		type: complaint.type,
+		status: complaint.status,
+		address: getAddress(complaint) ?? "",
+		date:
+			complaint.created_at instanceof Date
+				? complaint.created_at.toISOString()
+				: String(complaint.created_at),
 	};
 
 	const handleAddResolution = () => {
@@ -351,16 +247,7 @@ export function ComplaintBottomSheet({
 		}
 		router.push({
 			pathname: "/(tabs)/complaints/resolution",
-			params: {
-				id: complaint.id,
-				type: complaint.type,
-				status: complaint.status,
-				address: getAddress(complaint) ?? "",
-				date:
-					complaint.created_at instanceof Date
-						? complaint.created_at.toISOString()
-						: String(complaint.created_at),
-			},
+			params: complaintRouteContext,
 		});
 		onClose();
 	};
@@ -395,21 +282,15 @@ export function ComplaintBottomSheet({
 					)
 				: undefined;
 
+		setResolutionDraft({
+			description: resolution.description,
+			...(companyJson ? { companyJson } : {}),
+			...(attachmentsJson ? { attachmentsJson } : {}),
+		});
+
 		router.push({
 			pathname: "/(tabs)/complaints/resolution",
-			params: {
-				id: complaint.id,
-				type: complaint.type,
-				status: complaint.status,
-				address: getAddress(complaint) ?? "",
-				date:
-					complaint.created_at instanceof Date
-						? complaint.created_at.toISOString()
-						: String(complaint.created_at),
-				resolutionDescription: resolution.description,
-				...(companyJson ? { resolutionCompanyJson: companyJson } : {}),
-				...(attachmentsJson ? { resolutionAttachmentsJson: attachmentsJson } : {}),
-			},
+			params: complaintRouteContext,
 		});
 		onClose();
 	};
@@ -461,7 +342,6 @@ export function ComplaintBottomSheet({
 									/>
 								</View>
 
-								{/* Distance chip */}
 								{distanceLabel && (
 									<Badge className="flex-row items-center gap-1 rounded-xl bg-gray-100 px-2 py-1">
 										<BadgeIcon as={MapPinIcon} className="text-gray-500" />
@@ -472,7 +352,6 @@ export function ComplaintBottomSheet({
 								)}
 							</HStack>
 
-							{/* Address */}
 							{address && (
 								<View className="flex-row items-center gap-1.5">
 									<MapPinIcon
@@ -486,7 +365,6 @@ export function ComplaintBottomSheet({
 								</View>
 							)}
 
-							{/* Date */}
 							<View className="flex-row items-center gap-1.5">
 								<CalendarIcon
 									size={13}
@@ -501,7 +379,6 @@ export function ComplaintBottomSheet({
 								</Text>
 							</View>
 
-							{/* Coordinates */}
 							{coords && (
 								<View className="flex-row items-center gap-1.5">
 									<CrosshairIcon
@@ -513,12 +390,10 @@ export function ComplaintBottomSheet({
 								</View>
 							)}
 
-							{/* Observations */}
 							{observations && (
 								<Text className="leading-5 text-gray-600">{observations}</Text>
 							)}
 
-							{/* Attachment gallery */}
 							<HStack className="gap-2">
 								<Heading size="sm">Anexos</Heading>
 								<Badge variant="outline">
@@ -579,11 +454,10 @@ export function ComplaintBottomSheet({
 									notResolvedVotes={notResolvedVotes}
 									isResolvedActive={isResolvedActive}
 									isNotResolvedActive={isNotResolvedActive}
-									isPendingVote={isPendingVote}
+									isPendingVote={voteMutation.isPending}
 									onVote={handleVotePress}
 								/>
 
-								{/* Resolutions list */}
 								<VStack className="w-full gap-2">
 									<Text className="font-bold text-gray-800">Resoluções</Text>
 									<Alert className="flex-row items-start gap-2 rounded-lg border border-amber-700 bg-amber-50 p-3">
@@ -605,163 +479,24 @@ export function ComplaintBottomSheet({
 										</>
 									) : (
 										resolutions.map(resolution => {
-											const isCompanyResolution =
-												resolution.resolver_company !== null;
-											const resolverName = isCompanyResolution
-												? (resolution.resolver_company?.business_name ??
-													resolution.resolver_company?.corporate_name)
-												: (resolution.resolver_user_profile.display_name ??
-													resolution.resolver_user_profile.full_name);
-											const avatarUrl = isCompanyResolution
-												? (resolution.resolver_company?.avatar_url ?? null)
-												: (resolution.resolver_user_profile.avatar_url ?? null);
 											const isOwnResolution =
 												isAuthenticated &&
-												!isCompanyResolution &&
+												resolution.resolver_company === null &&
 												resolution.resolver_user_profile.display_name ===
 													user?.profile.display_name;
-
-											const cardContent = (
-												<View
-													className="gap-2 rounded-[10px] border border-gray-100 p-3"
-													style={
-														isOwnResolution
-															? { borderColor: colors.lime[200] }
-															: undefined
-													}
-												>
-													{/* Own resolution badge */}
-													{isOwnResolution && (
-														<View className="self-start">
-															<Badge
-																variant="outline"
-																className="border-lime-600 bg-lime-50"
-															>
-																<BadgeText className="text-[10px] font-semibold text-lime-700">
-																	Sua Resolução
-																</BadgeText>
-															</Badge>
-														</View>
-													)}
-
-													{/* Header: avatar + name + date + stack */}
-													<View className="flex-row items-center gap-2">
-														{/* Avatar */}
-														{avatarUrl ? (
-															<Image
-																source={{ uri: avatarUrl }}
-																style={{
-																	width: 32,
-																	height: 32,
-																	borderRadius: 16,
-																}}
-															/>
-														) : (
-															<View className="h-8 w-8 items-center justify-center rounded-full bg-gray-100">
-																{isCompanyResolution ? (
-																	<BuildingIcon
-																		size={14}
-																		color={colors.gray[500]}
-																		strokeWidth={2}
-																	/>
-																) : (
-																	<UserIcon
-																		size={14}
-																		color={colors.gray[500]}
-																		strokeWidth={2}
-																	/>
-																)}
-															</View>
-														)}
-
-														{/* Name + date */}
-														<View className="flex-1">
-															<Text className="text-sm font-semibold text-gray-800">
-																{resolverName}
-															</Text>
-															<Text className="text-xs text-gray-400">
-																{format(
-																	new Date(resolution.created_at),
-																	"d 'de' MMM",
-																	{ locale: ptBR },
-																)}{" "}
-																•{" "}
-																{formatDistanceToNowStrict(
-																	resolution.created_at,
-																	{ locale: ptBR },
-																)}
-															</Text>
-														</View>
-
-														{/* Attachment stack on the right */}
-														{resolution.attachments.length > 0 && (
-															<ResolutionAttachmentsStack
-																attachments={resolution.attachments}
-															/>
-														)}
-													</View>
-
-													{/* Company badge */}
-													{isCompanyResolution && (
-														<View className="flex-row items-center gap-1 self-start rounded-full bg-gray-100 px-2 py-0.5">
-															<BuildingIcon
-																size={11}
-																color={colors.gray[500]}
-																strokeWidth={2}
-															/>
-															<Text className="text-xs text-gray-500">
-																Empresa responsável
-															</Text>
-														</View>
-													)}
-
-													{/* Description */}
-													<Text
-														className="text-gray-600"
-														style={{ lineHeight: 18 }}
-													>
-														{resolution.description}
-													</Text>
-												</View>
+											return (
+												<ResolutionCard
+													key={resolution.id}
+													resolution={resolution}
+													isOwnResolution={isOwnResolution}
+													onEdit={() => handleEditResolution(resolution)}
+													onDelete={() => deleteMutation.mutate()}
+												/>
 											);
-
-											if (isOwnResolution) {
-												return (
-													<ReanimatedSwipeable
-														key={resolution.id}
-														friction={2}
-														overshootLeft={false}
-														overshootRight={false}
-														renderLeftActions={(_, translation, swipeable) => (
-															<SwipeEditAction
-																translation={translation}
-																onEdit={() => {
-																	swipeable.close();
-																	handleEditResolution(resolution);
-																}}
-															/>
-														)}
-														renderRightActions={(_, translation, swipeable) => (
-															<SwipeDeleteAction
-																translation={translation}
-																onDelete={() => {
-																	swipeable.close();
-																	deleteMutation.mutate();
-																}}
-															/>
-														)}
-													>
-														{cardContent}
-													</ReanimatedSwipeable>
-												);
-											}
-
-											return <View key={resolution.id}>{cardContent}</View>;
 										})
 									)}
 								</VStack>
 
-								{/* Adicionar Resolução */}
 								<TouchableOpacity
 									activeOpacity={0.85}
 									onPress={handleAddResolution}

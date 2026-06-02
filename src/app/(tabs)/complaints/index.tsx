@@ -46,11 +46,8 @@ export default function ComplaintsMapScreen() {
 	const {
 		complaints,
 		isLoadingMap,
-		selectedComplaint,
-		setSelectedComplaint,
-		currentVote,
-		handleVote,
-		isPendingVote,
+		selectedMapComplaint,
+		setSelectedMapComplaint,
 	} = useComplaintsMap({ userLocation, activeTypeFilter, activeStatusFilter });
 
 	useEffect(() => {
@@ -69,8 +66,8 @@ export default function ComplaintsMapScreen() {
 
 	const handleMarkerPress = (complaint: MapComplaint) => {
 		suppressMapPressRef.current = true;
-		setSelectedComplaint(prev =>
-			prev?.id === complaint.id ? null : complaint,
+		setSelectedMapComplaint(
+			selectedMapComplaint?.id === complaint.id ? null : complaint,
 		);
 		setTimeout(() => {
 			suppressMapPressRef.current = false;
@@ -79,7 +76,7 @@ export default function ComplaintsMapScreen() {
 
 	const handleClosePanel = () => {
 		if (suppressMapPressRef.current) return;
-		setSelectedComplaint(null);
+		setSelectedMapComplaint(null);
 	};
 
 	return (
@@ -101,7 +98,7 @@ export default function ComplaintsMapScreen() {
 					const pinColor =
 						COMPLAINT_TYPE_COLORS[complaint.type as ComplaintType] ??
 						colors.gray[500];
-					const isSelected = selectedComplaint?.id === complaint.id;
+					const isSelected = selectedMapComplaint?.id === complaint.id;
 					const Icon = typeInfo?.icon;
 					return (
 						<Marker
@@ -250,15 +247,7 @@ export default function ComplaintsMapScreen() {
 				onClose={() => setShowAuthModal(false)}
 			/>
 
-			<ComplaintBottomSheet
-				isOpen={!!selectedComplaint}
-				onClose={() => setSelectedComplaint(null)}
-				complaint={selectedComplaint}
-				currentVote={currentVote}
-				onVote={handleVote}
-				isPendingVote={isPendingVote}
-				userLocation={userLocation}
-			/>
+			<ComplaintBottomSheet />
 		</View>
 	);
 }
