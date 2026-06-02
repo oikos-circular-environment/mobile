@@ -812,7 +812,7 @@ export default function ProfileScreen() {
 																size="sm"
 																className={cn(
 																	"justify-between",
-																	Platform.OS === "android" && "px-3",
+																	Platform.OS === "android" ? "px-3" : "pr-3",
 																)}
 															>
 																<SelectInput
@@ -920,7 +920,7 @@ export default function ProfileScreen() {
 															size="sm"
 															className={cn(
 																"justify-between",
-																Platform.OS === "android" && "px-3",
+																Platform.OS === "android" ? "px-3" : "pr-3",
 															)}
 														>
 															<SelectInput

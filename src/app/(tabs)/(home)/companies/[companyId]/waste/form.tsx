@@ -354,9 +354,10 @@ export default function WasteFormScreen() {
 								render={({ field: { value, onChange } }) => (
 									<Select selectedValue={value} onValueChange={onChange}>
 										<SelectTrigger
+											size="sm"
 											className={cn(
 												"justify-between",
-												Platform.OS === "android" && "px-3",
+												Platform.OS === "android" ? "px-3" : "pr-3",
 											)}
 										>
 											<SelectInput placeholder="Selecione a unidade" />

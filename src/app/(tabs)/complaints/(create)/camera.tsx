@@ -129,13 +129,13 @@ export default function ComplaintCameraScreen() {
 				</TouchableOpacity>
 			</View>
 
-			<Camera.RecordingTimer />
+			{/* <Camera.RecordingTimer /> */}
 
 			<Camera.GeospatialOverlay />
 
-			<Camera.ZoomControls style={{ bottom: insets.bottom + 184 }} />
+			<Camera.ZoomControls style={{ bottom: insets.bottom + 120 }} />
 
-			<Camera.ModeSelector style={{ bottom: insets.bottom + 120 }} />
+			{/* <Camera.ModeSelector style={{ bottom: insets.bottom + 120 }} /> */}
 
 			<View
 				className="absolute left-0 right-0 px-4"

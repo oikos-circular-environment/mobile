@@ -419,9 +419,10 @@ export default function CompanyAddressScreen() {
 												}}
 											>
 												<SelectTrigger
+													size="sm"
 													className={cn(
 														"justify-between",
-														Platform.OS === "android" && "px-3",
+														Platform.OS === "android" ? "px-3" : "pr-3",
 													)}
 												>
 													<SelectInput

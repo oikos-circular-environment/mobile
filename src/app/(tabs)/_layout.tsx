@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Leaf, MapPin, Shield } from "lucide-react-native";
+import { Leaf, RecycleIcon, Shield } from "lucide-react-native";
 import { colors } from "@/components/style/colors";
 import { useAuthContext } from "@/contexts/auth-context";
 
@@ -29,7 +29,9 @@ export default function TabsNavigator() {
 				name="market"
 				options={{
 					title: "Pontos de coleta",
-					tabBarIcon: ({ color, size }) => <MapPin color={color} size={size} />,
+					tabBarIcon: ({ color, size }) => (
+						<RecycleIcon color={color} size={size} />
+					),
 				}}
 			/>
 			<Tabs.Screen

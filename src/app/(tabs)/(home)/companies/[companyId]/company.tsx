@@ -265,12 +265,14 @@ export default function CompanyGeneralInfoScreen() {
 
 	useEffect(() => {
 		if (useProfileData && user?.profile) {
-			setValue("identity_type", "CPF");
-			setValue("identity", mask.cpf(user.profile.cpf));
-			setValue("corporate_name", user.profile.full_name);
-			setValue("business_name", user.profile.display_name);
+			setValue("identity_type", "CPF", { shouldDirty: true });
+			setValue("identity", mask.cpf(user.profile.cpf), { shouldDirty: true });
+			setValue("corporate_name", user.profile.full_name, { shouldDirty: true });
+			setValue("business_name", user.profile.display_name, { shouldDirty: true });
 			if (user.profile.phone) {
-				setValue("phones", [mask.phoneBr(user.profile.phone), ""]);
+				setValue("phones", [mask.phoneBr(user.profile.phone), ""], {
+					shouldDirty: true,
+				});
 			}
 		}
 	}, [useProfileData, user, setValue]);
@@ -394,7 +396,7 @@ export default function CompanyGeneralInfoScreen() {
 						</FormControl>
 					</Card>
 
-					<Card className="shadow-none gap-3">
+					<View className="shadow-none gap-3">
 						<FormControl isInvalid={!!errors.identity_type} className="gap-2">
 							<FormControlLabel>
 								<FormControlLabelText>Tipo de identidade</FormControlLabelText>
@@ -491,9 +493,10 @@ export default function CompanyGeneralInfoScreen() {
 										}
 									>
 										<SelectTrigger
+											size="sm"
 											className={cn(
 												"justify-between",
-												Platform.OS === "android" && "px-3",
+												Platform.OS === "android" ? "px-3" : "pr-3",
 											)}
 										>
 											<SelectInput placeholder="Selecione o tipo" />
@@ -745,7 +748,7 @@ export default function CompanyGeneralInfoScreen() {
 								{isSubmitting && <ButtonIcon as={Spinner} />}
 							</Button>
 						</HStack>
-					</Card>
+					</View>
 				</View>
 			</ScrollView>
 		</KeyboardAvoidingView>

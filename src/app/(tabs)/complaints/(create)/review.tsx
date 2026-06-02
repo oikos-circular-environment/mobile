@@ -9,6 +9,8 @@ import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { z } from "zod";
 import { ComplaintCarousel } from "@/components/complaints/complaint-carousel";
 import { ComplaintMap } from "@/components/complaints/complaint-map";
+import { useComplaintCreate } from "@/components/complaints/hooks/use-complaint-create";
+import { useSubmitComplaints } from "@/components/complaints/hooks/use-submit-complaints";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,8 +27,6 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { useComplaintCreate } from "@/components/complaints/hooks/use-complaint-create";
-import { useSubmitComplaints } from "@/components/complaints/hooks/use-submit-complaints";
 import {
 	formatHeading,
 	formatMeters,
