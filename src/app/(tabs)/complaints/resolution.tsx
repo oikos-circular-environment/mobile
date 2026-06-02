@@ -50,6 +50,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
+	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
 	patchV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
@@ -59,6 +60,13 @@ import { complaintTypeValues } from "@/libs/types/complaint";
 
 const MIN_ATTACHMENTS = 2;
 const MIN_CHARS = 50;
+
+type ExistingAttachment = { id: string; url: string; file_name: string };
+
+function mediaTypeFromFileName(fileName: string): "photo" | "video" {
+	const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
+	return ["mp4", "mov", "avi", "webm", "mkv"].includes(ext) ? "video" : "photo";
+}
 
 const resolutionSchema = z.object({
 	description: z
@@ -72,16 +80,25 @@ const resolutionSchema = z.object({
 type ResolutionFormValues = z.infer<typeof resolutionSchema>;
 
 export default function ComplaintResolutionScreen() {
-	const { id, type, status, address, date, resolutionDescription, resolutionCompanyJson } =
-		useLocalSearchParams<{
-			id: string;
-			type: string;
-			status: string;
-			address: string;
-			date: string;
-			resolutionDescription?: string;
-			resolutionCompanyJson?: string;
-		}>();
+	const {
+		id,
+		type,
+		status,
+		address,
+		date,
+		resolutionDescription,
+		resolutionCompanyJson,
+		resolutionAttachmentsJson,
+	} = useLocalSearchParams<{
+		id: string;
+		type: string;
+		status: string;
+		address: string;
+		date: string;
+		resolutionDescription?: string;
+		resolutionCompanyJson?: string;
+		resolutionAttachmentsJson?: string;
+	}>();
 	const insets = useSafeAreaInsets();
 	const { user, isAuthenticated } = useAuthContext();
 	const queryClient = useQueryClient();
@@ -93,6 +110,12 @@ export default function ComplaintResolutionScreen() {
 	>([]);
 	const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 	const [showCompanyPicker, setShowCompanyPicker] = useState(false);
+	const [existingAttachments, setExistingAttachments] = useState<
+		ExistingAttachment[]
+	>([]);
+	const [removedAttachmentIds, setRemovedAttachmentIds] = useState<Set<string>>(
+		new Set(),
+	);
 
 	useEffect(() => {
 		if (resolutionCompanyJson) {
@@ -103,6 +126,18 @@ export default function ComplaintResolutionScreen() {
 			}
 		}
 	}, [resolutionCompanyJson]);
+
+	useEffect(() => {
+		if (resolutionAttachmentsJson) {
+			try {
+				setExistingAttachments(
+					JSON.parse(resolutionAttachmentsJson) as ExistingAttachment[],
+				);
+			} catch {
+				// ignore malformed JSON
+			}
+		}
+	}, [resolutionAttachmentsJson]);
 
 	const {
 		control,
@@ -172,6 +207,11 @@ export default function ComplaintResolutionScreen() {
 						...(selectedCompany ? { company_id: selectedCompany.id } : {}),
 					},
 				});
+				for (const attachmentId of removedAttachmentIds) {
+					await deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId({
+						path: { id, attachmentId },
+					});
+				}
 			} else {
 				await postV1ComplaintsByIdResolutions({
 					path: { id },
@@ -199,15 +239,22 @@ export default function ComplaintResolutionScreen() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["complaint", "public", id] });
-			queryClient.invalidateQueries({ queryKey: ["complaint", "resolutions", id] });
+			queryClient.invalidateQueries({
+				queryKey: ["complaint", "resolutions", id],
+			});
 			toast.success(
 				isEditMode ? "Resolução atualizada!" : "Resolução publicada!",
-				isEditMode ? "Sua resolução foi atualizada." : "Sua resolução foi registrada.",
+				isEditMode
+					? "Sua resolução foi atualizada."
+					: "Sua resolução foi registrada.",
 			);
 			router.back();
 		},
 		onError: () => {
-			toast.error("Erro", `Não foi possível ${isEditMode ? "atualizar" : "publicar"} a resolução.`);
+			toast.error(
+				"Erro",
+				`Não foi possível ${isEditMode ? "atualizar" : "publicar"} a resolução.`,
+			);
 		},
 	});
 
@@ -424,7 +471,9 @@ export default function ComplaintResolutionScreen() {
 
 					{/* Anexos */}
 					<FormControl
-						isInvalid={selectedAssets.length > 0 && attachmentsMissing > 0}
+						isInvalid={
+							!isEditMode && selectedAssets.length > 0 && attachmentsMissing > 0
+						}
 					>
 						<View className="mb-2 flex-row items-center justify-between">
 							<FormControlLabel>
@@ -432,11 +481,13 @@ export default function ComplaintResolutionScreen() {
 									Anexos
 								</FormControlLabelText>
 							</FormControlLabel>
-							<Text
-								className={`text-sm ${selectedAssets.length >= MIN_ATTACHMENTS ? "text-lime-700" : "text-gray-400"}`}
-							>
-								{selectedAssets.length}/{MIN_ATTACHMENTS} mínimo
-							</Text>
+							{!isEditMode && (
+								<Text
+									className={`text-sm ${selectedAssets.length >= MIN_ATTACHMENTS ? "text-lime-700" : "text-gray-400"}`}
+								>
+									{selectedAssets.length}/{MIN_ATTACHMENTS} mínimo
+								</Text>
+							)}
 						</View>
 
 						<ScrollView
@@ -458,6 +509,43 @@ export default function ComplaintResolutionScreen() {
 								/>
 							</Pressable>
 
+							{/* Anexos existentes do servidor */}
+							{existingAttachments
+								.filter(a => !removedAttachmentIds.has(a.id))
+								.map(attachment => (
+									<View
+										key={attachment.id}
+										className="relative"
+										style={{ width: 80, height: 80 }}
+									>
+										<View className="flex-1 overflow-hidden rounded-xl">
+											<MediaThumbnail
+												mediaType={mediaTypeFromFileName(attachment.file_name)}
+												uri={attachment.url}
+												fallbackLabel={
+													mediaTypeFromFileName(attachment.file_name) ===
+													"video"
+														? "VÍD"
+														: "IMG"
+												}
+											/>
+										</View>
+										<TouchableOpacity
+											className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
+											onPress={() =>
+												setRemovedAttachmentIds(prev => {
+													const next = new Set(prev);
+													next.add(attachment.id);
+													return next;
+												})
+											}
+										>
+											<X size={12} color={colors.white} strokeWidth={2.5} />
+										</TouchableOpacity>
+									</View>
+								))}
+
+							{/* Novos anexos selecionados localmente */}
 							{selectedAssets.map(asset => (
 								<View
 									key={asset.uri}
@@ -481,7 +569,9 @@ export default function ComplaintResolutionScreen() {
 							))}
 						</ScrollView>
 
-						{attachmentsMissing > 0 && selectedAssets.length > 0 ? (
+						{!isEditMode &&
+						attachmentsMissing > 0 &&
+						selectedAssets.length > 0 ? (
 							<FormControlError>
 								<FormControlErrorText>
 									Adicione mais {attachmentsMissing}{" "}
@@ -491,7 +581,9 @@ export default function ComplaintResolutionScreen() {
 						) : (
 							<FormControlHelper>
 								<FormControlHelperText>
-									Mínimo de {MIN_ATTACHMENTS} anexos (fotos ou vídeos).
+									{isEditMode
+										? "Remova ou adicione novos anexos à resolução."
+										: `Mínimo de ${MIN_ATTACHMENTS} anexos (fotos ou vídeos).`}
 								</FormControlHelperText>
 							</FormControlHelper>
 						)}

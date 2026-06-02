@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AuthModal } from "@/components/auth/auth-modal";
 import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
 import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
@@ -11,7 +12,6 @@ import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/to
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
 import { colors } from "@/components/style/colors";
-import { AuthModal } from "@/components/auth/auth-modal";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";

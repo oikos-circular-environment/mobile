@@ -384,6 +384,17 @@ export function ComplaintBottomSheet({
 				})
 			: undefined;
 
+		const attachmentsJson =
+			resolution.attachments.length > 0
+				? JSON.stringify(
+						resolution.attachments.map(a => ({
+							id: a.id,
+							url: a.url,
+							file_name: a.file_name,
+						})),
+					)
+				: undefined;
+
 		router.push({
 			pathname: "/(tabs)/complaints/resolution",
 			params: {
@@ -397,6 +408,7 @@ export function ComplaintBottomSheet({
 						: String(complaint.created_at),
 				resolutionDescription: resolution.description,
 				...(companyJson ? { resolutionCompanyJson: companyJson } : {}),
+				...(attachmentsJson ? { resolutionAttachmentsJson: attachmentsJson } : {}),
 			},
 		});
 		onClose();

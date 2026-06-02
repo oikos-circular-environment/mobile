@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 import type { VideoThumbnail } from "expo-video";
 import { useVideoPlayer } from "expo-video";
 import { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 
@@ -15,19 +15,27 @@ type MediaThumbnailProps = {
 	fallbackLabel?: string;
 };
 
+const styles = StyleSheet.create({
+	overlay: {
+		...StyleSheet.absoluteFillObject,
+		borderRadius: 6,
+	},
+});
+
 export function MediaThumbnail({
 	mediaType,
 	uri,
 	loadingLabel = "Carregando",
 	fallbackLabel = "MEDIA",
 }: MediaThumbnailProps) {
-	const [thumbnail, setThumbnail] = useState<MediaThumbnailState | undefined>(
-		undefined,
+	const [videoThumbnail, setVideoThumbnail] = useState<
+		MediaThumbnailState | undefined
+	>(undefined);
+	const [photoState, setPhotoState] = useState<"loading" | "loaded" | "failed">(
+		uri ? "loading" : "failed",
 	);
 	const isMountedRef = useRef(true);
 
-	// useVideoPlayer gerencia o ciclo de vida e libera o player automaticamente no unmount.
-	// Passa null para fotos para não criar player desnecessariamente.
 	const player = useVideoPlayer(mediaType === "video" && uri ? { uri } : null);
 
 	useEffect(() => {
@@ -37,13 +45,20 @@ export function MediaThumbnail({
 		};
 	}, []);
 
+	// Reset photo state when uri changes
+	useEffect(() => {
+		if (mediaType !== "photo") return;
+		setPhotoState(uri ? "loading" : "failed");
+	}, [mediaType, uri]);
+
+	// Generate video thumbnail
 	useEffect(() => {
 		if (mediaType !== "video" || !uri) {
-			setThumbnail(undefined);
+			setVideoThumbnail(undefined);
 			return;
 		}
 
-		setThumbnail(undefined);
+		setVideoThumbnail(undefined);
 
 		const generateThumbnail = async () => {
 			try {
@@ -51,11 +66,11 @@ export function MediaThumbnail({
 					maxHeight: 240,
 				});
 				if (isMountedRef.current) {
-					setThumbnail(results[0] ?? "failed");
+					setVideoThumbnail(results[0] ?? "failed");
 				}
 			} catch {
 				if (isMountedRef.current) {
-					setThumbnail("failed");
+					setVideoThumbnail("failed");
 				}
 			}
 		};
@@ -67,7 +82,6 @@ export function MediaThumbnail({
 			}
 		});
 
-		// Caso o player já esteja pronto (ex: fonte em cache).
 		if (player.status === "readyToPlay") {
 			void generateThumbnail();
 		}
@@ -87,15 +101,40 @@ export function MediaThumbnail({
 		}
 
 		return (
-			<Image
-				source={{ uri }}
-				style={{ height: "100%", width: "100%", borderRadius: 6 }}
-				contentFit="cover"
-			/>
+			<View className="flex-1">
+				<Image
+					source={{ uri }}
+					style={{ height: "100%", width: "100%", borderRadius: 6 }}
+					contentFit="cover"
+					onLoad={() => setPhotoState("loaded")}
+					onError={() => setPhotoState("failed")}
+				/>
+				{photoState === "loading" && (
+					<View
+						style={styles.overlay}
+						className="items-center justify-center bg-zinc-700"
+					>
+						<Spinner size="small" color="grey" />
+						<Text className="mt-1 text-[10px] text-white/70">
+							{loadingLabel}
+						</Text>
+					</View>
+				)}
+				{photoState === "failed" && (
+					<View
+						style={styles.overlay}
+						className="items-center justify-center bg-zinc-800"
+					>
+						<Text className="text-[10px] font-semibold text-white">
+							{fallbackLabel}
+						</Text>
+					</View>
+				)}
+			</View>
 		);
 	}
 
-	if (!uri || thumbnail === undefined) {
+	if (!uri || videoThumbnail === undefined) {
 		return (
 			<View className="flex-1 items-center justify-center bg-zinc-700">
 				<Spinner size="small" color="grey" />
@@ -104,7 +143,7 @@ export function MediaThumbnail({
 		);
 	}
 
-	if (thumbnail === "failed") {
+	if (videoThumbnail === "failed") {
 		return (
 			<View className="flex-1 items-center justify-center bg-zinc-800">
 				<Text className="text-[10px] font-semibold text-white">
@@ -116,7 +155,7 @@ export function MediaThumbnail({
 
 	return (
 		<Image
-			source={thumbnail}
+			source={videoThumbnail}
 			style={{ height: "100%", width: "100%", borderRadius: 6 }}
 			contentFit="cover"
 		/>
