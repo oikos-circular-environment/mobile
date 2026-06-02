@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -15,6 +16,7 @@ import {
 	XIcon,
 } from "lucide-react-native";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
 	Image,
 	KeyboardAvoidingView,
@@ -24,6 +26,7 @@ import {
 	View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { z } from "zod";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker-bottom-sheet";
 import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
@@ -32,7 +35,15 @@ import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
-import { Heading } from "@/components/ui/heading";
+import {
+	FormControl,
+	FormControlError,
+	FormControlErrorText,
+	FormControlHelper,
+	FormControlHelperText,
+	FormControlLabel,
+	FormControlLabelText,
+} from "@/components/ui/form-control";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
@@ -46,6 +57,18 @@ import type { ComplaintStatus, ComplaintType } from "@/libs/types/complaint";
 import { complaintTypeValues } from "@/libs/types/complaint";
 
 const MIN_ATTACHMENTS = 2;
+const MIN_CHARS = 50;
+
+const resolutionSchema = z.object({
+	description: z
+		.string()
+		.min(
+			MIN_CHARS,
+			`A descrição precisa ter pelo menos ${MIN_CHARS} caracteres.`,
+		),
+});
+
+type ResolutionFormValues = z.infer<typeof resolutionSchema>;
 
 export default function ComplaintResolutionScreen() {
 	const { id, type, status, address, date } = useLocalSearchParams<{
@@ -59,12 +82,25 @@ export default function ComplaintResolutionScreen() {
 	const { user, isAuthenticated } = useAuthContext();
 	const queryClient = useQueryClient();
 
-	const [description, setDescription] = useState("");
 	const [selectedAssets, setSelectedAssets] = useState<
 		ImagePicker.ImagePickerAsset[]
 	>([]);
 	const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 	const [showCompanyPicker, setShowCompanyPicker] = useState(false);
+
+	const {
+		control,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<ResolutionFormValues>({
+		resolver: zodResolver(resolutionSchema),
+		defaultValues: { description: "" },
+		mode: "onTouched",
+	});
+
+	const description = watch("description");
+	const charCount = description.length;
 
 	const typeInfo = complaintTypeValues.find(v => v.value === type);
 	const title =
@@ -109,13 +145,13 @@ export default function ComplaintResolutionScreen() {
 	};
 
 	const mutation = useMutation({
-		mutationFn: async () => {
+		mutationFn: async (data: ResolutionFormValues) => {
 			if (!id || !user?.profile.id) throw new Error("Dados inválidos.");
 
 			await postV1ComplaintsByIdResolutions({
 				path: { id },
 				body: {
-					description,
+					description: data.description,
 					...(selectedCompany ? { company_id: selectedCompany.id } : {}),
 				},
 			});
@@ -145,13 +181,22 @@ export default function ComplaintResolutionScreen() {
 		},
 	});
 
+	const attachmentsMissing = MIN_ATTACHMENTS - selectedAssets.length;
 	const canSubmit =
 		isAuthenticated &&
-		description.trim().length >= 10 &&
 		selectedAssets.length >= MIN_ATTACHMENTS &&
 		!mutation.isPending;
 
-	const attachmentsMissing = MIN_ATTACHMENTS - selectedAssets.length;
+	const onSubmit = (data: ResolutionFormValues) => {
+		if (selectedAssets.length < MIN_ATTACHMENTS) {
+			toast.error(
+				"Anexos insuficientes",
+				`Adicione pelo menos ${MIN_ATTACHMENTS} anexos.`,
+			);
+			return;
+		}
+		mutation.mutate(data);
+	};
 
 	return (
 		<>
@@ -160,8 +205,8 @@ export default function ComplaintResolutionScreen() {
 				className="flex-1 bg-white"
 			>
 				<ScrollView
-					className="flex-1 gap-4 px-4 pb-6"
-					contentContainerClassName="flex-col gap-4"
+					className="flex-1 px-4"
+					contentContainerClassName="flex-col gap-4 pb-6"
 					keyboardShouldPersistTaps="handled"
 					showsVerticalScrollIndicator={false}
 				>
@@ -234,28 +279,62 @@ export default function ComplaintResolutionScreen() {
 					</Alert>
 
 					{/* Descrição */}
-					<View className="gap-2">
-						<Heading size="md">Descrição</Heading>
-						<Input className="min-h-[100px]">
-							<InputField
-								value={description}
-								onChangeText={setDescription}
-								placeholder="Descreva como a denúncia foi resolvida..."
-								multiline
-								numberOfLines={4}
-								textAlignVertical="top"
-								maxLength={1000}
-							/>
-						</Input>
-					</View>
+					<Controller
+						control={control}
+						name="description"
+						render={({ field: { onChange, onBlur, value } }) => (
+							<FormControl isInvalid={!!errors.description}>
+								<View className="mb-2 flex-row items-center justify-between">
+									<FormControlLabel>
+										<FormControlLabelText className="text-base font-bold text-gray-800">
+											Descrição
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Text
+										className={`text-sm ${charCount >= MIN_CHARS ? "text-lime-700" : "text-gray-400"}`}
+									>
+										{charCount} caracteres
+									</Text>
+								</View>
+								<Input className="min-h-[100px]">
+									<InputField
+										value={value}
+										onChangeText={onChange}
+										onBlur={onBlur}
+										placeholder="Descreva como a denúncia foi resolvida..."
+										multiline
+										numberOfLines={4}
+										textAlignVertical="top"
+										maxLength={1000}
+									/>
+								</Input>
+								{errors.description ? (
+									<FormControlError>
+										<FormControlErrorText>
+											{errors.description.message}
+										</FormControlErrorText>
+									</FormControlError>
+								) : (
+									<FormControlHelper>
+										<FormControlHelperText>
+											Mínimo de {MIN_CHARS} caracteres.
+										</FormControlHelperText>
+									</FormControlHelper>
+								)}
+							</FormControl>
+						)}
+					/>
 
 					{/* Empresa vinculada (opcional) */}
-					<View className="gap-2">
-						<Heading size="md">Empresa responsável</Heading>
-						<Text className="text-sm text-gray-500">
-							Opcional — vincule uma empresa caso ela tenha participado da
-							resolução.
-						</Text>
+					<FormControl>
+						<View className="mb-2 flex-row items-center justify-between">
+							<FormControlLabel>
+								<FormControlLabelText className="text-base font-bold text-gray-800">
+									Empresa responsável
+								</FormControlLabelText>
+							</FormControlLabel>
+							<Text className="text-xs text-gray-400">opcional</Text>
+						</View>
 
 						{selectedCompany ? (
 							<View className="flex-row items-center gap-3 rounded-xl border border-lime-700 bg-lime-50 p-3">
@@ -305,29 +384,30 @@ export default function ComplaintResolutionScreen() {
 								/>
 							</TouchableOpacity>
 						)}
-					</View>
+
+						<FormControlHelper>
+							<FormControlHelperText>
+								Vincule uma empresa caso ela tenha participado da resolução.
+							</FormControlHelperText>
+						</FormControlHelper>
+					</FormControl>
 
 					{/* Anexos */}
-					<View className="gap-2">
-						<View className="flex-row items-center justify-between">
-							<Heading size="md">Anexos</Heading>
+					<FormControl
+						isInvalid={selectedAssets.length > 0 && attachmentsMissing > 0}
+					>
+						<View className="mb-2 flex-row items-center justify-between">
+							<FormControlLabel>
+								<FormControlLabelText className="text-base font-bold text-gray-800">
+									Anexos
+								</FormControlLabelText>
+							</FormControlLabel>
 							<Text
-								className={`text-sm ${
-									selectedAssets.length >= MIN_ATTACHMENTS
-										? "text-lime-700"
-										: "text-red-500"
-								}`}
+								className={`text-sm ${selectedAssets.length >= MIN_ATTACHMENTS ? "text-lime-700" : "text-gray-400"}`}
 							>
 								{selectedAssets.length}/{MIN_ATTACHMENTS} mínimo
 							</Text>
 						</View>
-
-						{attachmentsMissing > 0 && selectedAssets.length > 0 && (
-							<Text className="text-xs text-red-500">
-								Adicione mais {attachmentsMissing}{" "}
-								{attachmentsMissing === 1 ? "anexo" : "anexos"} para continuar.
-							</Text>
-						)}
 
 						<ScrollView
 							horizontal
@@ -370,10 +450,25 @@ export default function ComplaintResolutionScreen() {
 								</View>
 							))}
 						</ScrollView>
-					</View>
+
+						{attachmentsMissing > 0 && selectedAssets.length > 0 ? (
+							<FormControlError>
+								<FormControlErrorText>
+									Adicione mais {attachmentsMissing}{" "}
+									{attachmentsMissing === 1 ? "anexo" : "anexos"}.
+								</FormControlErrorText>
+							</FormControlError>
+						) : (
+							<FormControlHelper>
+								<FormControlHelperText>
+									Mínimo de {MIN_ATTACHMENTS} anexos (fotos ou vídeos).
+								</FormControlHelperText>
+							</FormControlHelper>
+						)}
+					</FormControl>
 
 					<TouchableOpacity
-						onPress={() => mutation.mutate()}
+						onPress={handleSubmit(onSubmit)}
 						disabled={!canSubmit}
 						activeOpacity={0.85}
 						className={`h-12 items-center justify-center rounded-[10px] ${canSubmit ? "bg-lime-800" : "bg-gray-200"}`}

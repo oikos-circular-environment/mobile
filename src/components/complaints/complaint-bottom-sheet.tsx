@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { router } from "expo-router";
 import {
@@ -335,7 +335,12 @@ export function ComplaintBottomSheet({
 									color={colors.gray[500]}
 									strokeWidth={2}
 								/>
-								<Text className=" text-gray-500">{dateLabel}</Text>
+								<Text className=" text-gray-500">
+									{dateLabel} • Aberto à{" "}
+									{formatDistanceToNowStrict(complaint.created_at, {
+										locale: ptBR,
+									})}
+								</Text>
 							</View>
 
 							{/* Coordinates */}
