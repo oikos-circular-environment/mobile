@@ -6,7 +6,7 @@ import {
 	getV1ComplaintsMap,
 	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
-import type { ComplaintStatus, ComplaintType, MapComplaint } from "@/libs/types/complaint";
+import type { ComplaintStatus, ComplaintType } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 export type { MapComplaint } from "@/libs/types/complaint";
@@ -29,7 +29,9 @@ export function useComplaintsMap({
 	const setVote = useComplaintsStore(s => s.setVote);
 	const removeVote = useComplaintsStore(s => s.removeVote);
 	const selectedMapComplaint = useComplaintsStore(s => s.selectedMapComplaint);
-	const setSelectedMapComplaint = useComplaintsStore(s => s.setSelectedMapComplaint);
+	const setSelectedMapComplaint = useComplaintsStore(
+		s => s.setSelectedMapComplaint,
+	);
 	const patchSelectedMapComplaintVoteCounts = useComplaintsStore(
 		s => s.patchSelectedMapComplaintVoteCounts,
 	);

@@ -5,7 +5,6 @@ import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
-import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
 import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
 import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/tokens";
@@ -246,8 +245,6 @@ export default function ComplaintsMapScreen() {
 				isOpen={showAuthModal}
 				onClose={() => setShowAuthModal(false)}
 			/>
-
-			<ComplaintBottomSheet />
 		</View>
 	);
 }

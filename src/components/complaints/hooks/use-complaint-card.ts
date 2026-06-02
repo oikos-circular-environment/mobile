@@ -1,39 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
 import { Alert, Linking, Platform } from "react-native";
 import { toast } from "@/components/toast";
-import {
-	patchV1ComplaintsByIdCanceled,
-	patchV1ComplaintsByIdResolved,
-} from "@/libs/oikos-sdk";
+import { patchV1ComplaintsByIdCanceled } from "@/libs/oikos-sdk";
+import type { MapComplaint } from "@/libs/types/complaint";
 import type { ApiComplaint } from "@/stores/complaints-store";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
-export type ResolveComplaintData = {
-	description: string;
-	resolver: string;
-	rating: number;
-};
-
 export function useComplaintCard(complaint: ApiComplaint) {
 	const shiftComplaintStatus = useComplaintsStore(s => s.shiftComplaintStatus);
-
-	const resolveMutation = useMutation({
-		mutationFn: (data: ResolveComplaintData) =>
-			patchV1ComplaintsByIdResolved({
-				path: { id: complaint.id },
-				body: {
-					description: data.description,
-					resolver: data.resolver,
-					rating: data.rating,
-				},
-			}),
-		onSuccess: () => {
-			shiftComplaintStatus(complaint.id, "RESOLVED");
-			toast.success("Denúncia resolvida", "Marcada como resolvida.");
-		},
-		onError: () =>
-			toast.error("Erro", "Não foi possível marcar como resolvida."),
-	});
+	const setSelectedMapComplaint = useComplaintsStore(
+		s => s.setSelectedMapComplaint,
+	);
 
 	const cancelMutation = useMutation({
 		mutationFn: () =>
@@ -65,12 +42,17 @@ export function useComplaintCard(complaint: ApiComplaint) {
 		}
 	};
 
+	const openBottomSheet = () => {
+		const location = coords
+			? { lat: coords.latitude, lon: coords.longitude }
+			: null;
+		setSelectedMapComplaint({ ...complaint, location } as MapComplaint);
+	};
+
 	return {
-		resolveComplaint: (data: ResolveComplaintData) =>
-			resolveMutation.mutate(data),
 		cancelComplaint: () => cancelMutation.mutate(),
-		isResolvingComplaint: resolveMutation.isPending,
 		isCancelingComplaint: cancelMutation.isPending,
 		openInMaps,
+		openBottomSheet,
 	};
 }

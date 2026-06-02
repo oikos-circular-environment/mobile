@@ -7,11 +7,11 @@ import {
 	ComplaintCardSkeleton,
 } from "@/components/complaints/complaint-card";
 import { ComplaintListHeader } from "@/components/complaints/complaint-list-header";
+import { useComplaintsList } from "@/components/complaints/hooks/use-complaints-list";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { useComplaintsList } from "@/components/complaints/hooks/use-complaints-list";
 import {
 	type ApiComplaint,
 	selectFilteredComplaints,

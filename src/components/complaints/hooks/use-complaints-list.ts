@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { getV1Complaints, getV1ComplaintsDashboard } from "@/libs/oikos-sdk";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
