@@ -18,10 +18,9 @@ import type {
 	PatchV1ComplaintsByIdResponse,
 	PostV1CompaniesByIdAvatarResponse,
 	PostV1CompaniesResponse,
-	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponse,
+	PostV1ComplaintsByIdAttachmentsResponse,
 	PostV1ComplaintsByIdResolutionsAttachmentsResponse,
 	PostV1ComplaintsByIdVotesResponse,
-	PostV1ComplaintsManualResponse,
 	PostV1ComplaintsResponse,
 	PutV1CompaniesByIdAddressesResponse,
 	PutV1CompaniesByIdResponse,
@@ -209,12 +208,8 @@ export const getV1ComplaintsResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ComplaintsResponse> => {
 	data.complaints = data.complaints.map((item: any) => {
-		item.captures = item.captures.map((item: any) => {
-			item.date = new Date(item.date);
-			item.attachments = item.attachments.map((item: any) => {
-				item.created_at = new Date(item.created_at);
-				return item;
-			});
+		item.date = new Date(item.date);
+		item.attachments = item.attachments.map((item: any) => {
 			item.created_at = new Date(item.created_at);
 			return item;
 		});
@@ -230,12 +225,8 @@ export const getV1ComplaintsResponseTransformer = async (
 export const postV1ComplaintsResponseTransformer = async (
 	data: any,
 ): Promise<PostV1ComplaintsResponse> => {
-	data.complaint.captures = data.complaint.captures.map((item: any) => {
-		item.date = new Date(item.date);
-		item.attachments = item.attachments.map((item: any) => {
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
+	data.complaint.date = new Date(data.complaint.date);
+	data.complaint.attachments = data.complaint.attachments.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
@@ -247,12 +238,8 @@ export const getV1ComplaintsMapResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ComplaintsMapResponse> => {
 	data.complaints = data.complaints.map((item: any) => {
-		item.captures = item.captures.map((item: any) => {
-			item.date = new Date(item.date);
-			item.attachments = item.attachments.map((item: any) => {
-				item.created_at = new Date(item.created_at);
-				return item;
-			});
+		item.date = new Date(item.date);
+		item.attachments = item.attachments.map((item: any) => {
 			item.created_at = new Date(item.created_at);
 			return item;
 		});
@@ -265,12 +252,8 @@ export const getV1ComplaintsMapResponseTransformer = async (
 export const getV1ComplaintsByIdPublicResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ComplaintsByIdPublicResponse> => {
-	data.complaint.captures = data.complaint.captures.map((item: any) => {
-		item.date = new Date(item.date);
-		item.attachments = item.attachments.map((item: any) => {
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
+	data.complaint.date = new Date(data.complaint.date);
+	data.complaint.attachments = data.complaint.attachments.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
@@ -289,12 +272,8 @@ export const getV1ComplaintsByIdPublicResponseTransformer = async (
 export const getV1ComplaintsByIdResponseTransformer = async (
 	data: any,
 ): Promise<GetV1ComplaintsByIdResponse> => {
-	data.complaint.captures = data.complaint.captures.map((item: any) => {
-		item.date = new Date(item.date);
-		item.attachments = item.attachments.map((item: any) => {
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
+	data.complaint.date = new Date(data.complaint.date);
+	data.complaint.attachments = data.complaint.attachments.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
@@ -305,28 +284,8 @@ export const getV1ComplaintsByIdResponseTransformer = async (
 export const patchV1ComplaintsByIdResponseTransformer = async (
 	data: any,
 ): Promise<PatchV1ComplaintsByIdResponse> => {
-	data.complaint.captures = data.complaint.captures.map((item: any) => {
-		item.date = new Date(item.date);
-		item.attachments = item.attachments.map((item: any) => {
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
-		item.created_at = new Date(item.created_at);
-		return item;
-	});
-	data.complaint.created_at = new Date(data.complaint.created_at);
-	return data;
-};
-
-export const postV1ComplaintsManualResponseTransformer = async (
-	data: any,
-): Promise<PostV1ComplaintsManualResponse> => {
-	data.complaint.captures = data.complaint.captures.map((item: any) => {
-		item.date = new Date(item.date);
-		item.attachments = item.attachments.map((item: any) => {
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
+	data.complaint.date = new Date(data.complaint.date);
+	data.complaint.attachments = data.complaint.attachments.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
@@ -337,12 +296,20 @@ export const postV1ComplaintsManualResponseTransformer = async (
 export const patchV1ComplaintsByIdResolvedResponseTransformer = async (
 	data: any,
 ): Promise<PatchV1ComplaintsByIdResolvedResponse> => {
-	data.complaint.captures = data.complaint.captures.map((item: any) => {
-		item.date = new Date(item.date);
-		item.attachments = item.attachments.map((item: any) => {
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
+	data.complaint.date = new Date(data.complaint.date);
+	data.complaint.attachments = data.complaint.attachments.map((item: any) => {
+		item.created_at = new Date(item.created_at);
+		return item;
+	});
+	data.complaint.created_at = new Date(data.complaint.created_at);
+	return data;
+};
+
+export const patchV1ComplaintsByIdCanceledResponseTransformer = async (
+	data: any,
+): Promise<PatchV1ComplaintsByIdCanceledResponse> => {
+	data.complaint.date = new Date(data.complaint.date);
+	data.complaint.attachments = data.complaint.attachments.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
@@ -391,35 +358,14 @@ export const postV1ComplaintsByIdResolutionsAttachmentsResponseTransformer =
 		return data;
 	};
 
-export const patchV1ComplaintsByIdCanceledResponseTransformer = async (
+export const postV1ComplaintsByIdAttachmentsResponseTransformer = async (
 	data: any,
-): Promise<PatchV1ComplaintsByIdCanceledResponse> => {
-	data.complaint.captures = data.complaint.captures.map((item: any) => {
-		item.date = new Date(item.date);
-		item.attachments = item.attachments.map((item: any) => {
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
+): Promise<PostV1ComplaintsByIdAttachmentsResponse> => {
+	data.complaint.date = new Date(data.complaint.date);
+	data.complaint.attachments = data.complaint.attachments.map((item: any) => {
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
 	data.complaint.created_at = new Date(data.complaint.created_at);
 	return data;
 };
-
-export const postV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponseTransformer =
-	async (
-		data: any,
-	): Promise<PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponse> => {
-		data.complaint.captures = data.complaint.captures.map((item: any) => {
-			item.date = new Date(item.date);
-			item.attachments = item.attachments.map((item: any) => {
-				item.created_at = new Date(item.created_at);
-				return item;
-			});
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
-		data.complaint.created_at = new Date(data.complaint.created_at);
-		return data;
-	};

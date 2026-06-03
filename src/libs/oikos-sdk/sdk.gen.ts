@@ -20,10 +20,9 @@ import {
 	patchV1ComplaintsByIdResponseTransformer,
 	postV1CompaniesByIdAvatarResponseTransformer,
 	postV1CompaniesResponseTransformer,
-	postV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponseTransformer,
+	postV1ComplaintsByIdAttachmentsResponseTransformer,
 	postV1ComplaintsByIdResolutionsAttachmentsResponseTransformer,
 	postV1ComplaintsByIdVotesResponseTransformer,
-	postV1ComplaintsManualResponseTransformer,
 	postV1ComplaintsResponseTransformer,
 	putV1CompaniesByIdAddressesResponseTransformer,
 	putV1CompaniesByIdResponseTransformer,
@@ -112,9 +111,9 @@ import type {
 	PostV1CompaniesData,
 	PostV1CompaniesErrors,
 	PostV1CompaniesResponses,
-	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsData,
-	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors,
-	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses,
+	PostV1ComplaintsByIdAttachmentsData,
+	PostV1ComplaintsByIdAttachmentsErrors,
+	PostV1ComplaintsByIdAttachmentsResponses,
 	PostV1ComplaintsByIdResolutionsAttachmentsData,
 	PostV1ComplaintsByIdResolutionsAttachmentsErrors,
 	PostV1ComplaintsByIdResolutionsAttachmentsResponses,
@@ -126,9 +125,6 @@ import type {
 	PostV1ComplaintsByIdVotesResponses,
 	PostV1ComplaintsData,
 	PostV1ComplaintsErrors,
-	PostV1ComplaintsManualData,
-	PostV1ComplaintsManualErrors,
-	PostV1ComplaintsManualResponses,
 	PostV1ComplaintsResponses,
 	PostV1UsersRegisterData,
 	PostV1UsersRegisterErrors,
@@ -638,9 +634,9 @@ export const getV1Complaints = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Create automatic complaint
+ * Create complaint
  *
- * Creates a complaint with raw geospatial data and no attachment.
+ * Creates a new complaint with geospatial data. Pass `heading: null` when the device heading is unavailable.
  */
 export const postV1Complaints = <ThrowOnError extends boolean = false>(
 	options: Options<PostV1ComplaintsData, ThrowOnError>,
@@ -738,7 +734,7 @@ export const getV1ComplaintsById = <ThrowOnError extends boolean = false>(
 /**
  * Update complaint
  *
- * Updates only the basic complaint fields: observations.
+ * Updates complaint fields. Accepts any combination of `date`, `type`, `observations`, and `geospatial`.
  */
 export const patchV1ComplaintsById = <ThrowOnError extends boolean = false>(
 	options: Options<PatchV1ComplaintsByIdData, ThrowOnError>,
@@ -752,30 +748,6 @@ export const patchV1ComplaintsById = <ThrowOnError extends boolean = false>(
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
- * Create manual complaint
- *
- * Creates a complaint from existing media with address provided by the user.
- */
-export const postV1ComplaintsManual = <ThrowOnError extends boolean = false>(
-	options: Options<PostV1ComplaintsManualData, ThrowOnError>,
-) =>
-	(options.client ?? client).post<
-		PostV1ComplaintsManualResponses,
-		PostV1ComplaintsManualErrors,
-		ThrowOnError
-	>({
-		responseTransformer: postV1ComplaintsManualResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/complaints/manual",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
@@ -807,6 +779,28 @@ export const patchV1ComplaintsByIdResolved = <
 			"Content-Type": "application/json",
 			...options.headers,
 		},
+	});
+
+/**
+ * Cancel complaint
+ *
+ * Marks the authenticated user's complaint as canceled.
+ */
+export const patchV1ComplaintsByIdCanceled = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<PatchV1ComplaintsByIdCanceledData, ThrowOnError>,
+) =>
+	(options.client ?? client).patch<
+		PatchV1ComplaintsByIdCanceledResponses,
+		PatchV1ComplaintsByIdCanceledErrors,
+		ThrowOnError
+	>({
+		responseTransformer: patchV1ComplaintsByIdCanceledResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/canceled",
+		...options,
 	});
 
 /**
@@ -1003,50 +997,24 @@ export const deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId = <
 	});
 
 /**
- * Cancel complaint
+ * Upload complaint attachment
  *
- * Marks the authenticated user's complaint as canceled.
+ * Uploads and attaches a file to an existing complaint. Send one file per request.
  */
-export const patchV1ComplaintsByIdCanceled = <
+export const postV1ComplaintsByIdAttachments = <
 	ThrowOnError extends boolean = false,
 >(
-	options: Options<PatchV1ComplaintsByIdCanceledData, ThrowOnError>,
-) =>
-	(options.client ?? client).patch<
-		PatchV1ComplaintsByIdCanceledResponses,
-		PatchV1ComplaintsByIdCanceledErrors,
-		ThrowOnError
-	>({
-		responseTransformer: patchV1ComplaintsByIdCanceledResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/complaints/{id}/canceled",
-		...options,
-	});
-
-/**
- * Create complaint capture attachment
- *
- * Uploads and attaches a file to an existing complaint capture.
- */
-export const postV1ComplaintsByIdCapturesByCaptureIdAttachments = <
-	ThrowOnError extends boolean = false,
->(
-	options: Options<
-		PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsData,
-		ThrowOnError
-	>,
+	options: Options<PostV1ComplaintsByIdAttachmentsData, ThrowOnError>,
 ) =>
 	(options.client ?? client).post<
-		PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses,
-		PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors,
+		PostV1ComplaintsByIdAttachmentsResponses,
+		PostV1ComplaintsByIdAttachmentsErrors,
 		ThrowOnError
 	>({
-		responseTransformer:
-			postV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponseTransformer,
+		responseTransformer: postV1ComplaintsByIdAttachmentsResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/complaints/{id}/captures/{captureId}/attachments",
+		url: "/v1/complaints/{id}/attachments",
 		...options,
 	});
 

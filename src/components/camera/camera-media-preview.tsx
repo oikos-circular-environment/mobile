@@ -2,10 +2,10 @@ import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { MediaThumbnail, MediaViewer } from "@/components/medias-preview";
 import { Text } from "@/components/ui/text";
-import type { ComplaintCapture } from "@/libs/types/complaint";
+import type { DraftAttachment } from "@/libs/types/complaint";
 
 type CameraMediaPreviewProps = {
-	captures: ComplaintCapture[];
+	attachments: DraftAttachment[];
 	onDelete?: (id: string) => void;
 };
 
@@ -20,16 +20,16 @@ const STACK_LAYERS = [
 ] as const;
 
 export function CameraMediaPreview({
-	captures,
+	attachments,
 	onDelete,
 }: CameraMediaPreviewProps) {
 	const [viewerOpen, setViewerOpen] = useState(false);
 
-	const frontCapture =
-		captures.length > 0 ? captures[captures.length - 1] : null;
-	const stackCaptures = captures.slice(-3);
+	const frontAttachment =
+		attachments.length > 0 ? attachments[attachments.length - 1] : null;
+	const stackAttachments = attachments.slice(-3);
 
-	if (captures.length === 0) {
+	if (attachments.length === 0) {
 		return (
 			<View
 				style={{ width: CONTAINER_WIDTH, height: CARD_SIZE }}
@@ -49,13 +49,13 @@ export function CameraMediaPreview({
 				activeOpacity={0.85}
 			>
 				<View style={{ width: CONTAINER_WIDTH, height: CARD_SIZE }}>
-					{stackCaptures.map((capture, index) => {
-						const layerIndex = index + (3 - stackCaptures.length);
+					{stackAttachments.map((attachment, index) => {
+						const layerIndex = index + (3 - stackAttachments.length);
 						const layer = STACK_LAYERS[layerIndex] ?? STACK_LAYERS[2];
 
 						return (
 							<View
-								key={capture.id}
+								key={attachment.id}
 								style={{
 									position: "absolute",
 									top: 0,
@@ -71,10 +71,10 @@ export function CameraMediaPreview({
 							>
 								<View className="flex-1 overflow-hidden rounded-xl border border-white/10">
 									<MediaThumbnail
-										mediaType={capture.capture.type}
-										uri={capture.capture.object?.uri}
+										mediaType={attachment.mediaType}
+										uri={attachment.uri}
 										fallbackLabel={
-											capture.capture.type === "video" ? "VIDEO" : "FOTO"
+											attachment.mediaType === "video" ? "VIDEO" : "FOTO"
 										}
 									/>
 								</View>
@@ -86,7 +86,7 @@ export function CameraMediaPreview({
 
 			<MediaViewer
 				visible={viewerOpen}
-				capture={frontCapture}
+				attachment={frontAttachment}
 				onClose={() => setViewerOpen(false)}
 				onDelete={onDelete}
 			/>

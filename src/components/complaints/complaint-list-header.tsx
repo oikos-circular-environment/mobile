@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { CameraIcon, ImagePlusIcon, ShieldIcon } from "lucide-react-native";
+import { CameraIcon, ShieldIcon } from "lucide-react-native";
 import { useState } from "react";
 import { View } from "react-native";
 import { AuthModal } from "@/components/auth/auth-modal";
@@ -21,15 +21,7 @@ export function ComplaintListHeader() {
 			setShowAuthModal(true);
 			return;
 		}
-		router.push("/(tabs)/complaints/(create)/camera");
-	};
-
-	const handleManualComplaint = () => {
-		if (!isAuthenticated) {
-			setShowAuthModal(true);
-			return;
-		}
-		router.push("/(tabs)/complaints/(create)/manual");
+		router.push("/(tabs)/complaints/(create)");
 	};
 
 	return (
@@ -54,20 +46,8 @@ export function ComplaintListHeader() {
 				<HStack className="gap-2">
 					<Button size="lg" className="flex-1" onPress={handleNewComplaint}>
 						<ButtonIcon as={CameraIcon} className="text-white" />
-						<ButtonText className="flex-1 text-center font-semibold text-white">
+						<ButtonText className="text-center font-semibold text-white">
 							Nova Denúncia{" "}
-						</ButtonText>
-					</Button>
-
-					<Button
-						size="lg"
-						className="flex-1"
-						variant="secondary"
-						onPress={handleManualComplaint}
-					>
-						<ButtonIcon as={ImagePlusIcon} />
-						<ButtonText className="flex-1 text-center font-semibold ">
-							Denúncia Manual
 						</ButtonText>
 					</Button>
 				</HStack>

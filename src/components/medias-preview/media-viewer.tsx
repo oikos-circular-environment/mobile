@@ -4,20 +4,20 @@ import { Modal, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
-import type { ComplaintCapture } from "@/libs/types/complaint";
+import type { DraftAttachment } from "@/libs/types/complaint";
 import { ImagePreviewViewer } from "./image-preview-viewer";
 import { VideoPreviewPlayer } from "./video-preview-player";
 
 type MediaViewerProps = {
 	visible: boolean;
-	capture: ComplaintCapture | null;
+	attachment: DraftAttachment | null;
 	onClose: () => void;
 	onDelete?: (id: string) => void;
 };
 
 export function MediaViewer({
 	visible,
-	capture,
+	attachment,
 	onClose,
 	onDelete,
 }: MediaViewerProps) {
@@ -28,8 +28,8 @@ export function MediaViewer({
 		if (!visible) setConfirmingDelete(false);
 	}, [visible]);
 
-	const captureUri = capture?.capture.object?.uri;
-	const captureType = capture?.capture.type;
+	const uri = attachment?.uri ?? attachment?.url;
+	const mediaType = attachment?.mediaType;
 
 	const handleClose = () => {
 		setConfirmingDelete(false);
@@ -37,8 +37,8 @@ export function MediaViewer({
 	};
 
 	const handleDeleteConfirm = () => {
-		if (!capture || !onDelete) return;
-		onDelete(capture.id);
+		if (!attachment || !onDelete) return;
+		onDelete(attachment.id);
 		setConfirmingDelete(false);
 		onClose();
 	};
@@ -57,10 +57,10 @@ export function MediaViewer({
 			}}
 		>
 			<View className="flex-1 bg-black">
-				{captureType === "photo" && captureUri ? (
-					<ImagePreviewViewer uri={captureUri} />
-				) : captureType === "video" && captureUri ? (
-					<VideoPreviewPlayer uri={captureUri} />
+				{mediaType === "photo" && uri ? (
+					<ImagePreviewViewer uri={uri} />
+				) : mediaType === "video" && uri ? (
+					<VideoPreviewPlayer uri={uri} />
 				) : (
 					<View className="flex-1 items-center justify-center">
 						<Text className="text-white/50">Mídia indisponível</Text>

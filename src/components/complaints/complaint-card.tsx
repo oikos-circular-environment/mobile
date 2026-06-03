@@ -39,19 +39,18 @@ function ComplaintCardContent({ complaint }: { complaint: ApiComplaint }) {
 	const { cancelComplaint, openInMaps, isCancelingComplaint, openBottomSheet } =
 		useComplaintCard(complaint);
 
-	const firstCapture = complaint.captures[0];
-	const firstAttachment = firstCapture?.attachments[0];
-	const coords = firstCapture?.geospatial.location.coords;
+	const firstAttachment = complaint.attachments[0];
+	const coords = complaint.geospatial.location.coords;
 
 	const address =
-		firstCapture?.geospatial.addresses.formattedAddress ??
+		complaint.geospatial.addresses.formattedAddress ??
 		[
-			firstCapture?.geospatial.addresses.street,
-			firstCapture?.geospatial.addresses.streetNumber,
-			firstCapture?.geospatial.addresses.district,
-			firstCapture?.geospatial.addresses.city,
-			firstCapture?.geospatial.addresses.region,
-			firstCapture?.geospatial.addresses.postalCode,
+			complaint.geospatial.addresses.street,
+			complaint.geospatial.addresses.streetNumber,
+			complaint.geospatial.addresses.district,
+			complaint.geospatial.addresses.city,
+			complaint.geospatial.addresses.region,
+			complaint.geospatial.addresses.postalCode,
 		]
 			.filter(Boolean)
 			.join(", ");

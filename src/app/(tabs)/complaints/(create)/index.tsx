@@ -1,10 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
+import * as Crypto from "expo-crypto";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { Camera, ShieldAlertIcon, X } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import {
+	Camera,
+	ImageIcon,
+	ShieldAlertIcon,
+	X,
+} from "lucide-react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	KeyboardAvoidingView,
@@ -13,11 +17,18 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
+import type { MediaItem } from "@/components/complaints/hooks/use-submit-complaints";
+import { useSubmitComplaints } from "@/components/complaints/hooks/use-submit-complaints";
 import { GooglePlacesInput } from "@/components/google-places-input";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
+import {
+	Button,
+	ButtonIcon,
+	ButtonSpinner,
+	ButtonText,
+} from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Divider } from "@/components/ui/divider";
 import {
@@ -29,48 +40,20 @@ import {
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
-import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import WrapperMap from "@/components/wrapper-map";
-import {
-	COMPLAINTS_QUERY_KEY,
-	DASHBOARD_QUERY_KEY,
-} from "@/contexts/complaints-context";
+import { useComplaintCreation } from "@/contexts/complaint-creation-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 import { getCepV2 } from "@/libs/brasil-api-sdk";
 import {
 	type GoogleAddressFields,
 	reverseGeocode,
 } from "@/libs/google/reverse-geocode";
 import { mask } from "@/libs/mask";
-import {
-	postV1ComplaintsByIdCapturesByCaptureIdAttachments,
-	postV1ComplaintsManual,
-} from "@/libs/oikos-sdk";
-import {
-	type ComplaintType,
-	complaintTypeValues,
-} from "@/libs/types/complaint";
+import type { Geospatial } from "@/libs/types/complaint";
 
-function maskDate(v: string) {
-	const d = v.replace(/\D/g, "").slice(0, 8);
-	return d.replace(/(\d{2})(\d)/, "$1/$2").replace(/(\d{2})(\d)/, "$1/$2");
-}
-
-function maskTime(v: string) {
-	const d = v.replace(/\D/g, "").slice(0, 4);
-	return d.replace(/(\d{2})(\d)/, "$1:$2");
-}
-
-const manualSchema = z.object({
-	type: z.enum([
-		"IRREGULAR_DISPOSAL",
-		"DEFORESTATION",
-		"BURNING",
-		"VACANT_LOT",
-	]),
-	date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/, "Use o formato DD/MM/AAAA."),
-	time: z.string().regex(/^\d{2}:\d{2}$/, "Use o formato HH:MM."),
+const schema = z.object({
 	observations: z.string().max(500, "Máximo de 500 caracteres.").optional(),
 	postalCode: z.string().regex(/^\d{5}-\d{3}$/, "CEP inválido."),
 	street: z.string().min(2, "Informe a rua."),
@@ -88,24 +71,29 @@ const manualSchema = z.object({
 		.refine(v => !Number.isNaN(parseFloat(v)), "Longitude inválida."),
 });
 
-type ManualFormValues = z.infer<typeof manualSchema>;
+type FormValues = z.infer<typeof schema>;
 
-export default function ManualComplaintScreen() {
-	const queryClient = useQueryClient();
-	const now = new Date();
+export default function ComplaintCreateScreen() {
+	const { location, heading, addresses } = useGeospatial();
+	const { attachments, addAttachment, removeAttachment, clearDraft } =
+		useComplaintCreation();
+	const hasAutoFilled = useRef(false);
+
+	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
+	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
+
+	const { mutateAsync: submitComplaint, isPending } = useSubmitComplaints();
 
 	const {
 		control,
 		handleSubmit,
 		setValue,
 		watch,
+		reset,
 		formState: { errors },
-	} = useForm<ManualFormValues>({
-		resolver: zodResolver(manualSchema),
+	} = useForm<FormValues>({
+		resolver: zodResolver(schema),
 		defaultValues: {
-			type: "IRREGULAR_DISPOSAL",
-			date: format(now, "dd/MM/yyyy"),
-			time: format(now, "HH:mm"),
 			observations: "",
 			postalCode: "",
 			street: "",
@@ -118,16 +106,33 @@ export default function ManualComplaintScreen() {
 		},
 	});
 
-	const [selectedAssets, setSelectedAssets] = useState<
-		ImagePicker.ImagePickerAsset[]
-	>([]);
-	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
-	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
-	const selectedType = watch("type");
 	const latValue = watch("latitude");
 	const lonValue = watch("longitude");
+
+	useEffect(() => {
+		if (hasAutoFilled.current) return;
+		if (!location && addresses.length === 0) return;
+
+		hasAutoFilled.current = true;
+
+		if (location) {
+			setValue("latitude", String(location.coords.latitude));
+			setValue("longitude", String(location.coords.longitude));
+		}
+		if (addresses[0]) {
+			if (addresses[0].street) setValue("street", addresses[0].street ?? "");
+			if (addresses[0].streetNumber)
+				setValue("streetNumber", addresses[0].streetNumber ?? "");
+			if (addresses[0].district)
+				setValue("district", addresses[0].district ?? "");
+			if (addresses[0].city) setValue("city", addresses[0].city ?? "");
+			if (addresses[0].region) setValue("region", addresses[0].region ?? "");
+			if (addresses[0].postalCode)
+				setValue("postalCode", mask.cep(addresses[0].postalCode ?? ""));
+		}
+	}, [location, addresses, setValue]);
+
+	// ─── Address helpers ──────────────────────────────────────────────────────
 
 	const handleAddressSelect = useCallback(
 		(fields: GoogleAddressFields) => {
@@ -209,7 +214,9 @@ export default function ManualComplaintScreen() {
 		[setValue],
 	);
 
-	const handlePickMedia = async () => {
+	// ─── Gallery ─────────────────────────────────────────────────────────────
+
+	const handlePickGallery = async () => {
 		const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
 		if (!perm.granted) {
 			toast.error(
@@ -218,110 +225,91 @@ export default function ManualComplaintScreen() {
 			);
 			return;
 		}
-
 		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ["images", "videos"],
 			allowsMultipleSelection: true,
 			quality: 0.85,
 			orderedSelection: true,
 		});
-
 		if (!result.canceled) {
-			setSelectedAssets(prev => {
-				const existingUris = new Set(prev.map(a => a.uri));
-				const toAdd = result.assets.filter(a => !existingUris.has(a.uri));
-				return [...prev, ...toAdd];
-			});
+			const existingUris = new Set(
+				attachments.map(a => a.uri).filter(Boolean),
+			);
+			for (const asset of result.assets) {
+				if (existingUris.has(asset.uri)) continue;
+				addAttachment({
+					id: asset.assetId ?? Crypto.randomUUID(),
+					source: "gallery",
+					mediaType: asset.type === "video" ? "video" : "photo",
+					uri: asset.uri,
+				});
+			}
 		}
 	};
 
-	const handleRemoveAsset = (uri: string) => {
-		setSelectedAssets(prev => prev.filter(a => a.uri !== uri));
-	};
+	// ─── Submit ───────────────────────────────────────────────────────────────
+
+	const localMedia: MediaItem[] = attachments
+		.filter(a => !!a.uri)
+		.map(a => ({ id: a.id, uri: a.uri as string, mediaType: a.mediaType }));
 
 	const onSubmit = handleSubmit(async data => {
-		setIsSubmitting(true);
-		try {
-			const [day, month, year] = data.date.split("/");
-			const [hour, minute] = data.time.split(":");
-			const eventDate = new Date(
-				`${year}-${month}-${day}T${hour}:${minute}:00`,
+		if (localMedia.length === 0) {
+			toast.warning(
+				"Adicione pelo menos uma mídia",
+				"Tire uma foto ou selecione da galeria.",
 			);
-
-			const res = await postV1ComplaintsManual({
-				body: {
-					date: eventDate.toISOString(),
-					type: data.type,
-					observations: data.observations?.trim() || null,
-					geospatial: {
-						heading: null,
-						location: {
-							coords: {
-								latitude: parseFloat(data.latitude),
-								longitude: parseFloat(data.longitude),
-								altitude: null,
-								accuracy: null,
-								altitudeAccuracy: null,
-								heading: null,
-								speed: null,
-							},
-							timestamp: eventDate.getTime(),
-						},
-						addresses: {
-							street: data.street,
-							streetNumber: data.streetNumber,
-							district: data.district,
-							city: data.city,
-							region: data.region,
-							postalCode: data.postalCode,
-							subregion: null,
-							country: "Brasil",
-							name: null,
-							isoCountryCode: "BR",
-							timezone: null,
-						},
-					},
-				},
-			});
-
-			const complaintId = res.data?.complaint.id;
-			const captureId = res.data?.complaint.captures[0]?.id;
-
-			if (complaintId && captureId && selectedAssets.length > 0) {
-				for (const asset of selectedAssets) {
-					const isPhoto = asset.type === "image";
-					const ext = isPhoto ? "jpg" : "mp4";
-					const formData = new FormData();
-					formData.append("file", {
-						uri: asset.uri,
-						name:
-							asset.fileName ?? `manual_${complaintId}_${Date.now()}.${ext}`,
-						type: isPhoto ? "image/jpeg" : "video/mp4",
-					} as unknown as Blob);
-					await postV1ComplaintsByIdCapturesByCaptureIdAttachments({
-						path: { id: complaintId, captureId },
-						body: formData as unknown as undefined,
-					});
-				}
-			}
-
-			await queryClient.invalidateQueries({ queryKey: COMPLAINTS_QUERY_KEY });
-			await queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
-
-			toast.success(
-				"Denúncia registrada",
-				"Sua denúncia manual foi enviada com sucesso.",
-			);
-			router.replace("/(tabs)/complaints");
-		} catch {
-			toast.error(
-				"Erro ao enviar",
-				"Não foi possível registrar a denúncia. Tente novamente.",
-			);
-		} finally {
-			setIsSubmitting(false);
+			return;
 		}
+
+		const geospatial: Geospatial = {
+			heading: heading
+				? {
+						trueHeading: heading.trueHeading,
+						magHeading: heading.magHeading,
+						accuracy: heading.accuracy,
+					}
+				: null,
+			location: {
+				coords: {
+					latitude: parseFloat(data.latitude),
+					longitude: parseFloat(data.longitude),
+					altitude: location?.coords.altitude ?? null,
+					accuracy: location?.coords.accuracy ?? null,
+					altitudeAccuracy: location?.coords.altitudeAccuracy ?? null,
+					heading: location?.coords.heading ?? null,
+					speed: location?.coords.speed ?? null,
+				},
+				timestamp: location?.timestamp ?? Date.now(),
+			},
+			addresses: {
+				city: data.city,
+				district: data.district,
+				streetNumber: data.streetNumber,
+				street: data.street,
+				region: data.region,
+				subregion: addresses[0]?.subregion ?? null,
+				country: addresses[0]?.country ?? null,
+				postalCode: data.postalCode,
+				name: addresses[0]?.name ?? null,
+				isoCountryCode: addresses[0]?.isoCountryCode ?? null,
+				timezone: addresses[0]?.timezone ?? null,
+				formattedAddress: addresses[0]?.formattedAddress ?? null,
+			},
+		};
+
+		await submitComplaint({
+			geospatial,
+			observations: data.observations?.trim() || null,
+			media: localMedia,
+		});
+
+		clearDraft();
+		reset();
+		router.replace("/(tabs)/complaints");
 	});
+
+	// ─── Render ───────────────────────────────────────────────────────────────
 
 	return (
 		<KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">
@@ -333,117 +321,17 @@ export default function ManualComplaintScreen() {
 				{/* Info card */}
 				<Card className="flex-row items-start gap-3 bg-gray-100 p-3 shadow-none">
 					<View className="size-10 items-center justify-center rounded-lg bg-lime-800">
-						<ShieldAlertIcon size={18} color={colors.white} strokeWidth={2.2} />
+						<ShieldAlertIcon
+							size={18}
+							color={colors.white}
+							strokeWidth={2.2}
+						/>
 					</View>
 					<Text className="flex-1 text-sm text-gray-600">
-						Use este formulário para registrar denúncias de eventos que já
-						ocorreram, informando o endereço e anexando fotos ou vídeos da sua
-						galeria.
+						Registre denúncias de descarte irregular informando o local e
+						anexando fotos ou vídeos como evidência.
 					</Text>
 				</Card>
-
-				{/* Tipo */}
-				<FormControl isInvalid={!!errors.type} className="gap-2">
-					<FormControlLabel>
-						<FormControlLabelText>Tipo da denúncia *</FormControlLabelText>
-					</FormControlLabel>
-					<Controller
-						control={control}
-						name="type"
-						render={({ field: { value, onChange } }) => (
-							<View className="flex-row flex-wrap gap-2">
-								{complaintTypeValues.map(opt => {
-									const isSelected = value === opt.value;
-									return (
-										<Pressable
-											key={opt.value}
-											className={`rounded-md border px-3 py-2 ${isSelected ? "border-lime-800 bg-lime-800" : "border-gray-200 bg-white"}`}
-											onPress={() => onChange(opt.value as ComplaintType)}
-										>
-											<Text
-												className={isSelected ? "text-white" : "text-gray-700"}
-											>
-												{opt.label}
-											</Text>
-										</Pressable>
-									);
-								})}
-							</View>
-						)}
-					/>
-					<Card className="shadow-none bg-lime-50 border-lime-800 p-2">
-						<Text className="text-sm text-lime-900">
-							{
-								complaintTypeValues.find(o => o.value === selectedType)
-									?.description
-							}
-						</Text>
-					</Card>
-					{errors.type?.message && (
-						<FormControlError>
-							<FormControlErrorText>{errors.type.message}</FormControlErrorText>
-						</FormControlError>
-					)}
-				</FormControl>
-
-				{/* Data e hora */}
-				<View className="flex-row gap-3">
-					<FormControl isInvalid={!!errors.date} className="flex-1 gap-1">
-						<FormControlLabel>
-							<FormControlLabelText>Data do ocorrido *</FormControlLabelText>
-						</FormControlLabel>
-						<Controller
-							control={control}
-							name="date"
-							render={({ field: { value, onChange } }) => (
-								<Input>
-									<InputField
-										placeholder="DD/MM/AAAA"
-										keyboardType="numeric"
-										value={value}
-										onChangeText={v => onChange(maskDate(v))}
-										maxLength={10}
-									/>
-								</Input>
-							)}
-						/>
-						{errors.date?.message && (
-							<FormControlError>
-								<FormControlErrorText>
-									{errors.date.message}
-								</FormControlErrorText>
-							</FormControlError>
-						)}
-					</FormControl>
-
-					<FormControl isInvalid={!!errors.time} className="w-28 gap-1">
-						<FormControlLabel>
-							<FormControlLabelText>Hora *</FormControlLabelText>
-						</FormControlLabel>
-						<Controller
-							control={control}
-							name="time"
-							render={({ field: { value, onChange } }) => (
-								<Input>
-									<InputField
-										placeholder="HH:MM"
-										keyboardType="numeric"
-										value={value}
-										onChangeText={v => onChange(maskTime(v))}
-										maxLength={5}
-									/>
-								</Input>
-							)}
-						/>
-						{errors.time?.message && (
-							<FormControlError>
-								<FormControlErrorText>
-									{errors.time.message}
-								</FormControlErrorText>
-							</FormControlError>
-						)}
-					</FormControl>
-				</View>
 
 				{/* Observações */}
 				<FormControl isInvalid={!!errors.observations} className="gap-1">
@@ -476,18 +364,17 @@ export default function ManualComplaintScreen() {
 					)}
 				</FormControl>
 
-				{/* Seção de endereço */}
+				{/* Localização */}
 				<View className="gap-1 pt-1">
 					<Heading size="md">Localização do ocorrido</Heading>
 					<Text className="text-sm text-gray-500">
-						Busque pelo endereço ou toque no mapa, ambas ações preenchem o
-						endereço automaticamente.
+						Preenchido automaticamente pela sua localização. Ajuste pelo mapa,
+						busca de endereço ou CEP se necessário.
 					</Text>
 				</View>
 
 				<GooglePlacesInput onSelect={handleAddressSelect} />
 
-				{/* Mapa */}
 				<WrapperMap
 					latitude={latValue ? parseFloat(latValue) : null}
 					longitude={lonValue ? parseFloat(lonValue) : null}
@@ -577,7 +464,10 @@ export default function ManualComplaintScreen() {
 						)}
 					</FormControl>
 
-					<FormControl isInvalid={!!errors.streetNumber} className="w-24 gap-1">
+					<FormControl
+						isInvalid={!!errors.streetNumber}
+						className="w-24 gap-1"
+					>
 						<FormControlLabel>
 							<FormControlLabelText>Nº *</FormControlLabelText>
 						</FormControlLabel>
@@ -689,7 +579,9 @@ export default function ManualComplaintScreen() {
 					/>
 					{errors.city?.message && (
 						<FormControlError>
-							<FormControlErrorText>{errors.city.message}</FormControlErrorText>
+							<FormControlErrorText>
+								{errors.city.message}
+							</FormControlErrorText>
 						</FormControlError>
 					)}
 				</FormControl>
@@ -698,67 +590,98 @@ export default function ManualComplaintScreen() {
 				<View className="gap-2 pt-1">
 					<Heading size="md">Fotos e vídeos</Heading>
 					<Text className="text-sm text-gray-500">
-						Selecione as imagens ou vídeos da galeria que registram o ocorrido.
+						Capture pela câmera ou selecione da galeria. Ao menos uma mídia é
+						obrigatória.
 					</Text>
 
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						contentContainerClassName="gap-2 py-2"
-						nestedScrollEnabled
-						keyboardShouldPersistTaps="always"
-					>
-						<Pressable
-							onPress={handlePickMedia}
-							className="items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50"
-							style={{ width: 80, height: 80 }}
+					<View className="flex-row gap-2">
+						<Button
+							variant="outline"
+							className="flex-1"
+							onPress={() =>
+								router.push("/(tabs)/complaints/(create)/camera")
+							}
+							isDisabled={isPending}
 						>
-							<Camera size={24} color={colors.gray[400]} />
-						</Pressable>
+							<ButtonIcon as={Camera} />
+							<ButtonText>Câmera</ButtonText>
+						</Button>
+						<Button
+							variant="outline"
+							className="flex-1"
+							onPress={handlePickGallery}
+							isDisabled={isPending}
+						>
+							<ButtonIcon as={ImageIcon} />
+							<ButtonText>Galeria</ButtonText>
+						</Button>
+					</View>
 
-						{selectedAssets.map(asset => (
-							<View
-								key={asset.uri}
-								className="relative"
-								style={{ width: 80, height: 80 }}
-							>
-								<View className="flex-1 overflow-hidden rounded-xl">
-									<MediaThumbnail
-										mediaType={asset.type === "video" ? "video" : "photo"}
-										uri={asset.uri}
-										fallbackLabel={asset.type === "video" ? "VÍD" : "IMG"}
-									/>
-								</View>
-								<TouchableOpacity
-									className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
-									onPress={() => handleRemoveAsset(asset.uri)}
-								>
-									<X size={12} color={colors.white} strokeWidth={2.5} />
-								</TouchableOpacity>
-							</View>
-						))}
-					</ScrollView>
+					{attachments.length > 0 && (
+						<ScrollView
+							horizontal
+							showsHorizontalScrollIndicator={false}
+							contentContainerClassName="gap-2 py-2"
+							nestedScrollEnabled
+							keyboardShouldPersistTaps="always"
+						>
+							{attachments.map(attachment => {
+								const uri = attachment.uri ?? attachment.url;
+								if (!uri) return null;
+								return (
+									<View
+										key={attachment.id}
+										className="relative"
+										style={{ width: 80, height: 80 }}
+									>
+										<TouchableOpacity
+											activeOpacity={0.85}
+											onPress={() =>
+												router.push({
+													pathname: "/(tabs)/complaints/(create)/preview",
+													params: { id: attachment.id },
+												})
+											}
+											className="flex-1 overflow-hidden rounded-xl"
+										>
+											<MediaThumbnail
+												mediaType={attachment.mediaType}
+												uri={uri}
+												fallbackLabel={
+													attachment.mediaType === "video" ? "VÍD" : "IMG"
+												}
+											/>
+										</TouchableOpacity>
+										<TouchableOpacity
+											className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
+											onPress={() => removeAttachment(attachment.id)}
+										>
+											<X size={12} color={colors.white} strokeWidth={2.5} />
+										</TouchableOpacity>
+									</View>
+								);
+							})}
+						</ScrollView>
+					)}
 				</View>
 
-				{/* Actions */}
+				{/* Ações */}
 				<View className="flex-row gap-3 pt-2">
 					<Button
 						variant="outline"
 						className="flex-1"
 						onPress={() => router.back()}
-						disabled={isSubmitting}
+						isDisabled={isPending}
 					>
 						<ButtonText>Cancelar</ButtonText>
 					</Button>
 					<Button
 						className="flex-1 bg-lime-800"
 						onPress={onSubmit}
-						disabled={isSubmitting}
+						isDisabled={isPending}
 					>
-						<ButtonText className="text-white">
-							{isSubmitting ? "Enviando…" : "Enviar denúncia"}
-						</ButtonText>
-						{isSubmitting && <ButtonSpinner />}
+						<ButtonText className="text-white">Enviar denúncia</ButtonText>
+						{isPending && <ButtonSpinner />}
 					</Button>
 				</View>
 			</ScrollView>

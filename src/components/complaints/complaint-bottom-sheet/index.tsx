@@ -180,21 +180,17 @@ export function ComplaintBottomSheet() {
 
 	const typeInfo = complaintTypeValues.find(t => t.value === complaint.type);
 	const resolutions = resolutionsData?.resolutions ?? [];
-	const isManual = complaint.complaint_method === "MANUAL";
 
-	const attachmentObservationMap: Record<string, string | null> = isManual
-		? {}
-		: Object.fromEntries(
-				complaint.captures.flatMap(c =>
-					c.attachments.map(a => [a.id, c.observations]),
-				),
-			);
+	const attachmentObservationMap: Record<string, string | null> =
+		Object.fromEntries(
+			complaint.attachments.map(a => [a.id, complaint.observations]),
+		);
 
 	const selectedObservation = selectedAttachmentId
 		? (attachmentObservationMap[selectedAttachmentId] ?? null)
 		: null;
 
-	const allAttachments = complaint.captures.flatMap(c => c.attachments);
+	const allAttachments = complaint.attachments;
 	const address = getAddress(complaint);
 	const dateLabel = format(
 		new Date(complaint.created_at),
@@ -391,7 +387,7 @@ export function ComplaintBottomSheet() {
 								</View>
 							)}
 
-							{isManual && complaint.observations && (
+							{complaint.observations && (
 								<Text className="leading-5 text-gray-600">
 									{complaint.observations}
 								</Text>
@@ -411,15 +407,14 @@ export function ComplaintBottomSheet() {
 									contentContainerClassName="gap-2"
 								>
 									{allAttachments.map(att => {
-										const isSelected =
-											!isManual && selectedAttachmentId === att.id;
+										const isSelected = selectedAttachmentId === att.id;
 										return (
 											<TouchableOpacity
 												key={att.id}
 												activeOpacity={0.85}
 												onPress={() => {
 													setPreviewAttachment(att);
-													if (!isManual) setSelectedAttachmentId(att.id);
+													setSelectedAttachmentId(att.id);
 												}}
 												className="h-[110px] w-[110px] overflow-hidden rounded-lg bg-gray-100"
 												style={
@@ -448,16 +443,14 @@ export function ComplaintBottomSheet() {
 								</ScrollView>
 							)}
 
-							{!isManual && (
-								<View className="gap-1">
-									<Heading size="sm">Observações</Heading>
-									<Text
-										className={`leading-5 ${selectedObservation ? "text-gray-600" : "text-gray-400"}`}
-									>
-										{selectedObservation ?? "Sem observações complementares"}
-									</Text>
-								</View>
-							)}
+							<View className="gap-1">
+								<Heading size="sm">Observações</Heading>
+								<Text
+									className={`leading-5 ${selectedObservation ? "text-gray-600" : "text-gray-400"}`}
+								>
+									{selectedObservation ?? "Sem observações complementares"}
+								</Text>
+							</View>
 
 							<Divider />
 

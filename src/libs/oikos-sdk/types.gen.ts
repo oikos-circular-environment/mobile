@@ -1286,89 +1286,52 @@ export type GetV1ComplaintsResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
+			date: Date;
 			observations: string | null;
-			captures: Array<{
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
+			attachments: Array<{
 				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
 			vote_counts: {
@@ -1395,7 +1358,7 @@ export type PostV1ComplaintsData = {
 				trueHeading: number;
 				magHeading: number;
 				accuracy: number;
-			};
+			} | null;
 			location: {
 				coords: {
 					latitude: number;
@@ -1439,14 +1402,6 @@ export type PostV1ComplaintsErrors = {
 		code: string;
 		statusCode: number;
 	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
 };
 
 export type PostV1ComplaintsError =
@@ -1461,89 +1416,52 @@ export type PostV1ComplaintsResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
+			date: Date;
 			observations: string | null;
-			captures: Array<{
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
+			attachments: Array<{
 				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
 			vote_counts: {
@@ -1621,93 +1539,56 @@ export type GetV1ComplaintsMapResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
+			date: Date;
 			observations: string | null;
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
 			location: {
 				lat: number;
 				lon: number;
 			} | null;
-			captures: Array<{
+			attachments: Array<{
 				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
 			vote_counts: {
@@ -1763,93 +1644,56 @@ export type GetV1ComplaintsByIdPublicResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
+			date: Date;
 			observations: string | null;
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
 			location: {
 				lat: number;
 				lon: number;
 			} | null;
-			captures: Array<{
+			attachments: Array<{
 				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
 			vote_counts: {
@@ -1929,89 +1773,52 @@ export type GetV1ComplaintsByIdResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
+			date: Date;
 			observations: string | null;
-			captures: Array<{
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
+			attachments: Array<{
 				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
 			vote_counts: {
@@ -2029,7 +1836,43 @@ export type GetV1ComplaintsByIdResponse =
 
 export type PatchV1ComplaintsByIdData = {
 	body: {
+		date?: unknown;
+		type?: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 		observations?: string | null;
+		geospatial?: {
+			heading: {
+				trueHeading: number;
+				magHeading: number;
+				accuracy: number;
+			} | null;
+			location: {
+				coords: {
+					latitude: number;
+					longitude: number;
+					altitude: number | null;
+					accuracy: number | null;
+					altitudeAccuracy: number | null;
+					heading: number | null;
+					speed: number | null;
+				};
+				timestamp: number;
+				mocked?: boolean;
+			};
+			addresses: {
+				city: string | null;
+				district: string | null;
+				streetNumber: string | null;
+				street: string | null;
+				region: string | null;
+				subregion: string | null;
+				country: string | null;
+				postalCode: string | null;
+				name: string | null;
+				isoCountryCode: string | null;
+				timezone: string | null;
+				formattedAddress?: string | null;
+			};
+		};
 	};
 	path: {
 		id: string;
@@ -2069,89 +1912,52 @@ export type PatchV1ComplaintsByIdResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
+			date: Date;
 			observations: string | null;
-			captures: Array<{
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
+			attachments: Array<{
 				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
 			vote_counts: {
@@ -2166,176 +1972,6 @@ export type PatchV1ComplaintsByIdResponses = {
 
 export type PatchV1ComplaintsByIdResponse =
 	PatchV1ComplaintsByIdResponses[keyof PatchV1ComplaintsByIdResponses];
-
-export type PostV1ComplaintsManualData = {
-	body: {
-		date: unknown;
-		type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-		observations?: string | null;
-		geospatial: {
-			heading: null;
-			location: {
-				coords: {
-					latitude: number;
-					longitude: number;
-					altitude: number | null;
-					accuracy: number | null;
-					altitudeAccuracy: number | null;
-					heading: number | null;
-					speed: number | null;
-				};
-				timestamp: number;
-				mocked?: boolean;
-			};
-			addresses: {
-				city: string;
-				district: string;
-				streetNumber: string;
-				street: string;
-				region: string;
-				subregion: string | null;
-				country: string | null;
-				postalCode: string;
-				name: string | null;
-				isoCountryCode: string | null;
-				timezone: string | null;
-				formattedAddress?: string | null;
-			};
-		};
-	};
-	path?: never;
-	query?: never;
-	url: "/v1/complaints/manual";
-};
-
-export type PostV1ComplaintsManualErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PostV1ComplaintsManualError =
-	PostV1ComplaintsManualErrors[keyof PostV1ComplaintsManualErrors];
-
-export type PostV1ComplaintsManualResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		complaint: {
-			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
-			observations: string | null;
-			captures: Array<{
-				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
-				created_at: Date;
-			}>;
-			vote_counts: {
-				resolved: number;
-				not_resolved: number;
-			};
-			resolution_count: number;
-			created_at: Date;
-		};
-	};
-};
-
-export type PostV1ComplaintsManualResponse =
-	PostV1ComplaintsManualResponses[keyof PostV1ComplaintsManualResponses];
 
 export type PatchV1ComplaintsByIdResolvedData = {
 	body: {
@@ -2388,89 +2024,52 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
+			date: Date;
 			observations: string | null;
-			captures: Array<{
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
+			attachments: Array<{
 				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
 			vote_counts: {
@@ -2485,6 +2084,107 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 
 export type PatchV1ComplaintsByIdResolvedResponse =
 	PatchV1ComplaintsByIdResolvedResponses[keyof PatchV1ComplaintsByIdResolvedResponses];
+
+export type PatchV1ComplaintsByIdCanceledData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/canceled";
+};
+
+export type PatchV1ComplaintsByIdCanceledErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PatchV1ComplaintsByIdCanceledError =
+	PatchV1ComplaintsByIdCanceledErrors[keyof PatchV1ComplaintsByIdCanceledErrors];
+
+export type PatchV1ComplaintsByIdCanceledResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		complaint: {
+			id: string;
+			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
+			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			date: Date;
+			observations: string | null;
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
+			attachments: Array<{
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
+				created_at: Date;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
+			created_at: Date;
+		};
+	};
+};
+
+export type PatchV1ComplaintsByIdCanceledResponse =
+	PatchV1ComplaintsByIdCanceledResponses[keyof PatchV1ComplaintsByIdCanceledResponses];
 
 export type DeleteV1ComplaintsByIdVotesData = {
 	body?: never;
@@ -2941,155 +2641,16 @@ export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses 
 export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponse =
 	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses[keyof DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses];
 
-export type PatchV1ComplaintsByIdCanceledData = {
+export type PostV1ComplaintsByIdAttachmentsData = {
 	body?: never;
 	path: {
 		id: string;
 	};
 	query?: never;
-	url: "/v1/complaints/{id}/canceled";
+	url: "/v1/complaints/{id}/attachments";
 };
 
-export type PatchV1ComplaintsByIdCanceledErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PatchV1ComplaintsByIdCanceledError =
-	PatchV1ComplaintsByIdCanceledErrors[keyof PatchV1ComplaintsByIdCanceledErrors];
-
-export type PatchV1ComplaintsByIdCanceledResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		complaint: {
-			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
-			observations: string | null;
-			captures: Array<{
-				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
-				created_at: Date;
-			}>;
-			vote_counts: {
-				resolved: number;
-				not_resolved: number;
-			};
-			resolution_count: number;
-			created_at: Date;
-		};
-	};
-};
-
-export type PatchV1ComplaintsByIdCanceledResponse =
-	PatchV1ComplaintsByIdCanceledResponses[keyof PatchV1ComplaintsByIdCanceledResponses];
-
-export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsData = {
-	body?: never;
-	path: {
-		id: string;
-		captureId: string;
-	};
-	query?: never;
-	url: "/v1/complaints/{id}/captures/{captureId}/attachments";
-};
-
-export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors = {
+export type PostV1ComplaintsByIdAttachmentsErrors = {
 	/**
 	 * Default Response
 	 */
@@ -3117,14 +2678,6 @@ export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors = {
 	/**
 	 * Default Response
 	 */
-	409: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
 	500: {
 		message: string;
 		code: string;
@@ -3132,10 +2685,10 @@ export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors = {
 	};
 };
 
-export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsError =
-	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors[keyof PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsErrors];
+export type PostV1ComplaintsByIdAttachmentsError =
+	PostV1ComplaintsByIdAttachmentsErrors[keyof PostV1ComplaintsByIdAttachmentsErrors];
 
-export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses = {
+export type PostV1ComplaintsByIdAttachmentsResponses = {
 	/**
 	 * Default Response
 	 */
@@ -3144,89 +2697,52 @@ export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses = {
 			id: string;
 			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			complaint_method: "AUTOMATIC" | "MANUAL";
+			date: Date;
 			observations: string | null;
-			captures: Array<{
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
+			attachments: Array<{
 				id: string;
-				date: Date;
-				observations: string | null;
-				geospatial:
-					| {
-							heading: {
-								trueHeading: number;
-								magHeading: number;
-								accuracy: number;
-							};
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string | null;
-								district: string | null;
-								streetNumber: string | null;
-								street: string | null;
-								region: string | null;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string | null;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  }
-					| {
-							heading: null;
-							location: {
-								coords: {
-									latitude: number;
-									longitude: number;
-									altitude: number | null;
-									accuracy: number | null;
-									altitudeAccuracy: number | null;
-									heading: number | null;
-									speed: number | null;
-								};
-								timestamp: number;
-								mocked?: boolean;
-							};
-							addresses: {
-								city: string;
-								district: string;
-								streetNumber: string;
-								street: string;
-								region: string;
-								subregion: string | null;
-								country: string | null;
-								postalCode: string;
-								name: string | null;
-								isoCountryCode: string | null;
-								timezone: string | null;
-								formattedAddress?: string | null;
-							};
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					path: string;
-					base64: string;
-					metadata: {
-						[key: string]: unknown;
-					} | null;
-					type: "PHOTO" | "VIDEO";
-					created_at: Date;
-				}>;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
 			vote_counts: {
@@ -3239,8 +2755,8 @@ export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses = {
 	};
 };
 
-export type PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponse =
-	PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses[keyof PostV1ComplaintsByIdCapturesByCaptureIdAttachmentsResponses];
+export type PostV1ComplaintsByIdAttachmentsResponse =
+	PostV1ComplaintsByIdAttachmentsResponses[keyof PostV1ComplaintsByIdAttachmentsResponses];
 
 export type GetV1MarketData = {
 	body?: never;

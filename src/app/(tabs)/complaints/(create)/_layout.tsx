@@ -1,19 +1,21 @@
 import { Stack } from "expo-router";
+import { ComplaintCreationProvider } from "@/contexts/complaint-creation-context";
 
 export default function ComplaintsCreateStackLayout() {
 	return (
-		<Stack>
-			<Stack.Screen name="camera" options={{ headerShown: false }} />
-			<Stack.Screen name="manual" options={{ headerShown: false }} />
-			<Stack.Screen name="review" options={{ headerShown: false }} />
-			<Stack.Screen
-				name="preview"
-				options={{
-					headerShown: false,
-					presentation: "fullScreenModal",
-					animation: "fade",
-				}}
-			/>
-		</Stack>
+		<ComplaintCreationProvider>
+			<Stack>
+				<Stack.Screen name="index" options={{ headerShown: false }} />
+				<Stack.Screen name="camera" options={{ headerShown: false }} />
+				<Stack.Screen
+					name="preview"
+					options={{
+						headerShown: false,
+						presentation: "fullScreenModal",
+						animation: "fade",
+					}}
+				/>
+			</Stack>
+		</ComplaintCreationProvider>
 	);
 }

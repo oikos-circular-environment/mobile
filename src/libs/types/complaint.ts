@@ -55,6 +55,14 @@ export const complaintTypeValues: ValueMapping<ComplaintType>[] = [
 
 export type ComplaintCaptureMode = "photo" | "video";
 
+export type DraftAttachment = {
+	id: string;
+	mediaType: "photo" | "video";
+	source: "camera" | "gallery" | "api";
+	uri?: string;
+	url?: string;
+};
+
 export type CameraCapturedVideo =
 	| {
 			uri: string;
@@ -119,7 +127,7 @@ export type Geospatial = {
 		trueHeading: number;
 		magHeading: number;
 		accuracy: number;
-	};
+	} | null;
 	location: {
 		coords: {
 			latitude: number;

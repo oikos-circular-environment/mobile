@@ -1,7 +1,6 @@
 import type { MapComplaint } from "@/libs/types/complaint";
 
-export type Attachment =
-	MapComplaint["captures"][number]["attachments"][number];
+export type Attachment = MapComplaint["attachments"][number];
 
 export function haversineKm(
 	lat1: number,
@@ -25,9 +24,9 @@ export function formatDistance(km: number): string {
 }
 
 export function getAddress(complaint: MapComplaint): string | null {
-	const geo = complaint.captures[0]?.geospatial;
-	if (!geo) return null;
-	const { street, streetNumber, district } = geo.addresses;
-	const streetPart = [street, streetNumber].filter(Boolean).join(", ");
-	return [streetPart, district].filter(Boolean).join(" — ") || null;
+	const { addresses } = complaint.geospatial;
+	const streetPart = [addresses.street, addresses.streetNumber]
+		.filter(Boolean)
+		.join(", ");
+	return [streetPart, addresses.district].filter(Boolean).join(" — ") || null;
 }

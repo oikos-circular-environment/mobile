@@ -394,7 +394,7 @@ export default function ComplaintsMapScreen() {
 							setShowAuthModal(true);
 							return;
 						}
-						router.push("/(tabs)/complaints/(create)/camera");
+						router.push("/(tabs)/complaints/(create)");
 					}}
 					className="h-[50px] w-[50px] items-center justify-center rounded-[14px] bg-lime-800"
 					style={{

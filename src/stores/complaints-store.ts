@@ -3,7 +3,7 @@ import type {
 	GetV1ComplaintsDashboardResponse,
 	GetV1ComplaintsResponse,
 } from "@/libs/oikos-sdk";
-import type { ComplaintCapture, MapComplaint } from "@/libs/types/complaint";
+import type { MapComplaint } from "@/libs/types/complaint";
 
 export type ApiComplaint =
 	NonNullable<GetV1ComplaintsResponse>["complaints"][number];
@@ -27,24 +27,6 @@ type ListActions = {
 	setDashboard: (dashboard: ComplaintDashboard) => void;
 	setActiveFilter: (status: ApiComplaintStatus | null) => void;
 	shiftComplaintStatus: (id: string, newStatus: ApiComplaintStatus) => void;
-};
-
-// ─── Create Draft Slice ───────────────────────────────────────────────────────
-
-type DraftState = {
-	draftCaptures: ComplaintCapture[];
-	selectedCaptureId: string;
-};
-
-type DraftActions = {
-	addCapture: (capture: ComplaintCapture) => void;
-	updateCapture: (
-		captureId: string,
-		payload: Partial<Pick<ComplaintCapture, "observation" | "type">>,
-	) => void;
-	deleteCapture: (captureId: string) => void;
-	clearDraft: () => void;
-	setSelectedCaptureId: (id: string) => void;
 };
 
 // ─── Map Votes Slice ─────────────────────────────────────────────────────────
@@ -95,8 +77,6 @@ type ResolutionDraftActions = {
 
 type ComplaintsStoreState = ListState &
 	ListActions &
-	DraftState &
-	DraftActions &
 	MapVotesState &
 	MapVotesActions &
 	MapSelectionState &
@@ -156,41 +136,6 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 		});
 	},
 
-	// ── Create Draft ──
-	draftCaptures: [],
-	selectedCaptureId: "",
-
-	addCapture: capture =>
-		set(state => ({
-			draftCaptures: [capture, ...state.draftCaptures],
-			selectedCaptureId: capture.id,
-		})),
-
-	updateCapture: (captureId, payload) =>
-		set(state => ({
-			draftCaptures: state.draftCaptures.map(c =>
-				c.id === captureId
-					? { ...c, ...payload, updated_at: new Date().toISOString() }
-					: c,
-			),
-		})),
-
-	deleteCapture: captureId =>
-		set(state => {
-			const updated = state.draftCaptures.filter(c => c.id !== captureId);
-			const stillSelected = updated.some(c => c.id === state.selectedCaptureId);
-			return {
-				draftCaptures: updated,
-				selectedCaptureId: stillSelected
-					? state.selectedCaptureId
-					: (updated[0]?.id ?? ""),
-			};
-		}),
-
-	clearDraft: () => set({ draftCaptures: [], selectedCaptureId: "" }),
-
-	setSelectedCaptureId: id => set({ selectedCaptureId: id }),
-
 	// ── Map Votes ──
 	userVotes: {},
 
@@ -237,13 +182,4 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 export const selectFilteredComplaints = (state: ComplaintsStoreState) => {
 	if (!state.activeFilter) return state.complaints;
 	return state.complaints.filter(c => c.status === state.activeFilter);
-};
-
-export const selectSelectedCapture = (state: ComplaintsStoreState) => {
-	if (state.draftCaptures.length === 0) return null;
-	return (
-		state.draftCaptures.find(c => c.id === state.selectedCaptureId) ??
-		state.draftCaptures[0] ??
-		null
-	);
 };

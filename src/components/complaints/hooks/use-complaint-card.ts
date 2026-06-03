@@ -22,9 +22,9 @@ export function useComplaintCard(complaint: ApiComplaint) {
 		onError: () => toast.error("Erro", "Não foi possível cancelar a denúncia."),
 	});
 
-	const coords = complaint.captures[0]?.geospatial.location.coords;
-	const latitude = coords?.latitude ?? 0;
-	const longitude = coords?.longitude ?? 0;
+	const coords = complaint.geospatial.location.coords;
+	const latitude = coords.latitude;
+	const longitude = coords.longitude;
 
 	const mapsUrl =
 		Platform.OS === "ios"
