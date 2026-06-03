@@ -186,10 +186,6 @@ export function ComplaintBottomSheet() {
 			complaint.attachments.map(a => [a.id, complaint.observations]),
 		);
 
-	const selectedObservation = selectedAttachmentId
-		? (attachmentObservationMap[selectedAttachmentId] ?? null)
-		: null;
-
 	const allAttachments = complaint.attachments;
 	const address = getAddress(complaint);
 	const dateLabel = format(
@@ -388,9 +384,12 @@ export function ComplaintBottomSheet() {
 							)}
 
 							{complaint.observations && (
-								<Text className="leading-5 text-gray-600">
-									{complaint.observations}
-								</Text>
+								<View className="gap-1">
+									<Heading size="sm">Observações</Heading>
+									<Text className="leading-5 text-gray-600">
+										{complaint.observations}
+									</Text>
+								</View>
 							)}
 
 							<HStack className="gap-2">
@@ -442,15 +441,6 @@ export function ComplaintBottomSheet() {
 									})}
 								</ScrollView>
 							)}
-
-							<View className="gap-1">
-								<Heading size="sm">Observações</Heading>
-								<Text
-									className={`leading-5 ${selectedObservation ? "text-gray-600" : "text-gray-400"}`}
-								>
-									{selectedObservation ?? "Sem observações complementares"}
-								</Text>
-							</View>
 
 							<Divider />
 

@@ -2,12 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as Crypto from "expo-crypto";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import {
-	Camera,
-	ImageIcon,
-	ShieldAlertIcon,
-	X,
-} from "lucide-react-native";
+import { Camera, ImageIcon, ShieldAlertIcon, X } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -232,9 +227,7 @@ export default function ComplaintCreateScreen() {
 			orderedSelection: true,
 		});
 		if (!result.canceled) {
-			const existingUris = new Set(
-				attachments.map(a => a.uri).filter(Boolean),
-			);
+			const existingUris = new Set(attachments.map(a => a.uri).filter(Boolean));
 			for (const asset of result.assets) {
 				if (existingUris.has(asset.uri)) continue;
 				addAttachment({
@@ -321,48 +314,13 @@ export default function ComplaintCreateScreen() {
 				{/* Info card */}
 				<Card className="flex-row items-start gap-3 bg-gray-100 p-3 shadow-none">
 					<View className="size-10 items-center justify-center rounded-lg bg-lime-800">
-						<ShieldAlertIcon
-							size={18}
-							color={colors.white}
-							strokeWidth={2.2}
-						/>
+						<ShieldAlertIcon size={18} color={colors.white} strokeWidth={2.2} />
 					</View>
 					<Text className="flex-1 text-sm text-gray-600">
 						Registre denúncias de descarte irregular informando o local e
 						anexando fotos ou vídeos como evidência.
 					</Text>
 				</Card>
-
-				{/* Observações */}
-				<FormControl isInvalid={!!errors.observations} className="gap-1">
-					<FormControlLabel>
-						<FormControlLabelText>Observações</FormControlLabelText>
-					</FormControlLabel>
-					<Controller
-						control={control}
-						name="observations"
-						render={({ field: { value, onChange } }) => (
-							<Input className="min-h-20">
-								<InputField
-									multiline
-									textAlignVertical="top"
-									numberOfLines={3}
-									maxLength={500}
-									placeholder="Descreva o ocorrido com detalhes relevantes..."
-									value={value}
-									onChangeText={onChange}
-								/>
-							</Input>
-						)}
-					/>
-					{errors.observations?.message && (
-						<FormControlError>
-							<FormControlErrorText>
-								{errors.observations.message}
-							</FormControlErrorText>
-						</FormControlError>
-					)}
-				</FormControl>
 
 				{/* Localização */}
 				<View className="gap-1 pt-1">
@@ -464,10 +422,7 @@ export default function ComplaintCreateScreen() {
 						)}
 					</FormControl>
 
-					<FormControl
-						isInvalid={!!errors.streetNumber}
-						className="w-24 gap-1"
-					>
+					<FormControl isInvalid={!!errors.streetNumber} className="w-24 gap-1">
 						<FormControlLabel>
 							<FormControlLabelText>Nº *</FormControlLabelText>
 						</FormControlLabel>
@@ -579,9 +534,7 @@ export default function ComplaintCreateScreen() {
 					/>
 					{errors.city?.message && (
 						<FormControlError>
-							<FormControlErrorText>
-								{errors.city.message}
-							</FormControlErrorText>
+							<FormControlErrorText>{errors.city.message}</FormControlErrorText>
 						</FormControlError>
 					)}
 				</FormControl>
@@ -598,9 +551,7 @@ export default function ComplaintCreateScreen() {
 						<Button
 							variant="outline"
 							className="flex-1"
-							onPress={() =>
-								router.push("/(tabs)/complaints/(create)/camera")
-							}
+							onPress={() => router.push("/(tabs)/complaints/(create)/camera")}
 							isDisabled={isPending}
 						>
 							<ButtonIcon as={Camera} />
@@ -664,6 +615,37 @@ export default function ComplaintCreateScreen() {
 						</ScrollView>
 					)}
 				</View>
+
+				{/* Observações */}
+				<FormControl isInvalid={!!errors.observations} className="gap-1">
+					<FormControlLabel>
+						<FormControlLabelText>Observações</FormControlLabelText>
+					</FormControlLabel>
+					<Controller
+						control={control}
+						name="observations"
+						render={({ field: { value, onChange } }) => (
+							<Input className="min-h-20">
+								<InputField
+									multiline
+									textAlignVertical="top"
+									numberOfLines={3}
+									maxLength={500}
+									placeholder="Descreva o ocorrido com detalhes relevantes..."
+									value={value}
+									onChangeText={onChange}
+								/>
+							</Input>
+						)}
+					/>
+					{errors.observations?.message && (
+						<FormControlError>
+							<FormControlErrorText>
+								{errors.observations.message}
+							</FormControlErrorText>
+						</FormControlError>
+					)}
+				</FormControl>
 
 				{/* Ações */}
 				<View className="flex-row gap-3 pt-2">
