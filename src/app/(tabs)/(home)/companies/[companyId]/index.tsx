@@ -15,7 +15,6 @@ import { Pressable, ScrollView, View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
-import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { Text } from "@/components/ui/text";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 
@@ -28,7 +27,7 @@ type CompanySetting = {
 
 export default function CompanyHubScreen() {
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
-	const { company, completionRate } = useUserCompanyContext();
+	const { company } = useUserCompanyContext();
 	const isCompanyRegistered = company != null;
 
 	const companyOptions: CompanySetting[] = [
@@ -87,15 +86,6 @@ export default function CompanyHubScreen() {
 				</Card>
 
 				<View className="gap-2">
-					<View className="flex-row items-center justify-between">
-						<Heading className="text-base">Informações cadastrais</Heading>
-						<Text className="text-xs">{completionRate}%</Text>
-					</View>
-
-					<Progress value={completionRate} className="h-2">
-						<ProgressFilledTrack className="bg-lime-500" />
-					</Progress>
-
 					<View className="gap-2 pt-1">
 						{companyOptions.map((option, index) => {
 							const isLocked = index !== 0 && !isCompanyRegistered;

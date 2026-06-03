@@ -39,20 +39,20 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 			<Card className="shadow-none gap-3">
 				<View className="flex-row items-center gap-3">
 					{company.avatar ? (
-						<View className="size-20 rounded-md bg-secondary items-center justify-center">
+						<View className="border border-gray-200 rounded-lg items-center justify-center">
 							<Image
 								source={{ uri: company.avatar.url }}
-								style={{ width: 48, height: 48, borderRadius: 8 }}
+								style={{ width: 64, height: 64, borderRadius: 8 }}
 								contentFit="contain"
 							/>
 						</View>
 					) : (
-						<View className="size-20 rounded-md bg-secondary items-center justify-center">
+						<View className="size-18 rounded-md bg-secondary items-center justify-center">
 							<FactoryIcon size={22} className="text-muted-foreground" />
 						</View>
 					)}
 
-					<View className="flex-1 gap-1">
+					<View className="flex-1 justify-center">
 						<Heading size="xl" className="font-semibold" numberOfLines={1}>
 							{company.business_name ?? company.corporate_name}
 						</Heading>

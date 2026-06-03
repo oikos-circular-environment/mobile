@@ -63,10 +63,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { getCnpj } from "@/libs/brasil-api-sdk";
-import { compressImage } from "@/libs/media-compression";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
-import { postV1Companies } from "@/libs/oikos-sdk";
-import { client } from "@/libs/oikos-sdk/client.gen";
+import { compressImage } from "@/libs/media-compression";
+import { postV1Companies, postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import {
 	companyTypeOptions,
 	identityTypeOptions,
@@ -136,8 +135,7 @@ export default function CompanyGeneralInfoScreen() {
 	const { user } = useAuthContext();
 	const [useProfileData, setUseProfileData] = useState(false);
 	const [avatarPreviewUri, setAvatarPreviewUri] = useState<string | null>(null);
-	const { company, isLoadingCompany, saveCompany, isSavingCompany } =
-		useUserCompanyContext();
+	const { company, isLoadingCompany, saveCompany } = useUserCompanyContext();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const isNewCompany = companyId === "new-company";
 	const queryClient = useQueryClient();
@@ -208,8 +206,10 @@ export default function CompanyGeneralInfoScreen() {
 			name: asset.fileName ?? "image.jpg",
 			type: "image/jpeg",
 		} as unknown as Blob);
-		await client.instance.post(`/v1/companies/${id}/avatar`, formData, {
-			headers: { "Content-Type": "multipart/form-data" },
+
+		await postV1CompaniesByIdAvatar({
+			path: { id },
+			body: formData as unknown as undefined,
 		});
 	};
 
@@ -270,7 +270,9 @@ export default function CompanyGeneralInfoScreen() {
 			setValue("identity_type", "CPF", { shouldDirty: true });
 			setValue("identity", mask.cpf(user.profile.cpf), { shouldDirty: true });
 			setValue("corporate_name", user.profile.full_name, { shouldDirty: true });
-			setValue("business_name", user.profile.display_name, { shouldDirty: true });
+			setValue("business_name", user.profile.display_name, {
+				shouldDirty: true,
+			});
 			if (user.profile.phone) {
 				setValue("phones", [mask.phoneBr(user.profile.phone), ""], {
 					shouldDirty: true,

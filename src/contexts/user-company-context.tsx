@@ -83,8 +83,6 @@ type UserCompanyContextValue = {
 	isLoadingWastes: boolean;
 	saveWastes: (payload: WastesPayload) => Promise<void>;
 	isSavingWastes: boolean;
-
-	completionRate: number;
 };
 
 const UserCompanyContext = createContext<UserCompanyContextValue | null>(null);
@@ -256,16 +254,6 @@ export function UserCompanyProvider({
 		},
 	});
 
-	const completionRate = useMemo(() => {
-		let rate = 0;
-		if (company != null) rate += 20;
-		if (addressData?.address != null) rate += 20;
-		if ((businessHoursData?.business_hours?.length ?? 0) > 0) rate += 20;
-		if ((servicesData?.services?.length ?? 0) > 0) rate += 20;
-		if ((wastesData?.wastes?.length ?? 0) > 0) rate += 20;
-		return rate;
-	}, [company, addressData, businessHoursData, servicesData, wastesData]);
-
 	const value = useMemo<UserCompanyContextValue>(
 		() => ({
 			company,
@@ -302,8 +290,6 @@ export function UserCompanyProvider({
 				await wastesMutation.mutateAsync(payload);
 			},
 			isSavingWastes: wastesMutation.isPending,
-
-			completionRate,
 		}),
 		[
 			company,
@@ -321,7 +307,6 @@ export function UserCompanyProvider({
 			wastesData,
 			isLoadingWastes,
 			wastesMutation,
-			completionRate,
 		],
 	);
 
