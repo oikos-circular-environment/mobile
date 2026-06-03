@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { format, parse, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Image } from "expo-image";
@@ -61,11 +61,13 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
-import { useUserCompanyContext } from "@/contexts/user-company-context";
+import { useCreateCompany } from "@/components/companies/hooks/use-create-company";
+import { useSaveCompany } from "@/components/companies/hooks/use-save-company";
+import { useCompaniesStore } from "@/stores/companies-store";
 import { getCnpj } from "@/libs/brasil-api-sdk";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
 import { compressImage } from "@/libs/media-compression";
-import { postV1Companies, postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
+import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import {
 	companyTypeOptions,
 	identityTypeOptions,
@@ -105,9 +107,6 @@ const companySchema = z
 			.enum(["ONG", "COMPANY", "GOVERNMENT", "COLLECTOR"])
 			.default("COMPANY"),
 		identity_type: z.enum(["CPF", "CNPJ"]).default("CNPJ"),
-		status: z.boolean(),
-		isHeadquarters: z.boolean(),
-		accept_appointments: z.boolean(),
 	})
 	.superRefine((data, ctx) => {
 		if (data.identity_type === "CNPJ") {
@@ -135,11 +134,13 @@ export default function CompanyGeneralInfoScreen() {
 	const { user } = useAuthContext();
 	const [useProfileData, setUseProfileData] = useState(false);
 	const [avatarPreviewUri, setAvatarPreviewUri] = useState<string | null>(null);
-	const { company, isLoadingCompany, saveCompany } = useUserCompanyContext();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const isNewCompany = companyId === "new-company";
-	const queryClient = useQueryClient();
+	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const isLoadingCompany = useCompaniesStore(s => !s.isLoaded);
 	const router = useRouter();
+	const { mutateAsync: createCompany, isPending: isCreating } = useCreateCompany();
+	const { mutateAsync: saveCompany, isPending: isSaving } = useSaveCompany(companyId);
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
 	const contentOpacity = useRef(new Animated.Value(0)).current;
 
@@ -149,7 +150,7 @@ export default function CompanyGeneralInfoScreen() {
 		reset,
 		setValue,
 		watch,
-		formState: { errors, isDirty, isSubmitting },
+		formState: { errors, isDirty },
 	} = useForm({
 		resolver: zodResolver(companySchema),
 		defaultValues: {
@@ -161,9 +162,6 @@ export default function CompanyGeneralInfoScreen() {
 			started_activity_in: new Date(),
 			company_type: "COMPANY" as const,
 			identity_type: "CNPJ" as const,
-			status: true,
-			isHeadquarters: true,
-			accept_appointments: false,
 		},
 	});
 
@@ -257,9 +255,6 @@ export default function CompanyGeneralInfoScreen() {
 					: null,
 				company_type: company.company_type,
 				identity_type: company.identity_type,
-				status: company.status,
-				isHeadquarters: company.is_headquarters,
-				accept_appointments: company.accept_appointments,
 			});
 			setUseProfileData(false);
 		}
@@ -284,30 +279,27 @@ export default function CompanyGeneralInfoScreen() {
 	const handleFormSubmit: SubmitHandler<CompanyFormData> = async data => {
 		const corporate_name = data.corporate_name;
 		const business_name =
-			data.identity_type === "CPF" ? data.corporate_name : data.business_name;
+			data.identity_type === "CPF"
+				? data.corporate_name
+				: data.business_name || data.corporate_name;
 
 		const payload = {
 			identity: data.identity,
 			identity_type: data.identity_type,
 			corporate_name,
-			business_name: business_name || null,
+			business_name,
 			email: data.email || null,
 			phones: data.phones.filter(p => !!p),
 			started_activity_in: data.started_activity_in,
 			company_type: data.company_type,
-			status: data.status,
-			is_headquarters: data.isHeadquarters,
-			accept_appointments: data.accept_appointments,
 		};
 
 		if (isNewCompany) {
-			const res = await postV1Companies({ body: payload });
+			const res = await createCompany({ ...payload, status: true });
 			const newId = res.data?.company?.id;
 			if (newId && selectedAsset.current) {
 				await uploadAvatar(newId, selectedAsset.current);
 			}
-			queryClient.invalidateQueries({ queryKey: ["companies"] });
-			toast.success("Empresa cadastrada com sucesso!");
 			router.replace({
 				pathname: "/(tabs)/(home)/companies/[companyId]",
 				params: { companyId: newId ?? "new-company" },
@@ -317,10 +309,11 @@ export default function CompanyGeneralInfoScreen() {
 			if (selectedAsset.current) {
 				await uploadAvatar(companyId, selectedAsset.current);
 				selectedAsset.current = null;
-				queryClient.invalidateQueries({ queryKey: ["companies"] });
 			}
 		}
 	};
+
+	const isSubmitting = isCreating || isSaving;
 
 	if (!isNewCompany && isLoadingCompany) {
 		return <CompanyFormSkeleton />;

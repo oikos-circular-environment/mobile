@@ -1,32 +1,11 @@
 import { Image } from "expo-image";
-import { FactoryIcon } from "lucide-react-native";
+import { AlertTriangleIcon, FactoryIcon } from "lucide-react-native";
 import { Pressable, View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import type { GetV1CompaniesResponses } from "@/libs/oikos-sdk";
-import { CompanyCountStats } from "./company-count-stats";
-
-type Company = GetV1CompaniesResponses[200]["companies"][number];
-
-function Badge({
-	label,
-	variant = "primary",
-}: {
-	label: string;
-	variant?: "primary" | "secondary";
-}) {
-	const cls =
-		variant === "primary"
-			? "bg-primary/10 px-2 py-0.5 rounded-md"
-			: "bg-gray-100 px-2 py-0.5 rounded-md";
-	const textCls = variant === "primary" ? "text-primary" : "text-gray-600";
-	return (
-		<View className={cls}>
-			<Text className={textCls}>{label}</Text>
-		</View>
-	);
-}
+import type { Company } from "@/stores/companies-store";
 
 interface CompanyCardProps {
 	company: Company;
@@ -52,7 +31,7 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 						</View>
 					)}
 
-					<View className="flex-1 justify-center">
+					<View className="flex-1 justify-center gap-1">
 						<Heading size="xl" className="font-semibold" numberOfLines={1}>
 							{company.business_name ?? company.corporate_name}
 						</Heading>
@@ -64,10 +43,38 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 						<Text className="text-muted-foreground" numberOfLines={1}>
 							{company.identity}
 						</Text>
+
+						<View className="flex-row gap-2 mt-1 flex-wrap">
+							<View
+								className={
+									company.status
+										? "bg-primary/10 px-2 py-0.5 rounded-md"
+										: "bg-gray-100 px-2 py-0.5 rounded-md"
+								}
+							>
+								<Text
+									className={`text-xs ${company.status ? "text-primary" : "text-gray-500"}`}
+								>
+									{company.status ? "Ativa" : "Inativa"}
+								</Text>
+							</View>
+
+							{!company.is_company_valid && (
+								<View className="flex-row items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md">
+									<AlertTriangleIcon
+										size={10}
+										color={colors.amber[600]}
+										strokeWidth={2}
+									/>
+									<Text className="text-xs text-amber-600">
+										Perfil incompleto
+									</Text>
+								</View>
+							)}
+						</View>
 					</View>
 				</View>
 
-				<CompanyCountStats companyId={company.id} />
 			</Card>
 		</Pressable>
 	);

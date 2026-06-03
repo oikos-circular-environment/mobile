@@ -7,16 +7,19 @@ import {
 	LockKeyholeIcon,
 	type LucideIcon,
 	MapIcon,
+	PowerIcon,
 	RecycleIcon,
 	SettingsIcon,
 	WrenchIcon,
 } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
+import { useToggleCompanyStatus } from "@/components/companies/hooks/use-toggle-company-status";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { useUserCompanyContext } from "@/contexts/user-company-context";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 type CompanySetting = {
 	title: string;
@@ -27,8 +30,11 @@ type CompanySetting = {
 
 export default function CompanyHubScreen() {
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
-	const { company } = useUserCompanyContext();
+	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
 	const isCompanyRegistered = company != null;
+
+	const { mutate: toggleStatus, isPending: isTogglingStatus } =
+		useToggleCompanyStatus(companyId);
 
 	const companyOptions: CompanySetting[] = [
 		{
@@ -83,6 +89,23 @@ export default function CompanyHubScreen() {
 							<SettingsIcon color={colors.white} size={20} />
 						</View>
 					</View>
+
+					{isCompanyRegistered && (
+						<View className="flex-row items-center justify-between border-t border-border pt-3 mt-1">
+							<View className="flex-row items-center gap-2">
+								<PowerIcon size={16} className="text-foreground" strokeWidth={1.5} />
+								<Text className="text-sm font-medium">
+									{company.status ? "Empresa ativa" : "Empresa inativa"}
+								</Text>
+							</View>
+							<Switch
+								size="sm"
+								value={company.status}
+								onValueChange={toggleStatus}
+								isDisabled={isTogglingStatus}
+							/>
+						</View>
+					)}
 				</Card>
 
 				<View className="gap-2">

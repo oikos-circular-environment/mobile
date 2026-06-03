@@ -8,12 +8,14 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { useUserCompanyContext } from "@/contexts/user-company-context";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function WasteIndexScreen() {
-	const { wastes, isLoadingWastes } = useUserCompanyContext();
-	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
+	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const wastes = company?.wastes;
+	const isLoadingWastes = useCompaniesStore(s => !s.isLoaded);
+	const router = useRouter();
 
 	useEffect(() => {
 		if (!isLoadingWastes && wastes && wastes.length === 0) {

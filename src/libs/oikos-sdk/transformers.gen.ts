@@ -13,6 +13,7 @@ import type {
 	GetV1ComplaintsResponse,
 	GetV1ProfilesAddressesResponse,
 	GetV1ProfilesResponse,
+	PatchV1CompaniesByIdStatusResponse,
 	PatchV1ComplaintsByIdCanceledResponse,
 	PatchV1ComplaintsByIdResolvedResponse,
 	PatchV1ComplaintsByIdResponse,
@@ -97,6 +98,20 @@ export const getV1CompaniesResponseTransformer = async (
 		}
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
+		if (item.address) {
+			item.address.created_at = new Date(item.address.created_at);
+			item.address.updated_at = new Date(item.address.updated_at);
+		}
+		item.wastes = item.wastes.map((item: any) => {
+			item.created_at = new Date(item.created_at);
+			item.updated_at = new Date(item.updated_at);
+			return item;
+		});
+		item.services = item.services.map((item: any) => {
+			item.created_at = new Date(item.created_at);
+			item.updated_at = new Date(item.updated_at);
+			return item;
+		});
 		return item;
 	});
 	return data;
@@ -127,6 +142,18 @@ export const putV1CompaniesByIdResponseTransformer = async (
 		data.company.created_at = new Date(data.company.created_at);
 		data.company.updated_at = new Date(data.company.updated_at);
 	}
+	return data;
+};
+
+export const patchV1CompaniesByIdStatusResponseTransformer = async (
+	data: any,
+): Promise<PatchV1CompaniesByIdStatusResponse> => {
+	data.company.started_activity_in = new Date(data.company.started_activity_in);
+	if (data.company.avatar) {
+		data.company.avatar.created_at = new Date(data.company.avatar.created_at);
+	}
+	data.company.created_at = new Date(data.company.created_at);
+	data.company.updated_at = new Date(data.company.updated_at);
 	return data;
 };
 

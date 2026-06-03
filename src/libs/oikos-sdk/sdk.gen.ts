@@ -15,6 +15,7 @@ import {
 	getV1ComplaintsResponseTransformer,
 	getV1ProfilesAddressesResponseTransformer,
 	getV1ProfilesResponseTransformer,
+	patchV1CompaniesByIdStatusResponseTransformer,
 	patchV1ComplaintsByIdCanceledResponseTransformer,
 	patchV1ComplaintsByIdResolvedResponseTransformer,
 	patchV1ComplaintsByIdResponseTransformer,
@@ -93,6 +94,9 @@ import type {
 	PatchV1AuthRefreshData,
 	PatchV1AuthRefreshErrors,
 	PatchV1AuthRefreshResponses,
+	PatchV1CompaniesByIdStatusData,
+	PatchV1CompaniesByIdStatusErrors,
+	PatchV1CompaniesByIdStatusResponses,
 	PatchV1ComplaintsByIdCanceledData,
 	PatchV1ComplaintsByIdCanceledErrors,
 	PatchV1ComplaintsByIdCanceledResponses,
@@ -345,7 +349,7 @@ export const getV1ProfilesAddresses = <ThrowOnError extends boolean = false>(
 /**
  * Get user companies
  *
- * Returns all companies of the authenticated user.
+ * Returns all companies of the authenticated user with address, business hours, wastes and services.
  */
 export const getV1Companies = <ThrowOnError extends boolean = false>(
 	options?: Options<GetV1CompaniesData, ThrowOnError>,
@@ -403,6 +407,32 @@ export const putV1CompaniesById = <ThrowOnError extends boolean = false>(
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/companies/{id}",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
+ * Toggle company status
+ *
+ * Activates or deactivates a company for the authenticated user.
+ */
+export const patchV1CompaniesByIdStatus = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<PatchV1CompaniesByIdStatusData, ThrowOnError>,
+) =>
+	(options.client ?? client).patch<
+		PatchV1CompaniesByIdStatusResponses,
+		PatchV1CompaniesByIdStatusErrors,
+		ThrowOnError
+	>({
+		responseTransformer: patchV1CompaniesByIdStatusResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/companies/{id}/status",
 		...options,
 		headers: {
 			"Content-Type": "application/json",

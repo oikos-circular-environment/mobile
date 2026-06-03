@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { BuildingIcon } from "lucide-react-native";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
@@ -9,29 +8,12 @@ import { CompanyListHeader } from "@/components/companies/company-list-header";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import type { GetV1CompaniesResponses } from "@/libs/oikos-sdk";
-import { getV1Companies } from "@/libs/oikos-sdk";
-
-type Company = GetV1CompaniesResponses[200]["companies"][number];
+import { type Company, useCompaniesStore } from "@/stores/companies-store";
 
 export default function CompaniesListScreen() {
 	const router = useRouter();
-
-	const { data, isLoading, refetch } = useQuery({
-		queryKey: ["companies"],
-		queryFn: async () => {
-			const res = await getV1Companies();
-			return res.data;
-		},
-	});
-
-	const companies = data?.companies ?? [];
-
-	useFocusEffect(
-		useCallback(() => {
-			refetch();
-		}, [refetch]),
-	);
+	const companies = useCompaniesStore(s => s.companies);
+	const isLoading = useCompaniesStore(s => !s.isLoaded);
 
 	const handleSelectCompany = useCallback(
 		(companyId: string) => {

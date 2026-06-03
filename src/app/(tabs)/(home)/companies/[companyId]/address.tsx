@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useLocalSearchParams } from "expo-router";
 import { ChevronDown, MapIcon, Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -34,7 +35,8 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import WrapperMap from "@/components/wrapper-map";
-import { useUserCompanyContext } from "@/contexts/user-company-context";
+import { useSaveAddress } from "@/components/companies/hooks/use-save-address";
+import { useCompaniesStore } from "@/stores/companies-store";
 import {
 	getCepV2,
 	listIbgeMunicipios,
@@ -61,8 +63,12 @@ const addressSchema = z.object({
 type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function CompanyAddressScreen() {
-	const { address, isLoadingAddress, saveAddress, isSavingAddress } =
-		useUserCompanyContext();
+	const { companyId } = useLocalSearchParams<{ companyId: string }>();
+	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const address = company?.address;
+	const isLoadingAddress = useCompaniesStore(s => !s.isLoaded);
+	const { mutateAsync: saveAddress, isPending: isSavingAddress } =
+		useSaveAddress(companyId);
 	const [selectedCity, setSelectedCity] = useState<string | null>(null);
 	const defaultValues = useMemo<AddressFormValues>(
 		() => ({
@@ -132,8 +138,8 @@ export default function CompanyAddressScreen() {
 			city: data.city,
 			state: data.state,
 			state_code: data.state_code,
-			latitude: data.latitude ?? null,
-			longitude: data.longitude ?? null,
+			latitude: data.latitude ?? 0,
+			longitude: data.longitude ?? 0,
 			city_ibge_id: data.city_ibge_id,
 			state_ibge_id: data.state_ibge_id,
 		});

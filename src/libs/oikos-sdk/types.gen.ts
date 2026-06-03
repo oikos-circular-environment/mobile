@@ -462,15 +462,13 @@ export type GetV1CompaniesResponses = {
 			identity_type: "CPF" | "CNPJ";
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 			status: boolean;
-			is_headquarters: boolean;
-			business_name?: string | null;
+			business_name: string;
 			corporate_name: string;
-			accept_appointments: boolean;
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			description: string | null;
 			id: string;
+			is_company_valid: boolean;
 			avatar: {
 				id: string;
 				url: string;
@@ -480,6 +478,66 @@ export type GetV1CompaniesResponses = {
 			} | null;
 			created_at: Date;
 			updated_at: Date;
+			address: {
+				id: string;
+				zip_code: string;
+				street: string;
+				number: string;
+				complement: string | null;
+				district: string;
+				city_ibge_id: number;
+				city: string;
+				state_ibge_id: number;
+				state: string;
+				state_code: string;
+				latitude: number | null;
+				longitude: number | null;
+				created_at: Date;
+				updated_at: Date;
+			} | null;
+			business_hours: Array<{
+				id: string;
+				day_of_week:
+					| "SUNDAY"
+					| "MONDAY"
+					| "TUESDAY"
+					| "WEDNESDAY"
+					| "THURSDAY"
+					| "FRIDAY"
+					| "SATURDAY";
+				is_open: boolean;
+				time_slots: Array<{
+					id: string;
+					start_time: string;
+					end_time: string;
+				}>;
+			}>;
+			wastes: Array<{
+				name: string;
+				description?: string | null;
+				price: number;
+				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				waste_type: "RECYCLABLE" | "GARBAGE";
+				quantity: number;
+				observations?: string | null;
+				sub_items: Array<string> | null;
+				id: string;
+				created_at: Date;
+				updated_at: Date;
+			}>;
+			services: Array<{
+				name: string;
+				description?: string | null;
+				price: number;
+				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				waste_type: "RECYCLABLE" | "GARBAGE";
+				quantity: number;
+				observations?: string | null;
+				sub_items: Array<string> | null;
+				id: string;
+				created_at: Date;
+				updated_at: Date;
+			}>;
 		}>;
 	};
 };
@@ -493,14 +551,11 @@ export type PostV1CompaniesData = {
 		identity_type: "CPF" | "CNPJ";
 		company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 		status?: boolean;
-		is_headquarters?: boolean;
-		business_name?: string | null;
+		business_name: string;
 		corporate_name: string;
-		accept_appointments?: boolean;
 		email?: string | null;
 		phones: Array<string>;
 		started_activity_in: unknown;
-		description?: string | null;
 	};
 	path?: never;
 	query?: never;
@@ -532,15 +587,13 @@ export type PostV1CompaniesResponses = {
 			identity_type: "CPF" | "CNPJ";
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 			status: boolean;
-			is_headquarters: boolean;
-			business_name?: string | null;
+			business_name: string;
 			corporate_name: string;
-			accept_appointments: boolean;
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			description: string | null;
 			id: string;
+			is_company_valid: boolean;
 			avatar: {
 				id: string;
 				url: string;
@@ -563,14 +616,11 @@ export type PutV1CompaniesByIdData = {
 		identity_type?: "CPF" | "CNPJ";
 		company_type?: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 		status?: boolean;
-		is_headquarters?: boolean;
-		business_name?: string | null;
+		business_name?: string;
 		corporate_name?: string;
-		accept_appointments?: boolean;
 		email?: string | null;
 		phones?: Array<string>;
 		started_activity_in?: unknown;
-		description?: string | null;
 	};
 	path: {
 		id: string;
@@ -612,15 +662,13 @@ export type PutV1CompaniesByIdResponses = {
 			identity_type: "CPF" | "CNPJ";
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 			status: boolean;
-			is_headquarters: boolean;
-			business_name?: string | null;
+			business_name: string;
 			corporate_name: string;
-			accept_appointments: boolean;
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			description: string | null;
 			id: string;
+			is_company_valid: boolean;
 			avatar: {
 				id: string;
 				url: string;
@@ -636,6 +684,73 @@ export type PutV1CompaniesByIdResponses = {
 
 export type PutV1CompaniesByIdResponse =
 	PutV1CompaniesByIdResponses[keyof PutV1CompaniesByIdResponses];
+
+export type PatchV1CompaniesByIdStatusData = {
+	body: {
+		status: boolean;
+	};
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/companies/{id}/status";
+};
+
+export type PatchV1CompaniesByIdStatusErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PatchV1CompaniesByIdStatusError =
+	PatchV1CompaniesByIdStatusErrors[keyof PatchV1CompaniesByIdStatusErrors];
+
+export type PatchV1CompaniesByIdStatusResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		company: {
+			user_id: string;
+			identity: string;
+			identity_type: "CPF" | "CNPJ";
+			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
+			status: boolean;
+			business_name: string;
+			corporate_name: string;
+			email?: string | null;
+			phones: Array<string>;
+			started_activity_in: Date;
+			id: string;
+			is_company_valid: boolean;
+			avatar: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				created_at: Date;
+			} | null;
+			created_at: Date;
+			updated_at: Date;
+		};
+	};
+};
+
+export type PatchV1CompaniesByIdStatusResponse =
+	PatchV1CompaniesByIdStatusResponses[keyof PatchV1CompaniesByIdStatusResponses];
 
 export type PostV1CompaniesByIdAvatarData = {
 	body?: never;
@@ -695,15 +810,13 @@ export type PostV1CompaniesByIdAvatarResponses = {
 			identity_type: "CPF" | "CNPJ";
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 			status: boolean;
-			is_headquarters: boolean;
-			business_name?: string | null;
+			business_name: string;
 			corporate_name: string;
-			accept_appointments: boolean;
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			description: string | null;
 			id: string;
+			is_company_valid: boolean;
 			avatar: {
 				id: string;
 				url: string;
@@ -1191,8 +1304,8 @@ export type PutV1CompaniesByIdAddressesData = {
 		state_ibge_id: number;
 		state: string;
 		state_code: string;
-		latitude?: number | null;
-		longitude?: number | null;
+		latitude: number;
+		longitude: number;
 	};
 	path: {
 		id: string;
@@ -1707,8 +1820,7 @@ export type GetV1ComplaintsByIdPublicResponses = {
 					| {
 							type: "company";
 							corporate_name: string;
-							business_name: string | null;
-							description: string | null;
+							business_name: string;
 							avatar_url: string | null;
 					  }
 					| {
@@ -2411,8 +2523,7 @@ export type GetV1ComplaintsByIdResolutionsResponses = {
 			resolver_company: {
 				type: "company";
 				corporate_name: string;
-				business_name: string | null;
-				description: string | null;
+				business_name: string;
 				avatar_url: string | null;
 			} | null;
 			attachments: Array<{

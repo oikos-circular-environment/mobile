@@ -1,6 +1,9 @@
 import { Stack } from "expo-router";
+import { useLoadCompanies } from "@/components/companies/hooks/use-load-companies";
 
 export default function CompaniesLayout() {
+	useLoadCompanies();
+
 	return (
 		<Stack
 			screenOptions={{

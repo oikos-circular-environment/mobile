@@ -56,15 +56,19 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { useUserCompanyContext } from "@/contexts/user-company-context";
+import { useSaveWastes } from "@/components/companies/hooks/use-save-wastes";
+import { useCompaniesStore } from "@/stores/companies-store";
 import { measurements } from "@/libs/types/measurement";
 import { wasteTypes } from "@/libs/types/waste";
 import { cn } from "@/libs/utils";
 
 export default function WasteFormScreen() {
 	const router = useRouter();
-	const { id } = useLocalSearchParams<{ id: string }>();
-	const { wastes, saveWastes, isSavingWastes } = useUserCompanyContext();
+	const { id, companyId } = useLocalSearchParams<{ id: string; companyId: string }>();
+	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const wastes = company?.wastes;
+	const { mutateAsync: saveWastes, isPending: isSavingWastes } =
+		useSaveWastes(companyId);
 	const [subItemDraft, setSubItemDraft] = useState("");
 
 	const initialData = id ? wastes?.find(w => w.id === id) : null;

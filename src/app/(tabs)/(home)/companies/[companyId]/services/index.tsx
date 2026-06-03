@@ -8,12 +8,14 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { useUserCompanyContext } from "@/contexts/user-company-context";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function ServicesIndexScreen() {
-	const { services, isLoadingServices } = useUserCompanyContext();
-	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
+	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const services = company?.services;
+	const isLoadingServices = useCompaniesStore(s => !s.isLoaded);
+	const router = useRouter();
 
 	useEffect(() => {
 		if (!isLoadingServices && services && services.length === 0) {
