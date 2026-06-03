@@ -12,6 +12,8 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
+import { useAttachmentRemove } from "@/components/complaints/hooks/use-attachment-remove";
+import { useEditComplaint } from "@/components/complaints/hooks/use-edit-complaint";
 import type { MediaItem } from "@/components/complaints/hooks/use-submit-complaints";
 import { useSubmitComplaints } from "@/components/complaints/hooks/use-submit-complaints";
 import { GooglePlacesInput } from "@/components/google-places-input";
@@ -35,6 +37,14 @@ import {
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
+import {
+	Modal,
+	ModalBackdrop,
+	ModalBody,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+} from "@/components/ui/modal";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import WrapperMap from "@/components/wrapper-map";
@@ -70,14 +80,31 @@ type FormValues = z.infer<typeof schema>;
 
 export default function ComplaintCreateScreen() {
 	const { location, heading, addresses } = useGeospatial();
-	const { attachments, addAttachment, removeAttachment, clearDraft } =
-		useComplaintCreation();
+	const {
+		attachments,
+		editingComplaint,
+		addAttachment,
+		clearDraft,
+		exitEditMode,
+	} = useComplaintCreation();
 	const hasAutoFilled = useRef(false);
 
 	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
 	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
 
-	const { mutateAsync: submitComplaint, isPending } = useSubmitComplaints();
+	const { mutateAsync: submitComplaint, isPending: isSubmitting } =
+		useSubmitComplaints();
+	const { mutateAsync: editComplaint, isPending: isEditing } =
+		useEditComplaint();
+	const isPending = isSubmitting || isEditing;
+
+	const {
+		handleRemove,
+		pendingDelete,
+		confirmDelete,
+		cancelDelete,
+		isDeleting,
+	} = useAttachmentRemove(editingComplaint?.id);
 
 	const {
 		control,
@@ -85,7 +112,7 @@ export default function ComplaintCreateScreen() {
 		setValue,
 		watch,
 		reset,
-		formState: { errors },
+		formState: { errors, isDirty },
 	} = useForm<FormValues>({
 		resolver: zodResolver(schema),
 		defaultValues: {
@@ -104,6 +131,25 @@ export default function ComplaintCreateScreen() {
 	const latValue = watch("latitude");
 	const lonValue = watch("longitude");
 
+	// Pre-fill form from existing complaint in edit mode
+	useEffect(() => {
+		if (!editingComplaint) return;
+		hasAutoFilled.current = true;
+		const g = editingComplaint.geospatial;
+		reset({
+			observations: editingComplaint.observations ?? "",
+			postalCode: mask.cep(g.addresses.postalCode ?? ""),
+			street: g.addresses.street ?? "",
+			streetNumber: g.addresses.streetNumber ?? "",
+			district: g.addresses.district ?? "",
+			city: g.addresses.city ?? "",
+			region: g.addresses.region ?? "",
+			latitude: String(g.location.coords.latitude),
+			longitude: String(g.location.coords.longitude),
+		});
+	}, [editingComplaint, reset]);
+
+	// Auto-fill from device geolocation (create mode only)
 	useEffect(() => {
 		if (hasAutoFilled.current) return;
 		if (!location && addresses.length === 0) return;
@@ -126,6 +172,11 @@ export default function ComplaintCreateScreen() {
 				setValue("postalCode", mask.cep(addresses[0].postalCode ?? ""));
 		}
 	}, [location, addresses, setValue]);
+
+	// Clear edit state if user navigates away without saving
+	useEffect(() => {
+		return () => exitEditMode();
+	}, [exitEditMode]);
 
 	// ─── Address helpers ──────────────────────────────────────────────────────
 
@@ -220,40 +271,46 @@ export default function ComplaintCreateScreen() {
 			);
 			return;
 		}
-		const result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ["images", "videos"],
-			allowsMultipleSelection: true,
-			quality: 0.85,
-			orderedSelection: true,
-		});
-		if (!result.canceled) {
-			const existingUris = new Set(attachments.map(a => a.uri).filter(Boolean));
-			for (const asset of result.assets) {
-				if (existingUris.has(asset.uri)) continue;
-				addAttachment({
-					id: asset.assetId ?? Crypto.randomUUID(),
-					source: "gallery",
-					mediaType: asset.type === "video" ? "video" : "photo",
-					uri: asset.uri,
-				});
+		try {
+			const result = await ImagePicker.launchImageLibraryAsync({
+				mediaTypes: ["images", "videos"],
+				allowsMultipleSelection: true,
+				quality: 0.85,
+			});
+			if (!result.canceled) {
+				const existingUris = new Set(
+					attachments.map(a => a.uri).filter(Boolean),
+				);
+				for (const asset of result.assets) {
+					if (existingUris.has(asset.uri)) continue;
+					addAttachment({
+						id: asset.assetId ?? Crypto.randomUUID(),
+						source: "gallery",
+						mediaType: asset.type === "video" ? "video" : "photo",
+						uri: asset.uri,
+					});
+				}
 			}
+		} catch {
+			toast.error(
+				"Erro ao acessar arquivo",
+				"O vídeo pode estar armazenado no iCloud. Baixe-o para o dispositivo e tente novamente.",
+			);
 		}
 	};
 
 	// ─── Submit ───────────────────────────────────────────────────────────────
 
-	const localMedia: MediaItem[] = attachments
-		.filter(a => !!a.uri)
-		.map(a => ({ id: a.id, uri: a.uri as string, mediaType: a.mediaType }));
-
 	const onSubmit = handleSubmit(async data => {
-		if (localMedia.length === 0) {
+		if (attachments.length === 0) {
 			toast.warning(
 				"Adicione pelo menos uma mídia",
 				"Tire uma foto ou selecione da galeria.",
 			);
 			return;
 		}
+
+		const coordsFallback = editingComplaint?.geospatial.location.coords;
 
 		const geospatial: Geospatial = {
 			heading: heading
@@ -262,18 +319,26 @@ export default function ComplaintCreateScreen() {
 						magHeading: heading.magHeading,
 						accuracy: heading.accuracy,
 					}
-				: null,
+				: (editingComplaint?.geospatial.heading ?? null),
 			location: {
 				coords: {
 					latitude: parseFloat(data.latitude),
 					longitude: parseFloat(data.longitude),
-					altitude: location?.coords.altitude ?? null,
-					accuracy: location?.coords.accuracy ?? null,
-					altitudeAccuracy: location?.coords.altitudeAccuracy ?? null,
-					heading: location?.coords.heading ?? null,
-					speed: location?.coords.speed ?? null,
+					altitude:
+						location?.coords.altitude ?? coordsFallback?.altitude ?? null,
+					accuracy:
+						location?.coords.accuracy ?? coordsFallback?.accuracy ?? null,
+					altitudeAccuracy:
+						location?.coords.altitudeAccuracy ??
+						coordsFallback?.altitudeAccuracy ??
+						null,
+					heading: location?.coords.heading ?? coordsFallback?.heading ?? null,
+					speed: location?.coords.speed ?? coordsFallback?.speed ?? null,
 				},
-				timestamp: location?.timestamp ?? Date.now(),
+				timestamp:
+					location?.timestamp ??
+					editingComplaint?.geospatial.location.timestamp ??
+					Date.now(),
 			},
 			addresses: {
 				city: data.city,
@@ -291,6 +356,26 @@ export default function ComplaintCreateScreen() {
 			},
 		};
 
+		if (editingComplaint) {
+			const newMedia = attachments
+				.filter(a => a.source !== "api" && !!a.uri)
+				.map(a => ({ id: a.id, uri: a.uri as string, mediaType: a.mediaType }));
+
+			await editComplaint({
+				id: editingComplaint.id,
+				geospatial,
+				observations: data.observations?.trim() || null,
+				newMedia,
+			});
+
+			router.replace("/(tabs)/complaints/list");
+			return;
+		}
+
+		const localMedia: MediaItem[] = attachments
+			.filter(a => !!a.uri)
+			.map(a => ({ id: a.id, uri: a.uri as string, mediaType: a.mediaType }));
+
 		await submitComplaint({
 			geospatial,
 			observations: data.observations?.trim() || null,
@@ -299,10 +384,20 @@ export default function ComplaintCreateScreen() {
 
 		clearDraft();
 		reset();
-		router.replace("/(tabs)/complaints");
+		router.replace("/(tabs)/complaints/list");
 	});
 
 	// ─── Render ───────────────────────────────────────────────────────────────
+
+	const isEditMode = !!editingComplaint;
+
+	const hasNewAttachments = attachments.some(a => a.source !== "api");
+	const hasRemovedAttachments =
+		isEditMode &&
+		attachments.filter(a => a.source === "api").length <
+			(editingComplaint?.attachments.length ?? 0);
+	const hasChanges = isDirty || hasNewAttachments || hasRemovedAttachments;
+	const isSubmitDisabled = isPending || (isEditMode && !hasChanges);
 
 	return (
 		<KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">
@@ -317,8 +412,9 @@ export default function ComplaintCreateScreen() {
 						<ShieldAlertIcon size={18} color={colors.white} strokeWidth={2.2} />
 					</View>
 					<Text className="flex-1 text-sm text-gray-600">
-						Registre denúncias de descarte irregular informando o local e
-						anexando fotos ou vídeos como evidência.
+						{isEditMode
+							? "Edite os dados da denúncia. Você pode atualizar a localização, observações e adicionar novas mídias."
+							: "Registre denúncias de descarte irregular informando o local e anexando fotos ou vídeos como evidência."}
 					</Text>
 				</Card>
 
@@ -326,8 +422,9 @@ export default function ComplaintCreateScreen() {
 				<View className="gap-1 pt-1">
 					<Heading size="md">Localização do ocorrido</Heading>
 					<Text className="text-sm text-gray-500">
-						Preenchido automaticamente pela sua localização. Ajuste pelo mapa,
-						busca de endereço ou CEP se necessário.
+						{isEditMode
+							? "Ajuste pelo mapa, busca de endereço ou CEP se necessário."
+							: "Preenchido automaticamente pela sua localização. Ajuste pelo mapa, busca de endereço ou CEP se necessário."}
 					</Text>
 				</View>
 
@@ -543,8 +640,9 @@ export default function ComplaintCreateScreen() {
 				<View className="gap-2 pt-1">
 					<Heading size="md">Fotos e vídeos</Heading>
 					<Text className="text-sm text-gray-500">
-						Capture pela câmera ou selecione da galeria. Ao menos uma mídia é
-						obrigatória.
+						{isEditMode
+							? "Adicione novas mídias ou remova as existentes."
+							: "Capture pela câmera ou selecione da galeria. Ao menos uma mídia é obrigatória."}
 					</Text>
 
 					<View className="flex-row gap-2">
@@ -605,7 +703,7 @@ export default function ComplaintCreateScreen() {
 										</TouchableOpacity>
 										<TouchableOpacity
 											className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
-											onPress={() => removeAttachment(attachment.id)}
+											onPress={() => handleRemove(attachment)}
 										>
 											<X size={12} color={colors.white} strokeWidth={2.5} />
 										</TouchableOpacity>
@@ -655,18 +753,56 @@ export default function ComplaintCreateScreen() {
 						onPress={() => router.back()}
 						isDisabled={isPending}
 					>
-						<ButtonText>Cancelar</ButtonText>
+						<ButtonText>
+							{isEditMode ? "Cancelar edição" : "Cancelar"}
+						</ButtonText>
 					</Button>
 					<Button
 						className="flex-1 bg-lime-800"
 						onPress={onSubmit}
-						isDisabled={isPending}
+						isDisabled={isSubmitDisabled}
 					>
-						<ButtonText className="text-white">Enviar denúncia</ButtonText>
+						<ButtonText className="text-white">
+							{isEditMode ? "Salvar alterações" : "Enviar denúncia"}
+						</ButtonText>
 						{isPending && <ButtonSpinner />}
 					</Button>
 				</View>
 			</ScrollView>
+
+			{/* Modal de confirmação de deleção de anexo */}
+			<Modal isOpen={!!pendingDelete} onClose={cancelDelete} size="sm">
+				<ModalBackdrop />
+				<ModalContent>
+					<ModalHeader>
+						<Heading size="md">Remover anexo</Heading>
+					</ModalHeader>
+					<ModalBody>
+						<Text className="text-sm text-gray-600">
+							Tem certeza que deseja remover este anexo? Esta ação não pode ser
+							desfeita.
+						</Text>
+					</ModalBody>
+					<ModalFooter className="gap-2">
+						<Button
+							variant="outline"
+							className="flex-1"
+							onPress={cancelDelete}
+							isDisabled={isDeleting}
+						>
+							<ButtonText>Cancelar</ButtonText>
+						</Button>
+						<Button
+							className="flex-1 bg-red-600"
+							onPress={confirmDelete}
+							isDisabled={isDeleting}
+						>
+							<ButtonText className="text-white">Remover</ButtonText>
+							{isDeleting && <ButtonSpinner />}
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
 		</KeyboardAvoidingView>
 	);
 }

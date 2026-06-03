@@ -32,6 +32,9 @@ import {
 	putV1ProfilesResponseTransformer,
 } from "./transformers.gen";
 import type {
+	DeleteV1ComplaintsByIdAttachmentsByAttachmentIdData,
+	DeleteV1ComplaintsByIdAttachmentsByAttachmentIdErrors,
+	DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponses,
 	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdData,
 	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors,
 	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses,
@@ -993,6 +996,29 @@ export const deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId = <
 	>({
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}/resolutions/attachments/{attachmentId}",
+		...options,
+	});
+
+/**
+ * Delete complaint attachment
+ *
+ * Deletes an attachment from the authenticated user's complaint.
+ */
+export const deleteV1ComplaintsByIdAttachmentsByAttachmentId = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<
+		DeleteV1ComplaintsByIdAttachmentsByAttachmentIdData,
+		ThrowOnError
+	>,
+) =>
+	(options.client ?? client).delete<
+		DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponses,
+		DeleteV1ComplaintsByIdAttachmentsByAttachmentIdErrors,
+		ThrowOnError
+	>({
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/attachments/{attachmentId}",
 		...options,
 	});
 

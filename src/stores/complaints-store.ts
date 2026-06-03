@@ -27,6 +27,7 @@ type ListActions = {
 	setDashboard: (dashboard: ComplaintDashboard) => void;
 	setActiveFilter: (status: ApiComplaintStatus | null) => void;
 	shiftComplaintStatus: (id: string, newStatus: ApiComplaintStatus) => void;
+	updateComplaint: (id: string, patch: Partial<ApiComplaint>) => void;
 };
 
 // ─── Map Votes Slice ─────────────────────────────────────────────────────────
@@ -105,6 +106,11 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 	setDashboard: dashboard => set({ dashboard }),
 
 	setActiveFilter: status => set({ activeFilter: status }),
+
+	updateComplaint: (id, patch) =>
+		set(state => ({
+			complaints: state.complaints.map(c => (c.id === id ? { ...c, ...patch } : c)),
+		})),
 
 	shiftComplaintStatus: (id, newStatus) => {
 		set(state => {

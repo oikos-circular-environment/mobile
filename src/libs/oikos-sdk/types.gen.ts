@@ -2641,6 +2641,48 @@ export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses 
 export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponse =
 	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses[keyof DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses];
 
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdData = {
+	body?: never;
+	path: {
+		id: string;
+		attachmentId: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/attachments/{attachmentId}";
+};
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdError =
+	DeleteV1ComplaintsByIdAttachmentsByAttachmentIdErrors[keyof DeleteV1ComplaintsByIdAttachmentsByAttachmentIdErrors];
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponses = {
+	/**
+	 * Default Response
+	 */
+	204: void;
+};
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponse =
+	DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponses[keyof DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponses];
+
 export type PostV1ComplaintsByIdAttachmentsData = {
 	body?: never;
 	path: {

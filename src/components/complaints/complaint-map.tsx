@@ -18,8 +18,8 @@ export function ComplaintMap({ latitude, longitude }: ComplaintMapProps) {
 	const region: Region = {
 		latitude,
 		longitude,
-		latitudeDelta: 0.0005,
-		longitudeDelta: 0.0005,
+		latitudeDelta: 0.005,
+		longitudeDelta: 0.005,
 	};
 
 	if (Platform.OS === "web") {

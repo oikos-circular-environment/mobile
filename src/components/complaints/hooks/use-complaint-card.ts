@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { Alert, Linking, Platform } from "react-native";
 import { toast } from "@/components/toast";
+import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { patchV1ComplaintsByIdCanceled } from "@/libs/oikos-sdk";
 import type { MapComplaint } from "@/libs/types/complaint";
 import type { ApiComplaint } from "@/stores/complaints-store";
@@ -11,6 +13,7 @@ export function useComplaintCard(complaint: ApiComplaint) {
 	const setSelectedMapComplaint = useComplaintsStore(
 		s => s.setSelectedMapComplaint,
 	);
+	const { enterEditMode } = useComplaintCreation();
 
 	const cancelMutation = useMutation({
 		mutationFn: () =>
@@ -49,10 +52,16 @@ export function useComplaintCard(complaint: ApiComplaint) {
 		setSelectedMapComplaint({ ...complaint, location } as MapComplaint);
 	};
 
+	const editComplaint = () => {
+		enterEditMode(complaint);
+		router.push("/(tabs)/complaints/(create)");
+	};
+
 	return {
 		cancelComplaint: () => cancelMutation.mutate(),
 		isCancelingComplaint: cancelMutation.isPending,
 		openInMaps,
 		openBottomSheet,
+		editComplaint,
 	};
 }

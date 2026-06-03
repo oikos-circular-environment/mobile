@@ -2,10 +2,8 @@ import { useFocusEffect } from "expo-router";
 import { ShieldIcon } from "lucide-react-native";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
-import {
-	ComplaintCard,
-	ComplaintCardSkeleton,
-} from "@/components/complaints/complaint-card";
+import { ComplaintCard } from "@/components/complaints/complaint-card";
+import { ComplaintCardSkeleton } from "@/components/complaints/complaint-card-skeleton";
 import { ComplaintListHeader } from "@/components/complaints/complaint-list-header";
 import { useComplaintsList } from "@/components/complaints/hooks/use-complaints-list";
 import { colors } from "@/components/style/colors";
