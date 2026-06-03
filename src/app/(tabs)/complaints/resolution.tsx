@@ -55,11 +55,12 @@ import {
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
+import { compressMedia } from "@/libs/media-compression";
 import type { ComplaintStatus, ComplaintType } from "@/libs/types/complaint";
 import { complaintTypeValues } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
-const MIN_ATTACHMENTS = 2;
+const MIN_ATTACHMENTS = 1;
 const MIN_CHARS = 50;
 
 type ExistingAttachment = { id: string; url: string; file_name: string };
@@ -216,9 +217,13 @@ export default function ComplaintResolutionScreen() {
 			for (const asset of selectedAssets) {
 				const isPhoto = asset.type === "image";
 				const ext = isPhoto ? "jpg" : "mp4";
+				const compressedUri = await compressMedia(
+					asset.uri,
+					isPhoto ? "photo" : "video",
+				);
 				const formData = new FormData();
 				formData.append("file", {
-					uri: asset.uri,
+					uri: compressedUri,
 					name: asset.fileName ?? `resolution_${id}_${Date.now()}.${ext}`,
 					type: isPhoto ? "image/jpeg" : "video/mp4",
 				} as unknown as Blob);
@@ -608,6 +613,7 @@ export default function ComplaintResolutionScreen() {
 				onClose={() => setShowCompanyPicker(false)}
 				onSelect={company => setSelectedCompany(company)}
 				selectedCompanyId={selectedCompany?.id}
+				disablePortal
 			/>
 		</>
 	);

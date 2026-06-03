@@ -67,6 +67,7 @@ import {
 	listIbgeMunicipios,
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
+import { compressImage } from "@/libs/media-compression";
 import { mask } from "@/libs/mask";
 import { putV1Profiles } from "@/libs/oikos-sdk";
 import { client } from "@/libs/oikos-sdk/client.gen";
@@ -267,11 +268,12 @@ export default function ProfileScreen() {
 
 	const profileAvatarMutation = useMutation({
 		mutationFn: async (asset: ImagePicker.ImagePickerAsset) => {
+			const compressedUri = await compressImage(asset.uri, "avatar");
 			const formData = new FormData();
 			const file = {
-				uri: asset.uri,
+				uri: compressedUri,
 				name: asset.fileName ?? "image.jpg",
-				type: asset.mimeType ?? "image/jpeg",
+				type: "image/jpeg",
 			} as unknown as Blob;
 			formData.append("file", file);
 

@@ -23,6 +23,7 @@ type CompanyPickerBottomSheetProps = {
 	onClose: () => void;
 	onSelect: (company: Company) => void;
 	selectedCompanyId?: string | null;
+	disablePortal?: boolean;
 };
 
 export function CompanyPickerBottomSheet({
@@ -30,6 +31,7 @@ export function CompanyPickerBottomSheet({
 	onClose,
 	onSelect,
 	selectedCompanyId,
+	disablePortal = false,
 }: CompanyPickerBottomSheetProps) {
 	const ref = useRef<BottomSheetRef>(null);
 	const [search, setSearch] = useState("");
@@ -66,6 +68,7 @@ export function CompanyPickerBottomSheet({
 				snapPoints={["60%"]}
 				backdropComponent={BottomSheetBackdrop}
 				handleComponent={BottomSheetDragIndicator}
+				disablePortal={disablePortal}
 			>
 				<View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
 					<Text

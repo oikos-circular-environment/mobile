@@ -80,6 +80,7 @@ const config: ExpoConfig = {
 			},
 		],
 		"expo-secure-store",
+		"react-native-compressor",
 	],
 	experiments: {
 		typedRoutes: true,

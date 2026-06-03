@@ -63,6 +63,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useUserCompanyContext } from "@/contexts/user-company-context";
 import { getCnpj } from "@/libs/brasil-api-sdk";
+import { compressImage } from "@/libs/media-compression";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
 import { postV1Companies } from "@/libs/oikos-sdk";
 import { client } from "@/libs/oikos-sdk/client.gen";
@@ -200,11 +201,12 @@ export default function CompanyGeneralInfoScreen() {
 		id: string,
 		asset: ImagePicker.ImagePickerAsset,
 	) => {
+		const compressedUri = await compressImage(asset.uri, "avatar");
 		const formData = new FormData();
 		formData.append("file", {
-			uri: asset.uri,
+			uri: compressedUri,
 			name: asset.fileName ?? "image.jpg",
-			type: asset.mimeType ?? "image/jpeg",
+			type: "image/jpeg",
 		} as unknown as Blob);
 		await client.instance.post(`/v1/companies/${id}/avatar`, formData, {
 			headers: { "Content-Type": "multipart/form-data" },

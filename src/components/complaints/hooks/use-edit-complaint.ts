@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
+import { compressMedia } from "@/libs/media-compression";
 import {
 	patchV1ComplaintsById,
 	postV1ComplaintsByIdAttachments,
@@ -62,9 +63,10 @@ export function useEditComplaint() {
 
 			for (const item of newMedia) {
 				const isPhoto = item.mediaType === "photo";
+				const compressedUri = await compressMedia(item.uri, item.mediaType);
 				const formData = new FormData();
 				formData.append("file", {
-					uri: item.uri,
+					uri: compressedUri,
 					name: `complaint_${id}_${item.id}.${isPhoto ? "jpg" : "mp4"}`,
 					type: isPhoto ? "image/jpeg" : "video/mp4",
 				} as unknown as Blob);
