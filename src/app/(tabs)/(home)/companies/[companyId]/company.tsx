@@ -24,6 +24,9 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
+import { useCreateCompany } from "@/components/companies/hooks/use-create-company";
+import { useSaveCompany } from "@/components/companies/hooks/use-save-company";
+import { useUploadCompanyAvatar } from "@/components/companies/hooks/use-upload-company-avatar";
 import { CompanyFormSkeleton } from "@/components/companies/skeletons";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
@@ -61,18 +64,14 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
-import { useCreateCompany } from "@/components/companies/hooks/use-create-company";
-import { useSaveCompany } from "@/components/companies/hooks/use-save-company";
-import { useCompaniesStore } from "@/stores/companies-store";
 import { getCnpj } from "@/libs/brasil-api-sdk";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
-import { compressImage } from "@/libs/media-compression";
-import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import {
 	companyTypeOptions,
 	identityTypeOptions,
 } from "@/libs/types/companies";
 import { cn } from "@/libs/utils";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 const companySchema = z
 	.object({
@@ -136,11 +135,19 @@ export default function CompanyGeneralInfoScreen() {
 	const [avatarPreviewUri, setAvatarPreviewUri] = useState<string | null>(null);
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const isNewCompany = companyId === "new-company";
-	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const company = useCompaniesStore(s =>
+		s.companies.find(c => c.id === companyId),
+	);
 	const isLoadingCompany = useCompaniesStore(s => !s.isLoaded);
 	const router = useRouter();
-	const { mutateAsync: createCompany, isPending: isCreating } = useCreateCompany();
-	const { mutateAsync: saveCompany, isPending: isSaving } = useSaveCompany(companyId);
+
+	const { mutateAsync: createCompany, isPending: isCreating } =
+		useCreateCompany();
+	const { mutateAsync: saveCompany, isPending: isSaving } =
+		useSaveCompany(companyId);
+	const { mutateAsync: uploadAvatar, isPending: isUploading } =
+		useUploadCompanyAvatar();
+
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
 	const contentOpacity = useRef(new Animated.Value(0)).current;
 
@@ -166,6 +173,23 @@ export default function CompanyGeneralInfoScreen() {
 	});
 
 	const identity_type = watch("identity_type");
+	const isCpf = identity_type === "CPF";
+
+	const availableCompanyTypes = isCpf
+		? companyTypeOptions.filter(o => o.value === "COLLECTOR")
+		: companyTypeOptions.filter(o => o.value !== "COLLECTOR");
+
+	useEffect(() => {
+		if (isCpf) {
+			setValue("company_type", "COLLECTOR", { shouldDirty: true });
+		} else {
+			const current = (control._formValues as { company_type: string })
+				.company_type;
+			if (current === "COLLECTOR") {
+				setValue("company_type", "COMPANY", { shouldDirty: true });
+			}
+		}
+	}, [isCpf, setValue, control]);
 
 	const getCnpjMutation = useMutation({
 		mutationKey: ["get", "cnpj", "brasil-api"],
@@ -192,24 +216,6 @@ export default function CompanyGeneralInfoScreen() {
 			);
 		},
 	});
-
-	const uploadAvatar = async (
-		id: string,
-		asset: ImagePicker.ImagePickerAsset,
-	) => {
-		const compressedUri = await compressImage(asset.uri, "avatar");
-		const formData = new FormData();
-		formData.append("file", {
-			uri: compressedUri,
-			name: asset.fileName ?? "image.jpg",
-			type: "image/jpeg",
-		} as unknown as Blob);
-
-		await postV1CompaniesByIdAvatar({
-			path: { id },
-			body: formData as unknown as undefined,
-		});
-	};
 
 	const onPickAvatar = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
@@ -298,7 +304,7 @@ export default function CompanyGeneralInfoScreen() {
 			const res = await createCompany({ ...payload, status: true });
 			const newId = res.data?.company?.id;
 			if (newId && selectedAsset.current) {
-				await uploadAvatar(newId, selectedAsset.current);
+				await uploadAvatar({ companyId: newId, asset: selectedAsset.current });
 			}
 			router.replace({
 				pathname: "/(tabs)/(home)/companies/[companyId]",
@@ -307,13 +313,17 @@ export default function CompanyGeneralInfoScreen() {
 		} else {
 			await saveCompany(payload);
 			if (selectedAsset.current) {
-				await uploadAvatar(companyId, selectedAsset.current);
+				await uploadAvatar({ companyId, asset: selectedAsset.current });
 				selectedAsset.current = null;
 			}
+			router.replace({
+				pathname: "/(tabs)/(home)/companies/[companyId]",
+				params: { companyId },
+			});
 		}
 	};
 
-	const isSubmitting = isCreating || isSaving;
+	const isSubmitting = isCreating || isSaving || isUploading;
 
 	if (!isNewCompany && isLoadingCompany) {
 		return <CompanyFormSkeleton />;
@@ -341,7 +351,7 @@ export default function CompanyGeneralInfoScreen() {
 								>
 									{(avatarPreviewUri ?? company?.avatar?.url) ? (
 										<Image
-											source={{ uri: avatarPreviewUri ?? company!.avatar!.url }}
+											source={{ uri: avatarPreviewUri ?? company?.avatar?.url }}
 											style={{ width: 80, height: 80, borderRadius: 6 }}
 										/>
 									) : (
@@ -485,19 +495,21 @@ export default function CompanyGeneralInfoScreen() {
 									<Select
 										onValueChange={onChange}
 										selectedValue={
-											companyTypeOptions.find(c => c.value === value)?.label ||
-											value
+											availableCompanyTypes.find(c => c.value === value)
+												?.label || value
 										}
+										isDisabled={isCpf}
 									>
 										<SelectTrigger
 											size="sm"
 											className={cn(
 												"justify-between",
 												Platform.OS === "android" ? "px-3" : "pr-3",
+												isCpf && "opacity-60",
 											)}
 										>
 											<SelectInput placeholder="Selecione o tipo" />
-											<SelectIcon as={ChevronDown} />
+											{!isCpf && <SelectIcon as={ChevronDown} />}
 										</SelectTrigger>
 										<SelectPortal>
 											<SelectBackdrop />
@@ -505,7 +517,7 @@ export default function CompanyGeneralInfoScreen() {
 												<SelectDragIndicatorWrapper>
 													<SelectDragIndicator />
 												</SelectDragIndicatorWrapper>
-												{companyTypeOptions.map(companyType => (
+												{availableCompanyTypes.map(companyType => (
 													<SelectItem
 														key={companyType.value}
 														value={companyType.value}
@@ -517,6 +529,13 @@ export default function CompanyGeneralInfoScreen() {
 									</Select>
 								)}
 							/>
+							{isCpf && (
+								<FormControlHelper>
+									<FormControlHelperText>
+										Pessoa física só pode ser cadastrada como Coletor.
+									</FormControlHelperText>
+								</FormControlHelper>
+							)}
 						</FormControl>
 
 						<FormControl isInvalid={!!errors.corporate_name} className="gap-2">

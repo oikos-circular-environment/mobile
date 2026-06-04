@@ -5,7 +5,6 @@ import { useCompaniesStore } from "@/stores/companies-store";
 
 export function useLoadCompanies() {
 	const setCompanies = useCompaniesStore(s => s.setCompanies);
-	const isLoaded = useCompaniesStore(s => s.isLoaded);
 
 	const query = useQuery({
 		queryKey: ["companies"],
@@ -13,7 +12,6 @@ export function useLoadCompanies() {
 			const res = await getV1Companies();
 			return res.data;
 		},
-		staleTime: isLoaded ? Number.POSITIVE_INFINITY : 0,
 	});
 
 	useEffect(() => {

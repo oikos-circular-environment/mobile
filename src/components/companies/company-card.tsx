@@ -1,11 +1,10 @@
-import { Image } from "expo-image";
 import { AlertTriangleIcon, FactoryIcon } from "lucide-react-native";
-import { Pressable, View } from "react-native";
-import { colors } from "@/components/style/colors";
+import { Image, Pressable, View } from "react-native";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import type { Company } from "@/stores/companies-store";
+import { Badge, BadgeIcon, BadgeText } from "../ui/badge";
 
 interface CompanyCardProps {
 	company: Company;
@@ -22,7 +21,6 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 							<Image
 								source={{ uri: company.avatar.url }}
 								style={{ width: 64, height: 64, borderRadius: 8 }}
-								contentFit="contain"
 							/>
 						</View>
 					) : (
@@ -31,7 +29,7 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 						</View>
 					)}
 
-					<View className="flex-1 justify-center gap-1">
+					<View className="flex-1 justify-center">
 						<Heading size="xl" className="font-semibold" numberOfLines={1}>
 							{company.business_name ?? company.corporate_name}
 						</Heading>
@@ -45,36 +43,27 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 						</Text>
 
 						<View className="flex-row gap-2 mt-1 flex-wrap">
-							<View
-								className={
-									company.status
-										? "bg-primary/10 px-2 py-0.5 rounded-md"
-										: "bg-gray-100 px-2 py-0.5 rounded-md"
-								}
-							>
-								<Text
-									className={`text-xs ${company.status ? "text-primary" : "text-gray-500"}`}
-								>
-									{company.status ? "Ativa" : "Inativa"}
-								</Text>
-							</View>
+							<Badge variant={company.status ? "default" : "destructive"}>
+								<BadgeText>{company.status ? "Ativa" : "Inativa"}</BadgeText>
+							</Badge>
 
 							{!company.is_company_valid && (
-								<View className="flex-row items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md">
-									<AlertTriangleIcon
-										size={10}
-										color={colors.amber[600]}
-										strokeWidth={2}
+								<Badge
+									variant="outline"
+									className="flex-row items-center gap-1 border-amber-100 bg-amber-100 px-2 py-0.5 rounded-md"
+								>
+									<BadgeIcon
+										as={AlertTriangleIcon}
+										className="text-amber-600"
 									/>
-									<Text className="text-xs text-amber-600">
+									<BadgeText className="BadgeText-xs text-amber-600">
 										Perfil incompleto
-									</Text>
-								</View>
+									</BadgeText>
+								</Badge>
 							)}
 						</View>
 					</View>
 				</View>
-
 			</Card>
 		</Pressable>
 	);

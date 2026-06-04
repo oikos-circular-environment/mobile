@@ -7,14 +7,15 @@ import {
 	LockKeyholeIcon,
 	type LucideIcon,
 	MapIcon,
-	PowerIcon,
 	RecycleIcon,
 	SettingsIcon,
+	TriangleAlertIcon,
 	WrenchIcon,
 } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { useToggleCompanyStatus } from "@/components/companies/hooks/use-toggle-company-status";
 import { colors } from "@/components/style/colors";
+import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Switch } from "@/components/ui/switch";
@@ -26,11 +27,17 @@ type CompanySetting = {
 	description: string;
 	icon: LucideIcon;
 	href: Href;
+	validation?: {
+		is_validation: boolean;
+		description: string;
+	}[];
 };
 
 export default function CompanyHubScreen() {
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
-	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const company = useCompaniesStore(s =>
+		s.companies.find(c => c.id === companyId),
+	);
 	const isCompanyRegistered = company != null;
 
 	const { mutate: toggleStatus, isPending: isTogglingStatus } =
@@ -62,8 +69,9 @@ export default function CompanyHubScreen() {
 			href: `/(tabs)/(home)/companies/${companyId}/services` as Href,
 		},
 		{
-			title: "Gestão de resíduos",
-			description: "Configure como sua empresa lida com os tipos de resíduos.",
+			title: "Resíduos",
+			description:
+				"Caso seja um ponto de coleta de resíduo, especifique com quais resíduos você trabalha.",
 			icon: RecycleIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/waste` as Href,
 		},
@@ -89,11 +97,21 @@ export default function CompanyHubScreen() {
 							<SettingsIcon color={colors.white} size={20} />
 						</View>
 					</View>
+				</Card>
 
+				<Alert className="gap-3 bg-amber-100 border-amber-400">
+					<AlertIcon as={TriangleAlertIcon} className="text-destructive" />
+					<AlertText className="text-foreground/80">
+						Para que sua empresa seja listada no Mercado, é necessário que tenha
+						todos os dados preenchidos e com dados reais. A cada seção haverá um
+						indicador auxiliando no nível de validação dos dados.
+					</AlertText>
+				</Alert>
+
+				<Card className="shadow-none">
 					{isCompanyRegistered && (
-						<View className="flex-row items-center justify-between border-t border-border pt-3 mt-1">
+						<View className="flex-row items-center justify-between">
 							<View className="flex-row items-center gap-2">
-								<PowerIcon size={16} className="text-foreground" strokeWidth={1.5} />
 								<Text className="text-sm font-medium">
 									{company.status ? "Empresa ativa" : "Empresa inativa"}
 								</Text>
@@ -107,7 +125,6 @@ export default function CompanyHubScreen() {
 						</View>
 					)}
 				</Card>
-
 				<View className="gap-2">
 					<View className="gap-2 pt-1">
 						{companyOptions.map((option, index) => {
