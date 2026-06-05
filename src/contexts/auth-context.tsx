@@ -36,7 +36,7 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function UserProvider({ children }: PropsWithChildren) {
+export function AuthContextProvider({ children }: PropsWithChildren) {
 	const [user, setUser] = useState<User | null>(null);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [isInitializing, setIsInitializing] = useState(true);
@@ -52,9 +52,9 @@ export function UserProvider({ children }: PropsWithChildren) {
 		queryFn: async () => {
 			const response = await getV1Profiles();
 			const profile = response.data?.profile;
+			setIsAuthenticated(true);
 			if (profile) {
 				setUser({ profile } as User);
-				setIsAuthenticated(true);
 			}
 			return profile;
 		},
@@ -182,6 +182,16 @@ export function UserProvider({ children }: PropsWithChildren) {
 		}
 	}, [isError]);
 
+	useEffect(() => {
+		if (!isInitializing && isAuthenticated && user === null) {
+			toast.warning(
+				"Finalize seu cadastro",
+				"Para mantermos um lugar seguro, precisamos que preencha as informações.",
+			);
+			router.push("/(tabs)/(home)/profile");
+		}
+	}, [isInitializing, isAuthenticated, user, router]);
+
 	const value = useMemo(
 		() => ({
 			user,
@@ -219,7 +229,7 @@ export function useAuthContext() {
 	const context = useContext(AuthContext);
 
 	if (!context) {
-		throw new Error("useAuthContext must be used within UserProvider");
+		throw new Error("useAuthContext must be used within AuthContextProvider");
 	}
 
 	return context;

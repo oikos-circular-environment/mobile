@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import type { ImagePickerAsset } from "expo-image-picker";
 import { toast } from "@/components/toast";
-import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import { compressImage } from "@/libs/media-compression";
+import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 type UploadAvatarParams = {

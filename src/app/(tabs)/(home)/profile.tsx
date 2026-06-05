@@ -5,8 +5,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
-	Check,
 	ChevronDown,
+	InfoIcon,
 	PencilIcon,
 	Search,
 } from "lucide-react-native";
@@ -23,19 +23,13 @@ import {
 import { z } from "zod";
 import DefaultImage from "@/assets/icons/icon.png";
 import { toast } from "@/components/toast";
+import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import {
 	Button,
 	ButtonIcon,
 	ButtonSpinner,
 	ButtonText,
 } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-	Checkbox,
-	CheckboxIcon,
-	CheckboxIndicator,
-	CheckboxLabel,
-} from "@/components/ui/checkbox";
 import {
 	FormControl,
 	FormControlError,
@@ -82,7 +76,6 @@ const profileSchema = z.object({
 	phone: z
 		.string()
 		.regex(/^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/, "Informe um celular valido."),
-	is_collector: z.boolean(),
 	address: z.object({
 		zip_code: z
 			.string()
@@ -125,7 +118,6 @@ export default function ProfileScreen() {
 			profileImage: user?.profile?.profile_image?.url || null,
 			cpf: user?.profile?.cpf ? mask.cpf(user.profile.cpf) : "",
 			phone: user?.profile?.phone ? mask.phoneBr(user.profile.phone) : "",
-			is_collector: user?.profile?.is_collector || false,
 			address: {
 				zip_code: user?.profile?.address?.zip_code
 					? mask.cep(user.profile.address.zip_code)
@@ -190,7 +182,6 @@ export default function ProfileScreen() {
 				profileImage: user.profile.profile_image?.url || null,
 				cpf: user.profile.cpf ? mask.cpf(user.profile.cpf) : "",
 				phone: user.profile.phone ? mask.phoneBr(user.profile.phone) : "",
-				is_collector: user.profile.is_collector || false,
 				address: {
 					zip_code: user.profile.address?.zip_code
 						? mask.cep(user.profile.address.zip_code)
@@ -233,7 +224,6 @@ export default function ProfileScreen() {
 				display_name: data.displayName,
 				cpf: data.cpf.replace(/\D/g, ""),
 				phone: data.phone.replace(/\D/g, ""),
-				is_collector: data.is_collector,
 				address: {
 					zip_code: data.address.zip_code.replace(/\D/g, ""),
 					street: data.address.street,
@@ -408,7 +398,7 @@ export default function ProfileScreen() {
 			>
 				<ScrollView className="flex-1 bg-white p-4">
 					<VStack className="gap-4">
-						<View className="relative mb-8">
+						<View className="relative mb-12">
 							<View className="h-28 items-center justify-center rounded-md bg-primary"></View>
 
 							<Animated.View
@@ -449,74 +439,197 @@ export default function ProfileScreen() {
 						</View>
 
 						<VStack className="gap-4">
-							<Card className="shadow-none">
-								<View>
-									<Heading>Perfil</Heading>
-								</View>
-								<View className="gap-3">
-									<View>
-										<Controller
-											control={control}
-											name="is_collector"
-											render={({ field: { value, onChange } }) => (
-												<Card className="shadow-none" id="is_collector">
-													<Checkbox
-														id="is_collector"
-														value="collector"
-														isChecked={value}
-														onChange={onChange}
-													>
-														<CheckboxIndicator className="data-[checked=true]:border-primary data-[checked=true]:bg-primary">
-															<CheckboxIcon as={Check} />
-														</CheckboxIndicator>
-														<CheckboxLabel>
-															Sou coletor independente
-														</CheckboxLabel>
-													</Checkbox>
-												</Card>
-											)}
-										/>
-									</View>
+							<Alert className="gap-3 bg-sky-100 border-sky-400">
+								<AlertIcon as={InfoIcon} className="text-sky-400" />
+								<AlertText className="text-foreground/80">
+									O preenchimento das informações, visam manter a plataforma
+									segura. Toda interação é registrada, porém ela não é pública,
+									isso garante a todos mais comprometimento com as informações e
+									ações dos usuários com a plataforma e a sociedade.
+								</AlertText>
+							</Alert>
+							<View>
+								<Heading>Perfil</Heading>
+							</View>
+							<View className="gap-3">
+								<FormControl isInvalid={!!errors.cpf} className="gap-2">
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											CPF
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="cpf"
+										render={({ field: { onChange, onBlur, value } }) => (
+											<Input>
+												<InputField
+													value={value}
+													onBlur={onBlur}
+													onChangeText={text => onChange(mask.cpf(text))}
+													keyboardType="number-pad"
+													maxLength={14}
+												/>
+											</Input>
+										)}
+									/>
+									{errors.cpf?.message ? (
+										<FormControlError>
+											<FormControlErrorText>
+												{errors.cpf.message}
+											</FormControlErrorText>
+										</FormControlError>
+									) : null}
+								</FormControl>
 
-									<FormControl isInvalid={!!errors.cpf} className="gap-2">
-										<FormControlLabel>
-											<FormControlLabelText className="text-sm">
-												CPF
-											</FormControlLabelText>
-										</FormControlLabel>
-										<Controller
-											control={control}
-											name="cpf"
-											render={({ field: { onChange, onBlur, value } }) => (
-												<Input>
-													<InputField
-														value={value}
-														onBlur={onBlur}
-														onChangeText={text => onChange(mask.cpf(text))}
-														keyboardType="number-pad"
-														maxLength={14}
+								<FormControl isInvalid={!!errors.fullName} className="gap-2">
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											Nome completo
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="fullName"
+										render={({ field: { onChange, onBlur, value } }) => (
+											<Input>
+												<InputField
+													value={value}
+													onBlur={onBlur}
+													onChangeText={onChange}
+												/>
+											</Input>
+										)}
+									/>
+									{errors.fullName?.message ? (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.fullName.message}
+											</FormControlErrorText>
+										</FormControlError>
+									) : null}
+								</FormControl>
+
+								<FormControl isInvalid={!!errors.displayName} className="gap-2">
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											Como gostaria de ser chamado?
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="displayName"
+										render={({ field: { onChange, onBlur, value } }) => (
+											<Input>
+												<InputField
+													value={value}
+													onBlur={onBlur}
+													onChangeText={onChange}
+												/>
+											</Input>
+										)}
+									/>
+									{errors.displayName?.message ? (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.displayName.message}
+											</FormControlErrorText>
+										</FormControlError>
+									) : null}
+								</FormControl>
+
+								<FormControl isInvalid={!!errors.phone} className="gap-2">
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											Celular
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="phone"
+										render={({ field: { onChange, onBlur, value } }) => (
+											<Input>
+												<InputField
+													value={value}
+													onBlur={onBlur}
+													onChangeText={text => onChange(mask.phoneBr(text))}
+													keyboardType="phone-pad"
+													maxLength={15}
+												/>
+											</Input>
+										)}
+									/>
+									{errors.phone?.message ? (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.phone.message}
+											</FormControlErrorText>
+										</FormControlError>
+									) : null}
+								</FormControl>
+							</View>
+
+							<View>
+								<Heading>Endereço</Heading>
+							</View>
+							<View className="gap-3">
+								<FormControl
+									isInvalid={!!errors.address?.zip_code}
+									className="gap-2"
+								>
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											CEP
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="address.zip_code"
+										render={({ field: { onChange, onBlur, value } }) => (
+											<Input>
+												<InputField
+													value={value}
+													onBlur={onBlur}
+													onChangeText={text => onChange(mask.cep(text))}
+													keyboardType="number-pad"
+													maxLength={9}
+												/>
+												<InputSlot
+													className="pr-3"
+													onPress={() => onPressSearchCep({ cep: value })}
+												>
+													<InputIcon
+														as={getCepMutation.isPending ? Spinner : Search}
 													/>
-												</Input>
-											)}
-										/>
-										{errors.cpf?.message ? (
-											<FormControlError>
-												<FormControlErrorText>
-													{errors.cpf.message}
-												</FormControlErrorText>
-											</FormControlError>
-										) : null}
-									</FormControl>
+												</InputSlot>
+											</Input>
+										)}
+									/>
+									{errors.address?.zip_code?.message ? (
+										<FormControlError>
+											<FormControlErrorText>
+												{errors.address.zip_code.message}
+											</FormControlErrorText>
+										</FormControlError>
+									) : null}
+								</FormControl>
 
-									<FormControl isInvalid={!!errors.fullName} className="gap-2">
+								<View className="flex flex-row gap-2">
+									<FormControl
+										isInvalid={!!errors.address?.street}
+										className="flex-1 gap-2"
+									>
 										<FormControlLabel>
 											<FormControlLabelText className="text-sm">
-												Nome completo
+												Rua
 											</FormControlLabelText>
 										</FormControlLabel>
 										<Controller
 											control={control}
-											name="fullName"
+											name="address.street"
 											render={({ field: { onChange, onBlur, value } }) => (
 												<Input>
 													<InputField
@@ -527,28 +640,28 @@ export default function ProfileScreen() {
 												</Input>
 											)}
 										/>
-										{errors.fullName?.message ? (
+										{errors.address?.street?.message ? (
 											<FormControlError>
 												<FormControlErrorIcon as={AlertCircleIcon} />
 												<FormControlErrorText>
-													{errors.fullName.message}
+													{errors.address.street.message}
 												</FormControlErrorText>
 											</FormControlError>
 										) : null}
 									</FormControl>
 
 									<FormControl
-										isInvalid={!!errors.displayName}
-										className="gap-2"
+										isInvalid={!!errors.address?.number}
+										className="w-20 gap-2"
 									>
 										<FormControlLabel>
 											<FormControlLabelText className="text-sm">
-												Como gostaria de ser chamado?
+												Número
 											</FormControlLabelText>
 										</FormControlLabel>
 										<Controller
 											control={control}
-											name="displayName"
+											name="address.number"
 											render={({ field: { onChange, onBlur, value } }) => (
 												<Input>
 													<InputField
@@ -559,358 +672,106 @@ export default function ProfileScreen() {
 												</Input>
 											)}
 										/>
-										{errors.displayName?.message ? (
+										{errors.address?.number?.message ? (
 											<FormControlError>
 												<FormControlErrorIcon as={AlertCircleIcon} />
 												<FormControlErrorText>
-													{errors.displayName.message}
-												</FormControlErrorText>
-											</FormControlError>
-										) : null}
-									</FormControl>
-
-									<FormControl isInvalid={!!errors.phone} className="gap-2">
-										<FormControlLabel>
-											<FormControlLabelText className="text-sm">
-												Celular
-											</FormControlLabelText>
-										</FormControlLabel>
-										<Controller
-											control={control}
-											name="phone"
-											render={({ field: { onChange, onBlur, value } }) => (
-												<Input>
-													<InputField
-														value={value}
-														onBlur={onBlur}
-														onChangeText={text => onChange(mask.phoneBr(text))}
-														keyboardType="phone-pad"
-														maxLength={15}
-													/>
-												</Input>
-											)}
-										/>
-										{errors.phone?.message ? (
-											<FormControlError>
-												<FormControlErrorIcon as={AlertCircleIcon} />
-												<FormControlErrorText>
-													{errors.phone.message}
+													{errors.address.number.message}
 												</FormControlErrorText>
 											</FormControlError>
 										) : null}
 									</FormControl>
 								</View>
-							</Card>
 
-							<Card className="shadow-none">
-								<View>
-									<Heading>Endereço</Heading>
-								</View>
-								<View className="gap-3">
-									<FormControl
-										isInvalid={!!errors.address?.zip_code}
-										className="gap-2"
-									>
-										<FormControlLabel>
-											<FormControlLabelText className="text-sm">
-												CEP
-											</FormControlLabelText>
-										</FormControlLabel>
-										<Controller
-											control={control}
-											name="address.zip_code"
-											render={({ field: { onChange, onBlur, value } }) => (
-												<Input>
-													<InputField
-														value={value}
-														onBlur={onBlur}
-														onChangeText={text => onChange(mask.cep(text))}
-														keyboardType="number-pad"
-														maxLength={9}
-													/>
-													<InputSlot
-														className="pr-3"
-														onPress={() => onPressSearchCep({ cep: value })}
-													>
-														<InputIcon
-															as={getCepMutation.isPending ? Spinner : Search}
-														/>
-													</InputSlot>
-												</Input>
-											)}
-										/>
-										{errors.address?.zip_code?.message ? (
-											<FormControlError>
-												<FormControlErrorText>
-													{errors.address.zip_code.message}
-												</FormControlErrorText>
-											</FormControlError>
-										) : null}
-									</FormControl>
+								<FormControl
+									isInvalid={!!errors.address?.complement}
+									className="gap-2"
+								>
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											Complemento
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="address.complement"
+										render={({ field: { onChange, onBlur, value } }) => (
+											<Input>
+												<InputField
+													value={value || ""}
+													onBlur={onBlur}
+													onChangeText={onChange}
+												/>
+											</Input>
+										)}
+									/>
+									{errors.address?.complement?.message ? (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.address.complement.message}
+											</FormControlErrorText>
+										</FormControlError>
+									) : null}
+								</FormControl>
 
+								<FormControl
+									isInvalid={!!errors.address?.district}
+									className="gap-2"
+								>
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											Bairro
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="address.district"
+										render={({ field: { onChange, onBlur, value } }) => (
+											<Input>
+												<InputField
+													value={value}
+													onBlur={onBlur}
+													onChangeText={onChange}
+												/>
+											</Input>
+										)}
+									/>
+									{errors.address?.district?.message ? (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.address.district.message}
+											</FormControlErrorText>
+										</FormControlError>
+									) : null}
+								</FormControl>
+
+								<View className="flex flex-col gap-3">
 									<View className="flex flex-row gap-2">
 										<FormControl
-											isInvalid={!!errors.address?.street}
+											isInvalid={!!errors.address?.state}
 											className="flex-1 gap-2"
 										>
 											<FormControlLabel>
 												<FormControlLabelText className="text-sm">
-													Rua
+													Estado
 												</FormControlLabelText>
 											</FormControlLabel>
 											<Controller
 												control={control}
-												name="address.street"
-												render={({ field: { onChange, onBlur, value } }) => (
-													<Input>
-														<InputField
-															value={value}
-															onBlur={onBlur}
-															onChangeText={onChange}
-														/>
-													</Input>
-												)}
-											/>
-											{errors.address?.street?.message ? (
-												<FormControlError>
-													<FormControlErrorIcon as={AlertCircleIcon} />
-													<FormControlErrorText>
-														{errors.address.street.message}
-													</FormControlErrorText>
-												</FormControlError>
-											) : null}
-										</FormControl>
-
-										<FormControl
-											isInvalid={!!errors.address?.number}
-											className="w-20 gap-2"
-										>
-											<FormControlLabel>
-												<FormControlLabelText className="text-sm">
-													Número
-												</FormControlLabelText>
-											</FormControlLabel>
-											<Controller
-												control={control}
-												name="address.number"
-												render={({ field: { onChange, onBlur, value } }) => (
-													<Input>
-														<InputField
-															value={value}
-															onBlur={onBlur}
-															onChangeText={onChange}
-														/>
-													</Input>
-												)}
-											/>
-											{errors.address?.number?.message ? (
-												<FormControlError>
-													<FormControlErrorIcon as={AlertCircleIcon} />
-													<FormControlErrorText>
-														{errors.address.number.message}
-													</FormControlErrorText>
-												</FormControlError>
-											) : null}
-										</FormControl>
-									</View>
-
-									<FormControl
-										isInvalid={!!errors.address?.complement}
-										className="gap-2"
-									>
-										<FormControlLabel>
-											<FormControlLabelText className="text-sm">
-												Complemento
-											</FormControlLabelText>
-										</FormControlLabel>
-										<Controller
-											control={control}
-											name="address.complement"
-											render={({ field: { onChange, onBlur, value } }) => (
-												<Input>
-													<InputField
-														value={value || ""}
-														onBlur={onBlur}
-														onChangeText={onChange}
-													/>
-												</Input>
-											)}
-										/>
-										{errors.address?.complement?.message ? (
-											<FormControlError>
-												<FormControlErrorIcon as={AlertCircleIcon} />
-												<FormControlErrorText>
-													{errors.address.complement.message}
-												</FormControlErrorText>
-											</FormControlError>
-										) : null}
-									</FormControl>
-
-									<FormControl
-										isInvalid={!!errors.address?.district}
-										className="gap-2"
-									>
-										<FormControlLabel>
-											<FormControlLabelText className="text-sm">
-												Bairro
-											</FormControlLabelText>
-										</FormControlLabel>
-										<Controller
-											control={control}
-											name="address.district"
-											render={({ field: { onChange, onBlur, value } }) => (
-												<Input>
-													<InputField
-														value={value}
-														onBlur={onBlur}
-														onChangeText={onChange}
-													/>
-												</Input>
-											)}
-										/>
-										{errors.address?.district?.message ? (
-											<FormControlError>
-												<FormControlErrorIcon as={AlertCircleIcon} />
-												<FormControlErrorText>
-													{errors.address.district.message}
-												</FormControlErrorText>
-											</FormControlError>
-										) : null}
-									</FormControl>
-
-									<View className="flex flex-col gap-3">
-										<View className="flex flex-row gap-2">
-											<FormControl
-												isInvalid={!!errors.address?.state}
-												className="flex-1 gap-2"
-											>
-												<FormControlLabel>
-													<FormControlLabelText className="text-sm">
-														Estado
-													</FormControlLabelText>
-												</FormControlLabel>
-												<Controller
-													control={control}
-													name="address.state"
-													render={({ field: { value, onChange } }) => (
-														<Select
-															selectedValue={value}
-															onValueChange={val => {
-																onChange(val);
-																const state = states?.find(s => s.nome === val);
-																if (state) {
-																	setValue("address.state_code", state.sigla);
-																	setValue(
-																		"address.state_ibge_id",
-																		Number(state.id),
-																	);
-																}
-															}}
-														>
-															<SelectTrigger
-																size="sm"
-																className={cn(
-																	"justify-between",
-																	Platform.OS === "android" ? "px-3" : "pr-3",
-																)}
-															>
-																<SelectInput
-																	placeholder="Selecione o estado"
-																	className="flex-1"
-																/>
-																<SelectIcon
-																	as={isPendingStates ? Spinner : ChevronDown}
-																/>
-															</SelectTrigger>
-															<SelectPortal>
-																<SelectBackdrop />
-																<SelectContent>
-																	<SelectDragIndicatorWrapper>
-																		<SelectDragIndicator />
-																	</SelectDragIndicatorWrapper>
-																	<ScrollView className="w-full max-h-80">
-																		{states ? (
-																			states.map(state => (
-																				<SelectItem
-																					key={state.id}
-																					label={state.nome}
-																					value={state.nome}
-																				/>
-																			))
-																		) : (
-																			<SelectItem
-																				label="Não há dados para mostrar"
-																				value=""
-																			/>
-																		)}
-																	</ScrollView>
-																</SelectContent>
-															</SelectPortal>
-														</Select>
-													)}
-												/>
-												{errors.address?.state?.message && (
-													<FormControlError>
-														<FormControlErrorIcon as={AlertCircleIcon} />
-														<FormControlErrorText>
-															{errors.address.state.message}
-														</FormControlErrorText>
-													</FormControlError>
-												)}
-											</FormControl>
-
-											<FormControl
-												isInvalid={!!errors.address?.state_code}
-												isReadOnly
-												className="w-20 gap-2"
-											>
-												<FormControlLabel>
-													<FormControlLabelText className="text-sm">
-														Sigla
-													</FormControlLabelText>
-												</FormControlLabel>
-												<Controller
-													control={control}
-													name="address.state_code"
-													render={({ field: { value } }) => (
-														<Input isReadOnly>
-															<InputField value={value} />
-														</Input>
-													)}
-												/>
-												{errors.address?.state_code?.message && (
-													<FormControlError>
-														<FormControlErrorIcon as={AlertCircleIcon} />
-														<FormControlErrorText>
-															{errors.address.state_code.message}
-														</FormControlErrorText>
-													</FormControlError>
-												)}
-											</FormControl>
-										</View>
-
-										<FormControl
-											isInvalid={!!errors.address?.city}
-											className="gap-2"
-										>
-											<FormControlLabel>
-												<FormControlLabelText className="text-sm">
-													Cidade
-												</FormControlLabelText>
-											</FormControlLabel>
-											<Controller
-												control={control}
-												name="address.city"
+												name="address.state"
 												render={({ field: { value, onChange } }) => (
 													<Select
 														selectedValue={value}
 														onValueChange={val => {
 															onChange(val);
-															const city = cities?.find(c => c.nome === val);
-															if (city) {
+															const state = states?.find(s => s.nome === val);
+															if (state) {
+																setValue("address.state_code", state.sigla);
 																setValue(
-																	"address.city_ibge_id",
-																	Number(city.codigo_ibge),
+																	"address.state_ibge_id",
+																	Number(state.id),
 																);
 															}
 														}}
@@ -923,11 +784,11 @@ export default function ProfileScreen() {
 															)}
 														>
 															<SelectInput
-																placeholder="Selecione a cidade"
-																className="flex-1 capitalize"
+																placeholder="Selecione o estado"
+																className="flex-1"
 															/>
 															<SelectIcon
-																as={isPendingCities ? Spinner : ChevronDown}
+																as={isPendingStates ? Spinner : ChevronDown}
 															/>
 														</SelectTrigger>
 														<SelectPortal>
@@ -937,18 +798,17 @@ export default function ProfileScreen() {
 																	<SelectDragIndicator />
 																</SelectDragIndicatorWrapper>
 																<ScrollView className="w-full max-h-80">
-																	{cities ? (
-																		cities.map(city => (
+																	{states ? (
+																		states.map(state => (
 																			<SelectItem
-																				key={city.codigo_ibge}
-																				label={city.nome}
-																				value={city.nome}
-																				className="capitalize"
+																				key={state.id}
+																				label={state.nome}
+																				value={state.nome}
 																			/>
 																		))
 																	) : (
 																		<SelectItem
-																			label="Selecione um estado"
+																			label="Não há dados para mostrar"
 																			value=""
 																		/>
 																	)}
@@ -958,11 +818,40 @@ export default function ProfileScreen() {
 													</Select>
 												)}
 											/>
-											{errors.address?.city?.message && (
+											{errors.address?.state?.message && (
 												<FormControlError>
 													<FormControlErrorIcon as={AlertCircleIcon} />
 													<FormControlErrorText>
-														{errors.address.city.message}
+														{errors.address.state.message}
+													</FormControlErrorText>
+												</FormControlError>
+											)}
+										</FormControl>
+
+										<FormControl
+											isInvalid={!!errors.address?.state_code}
+											isReadOnly
+											className="w-20 gap-2"
+										>
+											<FormControlLabel>
+												<FormControlLabelText className="text-sm">
+													Sigla
+												</FormControlLabelText>
+											</FormControlLabel>
+											<Controller
+												control={control}
+												name="address.state_code"
+												render={({ field: { value } }) => (
+													<Input isReadOnly>
+														<InputField value={value} />
+													</Input>
+												)}
+											/>
+											{errors.address?.state_code?.message && (
+												<FormControlError>
+													<FormControlErrorIcon as={AlertCircleIcon} />
+													<FormControlErrorText>
+														{errors.address.state_code.message}
 													</FormControlErrorText>
 												</FormControlError>
 											)}
@@ -970,44 +859,122 @@ export default function ProfileScreen() {
 									</View>
 
 									<FormControl
-										isInvalid={
-											!!errors.address?.latitude || !!errors.address?.longitude
-										}
+										isInvalid={!!errors.address?.city}
 										className="gap-2"
 									>
 										<FormControlLabel>
 											<FormControlLabelText className="text-sm">
-												Localização no Mapa
+												Cidade
 											</FormControlLabelText>
 										</FormControlLabel>
 										<Controller
 											control={control}
-											name="address"
-											render={({ field: { value } }) => (
-												<WrapperMap
-													latitude={value.latitude}
-													longitude={value.longitude}
-													onChange={loc => {
-														setValue("address.latitude", loc.latitude);
-														setValue("address.longitude", loc.longitude);
+											name="address.city"
+											render={({ field: { value, onChange } }) => (
+												<Select
+													selectedValue={value}
+													onValueChange={val => {
+														onChange(val);
+														const city = cities?.find(c => c.nome === val);
+														if (city) {
+															setValue(
+																"address.city_ibge_id",
+																Number(city.codigo_ibge),
+															);
+														}
 													}}
-												/>
+												>
+													<SelectTrigger
+														size="sm"
+														className={cn(
+															"justify-between",
+															Platform.OS === "android" ? "px-3" : "pr-3",
+														)}
+													>
+														<SelectInput
+															placeholder="Selecione a cidade"
+															className="flex-1 capitalize"
+														/>
+														<SelectIcon
+															as={isPendingCities ? Spinner : ChevronDown}
+														/>
+													</SelectTrigger>
+													<SelectPortal>
+														<SelectBackdrop />
+														<SelectContent>
+															<SelectDragIndicatorWrapper>
+																<SelectDragIndicator />
+															</SelectDragIndicatorWrapper>
+															<ScrollView className="w-full max-h-80">
+																{cities ? (
+																	cities.map(city => (
+																		<SelectItem
+																			key={city.codigo_ibge}
+																			label={city.nome}
+																			value={city.nome}
+																			className="capitalize"
+																		/>
+																	))
+																) : (
+																	<SelectItem
+																		label="Selecione um estado"
+																		value=""
+																	/>
+																)}
+															</ScrollView>
+														</SelectContent>
+													</SelectPortal>
+												</Select>
 											)}
 										/>
-										{(errors.address?.latitude ||
-											errors.address?.longitude) && (
+										{errors.address?.city?.message && (
 											<FormControlError>
 												<FormControlErrorIcon as={AlertCircleIcon} />
 												<FormControlErrorText>
-													{errors.address?.latitude?.message ||
-														errors.address?.longitude?.message ||
-														"Localização inválida"}
+													{errors.address.city.message}
 												</FormControlErrorText>
 											</FormControlError>
 										)}
 									</FormControl>
 								</View>
-							</Card>
+
+								<FormControl
+									isInvalid={
+										!!errors.address?.latitude || !!errors.address?.longitude
+									}
+									className="gap-2"
+								>
+									<FormControlLabel>
+										<FormControlLabelText className="text-sm">
+											Localização no Mapa
+										</FormControlLabelText>
+									</FormControlLabel>
+									<Controller
+										control={control}
+										name="address"
+										render={({ field: { value } }) => (
+											<WrapperMap
+												latitude={value.latitude}
+												longitude={value.longitude}
+												onChange={loc => {
+													setValue("address.latitude", loc.latitude);
+													setValue("address.longitude", loc.longitude);
+												}}
+											/>
+										)}
+									/>
+									{(errors.address?.latitude || errors.address?.longitude) && (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.address?.latitude?.message ||
+													errors.address?.longitude?.message ||
+													"Localização inválida"}
+											</FormControlErrorText>
+										</FormControlError>
+									)}
+								</FormControl>
+							</View>
 						</VStack>
 						<View className="flex flex-row gap-2 pb-10 pt-4">
 							<Button

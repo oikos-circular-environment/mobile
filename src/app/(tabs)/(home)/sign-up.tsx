@@ -30,11 +30,11 @@ const signUpSchema = z
 	.object({
 		email: z.string().email("Digite um e-mail válido."),
 		password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
-		confirmPassword: z.string(),
+		confirm_password: z.string(),
 	})
-	.refine(data => data.password === data.confirmPassword, {
+	.refine(data => data.password === data.confirm_password, {
 		message: "As senhas não coincidem.",
-		path: ["confirmPassword"],
+		path: ["confirm_password"],
 	});
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
@@ -55,7 +55,7 @@ export default function SignUpScreen() {
 		defaultValues: {
 			email: "",
 			password: "",
-			confirmPassword: "",
+			confirm_password: "",
 		},
 	});
 
@@ -191,7 +191,7 @@ export default function SignUpScreen() {
 						)}
 					</FormControl>
 
-					<FormControl isInvalid={!!errors.confirmPassword} className="gap-2">
+					<FormControl isInvalid={!!errors.confirm_password} className="gap-2">
 						<FormControlLabel>
 							<FormControlLabelText className="text-gray-500 font-medium">
 								Confirmar Senha
@@ -199,7 +199,7 @@ export default function SignUpScreen() {
 						</FormControlLabel>
 						<Controller
 							control={control}
-							name="confirmPassword"
+							name="confirm_password"
 							render={({ field: { onChange, onBlur, value } }) => (
 								<Input>
 									<InputField
@@ -222,10 +222,10 @@ export default function SignUpScreen() {
 								</Input>
 							)}
 						/>
-						{errors.confirmPassword?.message && (
+						{errors.confirm_password?.message && (
 							<FormControlError>
 								<FormControlErrorText>
-									{errors.confirmPassword.message}
+									{errors.confirm_password.message}
 								</FormControlErrorText>
 							</FormControlError>
 						)}

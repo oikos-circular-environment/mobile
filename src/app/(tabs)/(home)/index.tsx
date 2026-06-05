@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { Image } from "expo-image";
 import type { Href } from "expo-router";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import {
 	ArrowRight,
-	ArrowUpRight,
 	RecycleIcon,
 	ShieldIcon,
 	Sprout,
@@ -18,16 +16,14 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
-import OikosLogo from "@/assets/icons/icon.png";
-import { ButtonSignOut } from "@/components/auth/button-sign-out";
+import { HomeGuestCard } from "@/components/home/home-guest-card";
+import { HomeHeaderSkeleton } from "@/components/home/home-header-skeleton";
+import { HomeUserCard } from "@/components/home/home-user-card";
 import { colors } from "@/components/style/colors";
-import { toast } from "@/components/toast";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Grid, GridItem } from "@/components/ui/grid";
 import { Heading } from "@/components/ui/heading";
-import { HStack } from "@/components/ui/hstack";
-import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
@@ -74,10 +70,9 @@ function ServiceCard({
 }
 
 export default function HomeScreen() {
-	const { user, isAuthenticated, isLoading } = useAuthContext();
+	const { isAuthenticated, isLoading } = useAuthContext();
 	const { location, currentDate, isResolving, permissionDenied } =
 		useGeospatial();
-	const router = useRouter();
 	const contentOpacity = useRef(new Animated.Value(0)).current;
 
 	const lat = location?.coords.latitude;
@@ -96,16 +91,6 @@ export default function HomeScreen() {
 	});
 
 	const nearbyCompanies = nearbyData?.companies ?? [];
-
-	useEffect(() => {
-		if (isAuthenticated && user === null) {
-			toast.warning(
-				"Finalize seu cadastro",
-				"Para mantermos um lugar seguro, precisamos que preencha as informações.",
-			);
-			router.push("/(tabs)/(home)/profile");
-		}
-	});
 
 	useEffect(() => {
 		if (!isLoading) {
@@ -127,56 +112,10 @@ export default function HomeScreen() {
 			{/* Header — perfil ou CTA de login */}
 			<View>
 				{isLoading ? (
-					<Card className="flex flex-row gap-4 shadow-none items-center">
-						<HStack space="xs" className="flex flex-1 items-center">
-							<Skeleton variant="rounded" className="w-12 h-12 mr-2" />
-							<View className="flex-1">
-								<SkeletonText _lines={2} gap={1} className="h-4 w-full" />
-							</View>
-						</HStack>
-					</Card>
+					<HomeHeaderSkeleton />
 				) : (
 					<Animated.View style={{ opacity: contentOpacity }}>
-						{isAuthenticated && user ? (
-							<Card className="flex flex-row gap-4 shadow-none">
-								<Link href="/(tabs)/(home)/profile" asChild>
-									<Pressable className="flex flex-1 flex-row gap-4">
-										<Image
-											source={
-												user.profile.profile_image
-													? user.profile.profile_image.url
-													: OikosLogo
-											}
-											style={{ width: 40, height: 40, borderRadius: 4 }}
-										/>
-										<View className="flex flex-col flex-1">
-											<Heading numberOfLines={1}>
-												{user.profile.display_name}
-											</Heading>
-											<Text className="text-muted-foreground">
-												{`${user.profile.address?.street}, ${user.profile.address?.number}`}
-											</Text>
-										</View>
-									</Pressable>
-								</Link>
-								<ButtonSignOut />
-							</Card>
-						) : (
-							<Link href="/sign-in">
-								<Card className="flex flex-row justify-between shadow-none bg-secondary">
-									<View className="flex-1">
-										<Heading className="text-2xl">Bem-Vindos a Oikos!</Heading>
-										<Text className="text-muted-foreground">
-											Estamos felizes de você estar aqui conosco, colabore com o
-											nosso ecosistema
-										</Text>
-									</View>
-									<Card className="bg-primary items-center justify-center">
-										<ArrowUpRight color={colors.white} />
-									</Card>
-								</Card>
-							</Link>
-						)}
+						{isAuthenticated ? <HomeUserCard /> : <HomeGuestCard />}
 					</Animated.View>
 				)}
 			</View>

@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { UserProvider } from "@/contexts/auth-context";
+import { AuthContextProvider } from "@/contexts/auth-context";
 import { GeospatialProvider } from "@/contexts/geospatial-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import "react-native-reanimated";
@@ -46,7 +46,7 @@ export default function RootLayout() {
 		<GestureHandlerRootView style={{ flex: 1, backgroundColor: "white" }}>
 			<GluestackUIProvider mode="light">
 				<QueryClientProvider client={queryClient}>
-					<UserProvider>
+					<AuthContextProvider>
 						<GeospatialProvider>
 							<NotificationProvider>
 								<SafeAreaProvider>
@@ -66,7 +66,7 @@ export default function RootLayout() {
 								</SafeAreaProvider>
 							</NotificationProvider>
 						</GeospatialProvider>
-					</UserProvider>
+					</AuthContextProvider>
 					{isDevelopmentMode && <FloatingDevTools />}
 					{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
 				</QueryClientProvider>
