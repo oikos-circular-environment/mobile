@@ -76,14 +76,14 @@ const mockRouter = {
 	replace: jest.fn(),
 };
 
-function renderWithAuth(ui: React.ReactElement) {
+async function renderWithAuth(ui: React.ReactElement) {
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: { retry: false },
 			mutations: { retry: false },
 		},
 	});
-	return render(
+	return await render(
 		<QueryClientProvider client={queryClient}>
 			<AuthContextProvider>{ui}</AuthContextProvider>
 		</QueryClientProvider>,

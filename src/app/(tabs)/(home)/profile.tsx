@@ -346,13 +346,13 @@ export default function ProfileScreen() {
 		}
 	};
 
-	const onPressSearchCep = async ({ cep }: { cep: string }) => {
+	const onPressSearchCep = ({ cep }: { cep: string }) => {
 		const cleanCep = cep.replace(/\D/g, "");
 		if (cleanCep.length !== 8) {
 			toast.error("CEP inválido", "O CEP deve conter 8 dígitos.");
 			return;
 		}
-		await getCepMutation.mutateAsync({ cep: cleanCep });
+		getCepMutation.mutate({ cep: cleanCep });
 	};
 
 	const onCancel = () => {
@@ -411,6 +411,7 @@ export default function ProfileScreen() {
 									render={({ field: { value, onChange } }) => (
 										<View>
 											<TouchableOpacity
+												testID="avatar-touchable"
 												activeOpacity={0.7}
 												onPress={() => pickImage(onChange)}
 												className="rounded-md shadow-lg shadow-black/40"
@@ -464,6 +465,7 @@ export default function ProfileScreen() {
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
+													testID="input-full-name"
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
@@ -494,6 +496,7 @@ export default function ProfileScreen() {
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
+													testID="input-display-name"
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
@@ -524,6 +527,7 @@ export default function ProfileScreen() {
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
+													testID="input-phone"
 													value={value}
 													onBlur={onBlur}
 													onChangeText={text => onChange(mask.phoneBr(text))}
@@ -563,6 +567,7 @@ export default function ProfileScreen() {
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
+													testID="input-zip-code"
 													value={value}
 													onBlur={onBlur}
 													onChangeText={text => onChange(mask.cep(text))}
@@ -571,6 +576,7 @@ export default function ProfileScreen() {
 												/>
 												<InputSlot
 													className="pr-3"
+													testID="cep-search-btn"
 													onPress={() => onPressSearchCep({ cep: value })}
 												>
 													<InputIcon
@@ -605,6 +611,7 @@ export default function ProfileScreen() {
 											render={({ field: { onChange, onBlur, value } }) => (
 												<Input>
 													<InputField
+														testID="input-street"
 														value={value}
 														onBlur={onBlur}
 														onChangeText={onChange}
@@ -637,6 +644,7 @@ export default function ProfileScreen() {
 											render={({ field: { onChange, onBlur, value } }) => (
 												<Input>
 													<InputField
+														testID="input-number"
 														value={value}
 														onBlur={onBlur}
 														onChangeText={onChange}
@@ -670,6 +678,7 @@ export default function ProfileScreen() {
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
+													testID="input-complement"
 													value={value || ""}
 													onBlur={onBlur}
 													onChangeText={onChange}
@@ -702,6 +711,7 @@ export default function ProfileScreen() {
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
+													testID="input-district"
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
@@ -950,6 +960,7 @@ export default function ProfileScreen() {
 						</VStack>
 						<View className="flex flex-row gap-2 pb-10 pt-4">
 							<Button
+								testID="btn-cancel"
 								variant="outline"
 								className="flex-1"
 								onPress={onCancel}
@@ -958,6 +969,7 @@ export default function ProfileScreen() {
 								<ButtonText>Cancelar</ButtonText>
 							</Button>
 							<Button
+								testID="btn-confirm"
 								className="flex-1"
 								onPress={handleSubmit(onSubmit)}
 								isDisabled={isLoading || (!isDirty && !selectedAsset.current)}
