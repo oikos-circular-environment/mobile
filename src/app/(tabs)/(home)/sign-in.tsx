@@ -166,6 +166,7 @@ export default function SignInScreen() {
 									<InputSlot
 										onPress={() => setShowPassword(prev => !prev)}
 										className="pr-1"
+										testID="toggle-password"
 									>
 										<InputIcon
 											as={showPassword ? Eye : EyeOff}

@@ -173,6 +173,7 @@ export default function SignUpScreen() {
 									<InputSlot
 										onPress={() => setShowPassword(prev => !prev)}
 										className="pr-1"
+										testID="toggle-password"
 									>
 										<InputIcon
 											as={showPassword ? Eye : EyeOff}
@@ -213,6 +214,7 @@ export default function SignUpScreen() {
 									<InputSlot
 										onPress={() => setShowConfirmPassword(prev => !prev)}
 										className="pr-1"
+										testID="toggle-confirm-password"
 									>
 										<InputIcon
 											as={showPassword ? Eye : EyeOff}

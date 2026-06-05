@@ -9,7 +9,9 @@
     "ios": "expo run:ios",
     "lint": "biome lint --write --files-ignore-unknown=true .",
     "format": "biome format --write --files-ignore-unknown=true .",
-    "generate:api": "openapi-ts"
+    "generate:api": "openapi-ts",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@expo-google-fonts/oswald": "^0.4.2",
@@ -94,10 +96,15 @@
     "@faker-js/faker": "^10.3.0",
     "@hey-api/openapi-ts": "0.97.1",
     "@tailwindcss/postcss": "^4.2.2",
+    "@testing-library/react-native": "^14.0.0",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.0",
     "babel-plugin-module-resolver": "^5.0.3",
+    "jest": "^29.7.0",
+    "jest-expo": "^54.0.17",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
+    "test-renderer": "^1.2.0",
     "typescript": "~5.9.2"
   },
   "overrides": {

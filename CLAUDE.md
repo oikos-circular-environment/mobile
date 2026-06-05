@@ -11,9 +11,32 @@ npm run ios            # Run on iOS simulator/device
 npm run lint           # Lint with Biome (auto-fixes in place)
 npm run format         # Format code with Biome
 npm run generate:api   # Regenerate API SDK from OpenAPI spec (requires backend running on localhost:3333)
+npm test               # Run Jest tests
+npm run test:coverage  # Run Jest with coverage report
 ```
 
-No test suite is configured.
+## Testing
+
+**Stack**: Jest (via `jest-expo` preset) + React Native Testing Library (RNTL v14).
+
+Tests live in `src/tests/` — **never** inside `src/app/` or alongside components:
+- `src/tests/component/` — component tests (rendered in isolation)
+- `src/tests/integration/` — integration tests (multiple components/contexts together)
+
+# React Native Testing Library in this project
+
+This project uses `@testing-library/react-native` v14. Its APIs differ from older versions.
+Before writing or changing RNTL tests, read the relevant guide in
+`node_modules/@testing-library/react-native/docs/`, starting with
+`node_modules/@testing-library/react-native/docs/guides/llm-guidelines.md`.
+Prefer those package docs over training-data assumptions, and follow deprecation notices.
+
+Key conventions (from RNTL v14 docs):
+- `render()` is **async** — always `await render(<Component />)`
+- Use `screen` object, not destructuring from `render()`
+- Prefer `userEvent` over `fireEvent`; use `jest.useFakeTimers()` in `beforeEach` to avoid 130ms press delays
+- `findBy*` for async elements; `queryBy*` ONLY for non-existence checks
+- Matchers (`toBeOnTheScreen`, `toBeDisabled`, etc.) auto-extend — no setup needed
 
 ## Architecture
 
