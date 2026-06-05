@@ -28,6 +28,7 @@ type AuthContextValue = {
 	user: User | null;
 	isAuthenticated: boolean;
 	isLoading: boolean;
+	needsProfileCompletion: boolean;
 	signIn: (data: { email: string; password: string }) => Promise<void>;
 	signUp: (data: { email: string; password: string }) => Promise<void>;
 	signOut: () => void;
@@ -201,6 +202,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 				isLoadingProfile ||
 				signInMutation.isPending ||
 				signUpMutation.isPending,
+			needsProfileCompletion: isAuthenticated && user === null,
 			signIn: async (data: { email: string; password: string }) => {
 				await signInMutation.mutateAsync(data);
 			},

@@ -14,6 +14,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
@@ -65,7 +66,8 @@ export function ComplaintBottomSheet() {
 		string | null
 	>(null);
 	const [showAuthModal, setShowAuthModal] = useState(false);
-	const { isAuthenticated, user } = useAuthContext();
+	const [showProfileModal, setShowProfileModal] = useState(false);
+	const { isAuthenticated, needsProfileCompletion, user } = useAuthContext();
 	const { location } = useGeospatial();
 
 	const complaint = useComplaintsStore(s => s.selectedMapComplaint);
@@ -219,6 +221,10 @@ export function ComplaintBottomSheet() {
 			setShowAuthModal(true);
 			return;
 		}
+		if (needsProfileCompletion) {
+			setShowProfileModal(true);
+			return;
+		}
 		const previous = userVotes[complaintId] ?? null;
 		const next = previous === vote ? null : vote;
 		voteMutation.mutate({ voteType: next, previousVote: previous });
@@ -238,6 +244,10 @@ export function ComplaintBottomSheet() {
 	const handleAddResolution = () => {
 		if (!isAuthenticated) {
 			setShowAuthModal(true);
+			return;
+		}
+		if (needsProfileCompletion) {
+			setShowProfileModal(true);
 			return;
 		}
 		router.push({
@@ -530,6 +540,11 @@ export function ComplaintBottomSheet() {
 				isOpen={showAuthModal}
 				onClose={() => setShowAuthModal(false)}
 				description="Para interagir com denúncias você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente."
+			/>
+			<ProfileCompletionModal
+				isOpen={showProfileModal}
+				onClose={() => setShowProfileModal(false)}
+				description="Para interagir com denúncias você precisa finalizar o seu cadastro."
 			/>
 		</>
 	);

@@ -17,6 +17,7 @@ import {
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
 import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
 import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/tokens";
@@ -65,7 +66,7 @@ const controlShadow = {
 
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
-	const { isAuthenticated } = useAuthContext();
+	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
 	const { location } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
 	const radarSheetRef = useRef<BottomSheetRef>(null);
@@ -77,6 +78,7 @@ export default function ComplaintsMapScreen() {
 		: null;
 
 	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [mapHeading, setMapHeading] = useState(0);
 	const [activeRadius, setActiveRadius] = useState(10000);
 	const [activeTypeFilter, setActiveTypeFilter] =
@@ -373,6 +375,10 @@ export default function ComplaintsMapScreen() {
 							setShowAuthModal(true);
 							return;
 						}
+						if (needsProfileCompletion) {
+							setShowProfileModal(true);
+							return;
+						}
 						router.push("/(tabs)/complaints/list");
 					}}
 					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
@@ -394,6 +400,10 @@ export default function ComplaintsMapScreen() {
 							setShowAuthModal(true);
 							return;
 						}
+						if (needsProfileCompletion) {
+							setShowProfileModal(true);
+							return;
+						}
 						router.push("/(tabs)/complaints/(create)");
 					}}
 					className="h-[50px] w-[50px] items-center justify-center rounded-[14px] bg-lime-800"
@@ -412,6 +422,11 @@ export default function ComplaintsMapScreen() {
 			<AuthModal
 				isOpen={showAuthModal}
 				onClose={() => setShowAuthModal(false)}
+			/>
+			<ProfileCompletionModal
+				isOpen={showProfileModal}
+				onClose={() => setShowProfileModal(false)}
+				description="Para visualizar e registrar denúncias você precisa finalizar o seu cadastro."
 			/>
 
 			{/* Radar bottom sheet */}

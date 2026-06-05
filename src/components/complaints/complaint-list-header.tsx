@@ -3,6 +3,7 @@ import { CameraIcon, ShieldIcon } from "lucide-react-native";
 import { useState } from "react";
 import { View } from "react-native";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { ComplaintPainel } from "@/components/complaints/complaint-painel";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
@@ -13,12 +14,17 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { HStack } from "../ui/hstack";
 
 export function ComplaintListHeader() {
-	const { isAuthenticated } = useAuthContext();
+	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
 	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [showProfileModal, setShowProfileModal] = useState(false);
 
 	const handleNewComplaint = () => {
 		if (!isAuthenticated) {
 			setShowAuthModal(true);
+			return;
+		}
+		if (needsProfileCompletion) {
+			setShowProfileModal(true);
 			return;
 		}
 		router.push("/(tabs)/complaints/(create)");
@@ -71,6 +77,11 @@ export function ComplaintListHeader() {
 				isOpen={showAuthModal}
 				onClose={() => setShowAuthModal(false)}
 				description="Para registrar uma denúncia você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente."
+			/>
+			<ProfileCompletionModal
+				isOpen={showProfileModal}
+				onClose={() => setShowProfileModal(false)}
+				description="Para registrar uma denúncia você precisa finalizar o seu cadastro."
 			/>
 		</>
 	);
