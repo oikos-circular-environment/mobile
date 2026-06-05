@@ -10,8 +10,8 @@
     "lint": "biome lint --write --files-ignore-unknown=true .",
     "format": "biome format --write --files-ignore-unknown=true .",
     "generate:api": "openapi-ts",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test": "jest --forceExit",
+    "test:coverage": "jest --coverage --forceExit"
   },
   "dependencies": {
     "@expo-google-fonts/oswald": "^0.4.2",

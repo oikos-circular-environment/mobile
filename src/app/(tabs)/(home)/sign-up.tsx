@@ -59,8 +59,8 @@ export default function SignUpScreen() {
 		},
 	});
 
-	const onSubmit = async (data: SignUpFormValues) => {
-		await signUp(data);
+	const onSubmit = (data: SignUpFormValues) => {
+		signUp(data);
 	};
 
 	return (

@@ -51,8 +51,8 @@ export default function SignInScreen() {
 		},
 	});
 
-	const onSubmit = async (data: SignInFormValues) => {
-		await signIn(data);
+	const onSubmit = (data: SignInFormValues) => {
+		signIn(data);
 	};
 
 	return (
