@@ -142,9 +142,7 @@ export type GetV1ProfilesResponses = {
 			user_id: string;
 			full_name: string;
 			display_name: string;
-			cpf: string;
 			phone: string;
-			is_collector: boolean;
 			id: string;
 			created_at: Date;
 			updated_at: Date;
@@ -183,9 +181,7 @@ export type PutV1ProfilesData = {
 	body: {
 		full_name: string;
 		display_name: string;
-		cpf: string;
 		phone: string;
-		is_collector?: boolean;
 		address?: {
 			zip_code: string;
 			street: string;
@@ -236,9 +232,7 @@ export type PutV1ProfilesResponses = {
 			user_id: string;
 			full_name: string;
 			display_name: string;
-			cpf: string;
 			phone: string;
-			is_collector: boolean;
 			id: string;
 			created_at: Date;
 			updated_at: Date;
@@ -2999,3 +2993,19 @@ export type GetV1MarketResponses = {
 
 export type GetV1MarketResponse =
 	GetV1MarketResponses[keyof GetV1MarketResponses];
+
+export type GetStorageBy__Data = {
+	body?: never;
+	path: {
+		"*": string;
+	};
+	query?: never;
+	url: "/storage/{*}";
+};
+
+export type GetStorageBy__Responses = {
+	/**
+	 * Default Response
+	 */
+	200: unknown;
+};

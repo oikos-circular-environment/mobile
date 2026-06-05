@@ -48,6 +48,8 @@ import type {
 	DeleteV1ProfilesImagesData,
 	DeleteV1ProfilesImagesErrors,
 	DeleteV1ProfilesImagesResponses,
+	GetStorageBy__Data,
+	GetStorageBy__Responses,
 	GetV1CompaniesByIdAddressesData,
 	GetV1CompaniesByIdAddressesErrors,
 	GetV1CompaniesByIdAddressesResponses,
@@ -1087,3 +1089,12 @@ export const getV1Market = <ThrowOnError extends boolean = false>(
 		url: "/v1/market",
 		...options,
 	});
+
+export const getStorageBy__ = <ThrowOnError extends boolean = false>(
+	options: Options<GetStorageBy__Data, ThrowOnError>,
+) =>
+	(options.client ?? client).get<
+		GetStorageBy__Responses,
+		unknown,
+		ThrowOnError
+	>({ url: "/storage/{*}", ...options });

@@ -70,9 +70,6 @@ const profileSchema = z.object({
 	fullName: z.string().min(3, "Informe seu nome completo."),
 	displayName: z.string().min(2, "Informe como prefere ser chamado."),
 	profileImage: z.string().optional().nullable(),
-	cpf: z
-		.string()
-		.regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "Informe um CPF valido."),
 	phone: z
 		.string()
 		.regex(/^\(\d{2}\)\s(\d\s)?\d{4}-\d{4}$/, "Informe um celular valido."),
@@ -116,7 +113,6 @@ export default function ProfileScreen() {
 			fullName: user?.profile?.full_name || "",
 			displayName: user?.profile?.display_name || "",
 			profileImage: user?.profile?.profile_image?.url || null,
-			cpf: user?.profile?.cpf ? mask.cpf(user.profile.cpf) : "",
 			phone: user?.profile?.phone ? mask.phoneBr(user.profile.phone) : "",
 			address: {
 				zip_code: user?.profile?.address?.zip_code
@@ -180,7 +176,6 @@ export default function ProfileScreen() {
 				fullName: user.profile.full_name || "",
 				displayName: user.profile.display_name || "",
 				profileImage: user.profile.profile_image?.url || null,
-				cpf: user.profile.cpf ? mask.cpf(user.profile.cpf) : "",
 				phone: user.profile.phone ? mask.phoneBr(user.profile.phone) : "",
 				address: {
 					zip_code: user.profile.address?.zip_code
@@ -222,7 +217,6 @@ export default function ProfileScreen() {
 			const profileData = {
 				full_name: data.fullName,
 				display_name: data.displayName,
-				cpf: data.cpf.replace(/\D/g, ""),
 				phone: data.phone.replace(/\D/g, ""),
 				address: {
 					zip_code: data.address.zip_code.replace(/\D/g, ""),
@@ -273,13 +267,19 @@ export default function ProfileScreen() {
 			return response.data;
 		},
 		onSuccess: data => {
-			setValue("profileImage", data?.url);
+			if (!data || !user?.profile) return;
+			setValue("profileImage", data.url);
 			updateUserProfile({
 				profile: {
-					...user?.profile,
-					profile_image: { url: data?.url },
+					...user.profile,
+					profile_image: {
+						id: data.id,
+						url: data.url,
+						file_name: data.file_name,
+						path: data.path,
+					},
 				},
-			} as any);
+			});
 		},
 		onError: () => {
 			toast.error(
@@ -452,36 +452,6 @@ export default function ProfileScreen() {
 								<Heading>Perfil</Heading>
 							</View>
 							<View className="gap-3">
-								<FormControl isInvalid={!!errors.cpf} className="gap-2">
-									<FormControlLabel>
-										<FormControlLabelText className="text-sm">
-											CPF
-										</FormControlLabelText>
-									</FormControlLabel>
-									<Controller
-										control={control}
-										name="cpf"
-										render={({ field: { onChange, onBlur, value } }) => (
-											<Input>
-												<InputField
-													value={value}
-													onBlur={onBlur}
-													onChangeText={text => onChange(mask.cpf(text))}
-													keyboardType="number-pad"
-													maxLength={14}
-												/>
-											</Input>
-										)}
-									/>
-									{errors.cpf?.message ? (
-										<FormControlError>
-											<FormControlErrorText>
-												{errors.cpf.message}
-											</FormControlErrorText>
-										</FormControlError>
-									) : null}
-								</FormControl>
-
 								<FormControl isInvalid={!!errors.fullName} className="gap-2">
 									<FormControlLabel>
 										<FormControlLabelText className="text-sm">
@@ -497,6 +467,7 @@ export default function ProfileScreen() {
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
+													placeholder="Emanuel Ribeiro de Souza"
 												/>
 											</Input>
 										)}
@@ -526,6 +497,7 @@ export default function ProfileScreen() {
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
+													placeholder="Emanuel"
 												/>
 											</Input>
 										)}
