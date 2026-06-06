@@ -1,11 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { ChevronDown, MapIcon, Search } from "lucide-react-native";
+import {
+	AlertCircleIcon,
+	ChevronDown,
+	MapIcon,
+	Search,
+} from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { z } from "zod";
+import { useSaveAddress } from "@/components/companies/hooks/use-save-address";
 import { AddressFormSkeleton } from "@/components/companies/skeletons";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
@@ -14,6 +20,7 @@ import { Card } from "@/components/ui/card";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -35,8 +42,6 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import WrapperMap from "@/components/wrapper-map";
-import { useSaveAddress } from "@/components/companies/hooks/use-save-address";
-import { useCompaniesStore } from "@/stores/companies-store";
 import {
 	getCepV2,
 	listIbgeMunicipios,
@@ -44,6 +49,7 @@ import {
 } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
 import { cn } from "@/libs/utils";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 const addressSchema = z.object({
 	zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP válido."),
@@ -64,7 +70,9 @@ type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function CompanyAddressScreen() {
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
-	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const company = useCompaniesStore(s =>
+		s.companies.find(c => c.id === companyId),
+	);
 	const address = company?.address;
 	const isLoadingAddress = useCompaniesStore(s => !s.isLoaded);
 	const { mutateAsync: saveAddress, isPending: isSavingAddress } =
@@ -490,10 +498,7 @@ export default function CompanyAddressScreen() {
 								</FormControl>
 							</View>
 
-							<FormControl
-								isInvalid={!!errors.city || !!errors.city_ibge_id}
-								className="gap-2"
-							>
+							<FormControl isInvalid={!!errors.city} className="gap-2">
 								<FormControlLabel>
 									<FormControlLabelText className="text-sm">
 										Cidade
@@ -510,17 +515,21 @@ export default function CompanyAddressScreen() {
 												const city = cities?.find(c => c.nome === val);
 												if (city) {
 													setValue("city_ibge_id", Number(city.codigo_ibge));
-													setValue("city", city.nome);
 												}
 											}}
 										>
-											<SelectTrigger>
+											<SelectTrigger
+												size="sm"
+												className={cn(
+													"justify-between",
+													Platform.OS === "android" ? "px-3" : "pr-3",
+												)}
+											>
 												<SelectInput
 													placeholder="Selecione a cidade"
 													className="flex-1 capitalize"
 												/>
 												<SelectIcon
-													className="mr-3"
 													as={isPendingCities ? Spinner : ChevronDown}
 												/>
 											</SelectTrigger>
@@ -532,17 +541,17 @@ export default function CompanyAddressScreen() {
 													</SelectDragIndicatorWrapper>
 													<ScrollView className="w-full max-h-80">
 														{cities ? (
-															cities.map(c => (
+															cities.map(city => (
 																<SelectItem
-																	key={c.codigo_ibge}
-																	label={c.nome}
-																	value={c.nome}
+																	key={city.codigo_ibge}
+																	label={city.nome}
+																	value={city.nome}
 																	className="capitalize"
 																/>
 															))
 														) : (
 															<SelectItem
-																label="Selecione um estado primeiro"
+																label="Selecione um estado"
 																value=""
 															/>
 														)}
@@ -552,13 +561,14 @@ export default function CompanyAddressScreen() {
 										</Select>
 									)}
 								/>
-								{errors.city?.message || errors.city_ibge_id?.message ? (
+								{errors.city?.message && (
 									<FormControlError>
+										<FormControlErrorIcon as={AlertCircleIcon} />
 										<FormControlErrorText>
-											{errors.city?.message ?? errors.city_ibge_id?.message}
+											{errors.city.message}
 										</FormControlErrorText>
 									</FormControlError>
-								) : null}
+								)}
 							</FormControl>
 
 							<View className="gap-2">

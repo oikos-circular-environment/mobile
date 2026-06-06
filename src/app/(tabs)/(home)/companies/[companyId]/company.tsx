@@ -269,7 +269,6 @@ export default function CompanyGeneralInfoScreen() {
 	useEffect(() => {
 		if (useProfileData && user?.profile) {
 			setValue("identity_type", "CPF", { shouldDirty: true });
-			setValue("identity", mask.cpf(user.profile.cpf), { shouldDirty: true });
 			setValue("corporate_name", user.profile.full_name, { shouldDirty: true });
 			setValue("business_name", user.profile.display_name, {
 				shouldDirty: true,
