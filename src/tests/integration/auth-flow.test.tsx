@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react-native";
 import { AxiosError } from "axios";
 import { useRouter } from "expo-router";
-import React from "react";
+import type React from "react";
 import { Pressable, Text, View } from "react-native";
 import SignInScreen from "@/app/(tabs)/(home)/sign-in";
 import { toast } from "@/components/toast";
@@ -96,7 +96,9 @@ async function renderWithAuth(ui: React.ReactElement) {
 describe("Fluxo de autenticação — integração", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
-		jest.mocked(useRouter).mockReturnValue(mockRouter as any);
+		jest
+			.mocked(useRouter)
+			.mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>);
 	});
 
 	afterEach(() => {
@@ -113,10 +115,10 @@ describe("Fluxo de autenticação — integração", () => {
 		it("chama a API com as credenciais e navega para home quando o perfil existe", async () => {
 			jest.mocked(postV1AuthLogin).mockResolvedValue({
 				data: { token: "access-token", refreshToken: "refresh-token" },
-			} as any);
+			} as unknown as Awaited<ReturnType<typeof postV1AuthLogin>>);
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: { profile: { id: "user-1", name: "Test User" } },
-			} as any);
+			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
 
 			const user = userEvent.setup();
 			await renderWithAuth(<SignInScreen />);
@@ -139,9 +141,11 @@ describe("Fluxo de autenticação — integração", () => {
 		it("navega para completar perfil quando o usuário não possui perfil cadastrado", async () => {
 			jest.mocked(postV1AuthLogin).mockResolvedValue({
 				data: { token: "access-token", refreshToken: "refresh-token" },
-			} as any);
+			} as unknown as Awaited<ReturnType<typeof postV1AuthLogin>>);
 			// empty profile: onSuccess redirects to /profile
-			jest.mocked(getV1Profiles).mockResolvedValue({ data: {} } as any);
+			jest.mocked(getV1Profiles).mockResolvedValue({
+				data: {},
+			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
 
 			const user = userEvent.setup();
 			await renderWithAuth(<SignInScreen />);
@@ -193,7 +197,7 @@ describe("Fluxo de autenticação — integração", () => {
 			setAuthToken("existing-access-token");
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: { profile: { id: "user-1", name: "Test User" } },
-			} as any);
+			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
 
 			await renderWithAuth(<AuthStateHarness />);
 

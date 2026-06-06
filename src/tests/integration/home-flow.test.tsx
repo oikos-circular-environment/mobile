@@ -216,7 +216,7 @@ describe("HomeScreen — integração", () => {
 		setupGeospatial();
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 		jest.mocked(isCompanyOpenNow).mockReturnValue(true);
 	});
 
@@ -332,7 +332,7 @@ describe("HomeScreen — integração", () => {
 		});
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [mockCompany, company2], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 
 		await renderHome();
 
@@ -371,7 +371,7 @@ describe("HomeScreen — integração", () => {
 				],
 				next_cursor: null,
 			},
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 
 		await renderHome();
 
@@ -385,7 +385,7 @@ describe("HomeScreen — integração", () => {
 		});
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [mockCompany], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 
 		await renderHome();
 
@@ -448,7 +448,7 @@ describe("HomeScreen — integração", () => {
 		jest.mocked(getV1Market).mockReturnValue(
 			new Promise(resolve => {
 				resolveQuery = resolve;
-			}),
+			}) as unknown as ReturnType<typeof getV1Market>,
 		);
 
 		await renderHome();

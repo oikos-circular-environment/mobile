@@ -6,6 +6,7 @@ import {
 	screen,
 	waitFor,
 } from "@testing-library/react-native";
+import { launchImageLibraryAsync } from "expo-image-picker";
 import { useRouter } from "expo-router";
 import type React from "react";
 import ProfileScreen from "@/app/(tabs)/(home)/profile";
@@ -18,7 +19,6 @@ import {
 } from "@/libs/brasil-api-sdk";
 import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
 import type { User } from "@/libs/types/user";
-import { launchImageLibraryAsync } from "expo-image-picker";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
