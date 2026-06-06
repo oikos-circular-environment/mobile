@@ -80,7 +80,7 @@ export default function ServicesIndexScreen() {
 					<View className="flex-row justify-between items-start">
 						<View className="flex-1">
 							<Heading size="sm">{item.name}</Heading>
-							{item.description ? (
+							{item.description && (
 								<Text
 									size="sm"
 									className="text-muted-foreground"
@@ -88,7 +88,7 @@ export default function ServicesIndexScreen() {
 								>
 									{item.description}
 								</Text>
-							) : null}
+							)
 						</View>
 						<Text className="font-bold text-primary-600">
 							{new Intl.NumberFormat("pt-BR", {

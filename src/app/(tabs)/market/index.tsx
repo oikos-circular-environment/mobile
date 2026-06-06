@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
-import { ArrowRight, MapPinIcon, Search, Sprout } from "lucide-react-native";
+import { AlertCircleIcon, ArrowRight, MapPinIcon, Search, Sprout } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
 import {
 	ActivityIndicator,
@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/card";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -126,13 +127,14 @@ export default function MarketScreen() {
 									</Input>
 								)}
 							/>
-							{errors.query?.message ? (
+							{errors.query?.message && (
 								<FormControlError>
+									<FormControlErrorIcon as={AlertCircleIcon} />
 									<FormControlErrorText>
 										{errors.query.message}
 									</FormControlErrorText>
 								</FormControlError>
-							) : null}
+							)
 						</FormControl>
 
 						<LocationSourceSelect />
@@ -271,13 +273,13 @@ export default function MarketScreen() {
 																	</Badge>
 																</View>
 
-																{item.company_type === "COLLECTOR" ? (
+																{item.company_type === "COLLECTOR" && (
 																	<View className="rounded-[5px] bg-lime-800 px-3 py-1">
 																		<Text className="text-white">
 																			Coletor independente
 																		</Text>
 																	</View>
-																) : null}
+																)
 															</View>
 
 															<Text className="text-xs leading-4 text-gray-500">
@@ -308,7 +310,7 @@ export default function MarketScreen() {
 										onPress={() => fetchNextPage()}
 										disabled={isFetchingNextPage}
 									>
-										{isFetchingNextPage ? (
+										{isFetchingNextPage && (
 											<ActivityIndicator
 												size="small"
 												color={colors.lime[800]}
@@ -319,7 +321,7 @@ export default function MarketScreen() {
 											</Text>
 										)}
 									</Pressable>
-								) : null}
+								)
 							</View>
 						)}
 					</View>

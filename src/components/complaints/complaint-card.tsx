@@ -109,7 +109,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 										firstAttachment.type === "VIDEO" ? "VIDEO" : "FOTO"
 									}
 								/>
-								{firstAttachment.type === "VIDEO" ? (
+								{firstAttachment.type === "VIDEO" && (
 									<View
 										className="absolute inset-0 items-center justify-center"
 										style={{ backgroundColor: colors.overlay.black25 }}
@@ -120,7 +120,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 											strokeWidth={1.8}
 										/>
 									</View>
-								) : null}
+								)
 							</View>
 						) : null}
 						<View className="flex-1 justify-center">

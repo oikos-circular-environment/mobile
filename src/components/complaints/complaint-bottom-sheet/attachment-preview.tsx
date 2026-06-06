@@ -28,9 +28,9 @@ export function AttachmentPreview({
 			<View className="flex-1 bg-black">
 				{attachment?.type === "PHOTO" ? (
 					<ImagePreviewViewer uri={attachment.url} />
-				) : attachment?.type === "VIDEO" ? (
+				) : attachment?.type === "VIDEO" && (
 					<VideoPreviewPlayer uri={attachment.url} />
-				) : null}
+				)
 				<TouchableOpacity
 					className="absolute left-4 rounded-xl bg-black/50 p-3"
 					style={{ top: insets.top + 8 }}

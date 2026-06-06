@@ -1,7 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { ChevronDown, MapIcon, Search } from "lucide-react-native";
+import {
+	AlertCircleIcon,
+	ChevronDown,
+	MapIcon,
+	Search,
+} from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -15,6 +20,7 @@ import { Card } from "@/components/ui/card";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -35,6 +41,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
 import {
 	getCepV2,
@@ -246,7 +253,7 @@ export default function CompanyAddressScreen() {
 						</View>
 					</Card>
 
-					<Card className="shadow-none">
+					<VStack>
 						<View className="gap-3">
 							<FormControl isInvalid={!!errors.zip_code} className="gap-2">
 								<FormControlLabel>
@@ -274,13 +281,14 @@ export default function CompanyAddressScreen() {
 										</Input>
 									)}
 								/>
-								{errors.zip_code?.message ? (
+								{errors.zip_code?.message && (
 									<FormControlError>
+										<FormControlErrorIcon as={AlertCircleIcon} />
 										<FormControlErrorText>
 											{errors.zip_code.message}
 										</FormControlErrorText>
 									</FormControlError>
-								) : null}
+								)
 							</FormControl>
 
 							<View className="flex flex-row gap-2">
@@ -306,13 +314,14 @@ export default function CompanyAddressScreen() {
 											</Input>
 										)}
 									/>
-									{errors.street?.message ? (
+									{errors.street?.message && (
 										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.street.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 
 								<FormControl isInvalid={!!errors.number} className="w-20 gap-2">
@@ -334,13 +343,14 @@ export default function CompanyAddressScreen() {
 											</Input>
 										)}
 									/>
-									{errors.number?.message ? (
+									{errors.number?.message && (
 										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.number.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 							</View>
 
@@ -356,6 +366,7 @@ export default function CompanyAddressScreen() {
 									render={({ field: { onChange, onBlur, value } }) => (
 										<Input>
 											<InputField
+												testID="input-complement"
 												value={value ?? ""}
 												onBlur={onBlur}
 												onChangeText={onChange}
@@ -363,13 +374,14 @@ export default function CompanyAddressScreen() {
 										</Input>
 									)}
 								/>
-								{errors.complement?.message ? (
+								{errors.complement?.message && (
 									<FormControlError>
+										<FormControlErrorIcon as={AlertCircleIcon} />
 										<FormControlErrorText>
 											{errors.complement.message}
 										</FormControlErrorText>
 									</FormControlError>
-								) : null}
+								)
 							</FormControl>
 
 							<FormControl isInvalid={!!errors.district} className="gap-2">
@@ -384,6 +396,7 @@ export default function CompanyAddressScreen() {
 									render={({ field: { onChange, onBlur, value } }) => (
 										<Input>
 											<InputField
+												testID="input-district"
 												value={value}
 												onBlur={onBlur}
 												onChangeText={onChange}
@@ -391,13 +404,14 @@ export default function CompanyAddressScreen() {
 										</Input>
 									)}
 								/>
-								{errors.district?.message ? (
+								{errors.district?.message && (
 									<FormControlError>
+										<FormControlErrorIcon as={AlertCircleIcon} />
 										<FormControlErrorText>
 											{errors.district.message}
 										</FormControlErrorText>
 									</FormControlError>
-								) : null}
+								)
 							</FormControl>
 
 							<View className="flex-row gap-2">
@@ -434,6 +448,7 @@ export default function CompanyAddressScreen() {
 													)}
 												>
 													<SelectInput
+														testID="input-state"
 														placeholder="Selecione o estado"
 														className="flex-1"
 													/>
@@ -465,13 +480,14 @@ export default function CompanyAddressScreen() {
 											</Select>
 										)}
 									/>
-									{errors.state?.message || errors.state_ibge_id?.message ? (
+									{errors.state?.message || errors.state_ibge_id?.message && (
 										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.state?.message ?? errors.state_ibge_id?.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 
 								<FormControl isReadOnly className="w-16 gap-2">
@@ -518,6 +534,7 @@ export default function CompanyAddressScreen() {
 										>
 											<SelectTrigger>
 												<SelectInput
+													testID="input-city"
 													placeholder="Selecione a cidade"
 													className="flex-1 capitalize"
 												/>
@@ -554,13 +571,14 @@ export default function CompanyAddressScreen() {
 										</Select>
 									)}
 								/>
-								{errors.city?.message || errors.city_ibge_id?.message ? (
+								{errors.city?.message || errors.city_ibge_id?.message && (
 									<FormControlError>
+										<FormControlErrorIcon as={AlertCircleIcon} />
 										<FormControlErrorText>
 											{errors.city?.message ?? errors.city_ibge_id?.message}
 										</FormControlErrorText>
 									</FormControlError>
-								) : null}
+								)
 							</FormControl>
 
 							<View className="gap-2">
@@ -580,6 +598,7 @@ export default function CompanyAddressScreen() {
 
 						<View className="flex flex-row gap-2 pt-4">
 							<Button
+								testID="btn-cancel"
 								variant="outline"
 								className="flex-1"
 								onPress={onCancel}
@@ -588,6 +607,7 @@ export default function CompanyAddressScreen() {
 								<ButtonText>Cancelar</ButtonText>
 							</Button>
 							<Button
+								testID="btn-save"
 								className="flex-1"
 								onPress={handleSubmit(onSubmit)}
 								isDisabled={!isDirty || isSavingAddress}
@@ -596,7 +616,7 @@ export default function CompanyAddressScreen() {
 								{isSavingAddress && <ButtonIcon as={Spinner} />}
 							</Button>
 						</View>
-					</Card>
+					</VStack>
 				</View>
 			</ScrollView>
 		</KeyboardAvoidingView>

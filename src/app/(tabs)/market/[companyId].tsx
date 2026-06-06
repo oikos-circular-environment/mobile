@@ -148,11 +148,11 @@ export default function MarketCompanyDetailScreen() {
 								<Heading className="text-xl text-gray-950">
 									{company.corporate_name}
 								</Heading>
-								{company.business_name ? (
+								{company.business_name && (
 									<Text className="text-xs text-gray-500">
 										{company.business_name}
 									</Text>
-								) : null}
+								)
 							</View>
 						</Card>
 

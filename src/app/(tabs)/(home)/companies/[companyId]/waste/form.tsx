@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-	AlertCircle,
+	AlertCircleIcon,
 	ChevronDownIcon,
 	DollarSignIcon,
 	HashIcon,
@@ -245,14 +245,14 @@ export default function WasteFormScreen() {
 								</Input>
 							)}
 						/>
-						{formState.errors.name?.message ? (
+						{formState.errors.name?.message && (
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{formState.errors.name.message}
 								</FormControlErrorText>
 							</FormControlError>
-						) : null}
+						)
 					</FormControl>
 
 					<FormControl
@@ -282,14 +282,14 @@ export default function WasteFormScreen() {
 								</Input>
 							)}
 						/>
-						{formState.errors.description?.message ? (
+						{formState.errors.description?.message && (
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{formState.errors.description.message}
 								</FormControlErrorText>
 							</FormControlError>
-						) : null}
+						)
 					</FormControl>
 
 					<FormControl isInvalid={!!formState.errors.price} className="gap-2">

@@ -5,6 +5,7 @@ import { ptBR } from "date-fns/locale";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {
+	AlertCircleIcon,
 	AlertTriangleIcon,
 	BuildingIcon,
 	CalendarIcon,
@@ -38,6 +39,7 @@ import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlHelper,
 	FormControlHelperText,
@@ -296,15 +298,15 @@ export default function ComplaintResolutionScreen() {
 						</Text>
 
 						<View className="flex-row items-center gap-1.5">
-							{type ? (
+							{type && (
 								<ComplaintTypeChip type={type as ComplaintType} size="sm" />
-							) : null}
-							{status ? (
+							)
+							{status && (
 								<ComplaintStatusChip
 									status={status as ComplaintStatus}
 									size="sm"
 								/>
-							) : null}
+							)
 						</View>
 
 						{!!address && (
@@ -386,6 +388,7 @@ export default function ComplaintResolutionScreen() {
 								</Input>
 								{errors.description ? (
 									<FormControlError>
+										<FormControlErrorIcon as={AlertCircleIcon} />
 										<FormControlErrorText>
 											{errors.description.message}
 										</FormControlErrorText>
@@ -572,6 +575,7 @@ export default function ComplaintResolutionScreen() {
 						attachmentsMissing > 0 &&
 						selectedAssets.length > 0 ? (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									Adicione mais {attachmentsMissing}{" "}
 									{attachmentsMissing === 1 ? "anexo" : "anexos"}.

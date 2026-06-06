@@ -474,14 +474,14 @@ export default function ProfileScreen() {
 											</Input>
 										)}
 									/>
-									{errors.fullName?.message ? (
+									{errors.fullName?.message && (
 										<FormControlError>
 											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.fullName.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 
 								<FormControl isInvalid={!!errors.displayName} className="gap-2">
@@ -505,14 +505,14 @@ export default function ProfileScreen() {
 											</Input>
 										)}
 									/>
-									{errors.displayName?.message ? (
+									{errors.displayName?.message && (
 										<FormControlError>
 											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.displayName.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 
 								<FormControl isInvalid={!!errors.phone} className="gap-2">
@@ -537,14 +537,14 @@ export default function ProfileScreen() {
 											</Input>
 										)}
 									/>
-									{errors.phone?.message ? (
+									{errors.phone?.message && (
 										<FormControlError>
 											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.phone.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 							</View>
 
@@ -586,13 +586,14 @@ export default function ProfileScreen() {
 											</Input>
 										)}
 									/>
-									{errors.address?.zip_code?.message ? (
+									{errors.address?.zip_code?.message && (
 										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.address.zip_code.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 
 								<View className="flex flex-row gap-2">
@@ -619,14 +620,14 @@ export default function ProfileScreen() {
 												</Input>
 											)}
 										/>
-										{errors.address?.street?.message ? (
+										{errors.address?.street?.message && (
 											<FormControlError>
 												<FormControlErrorIcon as={AlertCircleIcon} />
 												<FormControlErrorText>
 													{errors.address.street.message}
 												</FormControlErrorText>
 											</FormControlError>
-										) : null}
+										)
 									</FormControl>
 
 									<FormControl
@@ -652,14 +653,14 @@ export default function ProfileScreen() {
 												</Input>
 											)}
 										/>
-										{errors.address?.number?.message ? (
+										{errors.address?.number?.message && (
 											<FormControlError>
 												<FormControlErrorIcon as={AlertCircleIcon} />
 												<FormControlErrorText>
 													{errors.address.number.message}
 												</FormControlErrorText>
 											</FormControlError>
-										) : null}
+										)
 									</FormControl>
 								</View>
 
@@ -686,14 +687,14 @@ export default function ProfileScreen() {
 											</Input>
 										)}
 									/>
-									{errors.address?.complement?.message ? (
+									{errors.address?.complement?.message && (
 										<FormControlError>
 											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.address.complement.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 
 								<FormControl
@@ -719,14 +720,14 @@ export default function ProfileScreen() {
 											</Input>
 										)}
 									/>
-									{errors.address?.district?.message ? (
+									{errors.address?.district?.message && (
 										<FormControlError>
 											<FormControlErrorIcon as={AlertCircleIcon} />
 											<FormControlErrorText>
 												{errors.address.district.message}
 											</FormControlErrorText>
 										</FormControlError>
-									) : null}
+									)
 								</FormControl>
 
 								<View className="flex flex-col gap-3">

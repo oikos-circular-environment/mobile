@@ -214,11 +214,11 @@ export function CompanyDetailGeneralTab({
 											</View>
 										</View>
 
-										{waste.description ? (
+										{waste.description && (
 											<Text className="text-sm ">{waste.description}</Text>
-										) : null}
+										)
 
-										{waste.sub_items?.length ? (
+										{waste.sub_items?.length && (
 											<View className="flex-row flex-wrap gap-1">
 												{waste.sub_items.map(sub => (
 													<Badge key={`${waste.id}-${sub}`} variant="outline">
@@ -226,7 +226,7 @@ export function CompanyDetailGeneralTab({
 													</Badge>
 												))}
 											</View>
-										) : null}
+										)
 									</Card>
 								</Pressable>
 							))
@@ -273,11 +273,11 @@ export function CompanyDetailGeneralTab({
 											</View>
 										</View>
 
-										{service.description ? (
+										{service.description && (
 											<Text className="text-sm ">{service.description}</Text>
-										) : null}
+										)
 
-										{service.sub_items?.length ? (
+										{service.sub_items?.length && (
 											<View className="flex-row flex-wrap gap-1">
 												{service.sub_items.map(sub => (
 													<Badge key={`${service.id}-${sub}`} variant="outline">
@@ -285,7 +285,7 @@ export function CompanyDetailGeneralTab({
 													</Badge>
 												))}
 											</View>
-										) : null}
+										)
 									</Card>
 								</Pressable>
 							))

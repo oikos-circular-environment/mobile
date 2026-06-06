@@ -186,12 +186,12 @@ export default function WrapperMap({
 					</Button>
 				</View>
 
-				{permissionDenied ? (
+				{permissionDenied && (
 					<Text className="text-xs text-destructive">
 						Permissão de localização negada. Você ainda pode definir o ponto
 						tocando no mapa.
 					</Text>
-				) : null}
+				)
 			</View>
 		</View>
 	);

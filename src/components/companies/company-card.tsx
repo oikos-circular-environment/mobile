@@ -33,11 +33,11 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 						<Heading size="xl" className="font-semibold" numberOfLines={1}>
 							{company.business_name ?? company.corporate_name}
 						</Heading>
-						{company.business_name ? (
+						{company.business_name && (
 							<Text className="text-muted-foreground" numberOfLines={1}>
 								{company.corporate_name}
 							</Text>
-						) : null}
+						)
 						<Text className="text-muted-foreground" numberOfLines={1}>
 							{company.identity}
 						</Text>

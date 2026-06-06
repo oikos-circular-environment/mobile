@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calculator, Trash2 } from "lucide-react-native";
+import { AlertCircleIcon, Calculator, Trash2 } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
@@ -15,6 +15,7 @@ import { DecimalInput, DecimalInputField } from "@/components/ui/decimal-input";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
@@ -294,6 +295,7 @@ export function CompanyDetailSimulationTab({
 									/>
 								</DecimalInput>
 								<FormControlError>
+									<FormControlErrorIcon as={AlertCircleIcon} />
 									<FormControlErrorText>
 										{errors.quantity?.message}
 									</FormControlErrorText>
@@ -392,11 +394,11 @@ export function CompanyDetailSimulationTab({
 									</HStack>
 								</VStack>
 
-								{item.note ? (
+								{item.note && (
 									<Text className="text-xs text-gray-500">
 										Obs.: {item.note}
 									</Text>
-								) : null}
+								)
 							</Card>
 						</ReanimatedSwipeable>
 					))

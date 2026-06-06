@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react-native";
+import { AlertCircleIcon, ArrowLeft, Eye, EyeOff } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -18,6 +18,7 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -144,6 +145,7 @@ export default function SignUpScreen() {
 						/>
 						{errors.email?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.email.message}
 								</FormControlErrorText>
@@ -185,6 +187,7 @@ export default function SignUpScreen() {
 						/>
 						{errors.password?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.password.message}
 								</FormControlErrorText>
@@ -226,6 +229,7 @@ export default function SignUpScreen() {
 						/>
 						{errors.confirm_password?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.confirm_password.message}
 								</FormControlErrorText>

@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as Crypto from "expo-crypto";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { Camera, ImageIcon, ShieldAlertIcon, X } from "lucide-react-native";
+import { AlertCircleIcon, Camera, ImageIcon, ShieldAlertIcon, X } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -31,6 +31,7 @@ import { Divider } from "@/components/ui/divider";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -445,6 +446,7 @@ export default function ComplaintCreateScreen() {
 				)}
 				{(errors.latitude?.message ?? errors.longitude?.message) && (
 					<FormControlError>
+						<FormControlErrorIcon as={AlertCircleIcon} />
 						<FormControlErrorText>
 							{errors.latitude?.message ?? errors.longitude?.message}
 						</FormControlErrorText>
@@ -484,6 +486,7 @@ export default function ComplaintCreateScreen() {
 					/>
 					{errors.postalCode?.message && (
 						<FormControlError>
+							<FormControlErrorIcon as={AlertCircleIcon} />
 							<FormControlErrorText>
 								{errors.postalCode.message}
 							</FormControlErrorText>
@@ -512,6 +515,7 @@ export default function ComplaintCreateScreen() {
 						/>
 						{errors.street?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.street.message}
 								</FormControlErrorText>
@@ -539,6 +543,7 @@ export default function ComplaintCreateScreen() {
 						/>
 						{errors.streetNumber?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.streetNumber.message}
 								</FormControlErrorText>
@@ -568,6 +573,7 @@ export default function ComplaintCreateScreen() {
 						/>
 						{errors.district?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.district.message}
 								</FormControlErrorText>
@@ -603,6 +609,7 @@ export default function ComplaintCreateScreen() {
 						/>
 						{errors.region?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.region.message}
 								</FormControlErrorText>
@@ -631,6 +638,7 @@ export default function ComplaintCreateScreen() {
 					/>
 					{errors.city?.message && (
 						<FormControlError>
+							<FormControlErrorIcon as={AlertCircleIcon} />
 							<FormControlErrorText>{errors.city.message}</FormControlErrorText>
 						</FormControlError>
 					)}
@@ -738,6 +746,7 @@ export default function ComplaintCreateScreen() {
 					/>
 					{errors.observations?.message && (
 						<FormControlError>
+							<FormControlErrorIcon as={AlertCircleIcon} />
 							<FormControlErrorText>
 								{errors.observations.message}
 							</FormControlErrorText>

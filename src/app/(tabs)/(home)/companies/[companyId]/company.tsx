@@ -6,7 +6,7 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-	AlertCircle,
+	AlertCircleIcon,
 	Check,
 	ChevronDown,
 	FactoryIcon,
@@ -430,7 +430,7 @@ export default function CompanyGeneralInfoScreen() {
 							/>
 
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.identity_type?.message}
 								</FormControlErrorText>
@@ -476,7 +476,7 @@ export default function CompanyGeneralInfoScreen() {
 								)}
 							/>
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.identity?.message}
 								</FormControlErrorText>
@@ -567,7 +567,7 @@ export default function CompanyGeneralInfoScreen() {
 								)}
 							/>
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.corporate_name?.message}
 								</FormControlErrorText>
@@ -597,7 +597,7 @@ export default function CompanyGeneralInfoScreen() {
 								)}
 							/>
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.business_name?.message}
 								</FormControlErrorText>
@@ -625,7 +625,7 @@ export default function CompanyGeneralInfoScreen() {
 								)}
 							/>
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.email?.message}
 								</FormControlErrorText>
@@ -652,7 +652,7 @@ export default function CompanyGeneralInfoScreen() {
 								)}
 							/>
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.phones?.[0]?.message}
 								</FormControlErrorText>
@@ -679,7 +679,7 @@ export default function CompanyGeneralInfoScreen() {
 								)}
 							/>
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.phones?.[1]?.message}
 								</FormControlErrorText>
@@ -734,7 +734,7 @@ export default function CompanyGeneralInfoScreen() {
 								</FormControlHelperText>
 							</FormControlHelper>
 							<FormControlError>
-								<FormControlErrorIcon as={AlertCircle} className="size-4" />
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.started_activity_in?.message}
 								</FormControlErrorText>

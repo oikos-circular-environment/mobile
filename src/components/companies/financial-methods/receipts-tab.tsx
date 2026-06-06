@@ -1,4 +1,4 @@
-import { AlertCircle, Check } from "lucide-react-native";
+import { AlertCircleIcon, Check } from "lucide-react-native";
 import { useMemo } from "react";
 import {
 	Controller,
@@ -101,7 +101,7 @@ export function ReceiptsTab({ form, fieldArray }: ReceiptsTabProps) {
 						</View>
 
 						{entry.financial_means === "CREDIT_CARD" ||
-						entry.financial_means === "DEBIT_CARD" ? (
+						entry.financial_means === "DEBIT_CARD" && (
 							<View className="gap-2">
 								<Text className="text-sm">Bandeiras aceitas</Text>
 								<Controller
@@ -182,7 +182,7 @@ export function ReceiptsTab({ form, fieldArray }: ReceiptsTabProps) {
 									)}
 								/>
 							</View>
-						) : null}
+						)
 
 						<FormControl
 							isInvalid={
@@ -205,7 +205,7 @@ export function ReceiptsTab({ form, fieldArray }: ReceiptsTabProps) {
 							</Input>
 							{formState.errors.methods?.[globalIndex]?.observations && (
 								<FormControlError>
-									<FormControlErrorIcon as={AlertCircle} />
+									<FormControlErrorIcon as={AlertCircleIcon} />
 									<FormControlErrorText>
 										{
 											formState.errors.methods[globalIndex]?.observations
