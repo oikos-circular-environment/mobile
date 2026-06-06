@@ -216,7 +216,7 @@ export function CompanyDetailGeneralTab({
 
 										{waste.description && (
 											<Text className="text-sm ">{waste.description}</Text>
-										)
+										)}
 
 										{waste.sub_items?.length && (
 											<View className="flex-row flex-wrap gap-1">
@@ -226,7 +226,7 @@ export function CompanyDetailGeneralTab({
 													</Badge>
 												))}
 											</View>
-										)
+										)}
 									</Card>
 								</Pressable>
 							))
@@ -275,7 +275,7 @@ export function CompanyDetailGeneralTab({
 
 										{service.description && (
 											<Text className="text-sm ">{service.description}</Text>
-										)
+										)}
 
 										{service.sub_items?.length && (
 											<View className="flex-row flex-wrap gap-1">
@@ -285,7 +285,7 @@ export function CompanyDetailGeneralTab({
 													</Badge>
 												))}
 											</View>
-										)
+										)}
 									</Card>
 								</Pressable>
 							))

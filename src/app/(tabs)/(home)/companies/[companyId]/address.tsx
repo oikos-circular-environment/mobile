@@ -288,7 +288,7 @@ export default function CompanyAddressScreen() {
 											{errors.zip_code.message}
 										</FormControlErrorText>
 									</FormControlError>
-								)
+								)}
 							</FormControl>
 
 							<View className="flex flex-row gap-2">
@@ -321,7 +321,7 @@ export default function CompanyAddressScreen() {
 												{errors.street.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 
 								<FormControl isInvalid={!!errors.number} className="w-20 gap-2">
@@ -350,7 +350,7 @@ export default function CompanyAddressScreen() {
 												{errors.number.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 							</View>
 
@@ -381,7 +381,7 @@ export default function CompanyAddressScreen() {
 											{errors.complement.message}
 										</FormControlErrorText>
 									</FormControlError>
-								)
+								)}
 							</FormControl>
 
 							<FormControl isInvalid={!!errors.district} className="gap-2">
@@ -411,7 +411,7 @@ export default function CompanyAddressScreen() {
 											{errors.district.message}
 										</FormControlErrorText>
 									</FormControlError>
-								)
+								)}
 							</FormControl>
 
 							<View className="flex-row gap-2">
@@ -487,7 +487,7 @@ export default function CompanyAddressScreen() {
 												{errors.state?.message ?? errors.state_ibge_id?.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 
 								<FormControl isReadOnly className="w-16 gap-2">
@@ -578,7 +578,7 @@ export default function CompanyAddressScreen() {
 											{errors.city?.message ?? errors.city_ibge_id?.message}
 										</FormControlErrorText>
 									</FormControlError>
-								)
+								)}
 							</FormControl>
 
 							<View className="gap-2">

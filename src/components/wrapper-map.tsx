@@ -191,7 +191,7 @@ export default function WrapperMap({
 						Permissão de localização negada. Você ainda pode definir o ponto
 						tocando no mapa.
 					</Text>
-				)
+				)}
 			</View>
 		</View>
 	);

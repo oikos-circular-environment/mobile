@@ -134,7 +134,7 @@ export default function MarketScreen() {
 										{errors.query.message}
 									</FormControlErrorText>
 								</FormControlError>
-							)
+							)}
 						</FormControl>
 
 						<LocationSourceSelect />
@@ -279,7 +279,7 @@ export default function MarketScreen() {
 																			Coletor independente
 																		</Text>
 																	</View>
-																)
+																)}
 															</View>
 
 															<Text className="text-xs leading-4 text-gray-500">
@@ -304,13 +304,13 @@ export default function MarketScreen() {
 									);
 								})}
 
-								{hasNextPage ? (
+								{hasNextPage && (
 									<Pressable
 										className="items-center py-3"
 										onPress={() => fetchNextPage()}
 										disabled={isFetchingNextPage}
 									>
-										{isFetchingNextPage && (
+										{isFetchingNextPage ? (
 											<ActivityIndicator
 												size="small"
 												color={colors.lime[800]}
@@ -321,7 +321,7 @@ export default function MarketScreen() {
 											</Text>
 										)}
 									</Pressable>
-								)
+								)}
 							</View>
 						)}
 					</View>

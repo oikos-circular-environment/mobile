@@ -87,7 +87,7 @@ export default function WasteIndexScreen() {
 								>
 									{item.description}
 								</Text>
-							)
+							)}
 						</View>
 						<Text className="font-bold text-primary-600">
 							{new Intl.NumberFormat("pt-BR", {

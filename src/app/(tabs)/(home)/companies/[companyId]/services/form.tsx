@@ -17,6 +17,7 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { useSaveServices } from "@/components/companies/hooks/use-save-services";
 import {
 	type ServiceFormInput,
 	type ServiceFormValues,
@@ -56,16 +57,20 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { useSaveServices } from "@/components/companies/hooks/use-save-services";
-import { useCompaniesStore } from "@/stores/companies-store";
 import { measurements } from "@/libs/types/measurement";
 import { wasteTypes } from "@/libs/types/waste";
 import { cn } from "@/libs/utils";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function ServiceFormScreen() {
 	const router = useRouter();
-	const { id, companyId } = useLocalSearchParams<{ id: string; companyId: string }>();
-	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const { id, companyId } = useLocalSearchParams<{
+		id: string;
+		companyId: string;
+	}>();
+	const company = useCompaniesStore(s =>
+		s.companies.find(c => c.id === companyId),
+	);
 	const services = company?.services;
 	const { mutateAsync: saveServices, isPending: isSavingServices } =
 		useSaveServices(companyId);
@@ -250,7 +255,7 @@ export default function ServiceFormScreen() {
 									{formState.errors.name.message}
 								</FormControlErrorText>
 							</FormControlError>
-						)
+						)}
 					</FormControl>
 
 					<FormControl
@@ -287,7 +292,7 @@ export default function ServiceFormScreen() {
 									{formState.errors.description.message}
 								</FormControlErrorText>
 							</FormControlError>
-						)
+						)}
 					</FormControl>
 
 					<FormControl isInvalid={!!formState.errors.price} className="gap-2">

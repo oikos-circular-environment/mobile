@@ -30,7 +30,7 @@ export function AttachmentPreview({
 					<ImagePreviewViewer uri={attachment.url} />
 				) : attachment?.type === "VIDEO" && (
 					<VideoPreviewPlayer uri={attachment.url} />
-				)
+				)}
 				<TouchableOpacity
 					className="absolute left-4 rounded-xl bg-black/50 p-3"
 					style={{ top: insets.top + 8 }}

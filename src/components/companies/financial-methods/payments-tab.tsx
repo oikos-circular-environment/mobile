@@ -100,8 +100,8 @@ export function PaymentsTab({ form, fieldArray }: PaymentsTabProps) {
 							</View>
 						</View>
 
-						{entry.financial_means === "CREDIT_CARD" ||
-						entry.financial_means === "DEBIT_CARD" && (
+						{(entry.financial_means === "CREDIT_CARD" ||
+						entry.financial_means === "DEBIT_CARD") && (
 							<View className="gap-2">
 								<Text className="text-sm">Bandeiras aceitas</Text>
 								<Controller
@@ -182,7 +182,7 @@ export function PaymentsTab({ form, fieldArray }: PaymentsTabProps) {
 									)}
 								/>
 							</View>
-						)
+						)}
 
 						<FormControl
 							isInvalid={

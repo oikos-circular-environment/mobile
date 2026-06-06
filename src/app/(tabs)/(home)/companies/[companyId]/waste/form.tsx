@@ -17,6 +17,7 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { useSaveWastes } from "@/components/companies/hooks/use-save-wastes";
 import {
 	type WasteManagementFormInput,
 	type WasteManagementFormValues,
@@ -56,16 +57,20 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { useSaveWastes } from "@/components/companies/hooks/use-save-wastes";
-import { useCompaniesStore } from "@/stores/companies-store";
 import { measurements } from "@/libs/types/measurement";
 import { wasteTypes } from "@/libs/types/waste";
 import { cn } from "@/libs/utils";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function WasteFormScreen() {
 	const router = useRouter();
-	const { id, companyId } = useLocalSearchParams<{ id: string; companyId: string }>();
-	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const { id, companyId } = useLocalSearchParams<{
+		id: string;
+		companyId: string;
+	}>();
+	const company = useCompaniesStore(s =>
+		s.companies.find(c => c.id === companyId),
+	);
 	const wastes = company?.wastes;
 	const { mutateAsync: saveWastes, isPending: isSavingWastes } =
 		useSaveWastes(companyId);
@@ -252,7 +257,7 @@ export default function WasteFormScreen() {
 									{formState.errors.name.message}
 								</FormControlErrorText>
 							</FormControlError>
-						)
+						)}
 					</FormControl>
 
 					<FormControl
@@ -289,7 +294,7 @@ export default function WasteFormScreen() {
 									{formState.errors.description.message}
 								</FormControlErrorText>
 							</FormControlError>
-						)
+						)}
 					</FormControl>
 
 					<FormControl isInvalid={!!formState.errors.price} className="gap-2">

@@ -398,7 +398,7 @@ export function CompanyDetailSimulationTab({
 									<Text className="text-xs text-gray-500">
 										Obs.: {item.note}
 									</Text>
-								)
+								)}
 							</Card>
 						</ReanimatedSwipeable>
 					))

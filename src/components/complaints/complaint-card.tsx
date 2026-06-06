@@ -91,7 +91,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 			>
 				<View className="gap-2">
 					<View className="flex-row items-center gap-2">
-						{firstAttachment?.url ? (
+						{firstAttachment?.url && (
 							<View
 								style={{
 									width: 48,
@@ -120,9 +120,9 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 											strokeWidth={1.8}
 										/>
 									</View>
-								)
+								)}
 							</View>
-						) : null}
+						)}
 						<View className="flex-1 justify-center">
 							<Heading numberOfLines={1}>
 								{address || "Endereço não informado"}

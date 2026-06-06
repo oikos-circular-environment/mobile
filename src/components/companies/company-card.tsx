@@ -37,7 +37,7 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 							<Text className="text-muted-foreground" numberOfLines={1}>
 								{company.corporate_name}
 							</Text>
-						)
+						)}
 						<Text className="text-muted-foreground" numberOfLines={1}>
 							{company.identity}
 						</Text>

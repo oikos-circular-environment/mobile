@@ -152,7 +152,7 @@ export default function MarketCompanyDetailScreen() {
 									<Text className="text-xs text-gray-500">
 										{company.business_name}
 									</Text>
-								)
+								)}
 							</View>
 						</Card>
 

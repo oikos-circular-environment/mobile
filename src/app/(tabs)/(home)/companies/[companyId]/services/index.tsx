@@ -88,7 +88,7 @@ export default function ServicesIndexScreen() {
 								>
 									{item.description}
 								</Text>
-							)
+							)}
 						</View>
 						<Text className="font-bold text-primary-600">
 							{new Intl.NumberFormat("pt-BR", {

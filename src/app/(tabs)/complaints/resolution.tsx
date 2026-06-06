@@ -300,13 +300,13 @@ export default function ComplaintResolutionScreen() {
 						<View className="flex-row items-center gap-1.5">
 							{type && (
 								<ComplaintTypeChip type={type as ComplaintType} size="sm" />
-							)
+							)}
 							{status && (
 								<ComplaintStatusChip
 									status={status as ComplaintStatus}
 									size="sm"
 								/>
-							)
+							)}
 						</View>
 
 						{!!address && (

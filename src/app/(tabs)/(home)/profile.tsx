@@ -481,7 +481,7 @@ export default function ProfileScreen() {
 												{errors.fullName.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 
 								<FormControl isInvalid={!!errors.displayName} className="gap-2">
@@ -512,7 +512,7 @@ export default function ProfileScreen() {
 												{errors.displayName.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 
 								<FormControl isInvalid={!!errors.phone} className="gap-2">
@@ -544,7 +544,7 @@ export default function ProfileScreen() {
 												{errors.phone.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 							</View>
 
@@ -593,7 +593,7 @@ export default function ProfileScreen() {
 												{errors.address.zip_code.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 
 								<View className="flex flex-row gap-2">
@@ -627,7 +627,7 @@ export default function ProfileScreen() {
 													{errors.address.street.message}
 												</FormControlErrorText>
 											</FormControlError>
-										)
+										)}
 									</FormControl>
 
 									<FormControl
@@ -660,7 +660,7 @@ export default function ProfileScreen() {
 													{errors.address.number.message}
 												</FormControlErrorText>
 											</FormControlError>
-										)
+										)}
 									</FormControl>
 								</View>
 
@@ -694,7 +694,7 @@ export default function ProfileScreen() {
 												{errors.address.complement.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 
 								<FormControl
@@ -727,7 +727,7 @@ export default function ProfileScreen() {
 												{errors.address.district.message}
 											</FormControlErrorText>
 										</FormControlError>
-									)
+									)}
 								</FormControl>
 
 								<View className="flex flex-col gap-3">
