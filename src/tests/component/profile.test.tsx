@@ -5,6 +5,7 @@ import {
 	userEvent,
 	waitFor,
 } from "@testing-library/react-native";
+import { launchImageLibraryAsync } from "expo-image-picker";
 import { useRouter } from "expo-router";
 import type React from "react";
 import ProfileScreen from "@/app/(tabs)/(home)/profile";
@@ -13,7 +14,6 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
 import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
 import type { User } from "@/libs/types/user";
-import { launchImageLibraryAsync } from "expo-image-picker";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
@@ -131,15 +131,21 @@ async function renderProfile() {
 describe("ProfileScreen", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
-		jest.mocked(useRouter).mockReturnValue(mockRouter as any);
+		jest
+			.mocked(useRouter)
+			.mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>);
 		jest.mocked(listIbgeUfs).mockResolvedValue({
 			data: [
 				{ id: 35, nome: "São Paulo", sigla: "SP" },
 				{ id: 33, nome: "Rio de Janeiro", sigla: "RJ" },
 			],
-		} as any);
-		jest.mocked(listIbgeMunicipios).mockResolvedValue({ data: [] } as any);
-		jest.mocked(putV1Profiles).mockResolvedValue({ data: {} } as any);
+		} as unknown as Awaited<ReturnType<typeof listIbgeUfs>>);
+		jest.mocked(listIbgeMunicipios).mockResolvedValue({
+			data: [],
+		} as unknown as Awaited<ReturnType<typeof listIbgeMunicipios>>);
+		jest.mocked(putV1Profiles).mockResolvedValue({
+			data: {},
+		} as unknown as Awaited<ReturnType<typeof putV1Profiles>>);
 	});
 
 	afterEach(() => {
@@ -164,13 +170,19 @@ describe("ProfileScreen", () => {
 			"value",
 			"(11) 9 8765-4321",
 		);
-		expect(screen.getByTestId("input-zip-code")).toHaveProp("value", "01310-100");
+		expect(screen.getByTestId("input-zip-code")).toHaveProp(
+			"value",
+			"01310-100",
+		);
 		expect(screen.getByTestId("input-street")).toHaveProp(
 			"value",
 			"Avenida Paulista",
 		);
 		expect(screen.getByTestId("input-number")).toHaveProp("value", "1000");
-		expect(screen.getByTestId("input-district")).toHaveProp("value", "Bela Vista");
+		expect(screen.getByTestId("input-district")).toHaveProp(
+			"value",
+			"Bela Vista",
+		);
 	});
 
 	it("renderiza campos de endereço vazios quando usuário não possui endereço", async () => {
@@ -217,7 +229,9 @@ describe("ProfileScreen", () => {
 	it("exibe erro de validação para nome completo muito curto", async () => {
 		const user = userEvent.setup();
 		setupAuthMock({ user: mockUser });
-		jest.mocked(putV1Profiles).mockResolvedValue({ data: {} } as any);
+		jest.mocked(putV1Profiles).mockResolvedValue({
+			data: {},
+		} as unknown as Awaited<ReturnType<typeof putV1Profiles>>);
 		await renderProfile();
 
 		const nameInput = screen.getByTestId("input-full-name");
@@ -273,8 +287,8 @@ describe("ProfileScreen", () => {
 		setupAuthMock({ user: mockUser });
 		jest.mocked(launchImageLibraryAsync).mockResolvedValue({
 			canceled: false,
-			assets: [{ uri: "fake-uri" } as any],
-		});
+			assets: [{ uri: "fake-uri" }],
+		} as unknown as Awaited<ReturnType<typeof launchImageLibraryAsync>>);
 
 		await renderProfile();
 		await user.press(screen.getByTestId("avatar-touchable"));
@@ -291,11 +305,11 @@ describe("ProfileScreen", () => {
 
 		jest.mocked(launchImageLibraryAsync).mockResolvedValue({
 			canceled: false,
-			assets: [{ uri: "fake-uri" } as any],
-		});
+			assets: [{ uri: "fake-uri" }],
+		} as unknown as Awaited<ReturnType<typeof launchImageLibraryAsync>>);
 		jest.mocked(putV1ProfilesAvatar).mockResolvedValue({
 			data: { id: "img-1", url: "http://new-avatar.url" },
-		} as any);
+		} as unknown as Awaited<ReturnType<typeof putV1ProfilesAvatar>>);
 
 		await renderProfile();
 		await user.press(screen.getByTestId("avatar-touchable"));

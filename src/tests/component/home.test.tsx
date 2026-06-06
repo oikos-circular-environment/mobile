@@ -189,7 +189,7 @@ describe("HomeScreen — componente", () => {
 		setupGeospatial();
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 		jest.mocked(isCompanyOpenNow).mockReturnValue(true);
 	});
 
@@ -330,7 +330,7 @@ describe("HomeScreen — componente", () => {
 			() =>
 				new Promise(resolve => {
 					resolveQuery = resolve;
-				}),
+				}) as unknown as ReturnType<typeof getV1Market>,
 		);
 		await renderHome();
 
@@ -367,7 +367,7 @@ describe("HomeScreen — componente", () => {
 		});
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [mockCompany], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 		await renderHome();
 
 		expect(await screen.findByText("Recicladora Verde Ltda")).toBeOnTheScreen();
@@ -400,7 +400,7 @@ describe("HomeScreen — componente", () => {
 		});
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [farCompany], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 		await renderHome();
 
 		expect(await screen.findByText("1,2 km")).toBeOnTheScreen();
@@ -413,7 +413,7 @@ describe("HomeScreen — componente", () => {
 		});
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [mockCompany], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 		await renderHome();
 
 		expect(await screen.findByText("Aberto")).toBeOnTheScreen();
@@ -426,7 +426,7 @@ describe("HomeScreen — componente", () => {
 		});
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [mockCompany], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 		await renderHome();
 
 		expect(await screen.findByText("Fechado")).toBeOnTheScreen();
@@ -439,7 +439,7 @@ describe("HomeScreen — componente", () => {
 		});
 		jest.mocked(getV1Market).mockResolvedValue({
 			data: { companies: [mockCompany], next_cursor: null },
-		});
+		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 		await renderHome();
 
 		await screen.findByText("Recicladora Verde Ltda");
