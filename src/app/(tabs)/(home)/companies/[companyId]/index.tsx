@@ -100,7 +100,7 @@ export default function CompanyHubScreen() {
 				</Card>
 
 				<Alert className="gap-3 bg-amber-100 border-amber-400">
-					<AlertIcon as={TriangleAlertIcon} className="text-destructive" />
+					<AlertIcon as={TriangleAlertIcon} className="text-amber-400" />
 					<AlertText className="text-foreground/80">
 						Para que sua empresa seja listada no Mercado, é necessário que tenha
 						todos os dados preenchidos e com dados reais. A cada seção haverá um
@@ -134,13 +134,7 @@ export default function CompanyHubScreen() {
 								<Card className="shadow-none">
 									<View className="flex-row items-center gap-3">
 										<View className="size-8 items-center justify-center">
-											<option.icon
-												size={28}
-												strokeWidth={1.5}
-												className={
-													isLocked ? "text-muted-foreground" : undefined
-												}
-											/>
+											<option.icon size={28} strokeWidth={1.5} />
 										</View>
 
 										<View className="flex-1">

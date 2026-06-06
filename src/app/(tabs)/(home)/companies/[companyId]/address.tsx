@@ -1,12 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import {
-	AlertCircleIcon,
-	ChevronDown,
-	MapIcon,
-	Search,
-} from "lucide-react-native";
+import { ChevronDown, MapIcon, Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -20,7 +15,6 @@ import { Card } from "@/components/ui/card";
 import {
 	FormControl,
 	FormControlError,
-	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -498,7 +492,10 @@ export default function CompanyAddressScreen() {
 								</FormControl>
 							</View>
 
-							<FormControl isInvalid={!!errors.city} className="gap-2">
+							<FormControl
+								isInvalid={!!errors.city || !!errors.city_ibge_id}
+								className="gap-2"
+							>
 								<FormControlLabel>
 									<FormControlLabelText className="text-sm">
 										Cidade
@@ -515,21 +512,17 @@ export default function CompanyAddressScreen() {
 												const city = cities?.find(c => c.nome === val);
 												if (city) {
 													setValue("city_ibge_id", Number(city.codigo_ibge));
+													setValue("city", city.nome);
 												}
 											}}
 										>
-											<SelectTrigger
-												size="sm"
-												className={cn(
-													"justify-between",
-													Platform.OS === "android" ? "px-3" : "pr-3",
-												)}
-											>
+											<SelectTrigger>
 												<SelectInput
 													placeholder="Selecione a cidade"
 													className="flex-1 capitalize"
 												/>
 												<SelectIcon
+													className="mr-3"
 													as={isPendingCities ? Spinner : ChevronDown}
 												/>
 											</SelectTrigger>
@@ -541,17 +534,17 @@ export default function CompanyAddressScreen() {
 													</SelectDragIndicatorWrapper>
 													<ScrollView className="w-full max-h-80">
 														{cities ? (
-															cities.map(city => (
+															cities.map(c => (
 																<SelectItem
-																	key={city.codigo_ibge}
-																	label={city.nome}
-																	value={city.nome}
+																	key={c.codigo_ibge}
+																	label={c.nome}
+																	value={c.nome}
 																	className="capitalize"
 																/>
 															))
 														) : (
 															<SelectItem
-																label="Selecione um estado"
+																label="Selecione um estado primeiro"
 																value=""
 															/>
 														)}
@@ -561,14 +554,13 @@ export default function CompanyAddressScreen() {
 										</Select>
 									)}
 								/>
-								{errors.city?.message && (
+								{errors.city?.message || errors.city_ibge_id?.message ? (
 									<FormControlError>
-										<FormControlErrorIcon as={AlertCircleIcon} />
 										<FormControlErrorText>
-											{errors.city.message}
+											{errors.city?.message ?? errors.city_ibge_id?.message}
 										</FormControlErrorText>
 									</FormControlError>
-								)}
+								) : null}
 							</FormControl>
 
 							<View className="gap-2">
