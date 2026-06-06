@@ -28,7 +28,7 @@ import { useAuthContext } from "@/contexts/auth-context";
 
 const signUpSchema = z
 	.object({
-		email: z.string().email("Digite um e-mail válido."),
+		email: z.email("Digite um e-mail válido."),
 		password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
 		confirm_password: z.string(),
 	})

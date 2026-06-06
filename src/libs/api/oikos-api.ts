@@ -18,7 +18,7 @@ import {
 
 // Production / ngrok
 const baseURL =
-	"https://fab0-2804-250c-1049-6500-957a-8d78-c5ac-5075.ngrok-free.app";
+	"https://0736-2804-250c-1049-6500-66b0-81cc-7409-f7d.ngrok-free.app";
 
 client.setConfig({ baseURL, throwOnError: true });
 
