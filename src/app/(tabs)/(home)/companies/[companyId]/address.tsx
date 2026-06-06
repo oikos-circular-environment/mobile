@@ -267,13 +267,18 @@ export default function CompanyAddressScreen() {
 									render={({ field: { onChange, onBlur, value } }) => (
 										<Input>
 											<InputField
+												testID="input-zip-code"
 												value={value}
 												onBlur={onBlur}
 												onChangeText={text => onChange(mask.cep(text))}
 												keyboardType="number-pad"
 												maxLength={9}
 											/>
-											<InputSlot className="pr-3" onPress={onPressSearchCep}>
+											<InputSlot
+												className="pr-3"
+												onPress={onPressSearchCep}
+												testID="cep-search-btn"
+											>
 												<InputIcon
 													as={getCepMutation.isPending ? Spinner : Search}
 												/>
@@ -307,6 +312,7 @@ export default function CompanyAddressScreen() {
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
+													testID="input-street"
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
@@ -336,6 +342,7 @@ export default function CompanyAddressScreen() {
 										render={({ field: { onChange, onBlur, value } }) => (
 											<Input>
 												<InputField
+													testID="input-number"
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}

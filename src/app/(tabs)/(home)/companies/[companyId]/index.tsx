@@ -16,10 +16,12 @@ import { Pressable, ScrollView, View } from "react-native";
 import { useToggleCompanyStatus } from "@/components/companies/hooks/use-toggle-company-status";
 import { colors } from "@/components/style/colors";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 type CompanySetting = {
@@ -27,10 +29,10 @@ type CompanySetting = {
 	description: string;
 	icon: LucideIcon;
 	href: Href;
-	validation?: {
+	validation: {
 		is_validation: boolean;
 		description: string;
-	}[];
+	};
 };
 
 export default function CompanyHubScreen() {
@@ -49,24 +51,41 @@ export default function CompanyHubScreen() {
 			description: "Informações cadastrais gerais sobre a sua empresa.",
 			icon: FactoryIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/company` as Href,
+			validation: {
+				is_validation: false,
+				description: "Todos os dados obrigatórios devem ser preenchidos",
+			},
 		},
 		{
 			title: "Endereço",
 			description: "Informe seu endereço para que as pessoas te encontre.",
 			icon: MapIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/address` as Href,
+			validation: {
+				is_validation: false,
+				description: "Todos os dados obrigatórios devem ser preenchidos.",
+			},
 		},
 		{
 			title: "Funcionamento",
 			description: "Informe os dias e horários em que sua empresa está aberta.",
 			icon: Clock8Icon,
 			href: `/(tabs)/(home)/companies/${companyId}/business-hours` as Href,
+			validation: {
+				is_validation: false,
+				description: "Deve abrir ao menos 1x na semana.",
+			},
 		},
 		{
 			title: "Serviços",
 			description: "Descreva os serviços que sua empresa oferece ao publico.",
 			icon: WrenchIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/services` as Href,
+			validation: {
+				is_validation: false,
+				description:
+					"Deve haver ao menos 1 (um) Serviço ou Resíduo cadastrado.",
+			},
 		},
 		{
 			title: "Resíduos",
@@ -74,6 +93,11 @@ export default function CompanyHubScreen() {
 				"Caso seja um ponto de coleta de resíduo, especifique com quais resíduos você trabalha.",
 			icon: RecycleIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/waste` as Href,
+			validation: {
+				is_validation: false,
+				description:
+					"Deve haver ao menos 1 (um) Serviço ou Resíduo cadastrado.",
+			},
 		},
 	];
 
@@ -157,6 +181,19 @@ export default function CompanyHubScreen() {
 											<ArrowRightIcon size={18} />
 										)}
 									</View>
+									<Badge
+										variant="outline"
+										className={cn(
+											"flex-row justify-start items-start",
+											option.validation.is_validation
+												? "bg-lime-100 border border-lime-200"
+												: "bg-rose-100 border border-rose-200",
+										)}
+									>
+										<BadgeText className="normal-case text-start text-muted-foreground">
+											{option.validation.description}
+										</BadgeText>
+									</Badge>
 								</Card>
 							);
 
