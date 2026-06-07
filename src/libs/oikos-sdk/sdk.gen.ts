@@ -59,6 +59,9 @@ import type {
 	GetV1CompaniesByIdServicesData,
 	GetV1CompaniesByIdServicesErrors,
 	GetV1CompaniesByIdServicesResponses,
+	GetV1CompaniesByIdValidationsData,
+	GetV1CompaniesByIdValidationsErrors,
+	GetV1CompaniesByIdValidationsResponses,
 	GetV1CompaniesByIdWastesData,
 	GetV1CompaniesByIdWastesErrors,
 	GetV1CompaniesByIdWastesResponses,
@@ -646,6 +649,27 @@ export const putV1CompaniesByIdAddresses = <
 			"Content-Type": "application/json",
 			...options.headers,
 		},
+	});
+
+/**
+ * Get company validations
+ *
+ * Returns the validation status for each section of the specified company.
+ */
+export const getV1CompaniesByIdValidations = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<GetV1CompaniesByIdValidationsData, ThrowOnError>,
+) =>
+	(options.client ?? client).get<
+		GetV1CompaniesByIdValidationsResponses,
+		GetV1CompaniesByIdValidationsErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/companies/{id}/validations",
+		...options,
 	});
 
 /**

@@ -1358,6 +1358,57 @@ export type PutV1CompaniesByIdAddressesResponses = {
 export type PutV1CompaniesByIdAddressesResponse =
 	PutV1CompaniesByIdAddressesResponses[keyof PutV1CompaniesByIdAddressesResponses];
 
+export type GetV1CompaniesByIdValidationsData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/companies/{id}/validations";
+};
+
+export type GetV1CompaniesByIdValidationsErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1CompaniesByIdValidationsError =
+	GetV1CompaniesByIdValidationsErrors[keyof GetV1CompaniesByIdValidationsErrors];
+
+export type GetV1CompaniesByIdValidationsResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		validation: {
+			id: string;
+			company_id: string;
+			general_registration: boolean;
+			address: boolean;
+			business_hours: boolean;
+			wastes: boolean;
+			services: boolean;
+		} | null;
+	};
+};
+
+export type GetV1CompaniesByIdValidationsResponse =
+	GetV1CompaniesByIdValidationsResponses[keyof GetV1CompaniesByIdValidationsResponses];
+
 export type GetV1ComplaintsData = {
 	body?: never;
 	path?: never;

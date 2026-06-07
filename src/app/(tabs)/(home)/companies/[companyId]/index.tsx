@@ -13,6 +13,7 @@ import {
 	WrenchIcon,
 } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
+import { useCompanyValidations } from "@/components/companies/hooks/use-company-validations";
 import { useToggleCompanyStatus } from "@/components/companies/hooks/use-toggle-company-status";
 import { colors } from "@/components/style/colors";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
@@ -21,7 +22,6 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 type CompanySetting = {
@@ -45,6 +45,8 @@ export default function CompanyHubScreen() {
 	const { mutate: toggleStatus, isPending: isTogglingStatus } =
 		useToggleCompanyStatus(companyId);
 
+	const { data: validation } = useCompanyValidations(companyId);
+
 	const companyOptions: CompanySetting[] = [
 		{
 			title: "Empresa",
@@ -52,7 +54,7 @@ export default function CompanyHubScreen() {
 			icon: FactoryIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/company` as Href,
 			validation: {
-				is_validation: false,
+				is_validation: validation?.general_registration ?? false,
 				description: "Todos os dados obrigatórios devem ser preenchidos",
 			},
 		},
@@ -62,7 +64,7 @@ export default function CompanyHubScreen() {
 			icon: MapIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/address` as Href,
 			validation: {
-				is_validation: false,
+				is_validation: validation?.address ?? false,
 				description: "Todos os dados obrigatórios devem ser preenchidos.",
 			},
 		},
@@ -72,7 +74,7 @@ export default function CompanyHubScreen() {
 			icon: Clock8Icon,
 			href: `/(tabs)/(home)/companies/${companyId}/business-hours` as Href,
 			validation: {
-				is_validation: false,
+				is_validation: validation?.business_hours ?? false,
 				description: "Deve abrir ao menos 1x na semana.",
 			},
 		},
@@ -82,7 +84,7 @@ export default function CompanyHubScreen() {
 			icon: WrenchIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/services` as Href,
 			validation: {
-				is_validation: false,
+				is_validation: validation?.services ?? false,
 				description:
 					"Deve haver ao menos 1 (um) Serviço ou Resíduo cadastrado.",
 			},
@@ -94,7 +96,7 @@ export default function CompanyHubScreen() {
 			icon: RecycleIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/waste` as Href,
 			validation: {
-				is_validation: false,
+				is_validation: validation?.wastes ?? false,
 				description:
 					"Deve haver ao menos 1 (um) Serviço ou Resíduo cadastrado.",
 			},
@@ -181,19 +183,16 @@ export default function CompanyHubScreen() {
 											<ArrowRightIcon size={18} />
 										)}
 									</View>
-									<Badge
-										variant="outline"
-										className={cn(
-											"flex-row justify-start items-start",
-											option.validation.is_validation
-												? "bg-lime-100 border border-lime-200"
-												: "bg-rose-100 border border-rose-200",
-										)}
-									>
-										<BadgeText className="normal-case text-start text-muted-foreground">
-											{option.validation.description}
-										</BadgeText>
-									</Badge>
+									{!option.validation.is_validation && (
+										<Badge
+											variant="outline"
+											className="flex-row justify-start items-start bg-rose-100 border border-rose-200"
+										>
+											<BadgeText className="normal-case text-start text-muted-foreground">
+												{option.validation.description}
+											</BadgeText>
+										</Badge>
+									)}
 								</Card>
 							);
 
