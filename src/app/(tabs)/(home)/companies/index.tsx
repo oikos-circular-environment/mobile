@@ -12,6 +12,7 @@ import { type Company, useCompaniesStore } from "@/stores/companies-store";
 
 export default function CompaniesListScreen() {
 	const router = useRouter();
+
 	const companies = useCompaniesStore(s => s.companies);
 	const isLoading = useCompaniesStore(s => !s.isLoaded);
 

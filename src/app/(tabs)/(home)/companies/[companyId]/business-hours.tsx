@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Clock8Icon } from "lucide-react-native";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ import {
 	businessHoursFormSchema,
 } from "@/components/companies/business-hours/business-hours-form-schema";
 import { DayBusinessHourField } from "@/components/companies/business-hours/day-business-hour-field";
+import { useSaveBusinessHours } from "@/components/companies/hooks/use-save-business-hours";
 import { BusinessHoursSkeleton } from "@/components/companies/skeletons";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
@@ -16,9 +17,8 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { useSaveBusinessHours } from "@/components/companies/hooks/use-save-business-hours";
-import { useCompaniesStore } from "@/stores/companies-store";
 import { daysOfWeek, defaultBusinessHours } from "@/libs/types/business-hour";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 type DayOfWeek =
 	| "SUNDAY"
@@ -30,8 +30,11 @@ type DayOfWeek =
 	| "SATURDAY";
 
 export default function CompanyBusinessHoursScreen() {
+	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
-	const company = useCompaniesStore(s => s.companies.find(c => c.id === companyId));
+	const company = useCompaniesStore(s =>
+		s.companies.find(c => c.id === companyId),
+	);
 	const businessHours = company?.business_hours;
 	const isLoadingBusinessHours = useCompaniesStore(s => !s.isLoaded);
 	const { mutateAsync: saveBusinessHours, isPending: isSavingBusinessHours } =
@@ -84,6 +87,8 @@ export default function CompanyBusinessHoursScreen() {
 				})),
 			})),
 		});
+
+		router.back();
 	};
 
 	const getDayLabel = (dayOfWeek: string) => {

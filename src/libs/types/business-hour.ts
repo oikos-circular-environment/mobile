@@ -52,7 +52,7 @@ export const defaultBusinessHours: BusinessHour[] = [
 				endTime: "17:30",
 			},
 		],
-		is_open: true,
+		is_open: false,
 	},
 	{
 		id: "0d900658-838a-4a33-ab8d-689dd79f0a5d",
@@ -64,7 +64,7 @@ export const defaultBusinessHours: BusinessHour[] = [
 				endTime: "17:30",
 			},
 		],
-		is_open: true,
+		is_open: false,
 	},
 	{
 		id: "0d900658-838a-4a33-ab8d-689dd79f0a5e",
@@ -76,7 +76,7 @@ export const defaultBusinessHours: BusinessHour[] = [
 				endTime: "17:30",
 			},
 		],
-		is_open: true,
+		is_open: false,
 	},
 	{
 		id: "0d900658-838a-4a33-ab8d-689dd79f0a5f",
@@ -88,7 +88,7 @@ export const defaultBusinessHours: BusinessHour[] = [
 				endTime: "17:30",
 			},
 		],
-		is_open: true,
+		is_open: false,
 	},
 	{
 		id: "0d900658-838a-4a33-ab8d-689dd79f0a5g",
@@ -100,7 +100,7 @@ export const defaultBusinessHours: BusinessHour[] = [
 				endTime: "17:00",
 			},
 		],
-		is_open: true,
+		is_open: false,
 	},
 	{
 		id: "0d900658-838a-4a33-ab8d-689dd79f0a5h",
@@ -112,6 +112,6 @@ export const defaultBusinessHours: BusinessHour[] = [
 				endTime: "12:00",
 			},
 		],
-		is_open: true,
+		is_open: false,
 	},
 ];
