@@ -7,7 +7,7 @@ import {
 	MapIcon,
 	Search,
 } from "lucide-react-native";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { z } from "zod";
@@ -78,7 +78,6 @@ export default function CompanyAddressScreen() {
 	const isLoadingAddress = useCompaniesStore(s => !s.isLoaded);
 	const { mutateAsync: saveAddress, isPending: isSavingAddress } =
 		useSaveAddress(companyId);
-	const [selectedCity, setSelectedCity] = useState<string | null>(null);
 	const defaultValues = useMemo<AddressFormValues>(
 		() => ({
 			zip_code: address?.zip_code ?? "",
@@ -169,12 +168,21 @@ export default function CompanyAddressScreen() {
 	const getCepMutation = useMutation({
 		mutationKey: ["get", "cep", "brasil-api"],
 		mutationFn: async ({ cep }: { cep: string }) => {
-			const response = await getCepV2({ path: { cep } });
-			return response.data;
+			const cepRes = await getCepV2({ path: { cep } });
+			if (!cepRes.data) throw new Error("CEP não encontrado");
+			const citiesRes = await listIbgeMunicipios({
+				path: { siglaUF: cepRes.data.state },
+			});
+			return {
+				cep: cepRes.data,
+				cities: citiesRes.data ?? [],
+			};
 		},
-		onSuccess: data => {
-			if (!data) return;
+		onSuccess: ({ cep: data, cities: cityList }) => {
 			const current = control._formValues as AddressFormValues;
+			const matched = cityList.find(
+				c => c.nome.toUpperCase() === data.city.toUpperCase(),
+			);
 			reset(
 				{
 					...current,
@@ -183,6 +191,7 @@ export default function CompanyAddressScreen() {
 					district: data.neighborhood ?? current.district,
 					city: data.city,
 					state_code: data.state,
+					city_ibge_id: matched ? Number(matched.codigo_ibge) : 0,
 				},
 				{ keepDefaultValues: true },
 			);
@@ -193,8 +202,6 @@ export default function CompanyAddressScreen() {
 				setValue("state_code", uf.sigla);
 				setValue("state_ibge_id", uf.id);
 			}
-
-			setSelectedCity(data.city);
 		},
 		onError: () => {
 			toast.error(
@@ -216,15 +223,6 @@ export default function CompanyAddressScreen() {
 	useEffect(() => {
 		reset(defaultValues);
 	}, [defaultValues, reset]);
-
-	useEffect(() => {
-		if (selectedCity) {
-			const city = cities?.find(c => c.nome === selectedCity);
-			if (city) {
-				setValue("city_ibge_id", Number(city.codigo_ibge));
-			}
-		}
-	}, [cities, selectedCity, setValue]);
 
 	if (isLoadingAddress) {
 		return <AddressFormSkeleton />;
@@ -564,7 +562,7 @@ export default function CompanyAddressScreen() {
 																<SelectItem
 																	key={c.codigo_ibge}
 																	label={c.nome}
-																	value={c.codigo_ibge}
+																	value={c.nome}
 																	className="capitalize"
 																/>
 															))
