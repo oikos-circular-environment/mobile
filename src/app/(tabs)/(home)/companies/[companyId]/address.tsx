@@ -487,14 +487,16 @@ export default function CompanyAddressScreen() {
 											</Select>
 										)}
 									/>
-									{errors.state?.message || errors.state_ibge_id?.message && (
-										<FormControlError>
-											<FormControlErrorIcon as={AlertCircleIcon} />
-											<FormControlErrorText>
-												{errors.state?.message ?? errors.state_ibge_id?.message}
-											</FormControlErrorText>
-										</FormControlError>
-									)}
+									{errors.state?.message ||
+										(errors.state_ibge_id?.message && (
+											<FormControlError>
+												<FormControlErrorIcon as={AlertCircleIcon} />
+												<FormControlErrorText>
+													{errors.state?.message ??
+														errors.state_ibge_id?.message}
+												</FormControlErrorText>
+											</FormControlError>
+										))}
 								</FormControl>
 
 								<FormControl isReadOnly className="w-16 gap-2">
@@ -562,7 +564,7 @@ export default function CompanyAddressScreen() {
 																<SelectItem
 																	key={c.codigo_ibge}
 																	label={c.nome}
-																	value={c.nome}
+																	value={c.codigo_ibge}
 																	className="capitalize"
 																/>
 															))
@@ -578,14 +580,15 @@ export default function CompanyAddressScreen() {
 										</Select>
 									)}
 								/>
-								{errors.city?.message || errors.city_ibge_id?.message && (
-									<FormControlError>
-										<FormControlErrorIcon as={AlertCircleIcon} />
-										<FormControlErrorText>
-											{errors.city?.message ?? errors.city_ibge_id?.message}
-										</FormControlErrorText>
-									</FormControlError>
-								)}
+								{errors.city?.message ||
+									(errors.city_ibge_id?.message && (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.city?.message ?? errors.city_ibge_id?.message}
+											</FormControlErrorText>
+										</FormControlError>
+									))}
 							</FormControl>
 
 							<View className="gap-2">
