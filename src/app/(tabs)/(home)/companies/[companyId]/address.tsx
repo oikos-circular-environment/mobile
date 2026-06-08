@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
 	ChevronDown,
@@ -70,6 +70,7 @@ const addressSchema = z.object({
 type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function CompanyAddressScreen() {
+	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const company = useCompaniesStore(s =>
 		s.companies.find(c => c.id === companyId),
@@ -151,6 +152,8 @@ export default function CompanyAddressScreen() {
 			city_ibge_id: data.city_ibge_id,
 			state_ibge_id: data.state_ibge_id,
 		});
+
+		router.back();
 	};
 
 	const onCancel = () => {
@@ -271,6 +274,7 @@ export default function CompanyAddressScreen() {
 												onChangeText={text => onChange(mask.cep(text))}
 												keyboardType="number-pad"
 												maxLength={9}
+												placeholder="00000-000"
 											/>
 											<InputSlot
 												className="pr-3"
@@ -314,6 +318,7 @@ export default function CompanyAddressScreen() {
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
+													placeholder="Rua das Flores"
 												/>
 											</Input>
 										)}
@@ -344,6 +349,7 @@ export default function CompanyAddressScreen() {
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
+													placeholder="123"
 												/>
 											</Input>
 										)}
@@ -375,6 +381,7 @@ export default function CompanyAddressScreen() {
 												value={value ?? ""}
 												onBlur={onBlur}
 												onChangeText={onChange}
+												placeholder="Apto 42"
 											/>
 										</Input>
 									)}
@@ -405,6 +412,7 @@ export default function CompanyAddressScreen() {
 												value={value}
 												onBlur={onBlur}
 												onChangeText={onChange}
+												placeholder="Centro"
 											/>
 										</Input>
 									)}
@@ -508,7 +516,7 @@ export default function CompanyAddressScreen() {
 										name="state_code"
 										render={({ field: { value } }) => (
 											<Input isReadOnly>
-												<InputField value={value} />
+												<InputField value={value} placeholder="SP" />
 											</Input>
 										)}
 									/>

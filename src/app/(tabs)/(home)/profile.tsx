@@ -533,6 +533,7 @@ export default function ProfileScreen() {
 													onChangeText={text => onChange(mask.phoneBr(text))}
 													keyboardType="phone-pad"
 													maxLength={15}
+													placeholder="(11) 9 9999-9999"
 												/>
 											</Input>
 										)}
@@ -573,6 +574,7 @@ export default function ProfileScreen() {
 													onChangeText={text => onChange(mask.cep(text))}
 													keyboardType="number-pad"
 													maxLength={9}
+													placeholder="00000-000"
 												/>
 												<InputSlot
 													className="pr-3"
@@ -616,6 +618,7 @@ export default function ProfileScreen() {
 														value={value}
 														onBlur={onBlur}
 														onChangeText={onChange}
+														placeholder="Rua das Flores"
 													/>
 												</Input>
 											)}
@@ -649,6 +652,7 @@ export default function ProfileScreen() {
 														value={value}
 														onBlur={onBlur}
 														onChangeText={onChange}
+														placeholder="123"
 													/>
 												</Input>
 											)}
@@ -683,6 +687,7 @@ export default function ProfileScreen() {
 													value={value || ""}
 													onBlur={onBlur}
 													onChangeText={onChange}
+													placeholder="Apto 42"
 												/>
 											</Input>
 										)}
@@ -716,6 +721,7 @@ export default function ProfileScreen() {
 													value={value}
 													onBlur={onBlur}
 													onChangeText={onChange}
+													placeholder="Centro"
 												/>
 											</Input>
 										)}
@@ -826,7 +832,7 @@ export default function ProfileScreen() {
 												name="address.state_code"
 												render={({ field: { value } }) => (
 													<Input isReadOnly>
-														<InputField value={value} />
+														<InputField value={value} placeholder="SP" />
 													</Input>
 												)}
 											/>
