@@ -3,6 +3,7 @@ import { parseDecimalInput } from "@/libs/mask";
 import type { Measurement } from "@/libs/types/measurement";
 
 const measurementValues = [
+	"DAY",
 	"KG",
 	"L",
 	"UNIT",

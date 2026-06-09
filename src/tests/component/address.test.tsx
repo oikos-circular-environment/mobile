@@ -1,11 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, userEvent } from "@testing-library/react-native";
 import { useLocalSearchParams } from "expo-router";
-import type React from "react";
 import CompanyAddressScreen from "@/app/(tabs)/(home)/companies/[companyId]/address";
 import { useSaveAddress } from "@/components/companies/hooks/use-save-address";
 import {
-	getCepV2,
 	listIbgeMunicipios,
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";

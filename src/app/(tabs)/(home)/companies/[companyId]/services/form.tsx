@@ -4,34 +4,24 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
 	ChevronDownIcon,
-	ChevronsUpIcon,
-	ChevronUpIcon,
-	CircleAlertIcon,
 	DollarSignIcon,
 	HashIcon,
-	InfoIcon,
-	MinusIcon,
 	WrenchIcon,
 } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
-import {
-	KeyboardAvoidingView,
-	Platform,
-	Pressable,
-	ScrollView,
-	View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
-import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import {
 	type ServiceFormInput,
 	type ServiceFormValues,
 	serviceFormSchema,
 } from "@/components/companies/services/services-form-schema";
+import {
+	WasteCategory,
+	WasteCategoryChips,
+	WasteCategoryContent,
+} from "@/components/companies/waste-category";
 import { colors } from "@/components/style/colors";
-import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
-import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
-import { Box } from "@/components/ui/box";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -85,8 +75,6 @@ export default function ServiceFormScreen() {
 
 	const initialData = id ? services?.find(s => s.id === id) : null;
 
-	const { categories, isLoading: isLoadingCategories } = useWasteCategories();
-
 	const form = useForm<ServiceFormInput, undefined, ServiceFormValues>({
 		resolver: zodResolver(serviceFormSchema),
 		defaultValues: {
@@ -101,13 +89,7 @@ export default function ServiceFormScreen() {
 		mode: "onChange",
 	});
 
-	const { control, formState, handleSubmit, setValue, watch } = form;
-	const wasteCategoryId = watch("waste_category_id");
-	const selectedCategory = categories.find(c => c.id === wasteCategoryId);
-
-	if (!selectedCategory && categories.length > 0) {
-		setValue("waste_category_id", categories[0].id);
-	}
+	const { control, formState, handleSubmit, setValue } = form;
 
 	const onSubmit = async (data: ServiceFormValues) => {
 		const payload = {
@@ -324,7 +306,6 @@ export default function ServiceFormScreen() {
 								render={({ field: { value, onChange } }) => (
 									<Select selectedValue={value} onValueChange={onChange}>
 										<SelectTrigger
-											size="sm"
 											className={cn(
 												"justify-between",
 												Platform.OS === "android" ? "px-3" : "pr-3",
@@ -388,56 +369,6 @@ export default function ServiceFormScreen() {
 					<VStack space="lg">
 						<Heading size="sm">Categoria de resíduo</Heading>
 
-						{isLoadingCategories ? (
-							<View className="flex-row gap-2">
-								{[1, 2, 3, 4].map(i => (
-									<View
-										key={i}
-										className="h-9 w-24 rounded-xl bg-secondary/60"
-									/>
-								))}
-							</View>
-						) : (
-							<ScrollView
-								horizontal
-								showsHorizontalScrollIndicator={false}
-								contentContainerClassName="gap-2 py-0.5"
-							>
-								{categories.map(category => {
-									const isSelected = category.id === wasteCategoryId;
-									return (
-										<Pressable
-											key={category.id}
-											onPress={() =>
-												setValue("waste_category_id", category.id, {
-													shouldValidate: true,
-													shouldDirty: true,
-												})
-											}
-										>
-											<View
-												className={cn(
-													"px-4 py-2 rounded-xl border",
-													isSelected
-														? "bg-lime-800 border-lime-800"
-														: "bg-white border-border",
-												)}
-											>
-												<Text
-													className={cn(
-														"text-sm font-medium",
-														isSelected && "text-white",
-													)}
-												>
-													{category.name}
-												</Text>
-											</View>
-										</Pressable>
-									);
-								})}
-							</ScrollView>
-						)}
-
 						{formState.errors.waste_category_id && (
 							<FormControl isInvalid>
 								<FormControlError>
@@ -449,71 +380,18 @@ export default function ServiceFormScreen() {
 							</FormControl>
 						)}
 
-						<VStack space="md">
-							<Card className="shadow-none gap-2">
-								<Text size="sm" className="font-semibold text-muted-foreground">
-									Grau de periculosidade geral
-								</Text>
-								<HStack className="gap-2">
-									{selectedCategory?.hazard_levels.map(hazard_level => (
-										<WasteCategoryHazardLevel
-											key={`${selectedCategory.id}-${hazard_level}`}
-											harzardLevel={hazard_level}
-										/>
-									))}
-									<Text className="text-sm text-muted-foreground"></Text>
-								</HStack>
-							</Card>
-
-							{selectedCategory?.description && (
-								<Alert className="gap-2 bg-sky-100 border-sky-400">
-									<AlertIcon as={InfoIcon} className="text-sky-400" />
-									<AlertText className="text-foreground/80">
-										{selectedCategory.description}
-									</AlertText>
-								</Alert>
-							)}
-
-							{selectedCategory?.observations && (
-								<Alert className="gap-2 bg-destructive/10 border-destructive/20">
-									<AlertIcon
-										as={CircleAlertIcon}
-										className="text-destructive/40"
-									/>
-									<AlertText className="flex-col text-foreground/80">
-										{selectedCategory.observations}
-									</AlertText>
-								</Alert>
-							)}
-
-							<Text size="sm" className="font-semibold text-muted-foreground">
-								Itens relacinados
-							</Text>
-							{selectedCategory?.subcategories.map(subItem => (
-								<Card key={subItem.id} className="shadow-none gap-2">
-									<HStack space="md" className="items-center">
-										<WasteCategoryHazardLevel
-											harzardLevel={subItem.hazard_level}
-										/>
-										<Box className="flex-1">
-											<Text numberOfLines={2}>{subItem.name}</Text>
-										</Box>
-									</HStack>
-									{subItem.observations && (
-										<Alert className="p-1 gap-2 bg-destructive/10 border-destructive/20 items-center">
-											<AlertIcon
-												as={CircleAlertIcon}
-												size={14}
-												className="text-destructive/40"
-											/>
-											<AlertText className="flex-col text-foreground/80">
-												{subItem.observations}
-											</AlertText>
-										</Alert>
-									)}
-								</Card>
-							))}
-						</VStack>
+						<WasteCategory
+							defaultCategoryId={initialData?.waste_category_id}
+							onSelectionChange={cat =>
+								setValue("waste_category_id", cat.id, {
+									shouldValidate: true,
+									shouldDirty: true,
+								})
+							}
+						>
+							<WasteCategoryChips />
+							<WasteCategoryContent />
+						</WasteCategory>
 					</VStack>
 
 					<View className="flex-row gap-2 mt-4">
@@ -552,62 +430,4 @@ export default function ServiceFormScreen() {
 			</ScrollView>
 		</KeyboardAvoidingView>
 	);
-}
-
-interface WasteCategoryHazardLevelProps {
-	harzardLevel: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
-}
-export function WasteCategoryHazardLevel({
-	harzardLevel,
-}: WasteCategoryHazardLevelProps) {
-	switch (harzardLevel) {
-		case "LOW":
-			return (
-				<Badge
-					variant="secondary"
-					className="gap-1 bg-lime-50 border border-lime-200"
-				>
-					<BadgeIcon as={ChevronDownIcon} className="text-lime-600 stroke-3" />
-					<BadgeText className="text-lime-600 font-semibold">Baixa</BadgeText>
-				</Badge>
-			);
-		case "MEDIUM":
-			return (
-				<Badge
-					variant="secondary"
-					className="gap-1 bg-yellow-50 border border-yellow-200"
-				>
-					<BadgeIcon as={MinusIcon} className="text-yellow-600 stroke-3" />
-					<BadgeText className="text-yellow-600 font-semibold">Média</BadgeText>
-				</Badge>
-			);
-		case "HIGH":
-			return (
-				<Badge
-					variant="secondary"
-					className="gap-1 bg-orange-50 border border-orange-200"
-				>
-					<BadgeIcon as={ChevronUpIcon} className="text-orange-600 stroke-3" />
-					<BadgeText className="text-orange-600 font-semibold">Alta</BadgeText>
-				</Badge>
-			);
-		case "VERY_HIGH":
-			return (
-				<Badge
-					variant="secondary"
-					className="gap-1 bg-red-50 border border-red-200"
-				>
-					<BadgeIcon as={ChevronsUpIcon} className="text-red-600 stroke-3" />
-					<BadgeText className="text-red-600 font-semibold">
-						Muito alta
-					</BadgeText>
-				</Badge>
-			);
-		default:
-			return (
-				<Badge variant="secondary">
-					<BadgeText>Desconhecido</BadgeText>
-				</Badge>
-			);
-	}
 }

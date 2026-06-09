@@ -1,8 +1,17 @@
 import type { ValueMapping } from "./value-mapping";
 
-export type Measurement = "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+export type Measurement =
+	| "KG"
+	| "L"
+	| "UNIT"
+	| "M"
+	| "M2"
+	| "M3"
+	| "ML"
+	| "DAY";
 
 export const measurements: ValueMapping<Measurement>[] = [
+	{ value: "DAY", label: "Diária" },
 	{ value: "KG", label: "Quilograma" },
 	{ value: "L", label: "Litro" },
 	{ value: "UNIT", label: "Unidade" },

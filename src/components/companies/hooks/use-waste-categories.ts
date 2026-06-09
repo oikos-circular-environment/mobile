@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { getV1WasteCategories } from "@/libs/oikos-sdk";
+import {
+	type GetV1WasteCategoriesResponses,
+	getV1WasteCategories,
+} from "@/libs/oikos-sdk";
+
+export type WasteCategory =
+	GetV1WasteCategoriesResponses[200]["categories"][number];
 
 export function useWasteCategories() {
 	const query = useQuery({

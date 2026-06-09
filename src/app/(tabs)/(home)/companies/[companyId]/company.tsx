@@ -305,20 +305,14 @@ export default function CompanyGeneralInfoScreen() {
 			if (newId && selectedAsset.current) {
 				await uploadAvatar({ companyId: newId, asset: selectedAsset.current });
 			}
-			router.replace({
-				pathname: "/(tabs)/(home)/companies/[companyId]",
-				params: { companyId: newId ?? "new-company" },
-			});
+			router.back();
 		} else {
 			await saveCompany(payload);
 			if (selectedAsset.current) {
 				await uploadAvatar({ companyId, asset: selectedAsset.current });
 				selectedAsset.current = null;
 			}
-			router.replace({
-				pathname: "/(tabs)/(home)/companies/[companyId]",
-				params: { companyId },
-			});
+			router.back();
 		}
 	};
 

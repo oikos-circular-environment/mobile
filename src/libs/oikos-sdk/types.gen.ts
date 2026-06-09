@@ -214,6 +214,14 @@ export type PutV1ProfilesErrors = {
 	/**
 	 * Default Response
 	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
 	409: {
 		message: string;
 		code: string;
@@ -511,7 +519,7 @@ export type GetV1CompaniesResponses = {
 				name: string;
 				description?: string | null;
 				price: number;
-				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 				waste_category_id: string;
 				waste_category: {
 					id: string;
@@ -542,7 +550,7 @@ export type GetV1CompaniesResponses = {
 				name: string;
 				description?: string | null;
 				price: number;
-				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 				waste_category_id: string;
 				waste_category: {
 					id: string;
@@ -1046,7 +1054,7 @@ export type GetV1CompaniesByIdWastesResponses = {
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_category_id: string;
 			waste_category: {
 				id: string;
@@ -1084,7 +1092,7 @@ export type PutV1CompaniesByIdWastesData = {
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_category_id: string;
 			quantity: number;
 			observations?: string | null;
@@ -1137,7 +1145,7 @@ export type PutV1CompaniesByIdWastesResponses = {
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_category_id: string;
 			waste_category: {
 				id: string;
@@ -1210,7 +1218,7 @@ export type GetV1CompaniesByIdServicesResponses = {
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_category_id: string;
 			waste_category: {
 				id: string;
@@ -1248,7 +1256,7 @@ export type PutV1CompaniesByIdServicesData = {
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_category_id: string;
 			quantity: number;
 			observations?: string | null;
@@ -1301,7 +1309,7 @@ export type PutV1CompaniesByIdServicesResponses = {
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_category_id: string;
 			waste_category: {
 				id: string;
@@ -3140,7 +3148,7 @@ export type GetV1MarketResponses = {
 				name: string;
 				description: string | null;
 				price: number;
-				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 				waste_category_id: string;
 				waste_category: {
 					id: string;
@@ -3155,7 +3163,7 @@ export type GetV1MarketResponses = {
 				name: string;
 				description: string | null;
 				price: number;
-				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 				waste_category_id: string;
 				waste_category: {
 					id: string;

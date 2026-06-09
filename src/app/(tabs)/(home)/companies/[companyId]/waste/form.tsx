@@ -9,20 +9,18 @@ import {
 	RecycleIcon,
 } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
-import {
-	KeyboardAvoidingView,
-	Platform,
-	Pressable,
-	ScrollView,
-	View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { useSaveWastes } from "@/components/companies/hooks/use-save-wastes";
-import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import {
 	type WasteManagementFormInput,
 	type WasteManagementFormValues,
 	wasteManagementFormSchema,
 } from "@/components/companies/waste/waste-form-schema";
+import {
+	WasteCategory,
+	WasteCategoryChips,
+	WasteCategoryContent,
+} from "@/components/companies/waste-category";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -77,8 +75,6 @@ export default function WasteFormScreen() {
 
 	const initialData = id ? wastes?.find(w => w.id === id) : null;
 
-	const { categories, isLoading: isLoadingCategories } = useWasteCategories();
-
 	const form = useForm<
 		WasteManagementFormInput,
 		undefined,
@@ -96,9 +92,7 @@ export default function WasteFormScreen() {
 		mode: "onChange",
 	});
 
-	const { control, formState, handleSubmit, setValue, watch } = form;
-	const wasteCategoryId = watch("waste_category_id");
-	const selectedCategory = categories.find(c => c.id === wasteCategoryId);
+	const { control, formState, handleSubmit, setValue } = form;
 
 	const onSubmit = async (data: WasteManagementFormValues) => {
 		const payload = {
@@ -158,80 +152,9 @@ export default function WasteFormScreen() {
 				</Card>
 
 				<VStack space="lg">
-					<Heading size="sm">Categoria do resíduo</Heading>
-
-					{isLoadingCategories ? (
-						<View className="flex-row gap-2">
-							{[1, 2, 3, 4].map(i => (
-								<View key={i} className="h-9 w-24 rounded-xl bg-secondary/60" />
-							))}
-						</View>
-					) : (
-						<ScrollView
-							horizontal
-							showsHorizontalScrollIndicator={false}
-							contentContainerClassName="gap-2 py-0.5"
-						>
-							{categories.map(category => {
-								const isSelected = category.id === wasteCategoryId;
-								return (
-									<Pressable
-										key={category.id}
-										onPress={() =>
-											setValue("waste_category_id", category.id, {
-												shouldValidate: true,
-												shouldDirty: true,
-											})
-										}
-									>
-										<View
-											className={cn(
-												"px-4 py-2 rounded-xl border",
-												isSelected
-													? "bg-lime-800 border-lime-800"
-													: "bg-white border-border",
-											)}
-										>
-											<Text
-												className={cn(
-													"text-sm font-medium",
-													isSelected && "text-white",
-												)}
-											>
-												{category.name}
-											</Text>
-										</View>
-									</Pressable>
-								);
-							})}
-						</ScrollView>
-					)}
-
-					{formState.errors.waste_category_id && (
-						<FormControl isInvalid>
-							<FormControlError>
-								<FormControlErrorIcon as={AlertCircleIcon} />
-								<FormControlErrorText>
-									{formState.errors.waste_category_id.message}
-								</FormControlErrorText>
-							</FormControlError>
-						</FormControl>
-					)}
-
-					{selectedCategory?.description && (
-						<Card className="shadow-none bg-secondary/40 p-3">
-							<Text className="text-sm text-muted-foreground">
-								{selectedCategory.description}
-							</Text>
-						</Card>
-					)}
-
 					<Heading size="sm">Informações principais</Heading>
 
-					<FormControl
-						isInvalid={!!formState.errors.name}
-						className="gap-2"
-					>
+					<FormControl isInvalid={!!formState.errors.name} className="gap-2">
 						<FormControlLabel>
 							<FormControlLabelText className="text-sm">
 								Nome do resíduo
@@ -298,10 +221,7 @@ export default function WasteFormScreen() {
 						)}
 					</FormControl>
 
-					<FormControl
-						isInvalid={!!formState.errors.price}
-						className="gap-2"
-					>
+					<FormControl isInvalid={!!formState.errors.price} className="gap-2">
 						<FormControlLabel>
 							<FormControlLabelText className="text-sm">
 								Preço
@@ -399,6 +319,34 @@ export default function WasteFormScreen() {
 						</FormControl>
 					</HStack>
 
+					<VStack space="lg">
+						<Heading size="sm">Categoria de resíduo</Heading>
+
+						{formState.errors.waste_category_id && (
+							<FormControl isInvalid>
+								<FormControlError>
+									<FormControlErrorIcon as={AlertCircleIcon} />
+									<FormControlErrorText>
+										{formState.errors.waste_category_id.message}
+									</FormControlErrorText>
+								</FormControlError>
+							</FormControl>
+						)}
+
+						<WasteCategory
+							defaultCategoryId={initialData?.waste_category_id}
+							onSelectionChange={cat =>
+								setValue("waste_category_id", cat.id, {
+									shouldValidate: true,
+									shouldDirty: true,
+								})
+							}
+						>
+							<WasteCategoryChips />
+							<WasteCategoryContent />
+						</WasteCategory>
+					</VStack>
+
 					<View className="flex-row gap-2 mt-4">
 						<Button
 							variant="outline"
@@ -413,14 +361,10 @@ export default function WasteFormScreen() {
 							className="flex-1"
 							onPress={handleSubmit(onSubmit)}
 							isDisabled={
-								!formState.isValid ||
-								formState.isSubmitting ||
-								isSavingWastes
+								!formState.isValid || formState.isSubmitting || isSavingWastes
 							}
 						>
-							<ButtonText>
-								{initialData ? "Salvar" : "Cadastrar"}
-							</ButtonText>
+							<ButtonText>{initialData ? "Salvar" : "Cadastrar"}</ButtonText>
 							{isSavingWastes && <ButtonIcon as={Spinner} />}
 						</Button>
 					</View>
