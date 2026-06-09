@@ -175,8 +175,10 @@ function setupStore(company: Company = mockCompany, isLoaded = true) {
 
 const mockSaveAsync = jest.fn().mockResolvedValue({});
 
+let queryClient: QueryClient;
+
 async function renderScreen() {
-	const queryClient = createQueryClient();
+	queryClient = createQueryClient();
 	await render(
 		<QueryClientProvider client={queryClient}>
 			<Toaster />
@@ -223,6 +225,7 @@ describe("CompanyAddressScreen — integração", () => {
 		// Flush any remaining TanStack Query async work before RNTL auto-cleanup
 		// unmounts the component, preventing state updates on unmounted components.
 		await act(async () => {});
+		queryClient?.clear();
 		jest.clearAllMocks();
 	});
 
