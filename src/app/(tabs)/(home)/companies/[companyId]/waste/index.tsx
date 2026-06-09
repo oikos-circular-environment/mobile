@@ -103,7 +103,7 @@ export default function WasteIndexScreen() {
 						</View>
 						<View className="bg-primary/10 px-2 py-1 rounded-md">
 							<Text className="text-xs text-primary-700">
-								{item.waste_type === "RECYCLABLE" ? "Reciclável" : "Rejeito"}
+								{item.waste_category.name}
 							</Text>
 						</View>
 					</View>

@@ -158,8 +158,8 @@ export type GetV1ProfilesResponses = {
 				state_ibge_id: number;
 				state: string;
 				state_code: string;
-				latitude: number | null;
-				longitude: number | null;
+				latitude: number;
+				longitude: number;
 				created_at: Date;
 				updated_at: Date;
 			} | null;
@@ -193,8 +193,8 @@ export type PutV1ProfilesData = {
 			state_ibge_id: number;
 			state: string;
 			state_code: string;
-			latitude?: number | null;
-			longitude?: number | null;
+			latitude: number;
+			longitude: number;
 		} | null;
 	};
 	path?: never;
@@ -248,8 +248,8 @@ export type PutV1ProfilesResponses = {
 				state_ibge_id: number;
 				state: string;
 				state_code: string;
-				latitude: number | null;
-				longitude: number | null;
+				latitude: number;
+				longitude: number;
 				created_at: Date;
 				updated_at: Date;
 			} | null;
@@ -413,8 +413,8 @@ export type GetV1ProfilesAddressesResponses = {
 			state_ibge_id: number;
 			state: string;
 			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
+			latitude: number;
+			longitude: number;
 			created_at: Date;
 			updated_at: Date;
 		} | null;
@@ -451,6 +451,7 @@ export type GetV1CompaniesResponses = {
 	 */
 	200: {
 		companies: Array<{
+			id: string;
 			user_id: string;
 			identity: string;
 			identity_type: "CPF" | "CNPJ";
@@ -461,7 +462,6 @@ export type GetV1CompaniesResponses = {
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			id: string;
 			is_company_valid: boolean;
 			avatar: {
 				id: string;
@@ -477,15 +477,15 @@ export type GetV1CompaniesResponses = {
 				zip_code: string;
 				street: string;
 				number: string;
-				complement: string | null;
+				complement?: string | null;
 				district: string;
 				city_ibge_id: number;
 				city: string;
 				state_ibge_id: number;
 				state: string;
 				state_code: string;
-				latitude: number | null;
-				longitude: number | null;
+				latitude: number;
+				longitude: number;
 				created_at: Date;
 				updated_at: Date;
 			} | null;
@@ -507,28 +507,64 @@ export type GetV1CompaniesResponses = {
 				}>;
 			}>;
 			wastes: Array<{
+				id: string;
 				name: string;
 				description?: string | null;
 				price: number;
 				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-				waste_type: "RECYCLABLE" | "GARBAGE";
+				waste_category_id: string;
+				waste_category: {
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+					created_at: Date;
+					updated_at: Date;
+					subcategories: Array<{
+						id: string;
+						name: string;
+						description: string | null;
+						observations: string | null;
+						hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+						type: "INCLUDE" | "EXCLUDE";
+						created_at: Date;
+						category_id: string;
+					}>;
+				};
 				quantity: number;
 				observations?: string | null;
-				sub_items: Array<string> | null;
-				id: string;
 				created_at: Date;
 				updated_at: Date;
 			}>;
 			services: Array<{
+				id: string;
 				name: string;
 				description?: string | null;
 				price: number;
 				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-				waste_type: "RECYCLABLE" | "GARBAGE";
+				waste_category_id: string;
+				waste_category: {
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+					created_at: Date;
+					updated_at: Date;
+					subcategories: Array<{
+						id: string;
+						name: string;
+						description: string | null;
+						observations: string | null;
+						hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+						type: "INCLUDE" | "EXCLUDE";
+						created_at: Date;
+						category_id: string;
+					}>;
+				};
 				quantity: number;
 				observations?: string | null;
-				sub_items: Array<string> | null;
-				id: string;
 				created_at: Date;
 				updated_at: Date;
 			}>;
@@ -576,6 +612,7 @@ export type PostV1CompaniesResponses = {
 	 */
 	200: {
 		company: {
+			id: string;
 			user_id: string;
 			identity: string;
 			identity_type: "CPF" | "CNPJ";
@@ -586,7 +623,6 @@ export type PostV1CompaniesResponses = {
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			id: string;
 			is_company_valid: boolean;
 			avatar: {
 				id: string;
@@ -651,6 +687,7 @@ export type PutV1CompaniesByIdResponses = {
 	 */
 	200: {
 		company: {
+			id: string;
 			user_id: string;
 			identity: string;
 			identity_type: "CPF" | "CNPJ";
@@ -661,7 +698,6 @@ export type PutV1CompaniesByIdResponses = {
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			id: string;
 			is_company_valid: boolean;
 			avatar: {
 				id: string;
@@ -718,6 +754,7 @@ export type PatchV1CompaniesByIdStatusResponses = {
 	 */
 	200: {
 		company: {
+			id: string;
 			user_id: string;
 			identity: string;
 			identity_type: "CPF" | "CNPJ";
@@ -728,7 +765,6 @@ export type PatchV1CompaniesByIdStatusResponses = {
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			id: string;
 			is_company_valid: boolean;
 			avatar: {
 				id: string;
@@ -799,6 +835,7 @@ export type PostV1CompaniesByIdAvatarResponses = {
 	 */
 	200: {
 		company: {
+			id: string;
 			user_id: string;
 			identity: string;
 			identity_type: "CPF" | "CNPJ";
@@ -809,7 +846,6 @@ export type PostV1CompaniesByIdAvatarResponses = {
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			id: string;
 			is_company_valid: boolean;
 			avatar: {
 				id: string;
@@ -1006,15 +1042,33 @@ export type GetV1CompaniesByIdWastesResponses = {
 	 */
 	200: {
 		wastes: Array<{
+			id: string;
 			name: string;
 			description?: string | null;
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			waste_category_id: string;
+			waste_category: {
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				created_at: Date;
+				updated_at: Date;
+				subcategories: Array<{
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+					type: "INCLUDE" | "EXCLUDE";
+					created_at: Date;
+					category_id: string;
+				}>;
+			};
 			quantity: number;
 			observations?: string | null;
-			sub_items: Array<string> | null;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 		}>;
@@ -1031,10 +1085,9 @@ export type PutV1CompaniesByIdWastesData = {
 			description?: string | null;
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			waste_category_id: string;
 			quantity: number;
 			observations?: string | null;
-			sub_items?: Array<string> | null;
 		}>;
 	};
 	path: {
@@ -1080,15 +1133,33 @@ export type PutV1CompaniesByIdWastesResponses = {
 	 */
 	200: {
 		wastes: Array<{
+			id: string;
 			name: string;
 			description?: string | null;
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			waste_category_id: string;
+			waste_category: {
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				created_at: Date;
+				updated_at: Date;
+				subcategories: Array<{
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+					type: "INCLUDE" | "EXCLUDE";
+					created_at: Date;
+					category_id: string;
+				}>;
+			};
 			quantity: number;
 			observations?: string | null;
-			sub_items: Array<string> | null;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 		}>;
@@ -1135,15 +1206,33 @@ export type GetV1CompaniesByIdServicesResponses = {
 	 */
 	200: {
 		services: Array<{
+			id: string;
 			name: string;
 			description?: string | null;
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			waste_category_id: string;
+			waste_category: {
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				created_at: Date;
+				updated_at: Date;
+				subcategories: Array<{
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+					type: "INCLUDE" | "EXCLUDE";
+					created_at: Date;
+					category_id: string;
+				}>;
+			};
 			quantity: number;
 			observations?: string | null;
-			sub_items: Array<string> | null;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 		}>;
@@ -1160,10 +1249,9 @@ export type PutV1CompaniesByIdServicesData = {
 			description?: string | null;
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			waste_category_id: string;
 			quantity: number;
 			observations?: string | null;
-			sub_items?: Array<string> | null;
 		}>;
 	};
 	path: {
@@ -1209,15 +1297,33 @@ export type PutV1CompaniesByIdServicesResponses = {
 	 */
 	200: {
 		services: Array<{
+			id: string;
 			name: string;
 			description?: string | null;
 			price: number;
 			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			waste_category_id: string;
+			waste_category: {
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				created_at: Date;
+				updated_at: Date;
+				subcategories: Array<{
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+					type: "INCLUDE" | "EXCLUDE";
+					created_at: Date;
+					category_id: string;
+				}>;
+			};
 			quantity: number;
 			observations?: string | null;
-			sub_items: Array<string> | null;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 		}>;
@@ -1268,15 +1374,15 @@ export type GetV1CompaniesByIdAddressesResponses = {
 			zip_code: string;
 			street: string;
 			number: string;
-			complement: string | null;
+			complement?: string | null;
 			district: string;
 			city_ibge_id: number;
 			city: string;
 			state_ibge_id: number;
 			state: string;
 			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
+			latitude: number;
+			longitude: number;
 			created_at: Date;
 			updated_at: Date;
 		} | null;
@@ -1340,15 +1446,15 @@ export type PutV1CompaniesByIdAddressesResponses = {
 			zip_code: string;
 			street: string;
 			number: string;
-			complement: string | null;
+			complement?: string | null;
 			district: string;
 			city_ibge_id: number;
 			city: string;
 			state_ibge_id: number;
 			state: string;
 			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
+			latitude: number;
+			longitude: number;
 			created_at: Date;
 			updated_at: Date;
 		};
@@ -1413,8 +1519,7 @@ export type GetV1ComplaintsData = {
 	body?: never;
 	path?: never;
 	query?: {
-		type?: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-		status?: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+		status?: "OPEN" | "RESOLVED" | "CANCELED";
 		cursor?: Date;
 		limit?: number;
 	};
@@ -1442,8 +1547,7 @@ export type GetV1ComplaintsResponses = {
 	200: {
 		complaints: Array<{
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -1492,6 +1596,11 @@ export type GetV1ComplaintsResponses = {
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
 			vote_counts: {
 				resolved: number;
 				not_resolved: number;
@@ -1509,7 +1618,6 @@ export type GetV1ComplaintsResponse =
 export type PostV1ComplaintsData = {
 	body: {
 		date: unknown;
-		type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 		observations?: string | null;
 		geospatial: {
 			heading: {
@@ -1545,6 +1653,7 @@ export type PostV1ComplaintsData = {
 				formattedAddress?: string | null;
 			};
 		};
+		waste_category_ids: Array<string>;
 	};
 	path?: never;
 	query?: never;
@@ -1572,8 +1681,7 @@ export type PostV1ComplaintsResponses = {
 	200: {
 		complaint: {
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -1621,6 +1729,11 @@ export type PostV1ComplaintsResponses = {
 				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 			}>;
 			vote_counts: {
 				resolved: number;
@@ -1664,10 +1777,8 @@ export type GetV1ComplaintsDashboardResponses = {
 		dashboard: {
 			total: number;
 			open: number;
-			pending: number;
 			resolved: number;
 			canceled: number;
-			rejected: number;
 		};
 	};
 };
@@ -1682,8 +1793,7 @@ export type GetV1ComplaintsMapData = {
 		lat: number;
 		lon: number;
 		radius?: number;
-		type?: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-		status?: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+		status?: "OPEN" | "RESOLVED" | "CANCELED";
 	};
 	url: "/v1/complaints/map";
 };
@@ -1695,8 +1805,7 @@ export type GetV1ComplaintsMapResponses = {
 	200: {
 		complaints: Array<{
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -1748,6 +1857,11 @@ export type GetV1ComplaintsMapResponses = {
 				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 			}>;
 			vote_counts: {
 				resolved: number;
@@ -1800,8 +1914,7 @@ export type GetV1ComplaintsByIdPublicResponses = {
 	200: {
 		complaint: {
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -1853,6 +1966,11 @@ export type GetV1ComplaintsByIdPublicResponses = {
 				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 			}>;
 			vote_counts: {
 				resolved: number;
@@ -1928,8 +2046,7 @@ export type GetV1ComplaintsByIdResponses = {
 	200: {
 		complaint: {
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -1978,6 +2095,11 @@ export type GetV1ComplaintsByIdResponses = {
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
 			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
 			vote_counts: {
 				resolved: number;
 				not_resolved: number;
@@ -1994,7 +2116,6 @@ export type GetV1ComplaintsByIdResponse =
 export type PatchV1ComplaintsByIdData = {
 	body: {
 		date?: unknown;
-		type?: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 		observations?: string | null;
 		geospatial?: {
 			heading: {
@@ -2030,6 +2151,7 @@ export type PatchV1ComplaintsByIdData = {
 				formattedAddress?: string | null;
 			};
 		};
+		waste_category_ids?: Array<string>;
 	};
 	path: {
 		id: string;
@@ -2067,8 +2189,7 @@ export type PatchV1ComplaintsByIdResponses = {
 	200: {
 		complaint: {
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -2116,6 +2237,11 @@ export type PatchV1ComplaintsByIdResponses = {
 				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 			}>;
 			vote_counts: {
 				resolved: number;
@@ -2179,8 +2305,7 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 	200: {
 		complaint: {
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -2228,6 +2353,11 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 			}>;
 			vote_counts: {
 				resolved: number;
@@ -2280,8 +2410,7 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 	200: {
 		complaint: {
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -2329,6 +2458,11 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 			}>;
 			vote_counts: {
 				resolved: number;
@@ -2893,8 +3027,7 @@ export type PostV1ComplaintsByIdAttachmentsResponses = {
 	200: {
 		complaint: {
 			id: string;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
 			observations: string | null;
 			geospatial: {
@@ -2942,6 +3075,11 @@ export type PostV1ComplaintsByIdAttachmentsResponses = {
 				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 			}>;
 			vote_counts: {
 				resolved: number;
@@ -3003,10 +3141,14 @@ export type GetV1MarketResponses = {
 				description: string | null;
 				price: number;
 				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-				waste_type: "RECYCLABLE" | "GARBAGE";
+				waste_category_id: string;
+				waste_category: {
+					id: string;
+					name: string;
+					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				};
 				quantity: number;
 				observations: string | null;
-				sub_items: Array<string> | null;
 			}>;
 			wastes: Array<{
 				id: string;
@@ -3014,10 +3156,14 @@ export type GetV1MarketResponses = {
 				description: string | null;
 				price: number;
 				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-				waste_type: "RECYCLABLE" | "GARBAGE";
+				waste_category_id: string;
+				waste_category: {
+					id: string;
+					name: string;
+					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				};
 				quantity: number;
 				observations: string | null;
-				sub_items: Array<string> | null;
 			}>;
 			business_hours: Array<{
 				id: string;
@@ -3044,6 +3190,110 @@ export type GetV1MarketResponses = {
 
 export type GetV1MarketResponse =
 	GetV1MarketResponses[keyof GetV1MarketResponses];
+
+export type GetV1WasteCategoriesData = {
+	body?: never;
+	path?: never;
+	query?: never;
+	url: "/v1/waste-categories";
+};
+
+export type GetV1WasteCategoriesErrors = {
+	/**
+	 * Default Response
+	 */
+	500: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1WasteCategoriesError =
+	GetV1WasteCategoriesErrors[keyof GetV1WasteCategoriesErrors];
+
+export type GetV1WasteCategoriesResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		categories: Array<{
+			id: string;
+			name: string;
+			description: string | null;
+			observations: string | null;
+			hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			created_at: Date;
+			updated_at: Date;
+			subcategories: Array<{
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+				type: "INCLUDE" | "EXCLUDE";
+				created_at: Date;
+				category_id: string;
+			}>;
+		}>;
+	};
+};
+
+export type GetV1WasteCategoriesResponse =
+	GetV1WasteCategoriesResponses[keyof GetV1WasteCategoriesResponses];
+
+export type GetV1WasteCategoriesByIdData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/waste-categories/{id}";
+};
+
+export type GetV1WasteCategoriesByIdErrors = {
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1WasteCategoriesByIdError =
+	GetV1WasteCategoriesByIdErrors[keyof GetV1WasteCategoriesByIdErrors];
+
+export type GetV1WasteCategoriesByIdResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		category: {
+			id: string;
+			name: string;
+			description: string | null;
+			observations: string | null;
+			hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			created_at: Date;
+			updated_at: Date;
+			subcategories: Array<{
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+				type: "INCLUDE" | "EXCLUDE";
+				created_at: Date;
+				category_id: string;
+			}>;
+		};
+	};
+};
+
+export type GetV1WasteCategoriesByIdResponse =
+	GetV1WasteCategoriesByIdResponses[keyof GetV1WasteCategoriesByIdResponses];
 
 export type GetStorageBy__Data = {
 	body?: never;

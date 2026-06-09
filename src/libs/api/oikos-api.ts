@@ -17,8 +17,7 @@ import {
 // });
 
 // Production / ngrok
-const baseURL =
-	"https://06e6-2804-196c-223-2d00-142a-606c-5595-148c.ngrok-free.app";
+const baseURL = process.env.EXPO_PUBLIC_BASE_URL;
 
 client.setConfig({ baseURL, throwOnError: true });
 

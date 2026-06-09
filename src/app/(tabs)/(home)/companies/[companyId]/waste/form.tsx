@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -6,9 +7,7 @@ import {
 	DollarSignIcon,
 	HashIcon,
 	RecycleIcon,
-	X,
 } from "lucide-react-native";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	KeyboardAvoidingView,
@@ -18,6 +17,7 @@ import {
 	View,
 } from "react-native";
 import { useSaveWastes } from "@/components/companies/hooks/use-save-wastes";
+import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import {
 	type WasteManagementFormInput,
 	type WasteManagementFormValues,
@@ -57,8 +57,8 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { measurements } from "@/libs/types/measurement";
-import { wasteTypes } from "@/libs/types/waste";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 
@@ -74,9 +74,10 @@ export default function WasteFormScreen() {
 	const wastes = company?.wastes;
 	const { mutateAsync: saveWastes, isPending: isSavingWastes } =
 		useSaveWastes(companyId);
-	const [subItemDraft, setSubItemDraft] = useState("");
 
 	const initialData = id ? wastes?.find(w => w.id === id) : null;
+
+	const { categories, isLoading: isLoadingCategories } = useWasteCategories();
 
 	const form = useForm<
 		WasteManagementFormInput,
@@ -85,119 +86,48 @@ export default function WasteFormScreen() {
 	>({
 		resolver: zodResolver(wasteManagementFormSchema),
 		defaultValues: {
+			waste_category_id: initialData?.waste_category_id ?? "",
 			name: initialData?.name ?? "",
 			description: initialData?.description ?? "",
 			price: initialData?.price ?? "0,00",
 			quantity: initialData?.quantity ?? "1,00",
 			unit: initialData?.unit ?? "KG",
-			waste_type: initialData?.waste_type ?? "RECYCLABLE",
-			subItems: initialData?.sub_items ?? [],
 		},
 		mode: "onChange",
 	});
 
-	const { control, formState, getValues, handleSubmit, setValue, watch } = form;
-	const subItems = watch("subItems") ?? [];
-
-	const onAddSubItem = () => {
-		const draft = subItemDraft.trim();
-		if (!draft) return;
-
-		const newItems = draft
-			.split(",")
-			.map(item => item.trim())
-			.filter(item => item !== "");
-
-		if (newItems.length === 0) return;
-
-		const currentSubItems = getValues("subItems") ?? [];
-		const uniqueNewItems = newItems.filter(
-			item => !currentSubItems.includes(item),
-		);
-
-		if (uniqueNewItems.length > 0) {
-			setValue("subItems", [...currentSubItems, ...uniqueNewItems], {
-				shouldDirty: true,
-				shouldValidate: true,
-			});
-		}
-
-		setSubItemDraft("");
-	};
-
-	const onRemoveSubItem = (subItem: string) => {
-		setValue(
-			"subItems",
-			(getValues("subItems") ?? []).filter(item => item !== subItem),
-			{ shouldDirty: true, shouldValidate: true },
-		);
-	};
+	const { control, formState, handleSubmit, setValue, watch } = form;
+	const wasteCategoryId = watch("waste_category_id");
+	const selectedCategory = categories.find(c => c.id === wasteCategoryId);
 
 	const onSubmit = async (data: WasteManagementFormValues) => {
-		let updatedWastes = [];
 		const payload = {
 			name: data.name.trim(),
 			description: data.description.trim() || null,
 			price: data.price,
 			quantity: data.quantity,
 			unit: data.unit,
-			waste_type: data.waste_type,
-			sub_items: data.subItems.length > 0 ? data.subItems : null,
+			waste_category_id: data.waste_category_id,
 		};
 
-		if (initialData?.id) {
-			updatedWastes = (wastes ?? []).map(w =>
-				w.id === initialData.id
-					? { ...w, ...payload }
-					: {
-							name: w.name,
-							description: w.description ?? null,
-							price: w.price,
-							quantity: w.quantity,
-							observations: w.observations,
-							unit: w.unit,
-							waste_type: w.waste_type,
-							sub_items: w.sub_items,
-						},
-			);
-		} else {
-			const existing = (wastes ?? []).map(w => ({
-				name: w.name,
-				description: w.description ?? null,
-				price: w.price,
-				unit: w.unit,
-				quantity: w.quantity,
-				observations: w.observations,
-				waste_type: w.waste_type,
-				sub_items: w.sub_items,
-			}));
-			updatedWastes = [...existing, payload];
-		}
+		const mapExisting = (w: NonNullable<typeof wastes>[number]) => ({
+			name: w.name,
+			description: w.description ?? null,
+			price: w.price,
+			unit: w.unit,
+			quantity: w.quantity,
+			waste_category_id: w.waste_category_id,
+			observations: w.observations ?? null,
+		});
+
+		const updatedWastes = initialData?.id
+			? (wastes ?? []).map(w =>
+					w.id === initialData.id ? { ...w, ...payload } : mapExisting(w),
+				)
+			: [...(wastes ?? []).map(mapExisting), payload];
 
 		await saveWastes({ wastes: updatedWastes });
 		router.back();
-	};
-
-	const handleRemove = async () => {
-		if (!initialData?.id) return;
-		const remaining = (wastes ?? []).filter(w => w.id !== initialData.id);
-		try {
-			await saveWastes({
-				wastes: remaining.map(w => ({
-					name: w.name,
-					description: w.description ?? null,
-					price: w.price,
-					unit: w.unit,
-					quantity: w.quantity,
-					observations: w.observations,
-					waste_type: w.waste_type,
-					sub_items: w.sub_items,
-				})),
-			});
-			router.back();
-		} catch {
-			// handled by context mutation's onError
-		}
 	};
 
 	return (
@@ -218,7 +148,7 @@ export default function WasteFormScreen() {
 							<Heading className="text-lg">
 								{initialData ? "Editar resíduo" : "Cadastro de resíduos"}
 							</Heading>
-							<Text className="text-sm ">
+							<Text className="text-sm">
 								{initialData
 									? "Atualize as informações do resíduo coletado."
 									: "Cadastre os resíduos que sua empresa coleta para vinculá-los ao seu perfil."}
@@ -227,10 +157,81 @@ export default function WasteFormScreen() {
 					</View>
 				</Card>
 
-				<Card className="shadow-none gap-4">
+				<VStack space="lg">
+					<Heading size="sm">Categoria do resíduo</Heading>
+
+					{isLoadingCategories ? (
+						<View className="flex-row gap-2">
+							{[1, 2, 3, 4].map(i => (
+								<View key={i} className="h-9 w-24 rounded-xl bg-secondary/60" />
+							))}
+						</View>
+					) : (
+						<ScrollView
+							horizontal
+							showsHorizontalScrollIndicator={false}
+							contentContainerClassName="gap-2 py-0.5"
+						>
+							{categories.map(category => {
+								const isSelected = category.id === wasteCategoryId;
+								return (
+									<Pressable
+										key={category.id}
+										onPress={() =>
+											setValue("waste_category_id", category.id, {
+												shouldValidate: true,
+												shouldDirty: true,
+											})
+										}
+									>
+										<View
+											className={cn(
+												"px-4 py-2 rounded-xl border",
+												isSelected
+													? "bg-lime-800 border-lime-800"
+													: "bg-white border-border",
+											)}
+										>
+											<Text
+												className={cn(
+													"text-sm font-medium",
+													isSelected && "text-white",
+												)}
+											>
+												{category.name}
+											</Text>
+										</View>
+									</Pressable>
+								);
+							})}
+						</ScrollView>
+					)}
+
+					{formState.errors.waste_category_id && (
+						<FormControl isInvalid>
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
+								<FormControlErrorText>
+									{formState.errors.waste_category_id.message}
+								</FormControlErrorText>
+							</FormControlError>
+						</FormControl>
+					)}
+
+					{selectedCategory?.description && (
+						<Card className="shadow-none bg-secondary/40 p-3">
+							<Text className="text-sm text-muted-foreground">
+								{selectedCategory.description}
+							</Text>
+						</Card>
+					)}
+
 					<Heading size="sm">Informações principais</Heading>
 
-					<FormControl isInvalid={!!formState.errors.name} className="gap-2">
+					<FormControl
+						isInvalid={!!formState.errors.name}
+						className="gap-2"
+					>
 						<FormControlLabel>
 							<FormControlLabelText className="text-sm">
 								Nome do resíduo
@@ -297,7 +298,10 @@ export default function WasteFormScreen() {
 						)}
 					</FormControl>
 
-					<FormControl isInvalid={!!formState.errors.price} className="gap-2">
+					<FormControl
+						isInvalid={!!formState.errors.price}
+						className="gap-2"
+					>
 						<FormControlLabel>
 							<FormControlLabelText className="text-sm">
 								Preço
@@ -395,68 +399,6 @@ export default function WasteFormScreen() {
 						</FormControl>
 					</HStack>
 
-					<Heading size="sm">Categoria do resíduo</Heading>
-					<Controller
-						control={control}
-						name="waste_type"
-						render={({ field: { value, onChange } }) => (
-							<View className="flex-row gap-2">
-								{wasteTypes.map(wasteType => {
-									const isSelected = wasteType.value === value;
-									return (
-										<Button
-											key={wasteType.value}
-											variant={isSelected ? "default" : "outline"}
-											className="flex-1 will-change-variable"
-											onPress={() => onChange(wasteType.value)}
-										>
-											<ButtonText>{wasteType.label}</ButtonText>
-										</Button>
-									);
-								})}
-							</View>
-						)}
-					/>
-
-					<Heading size="sm">Materiais vinculados</Heading>
-					<View className="flex-row items-end gap-2">
-						<Input className="flex-1">
-							<InputField
-								value={subItemDraft}
-								onChangeText={setSubItemDraft}
-								placeholder="Ex.: garrafas PET"
-								returnKeyType="done"
-								onSubmitEditing={onAddSubItem}
-							/>
-						</Input>
-						<Button size="sm" onPress={onAddSubItem}>
-							<ButtonText>Adicionar</ButtonText>
-						</Button>
-					</View>
-
-					<View className="flex-row flex-wrap gap-2">
-						{subItems.length > 0 ? (
-							subItems.map(subItem => (
-								<Pressable
-									key={subItem}
-									onPress={() => onRemoveSubItem(subItem)}
-								>
-									<Card
-										size="sm"
-										className="shadow-none flex-row items-center gap-2 border-border/80 bg-secondary/40"
-									>
-										<Text className="text-sm">{subItem}</Text>
-										<X size={14} />
-									</Card>
-								</Pressable>
-							))
-						) : (
-							<Text className="text-sm text-muted-foreground">
-								Nenhum material adicionado ainda.
-							</Text>
-						)}
-					</View>
-
 					<View className="flex-row gap-2 mt-4">
 						<Button
 							variant="outline"
@@ -471,14 +413,18 @@ export default function WasteFormScreen() {
 							className="flex-1"
 							onPress={handleSubmit(onSubmit)}
 							isDisabled={
-								!formState.isValid || formState.isSubmitting || isSavingWastes
+								!formState.isValid ||
+								formState.isSubmitting ||
+								isSavingWastes
 							}
 						>
-							<ButtonText>{initialData ? "Salvar" : "Cadastrar"}</ButtonText>
+							<ButtonText>
+								{initialData ? "Salvar" : "Cadastrar"}
+							</ButtonText>
 							{isSavingWastes && <ButtonIcon as={Spinner} />}
 						</Button>
 					</View>
-				</Card>
+				</VStack>
 			</ScrollView>
 		</KeyboardAvoidingView>
 	);

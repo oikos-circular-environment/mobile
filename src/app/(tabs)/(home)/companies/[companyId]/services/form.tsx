@@ -1,14 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
 	ChevronDownIcon,
+	ChevronsUpIcon,
+	ChevronUpIcon,
+	CircleAlertIcon,
 	DollarSignIcon,
 	HashIcon,
+	InfoIcon,
+	MinusIcon,
 	WrenchIcon,
-	X,
 } from "lucide-react-native";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	KeyboardAvoidingView,
@@ -18,12 +22,16 @@ import {
 	View,
 } from "react-native";
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
+import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import {
 	type ServiceFormInput,
 	type ServiceFormValues,
 	serviceFormSchema,
 } from "@/components/companies/services/services-form-schema";
 import { colors } from "@/components/style/colors";
+import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
+import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -57,8 +65,8 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { measurements } from "@/libs/types/measurement";
-import { wasteTypes } from "@/libs/types/waste";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 
@@ -74,103 +82,59 @@ export default function ServiceFormScreen() {
 	const services = company?.services;
 	const { mutateAsync: saveServices, isPending: isSavingServices } =
 		useSaveServices(companyId);
-	const [subItemDraft, setSubItemDraft] = useState("");
 
 	const initialData = id ? services?.find(s => s.id === id) : null;
+
+	const { categories, isLoading: isLoadingCategories } = useWasteCategories();
 
 	const form = useForm<ServiceFormInput, undefined, ServiceFormValues>({
 		resolver: zodResolver(serviceFormSchema),
 		defaultValues: {
+			waste_category_id: initialData?.waste_category_id ?? "",
 			name: initialData?.name ?? "",
 			description: initialData?.description ?? "",
 			price: initialData?.price ?? "0,00",
 			quantity: initialData?.quantity ?? "1,00",
 			unit: initialData?.unit ?? "KG",
-			waste_type: initialData?.waste_type ?? "RECYCLABLE",
-			subItems: initialData?.sub_items ?? [],
 			observations: initialData?.observations ?? "",
 		},
 		mode: "onChange",
 	});
 
-	const { control, formState, getValues, handleSubmit, setValue, watch } = form;
-	const subItems = watch("subItems") ?? [];
+	const { control, formState, handleSubmit, setValue, watch } = form;
+	const wasteCategoryId = watch("waste_category_id");
+	const selectedCategory = categories.find(c => c.id === wasteCategoryId);
 
-	const onAddSubItem = () => {
-		const draft = subItemDraft.trim();
-		if (!draft) return;
-
-		const newItems = draft
-			.split(",")
-			.map(item => item.trim())
-			.filter(item => item !== "");
-
-		if (newItems.length === 0) return;
-
-		const currentSubItems = getValues("subItems") ?? [];
-		const uniqueNewItems = newItems.filter(
-			item => !currentSubItems.includes(item),
-		);
-
-		if (uniqueNewItems.length > 0) {
-			setValue("subItems", [...currentSubItems, ...uniqueNewItems], {
-				shouldDirty: true,
-				shouldValidate: true,
-			});
-		}
-
-		setSubItemDraft("");
-	};
-
-	const onRemoveSubItem = (subItem: string) => {
-		setValue(
-			"subItems",
-			(getValues("subItems") ?? []).filter(item => item !== subItem),
-			{ shouldDirty: true, shouldValidate: true },
-		);
-	};
+	if (!selectedCategory && categories.length > 0) {
+		setValue("waste_category_id", categories[0].id);
+	}
 
 	const onSubmit = async (data: ServiceFormValues) => {
-		let updatedServices = [];
 		const payload = {
 			name: data.name.trim(),
 			description: data.description.trim() || null,
 			price: data.price,
 			quantity: data.quantity,
 			unit: data.unit,
-			waste_type: data.waste_type,
-			sub_items: data.subItems.length > 0 ? data.subItems : null,
+			waste_category_id: data.waste_category_id,
 			observations: data.observations.trim() || null,
 		};
 
-		if (initialData?.id) {
-			updatedServices = (services ?? []).map(s =>
-				s.id === initialData.id
-					? { ...s, ...payload }
-					: {
-							name: s.name,
-							description: s.description ?? null,
-							price: s.price,
-							quantity: s.quantity,
-							unit: s.unit,
-							waste_type: s.waste_type,
-							sub_items: s.sub_items,
-							observations: s.observations ?? null,
-						},
-			);
-		} else {
-			const existing = (services ?? []).map(s => ({
-				name: s.name,
-				description: s.description ?? null,
-				price: s.price,
-				quantity: s.quantity,
-				unit: s.unit,
-				waste_type: s.waste_type,
-				sub_items: s.sub_items,
-				observations: s.observations ?? null,
-			}));
-			updatedServices = [...existing, payload];
-		}
+		const mapExisting = (s: NonNullable<typeof services>[number]) => ({
+			name: s.name,
+			description: s.description ?? null,
+			price: s.price,
+			quantity: s.quantity,
+			unit: s.unit,
+			waste_category_id: s.waste_category_id,
+			observations: s.observations ?? null,
+		});
+
+		const updatedServices = initialData?.id
+			? (services ?? []).map(s =>
+					s.id === initialData.id ? { ...s, ...payload } : mapExisting(s),
+				)
+			: [...(services ?? []).map(mapExisting), payload];
 
 		try {
 			await saveServices({ services: updatedServices });
@@ -190,8 +154,7 @@ export default function ServiceFormScreen() {
 				price: s.price,
 				quantity: s.quantity,
 				unit: s.unit,
-				waste_type: s.waste_type,
-				sub_items: s.sub_items,
+				waste_category_id: s.waste_category_id,
 				observations: s.observations ?? null,
 			})),
 		});
@@ -216,7 +179,7 @@ export default function ServiceFormScreen() {
 							<Heading className="text-lg">
 								{initialData ? "Editar serviço" : "Cadastro de serviços"}
 							</Heading>
-							<Text className="text-sm ">
+							<Text className="text-sm">
 								{initialData
 									? "Atualize as informações do seu serviço."
 									: "Cadastre os serviços que sua empresa oferece e relacione-os aos resíduos aceitos."}
@@ -225,7 +188,7 @@ export default function ServiceFormScreen() {
 					</View>
 				</Card>
 
-				<Card className="shadow-none gap-4">
+				<VStack space="lg">
 					<Heading size="sm">Informações principais</Heading>
 
 					<FormControl isInvalid={!!formState.errors.name} className="gap-2">
@@ -422,67 +385,136 @@ export default function ServiceFormScreen() {
 						/>
 					</FormControl>
 
-					<Heading size="sm">Categoria de resíduo</Heading>
-					<Controller
-						control={control}
-						name="waste_type"
-						render={({ field: { value, onChange } }) => (
+					<VStack space="lg">
+						<Heading size="sm">Categoria de resíduo</Heading>
+
+						{isLoadingCategories ? (
 							<View className="flex-row gap-2">
-								{wasteTypes.map(wasteType => {
-									const isSelected = wasteType.value === value;
+								{[1, 2, 3, 4].map(i => (
+									<View
+										key={i}
+										className="h-9 w-24 rounded-xl bg-secondary/60"
+									/>
+								))}
+							</View>
+						) : (
+							<ScrollView
+								horizontal
+								showsHorizontalScrollIndicator={false}
+								contentContainerClassName="gap-2 py-0.5"
+							>
+								{categories.map(category => {
+									const isSelected = category.id === wasteCategoryId;
 									return (
-										<Button
-											key={wasteType.value}
-											variant={isSelected ? "default" : "outline"}
-											className="flex-1 will-change-variable"
-											onPress={() => onChange(wasteType.value)}
+										<Pressable
+											key={category.id}
+											onPress={() =>
+												setValue("waste_category_id", category.id, {
+													shouldValidate: true,
+													shouldDirty: true,
+												})
+											}
 										>
-											<ButtonText>{wasteType.label}</ButtonText>
-										</Button>
+											<View
+												className={cn(
+													"px-4 py-2 rounded-xl border",
+													isSelected
+														? "bg-lime-800 border-lime-800"
+														: "bg-white border-border",
+												)}
+											>
+												<Text
+													className={cn(
+														"text-sm font-medium",
+														isSelected && "text-white",
+													)}
+												>
+													{category.name}
+												</Text>
+											</View>
+										</Pressable>
 									);
 								})}
-							</View>
+							</ScrollView>
 						)}
-					/>
 
-					<Heading size="sm">Materiais vinculados</Heading>
-					<View className="flex-row items-end gap-2">
-						<Input className="flex-1">
-							<InputField
-								value={subItemDraft}
-								onChangeText={setSubItemDraft}
-								placeholder="Ex.: concreto, madeira, gesso"
-								returnKeyType="done"
-								onSubmitEditing={onAddSubItem}
-							/>
-						</Input>
-						<Button size="sm" onPress={onAddSubItem}>
-							<ButtonText>Adicionar</ButtonText>
-						</Button>
-					</View>
+						{formState.errors.waste_category_id && (
+							<FormControl isInvalid>
+								<FormControlError>
+									<FormControlErrorIcon as={AlertCircleIcon} />
+									<FormControlErrorText>
+										{formState.errors.waste_category_id.message}
+									</FormControlErrorText>
+								</FormControlError>
+							</FormControl>
+						)}
 
-					<View className="flex-row flex-wrap gap-2">
-						{subItems.length > 0 ? (
-							subItems.map(subItem => (
-								<Pressable
-									key={subItem}
-									onPress={() => onRemoveSubItem(subItem)}
-								>
-									<Card
-										size="sm"
-										className="shadow-none flex-row items-center gap-2 border-border/80 bg-secondary/40"
-									>
-										<Text className="text-sm">{subItem}</Text>
-										<X size={14} />
-									</Card>
-								</Pressable>
-							))
-						) : (
-							<Text className="text-sm text-muted-foreground">
-								Nenhum material adicionado ainda.
+						<VStack space="md">
+							<Card className="shadow-none gap-2">
+								<Text size="sm" className="font-semibold text-muted-foreground">
+									Grau de periculosidade geral
+								</Text>
+								<HStack className="gap-2">
+									{selectedCategory?.hazard_levels.map(hazard_level => (
+										<WasteCategoryHazardLevel
+											key={`${selectedCategory.id}-${hazard_level}`}
+											harzardLevel={hazard_level}
+										/>
+									))}
+									<Text className="text-sm text-muted-foreground"></Text>
+								</HStack>
+							</Card>
+
+							{selectedCategory?.description && (
+								<Alert className="gap-2 bg-sky-100 border-sky-400">
+									<AlertIcon as={InfoIcon} className="text-sky-400" />
+									<AlertText className="text-foreground/80">
+										{selectedCategory.description}
+									</AlertText>
+								</Alert>
+							)}
+
+							{selectedCategory?.observations && (
+								<Alert className="gap-2 bg-destructive/10 border-destructive/20">
+									<AlertIcon
+										as={CircleAlertIcon}
+										className="text-destructive/40"
+									/>
+									<AlertText className="flex-col text-foreground/80">
+										{selectedCategory.observations}
+									</AlertText>
+								</Alert>
+							)}
+
+							<Text size="sm" className="font-semibold text-muted-foreground">
+								Itens relacinados
 							</Text>
-						)}
-					</View>
+							{selectedCategory?.subcategories.map(subItem => (
+								<Card key={subItem.id} className="shadow-none gap-2">
+									<HStack space="md" className="items-center">
+										<WasteCategoryHazardLevel
+											harzardLevel={subItem.hazard_level}
+										/>
+										<Box className="flex-1">
+											<Text numberOfLines={2}>{subItem.name}</Text>
+										</Box>
+									</HStack>
+									{subItem.observations && (
+										<Alert className="p-1 gap-2 bg-destructive/10 border-destructive/20 items-center">
+											<AlertIcon
+												as={CircleAlertIcon}
+												size={14}
+												className="text-destructive/40"
+											/>
+											<AlertText className="flex-col text-foreground/80">
+												{subItem.observations}
+											</AlertText>
+										</Alert>
+									)}
+								</Card>
+							))}
+						</VStack>
+					</VStack>
 
 					<View className="flex-row gap-2 mt-4">
 						<Button
@@ -493,6 +525,7 @@ export default function ServiceFormScreen() {
 						>
 							<ButtonText>Cancelar</ButtonText>
 						</Button>
+
 						{initialData && (
 							<Button
 								variant="outline"
@@ -503,6 +536,7 @@ export default function ServiceFormScreen() {
 								<ButtonText className="text-error-600">Excluir</ButtonText>
 							</Button>
 						)}
+
 						<Button
 							className="flex-1"
 							onPress={handleSubmit(onSubmit)}
@@ -514,8 +548,66 @@ export default function ServiceFormScreen() {
 							{isSavingServices && <ButtonIcon as={Spinner} />}
 						</Button>
 					</View>
-				</Card>
+				</VStack>
 			</ScrollView>
 		</KeyboardAvoidingView>
 	);
+}
+
+interface WasteCategoryHazardLevelProps {
+	harzardLevel: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+}
+export function WasteCategoryHazardLevel({
+	harzardLevel,
+}: WasteCategoryHazardLevelProps) {
+	switch (harzardLevel) {
+		case "LOW":
+			return (
+				<Badge
+					variant="secondary"
+					className="gap-1 bg-lime-50 border border-lime-200"
+				>
+					<BadgeIcon as={ChevronDownIcon} className="text-lime-600 stroke-3" />
+					<BadgeText className="text-lime-600 font-semibold">Baixa</BadgeText>
+				</Badge>
+			);
+		case "MEDIUM":
+			return (
+				<Badge
+					variant="secondary"
+					className="gap-1 bg-yellow-50 border border-yellow-200"
+				>
+					<BadgeIcon as={MinusIcon} className="text-yellow-600 stroke-3" />
+					<BadgeText className="text-yellow-600 font-semibold">Média</BadgeText>
+				</Badge>
+			);
+		case "HIGH":
+			return (
+				<Badge
+					variant="secondary"
+					className="gap-1 bg-orange-50 border border-orange-200"
+				>
+					<BadgeIcon as={ChevronUpIcon} className="text-orange-600 stroke-3" />
+					<BadgeText className="text-orange-600 font-semibold">Alta</BadgeText>
+				</Badge>
+			);
+		case "VERY_HIGH":
+			return (
+				<Badge
+					variant="secondary"
+					className="gap-1 bg-red-50 border border-red-200"
+				>
+					<BadgeIcon as={ChevronsUpIcon} className="text-red-600 stroke-3" />
+					<BadgeText className="text-red-600 font-semibold">
+						Muito alta
+					</BadgeText>
+				</Badge>
+			);
+		default:
+			return (
+				<Badge variant="secondary">
+					<BadgeText>Desconhecido</BadgeText>
+				</Badge>
+			);
+	}
 }

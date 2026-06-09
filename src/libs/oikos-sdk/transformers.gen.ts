@@ -13,6 +13,8 @@ import type {
 	GetV1ComplaintsResponse,
 	GetV1ProfilesAddressesResponse,
 	GetV1ProfilesResponse,
+	GetV1WasteCategoriesByIdResponse,
+	GetV1WasteCategoriesResponse,
 	PatchV1CompaniesByIdStatusResponse,
 	PatchV1ComplaintsByIdCanceledResponse,
 	PatchV1ComplaintsByIdResolvedResponse,
@@ -103,11 +105,27 @@ export const getV1CompaniesResponseTransformer = async (
 			item.address.updated_at = new Date(item.address.updated_at);
 		}
 		item.wastes = item.wastes.map((item: any) => {
+			item.waste_category.created_at = new Date(item.waste_category.created_at);
+			item.waste_category.updated_at = new Date(item.waste_category.updated_at);
+			item.waste_category.subcategories = item.waste_category.subcategories.map(
+				(item: any) => {
+					item.created_at = new Date(item.created_at);
+					return item;
+				},
+			);
 			item.created_at = new Date(item.created_at);
 			item.updated_at = new Date(item.updated_at);
 			return item;
 		});
 		item.services = item.services.map((item: any) => {
+			item.waste_category.created_at = new Date(item.waste_category.created_at);
+			item.waste_category.updated_at = new Date(item.waste_category.updated_at);
+			item.waste_category.subcategories = item.waste_category.subcategories.map(
+				(item: any) => {
+					item.created_at = new Date(item.created_at);
+					return item;
+				},
+			);
 			item.created_at = new Date(item.created_at);
 			item.updated_at = new Date(item.updated_at);
 			return item;
@@ -173,6 +191,14 @@ export const getV1CompaniesByIdWastesResponseTransformer = async (
 	data: any,
 ): Promise<GetV1CompaniesByIdWastesResponse> => {
 	data.wastes = data.wastes.map((item: any) => {
+		item.waste_category.created_at = new Date(item.waste_category.created_at);
+		item.waste_category.updated_at = new Date(item.waste_category.updated_at);
+		item.waste_category.subcategories = item.waste_category.subcategories.map(
+			(item: any) => {
+				item.created_at = new Date(item.created_at);
+				return item;
+			},
+		);
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
 		return item;
@@ -184,6 +210,14 @@ export const putV1CompaniesByIdWastesResponseTransformer = async (
 	data: any,
 ): Promise<PutV1CompaniesByIdWastesResponse> => {
 	data.wastes = data.wastes.map((item: any) => {
+		item.waste_category.created_at = new Date(item.waste_category.created_at);
+		item.waste_category.updated_at = new Date(item.waste_category.updated_at);
+		item.waste_category.subcategories = item.waste_category.subcategories.map(
+			(item: any) => {
+				item.created_at = new Date(item.created_at);
+				return item;
+			},
+		);
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
 		return item;
@@ -195,6 +229,14 @@ export const getV1CompaniesByIdServicesResponseTransformer = async (
 	data: any,
 ): Promise<GetV1CompaniesByIdServicesResponse> => {
 	data.services = data.services.map((item: any) => {
+		item.waste_category.created_at = new Date(item.waste_category.created_at);
+		item.waste_category.updated_at = new Date(item.waste_category.updated_at);
+		item.waste_category.subcategories = item.waste_category.subcategories.map(
+			(item: any) => {
+				item.created_at = new Date(item.created_at);
+				return item;
+			},
+		);
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
 		return item;
@@ -206,6 +248,14 @@ export const putV1CompaniesByIdServicesResponseTransformer = async (
 	data: any,
 ): Promise<PutV1CompaniesByIdServicesResponse> => {
 	data.services = data.services.map((item: any) => {
+		item.waste_category.created_at = new Date(item.waste_category.created_at);
+		item.waste_category.updated_at = new Date(item.waste_category.updated_at);
+		item.waste_category.subcategories = item.waste_category.subcategories.map(
+			(item: any) => {
+				item.created_at = new Date(item.created_at);
+				return item;
+			},
+		);
 		item.created_at = new Date(item.created_at);
 		item.updated_at = new Date(item.updated_at);
 		return item;
@@ -394,5 +444,32 @@ export const postV1ComplaintsByIdAttachmentsResponseTransformer = async (
 		return item;
 	});
 	data.complaint.created_at = new Date(data.complaint.created_at);
+	return data;
+};
+
+export const getV1WasteCategoriesResponseTransformer = async (
+	data: any,
+): Promise<GetV1WasteCategoriesResponse> => {
+	data.categories = data.categories.map((item: any) => {
+		item.created_at = new Date(item.created_at);
+		item.updated_at = new Date(item.updated_at);
+		item.subcategories = item.subcategories.map((item: any) => {
+			item.created_at = new Date(item.created_at);
+			return item;
+		});
+		return item;
+	});
+	return data;
+};
+
+export const getV1WasteCategoriesByIdResponseTransformer = async (
+	data: any,
+): Promise<GetV1WasteCategoriesByIdResponse> => {
+	data.category.created_at = new Date(data.category.created_at);
+	data.category.updated_at = new Date(data.category.updated_at);
+	data.category.subcategories = data.category.subcategories.map((item: any) => {
+		item.created_at = new Date(item.created_at);
+		return item;
+	});
 	return data;
 };

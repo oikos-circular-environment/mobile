@@ -15,6 +15,8 @@ import {
 	getV1ComplaintsResponseTransformer,
 	getV1ProfilesAddressesResponseTransformer,
 	getV1ProfilesResponseTransformer,
+	getV1WasteCategoriesByIdResponseTransformer,
+	getV1WasteCategoriesResponseTransformer,
 	patchV1CompaniesByIdStatusResponseTransformer,
 	patchV1ComplaintsByIdCanceledResponseTransformer,
 	patchV1ComplaintsByIdResolvedResponseTransformer,
@@ -96,6 +98,12 @@ import type {
 	GetV1ProfilesData,
 	GetV1ProfilesErrors,
 	GetV1ProfilesResponses,
+	GetV1WasteCategoriesByIdData,
+	GetV1WasteCategoriesByIdErrors,
+	GetV1WasteCategoriesByIdResponses,
+	GetV1WasteCategoriesData,
+	GetV1WasteCategoriesErrors,
+	GetV1WasteCategoriesResponses,
 	PatchV1AuthRefreshData,
 	PatchV1AuthRefreshErrors,
 	PatchV1AuthRefreshResponses,
@@ -675,7 +683,7 @@ export const getV1CompaniesByIdValidations = <
 /**
  * List complaints
  *
- * Returns a paginated list of complaints for the authenticated user. Use `cursor` (the `next_cursor` from the previous response) for infinite scroll. Filter by `type` and/or `status` as needed.
+ * Returns a paginated list of complaints for the authenticated user. Use `cursor` (the `next_cursor` from the previous response) for infinite scroll. Filter by `status` as needed.
  */
 export const getV1Complaints = <ThrowOnError extends boolean = false>(
 	options?: Options<GetV1ComplaintsData, ThrowOnError>,
@@ -793,7 +801,7 @@ export const getV1ComplaintsById = <ThrowOnError extends boolean = false>(
 /**
  * Update complaint
  *
- * Updates complaint fields. Accepts any combination of `date`, `type`, `observations`, and `geospatial`.
+ * Updates complaint fields. Accepts any combination of `date`, `observations`, `geospatial`, and `waste_category_ids`.
  */
 export const patchV1ComplaintsById = <ThrowOnError extends boolean = false>(
 	options: Options<PatchV1ComplaintsByIdData, ThrowOnError>,
@@ -1111,6 +1119,44 @@ export const getV1Market = <ThrowOnError extends boolean = false>(
 	(options.client ?? client).get<GetV1MarketResponses, unknown, ThrowOnError>({
 		responseType: "json",
 		url: "/v1/market",
+		...options,
+	});
+
+/**
+ * List waste categories
+ *
+ * Returns all waste categories with subcategories. Used to populate waste/service selection in company registration.
+ */
+export const getV1WasteCategories = <ThrowOnError extends boolean = false>(
+	options?: Options<GetV1WasteCategoriesData, ThrowOnError>,
+) =>
+	(options?.client ?? client).get<
+		GetV1WasteCategoriesResponses,
+		GetV1WasteCategoriesErrors,
+		ThrowOnError
+	>({
+		responseTransformer: getV1WasteCategoriesResponseTransformer,
+		responseType: "json",
+		url: "/v1/waste-categories",
+		...options,
+	});
+
+/**
+ * Get waste category by ID
+ *
+ * Returns a single waste category with all subcategories.
+ */
+export const getV1WasteCategoriesById = <ThrowOnError extends boolean = false>(
+	options: Options<GetV1WasteCategoriesByIdData, ThrowOnError>,
+) =>
+	(options.client ?? client).get<
+		GetV1WasteCategoriesByIdResponses,
+		GetV1WasteCategoriesByIdErrors,
+		ThrowOnError
+	>({
+		responseTransformer: getV1WasteCategoriesByIdResponseTransformer,
+		responseType: "json",
+		url: "/v1/waste-categories/{id}",
 		...options,
 	});
 
