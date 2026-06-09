@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-	cleanup,
+	act,
 	fireEvent,
 	render,
 	screen,
@@ -76,7 +76,6 @@ jest.mock("@/components/toast", () => {
 	};
 });
 
-// WrapperMap: expõe Pressable de teste sem renderizar o mapa nativo
 jest.mock("@/components/wrapper-map", () => ({
 	__esModule: true,
 	default: ({
@@ -105,7 +104,7 @@ const mockRegiao = { id: 3, sigla: "SE", nome: "Sudeste" };
 
 const mockStates = [
 	{ id: 35, sigla: "SP", nome: "São Paulo", regiao: mockRegiao },
-	{ id: 33, sigla: "RJ", nome: "Rio de Janeiro", renderregiao: mockRegiao },
+	{ id: 33, sigla: "RJ", nome: "Rio de Janeiro", regiao: mockRegiao },
 ];
 
 const mockCitiesSP = [
@@ -187,14 +186,20 @@ const mockSaveAsync = jest.fn().mockResolvedValue({});
 
 async function renderScreen() {
 	const queryClient = createQueryClient();
-	const component = await render(
+	await render(
 		<QueryClientProvider client={queryClient}>
 			<Toaster />
 			<CompanyAddressScreen />
 		</QueryClientProvider>,
 	);
-	await screen.findByTestId("input-zip-code");
-	return component;
+	// useCompanyAddress fires loadStates() on mount via useMutation + useEffect.
+	// Waiting here keeps the act() scope open until that mutation's onSuccess
+	// (setStates) runs, preventing "overlapping act() calls" from leaking into
+	// subsequent tests and corrupting the React act() stack.
+	await waitFor(() => expect(listIbgeUfs).toHaveBeenCalled());
+	// Drain loadCities (fires when state_code is already set on mount) and any
+	// other follow-on microtasks from the TanStack Query scheduler.
+	await act(async () => {});
 }
 
 // ---------------------------------------------------------------------------
@@ -227,7 +232,9 @@ describe("CompanyAddressScreen — integração", () => {
 	});
 
 	afterEach(async () => {
-		cleanup();
+		// Flush any remaining TanStack Query async work before RNTL auto-cleanup
+		// unmounts the component, preventing state updates on unmounted components.
+		await act(async () => {});
 		jest.clearAllMocks();
 	});
 
@@ -237,10 +244,11 @@ describe("CompanyAddressScreen — integração", () => {
 	it("busca CEP bem-sucedida preenche rua e bairro com os dados retornados", async () => {
 		await renderScreen();
 
-		const zipInput = await screen.findByTestId("input-zip-code");
-		fireEvent.changeText(zipInput, "01001-000");
-		// InputSlot tem accessibilityElementsHidden=true no Gluestack
-		fireEvent.press(
+		await fireEvent.changeText(
+			screen.getByTestId("input-zip-code"),
+			"01001-000",
+		);
+		await fireEvent.press(
 			screen.getByTestId("cep-search-btn", { includeHiddenElements: true }),
 		);
 
@@ -250,16 +258,17 @@ describe("CompanyAddressScreen — integração", () => {
 				"Praça da Sé",
 			);
 		});
-
 		expect(screen.getByTestId("input-district")).toHaveProp("value", "Sé");
 	});
 
 	it("busca CEP bem-sucedida atualiza o campo CEP com a máscara formatada", async () => {
 		await renderScreen();
 
-		const zipInput = await screen.findByTestId("input-zip-code");
-		fireEvent.changeText(zipInput, "01001-000");
-		fireEvent.press(
+		await fireEvent.changeText(
+			screen.getByTestId("input-zip-code"),
+			"01001-000",
+		);
+		await fireEvent.press(
 			screen.getByTestId("cep-search-btn", { includeHiddenElements: true }),
 		);
 
@@ -277,9 +286,11 @@ describe("CompanyAddressScreen — integração", () => {
 	it("após busca CEP, dispara a query de cidades para o estado retornado", async () => {
 		await renderScreen();
 
-		const zipInput = await screen.findByTestId("input-zip-code");
-		fireEvent.changeText(zipInput, "01001-000");
-		fireEvent.press(
+		await fireEvent.changeText(
+			screen.getByTestId("input-zip-code"),
+			"01001-000",
+		);
+		await fireEvent.press(
 			screen.getByTestId("cep-search-btn", { includeHiddenElements: true }),
 		);
 
@@ -293,13 +304,14 @@ describe("CompanyAddressScreen — integração", () => {
 	it("após carregar cidades, auto-seleciona city_ibge_id correspondente à cidade do CEP", async () => {
 		await renderScreen();
 
-		const zipInput = await screen.findByTestId("input-zip-code");
-		fireEvent.changeText(zipInput, "01001-000");
-		fireEvent.press(
+		await fireEvent.changeText(
+			screen.getByTestId("input-zip-code"),
+			"01001-000",
+		);
+		await fireEvent.press(
 			screen.getByTestId("cep-search-btn", { includeHiddenElements: true }),
 		);
 
-		// Aguarda o useEffect de auto-seleção processar após cities + selectedCity disponíveis
 		await waitFor(() => {
 			expect(screen.getByTestId("input-street")).toHaveProp(
 				"value",
@@ -307,8 +319,7 @@ describe("CompanyAddressScreen — integração", () => {
 			);
 		});
 
-		// Verifica via submit: o city_ibge_id deve ser o do município "São Paulo"
-		fireEvent.press(screen.getByTestId("btn-save"));
+		await fireEvent.press(screen.getByTestId("btn-save"));
 
 		await waitFor(() => {
 			expect(mockSaveAsync).toHaveBeenCalledWith(
@@ -318,14 +329,15 @@ describe("CompanyAddressScreen — integração", () => {
 	});
 
 	it("busca CEP preenche state_code com a sigla do estado retornado", async () => {
-		// Empresa sem endereço para que o campo state_code comece vazio
 		setupStore({ ...mockCompany, address: null });
 
 		await renderScreen();
 
-		const zipInput = await screen.findByTestId("input-zip-code");
-		fireEvent.changeText(zipInput, "01001-000");
-		fireEvent.press(
+		await fireEvent.changeText(
+			screen.getByTestId("input-zip-code"),
+			"01001-000",
+		);
+		await fireEvent.press(
 			screen.getByTestId("cep-search-btn", { includeHiddenElements: true }),
 		);
 
@@ -342,9 +354,8 @@ describe("CompanyAddressScreen — integração", () => {
 	it("CEP com menos de 8 dígitos exibe toast de validação ao pressionar buscar", async () => {
 		await renderScreen();
 
-		const zipInput = await screen.findByTestId("input-zip-code");
-		fireEvent.changeText(zipInput, "01001");
-		fireEvent.press(
+		await fireEvent.changeText(screen.getByTestId("input-zip-code"), "01001");
+		await fireEvent.press(
 			screen.getByTestId("cep-search-btn", { includeHiddenElements: true }),
 		);
 
@@ -352,10 +363,10 @@ describe("CompanyAddressScreen — integração", () => {
 			expect(screen.getByTestId("toast-title")).toHaveTextContent(
 				"CEP inválido",
 			);
-			expect(screen.getByTestId("toast-message")).toHaveTextContent(
-				"O CEP deve conter 8 dígitos.",
-			);
 		});
+		expect(screen.getByTestId("toast-message")).toHaveTextContent(
+			"O CEP deve conter 8 dígitos.",
+		);
 		expect(getCepV2).not.toHaveBeenCalled();
 	});
 
@@ -367,14 +378,13 @@ describe("CompanyAddressScreen — integração", () => {
 
 		await renderScreen();
 
-		const streetInput = await screen.findByTestId("input-street");
-		const originalStreet = streetInput.props.value;
+		const originalStreet = screen.getByTestId("input-street").props.value;
 
-		fireEvent.changeText(
-			await screen.findByTestId("input-zip-code"),
+		await fireEvent.changeText(
+			screen.getByTestId("input-zip-code"),
 			"00000-000",
 		);
-		fireEvent.press(
+		await fireEvent.press(
 			screen.getByTestId("cep-search-btn", { includeHiddenElements: true }),
 		);
 
@@ -382,11 +392,10 @@ describe("CompanyAddressScreen — integração", () => {
 			expect(screen.getByTestId("toast-title")).toHaveTextContent(
 				"CEP não encontrado",
 			);
-			expect(screen.getByTestId("toast-message")).toHaveTextContent(
-				"Verifique o número e tente novamente.",
-			);
 		});
-
+		expect(screen.getByTestId("toast-message")).toHaveTextContent(
+			"Verifique o número e tente novamente.",
+		);
 		expect(screen.getByTestId("input-street")).toHaveProp(
 			"value",
 			originalStreet,
@@ -399,13 +408,8 @@ describe("CompanyAddressScreen — integração", () => {
 	it("submit com dados válidos chama saveAddress com o payload completo", async () => {
 		await renderScreen();
 
-		// Aguarda elementos aparecerem (testes anteriores podem ter operações async pendentes)
-		await screen.findByTestId("input-zip-code");
-
-		// Torna o formulário dirty via mapa (lat/lon)
-		fireEvent.press(screen.getByTestId("map-press"));
-
-		fireEvent.press(screen.getByTestId("btn-save"));
+		await fireEvent.press(screen.getByTestId("map-press"));
+		await fireEvent.press(screen.getByTestId("btn-save"));
 
 		await waitFor(() => {
 			expect(mockSaveAsync).toHaveBeenCalledWith(
