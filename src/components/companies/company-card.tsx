@@ -30,15 +30,19 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 					)}
 
 					<View className="flex-1 justify-center">
-						<Heading size="xl" className="font-semibold" numberOfLines={1}>
+						<Heading size="lg" className="font-semibold" numberOfLines={1}>
 							{company.business_name ?? company.corporate_name}
 						</Heading>
 						{company.business_name && (
-							<Text className="text-muted-foreground" numberOfLines={1}>
+							<Text
+								size="sm"
+								className="text-muted-foreground"
+								numberOfLines={1}
+							>
 								{company.corporate_name}
 							</Text>
 						)}
-						<Text className="text-muted-foreground" numberOfLines={1}>
+						<Text size="sm" className="text-muted-foreground" numberOfLines={1}>
 							{company.identity}
 						</Text>
 

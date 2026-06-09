@@ -40,7 +40,10 @@ export function CompanyListHeader() {
 			</Button>
 
 			<View>
-				<Heading>Minhas Empresas</Heading>
+				<Heading size="md">Minhas Empresas</Heading>
+				<Text size="sm" className="text-muted-foreground">
+					Listagem das empresas ligadas a sua conta, seja elas ativas ou não.
+				</Text>
 			</View>
 		</View>
 	);

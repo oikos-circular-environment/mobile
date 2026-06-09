@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+	runOnJS,
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
@@ -24,6 +25,23 @@ export function SwipeableCard({
 }: SwipeableCardProps) {
 	const translateX = useSharedValue(0);
 
+	const handlePress = () => {
+		if (translateX.value < -5) {
+			translateX.value = withSpring(0, SPRING);
+			return;
+		}
+		onPress();
+	};
+
+	const handleDelete = () => {
+		translateX.value = withSpring(0, SPRING);
+		onDelete();
+	};
+
+	const tapGesture = Gesture.Tap().onEnd(() => {
+		runOnJS(handlePress)();
+	});
+
 	const panGesture = Gesture.Pan()
 		.activeOffsetX([-10, 10])
 		.failOffsetY([-5, 5])
@@ -44,19 +62,6 @@ export function SwipeableCard({
 	const deleteOpacity = useAnimatedStyle(() => ({
 		opacity: Math.min(1, -translateX.value / DELETE_WIDTH),
 	}));
-
-	const handlePress = () => {
-		if (translateX.value < -5) {
-			translateX.value = withSpring(0, SPRING);
-			return;
-		}
-		onPress();
-	};
-
-	const handleDelete = () => {
-		translateX.value = withSpring(0, SPRING);
-		onDelete();
-	};
 
 	return (
 		<View className="overflow-hidden rounded-xl">
@@ -81,9 +86,9 @@ export function SwipeableCard({
 				</Pressable>
 			</Animated.View>
 
-			<GestureDetector gesture={panGesture}>
+			<GestureDetector gesture={Gesture.Race(panGesture, tapGesture)}>
 				<Animated.View style={cardStyle} className="bg-card">
-					<Pressable onPress={handlePress}>{children}</Pressable>
+					{children}
 				</Animated.View>
 			</GestureDetector>
 		</View>
