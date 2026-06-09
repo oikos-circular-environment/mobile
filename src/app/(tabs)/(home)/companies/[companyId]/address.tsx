@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -11,6 +10,7 @@ import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { z } from "zod";
+import { useCompanyAddress } from "@/components/companies/hooks/use-company-address";
 import { useSaveAddress } from "@/components/companies/hooks/use-save-address";
 import { AddressFormSkeleton } from "@/components/companies/skeletons";
 import { colors } from "@/components/style/colors";
@@ -43,14 +43,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
-import {
-	getCepV2,
-	listIbgeMunicipios,
-	listIbgeUfs,
-} from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
+
+// ---------------------------------------------------------------------------
+// Schema
+// ---------------------------------------------------------------------------
 
 const addressSchema = z.object({
 	zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP válido."),
@@ -72,29 +71,30 @@ type AddressFormValues = z.infer<typeof addressSchema>;
 export default function CompanyAddressScreen() {
 	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
+
 	const company = useCompaniesStore(s =>
 		s.companies.find(c => c.id === companyId),
 	);
-	const address = company?.address;
 	const isLoadingAddress = useCompaniesStore(s => !s.isLoaded);
 	const { mutateAsync: saveAddress, isPending: isSavingAddress } =
 		useSaveAddress(companyId);
+
 	const defaultValues = useMemo<AddressFormValues>(
 		() => ({
-			zip_code: address?.zip_code ?? "",
-			street: address?.street ?? "",
-			number: address?.number ?? "",
-			complement: address?.complement ?? null,
-			district: address?.district ?? "",
-			city: address?.city ?? "",
-			state: address?.state ?? "",
-			state_code: address?.state_code ?? "",
-			state_ibge_id: address?.state_ibge_id ?? 0,
-			city_ibge_id: address?.city_ibge_id ?? 0,
-			latitude: address?.latitude ?? null,
-			longitude: address?.longitude ?? null,
+			zip_code: company?.address?.zip_code ?? "",
+			street: company?.address?.street ?? "",
+			number: company?.address?.number ?? "",
+			complement: company?.address?.complement ?? null,
+			district: company?.address?.district ?? "",
+			city: company?.address?.city ?? "",
+			state: company?.address?.state ?? "",
+			state_code: company?.address?.state_code ?? "",
+			state_ibge_id: company?.address?.state_ibge_id ?? 0,
+			city_ibge_id: company?.address?.city_ibge_id ?? 0,
+			latitude: company?.address?.latitude ?? null,
+			longitude: company?.address?.longitude ?? null,
 		}),
-		[address],
+		[company?.address],
 	);
 
 	const {
@@ -102,6 +102,7 @@ export default function CompanyAddressScreen() {
 		handleSubmit,
 		reset,
 		setValue,
+		getValues,
 		watch,
 		formState: { errors, isDirty },
 	} = useForm<AddressFormValues>({
@@ -109,35 +110,69 @@ export default function CompanyAddressScreen() {
 		defaultValues,
 	});
 
+	const selectedStateCode = watch("state_code");
 	const latitude = watch("latitude");
 	const longitude = watch("longitude");
-	const selectedStateCode = watch("state_code");
 
-	const { data: states, isPending: isPendingStates } = useQuery({
-		queryKey: ["states"],
-		queryFn: async () => {
-			const res = await listIbgeUfs();
-			return res.data
-				? res.data.sort((a, b) => a.nome.localeCompare(b.nome))
-				: [];
-		},
-		staleTime: 1000 * 60 * 60 * 24,
-	});
+	const {
+		states,
+		cities,
+		isPendingStates,
+		isPendingCities,
+		isResolvingCep,
+		searchCep,
+	} = useCompanyAddress(selectedStateCode);
 
-	const { data: cities, isPending: isPendingCities } = useQuery({
-		queryKey: ["cities", selectedStateCode],
-		queryFn: async () => {
-			const res = await listIbgeMunicipios({
-				path: { siglaUF: selectedStateCode },
-			});
-			return res.data
-				? res.data.sort((a, b) => a.nome.localeCompare(b.nome))
-				: [];
-		},
-		enabled: !!selectedStateCode && selectedStateCode.length === 2,
-	});
+	useEffect(() => {
+		reset(defaultValues);
+	}, [defaultValues, reset]);
 
-	const onSubmit = async (data: AddressFormValues) => {
+	const onPressSearchCep = async () => {
+		const digits = getValues("zip_code").replace(/\D/g, "");
+		if (digits.length !== 8) {
+			toast.error("CEP inválido", "O CEP deve conter 8 dígitos.");
+			return;
+		}
+		try {
+			const resolved = await searchCep(digits);
+			reset({ ...getValues(), ...resolved }, { keepDefaultValues: true });
+		} catch {
+			toast.error(
+				"CEP não encontrado",
+				"Verifique o número e tente novamente.",
+			);
+		}
+	};
+
+	const onStateChange = (
+		stateName: string,
+		rhfOnChange: (v: string) => void,
+	) => {
+		rhfOnChange(stateName);
+		const uf = states?.find(s => s.nome === stateName);
+		if (uf) {
+			setValue("state_code", uf.sigla);
+			setValue("state_ibge_id", Number(uf.id));
+		}
+	};
+
+	const onCityChange = (cityName: string, rhfOnChange: (v: string) => void) => {
+		rhfOnChange(cityName);
+		const city = cities?.find(c => c.nome === cityName);
+		if (city) {
+			setValue("city_ibge_id", Number(city.codigo_ibge));
+		}
+	};
+
+	const onLocationChange = (location: {
+		latitude: number;
+		longitude: number;
+	}) => {
+		setValue("latitude", location.latitude, { shouldDirty: true });
+		setValue("longitude", location.longitude, { shouldDirty: true });
+	};
+
+	const onSubmit = handleSubmit(async data => {
 		await saveAddress({
 			zip_code: data.zip_code,
 			street: data.street,
@@ -152,80 +187,10 @@ export default function CompanyAddressScreen() {
 			city_ibge_id: data.city_ibge_id,
 			state_ibge_id: data.state_ibge_id,
 		});
-
 		router.back();
-	};
-
-	const onCancel = () => {
-		reset(defaultValues);
-	};
-
-	const handleLocationChange = (location: {
-		latitude: number;
-		longitude: number;
-	}) => {
-		setValue("latitude", location.latitude, { shouldDirty: true });
-		setValue("longitude", location.longitude, { shouldDirty: true });
-	};
-
-	const getCepMutation = useMutation({
-		mutationKey: ["get", "cep", "brasil-api"],
-		mutationFn: async ({ cep }: { cep: string }) => {
-			const cepRes = await getCepV2({ path: { cep } });
-			if (!cepRes.data) throw new Error("CEP não encontrado");
-			const citiesRes = await listIbgeMunicipios({
-				path: { siglaUF: cepRes.data.state },
-			});
-			return {
-				cep: cepRes.data,
-				cities: citiesRes.data ?? [],
-			};
-		},
-		onSuccess: ({ cep: data, cities: cityList }) => {
-			const current = control._formValues as AddressFormValues;
-			const matched = cityList.find(
-				c => c.nome.toUpperCase() === data.city.toUpperCase(),
-			);
-			reset(
-				{
-					...current,
-					zip_code: mask.cep(data.cep),
-					street: data.street ?? current.street,
-					district: data.neighborhood ?? current.district,
-					city: data.city,
-					state_code: data.state,
-					city_ibge_id: matched ? Number(matched.codigo_ibge) : 0,
-				},
-				{ keepDefaultValues: true },
-			);
-
-			const uf = states?.find(state => state.sigla === data.state);
-			if (uf) {
-				setValue("state", uf.nome);
-				setValue("state_code", uf.sigla);
-				setValue("state_ibge_id", uf.id);
-			}
-		},
-		onError: () => {
-			toast.error(
-				"CEP não encontrado",
-				"Verifique o número e tente novamente.",
-			);
-		},
 	});
 
-	const onPressSearchCep = () => {
-		const digits = (control._formValues.zip_code as string).replace(/\D/g, "");
-		if (digits.length !== 8) {
-			toast.error("CEP inválido", "O CEP deve conter 8 dígitos.");
-			return;
-		}
-		getCepMutation.mutate({ cep: digits });
-	};
-
-	useEffect(() => {
-		reset(defaultValues);
-	}, [defaultValues, reset]);
+	const onCancel = () => reset(defaultValues);
 
 	if (isLoadingAddress) {
 		return <AddressFormSkeleton />;
@@ -245,7 +210,7 @@ export default function CompanyAddressScreen() {
 							</View>
 							<View className="flex-1 gap-1">
 								<Heading className="text-lg">Endereço</Heading>
-								<Text className="text-sm ">
+								<Text className="text-sm">
 									Estes dados serão expostos na plataforma, o preenchimento com
 									informações reais trazem mais confiabilidade para os usuários
 									da plataforma.
@@ -281,9 +246,7 @@ export default function CompanyAddressScreen() {
 												onPress={onPressSearchCep}
 												testID="cep-search-btn"
 											>
-												<InputIcon
-													as={getCepMutation.isPending ? Spinner : Search}
-												/>
+												<InputIcon as={isResolvingCep ? Spinner : Search} />
 											</InputSlot>
 										</Input>
 									)}
@@ -440,18 +403,10 @@ export default function CompanyAddressScreen() {
 									<Controller
 										control={control}
 										name="state"
-										render={({ field: { value, onChange } }) => (
+										render={({ field: { onChange, value } }) => (
 											<Select
 												selectedValue={value}
-												onValueChange={val => {
-													onChange(val);
-													const uf = states?.find(s => s.nome === val);
-													if (uf) {
-														setValue("state_code", uf.sigla);
-														setValue("state_ibge_id", Number(uf.id));
-														setValue("state", uf.nome);
-													}
-												}}
+												onValueChange={val => onStateChange(val, onChange)}
 											>
 												<SelectTrigger
 													size="sm"
@@ -493,16 +448,14 @@ export default function CompanyAddressScreen() {
 											</Select>
 										)}
 									/>
-									{errors.state?.message ||
-										(errors.state_ibge_id?.message && (
-											<FormControlError>
-												<FormControlErrorIcon as={AlertCircleIcon} />
-												<FormControlErrorText>
-													{errors.state?.message ??
-														errors.state_ibge_id?.message}
-												</FormControlErrorText>
-											</FormControlError>
-										))}
+									{(errors.state?.message || errors.state_ibge_id?.message) && (
+										<FormControlError>
+											<FormControlErrorIcon as={AlertCircleIcon} />
+											<FormControlErrorText>
+												{errors.state?.message ?? errors.state_ibge_id?.message}
+											</FormControlErrorText>
+										</FormControlError>
+									)}
 								</FormControl>
 
 								<FormControl isReadOnly className="w-16 gap-2">
@@ -535,17 +488,10 @@ export default function CompanyAddressScreen() {
 								<Controller
 									control={control}
 									name="city"
-									render={({ field: { value, onChange } }) => (
+									render={({ field: { onChange, value } }) => (
 										<Select
 											selectedValue={value}
-											onValueChange={val => {
-												onChange(val);
-												const city = cities?.find(c => c.nome === val);
-												if (city) {
-													setValue("city_ibge_id", Number(city.codigo_ibge));
-													setValue("city", city.nome);
-												}
-											}}
+											onValueChange={val => onCityChange(val, onChange)}
 										>
 											<SelectTrigger>
 												<SelectInput
@@ -586,15 +532,14 @@ export default function CompanyAddressScreen() {
 										</Select>
 									)}
 								/>
-								{errors.city?.message ||
-									(errors.city_ibge_id?.message && (
-										<FormControlError>
-											<FormControlErrorIcon as={AlertCircleIcon} />
-											<FormControlErrorText>
-												{errors.city?.message ?? errors.city_ibge_id?.message}
-											</FormControlErrorText>
-										</FormControlError>
-									))}
+								{(errors.city?.message || errors.city_ibge_id?.message) && (
+									<FormControlError>
+										<FormControlErrorIcon as={AlertCircleIcon} />
+										<FormControlErrorText>
+											{errors.city?.message ?? errors.city_ibge_id?.message}
+										</FormControlErrorText>
+									</FormControlError>
+								)}
 							</FormControl>
 
 							<View className="gap-2">
@@ -602,7 +547,7 @@ export default function CompanyAddressScreen() {
 								<WrapperMap
 									latitude={latitude}
 									longitude={longitude}
-									onChange={handleLocationChange}
+									onChange={onLocationChange}
 								/>
 								<Text className="text-xs text-muted-foreground">
 									{latitude != null && longitude != null
@@ -625,7 +570,7 @@ export default function CompanyAddressScreen() {
 							<Button
 								testID="btn-save"
 								className="flex-1"
-								onPress={handleSubmit(onSubmit)}
+								onPress={onSubmit}
 								isDisabled={!isDirty || isSavingAddress}
 							>
 								<ButtonText>Salvar</ButtonText>
