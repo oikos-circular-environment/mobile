@@ -161,7 +161,10 @@ const mockCompany: Company = {
 
 function createQueryClient() {
 	return new QueryClient({
-		defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+		defaultOptions: {
+			queries: { retry: false, gcTime: 0 },
+			mutations: { retry: false, gcTime: 0 },
+		},
 	});
 }
 
