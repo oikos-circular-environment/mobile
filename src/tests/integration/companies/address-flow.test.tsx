@@ -18,9 +18,6 @@ import {
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 jest.mock("expo-router", () => ({
 	useLocalSearchParams: jest.fn(),
 	useRouter: jest.fn(),
@@ -97,9 +94,6 @@ jest.mock("@/components/wrapper-map", () => ({
 	},
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
 const mockRegiao = { id: 3, sigla: "SE", nome: "Sudeste" };
 
 const mockStates = [
@@ -165,9 +159,6 @@ const mockCompany: Company = {
 	services: [],
 };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function createQueryClient() {
 	return new QueryClient({
 		defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -202,9 +193,6 @@ async function renderScreen() {
 	await act(async () => {});
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("CompanyAddressScreen — integração", () => {
 	beforeEach(() => {
 		jest
@@ -238,9 +226,6 @@ describe("CompanyAddressScreen — integração", () => {
 		jest.clearAllMocks();
 	});
 
-	// -----------------------------------------------------------------------
-	// Busca de CEP — sucesso
-	// -----------------------------------------------------------------------
 	it("busca CEP bem-sucedida preenche rua e bairro com os dados retornados", async () => {
 		await renderScreen();
 
@@ -348,9 +333,6 @@ describe("CompanyAddressScreen — integração", () => {
 		});
 	});
 
-	// -----------------------------------------------------------------------
-	// Busca de CEP — CEP inválido (< 8 dígitos)
-	// -----------------------------------------------------------------------
 	it("CEP com menos de 8 dígitos exibe toast de validação ao pressionar buscar", async () => {
 		await renderScreen();
 
@@ -370,9 +352,6 @@ describe("CompanyAddressScreen — integração", () => {
 		expect(getCepV2).not.toHaveBeenCalled();
 	});
 
-	// -----------------------------------------------------------------------
-	// Busca de CEP — erro da API
-	// -----------------------------------------------------------------------
 	it("erro na busca de CEP exibe toast de erro e não altera os campos", async () => {
 		jest.mocked(getCepV2).mockRejectedValue(new Error("Not found"));
 
@@ -402,9 +381,6 @@ describe("CompanyAddressScreen — integração", () => {
 		);
 	});
 
-	// -----------------------------------------------------------------------
-	// Submit
-	// -----------------------------------------------------------------------
 	it("submit com dados válidos chama saveAddress com o payload completo", async () => {
 		await renderScreen();
 
