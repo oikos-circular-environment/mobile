@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, userEvent } from "@testing-library/react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import CompanyAddressScreen from "@/app/(tabs)/(home)/companies/[companyId]/address";
 import { useSaveAddress } from "@/components/companies/hooks/use-save-address";
 import {
@@ -15,6 +15,7 @@ import { useCompaniesStore } from "@/stores/companies-store";
 // ---------------------------------------------------------------------------
 jest.mock("expo-router", () => ({
 	useLocalSearchParams: jest.fn(),
+	useRouter: jest.fn(),
 }));
 
 jest.mock("@/stores/companies-store", () => ({
@@ -78,8 +79,8 @@ const mockAddress = {
 	state_code: "SP",
 	state_ibge_id: 35,
 	city_ibge_id: 3550308,
-	latitude: null,
-	longitude: null,
+	latitude: null as unknown as number,
+	longitude: null as unknown as number,
 	created_at: new Date(),
 	updated_at: new Date(),
 };
@@ -144,6 +145,7 @@ async function renderScreen() {
 describe("CompanyAddressScreen — componente", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
+		jest.mocked(useRouter).mockReturnValue({ back: jest.fn() } as unknown as ReturnType<typeof useRouter>);
 		jest
 			.mocked(useLocalSearchParams)
 			.mockReturnValue({ companyId: "company-1" });
