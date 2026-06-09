@@ -47,10 +47,6 @@ import { mask } from "@/libs/mask";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 
-// ---------------------------------------------------------------------------
-// Schema
-// ---------------------------------------------------------------------------
-
 const addressSchema = z.object({
 	zip_code: z.string().regex(/^\d{5}-\d{3}$/, "Informe um CEP válido."),
 	street: z.string().min(3, "Informe a rua."),

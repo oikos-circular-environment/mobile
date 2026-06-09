@@ -1,4 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import {
 	getCepV2,
 	listIbgeMunicipios,
@@ -7,8 +8,6 @@ import {
 	type State,
 } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
-
-const DAY_MS = 1000 * 60 * 60 * 24;
 
 export type ResolvedCepValues = {
 	zip_code: string;
@@ -21,87 +20,72 @@ export type ResolvedCepValues = {
 	city_ibge_id: number;
 };
 
-export async function resolveCepToAddress(
-	cep: string,
-	cachedStates: State[] | undefined,
-): Promise<{
-	values: ResolvedCepValues;
-	cities: Municipio[];
-	stateCode: string;
-}> {
-	// CEP e estados (quando não há cache) rodam em paralelo
-	const [cepRes, statesList] = await Promise.all([
-		getCepV2({ path: { cep } }),
-		cachedStates
-			? Promise.resolve(cachedStates)
-			: listIbgeUfs().then(r =>
-					(r.data ?? []).sort((a, b) => a.nome.localeCompare(b.nome)),
-				),
-	]);
-
-	if (!cepRes.data) throw new Error("CEP não encontrado");
-
-	// Cidades dependem da sigla retornada pelo CEP — fetch em série
-	const citiesRes = await listIbgeMunicipios({
-		path: { siglaUF: cepRes.data.state },
-	});
-	const cities = (citiesRes.data ?? []).sort((a, b) =>
-		a.nome.localeCompare(b.nome),
-	);
-
-	const uf = statesList.find(s => s.sigla === cepRes.data?.state);
-	const city = cities.find(
-		c => c.nome.toUpperCase() === cepRes.data?.city.toUpperCase(),
-	);
-
-	return {
-		values: {
-			zip_code: mask.cep(cepRes.data.cep),
-			street: cepRes.data.street ?? "",
-			district: cepRes.data.neighborhood ?? "",
-			city: cepRes.data.city,
-			state: uf?.nome ?? "",
-			state_code: cepRes.data.state,
-			state_ibge_id: uf?.id ?? 0,
-			city_ibge_id: city ? Number(city.codigo_ibge) : 0,
-		},
-		cities,
-		stateCode: cepRes.data.state,
-	};
-}
-
 export function useCompanyAddress(selectedStateCode: string) {
-	const queryClient = useQueryClient();
+	const [states, setStates] = useState<State[]>();
+	const [cities, setCities] = useState<Municipio[]>();
 
-	const { data: states, isPending: isPendingStates } = useQuery({
-		queryKey: ["states"],
-		queryFn: async () => {
+	const { mutate: loadStates, isPending: isPendingStates } = useMutation({
+		mutationFn: async () => {
 			const res = await listIbgeUfs();
 			return (res.data ?? []).sort((a, b) => a.nome.localeCompare(b.nome));
 		},
-		staleTime: DAY_MS,
+		onSuccess: setStates,
 	});
 
-	const { data: cities, isPending: isPendingCities } = useQuery({
-		queryKey: ["cities", selectedStateCode],
-		queryFn: async () => {
-			const res = await listIbgeMunicipios({
-				path: { siglaUF: selectedStateCode },
-			});
+	useEffect(() => {
+		loadStates();
+	}, [loadStates]);
+
+	const { mutate: loadCities, isPending: isPendingCities } = useMutation({
+		mutationFn: async (stateCode: string) => {
+			const res = await listIbgeMunicipios({ path: { siglaUF: stateCode } });
 			return (res.data ?? []).sort((a, b) => a.nome.localeCompare(b.nome));
 		},
-		enabled: selectedStateCode.length === 2,
+		onSuccess: setCities,
 	});
 
-	const cepMutation = useMutation({
-		mutationFn: (cep: string) =>
-			resolveCepToAddress(cep, queryClient.getQueryData<State[]>(["states"])),
+	useEffect(() => {
+		if (selectedStateCode.length === 2) loadCities(selectedStateCode);
+	}, [selectedStateCode, loadCities]);
+
+	const { mutateAsync: resolveCep, isPending: isResolvingCep } = useMutation({
+		mutationFn: async (cep: string) => {
+			const cepRes = await getCepV2({ path: { cep } });
+
+			if (!cepRes.data) throw new Error("CEP não encontrado");
+
+			const citiesRes = await listIbgeMunicipios({
+				path: { siglaUF: cepRes.data.state },
+			});
+			const resolvedCities = (citiesRes.data ?? []).sort((a, b) =>
+				a.nome.localeCompare(b.nome),
+			);
+
+			const { state: sigla, city: cityName } = cepRes.data;
+			const uf = states?.find(s => s.sigla === sigla);
+			const city = resolvedCities.find(
+				c => c.nome.toUpperCase() === cityName.toUpperCase(),
+			);
+
+			return {
+				cities: resolvedCities,
+				values: {
+					zip_code: mask.cep(cepRes.data.cep),
+					street: cepRes.data.street ?? "",
+					district: cepRes.data.neighborhood ?? "",
+					city: cityName,
+					state: uf?.nome ?? "",
+					state_code: sigla,
+					state_ibge_id: uf?.id ?? 0,
+					city_ibge_id: city ? Number(city.codigo_ibge) : 0,
+				} satisfies ResolvedCepValues,
+			};
+		},
+		onSuccess: ({ cities: resolvedCities }) => setCities(resolvedCities),
 	});
 
 	const searchCep = async (cep: string): Promise<ResolvedCepValues> => {
-		const result = await cepMutation.mutateAsync(cep);
-		// Pré-popula o cache para que o useQuery de cidades não dispare nova requisição
-		queryClient.setQueryData(["cities", result.stateCode], result.cities);
+		const result = await resolveCep(cep);
 		return result.values;
 	};
 
@@ -110,7 +94,7 @@ export function useCompanyAddress(selectedStateCode: string) {
 		cities,
 		isPendingStates,
 		isPendingCities,
-		isResolvingCep: cepMutation.isPending,
+		isResolvingCep,
 		searchCep,
 	};
 }
