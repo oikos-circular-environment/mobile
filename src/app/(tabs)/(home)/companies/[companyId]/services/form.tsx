@@ -126,23 +126,6 @@ export default function ServiceFormScreen() {
 		}
 	};
 
-	const handleRemove = async () => {
-		if (!initialData?.id) return;
-		const remaining = (services ?? []).filter(s => s.id !== initialData.id);
-		await saveServices({
-			services: remaining.map(s => ({
-				name: s.name,
-				description: s.description ?? null,
-				price: s.price,
-				quantity: s.quantity,
-				unit: s.unit,
-				waste_category_id: s.waste_category_id,
-				observations: s.observations ?? null,
-			})),
-		});
-		router.back();
-	};
-
 	return (
 		<KeyboardAvoidingView
 			className="flex-1"
@@ -403,17 +386,6 @@ export default function ServiceFormScreen() {
 						>
 							<ButtonText>Cancelar</ButtonText>
 						</Button>
-
-						{initialData && (
-							<Button
-								variant="outline"
-								className="flex-1 border-error-300"
-								onPress={handleRemove}
-								isDisabled={isSavingServices}
-							>
-								<ButtonText className="text-error-600">Excluir</ButtonText>
-							</Button>
-						)}
 
 						<Button
 							className="flex-1"

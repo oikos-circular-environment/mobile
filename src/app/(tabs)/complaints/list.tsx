@@ -2,6 +2,7 @@ import { useFocusEffect } from "expo-router";
 import { ShieldIcon } from "lucide-react-native";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 import { ComplaintCard } from "@/components/complaints/complaint-card";
 import { ComplaintCardSkeleton } from "@/components/complaints/complaint-card-skeleton";
 import { ComplaintListHeader } from "@/components/complaints/complaint-list-header";
@@ -10,7 +11,6 @@ import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { useShallow } from "zustand/react/shallow";
 import {
 	type ApiComplaint,
 	selectFilteredComplaints,
@@ -18,7 +18,9 @@ import {
 } from "@/stores/complaints-store";
 
 export default function ComplaintsScreen() {
-	const filteredComplaints = useComplaintsStore(useShallow(selectFilteredComplaints));
+	const filteredComplaints = useComplaintsStore(
+		useShallow(selectFilteredComplaints),
+	);
 	const {
 		isLoadingComplaints,
 		refetchAll,
