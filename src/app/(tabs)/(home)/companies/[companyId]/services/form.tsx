@@ -379,6 +379,7 @@ export default function ServiceFormScreen() {
 
 					<View className="flex-row gap-2 mt-4">
 						<Button
+							testID="btn-cancel"
 							variant="outline"
 							className="flex-1"
 							onPress={() => router.back()}
@@ -388,6 +389,7 @@ export default function ServiceFormScreen() {
 						</Button>
 
 						<Button
+							testID="btn-submit"
 							className="flex-1"
 							onPress={handleSubmit(onSubmit)}
 							isDisabled={

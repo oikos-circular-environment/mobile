@@ -137,6 +137,7 @@ export default function CompanyBusinessHoursScreen() {
 
 					<View className="flex-row gap-2 pt-4">
 						<Button
+							testID="btn-cancel"
 							variant="outline"
 							className="flex-1"
 							onPress={() => reset()}
@@ -145,6 +146,7 @@ export default function CompanyBusinessHoursScreen() {
 							<ButtonText>Cancelar</ButtonText>
 						</Button>
 						<Button
+							testID="btn-save"
 							className="flex-1"
 							onPress={handleSubmit(onSubmit)}
 							isDisabled={!isDirty || isSavingBusinessHours}
