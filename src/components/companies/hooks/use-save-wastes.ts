@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
-import { useCompaniesStore } from "@/stores/companies-store";
 import type { PutV1CompaniesByIdWastesData } from "@/libs/oikos-sdk";
 import { putV1CompaniesByIdWastes } from "@/libs/oikos-sdk";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 type SaveWastesBody = PutV1CompaniesByIdWastesData["body"];
 
