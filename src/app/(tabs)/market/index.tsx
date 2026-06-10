@@ -1,6 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
-import { AlertCircleIcon, ArrowRight, MapPinIcon, Search, Sprout } from "lucide-react-native";
+import {
+	AlertCircleIcon,
+	ArrowRight,
+	MapPinIcon,
+	Search,
+	Sprout,
+} from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
 import {
 	ActivityIndicator,
@@ -14,6 +20,7 @@ import { LocationSourceSelect } from "@/components/market/location-source-select
 import { RadiusToggle } from "@/components/market/radius-toggle";
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import {
 	FormControl,
@@ -24,6 +31,7 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -222,47 +230,89 @@ export default function MarketScreen() {
 							</Card>
 						) : (
 							<View className="gap-3">
-								{companies.map(item => {
-									const isOpen = isCompanyOpenNow(
-										item.business_hours,
-										currentDate,
-									);
+								{companies
+									.sort((a, b) =>
+										a.business_name.localeCompare(b.business_name),
+									)
+									.map(item => {
+										const isOpen = isCompanyOpenNow(
+											item.business_hours,
+											currentDate,
+										);
 
-									return (
-										<Link
-											key={item.id}
-											href={{
-												pathname: "/market/[companyId]",
-												params: { companyId: item.id },
-											}}
-											asChild
-										>
-											<Pressable>
-												<Card
-													size="sm"
-													className="border-0 bg-gray-100 shadow-none"
-												>
-													<View className="flex-row items-center gap-3">
-														<View className="h-12 w-12 items-center justify-center overflow-hidden rounded-[5px] bg-lime-800">
-															{item.company_type === "COLLECTOR" ? (
-																<Sprout size={16} color={colors.gray[900]} />
-															) : (
-																<Text className="text-[10px] font-semibold text-white">
-																	{item.corporate_name
-																		.split(" ")
-																		.slice(0, 2)
-																		.map(word => word[0]?.toUpperCase() ?? "")
-																		.join("")}
-																</Text>
-															)}
-														</View>
-
-														<View className="min-w-0 flex-1 gap-1">
-															<View className="flex-row items-center gap-2">
-																<View className="flex-row gap-2 flex-1">
-																	<Text className=" font-semibold text-gray-950">
-																		{item.corporate_name}
+										return (
+											<Link
+												key={item.id}
+												href={{
+													pathname: "/market/[companyId]",
+													params: { companyId: item.id },
+												}}
+												asChild
+											>
+												<Pressable>
+													<Card size="sm" className="shadow-none">
+														<View className="flex-row items-center gap-3">
+															<View className="h-12 w-12 items-center justify-center overflow-hidden rounded-[5px] bg-lime-800">
+																{item.company_type === "COLLECTOR" ? (
+																	<Sprout size={16} color={colors.white} />
+																) : (
+																	<Text
+																		size="sm"
+																		className="font-semibold text-white"
+																	>
+																		{item.corporate_name
+																			.split(" ")
+																			.slice(0, 2)
+																			.map(word => word[0]?.toUpperCase() ?? "")
+																			.join("")}
 																	</Text>
+																)}
+															</View>
+
+															<View className="min-w-0 flex-1 gap-1">
+																<VStack>
+																	<Box className="flex-1">
+																		<Text
+																			style={{ fontFamily: "Oswald_700Bold" }}
+																			className="uppercase"
+																		>
+																			{item.company_type === "COLLECTOR"
+																				? item.business_name
+																				: item.business_name}
+																		</Text>
+																	</Box>
+																	{item.company_type !== "COLLECTOR" && (
+																		<Box>
+																			<Text
+																				size="sm"
+																				className="text-muted-foreground"
+																			>
+																				{item.identity}
+																			</Text>
+																		</Box>
+																	)}
+																</VStack>
+
+																<Text className="text-xs leading-4 text-gray-500">
+																	{item.wastes
+																		.map(w => w.name)
+																		.slice(0, 4)
+																		.join(", ")}
+																</Text>
+
+																<HStack className="items-center gap-2">
+																	<Badge variant="secondary">
+																		<BadgeText>
+																			{formatDistance(item.distance_in_meters)}
+																		</BadgeText>
+																	</Badge>
+																	{item.company_type === "COLLECTOR" && (
+																		<Badge variant="default">
+																			<BadgeText>
+																				Coletor independente
+																			</BadgeText>
+																		</Badge>
+																	)}
 
 																	<Badge
 																		variant={isOpen ? "default" : "destructive"}
@@ -271,38 +321,16 @@ export default function MarketScreen() {
 																			{isOpen ? "Aberto" : "Fechado"}
 																		</BadgeText>
 																	</Badge>
-																</View>
-
-																{item.company_type === "COLLECTOR" && (
-																	<View className="rounded-[5px] bg-lime-800 px-3 py-1">
-																		<Text className="text-white">
-																			Coletor independente
-																		</Text>
-																	</View>
-																)}
+																</HStack>
 															</View>
 
-															<Text className="text-xs leading-4 text-gray-500">
-																{item.wastes
-																	.map(w => w.name)
-																	.slice(0, 4)
-																	.join(", ")}
-															</Text>
-
-															<View className="flex-row items-center justify-between gap-2">
-																<Text className="text-xs text-gray-400">
-																	{formatDistance(item.distance_in_meters)}
-																</Text>
-															</View>
+															<ArrowRight size={16} color={colors.gray[900]} />
 														</View>
-
-														<ArrowRight size={16} color={colors.gray[900]} />
-													</View>
-												</Card>
-											</Pressable>
-										</Link>
-									);
-								})}
+													</Card>
+												</Pressable>
+											</Link>
+										);
+									})}
 
 								{hasNextPage && (
 									<Pressable

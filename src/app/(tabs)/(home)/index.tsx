@@ -175,7 +175,7 @@ export default function HomeScreen() {
 					<View className="flex-row items-center justify-between">
 						<View className="gap-0.5">
 							<Heading>Próximas de você</Heading>
-							<Text className="text-xs text-gray-500">
+							<Text size="sm" className="text-gray-500">
 								Empresas em até 2 km
 							</Text>
 						</View>
@@ -225,7 +225,7 @@ export default function HomeScreen() {
 									<Link
 										key={item.id}
 										href={{
-											pathname: "/companies/[companyId]",
+											pathname: "/market/[companyId]",
 											params: { companyId: item.id },
 										}}
 										asChild

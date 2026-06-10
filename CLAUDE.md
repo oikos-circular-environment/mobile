@@ -90,3 +90,19 @@ These rules are enforced project-wide (`.github/copilot-instructions.md`):
 | Animation | `react-native-reanimated` + `@legendapp/motion` |
 | Haptics | `expo-haptics` |
 | Class merging | `clsx` + `tailwind-merge` |
+
+## Pencil design file
+
+The design source of truth is `pencil/oikos-pencil.pen` — read/edit it only through the Pencil MCP tools.
+
+**Document conventions**:
+- Screens are named after their expo-router route (e.g. `market/index`, `complaints/(create)/camera`). Screens without an implemented route get the `(proposta)` suffix.
+- Each feature lives in a top-level flow frame (`Market Flow`, `Complaints Flow`, `Auth Flow`...). Never leave loose nodes at the document root.
+- All master components live inside the `Oikos Design System` frame, named in PascalCase after the React component that implements them (`TabBar`, `FilterChip`, `CompanyCard`).
+- Every flow and master component carries a `context` property: purpose + corresponding code path.
+
+**Componentization rules (mandatory when designing)**:
+1. Before drawing, list existing components (`batch_get` with `reusable: true`) and reuse them via `ref` instances with overrides — never copy or redraw an existing pattern.
+2. Any UI that appears 2+ times (cards, chips, list rows) must first be created as a master component in the Design System, then instanced in screens.
+3. Variants (active/inactive, open/closed, collector/company) are instance overrides via `descendants` — not new components.
+4. Use the document variables (`$lime-*`, `$gray-*`, `$spacing-*`, `$radius-*`) instead of hardcoded values.

@@ -3124,10 +3124,9 @@ export type GetV1MarketResponses = {
 	200: {
 		companies: Array<{
 			id: string;
-			business_name: string | null;
+			business_name: string;
 			corporate_name: string;
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
-			accept_appointments: boolean;
 			status: boolean;
 			phones: Array<string>;
 			address: {
@@ -3140,8 +3139,8 @@ export type GetV1MarketResponses = {
 				city: string;
 				state: string;
 				state_code: string;
-				latitude: number | null;
-				longitude: number | null;
+				latitude: number;
+				longitude: number;
 			};
 			services: Array<{
 				id: string;
@@ -3191,6 +3190,8 @@ export type GetV1MarketResponses = {
 				}>;
 			}>;
 			distance_in_meters: number;
+			identity: string | null;
+			identity_type: "CNPJ";
 		}>;
 		next_cursor: string | null;
 	};
