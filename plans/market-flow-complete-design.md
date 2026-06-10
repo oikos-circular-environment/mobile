@@ -1,6 +1,8 @@
 # Plano: Fluxo completo de Market no Pencil (novo design system)
 
 > **Status (2026-06-10): EXECUTADO** ✅ — 7 telas no Market Flow (index, detalhe Geral, simulação, 3 sheets, modal de permissão) + 4 masters novos, validados com screenshots e `snapshot_layout` limpo. "Market Flow Old" mantido como referência da produção.
+>
+> **Aditivo (2026-06-10)**: seções do detalhe viraram **Resíduos/Serviços em grid 2 colunas** (`MarketItemTile` com HazardBadge da categoria ABNT NBR 10004); tap abre a 8ª tela `market/[companyId] — item (sheet)` com info completa do item + categoria (grau de periculosidade, alerts de descrição/observações, subcategorias INCLUDE/EXCLUDE). Masters novos: HazardBadge, Alert, SubcategoryCard, MarketItemTile. Implementação no código deve reusar `src/components/companies/waste-category/`.
 
 ## Fonte de verdade (código)
 
