@@ -2371,8 +2371,7 @@
                       "lineHeight": 1.3,
                       "fontFamily": "$font-heading",
                       "fontSize": "$text-overline",
-                      "fontWeight": "600",
-                      "letterSpacing": 1
+                      "fontWeight": "600"
                     },
                     {
                       "type": "frame",
@@ -3981,147 +3980,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "type": "frame",
-              "id": "QQ3ZM",
-              "name": "Complaints Block",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 10,
-              "children": [
-                {
-                  "type": "text",
-                  "id": "TX1Ux",
-                  "name": "Complaints Label",
-                  "fill": "$foreground",
-                  "content": "ComplaintStatus · ComplaintTypeTag · ComplaintTypeOption",
-                  "fontFamily": "$font-body",
-                  "fontSize": "$text-label",
-                  "fontWeight": "500"
-                },
-                {
-                  "type": "frame",
-                  "id": "msBah",
-                  "name": "Complaint Masters Row",
-                  "gap": 12,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "V467uZ",
-                      "name": "ComplaintStatus",
-                      "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
-                      "reusable": true,
-                      "fill": "#fef9c3",
-                      "cornerRadius": 999,
-                      "gap": 5,
-                      "padding": [
-                        4,
-                        10
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "ellipse",
-                          "id": "o8G9R",
-                          "name": "Dot",
-                          "fill": "#a16207",
-                          "width": 6,
-                          "height": 6
-                        },
-                        {
-                          "type": "text",
-                          "id": "opPOV",
-                          "name": "Label",
-                          "fill": "#a16207",
-                          "content": "Aberta",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-caption",
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "qeuaX",
-                      "name": "ComplaintTypeTag",
-                      "context": "Tag de tipo de denúncia. Código: src/components/complaints/complaint-type-tag.tsx.",
-                      "reusable": true,
-                      "fill": "#fee2e2",
-                      "cornerRadius": 999,
-                      "gap": 4,
-                      "padding": [
-                        3,
-                        8
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "M3Qa8",
-                          "name": "Icon",
-                          "width": 11,
-                          "height": 11,
-                          "icon": "trash-2",
-                          "library": "lucide",
-                          "fill": "#dc2626"
-                        },
-                        {
-                          "type": "text",
-                          "id": "fsKLJ",
-                          "name": "Label",
-                          "fill": "#dc2626",
-                          "content": "Descarte Irregular",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-caption",
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "G5y1t",
-                      "name": "ComplaintTypeOption",
-                      "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
-                      "reusable": true,
-                      "fill": "#ffffff",
-                      "cornerRadius": 8,
-                      "stroke": "#e5e7eb",
-                      "strokeWidth": 1,
-                      "strokeAlignment": "inner",
-                      "gap": 8,
-                      "padding": [
-                        10,
-                        14
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "f7iNy",
-                          "name": "Icon",
-                          "width": 16,
-                          "height": 16,
-                          "icon": "trash-2",
-                          "library": "lucide",
-                          "fill": "#6b7280"
-                        },
-                        {
-                          "type": "text",
-                          "id": "HnHg8",
-                          "name": "Label",
-                          "fill": "#374151",
-                          "content": "Descarte Irregular",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-label",
-                          "fontWeight": "500"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
             }
           ]
         }
@@ -5063,84 +4921,174 @@
               "gap": 8,
               "children": [
                 {
+                  "type": "frame",
                   "id": "mXsFV",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Aberta",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#fef9c3",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#a16207"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "Il7Xt",
+                      "name": "Dot",
+                      "fill": "#a16207",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "df75j",
+                      "name": "Label",
+                      "fill": "#a16207",
                       "content": "Aberta",
-                      "fill": "#a16207"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 },
                 {
+                  "type": "frame",
                   "id": "D27BT",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Em Análise",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#dbeafe",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#1d4ed8"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "vDo1b",
+                      "name": "Dot",
+                      "fill": "#1d4ed8",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "ZblSO",
+                      "name": "Label",
+                      "fill": "#1d4ed8",
                       "content": "Em Análise",
-                      "fill": "#1d4ed8"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 },
                 {
+                  "type": "frame",
                   "id": "ygVtk",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Em Andamento",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#ffedd5",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#c2410c"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "qrx5s",
+                      "name": "Dot",
+                      "fill": "#c2410c",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "mcSuE",
+                      "name": "Label",
+                      "fill": "#c2410c",
                       "content": "Em Andamento",
-                      "fill": "#c2410c"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 },
                 {
+                  "type": "frame",
                   "id": "H0alre",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Resolvida",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#e4f4e6",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#2f6637"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "P11x36",
+                      "name": "Dot",
+                      "fill": "#2f6637",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "CpQvq",
+                      "name": "Label",
+                      "fill": "#2f6637",
                       "content": "Resolvida",
-                      "fill": "#2f6637"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 },
                 {
+                  "type": "frame",
                   "id": "E57EP9",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Cancelada",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#f3f4f6",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#4b5563"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "DRNvT",
+                      "name": "Dot",
+                      "fill": "#4b5563",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "mr8QB",
+                      "name": "Label",
+                      "fill": "#4b5563",
                       "content": "Cancelada",
-                      "fill": "#4b5563"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 }
               ]
             },
@@ -6272,37 +6220,74 @@
                           "alignItems": "center",
                           "children": [
                             {
+                              "type": "frame",
                               "id": "ucaHz",
-                              "type": "ref",
-                              "ref": "qeuaX",
                               "name": "Type Badge",
+                              "context": "Tag de tipo de denúncia. Código: src/components/complaints/complaint-type-tag.tsx.",
                               "fill": "#fee2e2",
-                              "descendants": {
-                                "M3Qa8": {
-                                  "fill": "#dc2626",
-                                  "icon": "trash-2"
-                                },
-                                "fsKLJ": {
-                                  "content": "Descarte Irregular",
+                              "cornerRadius": 999,
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "zT2il",
+                                  "name": "Icon",
+                                  "width": 11,
+                                  "height": 11,
+                                  "icon": "trash-2",
+                                  "library": "lucide",
                                   "fill": "#dc2626"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "SpsmR",
+                                  "name": "Label",
+                                  "fill": "#dc2626",
+                                  "content": "Descarte Irregular",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
                                 }
-                              }
+                              ]
                             },
                             {
+                              "type": "frame",
                               "id": "Rmbnc",
-                              "type": "ref",
-                              "ref": "V467uZ",
                               "name": "Status Badge",
+                              "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                               "fill": "#fef9c3",
-                              "descendants": {
-                                "o8G9R": {
-                                  "fill": "#a16207"
+                              "cornerRadius": 999,
+                              "gap": 5,
+                              "padding": [
+                                4,
+                                10
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "u7SyV",
+                                  "name": "Dot",
+                                  "fill": "#a16207",
+                                  "width": 6,
+                                  "height": 6
                                 },
-                                "opPOV": {
+                                {
+                                  "type": "text",
+                                  "id": "uBFXN",
+                                  "name": "Label",
+                                  "fill": "#a16207",
                                   "content": "Aberta",
-                                  "fill": "#a16207"
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
                                 }
-                              }
+                              ]
                             }
                           ]
                         },
@@ -6793,84 +6778,174 @@
               "gap": 8,
               "children": [
                 {
+                  "type": "frame",
                   "id": "Q9A9MM",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Aberta",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#fef9c3",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#a16207"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "HHDbA",
+                      "name": "Dot",
+                      "fill": "#a16207",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "pk9tn",
+                      "name": "Label",
+                      "fill": "#a16207",
                       "content": "Aberta",
-                      "fill": "#a16207"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 },
                 {
+                  "type": "frame",
                   "id": "qwfys",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Em Análise",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#dbeafe",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#1d4ed8"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "HDbpC",
+                      "name": "Dot",
+                      "fill": "#1d4ed8",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "NaOKr",
+                      "name": "Label",
+                      "fill": "#1d4ed8",
                       "content": "Em Análise",
-                      "fill": "#1d4ed8"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 },
                 {
+                  "type": "frame",
                   "id": "X17yD",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Em Andamento",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#ffedd5",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#c2410c"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "y9loju",
+                      "name": "Dot",
+                      "fill": "#c2410c",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "s9kXef",
+                      "name": "Label",
+                      "fill": "#c2410c",
                       "content": "Em Andamento",
-                      "fill": "#c2410c"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 },
                 {
+                  "type": "frame",
                   "id": "J1eG4",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Resolvida",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#e4f4e6",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#2f6637"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "b4zmKm",
+                      "name": "Dot",
+                      "fill": "#2f6637",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "D8UNr",
+                      "name": "Label",
+                      "fill": "#2f6637",
                       "content": "Resolvida",
-                      "fill": "#2f6637"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 },
                 {
+                  "type": "frame",
                   "id": "iyZ8m",
-                  "type": "ref",
-                  "ref": "V467uZ",
                   "name": "Cancelada",
+                  "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                   "fill": "#f3f4f6",
-                  "descendants": {
-                    "o8G9R": {
-                      "fill": "#4b5563"
+                  "cornerRadius": 999,
+                  "gap": 5,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "amUb3",
+                      "name": "Dot",
+                      "fill": "#4b5563",
+                      "width": 6,
+                      "height": 6
                     },
-                    "opPOV": {
+                    {
+                      "type": "text",
+                      "id": "fxyWw",
+                      "name": "Label",
+                      "fill": "#4b5563",
                       "content": "Cancelada",
-                      "fill": "#4b5563"
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-caption",
+                      "fontWeight": "600"
                     }
-                  }
+                  ]
                 }
               ]
             }
@@ -8118,39 +8193,74 @@
                           "gap": 8,
                           "children": [
                             {
+                              "type": "frame",
                               "id": "YfBoW",
-                              "type": "ref",
-                              "ref": "qeuaX",
                               "name": "Type Badge",
+                              "context": "Tag de tipo de denúncia. Código: src/components/complaints/complaint-type-tag.tsx.",
                               "fill": "#fee2e2",
-                              "descendants": {
-                                "M3Qa8": {
-                                  "fill": "#dc2626",
-                                  "icon": "trash-2"
-                                },
-                                "fsKLJ": {
-                                  "content": "Descarte Irregular",
+                              "cornerRadius": 999,
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "HMnUM",
+                                  "name": "Icon",
+                                  "width": 11,
+                                  "height": 11,
+                                  "icon": "trash-2",
+                                  "library": "lucide",
                                   "fill": "#dc2626"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "WRUCf",
+                                  "name": "Label",
+                                  "fill": "#dc2626",
+                                  "content": "Descarte Irregular",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
                                 }
-                              }
+                              ]
                             },
                             {
+                              "type": "frame",
                               "id": "eV49W",
-                              "type": "ref",
-                              "ref": "V467uZ",
                               "name": "Status Badge",
+                              "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                               "fill": "#fef9c3",
-                              "x": 135,
-                              "y": 0,
-                              "descendants": {
-                                "o8G9R": {
-                                  "fill": "#a16207"
+                              "cornerRadius": 999,
+                              "gap": 5,
+                              "padding": [
+                                4,
+                                10
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "EymT3",
+                                  "name": "Dot",
+                                  "fill": "#a16207",
+                                  "width": 6,
+                                  "height": 6
                                 },
-                                "opPOV": {
+                                {
+                                  "type": "text",
+                                  "id": "T81ht",
+                                  "name": "Label",
+                                  "fill": "#a16207",
                                   "content": "Aberta",
-                                  "fill": "#a16207"
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
                                 }
-                              }
+                              ]
                             }
                           ]
                         },
@@ -8918,39 +9028,74 @@
                           "gap": 8,
                           "children": [
                             {
+                              "type": "frame",
                               "id": "GquTh",
-                              "type": "ref",
-                              "ref": "qeuaX",
                               "name": "Type Badge",
+                              "context": "Tag de tipo de denúncia. Código: src/components/complaints/complaint-type-tag.tsx.",
                               "fill": "#fee2e2",
-                              "descendants": {
-                                "M3Qa8": {
-                                  "fill": "#dc2626",
-                                  "icon": "trash-2"
-                                },
-                                "fsKLJ": {
-                                  "content": "Descarte Irregular",
+                              "cornerRadius": 999,
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "biXpQ",
+                                  "name": "Icon",
+                                  "width": 11,
+                                  "height": 11,
+                                  "icon": "trash-2",
+                                  "library": "lucide",
                                   "fill": "#dc2626"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "VbhqC",
+                                  "name": "Label",
+                                  "fill": "#dc2626",
+                                  "content": "Descarte Irregular",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
                                 }
-                              }
+                              ]
                             },
                             {
+                              "type": "frame",
                               "id": "QAc3m",
-                              "type": "ref",
-                              "ref": "V467uZ",
                               "name": "Status Badge",
+                              "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
                               "fill": "#fef9c3",
-                              "x": 135,
-                              "y": 0,
-                              "descendants": {
-                                "o8G9R": {
-                                  "fill": "#a16207"
+                              "cornerRadius": 999,
+                              "gap": 5,
+                              "padding": [
+                                4,
+                                10
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "W2UzP",
+                                  "name": "Dot",
+                                  "fill": "#a16207",
+                                  "width": 6,
+                                  "height": 6
                                 },
-                                "opPOV": {
+                                {
+                                  "type": "text",
+                                  "id": "EKUY0",
+                                  "name": "Label",
+                                  "fill": "#a16207",
                                   "content": "Aberta",
-                                  "fill": "#a16207"
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
                                 }
-                              }
+                              ]
                             }
                           ]
                         },
@@ -10748,43 +10893,82 @@
                       "gap": 8,
                       "children": [
                         {
+                          "type": "frame",
                           "id": "K1hBS",
-                          "type": "ref",
-                          "ref": "G5y1t",
                           "name": "Descarte Irregular",
+                          "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
                           "fill": "#333c12",
+                          "cornerRadius": 8,
                           "stroke": "#333c12",
                           "strokeWidth": 1,
-                          "strokeLinejoin": "miter",
-                          "strokeLinecap": "butt",
                           "strokeAlignment": "inner",
-                          "descendants": {
-                            "f7iNy": {
-                              "fill": "#ffffff",
-                              "icon": "trash-2"
+                          "gap": 8,
+                          "padding": [
+                            10,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "GU3XI",
+                              "name": "Icon",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "trash-2",
+                              "library": "lucide",
+                              "fill": "#ffffff"
                             },
-                            "HnHg8": {
-                              "content": "Descarte Irregular",
+                            {
+                              "type": "text",
+                              "id": "Z5mWQ",
+                              "name": "Label",
                               "fill": "#ffffff",
+                              "content": "Descarte Irregular",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "600"
                             }
-                          }
+                          ]
                         },
                         {
+                          "type": "frame",
                           "id": "k0n4c",
-                          "type": "ref",
-                          "ref": "G5y1t",
                           "name": "Desmatamento",
-                          "descendants": {
-                            "f7iNy": {
-                              "fill": "#6b7280",
-                              "icon": "trees"
+                          "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
+                          "fill": "#ffffff",
+                          "cornerRadius": 8,
+                          "stroke": "#e5e7eb",
+                          "strokeWidth": 1,
+                          "strokeAlignment": "inner",
+                          "gap": 8,
+                          "padding": [
+                            10,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "kaRe6",
+                              "name": "Icon",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "trees",
+                              "library": "lucide",
+                              "fill": "#6b7280"
                             },
-                            "HnHg8": {
+                            {
+                              "type": "text",
+                              "id": "k6lLX",
+                              "name": "Label",
+                              "fill": "#374151",
                               "content": "Desmatamento",
-                              "fill": "#374151"
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
+                              "fontWeight": "500"
                             }
-                          }
+                          ]
                         }
                       ]
                     },
@@ -10795,36 +10979,82 @@
                       "gap": 8,
                       "children": [
                         {
+                          "type": "frame",
                           "id": "lTPV0",
-                          "type": "ref",
-                          "ref": "G5y1t",
                           "name": "Queimadas",
-                          "descendants": {
-                            "f7iNy": {
-                              "fill": "#6b7280",
-                              "icon": "flame"
+                          "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
+                          "fill": "#ffffff",
+                          "cornerRadius": 8,
+                          "stroke": "#e5e7eb",
+                          "strokeWidth": 1,
+                          "strokeAlignment": "inner",
+                          "gap": 8,
+                          "padding": [
+                            10,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "j2DHMl",
+                              "name": "Icon",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "flame",
+                              "library": "lucide",
+                              "fill": "#6b7280"
                             },
-                            "HnHg8": {
+                            {
+                              "type": "text",
+                              "id": "HeCGE",
+                              "name": "Label",
+                              "fill": "#374151",
                               "content": "Queimadas",
-                              "fill": "#374151"
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
+                              "fontWeight": "500"
                             }
-                          }
+                          ]
                         },
                         {
+                          "type": "frame",
                           "id": "tB1Vw",
-                          "type": "ref",
-                          "ref": "G5y1t",
                           "name": "Terreno Baldio",
-                          "descendants": {
-                            "f7iNy": {
-                              "fill": "#6b7280",
-                              "icon": "shrub"
+                          "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
+                          "fill": "#ffffff",
+                          "cornerRadius": 8,
+                          "stroke": "#e5e7eb",
+                          "strokeWidth": 1,
+                          "strokeAlignment": "inner",
+                          "gap": 8,
+                          "padding": [
+                            10,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "K3tfE",
+                              "name": "Icon",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "shrub",
+                              "library": "lucide",
+                              "fill": "#6b7280"
                             },
-                            "HnHg8": {
+                            {
+                              "type": "text",
+                              "id": "U54vGi",
+                              "name": "Label",
+                              "fill": "#374151",
                               "content": "Terreno Baldio",
-                              "fill": "#374151"
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
+                              "fontWeight": "500"
                             }
-                          }
+                          ]
                         }
                       ]
                     },
@@ -11188,47 +11418,82 @@
                           "gap": 8,
                           "children": [
                             {
+                              "type": "frame",
                               "id": "GVOOF",
-                              "type": "ref",
-                              "ref": "G5y1t",
                               "name": "Descarte Irregular",
-                              "cornerRadius": 999,
+                              "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
                               "fill": "#333c12",
+                              "cornerRadius": 999,
                               "stroke": "#333c12",
                               "strokeWidth": 1,
-                              "strokeLinejoin": "miter",
-                              "strokeLinecap": "butt",
                               "strokeAlignment": "inner",
-                              "descendants": {
-                                "f7iNy": {
-                                  "fill": "#ffffff",
-                                  "icon": "trash-2"
+                              "gap": 8,
+                              "padding": [
+                                10,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "eh9r5",
+                                  "name": "Icon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "trash-2",
+                                  "library": "lucide",
+                                  "fill": "#ffffff"
                                 },
-                                "HnHg8": {
-                                  "content": "Descarte Irregular",
+                                {
+                                  "type": "text",
+                                  "id": "rwJUb",
+                                  "name": "Label",
                                   "fill": "#ffffff",
+                                  "content": "Descarte Irregular",
+                                  "fontFamily": "$font-body",
                                   "fontSize": 13,
                                   "fontWeight": "600"
                                 }
-                              }
+                              ]
                             },
                             {
+                              "type": "frame",
                               "id": "MQUJ8",
-                              "type": "ref",
-                              "ref": "G5y1t",
                               "name": "Queimada",
+                              "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
+                              "fill": "#ffffff",
                               "cornerRadius": 999,
-                              "descendants": {
-                                "f7iNy": {
-                                  "fill": "#6b7280",
-                                  "icon": "flame"
+                              "stroke": "#e5e7eb",
+                              "strokeWidth": 1,
+                              "strokeAlignment": "inner",
+                              "gap": 8,
+                              "padding": [
+                                10,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "etPYT",
+                                  "name": "Icon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "flame",
+                                  "library": "lucide",
+                                  "fill": "#6b7280"
                                 },
-                                "HnHg8": {
-                                  "content": "Queimada",
+                                {
+                                  "type": "text",
+                                  "id": "MxNdr",
+                                  "name": "Label",
                                   "fill": "#374151",
-                                  "fontSize": 13
+                                  "content": "Queimada",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
                                 }
-                              }
+                              ]
                             }
                           ]
                         },
@@ -11238,58 +11503,121 @@
                           "gap": 8,
                           "children": [
                             {
+                              "type": "frame",
                               "id": "iM6Si",
-                              "type": "ref",
-                              "ref": "G5y1t",
                               "name": "Poluição Hídrica",
+                              "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
+                              "fill": "#ffffff",
                               "cornerRadius": 999,
-                              "descendants": {
-                                "f7iNy": {
-                                  "fill": "#6b7280",
-                                  "icon": "droplets"
+                              "stroke": "#e5e7eb",
+                              "strokeWidth": 1,
+                              "strokeAlignment": "inner",
+                              "gap": 8,
+                              "padding": [
+                                10,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "l8CRV2",
+                                  "name": "Icon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "droplets",
+                                  "library": "lucide",
+                                  "fill": "#6b7280"
                                 },
-                                "HnHg8": {
+                                {
+                                  "type": "text",
+                                  "id": "x809Tf",
+                                  "name": "Label",
+                                  "fill": "#374151",
                                   "content": "Poluição Hídrica",
-                                  "fill": "#374151",
-                                  "fontSize": 13
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
                                 }
-                              }
+                              ]
                             },
                             {
+                              "type": "frame",
                               "id": "Idorf",
-                              "type": "ref",
-                              "ref": "G5y1t",
                               "name": "Desmatamento",
+                              "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
+                              "fill": "#ffffff",
                               "cornerRadius": 999,
-                              "descendants": {
-                                "f7iNy": {
-                                  "fill": "#6b7280",
-                                  "icon": "trees"
+                              "stroke": "#e5e7eb",
+                              "strokeWidth": 1,
+                              "strokeAlignment": "inner",
+                              "gap": 8,
+                              "padding": [
+                                10,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "D9JSa",
+                                  "name": "Icon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "trees",
+                                  "library": "lucide",
+                                  "fill": "#6b7280"
                                 },
-                                "HnHg8": {
-                                  "content": "Desmatamento",
+                                {
+                                  "type": "text",
+                                  "id": "L0nJXO",
+                                  "name": "Label",
                                   "fill": "#374151",
-                                  "fontSize": 13
+                                  "content": "Desmatamento",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
                                 }
-                              }
+                              ]
                             },
                             {
+                              "type": "frame",
                               "id": "dvd1G",
-                              "type": "ref",
-                              "ref": "G5y1t",
                               "name": "Outros",
+                              "context": "Opção de tipo de denúncia em formulário. Código: src/components/complaints/complaint-type-option.tsx. Selecionada: fill lime-800, textos brancos.",
+                              "fill": "#ffffff",
                               "cornerRadius": 999,
-                              "descendants": {
-                                "f7iNy": {
-                                  "fill": "#6b7280",
-                                  "icon": "circle-help"
+                              "stroke": "#e5e7eb",
+                              "strokeWidth": 1,
+                              "strokeAlignment": "inner",
+                              "gap": 8,
+                              "padding": [
+                                10,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "jMG6Z",
+                                  "name": "Icon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "circle-help",
+                                  "library": "lucide",
+                                  "fill": "#6b7280"
                                 },
-                                "HnHg8": {
-                                  "content": "Outros",
+                                {
+                                  "type": "text",
+                                  "id": "JoyBi",
+                                  "name": "Label",
                                   "fill": "#374151",
-                                  "fontSize": 13
+                                  "content": "Outros",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
                                 }
-                              }
+                              ]
                             }
                           ]
                         }
@@ -11400,7 +11728,9 @@
                               "descendants": {
                                 "rTGHR": {
                                   "content": "RUA",
-                                  "fontFamily": "Oswald"
+                                  "fontFamily": "Oswald",
+                                  "letterSpacing": 0,
+                                  "lineHeight": 1.3
                                 },
                                 "WLFwn": {
                                   "content": "Nome da rua"
@@ -11741,19 +12071,14 @@
       "children": [
         {
           "type": "frame",
-          "id": "EXyYG",
-          "name": "market/index",
-          "clip": true,
-          "width": 430,
-          "height": 932,
+          "id": "k8FJdz",
+          "name": "Market Home",
           "fill": "$background",
-          "layout": "none",
+          "layout": "vertical",
           "children": [
             {
               "type": "frame",
               "id": "duVik",
-              "x": 0,
-              "y": 0,
               "name": "Market Container",
               "height": 932,
               "layout": "vertical",
@@ -12264,27 +12589,38 @@
               ]
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "h0iJ8d",
+      "x": 2000,
+      "y": 5351,
+      "name": "Market Flow Old",
+      "context": "Tab market — src/app/(tabs)/market/. Listagem de empresas (index) e detalhe ([companyId]).",
+      "gap": 96,
+      "children": [
         {
           "type": "frame",
-          "id": "Ymcm4",
-          "name": "market/[companyId]",
+          "id": "W5vEdc",
+          "name": "Company Profile",
           "context": "Detalhe da empresa no market — src/app/(tabs)/market/[companyId].tsx. Aba Geral: info, horarios, produtos, servicos. Aba Simulacao: seletor de itens, calculadora, checkout.",
           "clip": true,
           "width": 430,
           "height": 932,
-          "fill": "#ffffff",
+          "fill": "$white",
           "children": [
             {
               "type": "frame",
-              "id": "v1eo7C",
+              "id": "ekIfo",
               "name": "Container",
               "width": "fill_container",
               "height": "fill_container",
               "layout": "vertical",
               "children": [
                 {
-                  "id": "FE2sX",
+                  "id": "SZ2im",
                   "type": "ref",
                   "ref": "fxxWe",
                   "width": "fill_container",
@@ -12292,7 +12628,7 @@
                 },
                 {
                   "type": "frame",
-                  "id": "QKiUZ",
+                  "id": "LC3ES",
                   "name": "Content",
                   "clip": true,
                   "width": "fill_container",
@@ -12303,7 +12639,7 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "UOIFJ",
+                      "id": "kuWlb",
                       "name": "CompanyHeaderCard",
                       "width": "fill_container",
                       "gap": 12,
@@ -12311,29 +12647,29 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "g3e0b",
+                          "id": "UnYv4",
                           "name": "Avatar",
                           "width": 64,
                           "height": 64,
-                          "fill": "#333c12",
-                          "cornerRadius": 8,
+                          "fill": "$primary",
+                          "cornerRadius": "$radius-md",
                           "justifyContent": "center",
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "ioxZ7",
-                              "fill": "#ffffff",
+                              "id": "K4VelF",
+                              "fill": "$white",
                               "content": "EV",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 20,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-h3",
                               "fontWeight": "600"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "cTVmf",
+                          "id": "zmdKA",
                           "name": "Info",
                           "width": "fill_container",
                           "layout": "vertical",
@@ -12342,22 +12678,23 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "p9Fd0",
-                              "fill": "#111827",
+                              "id": "zaUgz",
+                              "fill": "$foreground",
                               "content": "ECOPONTO VILA NOVA",
                               "lineHeight": 1.2,
-                              "fontFamily": "Oswald",
-                              "fontSize": 22,
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h2",
                               "fontWeight": "600"
                             },
                             {
                               "type": "text",
-                              "id": "ovbGd",
-                              "fill": "#6b7280",
+                              "id": "ulwvZ",
+                              "fill": "$muted-foreground",
                               "content": "Reciclagem geral",
                               "lineHeight": 1.45,
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -12365,55 +12702,55 @@
                     },
                     {
                       "type": "frame",
-                      "id": "jwDC7",
+                      "id": "CDgJ1",
                       "name": "TabSwitcher",
                       "width": "fill_container",
                       "height": 36,
-                      "fill": "#f3f4f6",
-                      "cornerRadius": 8,
+                      "fill": "$gray-100",
+                      "cornerRadius": "$radius-md",
                       "gap": 4,
                       "padding": 2,
                       "children": [
                         {
                           "type": "frame",
-                          "id": "W0EcN",
+                          "id": "ye5mx",
                           "name": "TabGeral",
                           "width": "fill_container",
                           "height": "fill_container",
-                          "fill": "#333c12",
-                          "cornerRadius": 6,
+                          "fill": "$primary",
+                          "cornerRadius": "$radius-md",
                           "justifyContent": "center",
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "ctU3j",
-                              "fill": "#ffffff",
+                              "id": "SGeLH",
+                              "fill": "$white",
                               "content": "Geral",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "E2264",
+                          "id": "clOM0",
                           "name": "TabSimulacao",
                           "width": "fill_container",
                           "height": "fill_container",
-                          "fill": "#00000000",
-                          "cornerRadius": 6,
+                          "fill": "$black",
+                          "cornerRadius": "$radius-md",
                           "justifyContent": "center",
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "E05jRs",
-                              "fill": "#4b5563",
+                              "id": "OPOFb",
+                              "fill": "$gray-600",
                               "content": "Simulacao",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -12422,7 +12759,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "n2pSl",
+                      "id": "My2Pv",
                       "name": "GeneralTab",
                       "width": "fill_container",
                       "layout": "vertical",
@@ -12430,7 +12767,7 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "ZA9mh",
+                          "id": "JxlWG",
                           "name": "InfoSection",
                           "width": "fill_container",
                           "layout": "vertical",
@@ -12438,54 +12775,54 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "ECitM",
-                              "fill": "#111827",
+                              "id": "A2FNpA",
+                              "fill": "$foreground",
                               "content": "Informacoes",
                               "lineHeight": 1.3,
-                              "fontFamily": "Oswald",
-                              "fontSize": 15,
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h4",
                               "fontWeight": "600"
                             },
                             {
                               "type": "frame",
-                              "id": "V1ERm0",
+                              "id": "sWK2A",
                               "name": "AddressCard",
                               "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": 12,
-                              "stroke": "#e5e7eb",
+                              "fill": "$white",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
                               "gap": 12,
                               "padding": 12,
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "k4Sa4",
-                                  "fill": "#111827",
+                                  "id": "mVCPV",
+                                  "fill": "$foreground",
                                   "content": "Av. Paulista, 1000 - Bela Vista, Sao Paulo - SP",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 15,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body",
                                   "fontWeight": "normal"
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "CASzb",
+                                  "id": "kBuYP",
                                   "name": "AddressIcon",
                                   "width": 40,
                                   "height": 40,
-                                  "fill": "#f3f4f6",
-                                  "cornerRadius": 5,
+                                  "fill": "$gray-100",
+                                  "cornerRadius": "$radius-md",
                                   "justifyContent": "center",
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "icon",
-                                      "id": "GBf1C",
+                                      "id": "Gn9nE",
                                       "name": "corner-up-right",
                                       "width": 14,
                                       "height": 14,
                                       "library": "lucide",
-                                      "fill": "#111827"
+                                      "fill": "$foreground"
                                     }
                                   ]
                                 }
@@ -12493,66 +12830,66 @@
                             },
                             {
                               "type": "frame",
-                              "id": "jLn2G",
+                              "id": "NlA0Z",
                               "name": "PhoneCard",
                               "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": 12,
-                              "stroke": "#e5e7eb",
+                              "fill": "$white",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
                               "gap": 12,
                               "padding": 12,
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "OZvF3",
-                                  "fill": "#111827",
+                                  "id": "mUsYx",
+                                  "fill": "$foreground",
                                   "content": "(11) 99999-8888",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 15,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body",
                                   "fontWeight": "normal"
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "QKjXy",
+                                  "id": "O6AVn",
                                   "name": "PhoneIcon",
                                   "width": 40,
                                   "height": 40,
-                                  "fill": "#f3f4f6",
-                                  "cornerRadius": 5,
+                                  "fill": "$gray-100",
+                                  "cornerRadius": "$radius-md",
                                   "justifyContent": "center",
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "icon",
-                                      "id": "x6QwNp",
+                                      "id": "XgHbV",
                                       "name": "phone",
                                       "width": 14,
                                       "height": 14,
                                       "library": "lucide",
-                                      "fill": "#111827"
+                                      "fill": "$foreground"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "e2yxVU",
+                                  "id": "EKEMq",
                                   "name": "WhatsIcon",
                                   "width": 40,
                                   "height": 40,
-                                  "fill": "#f3f4f6",
-                                  "cornerRadius": 5,
+                                  "fill": "$gray-100",
+                                  "cornerRadius": "$radius-md",
                                   "justifyContent": "center",
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "icon",
-                                      "id": "cWujz",
+                                      "id": "Hz93K",
                                       "name": "message-circle",
                                       "width": 14,
                                       "height": 14,
                                       "library": "lucide",
-                                      "fill": "#111827"
+                                      "fill": "$foreground"
                                     }
                                   ]
                                 }
@@ -12562,7 +12899,7 @@
                         },
                         {
                           "type": "frame",
-                          "id": "KqjeW",
+                          "id": "Zt6bG",
                           "name": "HoursSection",
                           "width": "fill_container",
                           "layout": "vertical",
@@ -12570,91 +12907,91 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "dyuW6",
-                              "fill": "#111827",
+                              "id": "s0fFTD",
+                              "fill": "$foreground",
                               "content": "Horario de funcionamento",
-                              "fontFamily": "Oswald",
-                              "fontSize": 15,
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h4",
                               "fontWeight": "600"
                             },
                             {
                               "type": "text",
-                              "id": "w5szMR",
-                              "fill": "#6b7280",
+                              "id": "y7NVD",
+                              "fill": "$muted-foreground",
                               "content": "O horario pode variar, clique para mais detalhes",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
                               "fontWeight": "normal"
                             },
                             {
                               "type": "frame",
-                              "id": "ItFKi",
+                              "id": "RoK9z",
                               "name": "HoursCard",
                               "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": 12,
-                              "stroke": "#e5e7eb",
+                              "fill": "$white",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
                               "gap": 16,
                               "padding": 8,
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "gtDzj",
+                                  "id": "r3AKR",
                                   "width": "fill_container",
                                   "layout": "vertical",
                                   "gap": 2,
                                   "children": [
                                     {
                                       "type": "frame",
-                                      "id": "Z6DHYc",
+                                      "id": "v7Lib",
                                       "gap": 8,
                                       "alignItems": "center",
                                       "children": [
                                         {
                                           "type": "text",
-                                          "id": "UfCzP",
-                                          "fill": "#111827",
+                                          "id": "Utsrx",
+                                          "fill": "$foreground",
                                           "content": "segunda-feira",
-                                          "fontFamily": "Space Grotesk",
-                                          "fontSize": 15,
+                                          "fontFamily": "$font-body",
+                                          "fontSize": "$text-body",
                                           "fontWeight": "700"
                                         }
                                       ]
                                     },
                                     {
                                       "type": "text",
-                                      "id": "o82lg",
-                                      "fill": "#6b7280",
+                                      "id": "Htwjy",
+                                      "fill": "$muted-foreground",
                                       "content": "Agora sao 14:30",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "normal"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "ytp2H",
+                                  "id": "O1wob",
                                   "layout": "vertical",
                                   "gap": 1,
                                   "alignItems": "end",
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "T1o5g",
-                                      "fill": "#111827",
+                                      "id": "S4HAv6",
+                                      "fill": "$foreground",
                                       "content": "08:00 - 12:00",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "700"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "yNiKs",
-                                      "fill": "#111827",
+                                      "id": "h2jdZW",
+                                      "fill": "$foreground",
                                       "content": "13:00 - 18:00",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "700"
                                     }
                                   ]
@@ -12665,18 +13002,18 @@
                         },
                         {
                           "type": "frame",
-                          "id": "gPJ87",
+                          "id": "ghHkx",
                           "name": "WarningCard",
                           "width": "fill_container",
                           "fill": "#f8fad8",
-                          "cornerRadius": 12,
+                          "cornerRadius": "$radius-lg",
                           "gap": 8,
                           "padding": 8,
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "frame",
-                              "id": "gAbCK",
+                              "id": "oszE7",
                               "width": 40,
                               "height": 40,
                               "justifyContent": "center",
@@ -12684,38 +13021,38 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "cvNMH",
+                                  "id": "N16FVJ",
                                   "name": "triangle-alert",
                                   "width": 16,
                                   "height": 16,
                                   "library": "lucide",
-                                  "fill": "#6b7280"
+                                  "fill": "$muted-foreground"
                                 }
                               ]
                             },
                             {
                               "type": "frame",
-                              "id": "pPuD0",
+                              "id": "GULIZ",
                               "width": "fill_container",
                               "layout": "vertical",
                               "gap": 2,
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "AKpIP",
-                                  "fill": "#111827",
+                                  "id": "V10VF",
+                                  "fill": "$foreground",
                                   "content": "Atencao",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 13,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
                                   "fontWeight": "600"
                                 },
                                 {
                                   "type": "text",
-                                  "id": "XFr8Z",
-                                  "fill": "#4b5563",
+                                  "id": "VzBHd",
+                                  "fill": "$gray-600",
                                   "content": "Sempre faca separacao e higienizacao do item, a qualidade impacta no valor do residuo!",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 13,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
                                   "fontWeight": "normal"
                                 }
                               ]
@@ -12724,7 +13061,7 @@
                         },
                         {
                           "type": "frame",
-                          "id": "YXexJ",
+                          "id": "F4gG9R",
                           "name": "ProductsSection",
                           "width": "fill_container",
                           "layout": "vertical",
@@ -12732,99 +13069,99 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "Aa45C",
-                              "fill": "#111827",
+                              "id": "P8DMb",
+                              "fill": "$foreground",
                               "content": "Produtos",
-                              "fontFamily": "Oswald",
-                              "fontSize": 15,
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h4",
                               "fontWeight": "600"
                             },
                             {
                               "type": "frame",
-                              "id": "b402G",
+                              "id": "oZqI8",
                               "name": "ProductCard",
                               "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": 12,
-                              "stroke": "#e5e7eb",
+                              "fill": "$white",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
                               "layout": "vertical",
                               "gap": 8,
                               "padding": 12,
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "G42LqF",
+                                  "id": "VcTGV",
                                   "width": "fill_container",
                                   "gap": 12,
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "frame",
-                                      "id": "QUvFB",
+                                      "id": "Rlo8C",
                                       "width": 40,
                                       "height": 40,
-                                      "fill": "#f3f4f6",
-                                      "cornerRadius": 8,
+                                      "fill": "$gray-100",
+                                      "cornerRadius": "$radius-md",
                                       "justifyContent": "center",
                                       "alignItems": "center",
                                       "children": [
                                         {
                                           "type": "icon",
-                                          "id": "t8tyh",
+                                          "id": "t6mPi",
                                           "name": "recycle",
                                           "width": 18,
                                           "height": 18,
                                           "library": "lucide",
-                                          "fill": "#111827"
+                                          "fill": "$foreground"
                                         }
                                       ]
                                     },
                                     {
                                       "type": "text",
-                                      "id": "YpioF",
-                                      "fill": "#111827",
+                                      "id": "QhMpH",
+                                      "fill": "$foreground",
                                       "content": "Plastico PET",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 15,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body",
                                       "fontWeight": "600"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "Pd16h",
-                                      "fill": "#111827",
+                                      "id": "t26MH",
+                                      "fill": "$foreground",
                                       "content": "R$ 3,50",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 15,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-button",
                                       "fontWeight": "700"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "WKARM",
-                                      "fill": "#9ca3af",
+                                      "id": "g3IWda",
+                                      "fill": "$gray-400",
                                       "content": "/kg",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "normal"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "text",
-                                  "id": "sEq1G",
-                                  "fill": "#4b5563",
+                                  "id": "KeTA0",
+                                  "fill": "$gray-600",
                                   "content": "Garrafas PET limpas e secas",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 13,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
                                   "fontWeight": "normal"
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "T6Hnv7",
+                                  "id": "gtBwW",
                                   "width": "fill_container",
                                   "gap": 4,
                                   "children": [
                                     {
-                                      "id": "V2MCQ1",
+                                      "id": "C3eyxD",
                                       "type": "ref",
                                       "ref": "hNp9X"
                                     }
@@ -12834,90 +13171,90 @@
                             },
                             {
                               "type": "frame",
-                              "id": "oqJMF",
+                              "id": "D2gGth",
                               "name": "ProductCard2",
                               "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": 12,
-                              "stroke": "#e5e7eb",
+                              "fill": "$white",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
                               "layout": "vertical",
                               "gap": 8,
                               "padding": 12,
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "V0g3Jz",
+                                  "id": "eu2ct",
                                   "width": "fill_container",
                                   "gap": 12,
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "frame",
-                                      "id": "HG5TT",
+                                      "id": "j2npE8",
                                       "width": 40,
                                       "height": 40,
-                                      "fill": "#f3f4f6",
-                                      "cornerRadius": 8,
+                                      "fill": "$gray-100",
+                                      "cornerRadius": "$radius-md",
                                       "justifyContent": "center",
                                       "alignItems": "center",
                                       "children": [
                                         {
                                           "type": "icon",
-                                          "id": "bN9fr",
+                                          "id": "fdFZd",
                                           "name": "recycle",
                                           "width": 18,
                                           "height": 18,
                                           "library": "lucide",
-                                          "fill": "#111827"
+                                          "fill": "$foreground"
                                         }
                                       ]
                                     },
                                     {
                                       "type": "text",
-                                      "id": "HKs9P",
-                                      "fill": "#111827",
+                                      "id": "g71HUr",
+                                      "fill": "$foreground",
                                       "content": "Vidro",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 15,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body",
                                       "fontWeight": "600"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "nbRTH",
-                                      "fill": "#111827",
+                                      "id": "tRcHB",
+                                      "fill": "$foreground",
                                       "content": "R$ 0,80",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 15,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-button",
                                       "fontWeight": "700"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "oGOvA",
-                                      "fill": "#9ca3af",
+                                      "id": "GP02D",
+                                      "fill": "$gray-400",
                                       "content": "/kg",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "normal"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "text",
-                                  "id": "UUcmD",
-                                  "fill": "#4b5563",
+                                  "id": "hGtkN",
+                                  "fill": "$gray-600",
                                   "content": "Garrafas e frascos de vidro",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 13,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
                                   "fontWeight": "normal"
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "oLknB",
+                                  "id": "mOnB1",
                                   "width": "fill_container",
                                   "gap": 4,
                                   "children": [
                                     {
-                                      "id": "mEBTJ",
+                                      "id": "tPgDE",
                                       "type": "ref",
                                       "ref": "hNp9X"
                                     }
@@ -12929,7 +13266,7 @@
                         },
                         {
                           "type": "frame",
-                          "id": "V4n1C",
+                          "id": "aB1gs",
                           "name": "ServicesSection",
                           "width": "fill_container",
                           "layout": "vertical",
@@ -12937,99 +13274,99 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "X5Dmpo",
-                              "fill": "#111827",
+                              "id": "RT97T",
+                              "fill": "$foreground",
                               "content": "Servicos",
-                              "fontFamily": "Oswald",
-                              "fontSize": 15,
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h4",
                               "fontWeight": "600"
                             },
                             {
                               "type": "frame",
-                              "id": "I7OXO",
+                              "id": "D4eua",
                               "name": "ServiceCard",
                               "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": 12,
-                              "stroke": "#e5e7eb",
+                              "fill": "$white",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
                               "layout": "vertical",
                               "gap": 8,
                               "padding": 12,
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "G46sCH",
+                                  "id": "aaNro",
                                   "width": "fill_container",
                                   "gap": 12,
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "frame",
-                                      "id": "QVQVf",
+                                      "id": "a8i581",
                                       "width": 40,
                                       "height": 40,
-                                      "fill": "#f3f4f6",
-                                      "cornerRadius": 8,
+                                      "fill": "$gray-100",
+                                      "cornerRadius": "$radius-md",
                                       "justifyContent": "center",
                                       "alignItems": "center",
                                       "children": [
                                         {
                                           "type": "icon",
-                                          "id": "c91dRF",
+                                          "id": "DplMl",
                                           "name": "hammer",
                                           "width": 18,
                                           "height": 18,
                                           "library": "lucide",
-                                          "fill": "#111827"
+                                          "fill": "$foreground"
                                         }
                                       ]
                                     },
                                     {
                                       "type": "text",
-                                      "id": "rthKe",
-                                      "fill": "#111827",
+                                      "id": "bxwUb",
+                                      "fill": "$foreground",
                                       "content": "Coleta de residuos",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 15,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body",
                                       "fontWeight": "600"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "SYpga",
-                                      "fill": "#111827",
+                                      "id": "RAoZP",
+                                      "fill": "$foreground",
                                       "content": "R$ 50,00",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 15,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-button",
                                       "fontWeight": "700"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "a62J11",
-                                      "fill": "#9ca3af",
+                                      "id": "dNLyp",
+                                      "fill": "$gray-400",
                                       "content": "/un",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "normal"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "text",
-                                  "id": "HlLZg",
-                                  "fill": "#4b5563",
+                                  "id": "JZYet",
+                                  "fill": "$gray-600",
                                   "content": "Coleta de residuos reciclaveis",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 13,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
                                   "fontWeight": "normal"
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "UiU8U",
+                                  "id": "r0kKyK",
                                   "width": "fill_container",
                                   "gap": 4,
                                   "children": [
                                     {
-                                      "id": "J5zeq",
+                                      "id": "YsyzH",
                                       "type": "ref",
                                       "ref": "hNp9X"
                                     }
@@ -13043,7 +13380,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "wIWHm",
+                      "id": "ssaZL",
                       "name": "SimulationTab",
                       "width": "fill_container",
                       "layout": "vertical",
@@ -13051,78 +13388,78 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "p73wB",
+                          "id": "k3vaga",
                           "width": "fill_container",
-                          "fill": "#ffffff",
-                          "cornerRadius": 12,
-                          "stroke": "#e5e7eb",
+                          "fill": "$white",
+                          "cornerRadius": "$radius-lg",
+                          "stroke": "$border",
                           "layout": "vertical",
                           "gap": 12,
                           "padding": 12,
                           "children": [
                             {
                               "type": "text",
-                              "id": "n1oQu",
-                              "fill": "#111827",
+                              "id": "q0CdX",
+                              "fill": "$foreground",
                               "content": "Simulacao",
-                              "fontFamily": "Oswald",
-                              "fontSize": 18,
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h3",
                               "fontWeight": "600"
                             },
                             {
                               "type": "text",
-                              "id": "mDWdB",
-                              "fill": "#6b7280",
+                              "id": "c681P",
+                              "fill": "$muted-foreground",
                               "content": "Selecione os itens e quantidades para montar sua simulacao.",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
                               "fontWeight": "normal"
                             },
                             {
                               "type": "frame",
-                              "id": "cc1Up",
+                              "id": "w1ys3N",
                               "width": "fill_container",
                               "height": 36,
                               "gap": 4,
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "JFld9",
+                                  "id": "ZFZ1h",
                                   "width": "fill_container",
                                   "height": "fill_container",
-                                  "fill": "#333c12",
-                                  "cornerRadius": 6,
+                                  "fill": "$primary",
+                                  "cornerRadius": "$radius-md",
                                   "justifyContent": "center",
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "HC4yD",
-                                      "fill": "#ffffff",
+                                      "id": "HB2ZG",
+                                      "fill": "$white",
                                       "content": "Residuos",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 13,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-label",
                                       "fontWeight": "500"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "anYyf",
+                                  "id": "YhCSB",
                                   "width": "fill_container",
                                   "height": "fill_container",
-                                  "fill": "#f3f4f6",
-                                  "cornerRadius": 6,
+                                  "fill": "$gray-100",
+                                  "cornerRadius": "$radius-md",
                                   "justifyContent": "center",
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "AdmD8",
-                                      "fill": "#374151",
+                                      "id": "v2Vxz",
+                                      "fill": "$gray-700",
                                       "content": "Servicos",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 13,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-label",
                                       "fontWeight": "500"
                                     }
                                   ]
@@ -13131,105 +13468,105 @@
                             },
                             {
                               "type": "frame",
-                              "id": "LFc5T",
+                              "id": "bqGwX",
                               "width": "fill_container",
                               "layout": "vertical",
                               "gap": 8,
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "CaN5n",
+                                  "id": "c7ibz",
                                   "width": "fill_container",
-                                  "fill": "#ecf1db",
-                                  "cornerRadius": 6,
-                                  "stroke": "#333c12",
+                                  "fill": "$lime-100",
+                                  "cornerRadius": "$radius-md",
+                                  "stroke": "$primary",
                                   "gap": 12,
                                   "padding": 12,
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "frame",
-                                      "id": "pxPJr",
+                                      "id": "jBtHY",
                                       "width": "fill_container",
                                       "layout": "vertical",
                                       "gap": 2,
                                       "children": [
                                         {
                                           "type": "text",
-                                          "id": "u2uG8",
-                                          "fill": "#111827",
+                                          "id": "lEcZL",
+                                          "fill": "$foreground",
                                           "content": "Plastico PET",
-                                          "fontFamily": "Space Grotesk",
-                                          "fontSize": 13,
+                                          "fontFamily": "$font-body",
+                                          "fontSize": "$text-body-sm",
                                           "fontWeight": "600"
                                         },
                                         {
                                           "type": "text",
-                                          "id": "STXTB",
-                                          "fill": "#6b7280",
+                                          "id": "Vjok9",
+                                          "fill": "$muted-foreground",
                                           "content": "Garrafas PET limpas",
-                                          "fontFamily": "Space Grotesk",
-                                          "fontSize": 11,
+                                          "fontFamily": "$font-body",
+                                          "fontSize": "$text-caption",
                                           "fontWeight": "normal"
                                         }
                                       ]
                                     },
                                     {
                                       "type": "text",
-                                      "id": "oxG4l",
-                                      "fill": "#1f2937",
+                                      "id": "f7z4tR",
+                                      "fill": "$gray-800",
                                       "content": "R$ 3,50 /kg",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "600"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "HPzvS",
+                                  "id": "M6oyY",
                                   "width": "fill_container",
-                                  "fill": "#ffffff",
-                                  "cornerRadius": 6,
-                                  "stroke": "#e5e7eb",
+                                  "fill": "$white",
+                                  "cornerRadius": "$radius-md",
+                                  "stroke": "$border",
                                   "gap": 12,
                                   "padding": 12,
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "frame",
-                                      "id": "C8ZrN",
+                                      "id": "MBEP1",
                                       "width": "fill_container",
                                       "layout": "vertical",
                                       "gap": 2,
                                       "children": [
                                         {
                                           "type": "text",
-                                          "id": "WWXad",
-                                          "fill": "#111827",
+                                          "id": "zCwxr",
+                                          "fill": "$foreground",
                                           "content": "Vidro",
-                                          "fontFamily": "Space Grotesk",
-                                          "fontSize": 13,
+                                          "fontFamily": "$font-body",
+                                          "fontSize": "$text-body-sm",
                                           "fontWeight": "600"
                                         },
                                         {
                                           "type": "text",
-                                          "id": "lrVRf",
-                                          "fill": "#6b7280",
+                                          "id": "Yj3cx",
+                                          "fill": "$muted-foreground",
                                           "content": "Garrafas e frascos",
-                                          "fontFamily": "Space Grotesk",
-                                          "fontSize": 11,
+                                          "fontFamily": "$font-body",
+                                          "fontSize": "$text-caption",
                                           "fontWeight": "normal"
                                         }
                                       ]
                                     },
                                     {
                                       "type": "text",
-                                      "id": "FrWiW",
-                                      "fill": "#1f2937",
+                                      "id": "MzBLt",
+                                      "fill": "$gray-800",
                                       "content": "R$ 0,80 /kg",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "600"
                                     }
                                   ]
@@ -13240,46 +13577,46 @@
                         },
                         {
                           "type": "frame",
-                          "id": "ZmrW4",
+                          "id": "OtQ5P",
                           "width": "fill_container",
-                          "fill": "#ffffff",
-                          "cornerRadius": 12,
-                          "stroke": "#e5e7eb",
+                          "fill": "$white",
+                          "cornerRadius": "$radius-lg",
+                          "stroke": "$border",
                           "layout": "vertical",
                           "gap": 12,
                           "padding": 12,
                           "children": [
                             {
                               "type": "frame",
-                              "id": "LVlz9",
+                              "id": "BSNyE",
                               "width": "fill_container",
                               "gap": 16,
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "iZZcx",
+                                  "id": "C3PYHE",
                                   "width": "fill_container",
                                   "layout": "vertical",
                                   "gap": 4,
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "jLQ6G",
-                                      "fill": "#6b7280",
+                                      "id": "GwUxh",
+                                      "fill": "$muted-foreground",
                                       "content": "Quantidade",
                                       "lineHeight": 1.4,
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "normal"
                                     },
                                     {
                                       "type": "frame",
-                                      "id": "vR5G1",
+                                      "id": "C8DX1",
                                       "width": "fill_container",
                                       "height": 42,
-                                      "fill": "#ffffff",
-                                      "cornerRadius": 8,
-                                      "stroke": "#e5e7eb",
+                                      "fill": "$white",
+                                      "cornerRadius": "$radius-md",
+                                      "stroke": "$border",
                                       "padding": [
                                         0,
                                         12
@@ -13289,11 +13626,11 @@
                                       "children": [
                                         {
                                           "type": "text",
-                                          "id": "sERvr",
-                                          "fill": "#111827",
+                                          "id": "BWOCI",
+                                          "fill": "$foreground",
                                           "content": "10",
-                                          "fontFamily": "Space Grotesk",
-                                          "fontSize": 15,
+                                          "fontFamily": "$font-body",
+                                          "fontSize": "$text-body",
                                           "fontWeight": "normal"
                                         }
                                       ]
@@ -13302,27 +13639,27 @@
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "yf4pv",
+                                  "id": "E8yYDP",
                                   "width": 72,
                                   "layout": "vertical",
                                   "gap": 4,
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "AyPrE",
-                                      "fill": "#6b7280",
+                                      "id": "wxew5",
+                                      "fill": "$muted-foreground",
                                       "content": "Unidade",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "normal"
                                     },
                                     {
                                       "type": "frame",
-                                      "id": "MHrrL",
+                                      "id": "h8YnC",
                                       "width": "fill_container",
                                       "height": 42,
-                                      "fill": "#f3f4f6",
-                                      "cornerRadius": 8,
+                                      "fill": "$gray-100",
+                                      "cornerRadius": "$radius-md",
                                       "padding": [
                                         0,
                                         12
@@ -13332,11 +13669,11 @@
                                       "children": [
                                         {
                                           "type": "text",
-                                          "id": "tmRKD",
-                                          "fill": "#6b7280",
+                                          "id": "ZNkv3",
+                                          "fill": "$muted-foreground",
                                           "content": "kg",
-                                          "fontFamily": "Space Grotesk",
-                                          "fontSize": 15,
+                                          "fontFamily": "$font-body",
+                                          "fontSize": "$text-body",
                                           "fontWeight": "normal"
                                         }
                                       ]
@@ -13347,68 +13684,68 @@
                             },
                             {
                               "type": "frame",
-                              "id": "tjboo",
+                              "id": "tGSK6",
                               "width": "fill_container",
-                              "fill": "#ecf1db",
-                              "cornerRadius": 8,
+                              "fill": "$lime-100",
+                              "cornerRadius": "$radius-md",
                               "padding": 12,
                               "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "yZMNw",
+                                  "id": "WvBgm",
                                   "gap": 8,
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "icon",
-                                      "id": "c74pD",
+                                      "id": "yTUaH",
                                       "name": "calculator",
                                       "width": 16,
                                       "height": 16,
                                       "library": "lucide",
-                                      "fill": "#333c12"
+                                      "fill": "$primary"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "KtktI",
-                                      "fill": "#333c12",
+                                      "id": "Z2KKzq",
+                                      "fill": "$primary",
                                       "content": "Total do item",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 13,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
                                       "fontWeight": "normal"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "text",
-                                  "id": "nOmpF",
-                                  "fill": "#333c12",
+                                  "id": "qnP06",
+                                  "fill": "$primary",
                                   "content": "R$ 35,00",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 15,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-button",
                                   "fontWeight": "700"
                                 }
                               ]
                             },
                             {
                               "type": "frame",
-                              "id": "e8wWI",
+                              "id": "iuyEu",
                               "width": "fill_container",
                               "height": 44,
-                              "fill": "#333c12",
-                              "cornerRadius": 8,
+                              "fill": "$primary",
+                              "cornerRadius": "$radius-md",
                               "justifyContent": "center",
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "rCmqF",
-                                  "fill": "#ffffff",
+                                  "id": "aEy3M",
+                                  "fill": "$white",
                                   "content": "Adicionar a simulacao",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 15,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-button",
                                   "fontWeight": "600"
                                 }
                               ]
@@ -13417,88 +13754,88 @@
                         },
                         {
                           "type": "frame",
-                          "id": "Uxllv",
+                          "id": "qI1kZ",
                           "width": "fill_container",
                           "layout": "vertical",
                           "gap": 8,
                           "children": [
                             {
                               "type": "text",
-                              "id": "r6VAMB",
-                              "fill": "#111827",
+                              "id": "ODyeW",
+                              "fill": "$foreground",
                               "content": "Lista",
-                              "fontFamily": "Oswald",
-                              "fontSize": 18,
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h3",
                               "fontWeight": "600"
                             },
                             {
                               "type": "text",
-                              "id": "Z5ETc",
-                              "fill": "#6b7280",
+                              "id": "N1ZRp",
+                              "fill": "$muted-foreground",
                               "content": "Deslize o card para deletar um item",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
                               "fontWeight": "normal"
                             },
                             {
                               "type": "frame",
-                              "id": "RaLtJ",
+                              "id": "xfWs9",
                               "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": 12,
-                              "stroke": "#e5e7eb",
+                              "fill": "$white",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
                               "padding": 12,
                               "children": [
                                 {
                                   "type": "frame",
-                                  "id": "o8iLR",
+                                  "id": "dNWoJ",
                                   "width": "fill_container",
                                   "layout": "vertical",
                                   "gap": 2,
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "DyJoB",
-                                      "fill": "#111827",
+                                      "id": "dVmKV",
+                                      "fill": "$foreground",
                                       "content": "Plastico PET",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 13,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
                                       "fontWeight": "600"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "xjz6i",
-                                      "fill": "#6b7280",
+                                      "id": "TkT4G",
+                                      "fill": "$muted-foreground",
                                       "content": "Residuo",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "normal"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "Krd09",
+                                  "id": "M7sMaT",
                                   "layout": "vertical",
                                   "gap": 2,
                                   "alignItems": "end",
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "dg6pm",
-                                      "fill": "#111827",
+                                      "id": "M47yIK",
+                                      "fill": "$foreground",
                                       "content": "R$ 35,00",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 13,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
                                       "fontWeight": "600"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "XoKEq",
-                                      "fill": "#6b7280",
+                                      "id": "sE0Zq",
+                                      "fill": "$muted-foreground",
                                       "content": "10 x R$ 3,50 / kg",
-                                      "fontFamily": "Space Grotesk",
-                                      "fontSize": 11,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
                                       "fontWeight": "normal"
                                     }
                                   ]
@@ -13507,39 +13844,39 @@
                             },
                             {
                               "type": "frame",
-                              "id": "y13ghe",
+                              "id": "P1YUJ",
                               "width": "fill_container",
-                              "fill": "#ecf1db",
-                              "cornerRadius": 8,
+                              "fill": "$lime-100",
+                              "cornerRadius": "$radius-md",
                               "padding": 12,
                               "justifyContent": "space_between",
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "N593Fb",
+                                  "id": "HQ4GR",
                                   "name": "calculator",
                                   "width": 16,
                                   "height": 16,
                                   "library": "lucide",
-                                  "fill": "#333c12"
+                                  "fill": "$primary"
                                 },
                                 {
                                   "type": "text",
-                                  "id": "t3tNa",
-                                  "fill": "#333c12",
+                                  "id": "jJYHF",
+                                  "fill": "$primary",
                                   "content": "Total geral",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 13,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
                                   "fontWeight": "normal"
                                 },
                                 {
                                   "type": "text",
-                                  "id": "EWc2A",
-                                  "fill": "#333c12",
+                                  "id": "jjbsn",
+                                  "fill": "$primary",
                                   "content": "R$ 35,00",
-                                  "fontFamily": "Space Grotesk",
-                                  "fontSize": 15,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-button",
                                   "fontWeight": "700"
                                 }
                               ]
@@ -13556,12 +13893,12 @@
         },
         {
           "type": "frame",
-          "id": "oeRQE",
+          "id": "Nm9SV",
           "name": "LocationSource BottomSheet",
           "context": "BottomSheet de selecao de localizacao — src/components/market/location-source-select.tsx. Escolha entre localizacao atual ou endereco do perfil.",
           "width": 430,
           "height": 500,
-          "fill": "#ffffff",
+          "fill": "$white",
           "cornerRadius": [
             20,
             20,
@@ -13573,7 +13910,7 @@
           "children": [
             {
               "type": "frame",
-              "id": "iPk8C",
+              "id": "uOEtg",
               "name": "Frame",
               "width": "fill_container",
               "padding": [
@@ -13584,17 +13921,17 @@
               "children": [
                 {
                   "type": "frame",
-                  "id": "HI07n",
+                  "id": "VxWBW",
                   "width": 36,
                   "height": 5,
-                  "fill": "#d1d5db",
-                  "cornerRadius": 999
+                  "fill": "$gray-300",
+                  "cornerRadius": "$radius-full"
                 }
               ]
             },
             {
               "type": "frame",
-              "id": "pjTFB",
+              "id": "lIg2t",
               "width": "fill_container",
               "layout": "vertical",
               "gap": 12,
@@ -13607,154 +13944,154 @@
               "children": [
                 {
                   "type": "text",
-                  "id": "TVXYK",
-                  "fill": "#111827",
+                  "id": "QTjWr",
+                  "fill": "$foreground",
                   "content": "Selecionar localizacao",
                   "lineHeight": 1.2,
-                  "fontFamily": "Oswald",
-                  "fontSize": 22,
+                  "fontFamily": "$font-heading",
+                  "fontSize": "$text-h2",
                   "fontWeight": "600"
                 },
                 {
                   "type": "frame",
-                  "id": "t5KbZa",
+                  "id": "t1WolI",
                   "width": "fill_container",
-                  "fill": "#ecf1db",
-                  "cornerRadius": 12,
-                  "stroke": "#333c12",
+                  "fill": "$lime-100",
+                  "cornerRadius": "$radius-lg",
+                  "stroke": "$primary",
                   "gap": 12,
                   "padding": 12,
                   "children": [
                     {
                       "type": "frame",
-                      "id": "ftTBj",
+                      "id": "VVWQ3",
                       "width": 40,
                       "height": 40,
-                      "fill": "#333c12",
-                      "cornerRadius": 8,
+                      "fill": "$primary",
+                      "cornerRadius": "$radius-md",
                       "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "icon",
-                          "id": "s307x",
+                          "id": "tOvRs",
                           "name": "locate",
                           "width": 14,
                           "height": 14,
                           "library": "lucide",
-                          "fill": "#ffffff"
+                          "fill": "$white"
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "x3yV6",
+                      "id": "LYszL",
                       "width": "fill_container",
                       "layout": "vertical",
                       "gap": 4,
                       "children": [
                         {
                           "type": "text",
-                          "id": "M9r3O",
-                          "fill": "#111827",
+                          "id": "Ql8DN",
+                          "fill": "$foreground",
                           "content": "Localizacao atual",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 13,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body-sm",
                           "fontWeight": "600"
                         },
                         {
                           "type": "text",
-                          "id": "YESY5",
-                          "fill": "#6b7280",
+                          "id": "BiBi9",
+                          "fill": "$muted-foreground",
                           "content": "Av. Paulista, 1000 - Bela Vista, Sao Paulo, SP",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 11,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
                           "fontWeight": "normal"
                         },
                         {
                           "type": "text",
-                          "id": "v0yi4d",
-                          "fill": "#9ca3af",
+                          "id": "fkRFQ",
+                          "fill": "$gray-400",
                           "content": "-23.561737  -46.655611",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 11,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
                           "fontWeight": "normal"
                         }
                       ]
                     },
                     {
                       "type": "icon",
-                      "id": "Mpr2f",
+                      "id": "KdD0P",
                       "name": "check",
                       "width": 16,
                       "height": 16,
                       "library": "lucide",
-                      "fill": "#333c12"
+                      "fill": "$primary"
                     }
                   ]
                 },
                 {
                   "type": "frame",
-                  "id": "V0rKT",
+                  "id": "yK6jb",
                   "width": "fill_container",
-                  "fill": "#f9fafb",
-                  "cornerRadius": 12,
+                  "fill": "$gray-50",
+                  "cornerRadius": "$radius-lg",
                   "gap": 12,
                   "padding": 12,
                   "children": [
                     {
                       "type": "frame",
-                      "id": "N5hwOW",
+                      "id": "KvrPC",
                       "width": 40,
                       "height": 40,
-                      "fill": "#374151",
-                      "cornerRadius": 8,
+                      "fill": "$gray-700",
+                      "cornerRadius": "$radius-md",
                       "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "icon",
-                          "id": "L7b8y2",
+                          "id": "H507W",
                           "name": "map-pin",
                           "width": 14,
                           "height": 14,
                           "library": "lucide",
-                          "fill": "#ffffff"
+                          "fill": "$white"
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "ShnuP",
+                      "id": "NI3DG",
                       "width": "fill_container",
                       "layout": "vertical",
                       "gap": 4,
                       "children": [
                         {
                           "type": "text",
-                          "id": "S3PQ5",
-                          "fill": "#111827",
+                          "id": "N1pgf",
+                          "fill": "$foreground",
                           "content": "Endereco do perfil",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 13,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body-sm",
                           "fontWeight": "600"
                         },
                         {
                           "type": "text",
-                          "id": "N1Gvwy",
-                          "fill": "#6b7280",
+                          "id": "pWvM6",
+                          "fill": "$muted-foreground",
                           "content": "Rua Augusta, 500 - Consolacao, Sao Paulo, SP",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 11,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
                           "fontWeight": "normal"
                         },
                         {
                           "type": "text",
-                          "id": "HmpMC",
-                          "fill": "#9ca3af",
+                          "id": "EcSpe",
+                          "fill": "$gray-400",
                           "content": "-23.556789  -46.654321",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 11,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
                           "fontWeight": "normal"
                         }
                       ]
@@ -13767,12 +14104,11 @@
         },
         {
           "type": "frame",
-          "id": "ef2ii",
+          "id": "qGwO6",
           "name": "BusinessHours BottomSheet",
           "context": "BottomSheet de horarios — src/components/market/business-hours-bottom-sheet.tsx. Lista completa de horarios por dia da semana.",
           "width": 430,
-          "height": 660,
-          "fill": "#ffffff",
+          "fill": "$white",
           "cornerRadius": [
             20,
             20,
@@ -13785,7 +14121,7 @@
           "children": [
             {
               "type": "frame",
-              "id": "ne46t",
+              "id": "ag0VY",
               "name": "Frame",
               "width": "fill_container",
               "padding": [
@@ -13796,17 +14132,17 @@
               "children": [
                 {
                   "type": "frame",
-                  "id": "ICd9i",
+                  "id": "Jtut0",
                   "width": 36,
                   "height": 5,
-                  "fill": "#d1d5db",
-                  "cornerRadius": 999
+                  "fill": "$gray-300",
+                  "cornerRadius": "$radius-full"
                 }
               ]
             },
             {
               "type": "frame",
-              "id": "YOfmJ",
+              "id": "pGQuB",
               "width": "fill_container",
               "layout": "vertical",
               "gap": 24,
@@ -13818,38 +14154,49 @@
               ],
               "children": [
                 {
-                  "type": "text",
-                  "id": "DPThM",
-                  "fill": "#111827",
-                  "content": "Horarios de funcionamento",
-                  "lineHeight": 1.2,
-                  "fontFamily": "Oswald",
-                  "fontSize": 24,
-                  "fontWeight": "600"
-                },
-                {
-                  "type": "text",
-                  "id": "Hj4WW",
-                  "fill": "#6b7280",
-                  "content": "Confira os horarios para planejar sua visita. O dia atual aparece destacado.",
-                  "lineHeight": 1.45,
-                  "fontFamily": "Space Grotesk",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
+                  "type": "frame",
+                  "id": "pjCp4",
+                  "name": "Frame",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "UFgkZ",
+                      "fill": "$foreground",
+                      "content": "Horarios de funcionamento",
+                      "lineHeight": 1.2,
+                      "fontFamily": "$font-heading",
+                      "fontSize": "$text-h2",
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "OuXz9",
+                      "fill": "$muted-foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Confira os horarios para planejar sua visita. O dia atual aparece destacado.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-body-sm",
+                      "fontWeight": "normal"
+                    }
+                  ]
                 },
                 {
                   "type": "frame",
-                  "id": "dbO0n",
+                  "id": "DKP73",
                   "width": "fill_container",
                   "layout": "vertical",
                   "gap": 10,
                   "children": [
                     {
                       "type": "frame",
-                      "id": "DV5Nd",
+                      "id": "PoY8P",
                       "width": "fill_container",
                       "fill": "$gray-100",
-                      "cornerRadius": 10,
+                      "cornerRadius": "$radius-lg",
                       "padding": [
                         14,
                         16
@@ -13859,36 +14206,36 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "qti7T",
-                          "fill": "#111827",
+                          "id": "d0znUK",
+                          "fill": "$foreground",
                           "content": "Segunda-feira",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 15,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body",
                           "fontWeight": "600"
                         },
                         {
                           "type": "frame",
-                          "id": "I0CWXu",
+                          "id": "wz99S",
                           "layout": "vertical",
                           "gap": 2,
                           "alignItems": "end",
                           "children": [
                             {
                               "type": "text",
-                              "id": "fZbgL",
-                              "fill": "#374151",
+                              "id": "yafyL",
+                              "fill": "$gray-700",
                               "content": "08:00 - 12:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             },
                             {
                               "type": "text",
-                              "id": "K8Hey7",
-                              "fill": "#374151",
+                              "id": "jjK7P",
+                              "fill": "$gray-700",
                               "content": "13:00 - 18:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -13897,11 +14244,11 @@
                     },
                     {
                       "type": "frame",
-                      "id": "SDd1V",
+                      "id": "RDfsY",
                       "width": "fill_container",
-                      "fill": "#f7f9f0",
-                      "cornerRadius": 10,
-                      "stroke": "#333c12",
+                      "fill": "$lime-50",
+                      "cornerRadius": "$radius-lg",
+                      "stroke": "$primary",
                       "gap": 8,
                       "padding": [
                         14,
@@ -13912,44 +14259,43 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "eFg0R",
+                          "id": "PMhsV",
                           "name": "Frame",
-                          "width": "fit_content(79)",
                           "children": [
                             {
                               "type": "text",
-                              "id": "fVeoX",
-                              "fill": "#333c12",
+                              "id": "x1Ikl",
+                              "fill": "$primary",
                               "content": "Terca-feira",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 15,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body",
                               "fontWeight": "700"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "d4Wa7",
+                          "id": "komXm",
                           "layout": "vertical",
                           "gap": 2,
                           "alignItems": "end",
                           "children": [
                             {
                               "type": "text",
-                              "id": "OcTsT",
-                              "fill": "#374151",
+                              "id": "Rh6BE",
+                              "fill": "$gray-700",
                               "content": "08:00 - 12:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             },
                             {
                               "type": "text",
-                              "id": "iGRdZ",
-                              "fill": "#374151",
+                              "id": "tEoZP",
+                              "fill": "$gray-700",
                               "content": "13:00 - 18:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -13958,10 +14304,10 @@
                     },
                     {
                       "type": "frame",
-                      "id": "D5OY5Z",
+                      "id": "Kagr7",
                       "width": "fill_container",
                       "fill": "$gray-100",
-                      "cornerRadius": 10,
+                      "cornerRadius": "$radius-lg",
                       "padding": [
                         14,
                         16
@@ -13971,36 +14317,36 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "HXX5g",
-                          "fill": "#111827",
+                          "id": "tip4v",
+                          "fill": "$foreground",
                           "content": "Quarta-feira",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 15,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body",
                           "fontWeight": "600"
                         },
                         {
                           "type": "frame",
-                          "id": "vKaLY",
+                          "id": "FGVtr",
                           "layout": "vertical",
                           "gap": 2,
                           "alignItems": "end",
                           "children": [
                             {
                               "type": "text",
-                              "id": "Y4YUL",
-                              "fill": "#374151",
+                              "id": "Dy7Y1",
+                              "fill": "$gray-700",
                               "content": "08:00 - 12:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             },
                             {
                               "type": "text",
-                              "id": "k0vSL3",
-                              "fill": "#374151",
+                              "id": "q879ny",
+                              "fill": "$gray-700",
                               "content": "13:00 - 18:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -14009,10 +14355,10 @@
                     },
                     {
                       "type": "frame",
-                      "id": "Y2uyo",
+                      "id": "SvZpU",
                       "width": "fill_container",
                       "fill": "$gray-100",
-                      "cornerRadius": 10,
+                      "cornerRadius": "$radius-lg",
                       "padding": [
                         14,
                         16
@@ -14022,36 +14368,36 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "HE37H",
-                          "fill": "#111827",
+                          "id": "nhm9m",
+                          "fill": "$foreground",
                           "content": "Quinta-feira",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 15,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body",
                           "fontWeight": "600"
                         },
                         {
                           "type": "frame",
-                          "id": "qctU1",
+                          "id": "J7GV7E",
                           "layout": "vertical",
                           "gap": 2,
                           "alignItems": "end",
                           "children": [
                             {
                               "type": "text",
-                              "id": "KiyLb",
-                              "fill": "#374151",
+                              "id": "Q0BhLD",
+                              "fill": "$gray-700",
                               "content": "08:00 - 12:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             },
                             {
                               "type": "text",
-                              "id": "u7r0c",
-                              "fill": "#374151",
+                              "id": "E44Fa",
+                              "fill": "$gray-700",
                               "content": "13:00 - 18:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -14060,10 +14406,10 @@
                     },
                     {
                       "type": "frame",
-                      "id": "A8mcWU",
+                      "id": "Ktq54",
                       "width": "fill_container",
                       "fill": "$gray-100",
-                      "cornerRadius": 10,
+                      "cornerRadius": "$radius-lg",
                       "padding": [
                         14,
                         16
@@ -14073,36 +14419,36 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "myms8",
-                          "fill": "#111827",
+                          "id": "D6TiwA",
+                          "fill": "$foreground",
                           "content": "Sexta-feira",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 15,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body",
                           "fontWeight": "600"
                         },
                         {
                           "type": "frame",
-                          "id": "S1EWz",
+                          "id": "GjoNH",
                           "layout": "vertical",
                           "gap": 2,
                           "alignItems": "end",
                           "children": [
                             {
                               "type": "text",
-                              "id": "NDSEg",
-                              "fill": "#374151",
+                              "id": "G6Uutl",
+                              "fill": "$gray-700",
                               "content": "08:00 - 12:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             },
                             {
                               "type": "text",
-                              "id": "oNKFH",
-                              "fill": "#374151",
+                              "id": "vjGXk",
+                              "fill": "$gray-700",
                               "content": "13:00 - 18:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -14111,11 +14457,11 @@
                     },
                     {
                       "type": "frame",
-                      "id": "rQxzP",
+                      "id": "KLLX4",
                       "width": "fill_container",
                       "height": 64,
                       "fill": "$gray-100",
-                      "cornerRadius": 10,
+                      "cornerRadius": "$radius-lg",
                       "padding": [
                         14,
                         16
@@ -14125,27 +14471,27 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "a5TgB",
-                          "fill": "#111827",
+                          "id": "BoIqO",
+                          "fill": "$foreground",
                           "content": "Sabado",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 15,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body",
                           "fontWeight": "600"
                         },
                         {
                           "type": "frame",
-                          "id": "ayKTw",
+                          "id": "RKBSH",
                           "layout": "vertical",
                           "gap": 2,
                           "alignItems": "end",
                           "children": [
                             {
                               "type": "text",
-                              "id": "v4Ycj",
-                              "fill": "#374151",
+                              "id": "ZSwI0",
+                              "fill": "$gray-700",
                               "content": "08:00 - 12:00",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -14154,12 +14500,12 @@
                     },
                     {
                       "type": "frame",
-                      "id": "sYlb0",
+                      "id": "W3XXlJ",
                       "width": "fill_container",
                       "height": 64,
-                      "fill": "#fafafa",
-                      "cornerRadius": 10,
-                      "stroke": "#e5e7eb",
+                      "fill": "$gray-50",
+                      "cornerRadius": "$radius-lg",
+                      "stroke": "$border",
                       "padding": [
                         14,
                         16
@@ -14169,14 +14515,15 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "J5C6Lf",
-                          "fill": "#9ca3af",
+                          "id": "A9hmv",
+                          "fill": "$gray-400",
                           "content": "Domingo",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 15
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body",
+                          "fontWeight": "normal"
                         },
                         {
-                          "id": "B2igba",
+                          "id": "ppKzt",
                           "type": "ref",
                           "ref": "hNp9X",
                           "name": "Badge destructive",
@@ -14193,13 +14540,6 @@
                       ]
                     }
                   ]
-                },
-                {
-                  "type": "ellipse",
-                  "id": "MSgtB",
-                  "fill": "#CCCCCC",
-                  "width": 1,
-                  "height": 3
                 }
               ]
             }
@@ -14207,12 +14547,12 @@
         },
         {
           "type": "frame",
-          "id": "KmkTn",
+          "id": "CmC29",
           "name": "Filter BottomSheet",
           "context": "BottomSheet de filtros — filtros de busca, categoria e raio para a listagem do market.",
           "width": 430,
           "height": 520,
-          "fill": "#ffffff",
+          "fill": "$white",
           "cornerRadius": [
             20,
             20,
@@ -14224,7 +14564,7 @@
           "children": [
             {
               "type": "frame",
-              "id": "ePmDI",
+              "id": "o363Rk",
               "name": "Frame",
               "width": "fill_container",
               "padding": [
@@ -14235,17 +14575,17 @@
               "children": [
                 {
                   "type": "frame",
-                  "id": "dIjhR",
+                  "id": "s1wXE",
                   "width": 36,
                   "height": 5,
-                  "fill": "#d1d5db",
-                  "cornerRadius": 999
+                  "fill": "$gray-300",
+                  "cornerRadius": "$radius-full"
                 }
               ]
             },
             {
               "type": "frame",
-              "id": "tPrZo",
+              "id": "wKbAS",
               "width": "fill_container",
               "layout": "vertical",
               "gap": 16,
@@ -14258,93 +14598,64 @@
               "children": [
                 {
                   "type": "text",
-                  "id": "W1Lesw",
-                  "fill": "#111827",
+                  "id": "p1lkz7",
+                  "fill": "$foreground",
                   "content": "Filtros",
-                  "fontFamily": "Oswald",
-                  "fontSize": 22,
+                  "fontFamily": "$font-heading",
+                  "fontSize": "$text-h2",
                   "fontWeight": "600"
                 },
                 {
-                  "type": "frame",
-                  "id": "ut6Gl",
+                  "id": "BMnn9",
+                  "type": "ref",
+                  "ref": "PYFm3",
+                  "name": "Input filled",
                   "width": "fill_container",
-                  "layout": "vertical",
-                  "gap": 8,
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "y9MBp",
-                      "fill": "#111827",
-                      "content": "Busca",
-                      "fontFamily": "Space Grotesk",
-                      "fontSize": 13,
-                      "fontWeight": "500"
+                  "x": 16,
+                  "y": 57,
+                  "descendants": {
+                    "rTGHR": {
+                      "content": "Busca"
                     },
-                    {
-                      "type": "frame",
-                      "id": "vMMMo",
-                      "width": "fill_container",
-                      "height": 42,
-                      "fill": "#ffffff",
-                      "cornerRadius": 8,
-                      "stroke": "#e5e7eb",
-                      "gap": 8,
-                      "padding": [
-                        0,
-                        12
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "tzUW5",
-                          "name": "search",
-                          "width": 16,
-                          "height": 16,
-                          "library": "lucide",
-                          "fill": "#9ca3af"
-                        },
-                        {
-                          "type": "text",
-                          "id": "c42idO",
-                          "fill": "#6b7280",
-                          "content": "Empresas, residuos ou servicos",
-                          "fontFamily": "Space Grotesk",
-                          "fontSize": 13,
-                          "fontWeight": "normal"
-                        }
-                      ]
+                    "dlth5": {
+                      "enabled": false
+                    },
+                    "WLFwn": {
+                      "content": "Garrafa plástica",
+                      "fill": "$foreground"
+                    },
+                    "FAMgV": {
+                      "enabled": false
                     }
-                  ]
+                  }
                 },
                 {
                   "type": "frame",
-                  "id": "aCHJb",
+                  "id": "QO6CF",
                   "width": "fill_container",
                   "layout": "vertical",
                   "gap": 8,
                   "children": [
                     {
                       "type": "text",
-                      "id": "NTbFp",
-                      "fill": "#111827",
+                      "id": "idsDO",
+                      "fill": "$foreground",
                       "content": "Categoria",
-                      "fontFamily": "Space Grotesk",
-                      "fontSize": 13,
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-label",
                       "fontWeight": "500"
                     },
                     {
                       "type": "frame",
-                      "id": "DgWiS",
+                      "id": "fSv7T",
                       "width": "fill_container",
                       "gap": 8,
                       "children": [
                         {
                           "type": "frame",
-                          "id": "vfbyr",
-                          "fill": "#333c12",
-                          "cornerRadius": 8,
+                          "id": "dXNtw",
+                          "fill": "$primary",
+                          "cornerRadius": "$radius-md",
                           "padding": [
                             8,
                             16
@@ -14354,20 +14665,20 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "ugKYQ",
-                              "fill": "#ffffff",
+                              "id": "a2APO",
+                              "fill": "$white",
                               "content": "Residuos",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "MPxYP",
-                          "fill": "#f3f4f6",
-                          "cornerRadius": 8,
+                          "id": "slIKx",
+                          "fill": "$gray-100",
+                          "cornerRadius": "$radius-md",
                           "padding": [
                             8,
                             16
@@ -14377,11 +14688,11 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "DCZpj",
-                              "fill": "#374151",
+                              "id": "V9ud3",
+                              "fill": "$gray-700",
                               "content": "Servicos",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -14392,31 +14703,35 @@
                 },
                 {
                   "type": "frame",
-                  "id": "nskUu",
+                  "id": "wreds",
                   "width": "fill_container",
                   "layout": "vertical",
                   "gap": 8,
+                  "padding": [
+                    "$radius-sm",
+                    0
+                  ],
                   "children": [
                     {
                       "type": "text",
-                      "id": "GwDnH",
-                      "fill": "#111827",
+                      "id": "aCAD2",
+                      "fill": "$foreground",
                       "content": "Raio",
-                      "fontFamily": "Space Grotesk",
-                      "fontSize": 13,
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-label",
                       "fontWeight": "500"
                     },
                     {
                       "type": "frame",
-                      "id": "H3JuX",
+                      "id": "NwDGG",
                       "width": "fill_container",
                       "gap": 8,
                       "children": [
                         {
                           "type": "frame",
-                          "id": "I6kMIT",
-                          "fill": "#333c12",
-                          "cornerRadius": 8,
+                          "id": "m0VEuc",
+                          "fill": "$primary",
+                          "cornerRadius": "$radius-md",
                           "padding": [
                             8,
                             16
@@ -14426,20 +14741,20 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "uhd5N",
-                              "fill": "#ffffff",
+                              "id": "XlRRi",
+                              "fill": "$white",
                               "content": "2 km",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "eUfaY",
-                          "fill": "#f3f4f6",
-                          "cornerRadius": 8,
+                          "id": "J6FCJ7",
+                          "fill": "$gray-100",
+                          "cornerRadius": "$radius-md",
                           "padding": [
                             8,
                             16
@@ -14449,20 +14764,20 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "qUJ8X",
-                              "fill": "#374151",
+                              "id": "ZTpuj",
+                              "fill": "$gray-700",
                               "content": "5 km",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "TqLhq",
-                          "fill": "#f3f4f6",
-                          "cornerRadius": 8,
+                          "id": "gZPS0",
+                          "fill": "$gray-100",
+                          "cornerRadius": "$radius-md",
                           "padding": [
                             8,
                             16
@@ -14472,20 +14787,20 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "gHnhy",
-                              "fill": "#374151",
+                              "id": "moH8B",
+                              "fill": "$gray-700",
                               "content": "10 km",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "XwlmJ",
-                          "fill": "#f3f4f6",
-                          "cornerRadius": 8,
+                          "id": "KjvQv",
+                          "fill": "$gray-100",
+                          "cornerRadius": "$radius-md",
                           "padding": [
                             8,
                             16
@@ -14495,20 +14810,20 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "h2VClc",
-                              "fill": "#374151",
+                              "id": "pQH5A",
+                              "fill": "$gray-700",
                               "content": "20 km",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "D0FXK",
-                          "fill": "#f3f4f6",
-                          "cornerRadius": 8,
+                          "id": "MdacG",
+                          "fill": "$gray-100",
+                          "cornerRadius": "$radius-md",
                           "padding": [
                             8,
                             16
@@ -14518,11 +14833,11 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "MjapA",
-                              "fill": "#374151",
+                              "id": "ZgAU5",
+                              "fill": "$gray-700",
                               "content": "30 km",
-                              "fontFamily": "Space Grotesk",
-                              "fontSize": 13,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
                               "fontWeight": "500"
                             }
                           ]
@@ -14533,21 +14848,21 @@
                 },
                 {
                   "type": "frame",
-                  "id": "gbLJk",
+                  "id": "qOWuZ",
                   "width": "fill_container",
                   "height": 44,
-                  "fill": "#333c12",
-                  "cornerRadius": 8,
+                  "fill": "$primary",
+                  "cornerRadius": "$radius-md",
                   "justifyContent": "center",
                   "alignItems": "center",
                   "children": [
                     {
                       "type": "text",
-                      "id": "bXuY0",
-                      "fill": "#ffffff",
+                      "id": "X3lhju",
+                      "fill": "$white",
                       "content": "Aplicar filtros",
-                      "fontFamily": "Space Grotesk",
-                      "fontSize": 15,
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-button",
                       "fontWeight": "600"
                     }
                   ]
@@ -14558,63 +14873,63 @@
         },
         {
           "type": "frame",
-          "id": "nvyA8",
+          "id": "K3Mq4b",
           "name": "Geolocation Permission Modal",
           "context": "Modal de permissao de geolocalizacao — src/contexts/geospatial-context.tsx. Exibido quando o usuario nega permissao de localizacao.",
           "width": 430,
           "height": 932,
-          "fill": "#00000033",
+          "fill": "$black",
           "layout": "vertical",
           "justifyContent": "center",
           "alignItems": "center",
           "children": [
             {
               "type": "frame",
-              "id": "ts5sF",
+              "id": "e8Wd6M",
               "width": 398,
-              "fill": "#ffffff",
-              "cornerRadius": 16,
+              "fill": "$white",
+              "cornerRadius": "$radius-xl",
               "layout": "vertical",
               "gap": 16,
               "padding": 24,
               "children": [
                 {
                   "type": "text",
-                  "id": "P9MVtL",
-                  "fill": "#111827",
+                  "id": "cCMjs",
+                  "fill": "$foreground",
                   "content": "Localizacao necessaria",
-                  "fontFamily": "Oswald",
-                  "fontSize": 18,
+                  "fontFamily": "$font-heading",
+                  "fontSize": "$text-h3",
                   "fontWeight": "600"
                 },
                 {
                   "type": "text",
-                  "id": "C3OyYz",
-                  "fill": "#6b7280",
+                  "id": "X3pJzK",
+                  "fill": "$muted-foreground",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "O aplicativo precisa de acesso a sua localizacao para funcionar corretamente. Habilite nas configuracoes do dispositivo.",
-                  "fontFamily": "Space Grotesk",
-                  "fontSize": 13,
+                  "fontFamily": "$font-body",
+                  "fontSize": "$text-body-sm",
                   "fontWeight": "normal"
                 },
                 {
                   "type": "frame",
-                  "id": "ZyEyg",
+                  "id": "OXEWn",
                   "width": "fill_container",
                   "height": 44,
-                  "fill": "#333c12",
-                  "cornerRadius": 8,
+                  "fill": "$primary",
+                  "cornerRadius": "$radius-md",
                   "justifyContent": "center",
                   "alignItems": "center",
                   "children": [
                     {
                       "type": "text",
-                      "id": "yyXeg",
-                      "fill": "#ffffff",
+                      "id": "fxG51",
+                      "fill": "$white",
                       "content": "Abrir configuracoes",
-                      "fontFamily": "Space Grotesk",
-                      "fontSize": 15,
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-button",
                       "fontWeight": "600"
                     }
                   ]
