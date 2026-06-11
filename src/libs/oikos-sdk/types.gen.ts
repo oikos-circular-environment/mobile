@@ -139,11 +139,11 @@ export type GetV1ProfilesResponses = {
 	 */
 	200: {
 		profile: {
+			id: string;
 			user_id: string;
 			full_name: string;
 			display_name: string;
 			phone: string;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 			address: {
@@ -237,11 +237,11 @@ export type PutV1ProfilesResponses = {
 	 */
 	200: {
 		profile: {
+			id: string;
 			user_id: string;
 			full_name: string;
 			display_name: string;
 			phone: string;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 			address: {
@@ -3146,32 +3146,32 @@ export type GetV1MarketResponses = {
 			services: Array<{
 				id: string;
 				name: string;
-				description: string | null;
 				price: number;
 				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 				waste_category_id: string;
+				quantity: number;
+				description: string | null;
+				observations: string | null;
 				waste_category: {
 					id: string;
 					name: string;
 					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 				};
-				quantity: number;
-				observations: string | null;
 			}>;
 			wastes: Array<{
 				id: string;
 				name: string;
-				description: string | null;
 				price: number;
 				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 				waste_category_id: string;
+				quantity: number;
+				description: string | null;
+				observations: string | null;
 				waste_category: {
 					id: string;
 					name: string;
 					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
 				};
-				quantity: number;
-				observations: string | null;
 			}>;
 			business_hours: Array<{
 				id: string;

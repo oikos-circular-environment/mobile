@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { WasteCategory } from "@/components/companies/hooks/use-waste-categories";
+import type { WasteCategory } from "@/libs/types/waste-category";
 
 interface WasteCategoryContextValue {
 	categories: WasteCategory[];

@@ -4,9 +4,13 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import type {
+	WasteCategoryHazardLevel,
+	WasteCategorySubcategory,
+} from "@/libs/types/waste-category";
 import { useWasteCategoryContext } from "./context";
 import { WasteCategoryCaption } from "./waste-category-caption";
-import { WasteCategoryHazardLevel } from "./waste-category-hazard-level";
+import { WasteCategoryHazardLevel as WasteCategoryHazardLevelComponent } from "./waste-category-hazard-level";
 import { WasteCategorySubcategoryCard } from "./waste-category-subcategory-card";
 
 export function WasteCategoryContent() {
@@ -19,12 +23,14 @@ export function WasteCategoryContent() {
 			</Text>
 			<Card className="shadow-none gap-2">
 				<HStack className="gap-2">
-					{selectedWasteCategory?.hazard_levels.map(hazard_level => (
-						<WasteCategoryHazardLevel
-							key={`${selectedWasteCategory.id}-${hazard_level}`}
-							hazardLevel={hazard_level}
-						/>
-					))}
+					{selectedWasteCategory?.hazard_levels.map(
+						(hazard_level: WasteCategoryHazardLevel) => (
+							<WasteCategoryHazardLevelComponent
+								key={`${selectedWasteCategory.id}-${hazard_level}`}
+								hazardLevel={hazard_level}
+							/>
+						),
+					)}
 				</HStack>
 			</Card>
 
@@ -50,13 +56,15 @@ export function WasteCategoryContent() {
 				Itens incluídos
 			</Text>
 			{selectedWasteCategory?.subcategories
-				.filter(subItem => subItem.type === "INCLUDE")
-				.map(subItem => (
+				.filter(
+					(subItem: WasteCategorySubcategory) => subItem.type === "INCLUDE",
+				)
+				.map((subItem: WasteCategorySubcategory) => (
 					<WasteCategorySubcategoryCard key={subItem.id} subItem={subItem} />
 				))}
 
 			{selectedWasteCategory?.subcategories.some(
-				subItem => subItem.type === "EXCLUDE",
+				(subItem: WasteCategorySubcategory) => subItem.type === "EXCLUDE",
 			) && (
 				<Text size="sm" className="font-semibold text-muted-foreground">
 					Itens excluídos
@@ -64,8 +72,10 @@ export function WasteCategoryContent() {
 			)}
 
 			{selectedWasteCategory?.subcategories
-				.filter(subItem => subItem.type === "EXCLUDE")
-				.map(subItem => (
+				.filter(
+					(subItem: WasteCategorySubcategory) => subItem.type === "EXCLUDE",
+				)
+				.map((subItem: WasteCategorySubcategory) => (
 					<WasteCategorySubcategoryCard key={subItem.id} subItem={subItem} />
 				))}
 

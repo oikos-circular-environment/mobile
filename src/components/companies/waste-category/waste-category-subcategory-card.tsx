@@ -4,19 +4,11 @@ import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
+import type { WasteCategorySubcategory } from "@/libs/types/waste-category";
 import { WasteCategoryHazardLevel } from "./waste-category-hazard-level";
 
 export interface WasteCategorySubcategoryCardProps {
-	subItem: {
-		id: string;
-		name: string;
-		description: string | null;
-		observations: string | null;
-		hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
-		type: "INCLUDE" | "EXCLUDE";
-		created_at: Date;
-		category_id: string;
-	};
+	subItem: WasteCategorySubcategory;
 }
 
 export function WasteCategorySubcategoryCard({

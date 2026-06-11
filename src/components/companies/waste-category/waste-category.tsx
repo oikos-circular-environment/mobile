@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ViewProps } from "react-native";
-import type { WasteCategory as WasteCategoryModel } from "@/components/companies/hooks/use-waste-categories";
+import type { WasteCategory as WasteCategoryModel } from "@/libs/types/waste-category";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VStack } from "@/components/ui/vstack";

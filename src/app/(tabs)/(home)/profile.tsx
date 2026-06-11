@@ -229,8 +229,8 @@ export default function ProfileScreen() {
 					state: data.address.state,
 					state_code: data.address.state_code,
 					state_ibge_id: data.address.state_ibge_id,
-					latitude: data.address.latitude,
-					longitude: data.address.longitude,
+					latitude: data.address.latitude ?? 0,
+					longitude: data.address.longitude ?? 0,
 				},
 			};
 
@@ -277,6 +277,7 @@ export default function ProfileScreen() {
 						url: data.url,
 						file_name: data.file_name,
 						path: data.path,
+						created_at: data.created_at,
 					},
 				},
 			});

@@ -5,9 +5,10 @@ import {
 	MinusIcon,
 } from "lucide-react-native";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
+import type { WasteCategoryHazardLevel as HazardLevel } from "@/libs/types/waste-category";
 
 export interface WasteCategoryHazardLevelProps {
-	hazardLevel: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+	hazardLevel: HazardLevel;
 }
 
 export function WasteCategoryHazardLevel({

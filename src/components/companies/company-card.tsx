@@ -3,7 +3,7 @@ import { Image, Pressable, View } from "react-native";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { Badge, BadgeIcon, BadgeText } from "../ui/badge";
 
 interface CompanyCardProps {

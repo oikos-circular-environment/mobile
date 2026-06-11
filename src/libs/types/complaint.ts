@@ -10,12 +10,30 @@ import {
 	TractorIcon,
 	Trash2Icon,
 } from "lucide-react-native";
-import type { GetV1ComplaintsMapResponses } from "@/libs/oikos-sdk";
+import type {
+	GetV1ComplaintsMapResponses,
+	GetV1ComplaintsResponses,
+} from "@/libs/oikos-sdk";
 import type { ValueMapping } from "./value-mapping";
+
+// SDK-derived types
+export type Complaint =
+	GetV1ComplaintsResponses[200]["complaints"][number];
+export type ComplaintAttachment = Complaint["attachments"][number];
+export type ComplaintCategory = Complaint["categories"][number];
+export type ComplaintGeospatial = Complaint["geospatial"];
+export type ComplaintVoteCounts = Complaint["vote_counts"];
 
 export type MapComplaint =
 	GetV1ComplaintsMapResponses[200]["complaints"][number];
-// import type * as Location from "expo-location";
+
+// UI/domain types
+export type ComplaintStatus =
+	| "OPEN"
+	| "IN_PROGRESS"
+	| "RESOLVED"
+	| "REJECTED"
+	| "CANCELED";
 
 export type ComplaintType =
 	| "IRREGULAR_DISPOSAL"
@@ -84,17 +102,6 @@ export type ComplaintCapture = {
 	updated_at: string;
 };
 
-export type ComplaintStatus =
-	| "OPEN"
-	| "IN_PROGRESS"
-	| "RESOLVED"
-	| "REJECTED"
-	| "CANCELED";
-
-export type Complaint = ComplaintCapture & {
-	status: ComplaintStatus;
-};
-
 export const complaintStatuses: ValueMapping<ComplaintStatus>[] = [
 	{
 		value: "OPEN",
@@ -113,12 +120,12 @@ export const complaintStatuses: ValueMapping<ComplaintStatus>[] = [
 	},
 	{
 		value: "CANCELED",
-		label: "Aberto",
+		label: "Cancelado",
 		icon: ShieldXIcon,
 	},
 	{
 		value: "REJECTED",
-		label: "Aberto",
+		label: "Rejeitado",
 		icon: ShieldAlertIcon,
 	},
 ];
