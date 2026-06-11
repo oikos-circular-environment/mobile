@@ -7,7 +7,10 @@ import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
  */
 export type CompressionPreset = "evidence" | "avatar";
 
-const IMAGE_PRESETS: Record<CompressionPreset, { maxWidth: number; quality: number }> = {
+const IMAGE_PRESETS: Record<
+	CompressionPreset,
+	{ maxWidth: number; quality: number }
+> = {
 	evidence: { maxWidth: 1920, quality: 0.8 },
 	avatar: { maxWidth: 512, quality: 0.85 },
 };
@@ -66,5 +69,7 @@ export async function compressMedia(
 	mediaType: "photo" | "video",
 	preset: CompressionPreset = "evidence",
 ): Promise<string> {
-	return mediaType === "video" ? compressVideo(uri) : compressImage(uri, preset);
+	return mediaType === "video"
+		? compressVideo(uri)
+		: compressImage(uri, preset);
 }
