@@ -109,7 +109,9 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 
 	updateComplaint: (id, patch) =>
 		set(state => ({
-			complaints: state.complaints.map(c => (c.id === id ? { ...c, ...patch } : c)),
+			complaints: state.complaints.map(c =>
+				c.id === id ? { ...c, ...patch } : c,
+			),
 		})),
 
 	shiftComplaintStatus: (id, newStatus) => {
@@ -127,16 +129,24 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 			const dash = { ...state.dashboard };
 
 			if (oldStatus === "OPEN") dash.open = Math.max(0, (dash.open ?? 0) - 1);
-			else if (oldStatus === "IN_PROGRESS") dash.pending = Math.max(0, (dash.pending ?? 0) - 1);
-			else if (oldStatus === "RESOLVED") dash.resolved = Math.max(0, (dash.resolved ?? 0) - 1);
-			else if (oldStatus === "CANCELED") dash.canceled = Math.max(0, (dash.canceled ?? 0) - 1);
-			else if (oldStatus === "REJECTED") dash.rejected = Math.max(0, (dash.rejected ?? 0) - 1);
+			else if (oldStatus === "IN_PROGRESS")
+				dash.pending = Math.max(0, (dash.pending ?? 0) - 1);
+			else if (oldStatus === "RESOLVED")
+				dash.resolved = Math.max(0, (dash.resolved ?? 0) - 1);
+			else if (oldStatus === "CANCELED")
+				dash.canceled = Math.max(0, (dash.canceled ?? 0) - 1);
+			else if (oldStatus === "REJECTED")
+				dash.rejected = Math.max(0, (dash.rejected ?? 0) - 1);
 
 			if (newStatus === "OPEN") dash.open = (dash.open ?? 0) + 1;
-			else if (newStatus === "IN_PROGRESS") dash.pending = (dash.pending ?? 0) + 1;
-			else if (newStatus === "RESOLVED") dash.resolved = (dash.resolved ?? 0) + 1;
-			else if (newStatus === "CANCELED") dash.canceled = (dash.canceled ?? 0) + 1;
-			else if (newStatus === "REJECTED") dash.rejected = (dash.rejected ?? 0) + 1;
+			else if (newStatus === "IN_PROGRESS")
+				dash.pending = (dash.pending ?? 0) + 1;
+			else if (newStatus === "RESOLVED")
+				dash.resolved = (dash.resolved ?? 0) + 1;
+			else if (newStatus === "CANCELED")
+				dash.canceled = (dash.canceled ?? 0) + 1;
+			else if (newStatus === "REJECTED")
+				dash.rejected = (dash.rejected ?? 0) + 1;
 
 			return { complaints: updatedComplaints, dashboard: dash };
 		});
@@ -160,18 +170,24 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 	// ── Map Selection ──
 	selectedMapComplaint: null,
 
-	setSelectedMapComplaint: complaint => set({ selectedMapComplaint: complaint }),
+	setSelectedMapComplaint: complaint =>
+		set({ selectedMapComplaint: complaint }),
 
 	patchSelectedMapComplaintVoteCounts: ({ previousVote, nextVote }) =>
 		set(state => {
 			if (!state.selectedMapComplaint) return {};
 			const counts = { ...state.selectedMapComplaint.vote_counts };
-			if (previousVote === "RESOLVED") counts.resolved = Math.max(0, counts.resolved - 1);
-			if (previousVote === "NOT_RESOLVED") counts.not_resolved = Math.max(0, counts.not_resolved - 1);
+			if (previousVote === "RESOLVED")
+				counts.resolved = Math.max(0, counts.resolved - 1);
+			if (previousVote === "NOT_RESOLVED")
+				counts.not_resolved = Math.max(0, counts.not_resolved - 1);
 			if (nextVote === "RESOLVED") counts.resolved += 1;
 			if (nextVote === "NOT_RESOLVED") counts.not_resolved += 1;
 			return {
-				selectedMapComplaint: { ...state.selectedMapComplaint, vote_counts: counts },
+				selectedMapComplaint: {
+					...state.selectedMapComplaint,
+					vote_counts: counts,
+				},
 			};
 		}),
 

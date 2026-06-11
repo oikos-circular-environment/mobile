@@ -1,11 +1,11 @@
 import { create } from "zustand";
-import type { GetV1CompaniesResponses } from "@/libs/oikos-sdk";
-
-export type Company = GetV1CompaniesResponses[200]["companies"][number];
-export type CompanyAddress = Company["address"];
-export type CompanyBusinessHour = Company["business_hours"][number];
-export type CompanyService = Company["services"][number];
-export type CompanyWaste = Company["wastes"][number];
+import type {
+	Company,
+	CompanyAddress,
+	CompanyBusinessHour,
+	CompanyService,
+	CompanyWaste,
+} from "@/libs/types/companies";
 
 type CompanyBasicFields = Omit<
 	Company,
@@ -24,13 +24,10 @@ type CompaniesActions = {
 	updateAddress: (companyId: string, address: CompanyAddress) => void;
 	updateBusinessHours: (
 		companyId: string,
-		businessHours: Company["business_hours"],
+		businessHours: CompanyBusinessHour[],
 	) => void;
-	updateServices: (
-		companyId: string,
-		services: Company["services"],
-	) => void;
-	updateWastes: (companyId: string, wastes: Company["wastes"]) => void;
+	updateServices: (companyId: string, services: CompanyService[]) => void;
+	updateWastes: (companyId: string, wastes: CompanyWaste[]) => void;
 };
 
 export const useCompaniesStore = create<CompaniesState & CompaniesActions>(
