@@ -70,7 +70,9 @@ jest.mock("@/components/companies/waste-category", () => ({
 			<View>
 				<Pressable
 					testID="mock-select-category"
-					onPress={() => onSelectionChange({ id: "cat-1", name: "Recicláveis" })}
+					onPress={() =>
+						onSelectionChange({ id: "cat-1", name: "Recicláveis" })
+					}
 				/>
 				{children}
 			</View>

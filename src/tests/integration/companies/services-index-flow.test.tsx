@@ -217,9 +217,7 @@ describe("ServicesIndexScreen — integração", () => {
 		await waitFor(() =>
 			expect(mockSaveAsync).toHaveBeenCalledWith(
 				expect.objectContaining({
-					services: [
-						expect.objectContaining({ name: "Coleta de Orgânicos" }),
-					],
+					services: [expect.objectContaining({ name: "Coleta de Orgânicos" })],
 				}),
 			),
 		);

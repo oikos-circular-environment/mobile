@@ -30,9 +30,7 @@ jest.mock("@/components/ui/bottomsheet", () => {
 				}),
 				[isVisible],
 			);
-			return (
-				<MockCtx.Provider value={ctx}>{children}</MockCtx.Provider>
-			);
+			return <MockCtx.Provider value={ctx}>{children}</MockCtx.Provider>;
 		},
 		BottomSheetPortal: () => null,
 		BottomSheetBackdrop: RNView,
@@ -75,9 +73,7 @@ const defaultMarket = {
 	getCompanyById: jest.fn(),
 };
 
-function setupGeospatial(
-	overrides: Partial<typeof defaultGeospatial> = {},
-) {
+function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
 	jest.mocked(useGeospatial).mockReturnValue({
 		...defaultGeospatial,
 		...overrides,
@@ -139,8 +135,7 @@ describe("MarketListHeader", () => {
 
 	describe("botões de categoria", () => {
 		it("chama setAppliedFilters com category='waste' ao pressionar Resíduos", async () => {
-			const userEvent =
-				require("@testing-library/react-native").userEvent;
+			const userEvent = require("@testing-library/react-native").userEvent;
 			const user = userEvent.setup();
 			await renderHeader();
 
@@ -152,8 +147,7 @@ describe("MarketListHeader", () => {
 		});
 
 		it("chama setAppliedFilters com category='services' ao pressionar Serviços", async () => {
-			const userEvent =
-				require("@testing-library/react-native").userEvent;
+			const userEvent = require("@testing-library/react-native").userEvent;
 			const user = userEvent.setup();
 			await renderHeader();
 
@@ -165,8 +159,7 @@ describe("MarketListHeader", () => {
 		});
 
 		it("desativa categoria ao pressionar botão já ativo (2º clique)", async () => {
-			const userEvent =
-				require("@testing-library/react-native").userEvent;
+			const userEvent = require("@testing-library/react-native").userEvent;
 			const user = userEvent.setup();
 			await renderHeader();
 
@@ -182,8 +175,7 @@ describe("MarketListHeader", () => {
 		});
 
 		it("preserva o raio do contexto ao mudar categoria", async () => {
-			const userEvent =
-				require("@testing-library/react-native").userEvent;
+			const userEvent = require("@testing-library/react-native").userEvent;
 			const user = userEvent.setup();
 			setupMarket({
 				appliedFilters: { query: "", radius: "30000", category: undefined },

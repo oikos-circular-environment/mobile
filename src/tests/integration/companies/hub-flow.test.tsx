@@ -163,9 +163,7 @@ describe("CompanyHubScreen — integração", () => {
 			setupValidation({ general_registration: true });
 			await renderScreen();
 			expect(
-				screen.queryByText(
-					"Todos os dados obrigatórios devem ser preenchidos",
-				),
+				screen.queryByText("Todos os dados obrigatórios devem ser preenchidos"),
 			).toBeNull();
 		});
 	});
@@ -252,9 +250,7 @@ describe("CompanyHubScreen — integração", () => {
 			setupValidation(ALL_TRUE);
 			await renderScreen();
 			expect(
-				screen.queryByText(
-					"Todos os dados obrigatórios devem ser preenchidos",
-				),
+				screen.queryByText("Todos os dados obrigatórios devem ser preenchidos"),
 			).toBeNull();
 			expect(
 				screen.queryByText(
@@ -275,17 +271,13 @@ describe("CompanyHubScreen — integração", () => {
 	describe("status da empresa", () => {
 		it("exibe switch de status quando empresa está registrada", async () => {
 			await renderScreen();
-			expect(
-				screen.getByTestId("company-status-switch"),
-			).toBeOnTheScreen();
+			expect(screen.getByTestId("company-status-switch")).toBeOnTheScreen();
 		});
 
 		it("não exibe switch quando empresa não está registrada", async () => {
 			setupStore(null);
 			await renderScreen();
-			expect(
-				screen.queryByTestId("company-status-switch"),
-			).toBeNull();
+			expect(screen.queryByTestId("company-status-switch")).toBeNull();
 		});
 
 		it("toggle chama mutate com o novo valor", async () => {

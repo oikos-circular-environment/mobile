@@ -30,15 +30,9 @@ jest.mock("@/components/ui/bottomsheet", () => {
 				[isVisible],
 			);
 
-			return (
-				<MockCtx.Provider value={ctx}>{children}</MockCtx.Provider>
-			);
+			return <MockCtx.Provider value={ctx}>{children}</MockCtx.Provider>;
 		},
-		BottomSheetPortal: ({
-			children,
-		}: {
-			children: React.ReactNode;
-		}) => {
+		BottomSheetPortal: ({ children }: { children: React.ReactNode }) => {
 			const { isVisible } = ReactMock.useContext(MockCtx);
 			if (!isVisible) return null;
 			return <RNView>{children}</RNView>;
@@ -72,9 +66,7 @@ const defaultMarket = {
 	getCompanyById: jest.fn(),
 };
 
-function setupMarket(
-	overrides: Partial<typeof defaultMarket> = {},
-) {
+function setupMarket(overrides: Partial<typeof defaultMarket> = {}) {
 	jest.mocked(useMarket).mockReturnValue({
 		...defaultMarket,
 		...overrides,
@@ -112,8 +104,7 @@ describe("RadiusBottomSheet", () => {
 			expect(screen.queryByText("5 km")).not.toBeOnTheScreen();
 			expect(screen.queryByText("10 km")).not.toBeOnTheScreen();
 
-			const userEvent =
-				require("@testing-library/react-native").userEvent;
+			const userEvent = require("@testing-library/react-native").userEvent;
 			await userEvent.press(screen.getByText("2 km"));
 
 			// Options now visible
@@ -135,8 +126,7 @@ describe("RadiusBottomSheet", () => {
 			});
 			await renderSheet();
 
-			const userEvent =
-				require("@testing-library/react-native").userEvent;
+			const userEvent = require("@testing-library/react-native").userEvent;
 			await userEvent.press(screen.getByText("10 km"));
 
 			expect(
@@ -149,8 +139,7 @@ describe("RadiusBottomSheet", () => {
 		it("chama setAppliedFilters com o valor selecionado", async () => {
 			await renderSheet();
 
-			const userEvent =
-				require("@testing-library/react-native").userEvent;
+			const userEvent = require("@testing-library/react-native").userEvent;
 			await userEvent.press(screen.getByText("2 km"));
 			await userEvent.press(screen.getByText("10 km"));
 
@@ -162,8 +151,7 @@ describe("RadiusBottomSheet", () => {
 		it("fecha o bottom sheet após selecionar um raio", async () => {
 			await renderSheet();
 
-			const userEvent =
-				require("@testing-library/react-native").userEvent;
+			const userEvent = require("@testing-library/react-native").userEvent;
 			await userEvent.press(screen.getByText("2 km"));
 
 			expect(screen.getByText("5 km")).toBeOnTheScreen();

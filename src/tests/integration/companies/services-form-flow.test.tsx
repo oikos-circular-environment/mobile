@@ -70,7 +70,9 @@ jest.mock("@/components/companies/waste-category", () => ({
 			<View>
 				<Pressable
 					testID="mock-select-category"
-					onPress={() => onSelectionChange({ id: "cat-1", name: "Recicláveis" })}
+					onPress={() =>
+						onSelectionChange({ id: "cat-1", name: "Recicláveis" })
+					}
 				/>
 				{children}
 			</View>
@@ -171,9 +173,10 @@ describe("ServiceFormScreen — integração", () => {
 	it("modo criação exibe título de cadastro e campos vazios", async () => {
 		await renderScreen();
 		expect(screen.getByText("Cadastro de serviços")).toBeOnTheScreen();
-		expect(
-			screen.getByPlaceholderText("Ex.: Coleta de RCC"),
-		).toHaveProp("value", "");
+		expect(screen.getByPlaceholderText("Ex.: Coleta de RCC")).toHaveProp(
+			"value",
+			"",
+		);
 	});
 
 	it("modo edição exibe título de edição e campos pré-preenchidos", async () => {
@@ -183,9 +186,10 @@ describe("ServiceFormScreen — integração", () => {
 		});
 		await renderScreen();
 		expect(screen.getByText("Editar serviço")).toBeOnTheScreen();
-		expect(
-			screen.getByPlaceholderText("Ex.: Coleta de RCC"),
-		).toHaveProp("value", "Coleta de RCC");
+		expect(screen.getByPlaceholderText("Ex.: Coleta de RCC")).toHaveProp(
+			"value",
+			"Coleta de RCC",
+		);
 	});
 
 	it("botão de submit desabilitado quando nome está vazio", async () => {

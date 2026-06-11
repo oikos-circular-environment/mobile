@@ -160,19 +160,27 @@ describe("isCompanyOpenNow — lógica", () => {
 	});
 
 	it("retorna true exatamente na abertura (07:00)", () => {
-		expect(isCompanyOpenNow(thursdayOpen, new Date(2026, 5, 11, 7, 0, 0))).toBe(true);
+		expect(isCompanyOpenNow(thursdayOpen, new Date(2026, 5, 11, 7, 0, 0))).toBe(
+			true,
+		);
 	});
 
 	it("retorna true exatamente no fechamento (17:30)", () => {
-		expect(isCompanyOpenNow(thursdayOpen, new Date(2026, 5, 11, 17, 30, 0))).toBe(true);
+		expect(
+			isCompanyOpenNow(thursdayOpen, new Date(2026, 5, 11, 17, 30, 0)),
+		).toBe(true);
 	});
 
 	it("retorna false um minuto antes da abertura (06:59)", () => {
-		expect(isCompanyOpenNow(thursdayOpen, new Date(2026, 5, 11, 6, 59, 0))).toBe(false);
+		expect(
+			isCompanyOpenNow(thursdayOpen, new Date(2026, 5, 11, 6, 59, 0)),
+		).toBe(false);
 	});
 
 	it("retorna false um minuto após o fechamento (17:31)", () => {
-		expect(isCompanyOpenNow(thursdayOpen, new Date(2026, 5, 11, 17, 31, 0))).toBe(false);
+		expect(
+			isCompanyOpenNow(thursdayOpen, new Date(2026, 5, 11, 17, 31, 0)),
+		).toBe(false);
 	});
 
 	it("retorna false quando is_open=false mesmo com horário válido", () => {

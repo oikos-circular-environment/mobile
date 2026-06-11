@@ -3,10 +3,7 @@ import { render, screen, userEvent } from "@testing-library/react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CompanyAddressScreen from "@/app/(tabs)/(home)/companies/[companyId]/address";
 import { useSaveAddress } from "@/components/companies/hooks/use-save-address";
-import {
-	listIbgeMunicipios,
-	listIbgeUfs,
-} from "@/libs/brasil-api-sdk";
+import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
 
@@ -108,7 +105,9 @@ const mockCompany: Company = {
 };
 
 const mockRegiao = { id: 3, sigla: "SE", nome: "Sudeste" };
-const mockStates = [{ id: 35, sigla: "SP", nome: "São Paulo", regiao: mockRegiao }];
+const mockStates = [
+	{ id: 35, sigla: "SP", nome: "São Paulo", regiao: mockRegiao },
+];
 const mockCities = [{ nome: "São Paulo", codigo_ibge: "3550308" }];
 
 // ---------------------------------------------------------------------------
@@ -145,7 +144,11 @@ async function renderScreen() {
 describe("CompanyAddressScreen — componente", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
-		jest.mocked(useRouter).mockReturnValue({ back: jest.fn() } as unknown as ReturnType<typeof useRouter>);
+		jest
+			.mocked(useRouter)
+			.mockReturnValue({ back: jest.fn() } as unknown as ReturnType<
+				typeof useRouter
+			>);
 		jest
 			.mocked(useLocalSearchParams)
 			.mockReturnValue({ companyId: "company-1" });

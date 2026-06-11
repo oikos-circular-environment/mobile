@@ -3,22 +3,22 @@
  * Uses a Proxy so any SVG element tag (Path, Circle, G, etc.) used by lucide-react-native
  * returns a no-op component instead of undefined.
  */
-import React from 'react';
-import { View } from 'react-native';
+import React from "react";
+import { View } from "react-native";
 
 const SvgMock = ({ children }: { children?: React.ReactNode }) =>
-  React.createElement(View, null, children);
+	React.createElement(View, null, children);
 
 const NullComponent = () => null;
 
 const mock = new Proxy(
-  { Svg: SvgMock, default: SvgMock },
-  {
-    get(target, name: string) {
-      if (name in target) return target[name as keyof typeof target];
-      return NullComponent;
-    },
-  }
+	{ Svg: SvgMock, default: SvgMock },
+	{
+		get(target, name: string) {
+			if (name in target) return target[name as keyof typeof target];
+			return NullComponent;
+		},
+	},
 );
 
 export default mock;
@@ -38,7 +38,7 @@ export const Use = NullComponent;
 export const Image = NullComponent;
 export const ClipPath = NullComponent;
 export const Defs = ({ children }: { children?: React.ReactNode }) =>
-  React.createElement(View, null, children);
+	React.createElement(View, null, children);
 export const Symbol = NullComponent;
 export const Mask = NullComponent;
 export const LinearGradient = NullComponent;
