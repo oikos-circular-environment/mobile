@@ -10,8 +10,8 @@ import {
 } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, View } from "react-native";
-import type { FiltersBottomSheetRef } from "@/components/market/filters-bottom-sheet";
 import type { LocationSheetRef } from "@/components/market/location-source-select";
+import type { RadiusBottomSheetRef } from "@/components/market/radius-bottom-sheet";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -31,7 +31,7 @@ import {
 } from "@/contexts/market-context";
 
 interface MarketListHeaderProps {
-	filtersSheetRef: React.RefObject<FiltersBottomSheetRef | null>;
+	filtersSheetRef: React.RefObject<RadiusBottomSheetRef | null>;
 	locationSheetRef: React.RefObject<LocationSheetRef | null>;
 }
 

@@ -8,15 +8,15 @@ import {
 	Pressable,
 	View,
 } from "react-native";
-import {
-	FiltersBottomSheet,
-	type FiltersBottomSheetRef,
-} from "@/components/market/filters-bottom-sheet";
 import { MarketListHeader } from "@/components/market/list-header-market";
 import {
 	type LocationSheetRef,
 	LocationSourceSelect,
 } from "@/components/market/location-source-select";
+import {
+	RadiusBottomSheet,
+	type RadiusBottomSheetRef,
+} from "@/components/market/radius-bottom-sheet";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Grid, GridItem } from "@/components/ui/grid";
@@ -131,7 +131,7 @@ export default function MarketScreen() {
 	} = useMarket();
 
 	const locationSheetRef = useRef<LocationSheetRef>(null);
-	const filtersSheetRef = useRef<FiltersBottomSheetRef>(null);
+	const filtersSheetRef = useRef<RadiusBottomSheetRef>(null);
 
 	const rows = useMemo(() => {
 		const chunked: MarketCompany[][] = [];
@@ -250,7 +250,7 @@ export default function MarketScreen() {
 					/>
 
 					<LocationSourceSelect ref={locationSheetRef} hideTrigger />
-					<FiltersBottomSheet ref={filtersSheetRef} />
+					<RadiusBottomSheet ref={filtersSheetRef} />
 				</>
 			)}
 		</KeyboardAvoidingView>
