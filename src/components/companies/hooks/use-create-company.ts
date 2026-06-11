@@ -10,8 +10,7 @@ export function useCreateCompany() {
 	const addCompany = useCompaniesStore(s => s.addCompany);
 
 	return useMutation({
-		mutationFn: (body: CreateCompanyBody) =>
-			postV1Companies({ body }),
+		mutationFn: (body: CreateCompanyBody) => postV1Companies({ body }),
 		onSuccess: data => {
 			if (data.data?.company) {
 				addCompany(data.data.company);

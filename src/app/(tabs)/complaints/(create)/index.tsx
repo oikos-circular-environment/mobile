@@ -2,7 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as Crypto from "expo-crypto";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { AlertCircleIcon, Camera, ImageIcon, ShieldAlertIcon, X } from "lucide-react-native";
+import {
+	AlertCircleIcon,
+	Camera,
+	ImageIcon,
+	ShieldAlertIcon,
+	X,
+} from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {

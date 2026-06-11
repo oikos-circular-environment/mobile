@@ -7,11 +7,14 @@ import type { DraftAttachment } from "@/libs/types/complaint";
 
 export function useAttachmentRemove(complaintId: string | undefined) {
 	const { removeAttachment } = useComplaintCreation();
-	const [pendingDelete, setPendingDelete] = useState<DraftAttachment | null>(null);
+	const [pendingDelete, setPendingDelete] = useState<DraftAttachment | null>(
+		null,
+	);
 
 	const deleteMutation = useMutation({
 		mutationFn: (attachment: DraftAttachment) => {
-			if (!complaintId) throw new Error("complaintId required to delete API attachment");
+			if (!complaintId)
+				throw new Error("complaintId required to delete API attachment");
 			return deleteV1ComplaintsByIdAttachmentsByAttachmentId({
 				path: { id: complaintId, attachmentId: attachment.id },
 			});

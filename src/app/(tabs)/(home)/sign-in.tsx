@@ -1,6 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
-import { AlertCircleIcon, ArrowLeftIcon, Eye, EyeOff } from "lucide-react-native";
+import {
+	AlertCircleIcon,
+	ArrowLeftIcon,
+	Eye,
+	EyeOff,
+} from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {

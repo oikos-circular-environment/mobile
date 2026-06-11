@@ -8,7 +8,8 @@ import { CompanyListHeader } from "@/components/companies/company-list-header";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { type Company, useCompaniesStore } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function CompaniesListScreen() {
 	const router = useRouter();

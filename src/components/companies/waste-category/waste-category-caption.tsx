@@ -20,10 +20,7 @@ export function WasteCategoryCaption() {
 							variant="secondary"
 							className="gap-1 bg-red-50 border border-red-200"
 						>
-							<BadgeIcon
-								as={RadiationIcon}
-								className="text-red-600 stroke-3"
-							/>
+							<BadgeIcon as={RadiationIcon} className="text-red-600 stroke-3" />
 							<BadgeText className="text-red-600 font-semibold">RP</BadgeText>
 						</Badge>
 						<Box className="flex-1">

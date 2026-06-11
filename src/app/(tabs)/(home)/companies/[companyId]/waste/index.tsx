@@ -99,7 +99,11 @@ export default function WasteIndexScreen() {
 						</View>
 					</Card>
 
-					<Button testID="btn-new" className="w-full gap-2" onPress={handleCreate}>
+					<Button
+						testID="btn-new"
+						className="w-full gap-2"
+						onPress={handleCreate}
+					>
 						<PlusIcon size={16} color={colors.white} />
 						<ButtonText>Novo resíduo</ButtonText>
 					</Button>

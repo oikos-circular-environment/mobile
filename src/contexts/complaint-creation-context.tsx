@@ -23,7 +23,9 @@ const ComplaintCreationContext =
 
 export function ComplaintCreationProvider({ children }: PropsWithChildren) {
 	const [attachments, setAttachments] = useState<DraftAttachment[]>([]);
-	const [editingComplaint, setEditingComplaint] = useState<ApiComplaint | null>(null);
+	const [editingComplaint, setEditingComplaint] = useState<ApiComplaint | null>(
+		null,
+	);
 
 	const addAttachment = useCallback((attachment: DraftAttachment) => {
 		setAttachments(prev => [...prev, attachment]);

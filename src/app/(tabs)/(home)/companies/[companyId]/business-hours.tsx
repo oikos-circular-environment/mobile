@@ -17,17 +17,94 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { daysOfWeek, defaultBusinessHours } from "@/libs/types/business-hour";
+import { type DayOfWeek, daysOfWeek } from "@/libs/types/business-hour";
 import { useCompaniesStore } from "@/stores/companies-store";
 
-type DayOfWeek =
-	| "SUNDAY"
-	| "MONDAY"
-	| "TUESDAY"
-	| "WEDNESDAY"
-	| "THURSDAY"
-	| "FRIDAY"
-	| "SATURDAY";
+const defaultBusinessHours: BusinessHoursFormValues["businessHours"] = [
+	{
+		id: "0d900658-838a-4a33-ab8d-689dd79f0a5b",
+		dayOfWeek: "SUNDAY",
+		timeSlots: [],
+		is_open: false,
+	},
+	{
+		id: "0d900658-838a-4a33-ab8d-689dd79f0a5c",
+		dayOfWeek: "MONDAY",
+		timeSlots: [
+			{
+				id: "0d900658-838a-4a33-ab8d-689dd79f0a5c",
+				startTime: "07:00",
+				endTime: "11:00",
+			},
+			{
+				id: "0d900658-838a-4a33-ab8d-689dd79f0a5d",
+				startTime: "13:00",
+				endTime: "17:30",
+			},
+		],
+		is_open: false,
+	},
+	{
+		id: "0d900658-838a-4a33-ab8d-689dd79f0a5d",
+		dayOfWeek: "TUESDAY",
+		timeSlots: [
+			{
+				id: "0d900658-838a-4a33-ab8d-689dd79f0a5c",
+				startTime: "07:00",
+				endTime: "17:30",
+			},
+		],
+		is_open: false,
+	},
+	{
+		id: "0d900658-838a-4a33-ab8d-689dd79f0a5e",
+		dayOfWeek: "WEDNESDAY",
+		timeSlots: [
+			{
+				id: "0d900658-838a-4a33-ab8d-689dd79f0a5c",
+				startTime: "07:00",
+				endTime: "17:30",
+			},
+		],
+		is_open: false,
+	},
+	{
+		id: "0d900658-838a-4a33-ab8d-689dd79f0a5f",
+		dayOfWeek: "THURSDAY",
+		timeSlots: [
+			{
+				id: "0d900658-838a-4a33-ab8d-689dd79f0a5c",
+				startTime: "07:00",
+				endTime: "17:30",
+			},
+		],
+		is_open: false,
+	},
+	{
+		id: "0d900658-838a-4a33-ab8d-689dd79f0a5g",
+		dayOfWeek: "FRIDAY",
+		timeSlots: [
+			{
+				id: "0d900658-838a-4a33-ab8d-689dd79f0a5c",
+				startTime: "07:00",
+				endTime: "17:00",
+			},
+		],
+		is_open: false,
+	},
+	{
+		id: "0d900658-838a-4a33-ab8d-689dd79f0a5h",
+		dayOfWeek: "SATURDAY",
+		timeSlots: [
+			{
+				id: "0d900658-838a-4a33-ab8d-689dd79f0a5c",
+				startTime: "07:00",
+				endTime: "12:00",
+			},
+		],
+		is_open: false,
+	},
+];
 
 export default function CompanyBusinessHoursScreen() {
 	const router = useRouter();

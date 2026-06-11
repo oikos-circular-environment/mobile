@@ -92,7 +92,10 @@ export function useSubmitComplaints() {
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: COMPLAINTS_QUERY_KEY });
 			await queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
-			toast.success("Denúncia registrada", "Sua denúncia foi enviada com sucesso.");
+			toast.success(
+				"Denúncia registrada",
+				"Sua denúncia foi enviada com sucesso.",
+			);
 		},
 		onError: () => {
 			toast.error(

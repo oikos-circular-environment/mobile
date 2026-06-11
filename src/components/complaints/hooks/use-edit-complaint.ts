@@ -23,7 +23,12 @@ export function useEditComplaint() {
 	const { exitEditMode } = useComplaintCreation();
 
 	return useMutation({
-		mutationFn: async ({ id, geospatial, observations, newMedia }: EditComplaintPayload) => {
+		mutationFn: async ({
+			id,
+			geospatial,
+			observations,
+			newMedia,
+		}: EditComplaintPayload) => {
 			await patchV1ComplaintsById({
 				path: { id },
 				body: {
@@ -82,6 +87,7 @@ export function useEditComplaint() {
 			exitEditMode();
 			toast.success("Denúncia atualizada", "As alterações foram salvas.");
 		},
-		onError: () => toast.error("Erro", "Não foi possível atualizar a denúncia."),
+		onError: () =>
+			toast.error("Erro", "Não foi possível atualizar a denúncia."),
 	});
 }

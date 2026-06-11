@@ -1,278 +1,294 @@
 {
-  "meta": {
-    "id": "terms-of-use",
-    "version": "1.0.0",
-    "effectiveDate": "2026-06-05",
-    "lastUpdated": "2026-06-05"
-  },
-  "title": "Termos de Uso",
-  "intro": "Bem-vindo ao Oikos, plataforma colaborativa para a economia circular de resíduos. Ao criar uma conta ou utilizar o aplicativo, você concorda com os presentes Termos de Uso. Leia com atenção antes de prosseguir.",
-  "sections": [
-    {
-      "id": "aceitacao",
-      "title": "1. Aceitação dos Termos",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "Estes Termos de Uso regulam o acesso e a utilização da plataforma Oikos (aplicativo móvel e demais canais digitais), operada por [RAZÃO SOCIAL DA EMPRESA], CNPJ [CNPJ], doravante denominada 'Oikos'."
-        },
-        {
-          "type": "paragraph",
-          "text": "Ao se cadastrar ou utilizar qualquer funcionalidade do Oikos, o usuário declara ter lido, compreendido e aceito integralmente estes Termos, bem como a Política de Privacidade da plataforma."
-        },
-        {
-          "type": "highlight",
-          "text": "Se você não concorda com qualquer disposição destes Termos, não utilize a plataforma."
-        }
-      ]
-    },
-    {
-      "id": "definicoes",
-      "title": "2. Definições",
-      "blocks": [
-        {
-          "type": "list",
-          "style": "bullet",
-          "items": [
-            "Plataforma: o aplicativo Oikos e seus serviços digitais associados.",
-            "Usuário: toda pessoa física ou jurídica que acessa ou utiliza a plataforma.",
-            "Cidadão: usuário pessoa física que utiliza a plataforma para descarte, denúncia e consulta de informações ambientais.",
-            "Catador: usuário pessoa física que atua na coleta de resíduos recicláveis, de forma autônoma ou em cooperativa.",
-            "Empresa: usuário pessoa jurídica geradora ou processadora de resíduos.",
-            "Cooperativa: associação de catadores formalizada ou em processo de formalização.",
-            "Órgão Público: entidade vinculada ao poder público com funções de fiscalização, regulação ou gestão ambiental.",
-            "Marketplace: ambiente da plataforma destinado à negociação de resíduos entre usuários.",
-            "Denúncia: registro de descarte irregular de resíduos com evidências (foto, localização, data/hora).",
-            "Ecoponto: local físico cadastrado na plataforma para entrega de resíduos específicos.",
-            "Conteúdo do Usuário: fotos, textos, anúncios e demais informações inseridas pelo usuário na plataforma."
-          ]
-        }
-      ]
-    },
-    {
-      "id": "cadastro",
-      "title": "3. Cadastro e Perfis de Usuário",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "Para acessar as funcionalidades completas do Oikos, é necessário criar uma conta fornecendo informações verdadeiras, completas e atualizadas. O usuário é responsável pela veracidade dos dados informados."
-        },
-        {
-          "type": "paragraph",
-          "text": "A plataforma oferece os seguintes perfis de conta:"
-        },
-        {
-          "type": "table",
-          "headers": ["Perfil", "Requisitos", "Funcionalidades principais"],
-          "rows": [
-            ["Cidadão", "CPF e e-mail válidos", "Mapa de ecopontos, denúncia cidadã, educação ambiental"],
-            ["Catador", "CPF, e-mail e localização habitual de atuação", "Marketplace, rotas de coleta, pagamentos digitais"],
-            ["Empresa", "CNPJ, e-mail corporativo e responsável legal", "Marketplace, gestão de resíduos, documentos de conformidade"],
-            ["Órgão Público", "CNPJ do órgão e credencial funcional (validada pela equipe Oikos)", "Dashboards de governança, acesso a denúncias encaminhadas"]
-          ]
-        },
-        {
-          "type": "list",
-          "style": "bullet",
-          "items": [
-            "Cada usuário pode ter apenas uma conta ativa por CPF ou CNPJ.",
-            "É proibida a criação de contas em nome de terceiros sem autorização.",
-            "O usuário é o único responsável pela guarda de suas credenciais de acesso.",
-            "Suspeitas de acesso não autorizado devem ser comunicadas imediatamente a suporte@oikos.app."
-          ]
-        }
-      ]
-    },
-    {
-      "id": "marketplace",
-      "title": "4. Marketplace de Resíduos",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "O marketplace do Oikos é um ambiente de intermediação para a negociação de resíduos recicláveis entre catadores, cooperativas e empresas. O Oikos não é parte nas transações realizadas entre os usuários."
-        },
-        {
-          "type": "list",
-          "style": "bullet",
-          "items": [
-            "Os anúncios de resíduos devem ser precisos quanto a tipo, quantidade, condição e localização do material.",
-            "É proibido anunciar resíduos perigosos (Classe I conforme ABNT NBR 10.004) sem as devidas licenças ambientais.",
-            "O usuário vendedor/doador é responsável pela conformidade ambiental dos resíduos anunciados, incluindo a emissão de documentos exigidos por lei (MTR/SINIR, quando aplicável).",
-            "O Oikos não garante a conclusão de nenhuma negociação, a qualidade dos materiais anunciados ou a idoneidade dos usuários.",
-            "Avaliações e comentários devem ser baseados em experiências reais. Avaliações falsas resultam em suspensão da conta."
-          ]
-        }
-      ]
-    },
-    {
-      "id": "denuncia",
-      "title": "5. Denúncia Cidadã",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "A funcionalidade de denúncia permite que cidadãos registrem descartes irregulares de resíduos com foto, geolocalização e data/hora. As denúncias podem ser encaminhadas a órgãos públicos de fiscalização, conforme configuração da plataforma e legislação local."
-        },
-        {
-          "type": "list",
-          "style": "bullet",
-          "items": [
-            "As denúncias devem ser baseadas em fatos verídicos e evidências reais.",
-            "É expressamente proibido realizar denúncias falsas ou de má-fé contra terceiros.",
-            "As fotos e dados de localização das denúncias podem ser compartilhados com órgãos públicos competentes.",
-            "O Oikos não se responsabiliza pela ação ou omissão dos órgãos públicos em relação às denúncias encaminhadas.",
-            "O usuário denunciante pode acompanhar o status da denúncia na plataforma."
-          ]
-        },
-        {
-          "type": "highlight",
-          "text": "Denúncias falsas ou de má-fé configuram violação destes Termos e podem resultar em suspensão permanente da conta, além de eventuais responsabilidades civis e penais."
-        }
-      ]
-    },
-    {
-      "id": "conduta",
-      "title": "6. Obrigações e Conduta do Usuário",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "Ao utilizar o Oikos, o usuário se compromete a:"
-        },
-        {
-          "type": "list",
-          "style": "ordered",
-          "items": [
-            "Fornecer informações verdadeiras e mantê-las atualizadas.",
-            "Utilizar a plataforma somente para fins lícitos e relacionados à gestão, coleta ou negociação de resíduos.",
-            "Não praticar spam, phishing, scraping automatizado ou qualquer ataque à infraestrutura da plataforma.",
-            "Não inserir vírus, malware ou código malicioso.",
-            "Respeitar os direitos de terceiros, incluindo privacidade, propriedade intelectual e honra.",
-            "Não utilizar a plataforma para fins discriminatórios, difamatórios ou que violem a legislação brasileira.",
-            "Cumprir a legislação ambiental aplicável, especialmente a PNRS (Lei 12.305/2010) e o Decreto 10.936/2022."
-          ]
-        }
-      ]
-    },
-    {
-      "id": "conteudo-usuario",
-      "title": "7. Conteúdo Gerado pelo Usuário",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "Ao inserir fotos, textos ou qualquer conteúdo na plataforma, o usuário:"
-        },
-        {
-          "type": "list",
-          "style": "bullet",
-          "items": [
-            "Declara ser o titular ou ter autorização para publicar o conteúdo.",
-            "Concede ao Oikos licença gratuita, não exclusiva e mundial para usar, armazenar, reproduzir e exibir o conteúdo no contexto da plataforma.",
-            "Permanece responsável pelo conteúdo publicado e por eventuais violações de direitos de terceiros.",
-            "Reconhece que o Oikos pode remover conteúdos que violem estes Termos ou que sejam ilegais, sem aviso prévio."
-          ]
-        }
-      ]
-    },
-    {
-      "id": "propriedade-intelectual",
-      "title": "8. Propriedade Intelectual",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "Todos os elementos da plataforma Oikos — incluindo marca, logotipo, interface, código-fonte, algoritmos e conteúdos editoriais — são propriedade do Oikos ou de seus licenciadores e estão protegidos pelas leis de propriedade intelectual brasileiras (Lei 9.610/1998 e Lei 9.279/1996)."
-        },
-        {
-          "type": "paragraph",
-          "text": "É vedada a reprodução, distribuição, modificação ou engenharia reversa de qualquer elemento da plataforma sem autorização prévia e escrita do Oikos."
-        }
-      ]
-    },
-    {
-      "id": "responsabilidade",
-      "title": "9. Isenção e Limitação de Responsabilidade",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "O Oikos atua como intermediário tecnológico entre os usuários e não é responsável por:"
-        },
-        {
-          "type": "list",
-          "style": "bullet",
-          "items": [
-            "A qualidade, quantidade, condição ou conformidade ambiental dos resíduos negociados no marketplace.",
-            "O descumprimento de obrigações legais pelos usuários (licenças ambientais, emissão de MTR, etc.).",
-            "Interrupções, falhas ou indisponibilidades temporárias da plataforma decorrentes de manutenção, força maior ou falhas de terceiros.",
-            "Perdas e danos resultantes do uso indevido da plataforma por outros usuários.",
-            "A ação ou omissão de órgãos públicos em relação às denúncias encaminhadas.",
-            "Danos indiretos, lucros cessantes ou danos morais decorrentes do uso da plataforma, na máxima extensão permitida pela lei."
-          ]
-        },
-        {
-          "type": "highlight",
-          "text": "A responsabilidade do Oikos, quando reconhecida, fica limitada ao valor pago pelo usuário pelo serviço nos últimos 3 meses. Para usuários do plano gratuito, a limitação é de R$ 100,00."
-        }
-      ]
-    },
-    {
-      "id": "suspensao",
-      "title": "10. Suspensão e Encerramento",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "O Oikos pode suspender ou encerrar o acesso de um usuário, com ou sem aviso prévio, nos seguintes casos:"
-        },
-        {
-          "type": "list",
-          "style": "bullet",
-          "items": [
-            "Violação de qualquer disposição destes Termos.",
-            "Fornecimento de informações falsas no cadastro.",
-            "Denúncias falsas ou uso indevido do marketplace.",
-            "Suspeita de fraude, golpe ou atividade ilegal.",
-            "Determinação de autoridade judicial ou administrativa."
-          ]
-        },
-        {
-          "type": "paragraph",
-          "text": "O usuário pode encerrar sua conta a qualquer momento nas configurações do aplicativo. O encerramento não prejudica o cumprimento das obrigações legais de retenção de dados previstas na Política de Privacidade."
-        }
-      ]
-    },
-    {
-      "id": "alteracoes",
-      "title": "11. Alterações nos Termos",
-      "blocks": [
-        {
-          "type": "paragraph",
-          "text": "O Oikos pode atualizar estes Termos a qualquer momento. Alterações relevantes serão comunicadas por notificação no aplicativo ou por e-mail, com antecedência mínima de 10 dias."
-        },
-        {
-          "type": "paragraph",
-          "text": "O uso continuado da plataforma após a data de vigência das alterações implica aceitação dos novos Termos."
-        }
-      ]
-    },
-    {
-      "id": "disposicoes-gerais",
-      "title": "12. Disposições Gerais",
-      "blocks": [
-        {
-          "type": "list",
-          "style": "bullet",
-          "items": [
-            "Estes Termos são regidos pelas leis brasileiras.",
-            "O foro competente para dirimir quaisquer controvérsias é o da comarca do domicílio do usuário, salvo disposição legal em contrário.",
-            "A eventual nulidade ou invalidade de qualquer cláusula destes Termos não afeta as demais disposições.",
-            "A omissão do Oikos em exigir o cumprimento de qualquer cláusula não implica renúncia ao direito de fazê-lo futuramente.",
-            "Em caso de dúvidas, entre em contato: suporte@oikos.app."
-          ]
-        },
-        {
-          "type": "contact",
-          "label": "Suporte",
-          "value": "suporte@oikos.app",
-          "href": "mailto:suporte@oikos.app"
-        }
-      ]
-    }
-  ]
+	"meta": {
+		"id": "terms-of-use",
+		"version": "1.0.0",
+		"effectiveDate": "2026-06-05",
+		"lastUpdated": "2026-06-05"
+	},
+	"title": "Termos de Uso",
+	"intro": "Bem-vindo ao Oikos, plataforma colaborativa para a economia circular de resíduos. Ao criar uma conta ou utilizar o aplicativo, você concorda com os presentes Termos de Uso. Leia com atenção antes de prosseguir.",
+	"sections": [
+		{
+			"id": "aceitacao",
+			"title": "1. Aceitação dos Termos",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "Estes Termos de Uso regulam o acesso e a utilização da plataforma Oikos (aplicativo móvel e demais canais digitais), operada por [RAZÃO SOCIAL DA EMPRESA], CNPJ [CNPJ], doravante denominada 'Oikos'."
+				},
+				{
+					"type": "paragraph",
+					"text": "Ao se cadastrar ou utilizar qualquer funcionalidade do Oikos, o usuário declara ter lido, compreendido e aceito integralmente estes Termos, bem como a Política de Privacidade da plataforma."
+				},
+				{
+					"type": "highlight",
+					"text": "Se você não concorda com qualquer disposição destes Termos, não utilize a plataforma."
+				}
+			]
+		},
+		{
+			"id": "definicoes",
+			"title": "2. Definições",
+			"blocks": [
+				{
+					"type": "list",
+					"style": "bullet",
+					"items": [
+						"Plataforma: o aplicativo Oikos e seus serviços digitais associados.",
+						"Usuário: toda pessoa física ou jurídica que acessa ou utiliza a plataforma.",
+						"Cidadão: usuário pessoa física que utiliza a plataforma para descarte, denúncia e consulta de informações ambientais.",
+						"Catador: usuário pessoa física que atua na coleta de resíduos recicláveis, de forma autônoma ou em cooperativa.",
+						"Empresa: usuário pessoa jurídica geradora ou processadora de resíduos.",
+						"Cooperativa: associação de catadores formalizada ou em processo de formalização.",
+						"Órgão Público: entidade vinculada ao poder público com funções de fiscalização, regulação ou gestão ambiental.",
+						"Marketplace: ambiente da plataforma destinado à negociação de resíduos entre usuários.",
+						"Denúncia: registro de descarte irregular de resíduos com evidências (foto, localização, data/hora).",
+						"Ecoponto: local físico cadastrado na plataforma para entrega de resíduos específicos.",
+						"Conteúdo do Usuário: fotos, textos, anúncios e demais informações inseridas pelo usuário na plataforma."
+					]
+				}
+			]
+		},
+		{
+			"id": "cadastro",
+			"title": "3. Cadastro e Perfis de Usuário",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "Para acessar as funcionalidades completas do Oikos, é necessário criar uma conta fornecendo informações verdadeiras, completas e atualizadas. O usuário é responsável pela veracidade dos dados informados."
+				},
+				{
+					"type": "paragraph",
+					"text": "A plataforma oferece os seguintes perfis de conta:"
+				},
+				{
+					"type": "table",
+					"headers": ["Perfil", "Requisitos", "Funcionalidades principais"],
+					"rows": [
+						[
+							"Cidadão",
+							"CPF e e-mail válidos",
+							"Mapa de ecopontos, denúncia cidadã, educação ambiental"
+						],
+						[
+							"Catador",
+							"CPF, e-mail e localização habitual de atuação",
+							"Marketplace, rotas de coleta, pagamentos digitais"
+						],
+						[
+							"Empresa",
+							"CNPJ, e-mail corporativo e responsável legal",
+							"Marketplace, gestão de resíduos, documentos de conformidade"
+						],
+						[
+							"Órgão Público",
+							"CNPJ do órgão e credencial funcional (validada pela equipe Oikos)",
+							"Dashboards de governança, acesso a denúncias encaminhadas"
+						]
+					]
+				},
+				{
+					"type": "list",
+					"style": "bullet",
+					"items": [
+						"Cada usuário pode ter apenas uma conta ativa por CPF ou CNPJ.",
+						"É proibida a criação de contas em nome de terceiros sem autorização.",
+						"O usuário é o único responsável pela guarda de suas credenciais de acesso.",
+						"Suspeitas de acesso não autorizado devem ser comunicadas imediatamente a suporte@oikos.app."
+					]
+				}
+			]
+		},
+		{
+			"id": "marketplace",
+			"title": "4. Marketplace de Resíduos",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "O marketplace do Oikos é um ambiente de intermediação para a negociação de resíduos recicláveis entre catadores, cooperativas e empresas. O Oikos não é parte nas transações realizadas entre os usuários."
+				},
+				{
+					"type": "list",
+					"style": "bullet",
+					"items": [
+						"Os anúncios de resíduos devem ser precisos quanto a tipo, quantidade, condição e localização do material.",
+						"É proibido anunciar resíduos perigosos (Classe I conforme ABNT NBR 10.004) sem as devidas licenças ambientais.",
+						"O usuário vendedor/doador é responsável pela conformidade ambiental dos resíduos anunciados, incluindo a emissão de documentos exigidos por lei (MTR/SINIR, quando aplicável).",
+						"O Oikos não garante a conclusão de nenhuma negociação, a qualidade dos materiais anunciados ou a idoneidade dos usuários.",
+						"Avaliações e comentários devem ser baseados em experiências reais. Avaliações falsas resultam em suspensão da conta."
+					]
+				}
+			]
+		},
+		{
+			"id": "denuncia",
+			"title": "5. Denúncia Cidadã",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "A funcionalidade de denúncia permite que cidadãos registrem descartes irregulares de resíduos com foto, geolocalização e data/hora. As denúncias podem ser encaminhadas a órgãos públicos de fiscalização, conforme configuração da plataforma e legislação local."
+				},
+				{
+					"type": "list",
+					"style": "bullet",
+					"items": [
+						"As denúncias devem ser baseadas em fatos verídicos e evidências reais.",
+						"É expressamente proibido realizar denúncias falsas ou de má-fé contra terceiros.",
+						"As fotos e dados de localização das denúncias podem ser compartilhados com órgãos públicos competentes.",
+						"O Oikos não se responsabiliza pela ação ou omissão dos órgãos públicos em relação às denúncias encaminhadas.",
+						"O usuário denunciante pode acompanhar o status da denúncia na plataforma."
+					]
+				},
+				{
+					"type": "highlight",
+					"text": "Denúncias falsas ou de má-fé configuram violação destes Termos e podem resultar em suspensão permanente da conta, além de eventuais responsabilidades civis e penais."
+				}
+			]
+		},
+		{
+			"id": "conduta",
+			"title": "6. Obrigações e Conduta do Usuário",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "Ao utilizar o Oikos, o usuário se compromete a:"
+				},
+				{
+					"type": "list",
+					"style": "ordered",
+					"items": [
+						"Fornecer informações verdadeiras e mantê-las atualizadas.",
+						"Utilizar a plataforma somente para fins lícitos e relacionados à gestão, coleta ou negociação de resíduos.",
+						"Não praticar spam, phishing, scraping automatizado ou qualquer ataque à infraestrutura da plataforma.",
+						"Não inserir vírus, malware ou código malicioso.",
+						"Respeitar os direitos de terceiros, incluindo privacidade, propriedade intelectual e honra.",
+						"Não utilizar a plataforma para fins discriminatórios, difamatórios ou que violem a legislação brasileira.",
+						"Cumprir a legislação ambiental aplicável, especialmente a PNRS (Lei 12.305/2010) e o Decreto 10.936/2022."
+					]
+				}
+			]
+		},
+		{
+			"id": "conteudo-usuario",
+			"title": "7. Conteúdo Gerado pelo Usuário",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "Ao inserir fotos, textos ou qualquer conteúdo na plataforma, o usuário:"
+				},
+				{
+					"type": "list",
+					"style": "bullet",
+					"items": [
+						"Declara ser o titular ou ter autorização para publicar o conteúdo.",
+						"Concede ao Oikos licença gratuita, não exclusiva e mundial para usar, armazenar, reproduzir e exibir o conteúdo no contexto da plataforma.",
+						"Permanece responsável pelo conteúdo publicado e por eventuais violações de direitos de terceiros.",
+						"Reconhece que o Oikos pode remover conteúdos que violem estes Termos ou que sejam ilegais, sem aviso prévio."
+					]
+				}
+			]
+		},
+		{
+			"id": "propriedade-intelectual",
+			"title": "8. Propriedade Intelectual",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "Todos os elementos da plataforma Oikos — incluindo marca, logotipo, interface, código-fonte, algoritmos e conteúdos editoriais — são propriedade do Oikos ou de seus licenciadores e estão protegidos pelas leis de propriedade intelectual brasileiras (Lei 9.610/1998 e Lei 9.279/1996)."
+				},
+				{
+					"type": "paragraph",
+					"text": "É vedada a reprodução, distribuição, modificação ou engenharia reversa de qualquer elemento da plataforma sem autorização prévia e escrita do Oikos."
+				}
+			]
+		},
+		{
+			"id": "responsabilidade",
+			"title": "9. Isenção e Limitação de Responsabilidade",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "O Oikos atua como intermediário tecnológico entre os usuários e não é responsável por:"
+				},
+				{
+					"type": "list",
+					"style": "bullet",
+					"items": [
+						"A qualidade, quantidade, condição ou conformidade ambiental dos resíduos negociados no marketplace.",
+						"O descumprimento de obrigações legais pelos usuários (licenças ambientais, emissão de MTR, etc.).",
+						"Interrupções, falhas ou indisponibilidades temporárias da plataforma decorrentes de manutenção, força maior ou falhas de terceiros.",
+						"Perdas e danos resultantes do uso indevido da plataforma por outros usuários.",
+						"A ação ou omissão de órgãos públicos em relação às denúncias encaminhadas.",
+						"Danos indiretos, lucros cessantes ou danos morais decorrentes do uso da plataforma, na máxima extensão permitida pela lei."
+					]
+				},
+				{
+					"type": "highlight",
+					"text": "A responsabilidade do Oikos, quando reconhecida, fica limitada ao valor pago pelo usuário pelo serviço nos últimos 3 meses. Para usuários do plano gratuito, a limitação é de R$ 100,00."
+				}
+			]
+		},
+		{
+			"id": "suspensao",
+			"title": "10. Suspensão e Encerramento",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "O Oikos pode suspender ou encerrar o acesso de um usuário, com ou sem aviso prévio, nos seguintes casos:"
+				},
+				{
+					"type": "list",
+					"style": "bullet",
+					"items": [
+						"Violação de qualquer disposição destes Termos.",
+						"Fornecimento de informações falsas no cadastro.",
+						"Denúncias falsas ou uso indevido do marketplace.",
+						"Suspeita de fraude, golpe ou atividade ilegal.",
+						"Determinação de autoridade judicial ou administrativa."
+					]
+				},
+				{
+					"type": "paragraph",
+					"text": "O usuário pode encerrar sua conta a qualquer momento nas configurações do aplicativo. O encerramento não prejudica o cumprimento das obrigações legais de retenção de dados previstas na Política de Privacidade."
+				}
+			]
+		},
+		{
+			"id": "alteracoes",
+			"title": "11. Alterações nos Termos",
+			"blocks": [
+				{
+					"type": "paragraph",
+					"text": "O Oikos pode atualizar estes Termos a qualquer momento. Alterações relevantes serão comunicadas por notificação no aplicativo ou por e-mail, com antecedência mínima de 10 dias."
+				},
+				{
+					"type": "paragraph",
+					"text": "O uso continuado da plataforma após a data de vigência das alterações implica aceitação dos novos Termos."
+				}
+			]
+		},
+		{
+			"id": "disposicoes-gerais",
+			"title": "12. Disposições Gerais",
+			"blocks": [
+				{
+					"type": "list",
+					"style": "bullet",
+					"items": [
+						"Estes Termos são regidos pelas leis brasileiras.",
+						"O foro competente para dirimir quaisquer controvérsias é o da comarca do domicílio do usuário, salvo disposição legal em contrário.",
+						"A eventual nulidade ou invalidade de qualquer cláusula destes Termos não afeta as demais disposições.",
+						"A omissão do Oikos em exigir o cumprimento de qualquer cláusula não implica renúncia ao direito de fazê-lo futuramente.",
+						"Em caso de dúvidas, entre em contato: suporte@oikos.app."
+					]
+				},
+				{
+					"type": "contact",
+					"label": "Suporte",
+					"value": "suporte@oikos.app",
+					"href": "mailto:suporte@oikos.app"
+				}
+			]
+		}
+	]
 }
