@@ -9698,6 +9698,7 @@
                               "id": "M1DyDu",
                               "name": "Grid Row 1",
                               "width": "fill_container",
+                              "layout": "vertical",
                               "gap": 12,
                               "children": [
                                 {
@@ -9707,32 +9708,30 @@
                                   "context": "Card de empresa no grid 2 colunas de market/index. Código: src/components/market/company-card.tsx. Nome = H4 (Oswald 15/600), metadados = Caption. Coletor: Replace de Initials por ícone sprout + TypeBadge enabled. Badges internos seguem espec do master Badge.",
                                   "clip": true,
                                   "width": "fill_container",
+                                  "height": 95,
                                   "fill": "#ffffff",
                                   "cornerRadius": 12,
                                   "stroke": "$gray-200",
                                   "strokeWidth": 1,
                                   "strokeAlignment": "inner",
                                   "layout": "vertical",
+                                  "padding": 8,
                                   "children": [
                                     {
                                       "type": "frame",
-                                      "id": "wWDu8",
-                                      "name": "CardMedia",
+                                      "id": "fgM0T",
+                                      "name": "Frame 27",
                                       "width": "fill_container",
-                                      "height": 92,
-                                      "fill": "$lime-50",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": 8,
-                                      "justifyContent": "center",
+                                      "height": "fill_container",
+                                      "gap": "$radius-md",
                                       "alignItems": "center",
                                       "children": [
                                         {
                                           "type": "frame",
                                           "id": "vb3bO",
                                           "name": "Avatar",
-                                          "width": 44,
-                                          "height": 44,
+                                          "width": 79,
+                                          "height": "fill_container",
                                           "fill": "$lime-800",
                                           "cornerRadius": 8,
                                           "justifyContent": "center",
@@ -9749,23 +9748,7 @@
                                               "fontWeight": "600"
                                             }
                                           ]
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "frame",
-                                      "id": "WfGUf",
-                                      "name": "CardBody",
-                                      "width": "fill_container",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": [
-                                        10,
-                                        12,
-                                        12,
-                                        12
-                                      ],
-                                      "children": [
+                                        },
                                         {
                                           "type": "frame",
                                           "id": "v79s2",
@@ -9794,135 +9777,122 @@
                                               "fill": "$gray-500",
                                               "textGrowth": "fixed-width",
                                               "width": "fill_container",
-                                              "content": "Reciclagem geral",
+                                              "content": "38.456.455/0001-71",
                                               "lineHeight": 1.4,
                                               "fontFamily": "$font-body",
                                               "fontSize": "$text-caption",
                                               "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "X845X0",
-                                          "name": "CardContent",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
+                                            },
                                             {
-                                              "type": "text",
-                                              "id": "AhY75",
-                                              "name": "Wastes",
-                                              "fill": "$gray-400",
-                                              "textGrowth": "fixed-width",
+                                              "type": "frame",
+                                              "id": "BRpmx",
+                                              "name": "CardBody",
                                               "width": "fill_container",
-                                              "content": "Plástico, Vidro +3",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "HNH3k",
-                                          "name": "CardFooter",
-                                          "width": "fill_container",
-                                          "gap": 6,
-                                          "padding": [
-                                            4,
-                                            0,
-                                            0,
-                                            0
-                                          ],
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "frame",
-                                              "id": "YlOiT",
-                                              "name": "DistanceBadge",
-                                              "fill": "$gray-100",
-                                              "cornerRadius": 999,
-                                              "gap": 3,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "icon",
-                                                  "id": "fF2zZ",
-                                                  "name": "DistanceIcon",
-                                                  "width": 10,
-                                                  "height": 10,
-                                                  "icon": "map-pin",
-                                                  "library": "lucide",
-                                                  "fill": "$gray-500"
-                                                },
-                                                {
-                                                  "type": "text",
-                                                  "id": "iy9MD",
-                                                  "name": "DistanceLabel",
-                                                  "fill": "$gray-700",
-                                                  "content": "850 m",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "500"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "po0iN",
-                                              "x": 65,
-                                              "y": 4,
-                                              "name": "TypeBadge",
-                                              "enabled": false,
-                                              "fill": "$lime-100",
-                                              "cornerRadius": 999,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "kdfQ9",
-                                                  "name": "TypeLabel",
-                                                  "fill": "$lime-700",
-                                                  "content": "Coletor",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "kCQdH",
-                                              "name": "OpenBadge",
-                                              "fill": "$green-100",
-                                              "cornerRadius": 999,
+                                              "layout": "vertical",
                                               "gap": 4,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
                                               "children": [
                                                 {
-                                                  "type": "text",
-                                                  "id": "BNOmP",
-                                                  "name": "OpenLabel",
-                                                  "fill": "$green-700",
-                                                  "content": "Aberto",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
+                                                  "type": "frame",
+                                                  "id": "X1XE8T",
+                                                  "name": "CardFooter",
+                                                  "width": "fill_container",
+                                                  "gap": 6,
+                                                  "padding": [
+                                                    4,
+                                                    0,
+                                                    0,
+                                                    0
+                                                  ],
+                                                  "alignItems": "center",
+                                                  "children": [
+                                                    {
+                                                      "type": "frame",
+                                                      "id": "N7ob2",
+                                                      "name": "DistanceBadge",
+                                                      "fill": "$gray-100",
+                                                      "cornerRadius": 999,
+                                                      "gap": 3,
+                                                      "padding": [
+                                                        3,
+                                                        8
+                                                      ],
+                                                      "alignItems": "center",
+                                                      "children": [
+                                                        {
+                                                          "type": "icon",
+                                                          "id": "S3VTe2",
+                                                          "name": "DistanceIcon",
+                                                          "width": 10,
+                                                          "height": 10,
+                                                          "icon": "map-pin",
+                                                          "library": "lucide",
+                                                          "fill": "$gray-500"
+                                                        },
+                                                        {
+                                                          "type": "text",
+                                                          "id": "DEk7I",
+                                                          "name": "DistanceLabel",
+                                                          "fill": "$gray-700",
+                                                          "content": "850 m",
+                                                          "fontFamily": "$font-body",
+                                                          "fontSize": 10,
+                                                          "fontWeight": "500"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "frame",
+                                                      "id": "pMQeA",
+                                                      "x": 65,
+                                                      "y": 4,
+                                                      "name": "TypeBadge",
+                                                      "enabled": false,
+                                                      "fill": "$lime-100",
+                                                      "cornerRadius": 999,
+                                                      "padding": [
+                                                        3,
+                                                        8
+                                                      ],
+                                                      "alignItems": "center",
+                                                      "children": [
+                                                        {
+                                                          "type": "text",
+                                                          "id": "dhAGf",
+                                                          "name": "TypeLabel",
+                                                          "fill": "$lime-700",
+                                                          "content": "Coletor",
+                                                          "fontFamily": "$font-body",
+                                                          "fontSize": 10,
+                                                          "fontWeight": "600"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "frame",
+                                                      "id": "rTiNu",
+                                                      "name": "OpenBadge",
+                                                      "fill": "$green-100",
+                                                      "cornerRadius": 999,
+                                                      "gap": 4,
+                                                      "padding": [
+                                                        3,
+                                                        8
+                                                      ],
+                                                      "alignItems": "center",
+                                                      "children": [
+                                                        {
+                                                          "type": "text",
+                                                          "id": "V188Ua",
+                                                          "name": "OpenLabel",
+                                                          "fill": "$green-700",
+                                                          "content": "ABERTO",
+                                                          "fontFamily": "$font-body",
+                                                          "fontSize": 10,
+                                                          "fontWeight": "600"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
                                                 }
                                               ]
                                             }
@@ -9934,37 +9904,33 @@
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "l2kvaN",
-                                  "name": "RECICLA SP",
+                                  "id": "XIF6Z",
+                                  "name": "ECOPONTO VILA NOVA",
                                   "context": "Card de empresa no grid 2 colunas de market/index. Código: src/components/market/company-card.tsx. Nome = H4 (Oswald 15/600), metadados = Caption. Coletor: Replace de Initials por ícone sprout + TypeBadge enabled. Badges internos seguem espec do master Badge.",
                                   "clip": true,
-                                  "width": "fill_container",
+                                  "width": "fit_content(398)",
                                   "fill": "#ffffff",
                                   "cornerRadius": 12,
                                   "stroke": "$gray-200",
                                   "strokeWidth": 1,
                                   "strokeAlignment": "inner",
                                   "layout": "vertical",
+                                  "padding": 8,
                                   "children": [
                                     {
                                       "type": "frame",
-                                      "id": "geuV8",
-                                      "name": "CardMedia",
+                                      "id": "L216E",
+                                      "name": "Frame 27",
                                       "width": "fill_container",
-                                      "height": 92,
-                                      "fill": "$lime-50",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": 8,
-                                      "justifyContent": "center",
+                                      "gap": "$radius-md",
                                       "alignItems": "center",
                                       "children": [
                                         {
                                           "type": "frame",
-                                          "id": "xCpyn",
+                                          "id": "O9QOJ",
                                           "name": "Avatar",
-                                          "width": 44,
-                                          "height": 44,
+                                          "width": 62,
+                                          "height": "fill_container",
                                           "fill": "$lime-800",
                                           "cornerRadius": 8,
                                           "justifyContent": "center",
@@ -9972,35 +9938,19 @@
                                           "children": [
                                             {
                                               "type": "text",
-                                              "id": "N1faZA",
+                                              "id": "Wt2i0",
                                               "name": "Initials",
                                               "fill": "#ffffff",
-                                              "content": "RS",
+                                              "content": "EV",
                                               "fontFamily": "$font-body",
                                               "fontSize": 14,
                                               "fontWeight": "600"
                                             }
                                           ]
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "frame",
-                                      "id": "UlCsR",
-                                      "name": "CardBody",
-                                      "width": "fill_container",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": [
-                                        10,
-                                        12,
-                                        12,
-                                        12
-                                      ],
-                                      "children": [
+                                        },
                                         {
                                           "type": "frame",
-                                          "id": "vNoXo",
+                                          "id": "bavQo",
                                           "name": "CardHeader",
                                           "width": "fill_container",
                                           "layout": "vertical",
@@ -10008,1097 +9958,150 @@
                                           "children": [
                                             {
                                               "type": "text",
-                                              "id": "QRGuI",
+                                              "id": "WNFE2",
                                               "name": "Name",
                                               "fill": "$foreground",
                                               "textGrowth": "fixed-width",
                                               "width": "fill_container",
-                                              "content": "ECOPONTO VILA NOVA",
+                                              "content": "CHRISTIAN CESAR",
                                               "lineHeight": 1.3,
                                               "fontFamily": "$font-heading",
                                               "fontSize": "$text-h4",
                                               "fontWeight": "600"
                                             },
                                             {
-                                              "type": "text",
-                                              "id": "t77jeB",
-                                              "name": "Identity",
-                                              "fill": "$gray-500",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Reciclagem geral",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "j089Fg",
-                                          "name": "CardContent",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "QTPNd",
-                                              "name": "Wastes",
-                                              "fill": "$gray-400",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Plástico, Vidro +3",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "t8prYv",
-                                          "name": "CardFooter",
-                                          "width": "fill_container",
-                                          "gap": 6,
-                                          "padding": [
-                                            4,
-                                            0,
-                                            0,
-                                            0
-                                          ],
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
                                               "type": "frame",
-                                              "id": "Z5SJv",
-                                              "name": "DistanceBadge",
-                                              "fill": "$gray-100",
-                                              "cornerRadius": 999,
-                                              "gap": 3,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
+                                              "id": "S5gErb",
+                                              "name": "CardContent",
+                                              "width": "fill_container",
+                                              "layout": "vertical",
+                                              "gap": 2,
                                               "children": [
                                                 {
-                                                  "type": "icon",
-                                                  "id": "VBbGu",
-                                                  "name": "DistanceIcon",
-                                                  "width": 10,
-                                                  "height": 10,
-                                                  "icon": "map-pin",
-                                                  "library": "lucide",
-                                                  "fill": "$gray-500"
-                                                },
-                                                {
                                                   "type": "text",
-                                                  "id": "zGUgV",
-                                                  "name": "DistanceLabel",
-                                                  "fill": "$gray-700",
-                                                  "content": "1,2 km",
+                                                  "id": "y9YxU",
+                                                  "name": "Wastes",
+                                                  "fill": "$gray-400",
+                                                  "textGrowth": "fixed-width",
+                                                  "width": "fill_container",
+                                                  "content": "Coletor Independente",
+                                                  "lineHeight": 1.4,
                                                   "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "500"
+                                                  "fontSize": "$text-caption",
+                                                  "fontWeight": "normal"
                                                 }
                                               ]
                                             },
                                             {
                                               "type": "frame",
-                                              "id": "dBNde",
-                                              "x": 65,
-                                              "y": 4,
-                                              "name": "TypeBadge",
-                                              "enabled": false,
-                                              "fill": "$lime-100",
-                                              "cornerRadius": 999,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "hpQWt",
-                                                  "name": "TypeLabel",
-                                                  "fill": "$lime-700",
-                                                  "content": "Coletor",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "NXW0A",
-                                              "name": "OpenBadge",
-                                              "fill": "$green-100",
-                                              "cornerRadius": 999,
+                                              "id": "dRtD8",
+                                              "name": "CardBody",
+                                              "width": "fill_container",
+                                              "layout": "vertical",
                                               "gap": 4,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
                                               "children": [
                                                 {
-                                                  "type": "text",
-                                                  "id": "sOpQ9",
-                                                  "name": "OpenLabel",
-                                                  "fill": "$green-700",
-                                                  "content": "Aberto",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "lQhKa",
-                              "name": "Grid Row 2",
-                              "width": "fill_container",
-                              "gap": 12,
-                              "children": [
-                                {
-                                  "type": "frame",
-                                  "id": "R1Txs",
-                                  "name": "JOÃO COLETOR",
-                                  "context": "Card de empresa no grid 2 colunas de market/index. Código: src/components/market/company-card.tsx. Nome = H4 (Oswald 15/600), metadados = Caption. Coletor: Replace de Initials por ícone sprout + TypeBadge enabled. Badges internos seguem espec do master Badge.",
-                                  "clip": true,
-                                  "width": "fill_container",
-                                  "height": "fill_container",
-                                  "fill": "#ffffff",
-                                  "cornerRadius": 12,
-                                  "stroke": "$gray-200",
-                                  "strokeWidth": 1,
-                                  "strokeAlignment": "inner",
-                                  "layout": "vertical",
-                                  "children": [
-                                    {
-                                      "type": "frame",
-                                      "id": "DVwGo",
-                                      "name": "CardMedia",
-                                      "width": "fill_container",
-                                      "height": 92,
-                                      "fill": "$lime-50",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": 8,
-                                      "justifyContent": "center",
-                                      "alignItems": "center",
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "E7CPqW",
-                                          "name": "Avatar",
-                                          "width": 44,
-                                          "height": 44,
-                                          "fill": "$lime-800",
-                                          "cornerRadius": 8,
-                                          "justifyContent": "center",
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "icon",
-                                              "id": "UyZSe",
-                                              "name": "Sprout",
-                                              "width": 20,
-                                              "height": 20,
-                                              "icon": "sprout",
-                                              "library": "lucide",
-                                              "fill": "#ffffff"
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "frame",
-                                      "id": "VH5aV",
-                                      "name": "CardBody",
-                                      "width": "fill_container",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": [
-                                        10,
-                                        12,
-                                        12,
-                                        12
-                                      ],
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "S4UVp7",
-                                          "name": "CardHeader",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "KhbLn",
-                                              "name": "Name",
-                                              "fill": "$foreground",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "ECOPONTO VILA NOVA",
-                                              "lineHeight": 1.3,
-                                              "fontFamily": "$font-heading",
-                                              "fontSize": "$text-h4",
-                                              "fontWeight": "600"
-                                            },
-                                            {
-                                              "type": "text",
-                                              "id": "t2D95",
-                                              "name": "Identity",
-                                              "fill": "$gray-500",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Reciclagem geral",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "v4dllI",
-                                          "name": "CardContent",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "DYYRM",
-                                              "name": "Wastes",
-                                              "fill": "$gray-400",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Plástico, Vidro +3",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "GiL0t",
-                                          "name": "CardFooter",
-                                          "width": "fill_container",
-                                          "gap": 6,
-                                          "padding": [
-                                            4,
-                                            0,
-                                            0,
-                                            0
-                                          ],
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "frame",
-                                              "id": "zs7y2",
-                                              "name": "DistanceBadge",
-                                              "fill": "$gray-100",
-                                              "cornerRadius": 999,
-                                              "gap": 3,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "icon",
-                                                  "id": "QdUUR",
-                                                  "name": "DistanceIcon",
-                                                  "width": 10,
-                                                  "height": 10,
-                                                  "icon": "map-pin",
-                                                  "library": "lucide",
-                                                  "fill": "$gray-500"
-                                                },
-                                                {
-                                                  "type": "text",
-                                                  "id": "bvUyp",
-                                                  "name": "DistanceLabel",
-                                                  "fill": "$gray-700",
-                                                  "content": "600 m",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "500"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "PslCv",
-                                              "name": "TypeBadge",
-                                              "fill": "$lime-100",
-                                              "cornerRadius": 999,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "i1whoR",
-                                                  "name": "TypeLabel",
-                                                  "fill": "$lime-700",
-                                                  "content": "Coletor",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "l2muyR",
-                                              "name": "OpenBadge",
-                                              "fill": "$green-100",
-                                              "cornerRadius": 999,
-                                              "gap": 4,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "S4c6ng",
-                                                  "name": "OpenLabel",
-                                                  "fill": "$green-700",
-                                                  "content": "Aberto",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "bTPoN",
-                                  "name": "COOPERATIVA VERDE",
-                                  "context": "Card de empresa no grid 2 colunas de market/index. Código: src/components/market/company-card.tsx. Nome = H4 (Oswald 15/600), metadados = Caption. Coletor: Replace de Initials por ícone sprout + TypeBadge enabled. Badges internos seguem espec do master Badge.",
-                                  "clip": true,
-                                  "width": "fill_container",
-                                  "fill": "#ffffff",
-                                  "cornerRadius": 12,
-                                  "stroke": "$gray-200",
-                                  "strokeWidth": 1,
-                                  "strokeAlignment": "inner",
-                                  "layout": "vertical",
-                                  "children": [
-                                    {
-                                      "type": "frame",
-                                      "id": "iB0fs",
-                                      "name": "CardMedia",
-                                      "width": "fill_container",
-                                      "height": 92,
-                                      "fill": "$lime-50",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": 8,
-                                      "justifyContent": "center",
-                                      "alignItems": "center",
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "ALjs4",
-                                          "name": "Avatar",
-                                          "width": 44,
-                                          "height": 44,
-                                          "fill": "$lime-800",
-                                          "cornerRadius": 8,
-                                          "justifyContent": "center",
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "nZQvz",
-                                              "name": "Initials",
-                                              "fill": "#ffffff",
-                                              "content": "CV",
-                                              "fontFamily": "$font-body",
-                                              "fontSize": 14,
-                                              "fontWeight": "600"
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "frame",
-                                      "id": "m6W0c",
-                                      "name": "CardBody",
-                                      "width": "fill_container",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": [
-                                        10,
-                                        12,
-                                        12,
-                                        12
-                                      ],
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "fzlxN",
-                                          "name": "CardHeader",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "Vt4zm",
-                                              "name": "Name",
-                                              "fill": "$foreground",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "ECOPONTO VILA NOVA",
-                                              "lineHeight": 1.3,
-                                              "fontFamily": "$font-heading",
-                                              "fontSize": "$text-h4",
-                                              "fontWeight": "600"
-                                            },
-                                            {
-                                              "type": "text",
-                                              "id": "g3znQ",
-                                              "name": "Identity",
-                                              "fill": "$gray-500",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Reciclagem geral",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "lZd5T",
-                                          "name": "CardContent",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "P9coD",
-                                              "name": "Wastes",
-                                              "fill": "$gray-400",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Plástico, Vidro +3",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "EgMiV",
-                                          "name": "CardFooter",
-                                          "width": "fill_container",
-                                          "gap": 6,
-                                          "padding": [
-                                            4,
-                                            0,
-                                            0,
-                                            0
-                                          ],
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "frame",
-                                              "id": "ecnHy",
-                                              "name": "DistanceBadge",
-                                              "fill": "$gray-100",
-                                              "cornerRadius": 999,
-                                              "gap": 3,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "icon",
-                                                  "id": "gdoZX",
-                                                  "name": "DistanceIcon",
-                                                  "width": 10,
-                                                  "height": 10,
-                                                  "icon": "map-pin",
-                                                  "library": "lucide",
-                                                  "fill": "$gray-500"
-                                                },
-                                                {
-                                                  "type": "text",
-                                                  "id": "e55zv",
-                                                  "name": "DistanceLabel",
-                                                  "fill": "$gray-700",
-                                                  "content": "2,1 km",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "500"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "oVkQ7",
-                                              "x": 65,
-                                              "y": 4,
-                                              "name": "TypeBadge",
-                                              "enabled": false,
-                                              "fill": "$lime-100",
-                                              "cornerRadius": 999,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "Y2kVDl",
-                                                  "name": "TypeLabel",
-                                                  "fill": "$lime-700",
-                                                  "content": "Coletor",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "FW1Ac",
-                                              "name": "OpenBadge",
-                                              "fill": "$green-100",
-                                              "cornerRadius": 999,
-                                              "gap": 4,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "EQwef",
-                                                  "name": "OpenLabel",
-                                                  "fill": "$green-700",
-                                                  "content": "Aberto",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "tIZAZ",
-                              "name": "Grid Row 3",
-                              "width": "fill_container",
-                              "gap": 12,
-                              "children": [
-                                {
-                                  "type": "frame",
-                                  "id": "rsB7d",
-                                  "name": "SUCATA & CIA",
-                                  "context": "Card de empresa no grid 2 colunas de market/index. Código: src/components/market/company-card.tsx. Nome = H4 (Oswald 15/600), metadados = Caption. Coletor: Replace de Initials por ícone sprout + TypeBadge enabled. Badges internos seguem espec do master Badge.",
-                                  "clip": true,
-                                  "width": "fill_container",
-                                  "fill": "#ffffff",
-                                  "cornerRadius": 12,
-                                  "stroke": "$gray-200",
-                                  "strokeWidth": 1,
-                                  "strokeAlignment": "inner",
-                                  "layout": "vertical",
-                                  "children": [
-                                    {
-                                      "type": "frame",
-                                      "id": "qgpiX",
-                                      "name": "CardMedia",
-                                      "width": "fill_container",
-                                      "height": 92,
-                                      "fill": "$lime-50",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": 8,
-                                      "justifyContent": "center",
-                                      "alignItems": "center",
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "r00bgB",
-                                          "name": "Avatar",
-                                          "width": 44,
-                                          "height": 44,
-                                          "fill": "$lime-800",
-                                          "cornerRadius": 8,
-                                          "justifyContent": "center",
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "Ts2iP",
-                                              "name": "Initials",
-                                              "fill": "#ffffff",
-                                              "content": "SC",
-                                              "fontFamily": "$font-body",
-                                              "fontSize": 14,
-                                              "fontWeight": "600"
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "frame",
-                                      "id": "DLFbh",
-                                      "name": "CardBody",
-                                      "width": "fill_container",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": [
-                                        10,
-                                        12,
-                                        12,
-                                        12
-                                      ],
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "KCzA0",
-                                          "name": "CardHeader",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "IU8Jk",
-                                              "name": "Name",
-                                              "fill": "$foreground",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "ECOPONTO VILA NOVA",
-                                              "lineHeight": 1.3,
-                                              "fontFamily": "$font-heading",
-                                              "fontSize": "$text-h4",
-                                              "fontWeight": "600"
-                                            },
-                                            {
-                                              "type": "text",
-                                              "id": "Cj9VG",
-                                              "name": "Identity",
-                                              "fill": "$gray-500",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Reciclagem geral",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "K9brG",
-                                          "name": "CardContent",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "x4zH31",
-                                              "name": "Wastes",
-                                              "fill": "$gray-400",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Plástico, Vidro +3",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "TMrpB",
-                                          "name": "CardFooter",
-                                          "width": "fill_container",
-                                          "gap": 6,
-                                          "padding": [
-                                            4,
-                                            0,
-                                            0,
-                                            0
-                                          ],
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "frame",
-                                              "id": "TXbxG",
-                                              "name": "DistanceBadge",
-                                              "fill": "$gray-100",
-                                              "cornerRadius": 999,
-                                              "gap": 3,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "icon",
-                                                  "id": "zVdR1",
-                                                  "name": "DistanceIcon",
-                                                  "width": 10,
-                                                  "height": 10,
-                                                  "icon": "map-pin",
-                                                  "library": "lucide",
-                                                  "fill": "$gray-500"
-                                                },
-                                                {
-                                                  "type": "text",
-                                                  "id": "QeTsg",
-                                                  "name": "DistanceLabel",
-                                                  "fill": "$gray-700",
-                                                  "content": "3,4 km",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "500"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "bnH9v",
-                                              "x": 65,
-                                              "y": 4,
-                                              "name": "TypeBadge",
-                                              "enabled": false,
-                                              "fill": "$lime-100",
-                                              "cornerRadius": 999,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "Z8qb4",
-                                                  "name": "TypeLabel",
-                                                  "fill": "$lime-700",
-                                                  "content": "Coletor",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "C8DI3",
-                                              "name": "OpenBadge",
-                                              "fill": "$green-100",
-                                              "cornerRadius": 999,
-                                              "gap": 4,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "eu0Jz",
-                                                  "name": "OpenLabel",
-                                                  "fill": "$green-700",
-                                                  "content": "Aberto",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "u2Gzec",
-                                  "name": "ECO ÓLEO",
-                                  "context": "Card de empresa no grid 2 colunas de market/index. Código: src/components/market/company-card.tsx. Nome = H4 (Oswald 15/600), metadados = Caption. Coletor: Replace de Initials por ícone sprout + TypeBadge enabled. Badges internos seguem espec do master Badge.",
-                                  "clip": true,
-                                  "width": "fill_container",
-                                  "fill": "#ffffff",
-                                  "cornerRadius": 12,
-                                  "stroke": "$gray-200",
-                                  "strokeWidth": 1,
-                                  "strokeAlignment": "inner",
-                                  "layout": "vertical",
-                                  "children": [
-                                    {
-                                      "type": "frame",
-                                      "id": "c2HdQ",
-                                      "name": "CardMedia",
-                                      "width": "fill_container",
-                                      "height": 92,
-                                      "fill": "$lime-50",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": 8,
-                                      "justifyContent": "center",
-                                      "alignItems": "center",
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "U3cVg",
-                                          "name": "Avatar",
-                                          "width": 44,
-                                          "height": 44,
-                                          "fill": "$lime-800",
-                                          "cornerRadius": 8,
-                                          "justifyContent": "center",
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "xzkLh",
-                                              "name": "Initials",
-                                              "fill": "#ffffff",
-                                              "content": "EO",
-                                              "fontFamily": "$font-body",
-                                              "fontSize": 14,
-                                              "fontWeight": "600"
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "frame",
-                                      "id": "e3Q2qV",
-                                      "name": "CardBody",
-                                      "width": "fill_container",
-                                      "layout": "vertical",
-                                      "gap": 4,
-                                      "padding": [
-                                        10,
-                                        12,
-                                        12,
-                                        12
-                                      ],
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "va57p",
-                                          "name": "CardHeader",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "x2YDtZ",
-                                              "name": "Name",
-                                              "fill": "$foreground",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "ECOPONTO VILA NOVA",
-                                              "lineHeight": 1.3,
-                                              "fontFamily": "$font-heading",
-                                              "fontSize": "$text-h4",
-                                              "fontWeight": "600"
-                                            },
-                                            {
-                                              "type": "text",
-                                              "id": "B9dVjD",
-                                              "name": "Identity",
-                                              "fill": "$gray-500",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Reciclagem geral",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "aRG9H",
-                                          "name": "CardContent",
-                                          "width": "fill_container",
-                                          "layout": "vertical",
-                                          "gap": 2,
-                                          "children": [
-                                            {
-                                              "type": "text",
-                                              "id": "h2GkX",
-                                              "name": "Wastes",
-                                              "fill": "$gray-400",
-                                              "textGrowth": "fixed-width",
-                                              "width": "fill_container",
-                                              "content": "Plástico, Vidro +3",
-                                              "lineHeight": 1.4,
-                                              "fontFamily": "$font-body",
-                                              "fontSize": "$text-caption",
-                                              "fontWeight": "normal"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "frame",
-                                          "id": "vvJW5",
-                                          "name": "CardFooter",
-                                          "width": "fill_container",
-                                          "gap": 6,
-                                          "padding": [
-                                            4,
-                                            0,
-                                            0,
-                                            0
-                                          ],
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "frame",
-                                              "id": "U9gZC2",
-                                              "name": "DistanceBadge",
-                                              "fill": "$gray-100",
-                                              "cornerRadius": 999,
-                                              "gap": 3,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "icon",
-                                                  "id": "MLvp4",
-                                                  "name": "DistanceIcon",
-                                                  "width": 10,
-                                                  "height": 10,
-                                                  "icon": "map-pin",
-                                                  "library": "lucide",
-                                                  "fill": "$gray-500"
-                                                },
-                                                {
-                                                  "type": "text",
-                                                  "id": "x4p19A",
-                                                  "name": "DistanceLabel",
-                                                  "fill": "$gray-700",
-                                                  "content": "1,8 km",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "500"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "PfSDB",
-                                              "x": 65,
-                                              "y": 4,
-                                              "name": "TypeBadge",
-                                              "enabled": false,
-                                              "fill": "$lime-100",
-                                              "cornerRadius": 999,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "baMGA",
-                                                  "name": "TypeLabel",
-                                                  "fill": "$lime-700",
-                                                  "content": "Coletor",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
-                                                }
-                                              ]
-                                            },
-                                            {
-                                              "type": "frame",
-                                              "id": "r9QEO",
-                                              "name": "OpenBadge",
-                                              "fill": "$green-100",
-                                              "cornerRadius": 999,
-                                              "gap": 4,
-                                              "padding": [
-                                                3,
-                                                8
-                                              ],
-                                              "alignItems": "center",
-                                              "children": [
-                                                {
-                                                  "type": "text",
-                                                  "id": "C2F3A",
-                                                  "name": "OpenLabel",
-                                                  "fill": "$green-700",
-                                                  "content": "Aberto",
-                                                  "fontFamily": "$font-body",
-                                                  "fontSize": 10,
-                                                  "fontWeight": "600"
+                                                  "type": "frame",
+                                                  "id": "L6p2Z",
+                                                  "name": "CardFooter",
+                                                  "width": "fill_container",
+                                                  "gap": 6,
+                                                  "padding": [
+                                                    4,
+                                                    0,
+                                                    0,
+                                                    0
+                                                  ],
+                                                  "alignItems": "center",
+                                                  "children": [
+                                                    {
+                                                      "type": "frame",
+                                                      "id": "GPYXg",
+                                                      "name": "DistanceBadge",
+                                                      "fill": "$gray-100",
+                                                      "cornerRadius": 999,
+                                                      "gap": 3,
+                                                      "padding": [
+                                                        3,
+                                                        8
+                                                      ],
+                                                      "alignItems": "center",
+                                                      "children": [
+                                                        {
+                                                          "type": "icon",
+                                                          "id": "u0JkYQ",
+                                                          "name": "DistanceIcon",
+                                                          "width": 10,
+                                                          "height": 10,
+                                                          "icon": "map-pin",
+                                                          "library": "lucide",
+                                                          "fill": "$gray-500"
+                                                        },
+                                                        {
+                                                          "type": "text",
+                                                          "id": "Nqpfb",
+                                                          "name": "DistanceLabel",
+                                                          "fill": "$gray-700",
+                                                          "content": "850 m",
+                                                          "fontFamily": "$font-body",
+                                                          "fontSize": 10,
+                                                          "fontWeight": "500"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "frame",
+                                                      "id": "P3XTvB",
+                                                      "x": 65,
+                                                      "y": 4,
+                                                      "name": "TypeBadge",
+                                                      "enabled": false,
+                                                      "fill": "$lime-100",
+                                                      "cornerRadius": 999,
+                                                      "padding": [
+                                                        3,
+                                                        8
+                                                      ],
+                                                      "alignItems": "center",
+                                                      "children": [
+                                                        {
+                                                          "type": "text",
+                                                          "id": "XQAYZ",
+                                                          "name": "TypeLabel",
+                                                          "fill": "$lime-700",
+                                                          "content": "Coletor",
+                                                          "fontFamily": "$font-body",
+                                                          "fontSize": 10,
+                                                          "fontWeight": "600"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "frame",
+                                                      "id": "kvfyl",
+                                                      "name": "OpenBadge",
+                                                      "fill": "$green-100",
+                                                      "cornerRadius": 999,
+                                                      "gap": 4,
+                                                      "padding": [
+                                                        3,
+                                                        8
+                                                      ],
+                                                      "alignItems": "center",
+                                                      "children": [
+                                                        {
+                                                          "type": "text",
+                                                          "id": "s2rVr",
+                                                          "name": "OpenLabel",
+                                                          "fill": "$green-700",
+                                                          "content": "ABERTO",
+                                                          "fontFamily": "$font-body",
+                                                          "fontSize": 10,
+                                                          "fontWeight": "600"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
                                                 }
                                               ]
                                             }
@@ -14049,7 +13052,7 @@
               "type": "ref",
               "ref": "cYytK",
               "name": "market/index — raios (sheet)",
-              "context": "BottomSheet de raio",
+              "context": "BottomSheet de filtros avançados — raio + categoria + localização. Abre pelo botão sliders da busca.",
               "clip": true,
               "descendants": {
                 "OpqBD": {

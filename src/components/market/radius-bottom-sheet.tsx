@@ -1,23 +1,17 @@
-import { CheckIcon } from "lucide-react-native";
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from "react";
+import { CheckIcon, NavigationIcon } from "lucide-react-native";
+import { useContext, useState } from "react";
 import { Pressable } from "react-native";
 import {
 	BottomSheet,
 	BottomSheetBackdrop,
+	BottomSheetContext,
 	BottomSheetDragIndicator,
 	BottomSheetPortal,
-	type BottomSheetRef,
 	BottomSheetScrollView,
+	BottomSheetTrigger,
 } from "@/components/ui/bottomsheet";
 import { Text } from "@/components/ui/text";
 import { useMarket } from "@/contexts/market-context";
-import { cn } from "@/libs/utils";
 import { colors } from "../style/colors";
 import { VStack } from "../ui/vstack";
 
@@ -31,74 +25,78 @@ const radiusOptions = [
 	{ value: "40000", label: "40 km" },
 ] as const;
 
-export interface RadiusBottomSheetRef {
-	open: () => void;
-	close: () => void;
+function formatRadiusLabel(value: string) {
+	const km = Number(value) / 1000;
+	return `${km} km`;
 }
 
-export const RadiusBottomSheet = forwardRef<RadiusBottomSheetRef>(
-	function RadiusBottomSheet(_props, ref) {
-		const { appliedFilters, setAppliedFilters } = useMarket();
-		const [isOpen, setIsOpen] = useState(false);
-		const sheetRef = useRef<BottomSheetRef>(null);
+function RadiusOption({
+	value,
+	label,
+	isSelected,
+	onSelect,
+}: {
+	value: string;
+	label: string;
+	isSelected: boolean;
+	onSelect: (value: string) => void;
+}) {
+	const { handleClose } = useContext(BottomSheetContext);
 
-		const [localRadius, setLocalRadius] = useState(appliedFilters.radius);
+	return (
+		<Pressable
+			className={`flex-row items-center justify-between p-3 rounded-xl ${
+				isSelected ? "bg-primary" : "bg-background border border-border"
+			}`}
+			onPress={() => {
+				onSelect(value);
+				handleClose();
+			}}
+			accessibilityLabel={`Raio de busca: ${label}${isSelected ? " (selecionado)" : ""}`}
+		>
+			<Text className={isSelected ? "text-primary-foreground" : undefined}>
+				{label}
+			</Text>
+			{isSelected && <CheckIcon size={16} color={colors.white} />}
+		</Pressable>
+	);
+}
 
-		useEffect(() => {
-			if (isOpen) {
-				setLocalRadius(appliedFilters.radius);
-				sheetRef.current?.open();
-			} else {
-				sheetRef.current?.close();
-			}
-		}, [isOpen, appliedFilters]);
+export function RadiusBottomSheet() {
+	const { appliedFilters, setAppliedFilters } = useMarket();
+	const [localRadius, setLocalRadius] = useState(appliedFilters.radius);
 
-		useImperativeHandle(ref, () => ({
-			open: () => setIsOpen(true),
-			close: () => setIsOpen(false),
-		}));
-
-		return (
-			<BottomSheet ref={sheetRef} onClose={() => setIsOpen(false)}>
-				<BottomSheetPortal
-					snapPoints={["50%"]}
-					backdropComponent={BottomSheetBackdrop}
-					handleComponent={BottomSheetDragIndicator}
-				>
-					<BottomSheetScrollView contentContainerClassName="pb-12">
-						<VStack className="gap-2 p-4">
-							{radiusOptions.map(option => {
-								const isSelected = localRadius === option.value;
-								return (
-									<Pressable
-										key={option.value}
-										className={`flex-row items-center justify-between p-3 rounded-xl ${
-											isSelected
-												? "bg-primary"
-												: "bg-background border border-border"
-										}`}
-										onPress={() => {
-											setLocalRadius(option.value);
-											setAppliedFilters({
-												...appliedFilters,
-												radius: option.value,
-											});
-											setIsOpen(false);
-										}}
-									>
-										<Text
-											className={cn(isSelected && "text-primary-foreground")}
-										>
-											{option.label}
-										</Text>
-										{isSelected && <CheckIcon size={16} color={colors.white} />}
-									</Pressable>
-								);
-							})}
-						</VStack>
-					</BottomSheetScrollView>
-				</BottomSheetPortal>
-			</BottomSheet>
-		);
-	},
-);
+	return (
+		<BottomSheet>
+			<BottomSheetTrigger className="flex-1 flex-row items-center justify-center gap-2">
+				<NavigationIcon size={14} />
+				<Text>{formatRadiusLabel(appliedFilters.radius)}</Text>
+			</BottomSheetTrigger>
+			<BottomSheetPortal
+				snapPoints={["50%"]}
+				backdropComponent={BottomSheetBackdrop}
+				handleComponent={BottomSheetDragIndicator}
+			>
+				<BottomSheetScrollView contentContainerClassName="pb-12">
+					<VStack className="gap-2 p-4">
+						{radiusOptions.map(option => (
+							<RadiusOption
+								key={option.value}
+								value={option.value}
+								label={option.label}
+								isSelected={localRadius === option.value}
+								onSelect={value => {
+									setLocalRadius(value);
+									setAppliedFilters({
+										...appliedFilters,
+										radius: value,
+									});
+								}}
+							/>
+						))}
+					</VStack>
+				</BottomSheetScrollView>
+			</BottomSheetPortal>
+		</BottomSheet>
+	);
+}

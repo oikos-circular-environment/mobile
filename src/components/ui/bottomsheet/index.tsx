@@ -69,7 +69,7 @@ type BottomSheetContextValue = {
   currentIndex: number;
 };
 
-const BottomSheetContext = createContext<BottomSheetContextValue>({
+export const BottomSheetContext = createContext<BottomSheetContextValue>({
   bottomSheetRef: { current: null! },
   handleClose: () => { },
   handleOpen: () => { },
@@ -112,6 +112,7 @@ export const BottomSheet = forwardRef<BottomSheetRef, IBottomSheetRootProps>(
 
     const handleClose = useCallback(() => {
       Keyboard.dismiss();
+      setIsVisible(false);
       setCurrentIndex(-1);
     }, []);
 

@@ -6,6 +6,7 @@ module.exports = {
 		"^nativewind/jsx-runtime$": "react/jsx-runtime",
 		"^nativewind/jsx-dev-runtime$": "react/jsx-dev-runtime",
 		"^react-native-svg$": "<rootDir>/src/tests/__mocks__/react-native-svg.tsx",
+		"^@gorhom/bottom-sheet$": "<rootDir>/src/tests/__mocks__/@gorhom/bottom-sheet.tsx",
 		"^@/(.*)$": "<rootDir>/src/$1",
 	},
 	setupFilesAfterEnv: ["<rootDir>/src/tests/setup.ts"],
