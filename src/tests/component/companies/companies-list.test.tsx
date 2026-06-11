@@ -1,12 +1,10 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
 import CompaniesListScreen from "@/app/(tabs)/(home)/companies/index";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
+import { makeCompany } from "@/tests/factories";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
 }));
@@ -49,36 +47,13 @@ jest.mock("@/components/companies/company-list-header", () => ({
 	},
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
-const mockCompany: Company = {
+const mockCompany = makeCompany({
 	id: "company-1",
-	user_id: "user-1",
-	identity: "12.345.678/0001-99",
-	identity_type: "CNPJ",
-	company_type: "COMPANY",
-	status: true,
 	business_name: "Reciclagem Express",
-	corporate_name: "Reciclagem Express Ltda",
-	email: null,
-	phones: ["11999999999"],
-	started_activity_in: new Date("2020-01-01"),
-	is_company_valid: true,
-	avatar: null,
-	created_at: new Date(),
-	updated_at: new Date(),
-	address: null,
-	business_hours: [],
-	wastes: [],
-	services: [],
-};
+}) as unknown as Company;
 
 const mockPush = jest.fn();
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function setupStore(companies: Company[] = [], isLoaded = true) {
 	jest
 		.mocked(useCompaniesStore)
@@ -89,9 +64,6 @@ async function renderScreen() {
 	return await render(<CompaniesListScreen />);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("CompaniesListScreen — componente", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -108,18 +80,12 @@ describe("CompaniesListScreen — componente", () => {
 		jest.clearAllMocks();
 	});
 
-	// -----------------------------------------------------------------------
-	// Header
-	// -----------------------------------------------------------------------
 	it("renderiza o CompanyListHeader", async () => {
 		await renderScreen();
 
 		expect(screen.getByTestId("company-list-header")).toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Estado de carregamento
-	// -----------------------------------------------------------------------
 	it("exibe 3 CompanyCardSkeletons enquanto isLoaded é false", async () => {
 		setupStore([], false);
 		await renderScreen();
@@ -134,9 +100,6 @@ describe("CompaniesListScreen — componente", () => {
 		expect(screen.queryByTestId("company-card-skeleton")).not.toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Estado vazio
-	// -----------------------------------------------------------------------
 	it("exibe mensagem de lista vazia quando não há empresas e isLoaded é true", async () => {
 		setupStore([], true);
 		await renderScreen();
@@ -153,9 +116,6 @@ describe("CompaniesListScreen — componente", () => {
 		).not.toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Lista de empresas
-	// -----------------------------------------------------------------------
 	it("renderiza um card para cada empresa da lista", async () => {
 		const company2 = { ...mockCompany, id: "company-2" };
 		setupStore([mockCompany, company2]);
@@ -175,9 +135,6 @@ describe("CompaniesListScreen — componente", () => {
 		).not.toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Navegação
-	// -----------------------------------------------------------------------
 	it("navega para o detalhe da empresa ao pressionar o card", async () => {
 		const user = userEvent.setup();
 		setupStore([mockCompany]);

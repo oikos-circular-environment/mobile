@@ -4,9 +4,6 @@ import {
 } from "@/libs/market/is-company-open";
 import type { MarketBusinessHour } from "@/libs/types/market";
 
-// ---------------------------------------------------------------------------
-// Fixtures extraídos do response real da API (11/jun/2026, quinta-feira)
-// ---------------------------------------------------------------------------
 
 const christianCesarHours: MarketBusinessHour[] = [
 	{ id: "9c7d31f2", day_of_week: "SUNDAY", is_open: false, time_slots: [] },
@@ -97,9 +94,6 @@ const oikosHours: MarketBusinessHour[] = [
 // 11/jun/2026 (quinta-feira) 10:48 — cenário do bug report
 const thu_10h48 = new Date(2026, 5, 11, 10, 48, 0);
 
-// ---------------------------------------------------------------------------
-// Testes com dados reais da API
-// ---------------------------------------------------------------------------
 
 describe("isCompanyOpenNow — dados reais da API", () => {
 	it("Christian Cesar: THURSDAY is_open=true → retorna true às 10:48", () => {
@@ -141,9 +135,6 @@ describe("isCompanyOpenNow — dados reais da API", () => {
 	});
 });
 
-// ---------------------------------------------------------------------------
-// Testes unitários da lógica central
-// ---------------------------------------------------------------------------
 
 describe("isCompanyOpenNow — lógica", () => {
 	const thursdayOpen: MarketBusinessHour[] = [

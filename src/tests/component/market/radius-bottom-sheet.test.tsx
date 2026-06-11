@@ -43,9 +43,6 @@ jest.mock("@/components/ui/bottomsheet", () => {
 	};
 });
 
-// ---------------------------------------------------------------------------
-// Mock useMarket
-// ---------------------------------------------------------------------------
 jest.mock("@/contexts/market-context");
 
 const setAppliedFilters = jest.fn();
@@ -73,9 +70,6 @@ function setupMarket(overrides: Partial<typeof defaultMarket> = {}) {
 	});
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("RadiusBottomSheet", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();

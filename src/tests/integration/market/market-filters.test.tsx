@@ -20,9 +20,6 @@ import {
 	makeWaste,
 } from "@/tests/factories";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 
 jest.mock("expo-router", () => ({
 	Link: ({
@@ -92,9 +89,6 @@ jest.mock("@/components/market/radius-bottom-sheet", () => ({
 	},
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
 
 const COORDS = { latitude: -23.55, longitude: -46.63 };
 
@@ -119,9 +113,6 @@ const defaultAuth = {
 	updateUserProfile: jest.fn(),
 };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
 	jest
@@ -155,9 +146,6 @@ async function renderMarket() {
 	);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("Market — filtros (integração)", () => {
 	beforeEach(() => {
@@ -173,9 +161,6 @@ describe("Market — filtros (integração)", () => {
 		jest.clearAllMocks();
 	});
 
-	// -------------------------------------------------------------------------
-	// Carga de dados
-	// -------------------------------------------------------------------------
 
 	describe("carga de dados", () => {
 		it("renderiza lista com 25 empresas e exibe contador correto", async () => {
@@ -200,9 +185,6 @@ describe("Market — filtros (integração)", () => {
 		});
 	});
 
-	// -------------------------------------------------------------------------
-	// Filtro de categoria
-	// -------------------------------------------------------------------------
 
 	describe("filtro de categoria", () => {
 		it("chama API com category=waste ao pressionar Resíduos", async () => {
@@ -264,9 +246,6 @@ describe("Market — filtros (integração)", () => {
 		});
 	});
 
-	// -------------------------------------------------------------------------
-	// Filtro de texto
-	// -------------------------------------------------------------------------
 
 	describe("filtro de texto", () => {
 		it("chama API com q preenchido ao submeter busca", async () => {
@@ -291,18 +270,16 @@ describe("Market — filtros (integração)", () => {
 		});
 	});
 
-	// -------------------------------------------------------------------------
-	// Filtro de raio
-	// -------------------------------------------------------------------------
 
 	describe("filtro de raio", () => {
 		it("chama API com radius=10000 ao selecionar 10 km", async () => {
-			const user = userEvent.setup();
 			mockMarketResponse([makeCompany()]);
 			await renderMarket();
 
-			screen.debug(undefined, Infinity);
-			await user.press(await screen.findByText("10 km"));
+			await waitFor(() => {
+				expect(screen.getByTestId("radius-btn-10000")).toBeOnTheScreen();
+			});
+			fireEvent.press(screen.getByTestId("radius-btn-10000"));
 
 			await waitFor(() => {
 				expect(getV1Market).toHaveBeenCalledWith(
@@ -314,11 +291,13 @@ describe("Market — filtros (integração)", () => {
 		});
 
 		it("chama API com radius=20000 ao selecionar 20 km", async () => {
-			const user = userEvent.setup();
 			mockMarketResponse([makeCompany()]);
 			await renderMarket();
 
-			await user.press(await screen.findByText("20 km"));
+			await waitFor(() => {
+				expect(screen.getByTestId("radius-btn-20000")).toBeOnTheScreen();
+			});
+			fireEvent.press(screen.getByTestId("radius-btn-20000"));
 
 			await waitFor(() => {
 				expect(getV1Market).toHaveBeenCalledWith(

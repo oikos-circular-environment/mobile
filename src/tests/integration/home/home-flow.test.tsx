@@ -11,10 +11,14 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { getV1Market } from "@/libs/oikos-sdk";
+import {
+	makeAddress,
+	makeCompany,
+	makeProfile,
+	makeUser,
+	makeWaste,
+} from "@/tests/factories";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 const mockLinkPress = jest.fn();
 
 jest.mock("expo-router", () => ({
@@ -111,9 +115,18 @@ jest.mock("@/components/toast", () => ({
 	},
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
+const mockCompany = makeCompany({
+	id: "company-1",
+	business_name: "Recicladora Verde Ltda",
+	corporate_name: "Recicladora Verde Ltda",
+	company_type: "COLLECTOR",
+	phones: ["11999999999"],
+	wastes: [
+		makeWaste({ id: "w-1", name: "Papel", unit: "KG", price: 0, quantity: 0 }),
+	],
+	distance_in_meters: 500,
+});
+
 const defaultAuth = {
 	user: null,
 	isAuthenticated: false,
@@ -135,48 +148,6 @@ const defaultGeospatial = {
 	reverseGeocodeError: false,
 };
 
-const mockCompany = {
-	id: "company-1",
-	business_name: null,
-	corporate_name: "Recicladora Verde Ltda",
-	company_type: "COLLECTOR" as const,
-	accept_appointments: true,
-	status: true,
-	phones: ["11999999999"],
-	address: {
-		id: "addr-1",
-		zip_code: "01310100",
-		street: "Rua Augusta",
-		number: "500",
-		complement: null,
-		district: "Consolação",
-		city: "São Paulo",
-		state: "São Paulo",
-		state_code: "SP",
-		latitude: -23.55,
-		longitude: -46.63,
-	},
-	services: [],
-	wastes: [
-		{
-			id: "w-1",
-			name: "Papel",
-			description: null,
-			price: 0,
-			unit: "KG" as const,
-			waste_type: "RECYCLABLE" as const,
-			quantity: 0,
-			observations: null,
-			sub_items: null,
-		},
-	],
-	business_hours: [],
-	distance_in_meters: 500,
-};
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function setupAuth(overrides: Partial<typeof defaultAuth> = {}) {
 	jest.mocked(useAuthContext).mockReturnValue({
 		...defaultAuth,
@@ -205,9 +176,6 @@ async function renderHome() {
 	);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("HomeScreen — integração", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -225,9 +193,6 @@ describe("HomeScreen — integração", () => {
 		jest.clearAllMocks();
 	});
 
-	// -----------------------------------------------------------------------
-	// Header — componentes reais
-	// -----------------------------------------------------------------------
 	it("renderiza GuestCard com boas-vindas para visitante", async () => {
 		setupAuth({ isAuthenticated: false });
 		await renderHome();
@@ -238,17 +203,14 @@ describe("HomeScreen — integração", () => {
 	it("renderiza UserCard com nome de exibição para usuário logado", async () => {
 		setupAuth({
 			isAuthenticated: true,
-			user: {
-				profile: {
+			user: makeUser({
+				profile: makeProfile({
 					user_id: "u1",
 					id: "p1",
 					full_name: "João Silva",
 					display_name: "João",
 					phone: "11999999999",
-					created_at: new Date(),
-					updated_at: new Date(),
-					profile_image: null,
-					address: {
+					address: makeAddress({
 						id: "a1",
 						zip_code: "01310100",
 						street: "Av Paulista",
@@ -262,9 +224,9 @@ describe("HomeScreen — integração", () => {
 						state_ibge_id: 35,
 						latitude: -23.55,
 						longitude: -46.63,
-					},
-				},
-			} as never,
+					}),
+				}),
+			}) as never,
 		});
 		await renderHome();
 
@@ -279,9 +241,6 @@ describe("HomeScreen — integração", () => {
 		expect(screen.getByText("Finalize seu cadastro")).toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Seções fixas
-	// -----------------------------------------------------------------------
 	it("exibe títulos das seções Serviços e Próximas de você", async () => {
 		await renderHome();
 
@@ -291,68 +250,61 @@ describe("HomeScreen — integração", () => {
 		expect(screen.getByText("Ver todas")).toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Fluxo completo de dados — API → tela
-	// -----------------------------------------------------------------------
-	it("carrega e exibe empresas próximas com dados formatados", async () => {
-		const company2 = {
-			...mockCompany,
-			id: "company-2",
-			corporate_name: "Coleta Seletiva S.A.",
-			company_type: "COMPANY" as const,
-			wastes: [
-				{
-					id: "w-2",
-					name: "Plástico",
-					description: null,
-					price: 0,
-					unit: "KG" as const,
-					waste_type: "RECYCLABLE" as const,
-					quantity: 0,
-					observations: null,
-					sub_items: null,
-				},
-				{
-					id: "w-3",
-					name: "Vidro",
-					description: null,
-					price: 0,
-					unit: "KG" as const,
-					waste_type: "RECYCLABLE" as const,
-					quantity: 0,
-					observations: null,
-					sub_items: null,
-				},
-			],
+	it("carrega e exibe 20 empresas próximas com dados formatados", async () => {
+		const companies = Array.from({ length: 20 }, (_, i) =>
+			makeCompany({
+				id: `company-${i + 1}`,
+				business_name: `Empresa ${i + 1}`,
+				corporate_name: `Empresa ${i + 1}`,
+				company_type: i === 0 ? "COLLECTOR" : "COMPANY",
+			}),
+		);
+
+		// Primeira é COLLECTOR para testar badge Coletor
+		companies[0] = {
+			...companies[0],
+			distance_in_meters: 500,
+			wastes: [makeWaste({ id: "w-1", name: "Papel" })],
+		};
+		// Segunda é COMPANY com nome específico para testar iniciais
+		companies[1] = {
+			...companies[1],
+			business_name: "Coleta Seletiva S.A.",
 			distance_in_meters: 1200,
+			wastes: [
+				makeWaste({ id: "w-2", name: "Plástico" }),
+				makeWaste({ id: "w-3", name: "Vidro" }),
+			],
 		};
 
 		setupGeospatial({
 			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
 		});
 		jest.mocked(getV1Market).mockResolvedValue({
-			data: { companies: [mockCompany, company2], next_cursor: null },
+			data: { companies, next_cursor: null },
 		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
 
 		await renderHome();
 
 		// Nomes das empresas
-		expect(await screen.findByText("Recicladora Verde Ltda")).toBeOnTheScreen();
+		expect(await screen.findByText("Empresa 1")).toBeOnTheScreen();
 		expect(screen.getByText("Coleta Seletiva S.A.")).toBeOnTheScreen();
+		expect(screen.getByText("Empresa 3")).toBeOnTheScreen();
 
-		// Resíduos (apenas 3 primeiros, separados por ", ")
+		// Resíduos (cada um em seu badge)
 		expect(screen.getByText("Papel")).toBeOnTheScreen();
-		expect(screen.getByText("Plástico, Vidro")).toBeOnTheScreen();
+		expect(screen.getByText("Plástico")).toBeOnTheScreen();
+		expect(screen.getByText("Vidro")).toBeOnTheScreen();
 
 		// Distância formatada
 		expect(screen.getByText("500 m")).toBeOnTheScreen();
 		expect(screen.getByText("1,2 km")).toBeOnTheScreen();
 
-		// Badge de status (ambas abertas)
-		expect(screen.getAllByText("Aberto")).toHaveLength(2);
+		// 20 badges de status (todas abertas)
+		expect(screen.getAllByText("Aberto")).toHaveLength(20);
 
-		// Ícone COLLECTOR (Sprout) — o fallback de iniciais não deve aparecer
-		expect(screen.queryByText("RV")).not.toBeOnTheScreen();
+		// Badge Coletor (apenas company-1 é COLLECTOR)
+		expect(screen.getByText("Coletor")).toBeOnTheScreen();
 	});
 
 	it("renderiza iniciais do nome para empresas do tipo COMPANY", async () => {
@@ -365,6 +317,7 @@ describe("HomeScreen — integração", () => {
 					{
 						...mockCompany,
 						id: "company-3",
+						business_name: "Coleta Seletiva S.A.",
 						company_type: "COMPANY",
 						corporate_name: "Coleta Seletiva S.A.",
 					},
@@ -392,9 +345,6 @@ describe("HomeScreen — integração", () => {
 		expect(await screen.findByText("Fechado")).toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Transições de estado
-	// -----------------------------------------------------------------------
 	it("transita de skeleton → UserCard ao fim do carregamento", async () => {
 		setupAuth({ isLoading: true });
 		await renderHome();
@@ -404,17 +354,21 @@ describe("HomeScreen — integração", () => {
 		setupAuth({
 			isLoading: false,
 			isAuthenticated: true,
-			user: {
-				profile: {
+			user: makeUser({
+				profile: makeProfile({
 					user_id: "u1",
 					id: "p1",
 					full_name: "Maria Souza",
 					display_name: "Maria",
 					phone: "11988888888",
-					created_at: new Date(),
-					updated_at: new Date(),
-					profile_image: { url: "https://example.com/avatar.jpg" },
-					address: {
+					profile_image: {
+						id: "pi-1",
+						url: "https://example.com/avatar.jpg",
+						file_name: "avatar.jpg",
+						path: "/avatars/avatar.jpg",
+						created_at: new Date("2025-01-01"),
+					},
+					address: makeAddress({
 						id: "a1",
 						zip_code: "01310100",
 						street: "Av Paulista",
@@ -428,9 +382,9 @@ describe("HomeScreen — integração", () => {
 						state_ibge_id: 35,
 						latitude: -23.55,
 						longitude: -46.63,
-					},
-				},
-			} as never,
+					}),
+				}),
+			}) as never,
 		});
 		await renderHome();
 
@@ -465,9 +419,6 @@ describe("HomeScreen — integração", () => {
 		expect(screen.queryByText("Buscando empresas…")).not.toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Interação: modal de perfil
-	// -----------------------------------------------------------------------
 	it("abre modal de finalizar cadastro ao pressionar Empresas com needsProfileCompletion", async () => {
 		const user = userEvent.setup();
 		setupAuth({

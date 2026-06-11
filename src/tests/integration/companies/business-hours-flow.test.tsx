@@ -11,6 +11,7 @@ import CompanyBusinessHoursScreen from "@/app/(tabs)/(home)/companies/[companyId
 import { useSaveBusinessHours } from "@/components/companies/hooks/use-save-business-hours";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
+import { makeStoreCompany } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
 	useLocalSearchParams: jest.fn(),
@@ -87,27 +88,11 @@ const mockBusinessHours = [
 	{ id: "bh-sat", day_of_week: "SATURDAY", is_open: false, time_slots: [] },
 ] as unknown as Company["business_hours"];
 
-const mockCompany: Company = {
+const mockCompany = makeStoreCompany({
 	id: "company-1",
-	user_id: "user-1",
-	identity: "12.345.678/0001-99",
-	identity_type: "CNPJ",
-	company_type: "COMPANY",
-	status: true,
 	business_name: "Empresa Teste",
 	corporate_name: "Empresa Teste Ltda",
-	email: null,
-	phones: [],
-	started_activity_in: new Date("2020-01-01"),
-	is_company_valid: true,
-	avatar: null,
-	created_at: new Date(),
-	updated_at: new Date(),
-	address: null,
-	business_hours: [],
-	wastes: [],
-	services: [],
-};
+});
 
 function createQueryClient() {
 	return new QueryClient({
@@ -118,7 +103,14 @@ function createQueryClient() {
 	});
 }
 
-function setupStore(company: Company = mockCompany, isLoaded = true) {
+function setupStore(
+	company: Company = makeStoreCompany({
+		id: "company-1",
+		business_name: "Empresa Teste",
+		corporate_name: "Empresa Teste Ltda",
+	}),
+	isLoaded = true,
+) {
 	jest
 		.mocked(useCompaniesStore)
 		.mockImplementation(selector =>

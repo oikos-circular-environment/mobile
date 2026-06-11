@@ -13,7 +13,7 @@ import { Toaster } from "@/components/toast";
 import { useAuthContext } from "@/contexts/auth-context";
 import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
 import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
-import type { User } from "@/libs/types/user";
+import { makeAddress, makeProfile, makeUser } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
@@ -61,20 +61,14 @@ jest.mock("@/components/toast", () => ({
 	Toaster: () => null,
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
-const mockUser: User = {
-	profile: {
+const mockUser = makeUser({
+	profile: makeProfile({
 		user_id: "user-1",
 		id: "profile-1",
 		full_name: "Emanuel Ribeiro de Souza",
 		display_name: "Emanuel",
 		phone: "11987654321",
-		created_at: new Date(),
-		updated_at: new Date(),
-		profile_image: null,
-		address: {
+		address: makeAddress({
 			id: "addr-1",
 			zip_code: "01310100",
 			street: "Avenida Paulista",
@@ -88,9 +82,9 @@ const mockUser: User = {
 			state_ibge_id: 35,
 			latitude: -23.5505,
 			longitude: -46.6333,
-		},
-	},
-};
+		}),
+	}),
+});
 
 const mockRouter = { push: jest.fn(), back: jest.fn(), navigate: jest.fn() };
 
@@ -125,9 +119,6 @@ async function renderProfile() {
 	return component;
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("ProfileScreen", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();

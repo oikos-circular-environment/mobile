@@ -6,6 +6,7 @@ import { useCompanyValidations } from "@/components/companies/hooks/use-company-
 import { useToggleCompanyStatus } from "@/components/companies/hooks/use-toggle-company-status";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
+import { makeStoreCompany } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
 	Link: ({
@@ -75,27 +76,11 @@ const ALL_TRUE: ValidationData = {
 	wastes: true,
 };
 
-const mockCompany: Company = {
+const mockCompany = makeStoreCompany({
 	id: "company-1",
-	user_id: "user-1",
-	identity: "12.345.678/0001-99",
-	identity_type: "CNPJ",
-	company_type: "COMPANY",
-	status: true,
 	business_name: "Empresa Teste",
 	corporate_name: "Empresa Teste Ltda",
-	email: null,
-	phones: [],
-	started_activity_in: new Date("2020-01-01"),
-	is_company_valid: true,
-	avatar: null,
-	created_at: new Date(),
-	updated_at: new Date(),
-	address: null,
-	business_hours: [],
-	wastes: [],
-	services: [],
-};
+});
 
 function createQueryClient() {
 	return new QueryClient({
@@ -106,7 +91,14 @@ function createQueryClient() {
 	});
 }
 
-function setupStore(company: Company | null = mockCompany, isLoaded = true) {
+function setupStore(
+	company: Company | null = makeStoreCompany({
+		id: "company-1",
+		business_name: "Empresa Teste",
+		corporate_name: "Empresa Teste Ltda",
+	}),
+	isLoaded = true,
+) {
 	jest
 		.mocked(useCompaniesStore)
 		.mockImplementation(selector =>

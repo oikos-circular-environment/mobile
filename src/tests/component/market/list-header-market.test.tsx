@@ -39,9 +39,6 @@ jest.mock("@/components/ui/bottomsheet", () => {
 	};
 });
 
-// ---------------------------------------------------------------------------
-// Mock contexts
-// ---------------------------------------------------------------------------
 jest.mock("@/contexts/geospatial-context");
 jest.mock("@/contexts/market-context");
 
@@ -87,9 +84,6 @@ function setupMarket(overrides: Partial<typeof defaultMarket> = {}) {
 	});
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("MarketListHeader", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();

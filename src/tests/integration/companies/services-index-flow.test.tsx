@@ -9,6 +9,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import ServicesIndexScreen from "@/app/(tabs)/(home)/companies/[companyId]/services/index";
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
+import { makeStoreCompany } from "@/tests/factories";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
 
@@ -86,27 +87,12 @@ const mockService2 = {
 	waste_category: { id: "cat-2", name: "Orgânicos", hazard_levels: [] },
 } as unknown as Company["services"][number];
 
-const mockCompany: Company = {
+const mockCompany = makeStoreCompany({
 	id: "company-1",
-	user_id: "user-1",
-	identity: "12.345.678/0001-99",
-	identity_type: "CNPJ",
-	company_type: "COMPANY",
-	status: true,
 	business_name: "Empresa Teste",
 	corporate_name: "Empresa Teste Ltda",
-	email: null,
-	phones: [],
-	started_activity_in: new Date("2020-01-01"),
-	is_company_valid: true,
-	avatar: null,
-	created_at: new Date(),
-	updated_at: new Date(),
-	address: null,
-	business_hours: [],
-	wastes: [],
 	services: [mockService1, mockService2],
-};
+});
 
 function createQueryClient() {
 	return new QueryClient({
@@ -117,7 +103,15 @@ function createQueryClient() {
 	});
 }
 
-function setupStore(company: Company = mockCompany, isLoaded = true) {
+function setupStore(
+	company: Company = makeStoreCompany({
+		id: "company-1",
+		business_name: "Empresa Teste",
+		corporate_name: "Empresa Teste Ltda",
+		services: [mockService1, mockService2],
+	}),
+	isLoaded = true,
+) {
 	jest
 		.mocked(useCompaniesStore)
 		.mockImplementation(selector =>
@@ -171,7 +165,7 @@ describe("ServicesIndexScreen — integração", () => {
 	});
 
 	it("redireciona para o formulário quando empresa não tem serviços", async () => {
-		setupStore({ ...mockCompany, services: [] });
+		setupStore(makeStoreCompany({ id: "company-1", services: [] }));
 		await renderScreen();
 		expect(mockReplace).toHaveBeenCalledWith(
 			expect.objectContaining({

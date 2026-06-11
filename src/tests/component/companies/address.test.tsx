@@ -4,12 +4,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import CompanyAddressScreen from "@/app/(tabs)/(home)/companies/[companyId]/address";
 import { useSaveAddress } from "@/components/companies/hooks/use-save-address";
 import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
+import { makeAddress, makeCompany } from "@/tests/factories";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 jest.mock("expo-router", () => ({
 	useLocalSearchParams: jest.fn(),
 	useRouter: jest.fn(),
@@ -61,10 +59,7 @@ jest.mock("@/components/wrapper-map", () => ({
 	},
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
-const mockAddress = {
+const mockAddress = makeAddress({
 	id: "address-1",
 	zip_code: "01001-000",
 	street: "Praça da Sé",
@@ -78,31 +73,12 @@ const mockAddress = {
 	city_ibge_id: 3550308,
 	latitude: null as unknown as number,
 	longitude: null as unknown as number,
-	created_at: new Date(),
-	updated_at: new Date(),
-};
+});
 
-const mockCompany: Company = {
+const mockCompany = makeCompany({
 	id: "company-1",
-	user_id: "user-1",
-	identity: "12.345.678/0001-99",
-	identity_type: "CNPJ",
-	company_type: "COMPANY",
-	status: true,
-	business_name: "Empresa Teste",
-	corporate_name: "Empresa Teste Ltda",
-	email: null,
-	phones: [],
-	started_activity_in: new Date("2020-01-01"),
-	is_company_valid: true,
-	avatar: null,
-	created_at: new Date(),
-	updated_at: new Date(),
 	address: mockAddress,
-	business_hours: [],
-	wastes: [],
-	services: [],
-};
+}) as unknown as Company;
 
 const mockRegiao = { id: 3, sigla: "SE", nome: "Sudeste" };
 const mockStates = [
@@ -110,9 +86,6 @@ const mockStates = [
 ];
 const mockCities = [{ nome: "São Paulo", codigo_ibge: "3550308" }];
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function createQueryClient() {
 	return new QueryClient({
 		defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -138,9 +111,6 @@ async function renderScreen() {
 	);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("CompanyAddressScreen — componente", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -170,9 +140,6 @@ describe("CompanyAddressScreen — componente", () => {
 		jest.clearAllMocks();
 	});
 
-	// -----------------------------------------------------------------------
-	// Skeleton
-	// -----------------------------------------------------------------------
 	it("não renderiza campos quando o endereço está carregando", async () => {
 		setupStore(mockCompany, false);
 		await renderScreen();
@@ -181,9 +148,6 @@ describe("CompanyAddressScreen — componente", () => {
 		expect(screen.queryByTestId("btn-save")).not.toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Formulário inicial
-	// -----------------------------------------------------------------------
 	it("preenche os campos com os dados do endereço existente", async () => {
 		await renderScreen();
 
@@ -208,9 +172,6 @@ describe("CompanyAddressScreen — componente", () => {
 		expect(screen.getByTestId("input-number")).toHaveProp("value", "");
 	});
 
-	// -----------------------------------------------------------------------
-	// Mapa — mensagem padrão
-	// -----------------------------------------------------------------------
 	it("exibe a mensagem padrão do mapa quando lat/lon são nulos", async () => {
 		await renderScreen();
 
@@ -221,9 +182,6 @@ describe("CompanyAddressScreen — componente", () => {
 		).toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Mapa — interação
-	// -----------------------------------------------------------------------
 	it("toque no mapa exibe o ponto selecionado com as coordenadas corretas", async () => {
 		const user = userEvent.setup();
 		await renderScreen();
@@ -268,9 +226,6 @@ describe("CompanyAddressScreen — componente", () => {
 		).toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Botões — estado desabilitado
-	// -----------------------------------------------------------------------
 	it("botões Cancelar e Salvar estão desabilitados quando o formulário não foi alterado", async () => {
 		await renderScreen();
 
@@ -278,9 +233,6 @@ describe("CompanyAddressScreen — componente", () => {
 		expect(screen.getByTestId("btn-save")).toBeDisabled();
 	});
 
-	// -----------------------------------------------------------------------
-	// Botões — habilitados após edição
-	// -----------------------------------------------------------------------
 	it("botões ficam habilitados ao editar um campo de texto", async () => {
 		const user = userEvent.setup();
 		await renderScreen();
@@ -291,9 +243,6 @@ describe("CompanyAddressScreen — componente", () => {
 		expect(screen.getByTestId("btn-save")).not.toBeDisabled();
 	});
 
-	// -----------------------------------------------------------------------
-	// Cancelar
-	// -----------------------------------------------------------------------
 	it("pressionar Cancelar restaura os valores originais do endereço", async () => {
 		const user = userEvent.setup();
 		await renderScreen();

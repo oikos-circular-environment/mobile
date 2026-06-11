@@ -17,6 +17,7 @@ import {
 } from "@/libs/brasil-api-sdk";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
+import { makeAddress, makeStoreCompany } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
 	useLocalSearchParams: jest.fn(),
@@ -119,7 +120,7 @@ const mockCepResponse = {
 	},
 };
 
-const mockAddress = {
+const mockAddress = makeAddress({
 	id: "address-1",
 	zip_code: "04001-000",
 	street: "Av. Paulista",
@@ -133,31 +134,15 @@ const mockAddress = {
 	city_ibge_id: 3550308,
 	latitude: null as unknown as number,
 	longitude: null as unknown as number,
-	created_at: new Date(),
-	updated_at: new Date(),
-};
+});
 
-const mockCompany: Company = {
+const mockCompany = makeStoreCompany({
 	id: "company-1",
-	user_id: "user-1",
-	identity: "12.345.678/0001-99",
-	identity_type: "CNPJ",
-	company_type: "COMPANY",
-	status: true,
 	business_name: "Empresa Teste",
 	corporate_name: "Empresa Teste Ltda",
-	email: null,
-	phones: [],
-	started_activity_in: new Date("2020-01-01"),
-	is_company_valid: true,
-	avatar: null,
-	created_at: new Date(),
-	updated_at: new Date(),
+	identity: "12.345.678/0001-99",
 	address: mockAddress,
-	business_hours: [],
-	wastes: [],
-	services: [],
-};
+});
 
 function createQueryClient() {
 	return new QueryClient({
@@ -168,7 +153,7 @@ function createQueryClient() {
 	});
 }
 
-function setupStore(company: Company = mockCompany, isLoaded = true) {
+function setupStore(company: Company = makeStoreCompany({ id: "company-1", address: mockAddress }), isLoaded = true) {
 	jest
 		.mocked(useCompaniesStore)
 		.mockImplementation(selector =>
@@ -271,9 +256,6 @@ describe("CompanyAddressScreen — integração", () => {
 		});
 	});
 
-	// -----------------------------------------------------------------------
-	// Fluxo de seleção automática de estado e município
-	// -----------------------------------------------------------------------
 	it("após busca CEP, dispara a query de cidades para o estado retornado", async () => {
 		await renderScreen();
 
@@ -320,7 +302,7 @@ describe("CompanyAddressScreen — integração", () => {
 	});
 
 	it("busca CEP preenche state_code com a sigla do estado retornado", async () => {
-		setupStore({ ...mockCompany, address: null });
+		setupStore(makeStoreCompany({ id: "company-1", address: null }));
 
 		await renderScreen();
 

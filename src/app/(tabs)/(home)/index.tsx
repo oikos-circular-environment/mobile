@@ -3,6 +3,7 @@ import type { Href } from "expo-router";
 import { Link } from "expo-router";
 import {
 	ArrowRight,
+	HammerIcon,
 	RecycleIcon,
 	ShieldIcon,
 	Sprout,
@@ -12,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import {
 	ActivityIndicator,
 	Animated,
+	Image,
 	Pressable,
 	ScrollView,
 	View,
@@ -21,21 +23,18 @@ import { HomeGuestCard } from "@/components/home/home-guest-card";
 import { HomeHeaderSkeleton } from "@/components/home/home-header-skeleton";
 import { HomeUserCard } from "@/components/home/home-user-card";
 import { colors } from "@/components/style/colors";
-import { Badge, BadgeText } from "@/components/ui/badge";
+import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Grid, GridItem } from "@/components/ui/grid";
 import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { formatDistance } from "@/libs/format-distance";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { getV1Market } from "@/libs/oikos-sdk";
-
-const formatDistance = (meters: number) => {
-	if (meters >= 1000)
-		return `${(meters / 1000).toFixed(1).replace(".", ",")} km`;
-	return `${Math.round(meters)} m`;
-};
 
 function ServiceCard({
 	label,
@@ -221,6 +220,11 @@ export default function HomeScreen() {
 									item.business_hours,
 									currentDate,
 								);
+								const initials = item.business_name
+									.split(" ")
+									.slice(0, 2)
+									.map(w => w[0]?.toUpperCase() ?? "")
+									.join("");
 								return (
 									<Link
 										key={item.id}
@@ -231,57 +235,92 @@ export default function HomeScreen() {
 										asChild
 									>
 										<Pressable>
-											<Card
-												size="sm"
-												className="border-0 bg-gray-100 shadow-none"
-											>
-												<View className="flex-row items-center gap-3">
-													<View className="h-12 w-12 items-center justify-center overflow-hidden rounded-[5px] bg-lime-800">
-														{item.company_type === "COLLECTOR" ? (
-															<Sprout size={16} color={colors.white} />
+											<Card className="shadow-none p-4">
+												<VStack space="md">
+													<HStack space="md" className="items-center">
+														{item.avatar ? (
+															<View className="w-16 h-16 rounded-lg overflow-hidden">
+																<Image
+																	source={{ uri: item.avatar }}
+																	className="w-full h-full"
+																	resizeMode="cover"
+																/>
+															</View>
 														) : (
-															<Text className="text-[10px] font-semibold text-white">
-																{item.corporate_name
-																	.split(" ")
-																	.slice(0, 2)
-																	.map(word => word[0]?.toUpperCase() ?? "")
-																	.join("")}
-															</Text>
+															<View className="w-16 h-16 rounded-lg bg-primary items-center justify-center">
+																{item.company_type === "COLLECTOR" ? (
+																	<Sprout
+																		size={20}
+																		className="text-primary-foreground"
+																	/>
+																) : (
+																	<Text className="text-primary-foreground text-sm font-bold">
+																		{initials}
+																	</Text>
+																)}
+															</View>
 														)}
-													</View>
 
-													<View className="min-w-0 flex-1 gap-1">
-														<View className="flex-row items-center gap-2">
-															<Text
-																className="font-semibold text-gray-950 flex-1"
-																numberOfLines={1}
-															>
-																{item.corporate_name}
+														<View className="gap-1">
+															<Text className="font-bold uppercase">
+																{item.business_name}
 															</Text>
-															<Badge
-																variant={isOpen ? "default" : "destructive"}
-															>
-																<BadgeText>
-																	{isOpen ? "Aberto" : "Fechado"}
-																</BadgeText>
-															</Badge>
+															<Text className="text-xs text-muted-foreground">
+																{item.identity_type === "CNPJ"
+																	? item.identity
+																	: "Coletor independente"}
+															</Text>
+															<HStack className="gap-1.5 pt-1 flex-wrap">
+																<Badge variant="secondary">
+																	<BadgeText>
+																		{formatDistance(item.distance_in_meters)}
+																	</BadgeText>
+																</Badge>
+																{item.company_type === "COLLECTOR" && (
+																	<Badge variant="default">
+																		<BadgeText>Coletor</BadgeText>
+																	</Badge>
+																)}
+																<Badge
+																	variant={isOpen ? "default" : "destructive"}
+																>
+																	<BadgeText>
+																		{isOpen ? "Aberto" : "Fechado"}
+																	</BadgeText>
+																</Badge>
+															</HStack>
 														</View>
-														<Text
-															className="text-xs leading-4 text-gray-500"
-															numberOfLines={1}
-														>
-															{item.wastes
-																.map(w => w.name)
-																.slice(0, 3)
-																.join(", ")}
-														</Text>
-														<Text className="text-xs text-gray-400">
-															{formatDistance(item.distance_in_meters)}
-														</Text>
-													</View>
-
-													<ArrowRight size={16} color={colors.gray[400]} />
-												</View>
+													</HStack>
+													<ScrollView
+														horizontal
+														showsHorizontalScrollIndicator={false}
+														contentContainerClassName="gap-2"
+														pointerEvents="auto"
+													>
+														<HStack space="sm">
+															{item.wastes.map(waste => (
+																<Badge
+																	key={waste.id}
+																	variant="secondary"
+																	className="gap-2"
+																>
+																	<BadgeIcon as={RecycleIcon} />
+																	<BadgeText>{waste.name}</BadgeText>
+																</Badge>
+															))}
+															{item.services.map(service => (
+																<Badge
+																	key={service.id}
+																	variant="secondary"
+																	className="gap-2"
+																>
+																	<BadgeIcon as={HammerIcon} />
+																	<BadgeText>{service.name}</BadgeText>
+																</Badge>
+															))}
+														</HStack>
+													</ScrollView>
+												</VStack>
 											</Card>
 										</Pressable>
 									</Link>

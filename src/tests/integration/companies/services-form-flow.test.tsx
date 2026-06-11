@@ -11,6 +11,7 @@ import ServiceFormScreen from "@/app/(tabs)/(home)/companies/[companyId]/service
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
+import { makeStoreCompany } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
 	useLocalSearchParams: jest.fn(),
@@ -94,27 +95,12 @@ const mockService = {
 	waste_category: { id: "cat-1", name: "Construção Civil", hazard_levels: [] },
 } as unknown as Company["services"][number];
 
-const mockCompany: Company = {
+const mockCompany = makeStoreCompany({
 	id: "company-1",
-	user_id: "user-1",
-	identity: "12.345.678/0001-99",
-	identity_type: "CNPJ",
-	company_type: "COMPANY",
-	status: true,
 	business_name: "Empresa Teste",
 	corporate_name: "Empresa Teste Ltda",
-	email: null,
-	phones: [],
-	started_activity_in: new Date("2020-01-01"),
-	is_company_valid: true,
-	avatar: null,
-	created_at: new Date(),
-	updated_at: new Date(),
-	address: null,
-	business_hours: [],
-	wastes: [],
 	services: [mockService],
-};
+});
 
 function createQueryClient() {
 	return new QueryClient({
@@ -125,7 +111,15 @@ function createQueryClient() {
 	});
 }
 
-function setupStore(company: Company = mockCompany, isLoaded = true) {
+function setupStore(
+	company: Company = makeStoreCompany({
+		id: "company-1",
+		business_name: "Empresa Teste",
+		corporate_name: "Empresa Teste Ltda",
+		services: [mockService],
+	}),
+	isLoaded = true,
+) {
 	jest
 		.mocked(useCompaniesStore)
 		.mockImplementation(selector =>

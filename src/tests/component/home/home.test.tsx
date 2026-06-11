@@ -7,9 +7,6 @@ import { useGeospatial } from "@/contexts/geospatial-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { getV1Market } from "@/libs/oikos-sdk";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 jest.mock("expo-router", () => ({
 	Link: ({
 		children,
@@ -85,9 +82,6 @@ jest.mock("@/components/auth/profile-completion-modal", () => ({
 	},
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
 const defaultAuth = {
 	user: null,
 	isAuthenticated: false,
@@ -148,9 +142,6 @@ const mockCompany = {
 	distance_in_meters: 500,
 };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function setupAuth(overrides: Partial<typeof defaultAuth> = {}) {
 	jest.mocked(useAuthContext).mockReturnValue({
 		...defaultAuth,
@@ -179,9 +170,6 @@ async function renderHome() {
 	);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("HomeScreen — componente", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -198,9 +186,6 @@ describe("HomeScreen — componente", () => {
 		jest.clearAllMocks();
 	});
 
-	// -----------------------------------------------------------------------
-	// Header (skeleton / guest / user)
-	// -----------------------------------------------------------------------
 	it("exibe skeleton enquanto isLoading é true", async () => {
 		setupAuth({ isLoading: true });
 		await renderHome();
@@ -226,9 +211,6 @@ describe("HomeScreen — componente", () => {
 		expect(screen.queryByTestId("home-guest-card")).not.toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Cards de serviço
-	// -----------------------------------------------------------------------
 	it("exibe Pontos de Coleta e Denúncias (sempre visíveis)", async () => {
 		await renderHome();
 
@@ -291,9 +273,6 @@ describe("HomeScreen — componente", () => {
 		);
 	});
 
-	// -----------------------------------------------------------------------
-	// Empresas próximas — loading / erro / vazio / dados
-	// -----------------------------------------------------------------------
 	it("exibe mensagem de localização indisponível quando permissionDenied", async () => {
 		setupGeospatial({ permissionDenied: true });
 		await renderHome();

@@ -49,9 +49,6 @@ jest.mock("@/components/toast", () => ({
 	Toaster: () => null,
 }));
 
-// ---------------------------------------------------------------------------
-// Helper component used in sign-out tests
-// ---------------------------------------------------------------------------
 function AuthStateHarness() {
 	const { signOut, isAuthenticated } = useAuthContext();
 	return (
@@ -66,9 +63,6 @@ function AuthStateHarness() {
 	);
 }
 
-// ---------------------------------------------------------------------------
-// Shared setup
-// ---------------------------------------------------------------------------
 const mockRouter = {
 	push: jest.fn(),
 	back: jest.fn(),
@@ -90,9 +84,6 @@ async function renderWithAuth(ui: React.ReactElement) {
 	);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("Fluxo de autenticação — integração", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -108,9 +99,6 @@ describe("Fluxo de autenticação — integração", () => {
 		setAuthToken(null);
 	});
 
-	// -------------------------------------------------------------------------
-	// Sign-in
-	// -------------------------------------------------------------------------
 	describe("SignIn", () => {
 		it("chama a API com as credenciais e navega para home quando o perfil existe", async () => {
 			jest.mocked(postV1AuthLogin).mockResolvedValue({
@@ -188,9 +176,6 @@ describe("Fluxo de autenticação — integração", () => {
 		});
 	});
 
-	// -------------------------------------------------------------------------
-	// Sign-out
-	// -------------------------------------------------------------------------
 	describe("SignOut", () => {
 		it("reseta o estado de autenticação, navega para home e exibe toast", async () => {
 			// Seed a valid token so the auth context initializes as authenticated

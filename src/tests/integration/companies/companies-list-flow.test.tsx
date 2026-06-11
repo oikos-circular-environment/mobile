@@ -3,10 +3,8 @@ import { router, useRouter } from "expo-router";
 import CompaniesListScreen from "@/app/(tabs)/(home)/companies/index";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
+import { makeStoreCompany } from "@/tests/factories";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
 	router: { push: jest.fn() },
@@ -16,36 +14,16 @@ jest.mock("@/stores/companies-store", () => ({
 	useCompaniesStore: jest.fn(),
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
-const mockCompany: Company = {
+const mockCompany = makeStoreCompany({
 	id: "company-1",
-	user_id: "user-1",
-	identity: "12.345.678/0001-99",
-	identity_type: "CNPJ",
-	company_type: "COMPANY",
-	status: true,
 	business_name: "Reciclagem Express",
 	corporate_name: "Reciclagem Express Ltda",
-	email: null,
+	identity: "12.345.678/0001-99",
 	phones: ["11999999999"],
-	started_activity_in: new Date("2020-01-01"),
-	is_company_valid: true,
-	avatar: null,
-	created_at: new Date(),
-	updated_at: new Date(),
-	address: null,
-	business_hours: [],
-	wastes: [],
-	services: [],
-};
+});
 
 const mockPush = jest.fn();
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function setupStore(companies: Company[] = [], isLoaded = true) {
 	jest
 		.mocked(useCompaniesStore)
@@ -56,9 +34,6 @@ async function renderScreen() {
 	return await render(<CompaniesListScreen />);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("CompaniesListScreen — integração", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -75,9 +50,6 @@ describe("CompaniesListScreen — integração", () => {
 		jest.clearAllMocks();
 	});
 
-	// -----------------------------------------------------------------------
-	// Header — CompanyListHeader real
-	// -----------------------------------------------------------------------
 	it("exibe título, descrição e seção Minhas Empresas no cabeçalho", async () => {
 		await renderScreen();
 
@@ -106,9 +78,6 @@ describe("CompaniesListScreen — integração", () => {
 		});
 	});
 
-	// -----------------------------------------------------------------------
-	// CompanyCard — exibição de dados
-	// -----------------------------------------------------------------------
 	it("exibe business_name como título e corporate_name como subtítulo quando ambos presentes", async () => {
 		setupStore([mockCompany]);
 		await renderScreen();
@@ -135,9 +104,6 @@ describe("CompaniesListScreen — integração", () => {
 		expect(await screen.findByText("12.345.678/0001-99")).toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// CompanyCard — badges de status
-	// -----------------------------------------------------------------------
 	it("exibe badge Ativa quando status é true", async () => {
 		setupStore([{ ...mockCompany, status: true }]);
 		await renderScreen();
@@ -169,9 +135,6 @@ describe("CompaniesListScreen — integração", () => {
 		expect(screen.queryByText("Perfil incompleto")).not.toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Navegação via card
-	// -----------------------------------------------------------------------
 	it("navega para o detalhe da empresa ao pressionar o card", async () => {
 		const user = userEvent.setup();
 		setupStore([mockCompany]);

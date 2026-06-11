@@ -6,9 +6,6 @@ import { useMarket } from "@/contexts/market-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { makeCompany, makeCompanyList } from "@/tests/factories";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 
 jest.mock("expo-router", () => ({
 	Link: ({
@@ -40,9 +37,6 @@ jest.mock("@/components/market/list-header-market", () => ({
 	},
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
 
 const defaultGeospatial = {
 	currentDate: new Date("2026-06-11T10:00:00"),
@@ -70,9 +64,6 @@ const defaultMarket = {
 	getCompanyById: jest.fn(),
 };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
 	jest
@@ -88,9 +79,6 @@ async function renderScreen() {
 	return await render(<MarketScreen />);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("MarketScreen", () => {
 	beforeEach(() => {
@@ -105,9 +93,6 @@ describe("MarketScreen", () => {
 		jest.clearAllMocks();
 	});
 
-	// -------------------------------------------------------------------------
-	// Estados vazios / erro / loading
-	// -------------------------------------------------------------------------
 
 	describe("estados da lista", () => {
 		it("não exibe cards de empresa durante carregamento (isPending=true)", async () => {
@@ -150,9 +135,6 @@ describe("MarketScreen", () => {
 		});
 	});
 
-	// -------------------------------------------------------------------------
-	// Renderização de cards
-	// -------------------------------------------------------------------------
 
 	describe("cards de empresa", () => {
 		it("renderiza 25 empresas geradas pela factory", async () => {
@@ -215,9 +197,6 @@ describe("MarketScreen", () => {
 		});
 	});
 
-	// -------------------------------------------------------------------------
-	// Paginação
-	// -------------------------------------------------------------------------
 
 	describe("paginação", () => {
 		it("exibe botão Carregar mais quando hasNextPage=true", async () => {

@@ -3,10 +3,12 @@ import { router, useRouter } from "expo-router";
 import CompaniesListScreen from "@/app/(tabs)/(home)/companies/index";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
+import {
+	makeAddress,
+	makeStoreCompany,
+	makeStoreCompanyList,
+} from "@/tests/factories";
 
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
 	router: { push: jest.fn() },
@@ -16,51 +18,33 @@ jest.mock("@/stores/companies-store", () => ({
 	useCompaniesStore: jest.fn(),
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
 function createCompany(overrides: Partial<Company> = {}): Company {
-	return {
+	return makeStoreCompany({
 		id: "company-1",
-		user_id: "user-1",
-		identity: "12.345.678/0001-99",
-		identity_type: "CNPJ",
-		company_type: "COMPANY",
-		status: true,
 		business_name: "Reciclagem Express",
 		corporate_name: "Reciclagem Express Ltda",
-		email: null,
+		identity: "12.345.678/0001-99",
 		phones: ["11999999999"],
-		started_activity_in: new Date("2020-01-01"),
-		is_company_valid: true,
-		avatar: null,
-		created_at: new Date(),
-		updated_at: new Date(),
-		address: null,
-		business_hours: [],
-		wastes: [],
-		services: [],
 		...overrides,
-	};
+	});
 }
 
 function generateCompanies(count: number): Company[] {
-	return Array.from({ length: count }, (_, i) =>
-		createCompany({
-			id: `company-${i + 1}`,
-			business_name: `Empresa ${i + 1}`,
-			corporate_name: `Empresa ${i + 1} Ltda`,
-			identity: `${String(i + 1).padStart(2, "0")}.${String(i + 1).padStart(3, "0")}.${String(i + 1).padStart(3, "0")}/0001-${String(i + 1).padStart(2, "0")}`,
-			is_company_valid: i % 3 !== 0,
-		}),
-	);
+	return makeStoreCompanyList(count, {
+		business_name: "",
+		corporate_name: "",
+	}).map((c, i) => ({
+		...c,
+		id: `company-${i + 1}`,
+		business_name: `Empresa ${i + 1}`,
+		corporate_name: `Empresa ${i + 1} Ltda`,
+		identity: `${String(i + 1).padStart(2, "0")}.${String(i + 1).padStart(3, "0")}.${String(i + 1).padStart(3, "0")}/0001-${String(i + 1).padStart(2, "0")}`,
+		is_company_valid: i % 3 !== 0,
+	}));
 }
 
 const mockPush = jest.fn();
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function setupStore(companies: Company[] = [], isLoaded = true) {
 	jest
 		.mocked(useCompaniesStore)
@@ -71,9 +55,6 @@ async function renderScreen() {
 	return await render(<CompaniesListScreen />);
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe("CompaniesListScreen — fluxo completo", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -90,9 +71,6 @@ describe("CompaniesListScreen — fluxo completo", () => {
 		jest.clearAllMocks();
 	});
 
-	// -----------------------------------------------------------------------
-	// Listagem — desempenho com 10+ empresas
-	// -----------------------------------------------------------------------
 	it("lista 10 empresas com todas visíveis na tela (ótimo desempenho)", async () => {
 		const companies = generateCompanies(10);
 		setupStore(companies);
@@ -142,7 +120,7 @@ describe("CompaniesListScreen — fluxo completo", () => {
 		const company = createCompany({
 			is_company_valid: true,
 			status: true,
-			address: {
+			address: makeAddress({
 				id: "addr-1",
 				zip_code: "01001-000",
 				street: "Rua Exemplo",
@@ -156,9 +134,7 @@ describe("CompaniesListScreen — fluxo completo", () => {
 				city_ibge_id: 3550308,
 				latitude: -23.55,
 				longitude: -46.63,
-				created_at: new Date(),
-				updated_at: new Date(),
-			},
+			}),
 			business_hours: [
 				{
 					id: "bh-1",
@@ -212,9 +188,6 @@ describe("CompaniesListScreen — fluxo completo", () => {
 		expect(await screen.findByText("Perfil incompleto")).toBeOnTheScreen();
 	});
 
-	// -----------------------------------------------------------------------
-	// Alternância entre perfis completos e incompletos na lista
-	// -----------------------------------------------------------------------
 	it("exibe badge apenas nas empresas com perfil incompleto em lista mista", async () => {
 		const validCompany = createCompany({
 			id: "company-1",
@@ -236,9 +209,6 @@ describe("CompaniesListScreen — fluxo completo", () => {
 		expect(screen.getAllByText("Perfil incompleto")).toHaveLength(1);
 	});
 
-	// -----------------------------------------------------------------------
-	// Navegação — card → detalhes da empresa
-	// -----------------------------------------------------------------------
 	it("navega para detalhes ao pressionar o company-card", async () => {
 		const user = userEvent.setup();
 		const company = createCompany({ id: "company-detail-1" });
@@ -274,9 +244,6 @@ describe("CompaniesListScreen — fluxo completo", () => {
 		);
 	});
 
-	// -----------------------------------------------------------------------
-	// Fluxo de criação — Nova Empresa
-	// -----------------------------------------------------------------------
 	it("navega para tela de criação ao pressionar Nova Empresa", async () => {
 		const user = userEvent.setup();
 		await renderScreen();

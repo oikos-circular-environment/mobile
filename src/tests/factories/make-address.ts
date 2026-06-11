@@ -16,6 +16,8 @@ export function makeAddress(overrides: Partial<Address> = {}): Address {
 		zip_code: faker.location.zipCode(),
 		latitude: faker.location.latitude({ min: -23.6, max: -23.4 }),
 		longitude: faker.location.longitude({ min: -46.7, max: -46.5 }),
+		created_at: faker.date.past({ years: 1 }),
+		updated_at: faker.date.recent(),
 		...overrides,
 	};
 }

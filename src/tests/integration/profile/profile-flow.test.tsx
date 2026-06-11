@@ -18,7 +18,7 @@ import {
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
 import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
-import type { User } from "@/libs/types/user";
+import { makeAddress, makeProfile, makeUser } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
@@ -90,22 +90,16 @@ jest.mock("@/libs/media-compression", () => ({
 	compressImage: jest.fn().mockResolvedValue("compressed-uri"),
 }));
 
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
 const mockUpdateUserProfile = jest.fn();
 
-const mockUser: User = {
-	profile: {
+const mockUser = makeUser({
+	profile: makeProfile({
 		user_id: "user-1",
 		id: "profile-1",
 		full_name: "Emanuel Ribeiro de Souza",
 		display_name: "Emanuel",
 		phone: "11987654321",
-		created_at: new Date(),
-		updated_at: new Date(),
-		profile_image: null,
-		address: {
+		address: makeAddress({
 			id: "addr-1",
 			zip_code: "01310100",
 			street: "Avenida Paulista",
@@ -119,9 +113,9 @@ const mockUser: User = {
 			state_ibge_id: 35,
 			latitude: -23.5505,
 			longitude: -46.6333,
-		},
-	},
-};
+		}),
+	}),
+});
 
 const mockRouter = { push: jest.fn(), back: jest.fn(), navigate: jest.fn() };
 
@@ -156,9 +150,6 @@ async function renderProfile() {
 	return component;
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("ProfileScreen — integração", () => {
 	beforeEach(() => {
@@ -182,9 +173,6 @@ describe("ProfileScreen — integração", () => {
 		jest.clearAllMocks();
 	});
 
-	// -------------------------------------------------------------------------
-	// Save profile
-	// -------------------------------------------------------------------------
 	it("salva o perfil com sucesso, atualiza o contexto, exibe toast e navega para home", async () => {
 		const updatedProfile = { ...mockUser.profile, display_name: "Manny" };
 		jest.mocked(putV1Profiles).mockResolvedValue({
@@ -279,9 +267,6 @@ describe("ProfileScreen — integração", () => {
 		expect(mockRouter.push).not.toHaveBeenCalled();
 	});
 
-	// -------------------------------------------------------------------------
-	// CEP search
-	// -------------------------------------------------------------------------
 	it("busca CEP com sucesso e preenche os campos de endereço", async () => {
 		jest.mocked(getCepV2).mockResolvedValue({
 			data: {
