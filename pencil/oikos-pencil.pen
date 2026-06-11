@@ -11117,7 +11117,10 @@
                     {
                       "type": "frame",
                       "id": "z4aLLC",
+                      "x": 0,
+                      "y": 832,
                       "name": "TabBar",
+                      "enabled": false,
                       "children": [
                         {
                           "type": "frame",
@@ -14046,7 +14049,7 @@
               "type": "ref",
               "ref": "cYytK",
               "name": "market/index — raios (sheet)",
-              "context": "BottomSheet de filtros avançados — raio + categoria + localização. Abre pelo botão sliders da busca.",
+              "context": "BottomSheet de raio",
               "clip": true,
               "descendants": {
                 "OpqBD": {
@@ -15964,6 +15967,16 @@
                   ]
                 }
               }
+            },
+            {
+              "type": "frame",
+              "id": "l1trG",
+              "name": "Frame 26",
+              "clip": true,
+              "width": 2,
+              "height": 1,
+              "fill": "#FFFFFF",
+              "layout": "none"
             }
           ]
         }

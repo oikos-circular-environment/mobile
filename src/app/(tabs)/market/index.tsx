@@ -1,60 +1,124 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
+import { Sprout } from "lucide-react-native";
+import { useMemo, useRef } from "react";
 import {
-	AlertCircleIcon,
-	ArrowRight,
-	MapPinIcon,
-	Search,
-	Sprout,
-} from "lucide-react-native";
-import { Controller, useForm } from "react-hook-form";
-import {
-	ActivityIndicator,
+	FlatList,
+	Image,
 	KeyboardAvoidingView,
 	Pressable,
-	ScrollView,
 	View,
 } from "react-native";
-import { CategoryToggle } from "@/components/market/category-toggle";
-import { LocationSourceSelect } from "@/components/market/location-source-select";
-import { RadiusToggle } from "@/components/market/radius-toggle";
-import { colors } from "@/components/style/colors";
+import {
+	FiltersBottomSheet,
+	type FiltersBottomSheetRef,
+} from "@/components/market/filters-bottom-sheet";
+import { MarketListHeader } from "@/components/market/list-header-market";
+import {
+	type LocationSheetRef,
+	LocationSourceSelect,
+} from "@/components/market/location-source-select";
 import { Badge, BadgeText } from "@/components/ui/badge";
-import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
-import {
-	FormControl,
-	FormControlError,
-	FormControlErrorIcon,
-	FormControlErrorText,
-	FormControlLabel,
-	FormControlLabelText,
-} from "@/components/ui/form-control";
-import { Heading } from "@/components/ui/heading";
+import { Grid, GridItem } from "@/components/ui/grid";
 import { HStack } from "@/components/ui/hstack";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
 import { useGeospatial } from "@/contexts/geospatial-context";
-import {
-	type MarketFilterValues,
-	marketFilterSchema,
-	useMarket,
-} from "@/contexts/market-context";
+import { useMarket } from "@/contexts/market-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
+import type { MarketCompany } from "@/libs/types/market";
 
 const formatDistance = (meters: number) => {
 	if (meters >= 1000) {
 		return `${(meters / 1000).toFixed(1).replace(".", ",")} km`;
 	}
-
 	return `${Math.round(meters)} m`;
 };
+
+function CompanyCardItem({
+	company,
+	currentDate,
+}: {
+	company: MarketCompany;
+	currentDate: Date;
+}) {
+	const isOpen = isCompanyOpenNow(company.business_hours, currentDate);
+	const initials = company.business_name
+		.split(" ")
+		.slice(0, 2)
+		.map(w => w[0]?.toUpperCase() ?? "")
+		.join("");
+
+	return (
+		<Link
+			href={{
+				pathname: "/market/[companyId]",
+				params: { companyId: company.id },
+			}}
+			asChild
+		>
+			<Pressable>
+				<Card className="gap-0 p-0 overflow-hidden rounded-xl border border-border shadow-none">
+					<View className="h-[92px] bg-primary/10 items-center justify-center">
+						{company.avatar ? (
+							<View className="w-11 h-11 rounded-lg overflow-hidden">
+								<Image
+									source={{ uri: company.avatar }}
+									className="w-full h-full"
+									resizeMode="cover"
+								/>
+							</View>
+						) : (
+							<View className="w-11 h-11 rounded-lg bg-primary items-center justify-center">
+								{company.company_type === "COLLECTOR" ? (
+									<Sprout size={20} className="text-primary-foreground" />
+								) : (
+									<Text className="text-primary-foreground text-sm font-bold">
+										{initials}
+									</Text>
+								)}
+							</View>
+						)}
+					</View>
+
+					<View className="px-3 pt-2.5 pb-3 gap-1">
+						<Text className="font-bold uppercase truncate">
+							{company.business_name}
+						</Text>
+						<Text
+							className="text-xs text-muted-foreground truncate"
+							numberOfLines={1}
+						>
+							{company.wastes
+								.map(w => w.name)
+								.slice(0, 4)
+								.join(", ")}
+						</Text>
+						<HStack className="gap-1.5 pt-1 flex-wrap">
+							<Badge variant="secondary">
+								<BadgeText>
+									{formatDistance(company.distance_in_meters)}
+								</BadgeText>
+							</Badge>
+							{company.company_type === "COLLECTOR" && (
+								<Badge variant="default">
+									<BadgeText>Coletor</BadgeText>
+								</Badge>
+							)}
+							<Badge variant={isOpen ? "default" : "destructive"}>
+								<BadgeText>{isOpen ? "Aberto" : "Fechado"}</BadgeText>
+							</Badge>
+						</HStack>
+					</View>
+				</Card>
+			</Pressable>
+		</Link>
+	);
+}
 
 export default function MarketScreen() {
 	const { currentDate } = useGeospatial();
 	const {
-		setAppliedFilters,
 		locationSource,
 		isLocationReady,
 		isResolvingLocation,
@@ -66,295 +130,129 @@ export default function MarketScreen() {
 		isError,
 	} = useMarket();
 
-	const {
-		control,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<MarketFilterValues>({
-		resolver: zodResolver(marketFilterSchema),
-		defaultValues: { query: "", radius: "2000", category: undefined },
-	});
+	const locationSheetRef = useRef<LocationSheetRef>(null);
+	const filtersSheetRef = useRef<FiltersBottomSheetRef>(null);
 
-	const onSubmit = handleSubmit(values => setAppliedFilters(values));
+	const rows = useMemo(() => {
+		const chunked: MarketCompany[][] = [];
+		for (let i = 0; i < companies.length; i += 2) {
+			chunked.push(companies.slice(i, i + 2));
+		}
+		return chunked;
+	}, [companies]);
+
+	const ListFooter = useMemo(
+		() =>
+			hasNextPage ? (
+				<Pressable
+					className="items-center py-3"
+					onPress={() => fetchNextPage()}
+					disabled={isFetchingNextPage}
+				>
+					{isFetchingNextPage ? (
+						<Spinner className="text-primary" />
+					) : (
+						<Text className="text-sm font-semibold text-primary">
+							Carregar mais
+						</Text>
+					)}
+				</Pressable>
+			) : null,
+		[hasNextPage, isFetchingNextPage, fetchNextPage],
+	);
 
 	return (
 		<KeyboardAvoidingView
 			behavior={process.env.EXPO_OS === "ios" ? "padding" : "height"}
-			className="flex-1 bg-white"
+			className="flex-1 bg-background"
 		>
-			<ScrollView
-				contentContainerClassName="p-4 pb-8 bg-white"
-				keyboardShouldPersistTaps="handled"
-				contentInsetAdjustmentBehavior="automatic"
-			>
-				<View className="gap-8">
-					<VStack className="gap-4">
-						<Card className="bg-gray-100 p-4 shadow-none">
-							<View className="flex-row items-center gap-4">
-								<View className="flex-1 gap-2">
-									<View className="flex-row gap-2">
-										<View className="p-2 items-center justify-center rounded-lg bg-lime-800">
-											<MapPinIcon
-												size={12}
-												color={colors.white}
-												strokeWidth={2.25}
-											/>
-										</View>
-										<Heading>Pontos de coletas</Heading>
-									</View>
-									<Text className=" text-muted-foreground" selectable>
-										Pesquise pontos de coletas que estão próximo a você.
+			{!isLocationReady ? (
+				isResolvingLocation ? (
+					<View className="flex-1 items-center justify-center p-6">
+						<Spinner className="text-primary" />
+						<Text className="mt-2 text-sm text-muted-foreground">
+							Obtendo localização…
+						</Text>
+					</View>
+				) : (
+					<View className="flex-1 p-4 gap-1">
+						<Text className="text-sm font-semibold text-foreground">
+							{locationSource === "current"
+								? "Localização indisponível"
+								: "Endereço não configurado"}
+						</Text>
+						<Text className="text-xs text-muted-foreground">
+							{locationSource === "current"
+								? "Permita o acesso à localização nas configurações do dispositivo."
+								: "Adicione um endereço no seu perfil para ver empresas próximas a você."}
+						</Text>
+					</View>
+				)
+			) : (
+				<>
+					<FlatList
+						data={rows}
+						keyExtractor={(_, index) => String(index)}
+						contentContainerClassName="px-4 pb-8"
+						ListHeaderComponent={
+							<MarketListHeader
+								filtersSheetRef={filtersSheetRef}
+								locationSheetRef={locationSheetRef}
+							/>
+						}
+						renderItem={({ item: row }) => (
+							<Grid
+								_extra={{ className: "grid-cols-2" }}
+								className="gap-3 mb-3"
+							>
+								{row.map(company => (
+									<GridItem
+										key={company.id}
+										_extra={{ className: "col-span-1" }}
+									>
+										<CompanyCardItem
+											company={company}
+											currentDate={currentDate}
+										/>
+									</GridItem>
+								))}
+								{row.length < 2 && (
+									<GridItem _extra={{ className: "col-span-1" }} />
+								)}
+							</Grid>
+						)}
+						ListFooterComponent={ListFooter}
+						ListEmptyComponent={
+							isPending ? (
+								<View className="items-center p-6">
+									<Spinner className="text-primary" />
+									<Text className="mt-2 text-sm text-muted-foreground">
+										Buscando empresas…
 									</Text>
 								</View>
-							</View>
-						</Card>
-
-						<FormControl isInvalid={!!errors.query} className="gap-2">
-							<FormControlLabel className="flex-col items-start">
-								<FormControlLabelText>Busca</FormControlLabelText>
-								<Text className="text-xs text-gray-400">
-									Pesquise por empresas, resíduo ou serviços.
-								</Text>
-							</FormControlLabel>
-							<Controller
-								control={control}
-								name="query"
-								render={({ field: { onChange, onBlur, value } }) => (
-									<Input className="rounded-md border-gray-200 bg-white">
-										<InputField
-											value={value}
-											onBlur={onBlur}
-											onChangeText={onChange}
-											onSubmitEditing={onSubmit}
-											returnKeyType="search"
-											placeholder="Exemplo: garrafa plástica"
-										/>
-										<InputSlot onPress={onSubmit}>
-											<InputIcon as={Search} className="text-gray-400" />
-										</InputSlot>
-									</Input>
-								)}
-							/>
-							{errors.query?.message && (
-								<FormControlError>
-									<FormControlErrorIcon as={AlertCircleIcon} />
-									<FormControlErrorText>
-										{errors.query.message}
-									</FormControlErrorText>
-								</FormControlError>
-							)}
-						</FormControl>
-
-						<LocationSourceSelect />
-
-						<View className="gap-4">
-							<FormControl className="gap-2">
-								<FormControlLabel>
-									<FormControlLabelText className="">Raio</FormControlLabelText>
-								</FormControlLabel>
-								<Controller
-									control={control}
-									name="radius"
-									render={({ field: { value, onChange } }) => (
-										<RadiusToggle value={value} onChange={onChange} />
-									)}
-								/>
-							</FormControl>
-
-							<FormControl className="gap-2">
-								<FormControlLabel>
-									<FormControlLabelText className="">
-										Categoria
-									</FormControlLabelText>
-								</FormControlLabel>
-								<Controller
-									control={control}
-									name="category"
-									render={({ field: { value, onChange } }) => (
-										<CategoryToggle value={value} onChange={onChange} />
-									)}
-								/>
-							</FormControl>
-						</View>
-					</VStack>
-
-					<View className="gap-4">
-						<View className="gap-1">
-							<Heading>Ecossistema</Heading>
-							<Text className=" text-gray-500">
-								Clique na empresa para obter mais informações.
-							</Text>
-						</View>
-
-						{!isLocationReady ? (
-							isResolvingLocation ? (
-								<Card className="items-center p-6 shadow-none bg-gray-50">
-									<ActivityIndicator size="small" color={colors.lime[800]} />
-									<Text className="mt-2  text-gray-500">
-										Obtendo localização…
+							) : isError ? (
+								<View className="p-4 gap-1">
+									<Text className="text-sm font-semibold text-foreground">
+										Erro ao carregar
 									</Text>
-								</Card>
+									<Text className="text-xs text-muted-foreground">
+										Não foi possível buscar as empresas. Tente novamente.
+									</Text>
+								</View>
 							) : (
-								<Card className="shadow-none bg-gray-50 p-4 gap-1">
-									<Text className=" font-semibold text-gray-900">
-										{locationSource === "current"
-											? "Localização indisponível"
-											: "Endereço não configurado"}
+								<View className="p-4">
+									<Text className="text-sm text-muted-foreground">
+										Nenhuma empresa encontrada para os filtros aplicados.
 									</Text>
-									<Text className="text-xs text-gray-500">
-										{locationSource === "current"
-											? "Permita o acesso à localização nas configurações do dispositivo."
-											: "Adicione um endereço no seu perfil para ver empresas próximas a você."}
-									</Text>
-								</Card>
+								</View>
 							)
-						) : isPending ? (
-							<Card className="items-center p-6 shadow-none bg-gray-50">
-								<ActivityIndicator size="small" color={colors.lime[800]} />
-								<Text className="mt-2  text-gray-500">Buscando empresas…</Text>
-							</Card>
-						) : isError ? (
-							<Card className="shadow-none bg-gray-50 p-4 gap-1">
-								<Text className=" font-semibold text-gray-900">
-									Erro ao carregar
-								</Text>
-								<Text className="text-xs text-gray-500">
-									Não foi possível buscar as empresas. Tente novamente.
-								</Text>
-							</Card>
-						) : companies.length === 0 ? (
-							<Card className="shadow-none bg-gray-50 p-4">
-								<Text className=" text-gray-500">
-									Nenhuma empresa encontrada para os filtros aplicados.
-								</Text>
-							</Card>
-						) : (
-							<View className="gap-3">
-								{companies
-									.sort((a, b) =>
-										a.business_name.localeCompare(b.business_name),
-									)
-									.map(item => {
-										const isOpen = isCompanyOpenNow(
-											item.business_hours,
-											currentDate,
-										);
+						}
+					/>
 
-										return (
-											<Link
-												key={item.id}
-												href={{
-													pathname: "/market/[companyId]",
-													params: { companyId: item.id },
-												}}
-												asChild
-											>
-												<Pressable>
-													<Card size="sm" className="shadow-none">
-														<View className="flex-row items-center gap-3">
-															<View className="h-12 w-12 items-center justify-center overflow-hidden rounded-[5px] bg-lime-800">
-																{item.company_type === "COLLECTOR" ? (
-																	<Sprout size={16} color={colors.white} />
-																) : (
-																	<Text
-																		size="sm"
-																		className="font-semibold text-white"
-																	>
-																		{item.corporate_name
-																			.split(" ")
-																			.slice(0, 2)
-																			.map(word => word[0]?.toUpperCase() ?? "")
-																			.join("")}
-																	</Text>
-																)}
-															</View>
-
-															<View className="min-w-0 flex-1 gap-1">
-																<VStack>
-																	<Box className="flex-1">
-																		<Text
-																			style={{ fontFamily: "Oswald_700Bold" }}
-																			className="uppercase"
-																		>
-																			{item.company_type === "COLLECTOR"
-																				? item.business_name
-																				: item.business_name}
-																		</Text>
-																	</Box>
-																	{item.company_type !== "COLLECTOR" && (
-																		<Box>
-																			<Text
-																				size="sm"
-																				className="text-muted-foreground"
-																			>
-																				{item.identity}
-																			</Text>
-																		</Box>
-																	)}
-																</VStack>
-
-																<Text className="text-xs leading-4 text-gray-500">
-																	{item.wastes
-																		.map(w => w.name)
-																		.slice(0, 4)
-																		.join(", ")}
-																</Text>
-
-																<HStack className="items-center gap-2">
-																	<Badge variant="secondary">
-																		<BadgeText>
-																			{formatDistance(item.distance_in_meters)}
-																		</BadgeText>
-																	</Badge>
-																	{item.company_type === "COLLECTOR" && (
-																		<Badge variant="default">
-																			<BadgeText>
-																				Coletor independente
-																			</BadgeText>
-																		</Badge>
-																	)}
-
-																	<Badge
-																		variant={isOpen ? "default" : "destructive"}
-																	>
-																		<BadgeText>
-																			{isOpen ? "Aberto" : "Fechado"}
-																		</BadgeText>
-																	</Badge>
-																</HStack>
-															</View>
-
-															<ArrowRight size={16} color={colors.gray[900]} />
-														</View>
-													</Card>
-												</Pressable>
-											</Link>
-										);
-									})}
-
-								{hasNextPage && (
-									<Pressable
-										className="items-center py-3"
-										onPress={() => fetchNextPage()}
-										disabled={isFetchingNextPage}
-									>
-										{isFetchingNextPage ? (
-											<ActivityIndicator
-												size="small"
-												color={colors.lime[800]}
-											/>
-										) : (
-											<Text className=" font-semibold text-lime-800">
-												Carregar mais
-											</Text>
-										)}
-									</Pressable>
-								)}
-							</View>
-						)}
-					</View>
-				</View>
-			</ScrollView>
+					<LocationSourceSelect ref={locationSheetRef} hideTrigger />
+					<FiltersBottomSheet ref={filtersSheetRef} />
+				</>
+			)}
 		</KeyboardAvoidingView>
 	);
 }

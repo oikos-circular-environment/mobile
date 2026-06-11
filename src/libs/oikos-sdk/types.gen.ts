@@ -3142,6 +3142,7 @@ export type GetV1MarketResponses = {
 				latitude: number;
 				longitude: number;
 			};
+			avatar: string | null;
 			services: Array<{
 				id: string;
 				name: string;

@@ -6,7 +6,7 @@ import {
 	MapPinIcon,
 } from "lucide-react-native";
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
 import { colors } from "@/components/style/colors";
 import {
@@ -25,6 +25,11 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { type LocationSource, useMarket } from "@/contexts/market-context";
 import type { Address } from "@/libs/types/address";
+
+export interface LocationSheetRef {
+	open: () => void;
+	close: () => void;
+}
 
 function formatGeocodedAddress(addr: Location.LocationGeocodedAddress): string {
 	const streetPart = [addr.streetNumber, addr.street].filter(Boolean).join(" ");
@@ -60,16 +65,28 @@ function CoordRow({
 	);
 }
 
-export function LocationSourceSelect() {
+type LocationSourceSelectProps = {
+	hideTrigger?: boolean;
+};
+
+export const LocationSourceSelect = forwardRef<LocationSheetRef, LocationSourceSelectProps>(function LocationSourceSelect(
+	{ hideTrigger },
+	externalRef,
+) {
 	const { locationSource, setLocationSource } = useMarket();
 	const { location, addresses } = useGeospatial();
 	const { user, isAuthenticated } = useAuthContext();
 	const [isOpen, setIsOpen] = useState(false);
-	const ref = useRef<BottomSheetRef>(null);
+	const sheetRef = useRef<BottomSheetRef>(null);
+
+	useImperativeHandle(externalRef, () => ({
+		open: () => setIsOpen(true),
+		close: () => setIsOpen(false),
+	}));
 
 	useEffect(() => {
-		if (isOpen) ref.current?.open();
-		else ref.current?.close();
+		if (isOpen) sheetRef.current?.open();
+		else sheetRef.current?.close();
 	}, [isOpen]);
 
 	const currentAddressText = addresses[0]
@@ -106,30 +123,34 @@ export function LocationSourceSelect() {
 
 	return (
 		<>
-			<Text className="text-sm font-semibold">Localização</Text>
-			<Pressable onPress={() => setIsOpen(true)}>
-				<HStack className="gap-3 items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
-					<View
-						className="p-2 rounded-lg items-center justify-center"
-						style={{ backgroundColor: colors.lime[800] }}
-					>
-						{isCurrentSelected ? (
-							<LocateIcon size={12} color={colors.white} />
-						) : (
-							<MapPinIcon size={12} color={colors.white} />
-						)}
-					</View>
-					<VStack className="flex-1 gap-0.5">
-						<Text className="text-sm text-gray-800" numberOfLines={1}>
-							{displayAddress}
-						</Text>
-						<CoordRow lat={displayLat} lon={displayLon} />
-					</VStack>
-					<ChevronDownIcon size={14} color={colors.gray[400]} />
-				</HStack>
-			</Pressable>
+			{!hideTrigger && (
+				<>
+					<Text className="text-sm font-semibold">Localização</Text>
+					<Pressable onPress={() => setIsOpen(true)}>
+						<HStack className="gap-3 items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
+							<View
+								className="p-2 rounded-lg items-center justify-center"
+								style={{ backgroundColor: colors.lime[800] }}
+							>
+								{isCurrentSelected ? (
+									<LocateIcon size={12} color={colors.white} />
+								) : (
+									<MapPinIcon size={12} color={colors.white} />
+								)}
+							</View>
+							<VStack className="flex-1 gap-0.5">
+								<Text className="text-sm text-gray-800" numberOfLines={1}>
+									{displayAddress}
+								</Text>
+								<CoordRow lat={displayLat} lon={displayLon} />
+							</VStack>
+							<ChevronDownIcon size={14} color={colors.gray[400]} />
+						</HStack>
+					</Pressable>
+				</>
+			)}
 
-			<BottomSheet ref={ref} onClose={() => setIsOpen(false)}>
+			<BottomSheet ref={sheetRef} onClose={() => setIsOpen(false)}>
 				<BottomSheetPortal
 					snapPoints={["44%"]}
 					backdropComponent={BottomSheetBackdrop}
@@ -176,7 +197,7 @@ export function LocationSourceSelect() {
 			</BottomSheet>
 		</>
 	);
-}
+});
 
 type OptionRowProps = {
 	icon: ReactNode;
