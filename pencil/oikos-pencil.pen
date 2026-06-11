@@ -10861,7 +10861,6 @@
                               "strokeWidth": 1,
                               "strokeAlignment": "inner",
                               "layout": "vertical",
-                              "gap": 8,
                               "children": [
                                 {
                                   "type": "frame",
@@ -10869,7 +10868,11 @@
                                   "name": "CardMedia",
                                   "width": "fill_container",
                                   "height": 64,
-                                  "fill": "$lime-50",
+                                  "fill": {
+                                    "type": "color",
+                                    "color": "$lime-50",
+                                    "enabled": false
+                                  },
                                   "cornerRadius": [
                                     "$radius-lg",
                                     "$radius-lg",
@@ -11073,7 +11076,6 @@
                               "strokeWidth": 1,
                               "strokeAlignment": "inner",
                               "layout": "vertical",
-                              "gap": 8,
                               "children": [
                                 {
                                   "type": "frame",
@@ -11081,7 +11083,11 @@
                                   "name": "CardMedia",
                                   "width": "fill_container",
                                   "height": 64,
-                                  "fill": "$lime-50",
+                                  "fill": {
+                                    "type": "color",
+                                    "color": "$lime-50",
+                                    "enabled": false
+                                  },
                                   "cornerRadius": [
                                     "$radius-lg",
                                     "$radius-lg",

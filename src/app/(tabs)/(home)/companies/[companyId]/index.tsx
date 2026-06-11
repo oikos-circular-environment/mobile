@@ -4,13 +4,13 @@ import {
 	ArrowRightIcon,
 	Clock8Icon,
 	FactoryIcon,
+	HammerIcon,
 	LockKeyholeIcon,
 	type LucideIcon,
 	MapIcon,
 	RecycleIcon,
 	SettingsIcon,
 	TriangleAlertIcon,
-	WrenchIcon,
 } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { useCompanyValidations } from "@/components/companies/hooks/use-company-validations";
@@ -81,7 +81,7 @@ export default function CompanyHubScreen() {
 		{
 			title: "Serviços",
 			description: "Descreva os serviços que sua empresa oferece ao publico.",
-			icon: WrenchIcon,
+			icon: HammerIcon,
 			href: `/(tabs)/(home)/companies/${companyId}/services` as Href,
 			validation: {
 				is_validation: validation?.services ?? false,

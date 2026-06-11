@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { PlusIcon, RecycleIcon } from "lucide-react-native";
+import { HammerIcon, PlusIcon } from "lucide-react-native";
 import { useEffect } from "react";
 import { FlatList, View } from "react-native";
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
@@ -90,16 +90,16 @@ export default function ServicesIndexScreen() {
 							</View>
 
 							<View className="size-14 items-center justify-center rounded-lg bg-lime-800">
-								<RecycleIcon
-									size={24}
-									color={colors.white}
-									strokeWidth={2.25}
-								/>
+								<HammerIcon size={24} color={colors.white} strokeWidth={2.25} />
 							</View>
 						</View>
 					</Card>
 
-					<Button testID="btn-new" className="w-full gap-2" onPress={handleCreate}>
+					<Button
+						testID="btn-new"
+						className="w-full gap-2"
+						onPress={handleCreate}
+					>
 						<PlusIcon size={16} color={colors.white} />
 						<ButtonText>Novo resíduo</ButtonText>
 					</Button>

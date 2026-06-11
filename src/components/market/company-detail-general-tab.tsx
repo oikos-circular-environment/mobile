@@ -6,7 +6,7 @@ import {
 	Recycle,
 	TriangleAlert,
 } from "lucide-react-native";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Linking, View } from "react-native";
 import { BusinessHoursBottomSheet } from "@/components/market/business-hours-bottom-sheet";
 import { colors } from "@/components/style/colors";
@@ -18,6 +18,7 @@ import { Text } from "@/components/ui/text";
 import type { MarketSimulationItemType } from "@/libs/memory/market-simulations";
 import type { MarketBusinessHour, MarketCompany } from "@/libs/types/market";
 import { Divider } from "../ui/divider";
+import { VStack } from "../ui/vstack";
 
 const openWhatsAppOrSms = async (phone: string) => {
 	const cleanPhone = phone.replace(/\D/g, "");
@@ -34,6 +35,7 @@ const measurementSymbol: Record<string, string> = {
 	M2: "m²",
 	M3: "m³",
 	ML: "ml",
+	DAY: "diária",
 };
 
 const formatCurrency = (value: number) =>
@@ -42,6 +44,57 @@ const formatCurrency = (value: number) =>
 		currency: "BRL",
 		minimumFractionDigits: 2,
 	}).format(value);
+
+type MarketItemCardProps = {
+	icon: ReactNode;
+	name: string;
+	price: number;
+	unit: string;
+	description: string | null | undefined;
+	categoryName: string;
+	onPress: () => void;
+};
+
+function MarketItemCard({
+	icon,
+	name,
+	price,
+	unit,
+	description,
+	categoryName,
+	onPress,
+}: MarketItemCardProps) {
+	return (
+		<Pressable onPress={onPress}>
+			<Card className="gap-2 shadow-none">
+				<View className="flex-row items-center gap-2">
+					<View className="bg-muted rounded-md size-10 items-center justify-center">
+						{icon}
+					</View>
+					<VStack space="xs">
+						<Text size="lg" className="font-bold">
+							{name}
+						</Text>
+						<View className="flex-row items-end gap-0.5">
+							<Text size="md" className="font-bold text-muted-foreground">
+								{formatCurrency(price)}
+							</Text>
+							<Text size="sm" className="text-muted-foreground">
+								/{measurementSymbol[unit]}
+							</Text>
+						</View>
+					</VStack>
+				</View>
+				{description && <Text className="text-sm">{description}</Text>}
+				<View className="flex-row flex-wrap gap-1">
+					<Badge variant="outline">
+						<BadgeText className="text-[10px]">{categoryName}</BadgeText>
+					</Badge>
+				</View>
+			</Card>
+		</Pressable>
+	);
+}
 
 type CompanyDetailGeneralTabProps = {
 	company: MarketCompany;
@@ -137,7 +190,7 @@ export function CompanyDetailGeneralTab({
 					</Text>
 
 					<Pressable onPress={() => setIsBusinessHoursBottomSheetOpen(true)}>
-						<Card className="gap-2 rounded-lg border-gray-200 p-2 shadow-none">
+						<Card className="gap-2 rounded-lg border-gray-200 shadow-none h-18 justify-center">
 							<View className="flex-row items-center justify-between gap-2">
 								<View>
 									<View className="flex flex-row gap-2 items-center">
@@ -189,44 +242,16 @@ export function CompanyDetailGeneralTab({
 					<View className="gap-2">
 						{company.wastes.length > 0 ? (
 							company.wastes.map(waste => (
-								<Pressable
+								<MarketItemCard
 									key={waste.id}
+									icon={<Recycle size={18} color={colors.gray[900]} />}
+									name={waste.name}
+									price={waste.price}
+									unit={waste.unit}
+									description={waste.description}
+									categoryName={waste.waste_category.name}
 									onPress={() => onSelectSimulationItem("waste", waste.id)}
-								>
-									<Card className="gap-2 shadow-none">
-										<View className="flex-row items-center gap-2">
-											<View className="bg-muted rounded-md h-10 w-10 items-center justify-center">
-												<Recycle size={18} color={colors.gray[900]} />
-											</View>
-
-											<View className="min-w-0 flex-1 flex-row items-center justify-between gap-2">
-												<Text className="flex-1 text-md font-semibold text-gray-900">
-													{waste.name}
-												</Text>
-												<View className="flex-row items-end gap-0.5">
-													<Text className="text-md font-bold text-gray-900">
-														{formatCurrency(waste.price)}
-													</Text>
-													<Text className="text-xs text-gray-400">
-														/{measurementSymbol[waste.unit]}
-													</Text>
-												</View>
-											</View>
-										</View>
-
-										{waste.description && (
-											<Text className="text-sm ">{waste.description}</Text>
-										)}
-
-										<View className="flex-row flex-wrap gap-1">
-											<Badge key={waste.waste_category_id} variant="outline">
-												<BadgeText className="text-[10px]">
-													{waste.waste_category.name}
-												</BadgeText>
-											</Badge>
-										</View>
-									</Card>
-								</Pressable>
+								/>
 							))
 						) : (
 							<Card className="shadow-none bg-gray-50 p-3">
@@ -246,44 +271,16 @@ export function CompanyDetailGeneralTab({
 					<View className="gap-2">
 						{company.services.length > 0 ? (
 							company.services.map(service => (
-								<Pressable
+								<MarketItemCard
 									key={service.id}
+									icon={<Hammer size={18} color={colors.gray[900]} />}
+									name={service.name}
+									price={service.price}
+									unit={service.unit}
+									description={service.description}
+									categoryName={service.waste_category.name}
 									onPress={() => onSelectSimulationItem("service", service.id)}
-								>
-									<Card className="gap-2 shadow-none">
-										<View className="flex-row items-center gap-2">
-											<View className="bg-muted rounded-md size-10 items-center justify-center">
-												<Hammer size={18} color={colors.gray[900]} />
-											</View>
-
-											<View className="min-w-0 flex-1 flex-row items-center justify-between gap-2">
-												<Text className="flex-1 text-md font-semibold text-gray-900">
-													{service.name}
-												</Text>
-												<View className="flex-row items-end gap-0.5">
-													<Text className="text-md font-bold text-gray-900">
-														{formatCurrency(service.price)}
-													</Text>
-													<Text className="text-xs text-gray-400">
-														/{measurementSymbol[service.unit]}
-													</Text>
-												</View>
-											</View>
-										</View>
-
-										{service.description && (
-											<Text className="text-sm ">{service.description}</Text>
-										)}
-
-										<View className="flex-row flex-wrap gap-1">
-											<Badge key={service.waste_category_id} variant="outline">
-												<BadgeText className="text-[10px]">
-													{service.waste_category.name}
-												</BadgeText>
-											</Badge>
-										</View>
-									</Card>
-								</Pressable>
+								/>
 							))
 						) : (
 							<Card className="shadow-none bg-gray-50 p-3">

@@ -63,13 +63,17 @@ export function BusinessHoursBottomSheet({
 					</View>
 					<View className="gap-2">
 						{(businessHours ?? []).map(item => (
-							<Card key={item.id} className="shadow-none">
+							<Card key={item.id} className="shadow-none h-18 justify-center">
 								<View className="flex-row items-center justify-between">
 									<Text className="text-sm font-semibold text-gray-900">
 										{getDayLabel(item.day_of_week)}
 									</Text>
 									<View>
-										{item.time_slots.length ? (
+										{!item.is_open || !item.time_slots.length ? (
+											<Badge variant="destructive">
+												<BadgeText>Fechado</BadgeText>
+											</Badge>
+										) : (
 											<View className="items-end gap-0.5">
 												{item.time_slots.map(slot => (
 													<Text key={slot.id} className="text-xs text-gray-700">
@@ -77,10 +81,6 @@ export function BusinessHoursBottomSheet({
 													</Text>
 												))}
 											</View>
-										) : (
-											<Badge variant="destructive">
-												<BadgeText>Fechado</BadgeText>
-											</Badge>
 										)}
 									</View>
 								</View>

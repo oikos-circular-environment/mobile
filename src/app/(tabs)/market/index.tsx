@@ -19,28 +19,31 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
+import { formatDistance } from "@/libs/format-distance";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import type { MarketCompany } from "@/libs/types/market";
 
-const formatDistance = (meters: number) => {
-	if (meters >= 1000) {
-		return `${(meters / 1000).toFixed(1).replace(".", ",")} km`;
-	}
-	return `${Math.round(meters)} m`;
-};
-
 function CompanyCardSkeleton() {
 	return (
-		<Card className="gap-0 p-0 overflow-hidden rounded-xl border border-border shadow-none">
-			<Skeleton className="h-[92px]" />
-			<View className="px-3 pt-2.5 pb-3 gap-2">
-				<Skeleton className="h-4 w-3/4 rounded-sm" />
-				<Skeleton className="h-3 w-full rounded-sm" />
-				<HStack className="gap-1.5 pt-1">
-					<Skeleton className="h-5 w-12 rounded-full" />
-					<Skeleton className="h-5 w-14 rounded-full" />
+		<Card className="shadow-none p-4">
+			<VStack space="md">
+				<HStack space="md" className="items-center">
+					<Skeleton className="w-16 h-16 rounded-lg" />
+					<View className="flex-1 gap-2">
+						<Skeleton className="h-4 w-3/4 rounded-sm" />
+						<Skeleton className="h-3 w-1/2 rounded-sm" />
+						<HStack className="gap-1.5 pt-1">
+							<Skeleton className="h-5 w-16 rounded-full" />
+							<Skeleton className="h-5 w-12 rounded-full" />
+						</HStack>
+					</View>
 				</HStack>
-			</View>
+				<HStack className="gap-2">
+					<Skeleton className="h-6 w-20 rounded-full" />
+					<Skeleton className="h-6 w-24 rounded-full" />
+					<Skeleton className="h-6 w-16 rounded-full" />
+				</HStack>
+			</VStack>
 		</Card>
 	);
 }
@@ -150,7 +153,6 @@ export default function MarketScreen() {
 	const {
 		locationSource,
 		isLocationReady,
-		isResolvingLocation,
 		companies,
 		isPending,
 		isFetchingNextPage,
@@ -184,71 +186,51 @@ export default function MarketScreen() {
 			behavior={process.env.EXPO_OS === "ios" ? "padding" : "height"}
 			className="flex-1 bg-background"
 		>
-			{!isLocationReady ? (
-				isResolvingLocation ? (
-					<View className="flex-1 px-4 pt-4 gap-4">
-						<Skeleton className="h-10 rounded-lg" />
-						<Skeleton className="h-10 rounded-xl" />
-						<HStack className="gap-2">
-							<Skeleton className="h-8 w-24 rounded-full" />
-							<Skeleton className="h-8 w-24 rounded-full" />
-							<Skeleton className="h-8 w-16 rounded-full" />
-						</HStack>
-						{[0, 1, 2, 3].map(i => (
-							<CompanyCardSkeleton key={i} />
-						))}
-					</View>
-				) : (
-					<View className="flex-1 p-4 gap-1">
-						<Text className="text-sm font-semibold text-foreground">
-							{locationSource === "current"
-								? "Localização indisponível"
-								: "Endereço não configurado"}
-						</Text>
-						<Text className="text-xs text-muted-foreground">
-							{locationSource === "current"
-								? "Permita o acesso à localização nas configurações do dispositivo."
-								: "Adicione um endereço no seu perfil para ver empresas próximas a você."}
-						</Text>
-					</View>
-				)
-			) : (
-				<FlatList
-					data={companies}
-					keyExtractor={company => company.id}
-					contentContainerClassName="px-4 pb-8"
-					ListHeaderComponent={MarketListHeader}
-					ItemSeparatorComponent={() => <View className="h-3" />}
-					renderItem={({ item: company }) => (
-						<CompanyCardItem company={company} currentDate={currentDate} />
-					)}
-					ListFooterComponent={ListFooter}
-					ListEmptyComponent={
-						isPending ? (
-							<View className="gap-3">
-								{[0, 1, 2, 3].map(i => (
-									<CompanyCardSkeleton key={i} />
-								))}
-							</View>
-						) : isError ? (
-							<View className="p-4 gap-1">
-								<Text className="text-sm font-semibold text-foreground">
-									Erro ao carregar
-								</Text>
-								<Text className="text-xs text-muted-foreground">
-									Não foi possível buscar as empresas. Tente novamente.
-								</Text>
-							</View>
-						) : (
-							<View className="p-4">
-								<Text className="text-sm text-muted-foreground">
-									Nenhuma empresa encontrada para os filtros aplicados.
-								</Text>
-							</View>
-						)
-					}
-				/>
-			)}
+			<FlatList
+				data={companies}
+				keyExtractor={company => company.id}
+				contentContainerClassName="px-4 pb-8"
+				ListHeaderComponent={MarketListHeader}
+				ItemSeparatorComponent={() => <View className="h-3" />}
+				renderItem={({ item: company }) => (
+					<CompanyCardItem company={company} currentDate={currentDate} />
+				)}
+				ListFooterComponent={ListFooter}
+				ListEmptyComponent={
+					!isLocationReady && locationSource === "profile" ? (
+						<View className="p-4 gap-1">
+							<Text className="text-sm font-semibold text-foreground">
+								Endereço não configurado
+							</Text>
+							<Text className="text-xs text-muted-foreground">
+								Adicione um endereço no seu perfil para ver empresas próximas a
+								você.
+							</Text>
+						</View>
+					) : isPending ? (
+						<View className="gap-3">
+							{[0, 1, 2, 3].map(i => (
+								<CompanyCardSkeleton key={i} />
+							))}
+						</View>
+					) : isError ? (
+						<View className="p-4 gap-1">
+							<Text className="text-sm font-semibold text-foreground">
+								Erro ao carregar
+							</Text>
+							<Text className="text-xs text-muted-foreground">
+								Não foi possível buscar as empresas. Tente novamente.
+							</Text>
+						</View>
+					) : (
+						<View className="p-4">
+							<Text className="text-sm text-muted-foreground">
+								Nenhuma empresa encontrada para os filtros aplicados.
+							</Text>
+						</View>
+					)
+				}
+			/>
 		</KeyboardAvoidingView>
 	);
 }

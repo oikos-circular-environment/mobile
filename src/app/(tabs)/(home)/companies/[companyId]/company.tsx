@@ -77,7 +77,7 @@ const companySchema = z
 	.object({
 		identity: z.string().min(1, "Documento é obrigatório"),
 		corporate_name: z.string().min(1, "Razão social é obrigatória"),
-		business_name: z.string().nullable(),
+		business_name: z.string(),
 		email: z.string().email("E-mail deve ser válido"),
 		phones: z
 			.array(z.string())
@@ -282,17 +282,11 @@ export default function CompanyGeneralInfoScreen() {
 	}, [useProfileData, user, setValue]);
 
 	const handleFormSubmit: SubmitHandler<CompanyFormData> = async data => {
-		const corporate_name = data.corporate_name;
-		const business_name =
-			data.identity_type === "CPF"
-				? data.corporate_name
-				: data.business_name || data.corporate_name;
-
 		const payload = {
 			identity: data.identity,
 			identity_type: data.identity_type,
-			corporate_name,
-			business_name,
+			corporate_name: data.corporate_name,
+			business_name: data.business_name,
 			email: data.email || null,
 			phones: data.phones.filter(p => !!p),
 			started_activity_in: data.started_activity_in,
