@@ -4,9 +4,11 @@ import {
 	LocateFixedIcon,
 	MinusIcon,
 	PlusIcon,
-	RadarIcon,
+	RecycleIcon,
+	SearchIcon,
+	Settings2Icon,
 } from "lucide-react-native";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	Image,
 	Platform,
@@ -18,12 +20,16 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
+import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
-import { ComplaintTypeChip } from "@/components/complaints/complaint-chip/complaint-type-chip";
 import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/tokens";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
 import { colors } from "@/components/style/colors";
+import {
+	WasteCategoryHazardLevel,
+	type HazardLevelVariant,
+} from "@/components/custom/waste-category";
 import {
 	BottomSheet,
 	BottomSheetBackdrop,
@@ -33,6 +39,7 @@ import {
 	BottomSheetScrollView,
 } from "@/components/ui/bottomsheet";
 import { Card } from "@/components/ui/card";
+import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Spinner } from "@/components/ui/spinner";
@@ -41,10 +48,10 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import {
 	type ComplaintStatus,
-	type ComplaintType,
-	complaintStatuses,
 	complaintTypeValues,
 } from "@/libs/types/complaint";
+import type { WasteCategory } from "@/libs/types/waste-category";
+import { cn } from "@/libs/utils";
 
 const RADIUS_OPTIONS = [
 	{ label: "2 km", value: 2000 },
@@ -64,12 +71,28 @@ const controlShadow = {
 	elevation: 3,
 };
 
+const STATUS_FILTER_OPTIONS: { label: string; value: ComplaintStatus | null }[] =
+	[
+		{ label: "Todos", value: null },
+		{ label: "Aberto", value: "OPEN" },
+		{ label: "Resolvido", value: "RESOLVED" },
+	];
+
+const HAZARD_LEVELS: HazardLevelVariant[] = ["low", "medium", "high", "very_high"];
+
+const HAZARD_SELECTED_STYLE: Record<HazardLevelVariant, string> = {
+	low: "border-lime-400 bg-lime-100",
+	medium: "border-yellow-400 bg-yellow-100",
+	high: "border-orange-400 bg-orange-100",
+	very_high: "border-red-400 bg-red-100",
+};
+
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
 	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
 	const { location } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
-	const radarSheetRef = useRef<BottomSheetRef>(null);
+	const filterSheetRef = useRef<BottomSheetRef>(null);
 	const hasAnimatedRef = useRef(false);
 	const suppressMapPressRef = useRef(false);
 
@@ -77,14 +100,17 @@ export default function ComplaintsMapScreen() {
 		? { lat: location.coords.latitude, lon: location.coords.longitude }
 		: null;
 
+	const { categories } = useWasteCategories();
+
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [mapHeading, setMapHeading] = useState(0);
 	const [activeRadius, setActiveRadius] = useState(10000);
-	const [activeTypeFilter, setActiveTypeFilter] =
-		useState<ComplaintType | null>("IRREGULAR_DISPOSAL");
 	const [activeStatusFilter, setActiveStatusFilter] =
 		useState<ComplaintStatus | null>("OPEN");
+	const [activeCategory, setActiveCategory] = useState<WasteCategory | null>(null);
+	const [activeHazardLevel, setActiveHazardLevel] =
+		useState<HazardLevelVariant | null>(null);
 
 	const {
 		complaints,
@@ -93,10 +119,34 @@ export default function ComplaintsMapScreen() {
 		setSelectedMapComplaint,
 	} = useComplaintsMap({
 		userLocation,
-		activeTypeFilter,
+		activeTypeFilter: null,
 		activeStatusFilter,
 		radius: activeRadius,
 	});
+
+	const filteredComplaints = useMemo(
+		() =>
+			complaints.filter(complaint => {
+				if (activeCategory) {
+					if (
+						!complaint.categories?.some(cat => cat.id === activeCategory.id)
+					)
+						return false;
+				}
+				if (activeHazardLevel) {
+					if (
+						!complaint.categories?.some(cat =>
+							cat.hazard_levels?.some(
+								h => h.toLowerCase() === activeHazardLevel,
+							),
+						)
+					)
+						return false;
+				}
+				return true;
+			}),
+		[complaints, activeCategory, activeHazardLevel],
+	);
 
 	useEffect(() => {
 		if (!location || hasAnimatedRef.current) return;
@@ -170,14 +220,6 @@ export default function ComplaintsMapScreen() {
 		}
 	};
 
-	const handleRadiusSelect = (value: number) => {
-		setActiveRadius(value);
-		radarSheetRef.current?.close();
-	};
-
-	const activeRadiusLabel =
-		RADIUS_OPTIONS.find(o => o.value === activeRadius)?.label ?? "10 km";
-
 	return (
 		<View className="flex-1">
 			<MapView
@@ -190,14 +232,13 @@ export default function ComplaintsMapScreen() {
 				onPress={handleClosePanel}
 				onRegionChangeComplete={handleRegionChangeComplete}
 			>
-				{complaints.map(complaint => {
+				{filteredComplaints.map(complaint => {
 					if (!complaint.location) return null;
 					const typeInfo = complaintTypeValues.find(
 						t => t.value === "IRREGULAR_DISPOSAL",
 					);
 					const pinColor =
-						COMPLAINT_TYPE_COLORS["IRREGULAR_DISPOSAL" as ComplaintType] ??
-						colors.gray[500];
+						COMPLAINT_TYPE_COLORS.IRREGULAR_DISPOSAL ?? colors.gray[500];
 					const isSelected = selectedMapComplaint?.id === complaint.id;
 					const Icon = typeInfo?.icon;
 					return (
@@ -234,47 +275,19 @@ export default function ComplaintsMapScreen() {
 				})}
 			</MapView>
 
-			{/* Filters */}
+			{/* Filter row */}
 			<View
-				className="absolute left-0 right-0 gap-2 pl-4"
+				className="absolute left-0 right-0 px-4"
 				style={{ top: 32 }}
 				pointerEvents="box-none"
 			>
-				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					contentContainerClassName="gap-2"
-					pointerEvents="auto"
-				>
-					{complaintTypeValues.map(({ value }) => (
-						<ComplaintTypeChip.Pressable
-							key={value}
-							type={value}
-							size="lg"
-							active={activeTypeFilter === value}
-							onPress={() => setActiveTypeFilter(value)}
-						/>
-					))}
-				</ScrollView>
-				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					contentContainerClassName="gap-2"
-					pointerEvents="auto"
-				>
-					{complaintStatuses.map(({ value }) => {
-						const isActive = activeStatusFilter === value;
-						return (
-							<ComplaintStatusChip.Pressable
-								key={value}
-								status={value}
-								size="lg"
-								active={isActive}
-								onPress={() => setActiveStatusFilter(isActive ? null : value)}
-							/>
-						);
-					})}
-				</ScrollView>
+				<FilterRow
+					activeCategory={activeCategory}
+					activeHazardLevel={activeHazardLevel}
+					activeStatusFilter={activeStatusFilter}
+					activeRadius={activeRadius}
+					onPress={() => filterSheetRef.current?.open()}
+				/>
 			</View>
 
 			{/* Loading indicator */}
@@ -349,17 +362,6 @@ export default function ComplaintsMapScreen() {
 					/>
 				</TouchableOpacity>
 
-				<TouchableOpacity
-					activeOpacity={0.85}
-					onPress={() => radarSheetRef.current?.open()}
-					className="h-[52px] w-11 items-center justify-center rounded-xl bg-white gap-0.5"
-					style={controlShadow}
-				>
-					<RadarIcon size={16} color={colors.gray[700]} strokeWidth={2.2} />
-					<Text className="text-[9px] font-semibold text-gray-700 leading-none">
-						{activeRadiusLabel.replace(" ", "").toUpperCase()}
-					</Text>
-				</TouchableOpacity>
 			</View>
 
 			{/* FABs */}
@@ -429,10 +431,10 @@ export default function ComplaintsMapScreen() {
 				description="Para visualizar e registrar denúncias você precisa finalizar o seu cadastro."
 			/>
 
-			{/* Radar bottom sheet */}
-			<BottomSheet ref={radarSheetRef}>
+			{/* Filter bottom sheet */}
+			<BottomSheet ref={filterSheetRef}>
 				<BottomSheetPortal
-					snapPoints={["42%"]}
+					snapPoints={["90%"]}
 					backdropComponent={BottomSheetBackdrop}
 					handleComponent={BottomSheetDragIndicator}
 				>
@@ -440,35 +442,248 @@ export default function ComplaintsMapScreen() {
 						contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
 					>
 						<Heading size="md" className="mb-4 text-gray-900">
-							Raio de busca
+							Filtros
 						</Heading>
-						{RADIUS_OPTIONS.map(({ label, value }) => {
-							const isActive = activeRadius === value;
-							return (
+
+						<Text className="text-sm font-semibold text-muted-foreground mb-3">
+							Categorias
+						</Text>
+						<View className="flex-row flex-wrap gap-2 mb-4">
+							<FilterOption
+								label="Todos"
+								active={activeCategory === null}
+								onPress={() => setActiveCategory(null)}
+							/>
+							{categories.map(cat => (
+								<FilterOption
+									key={cat.id}
+									label={cat.name}
+									active={activeCategory?.id === cat.id}
+									onPress={() =>
+										setActiveCategory(
+											activeCategory?.id === cat.id ? null : cat,
+										)
+									}
+								/>
+							))}
+						</View>
+
+						<Divider className="mb-4" />
+
+						<Text className="text-sm font-semibold text-muted-foreground mb-3">
+							Periculosidade
+						</Text>
+						<View className="flex-row flex-wrap gap-2 mb-4">
+							<FilterOption
+								label="Todos"
+								active={activeHazardLevel === null}
+								onPress={() => setActiveHazardLevel(null)}
+							/>
+							{HAZARD_LEVELS.map(level => (
 								<TouchableOpacity
-									key={value}
-									activeOpacity={0.85}
-									onPress={() => handleRadiusSelect(value)}
-									className={`mb-2 h-12 flex-row items-center justify-between rounded-xl px-4 ${
-										isActive
-											? "bg-lime-800"
-											: "bg-gray-50 border border-gray-100"
-									}`}
-								>
-									<Text
-										className={`font-semibold ${isActive ? "text-white" : "text-gray-800"}`}
-									>
-										{label}
-									</Text>
-									{isActive && (
-										<View className="h-2 w-2 rounded-full bg-white" />
+									key={level}
+									activeOpacity={0.8}
+									onPress={() =>
+										setActiveHazardLevel(
+											activeHazardLevel === level ? null : level,
+										)
+									}
+									className={cn(
+										"rounded-xl border px-3 py-2",
+										activeHazardLevel === level
+											? HAZARD_SELECTED_STYLE[level]
+											: "border-border bg-white",
 									)}
+								>
+									<WasteCategoryHazardLevel variant={level} />
 								</TouchableOpacity>
-							);
-						})}
+							))}
+						</View>
+
+						<Divider className="mb-4" />
+
+						<Text className="text-sm font-semibold text-muted-foreground mb-3">
+							Status
+						</Text>
+						<View className="gap-2">
+							{STATUS_FILTER_OPTIONS.map(opt => {
+								const isActive = activeStatusFilter === opt.value;
+								return (
+									<TouchableOpacity
+										key={opt.label}
+										activeOpacity={0.85}
+										onPress={() => setActiveStatusFilter(opt.value)}
+										className={cn(
+											"h-12 flex-row items-center justify-between rounded-xl px-4",
+											isActive
+												? "bg-lime-800"
+												: "bg-gray-50 border border-gray-100",
+										)}
+									>
+										<Text
+											className={cn(
+												"font-semibold",
+												isActive ? "text-white" : "text-gray-800",
+											)}
+										>
+											{opt.label}
+										</Text>
+										{isActive && (
+											<View className="h-2 w-2 rounded-full bg-white" />
+										)}
+									</TouchableOpacity>
+								);
+							})}
+						</View>
+
+						<Divider className="mb-4" />
+
+						<Text className="text-sm font-semibold text-muted-foreground mb-3">
+							Raio de busca
+						</Text>
+						<View className="gap-2">
+							{RADIUS_OPTIONS.map(({ label, value }) => {
+								const isActive = activeRadius === value;
+								return (
+									<TouchableOpacity
+										key={value}
+										activeOpacity={0.85}
+										onPress={() => setActiveRadius(value)}
+										className={cn(
+											"h-12 flex-row items-center justify-between rounded-xl px-4",
+											isActive
+												? "bg-lime-800"
+												: "bg-gray-50 border border-gray-100",
+										)}
+									>
+										<Text
+											className={cn(
+												"font-semibold",
+												isActive ? "text-white" : "text-gray-800",
+											)}
+										>
+											{label}
+										</Text>
+										{isActive && (
+											<View className="h-2 w-2 rounded-full bg-white" />
+										)}
+									</TouchableOpacity>
+								);
+							})}
+						</View>
 					</BottomSheetScrollView>
 				</BottomSheetPortal>
 			</BottomSheet>
 		</View>
+	);
+}
+
+type FilterRowProps = {
+	activeCategory: WasteCategory | null;
+	activeHazardLevel: HazardLevelVariant | null;
+	activeStatusFilter: ComplaintStatus | null;
+	activeRadius: number;
+	onPress: () => void;
+};
+
+function FilterRow({
+	activeCategory,
+	activeHazardLevel,
+	activeStatusFilter,
+	activeRadius,
+	onPress,
+}: FilterRowProps) {
+	const radiusLabel =
+		RADIUS_OPTIONS.find(o => o.value === activeRadius)?.label ?? "10 km";
+
+	const hasActiveFilter =
+		activeCategory !== null ||
+		activeHazardLevel !== null ||
+		activeStatusFilter !== null;
+
+	return (
+		<HStack className="gap-2 items-center" pointerEvents="auto">
+			<TouchableOpacity
+				activeOpacity={0.9}
+				onPress={onPress}
+				className="flex-1 flex-row items-center gap-2 bg-white rounded-xl px-3 border border-border"
+				style={{ height: 42 }}
+			>
+				<SearchIcon size={16} color={colors.gray[400]} strokeWidth={2} />
+				<ScrollView
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					contentContainerClassName="gap-1.5 items-center py-2"
+				>
+					{!hasActiveFilter && (
+						<Text className="text-sm text-muted-foreground">
+							Todos os filtros
+						</Text>
+					)}
+					{activeHazardLevel && (
+						<WasteCategoryHazardLevel variant={activeHazardLevel} />
+					)}
+					{activeCategory && (
+						<View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-2.5 py-0.5">
+							<RecycleIcon size={10} color={colors.gray[700]} strokeWidth={2.5} />
+							<Text className="text-[10px] font-semibold text-gray-700 uppercase">
+								{activeCategory.name}
+							</Text>
+						</View>
+					)}
+					{activeStatusFilter && (
+						<ComplaintStatusChip status={activeStatusFilter} size="xs" />
+					)}
+					<View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-2.5 py-0.5">
+						<Text className="text-[10px] font-semibold text-gray-700">
+							{radiusLabel}
+						</Text>
+					</View>
+				</ScrollView>
+			</TouchableOpacity>
+
+			<TouchableOpacity
+				activeOpacity={0.85}
+				onPress={onPress}
+				className="h-[42px] w-[42px] items-center justify-center rounded-xl bg-lime-800"
+				style={{
+					shadowColor: colors.black,
+					shadowOffset: { width: 0, height: 2 },
+					shadowOpacity: 0.2,
+					shadowRadius: 3,
+					elevation: 3,
+				}}
+			>
+				<Settings2Icon size={18} color={colors.white} strokeWidth={2} />
+			</TouchableOpacity>
+		</HStack>
+	);
+}
+
+type FilterOptionProps = {
+	label: string;
+	active: boolean;
+	onPress: () => void;
+};
+
+function FilterOption({ label, active, onPress }: FilterOptionProps) {
+	return (
+		<TouchableOpacity
+			onPress={onPress}
+			activeOpacity={0.8}
+			className={cn(
+				"h-9 px-4 rounded-xl border items-center justify-center",
+				active ? "bg-lime-800 border-lime-800" : "bg-white border-border",
+			)}
+		>
+			<Text
+				className={cn(
+					"text-sm font-medium",
+					active ? "text-white" : "text-foreground",
+				)}
+			>
+				{label}
+			</Text>
+		</TouchableOpacity>
 	);
 }
