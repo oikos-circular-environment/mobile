@@ -57,7 +57,7 @@ jest.mock("@/components/ui/decimal-input", () => ({
 	DecimalInputIcon: () => null,
 }));
 
-jest.mock("@/components/companies/waste-category", () => ({
+jest.mock("@/components/custom/waste-category", () => ({
 	WasteCategory: ({
 		onSelectionChange,
 		children,

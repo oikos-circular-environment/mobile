@@ -40,7 +40,7 @@ export function WasteCategoryCaption() {
 						</Box>
 					</VStack>
 					<VStack space="md" className="items-start">
-						<WasteCategoryHazardLevel hazardLevel="LOW" />
+						<WasteCategoryHazardLevel variant="low" />
 						<Box className="flex-1">
 							<Text>
 								RNP confirmado, sem características de periculosidade, contato
@@ -49,7 +49,7 @@ export function WasteCategoryCaption() {
 						</Box>
 					</VStack>
 					<VStack space="md" className="items-start">
-						<WasteCategoryHazardLevel hazardLevel="MEDIUM" />
+						<WasteCategoryHazardLevel variant="medium" />
 						<Box className="flex-1">
 							<Text>
 								RNP potencial ou composição variável — pode conter componentes
@@ -58,7 +58,7 @@ export function WasteCategoryCaption() {
 						</Box>
 					</VStack>
 					<VStack space="md" className="items-start">
-						<WasteCategoryHazardLevel hazardLevel="HIGH" />
+						<WasteCategoryHazardLevel variant="high" />
 						<Box className="flex-1">
 							<Text>
 								RP confirmado — exige manuseio com EPIs e coleta especializada.
@@ -66,7 +66,7 @@ export function WasteCategoryCaption() {
 						</Box>
 					</VStack>
 					<VStack space="md" className="items-start">
-						<WasteCategoryHazardLevel hazardLevel="VERY_HIGH" />
+						<WasteCategoryHazardLevel variant="very_high" />
 						<Box className="flex-1">
 							<Text>
 								RP de alta virulência, explosão, contaminação irreversível —

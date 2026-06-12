@@ -4,7 +4,10 @@ import { useEffect } from "react";
 import { FlatList, View } from "react-native";
 import { useSaveWastes } from "@/components/companies/hooks/use-save-wastes";
 import { WasteSkeleton } from "@/components/companies/waste/waste-skeleton";
-import { WasteCategoryHazardLevel } from "@/components/companies/waste-category";
+import {
+	type HazardLevelVariant,
+	WasteCategoryHazardLevel,
+} from "@/components/custom/waste-category";
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -156,7 +159,7 @@ export default function WasteIndexScreen() {
 								{item.waste_category.hazard_levels.map(hazard_level => (
 									<WasteCategoryHazardLevel
 										key={`${item.id}-${hazard_level}`}
-										hazardLevel={hazard_level}
+										variant={hazard_level.toLowerCase() as HazardLevelVariant}
 									/>
 								))}
 							</View>

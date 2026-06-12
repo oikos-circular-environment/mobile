@@ -3,7 +3,9 @@ import type { WasteCategory } from "@/libs/types/waste-category";
 
 interface WasteCategoryContextValue {
 	categories: WasteCategory[];
+	selectionMode: "single" | "multiple";
 	selectedWasteCategory: WasteCategory | null;
+	selectedWasteCategories: WasteCategory[];
 	onSelect: (category: WasteCategory) => void;
 }
 

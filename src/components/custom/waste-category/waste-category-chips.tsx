@@ -4,8 +4,13 @@ import { cn } from "@/libs/utils";
 import { useWasteCategoryContext } from "./context";
 
 export function WasteCategoryChips() {
-	const { categories, selectedWasteCategory, onSelect } =
-		useWasteCategoryContext();
+	const {
+		categories,
+		selectionMode,
+		selectedWasteCategory,
+		selectedWasteCategories,
+		onSelect,
+	} = useWasteCategoryContext();
 
 	return (
 		<ScrollView
@@ -14,7 +19,11 @@ export function WasteCategoryChips() {
 			contentContainerClassName="gap-2 py-0.5"
 		>
 			{categories.map(category => {
-				const isSelected = category.id === selectedWasteCategory?.id;
+				const isSelected =
+					selectionMode === "multiple"
+						? selectedWasteCategories.some(c => c.id === category.id)
+						: category.id === selectedWasteCategory?.id;
+
 				return (
 					<Pressable key={category.id} onPress={() => onSelect(category)}>
 						<View

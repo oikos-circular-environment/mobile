@@ -18,7 +18,6 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
-import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import { useAttachmentRemove } from "@/components/complaints/hooks/use-attachment-remove";
 import { useEditComplaint } from "@/components/complaints/hooks/use-edit-complaint";
 import type { MediaItem } from "@/components/complaints/hooks/use-submit-complaints";
@@ -53,7 +52,6 @@ import {
 	ModalFooter,
 	ModalHeader,
 } from "@/components/ui/modal";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -67,7 +65,10 @@ import {
 } from "@/libs/google/reverse-geocode";
 import { mask } from "@/libs/mask";
 import type { Geospatial } from "@/libs/types/complaint";
-import { cn } from "@/libs/utils";
+import {
+	WasteCategory,
+	WasteCategoryChips,
+} from "@/components/custom/waste-category";
 
 const schema = z.object({
 	observations: z.string().max(500, "Máximo de 500 caracteres.").optional(),
@@ -103,8 +104,6 @@ export default function ComplaintCreateScreen() {
 	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
 	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
 	const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
-
-	const { categories, isLoading: isLoadingCategories } = useWasteCategories();
 
 	const { mutateAsync: submitComplaint, isPending: isSubmitting } =
 		useSubmitComplaints();
@@ -793,48 +792,15 @@ export default function ComplaintCreateScreen() {
 						Selecione os tipos de resíduos que você consegue identificar no
 						local.
 					</Text>
-					{isLoadingCategories ? (
-						<View className="flex-row flex-wrap gap-2">
-							{Array.from({ length: 6 }).map((_, i) => (
-								<Skeleton
-									key={i}
-									startColor="bg-gray-200"
-									className="h-8 rounded-lg"
-									style={{ width: 80 + (i % 3) * 24 }}
-								/>
-							))}
-						</View>
-					) : (
-						<View className="flex-row flex-wrap gap-2">
-							{categories.map(cat => {
-								const active = selectedCategoryIds.includes(cat.id);
-								return (
-									<TouchableOpacity
-										key={cat.id}
-										activeOpacity={0.8}
-										onPress={() =>
-											setSelectedCategoryIds(prev =>
-												active
-													? prev.filter(id => id !== cat.id)
-													: [...prev, cat.id],
-											)
-										}
-										className={cn(
-											"rounded-md px-4 py-2",
-											active ? "bg-lime-800" : "border border-border bg-white",
-										)}
-									>
-										<Text
-											size="sm"
-											className={cn("font-semibold", active && "text-white")}
-										>
-											{cat.name}
-										</Text>
-									</TouchableOpacity>
-								);
-							})}
-						</View>
-					)}
+					<WasteCategory
+						selectionMode="multiple"
+						defaultCategoryIds={editingComplaint?.categories.map(c => c.id)}
+						onSelectionChange={cats =>
+							setSelectedCategoryIds(cats.map(c => c.id))
+						}
+					>
+						<WasteCategoryChips />
+					</WasteCategory>
 				</View>
 
 				{/* Ações */}

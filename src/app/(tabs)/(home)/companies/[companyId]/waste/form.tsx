@@ -20,7 +20,7 @@ import {
 	WasteCategory,
 	WasteCategoryChips,
 	WasteCategoryContent,
-} from "@/components/companies/waste-category";
+} from "@/components/custom/waste-category";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

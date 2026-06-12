@@ -5,7 +5,10 @@ import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import type { WasteCategorySubcategory } from "@/libs/types/waste-category";
-import { WasteCategoryHazardLevel } from "./waste-category-hazard-level";
+import {
+	type HazardLevelVariant,
+	WasteCategoryHazardLevel,
+} from "./waste-category-hazard-level";
 
 export interface WasteCategorySubcategoryCardProps {
 	subItem: WasteCategorySubcategory;
@@ -17,7 +20,9 @@ export function WasteCategorySubcategoryCard({
 	return (
 		<Card className="shadow-none gap-4">
 			<HStack space="md" className="items-center">
-				<WasteCategoryHazardLevel hazardLevel={subItem.hazard_level} />
+				<WasteCategoryHazardLevel
+					variant={subItem.hazard_level.toLowerCase() as HazardLevelVariant}
+				/>
 				<Box className="flex-1">
 					<Text numberOfLines={2}>{subItem.name}</Text>
 				</Box>

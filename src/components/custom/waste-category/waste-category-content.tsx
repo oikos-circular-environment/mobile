@@ -10,7 +10,10 @@ import type {
 } from "@/libs/types/waste-category";
 import { useWasteCategoryContext } from "./context";
 import { WasteCategoryCaption } from "./waste-category-caption";
-import { WasteCategoryHazardLevel as WasteCategoryHazardLevelComponent } from "./waste-category-hazard-level";
+import {
+	type HazardLevelVariant,
+	WasteCategoryHazardLevel as WasteCategoryHazardLevelComponent,
+} from "./waste-category-hazard-level";
 import { WasteCategorySubcategoryCard } from "./waste-category-subcategory-card";
 
 export function WasteCategoryContent() {
@@ -27,7 +30,7 @@ export function WasteCategoryContent() {
 						(hazard_level: WasteCategoryHazardLevel) => (
 							<WasteCategoryHazardLevelComponent
 								key={`${selectedWasteCategory.id}-${hazard_level}`}
-								hazardLevel={hazard_level}
+								variant={hazard_level.toLowerCase() as HazardLevelVariant}
 							/>
 						),
 					)}

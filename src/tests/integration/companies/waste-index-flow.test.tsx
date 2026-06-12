@@ -47,11 +47,11 @@ jest.mock("@/components/ui/swipeable-card", () => ({
 	},
 }));
 
-jest.mock("@/components/companies/waste-category", () => ({
-	WasteCategoryHazardLevel: ({ hazardLevel }: { hazardLevel: string }) => {
+jest.mock("@/components/custom/waste-category", () => ({
+	WasteCategoryHazardLevel: ({ variant }: { variant: string }) => {
 		const React = require("react");
 		const { Text } = require("react-native");
-		return <Text>{hazardLevel}</Text>;
+		return <Text>{variant}</Text>;
 	},
 }));
 
