@@ -1,33 +1,28 @@
 import { create } from "zustand";
 import type {
-	GetV1ComplaintsDashboardResponse,
-	GetV1ComplaintsResponse,
-} from "@/libs/oikos-sdk";
-import type { MapComplaint } from "@/libs/types/complaint";
-
-export type ApiComplaint =
-	NonNullable<GetV1ComplaintsResponse>["complaints"][number];
-export type ComplaintDashboard =
-	NonNullable<GetV1ComplaintsDashboardResponse>["dashboard"];
-export type ApiComplaintStatus = ApiComplaint["status"];
+	Complaint,
+	ComplaintDashboard,
+	ComplaintStatus,
+	MapComplaint,
+} from "@/libs/types/complaint";
 
 // ─── List Slice ──────────────────────────────────────────────────────────────
 
 type ListState = {
-	complaints: ApiComplaint[];
+	complaints: Complaint[];
 	dashboard: ComplaintDashboard | undefined;
 	nextCursor: Date | undefined;
 	hasNextPage: boolean;
-	activeFilter: ApiComplaintStatus | null;
+	activeFilter: ComplaintStatus | null;
 };
 
 type ListActions = {
-	setComplaints: (complaints: ApiComplaint[], nextCursor?: Date) => void;
-	appendComplaints: (complaints: ApiComplaint[], nextCursor?: Date) => void;
+	setComplaints: (complaints: Complaint[], nextCursor?: Date) => void;
+	appendComplaints: (complaints: Complaint[], nextCursor?: Date) => void;
 	setDashboard: (dashboard: ComplaintDashboard) => void;
-	setActiveFilter: (status: ApiComplaintStatus | null) => void;
-	shiftComplaintStatus: (id: string, newStatus: ApiComplaintStatus) => void;
-	updateComplaint: (id: string, patch: Partial<ApiComplaint>) => void;
+	setActiveFilter: (status: ComplaintStatus | null) => void;
+	shiftComplaintStatus: (id: string, newStatus: ComplaintStatus) => void;
+	updateComplaint: (id: string, patch: Partial<Complaint>) => void;
 };
 
 // ─── Map Votes Slice ─────────────────────────────────────────────────────────
@@ -119,7 +114,7 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 			const complaint = state.complaints.find(c => c.id === id);
 			if (!complaint) return {};
 
-			const oldStatus = complaint.status as ApiComplaintStatus;
+			const oldStatus = complaint.status as ComplaintStatus;
 			const updatedComplaints = state.complaints.map(c =>
 				c.id === id ? { ...c, status: newStatus } : c,
 			);
@@ -128,25 +123,15 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 
 			const dash = { ...state.dashboard };
 
-			if (oldStatus === "OPEN") dash.open = Math.max(0, (dash.open ?? 0) - 1);
-			else if (oldStatus === "IN_PROGRESS")
-				dash.pending = Math.max(0, (dash.pending ?? 0) - 1);
+			if (oldStatus === "OPEN") dash.open = Math.max(0, dash.open - 1);
 			else if (oldStatus === "RESOLVED")
-				dash.resolved = Math.max(0, (dash.resolved ?? 0) - 1);
+				dash.resolved = Math.max(0, dash.resolved - 1);
 			else if (oldStatus === "CANCELED")
-				dash.canceled = Math.max(0, (dash.canceled ?? 0) - 1);
-			else if (oldStatus === "REJECTED")
-				dash.rejected = Math.max(0, (dash.rejected ?? 0) - 1);
+				dash.canceled = Math.max(0, dash.canceled - 1);
 
-			if (newStatus === "OPEN") dash.open = (dash.open ?? 0) + 1;
-			else if (newStatus === "IN_PROGRESS")
-				dash.pending = (dash.pending ?? 0) + 1;
-			else if (newStatus === "RESOLVED")
-				dash.resolved = (dash.resolved ?? 0) + 1;
-			else if (newStatus === "CANCELED")
-				dash.canceled = (dash.canceled ?? 0) + 1;
-			else if (newStatus === "REJECTED")
-				dash.rejected = (dash.rejected ?? 0) + 1;
+			if (newStatus === "OPEN") dash.open += 1;
+			else if (newStatus === "RESOLVED") dash.resolved += 1;
+			else if (newStatus === "CANCELED") dash.canceled += 1;
 
 			return { complaints: updatedComplaints, dashboard: dash };
 		});

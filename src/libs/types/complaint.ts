@@ -1,16 +1,15 @@
 import type { CameraCapturedPicture } from "expo-camera";
 import {
 	FlameIcon,
-	ShieldAlertIcon,
 	ShieldCheckIcon,
 	ShieldIcon,
-	ShieldQuestionMarkIcon,
 	ShieldXIcon,
 	ShrubIcon,
 	TractorIcon,
 	Trash2Icon,
 } from "lucide-react-native";
 import type {
+	GetV1ComplaintsDashboardResponses,
 	GetV1ComplaintsMapResponses,
 	GetV1ComplaintsResponses,
 } from "@/libs/oikos-sdk";
@@ -27,13 +26,11 @@ export type ComplaintVoteCounts = Complaint["vote_counts"];
 export type MapComplaint =
 	GetV1ComplaintsMapResponses[200]["complaints"][number];
 
+export type ComplaintDashboard =
+	GetV1ComplaintsDashboardResponses[200]["dashboard"];
+
 // UI/domain types
-export type ComplaintStatus =
-	| "OPEN"
-	| "IN_PROGRESS"
-	| "RESOLVED"
-	| "REJECTED"
-	| "CANCELED";
+export type ComplaintStatus = "OPEN" | "RESOLVED" | "CANCELED";
 
 export type ComplaintType =
 	| "IRREGULAR_DISPOSAL"
@@ -109,24 +106,14 @@ export const complaintStatuses: ValueMapping<ComplaintStatus>[] = [
 		icon: ShieldIcon,
 	},
 	{
-		value: "IN_PROGRESS",
-		label: "Em andamento",
-		icon: ShieldQuestionMarkIcon,
-	},
-	{
 		value: "RESOLVED",
-		label: "Resolvidos",
+		label: "Resolvido",
 		icon: ShieldCheckIcon,
 	},
 	{
 		value: "CANCELED",
 		label: "Cancelado",
 		icon: ShieldXIcon,
-	},
-	{
-		value: "REJECTED",
-		label: "Rejeitado",
-		icon: ShieldAlertIcon,
 	},
 ];
 

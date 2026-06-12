@@ -4,11 +4,10 @@ import { Alert, Linking, Platform } from "react-native";
 import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { patchV1ComplaintsByIdCanceled } from "@/libs/oikos-sdk";
-import type { MapComplaint } from "@/libs/types/complaint";
-import type { ApiComplaint } from "@/stores/complaints-store";
+import type { Complaint, MapComplaint } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
-export function useComplaintCard(complaint: ApiComplaint) {
+export function useComplaintCard(complaint: Complaint) {
 	const shiftComplaintStatus = useComplaintsStore(s => s.shiftComplaintStatus);
 	const setSelectedMapComplaint = useComplaintsStore(
 		s => s.setSelectedMapComplaint,

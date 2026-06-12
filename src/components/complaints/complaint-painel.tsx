@@ -1,10 +1,8 @@
 "use client";
 
 import {
-	ShieldAlertIcon,
 	ShieldCheckIcon,
 	ShieldIcon,
-	ShieldQuestionMarkIcon,
 	ShieldXIcon,
 } from "lucide-react-native";
 import type { ComponentType } from "react";
@@ -16,11 +14,11 @@ import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
-import type { ApiComplaintStatus } from "@/stores/complaints-store";
+import type { ComplaintStatus } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 type PanelItem = {
-	status: ApiComplaintStatus | null;
+	status: ComplaintStatus | null;
 	label: string;
 	count: number;
 	iconColor: string;
@@ -56,7 +54,7 @@ export function ComplaintPainel() {
 		{
 			status: null,
 			label: "Total de denúncias",
-			count: dashboard?.total ?? 0,
+			count: dashboard.total,
 			iconColor: colors.gray[400],
 			iconBgColor: "bg-gray-100",
 			activeBg: "bg-gray-100",
@@ -66,7 +64,7 @@ export function ComplaintPainel() {
 		{
 			status: "OPEN",
 			label: "Abertas",
-			count: dashboard?.open ?? 0,
+			count: dashboard.open,
 			iconColor: colors.sky[500],
 			iconBgColor: "bg-sky-100",
 			activeBg: "bg-sky-100",
@@ -74,19 +72,9 @@ export function ComplaintPainel() {
 			Icon: ShieldIcon,
 		},
 		{
-			status: "IN_PROGRESS",
-			label: "Em andamento",
-			count: dashboard?.pending ?? 0,
-			iconColor: colors.amber[400],
-			iconBgColor: "bg-amber-100",
-			activeBg: "bg-amber-100",
-			activeBorder: "border-amber-300",
-			Icon: ShieldQuestionMarkIcon,
-		},
-		{
 			status: "RESOLVED",
 			label: "Resolvidas",
-			count: dashboard?.resolved ?? 0,
+			count: dashboard.resolved,
 			iconColor: colors.lime[800],
 			iconBgColor: "bg-lime-100",
 			activeBg: "bg-lime-100",
@@ -96,22 +84,12 @@ export function ComplaintPainel() {
 		{
 			status: "CANCELED",
 			label: "Canceladas",
-			count: dashboard?.canceled ?? 0,
+			count: dashboard.canceled,
 			iconColor: colors.red[700],
 			iconBgColor: "bg-red-100",
 			activeBg: "bg-red-100",
 			activeBorder: "border-red-300",
 			Icon: ShieldXIcon,
-		},
-		{
-			status: "REJECTED",
-			label: "Rejeitadas",
-			count: dashboard?.rejected ?? 0,
-			iconColor: colors.orange[600],
-			iconBgColor: "bg-orange-100",
-			activeBg: "bg-orange-100",
-			activeBorder: "border-orange-300",
-			Icon: ShieldAlertIcon,
 		},
 	];
 

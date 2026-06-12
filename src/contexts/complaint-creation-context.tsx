@@ -5,16 +5,15 @@ import {
 	useContext,
 	useState,
 } from "react";
-import type { ApiComplaint } from "@/stores/complaints-store";
-import type { DraftAttachment } from "@/libs/types/complaint";
+import type { Complaint, DraftAttachment } from "@/libs/types/complaint";
 
 type ComplaintCreationContextValue = {
 	attachments: DraftAttachment[];
-	editingComplaint: ApiComplaint | null;
+	editingComplaint: Complaint | null;
 	addAttachment: (attachment: DraftAttachment) => void;
 	removeAttachment: (id: string) => void;
 	clearDraft: () => void;
-	enterEditMode: (complaint: ApiComplaint) => void;
+	enterEditMode: (complaint: Complaint) => void;
 	exitEditMode: () => void;
 };
 
@@ -23,7 +22,7 @@ const ComplaintCreationContext =
 
 export function ComplaintCreationProvider({ children }: PropsWithChildren) {
 	const [attachments, setAttachments] = useState<DraftAttachment[]>([]);
-	const [editingComplaint, setEditingComplaint] = useState<ApiComplaint | null>(
+	const [editingComplaint, setEditingComplaint] = useState<Complaint | null>(
 		null,
 	);
 
@@ -39,7 +38,7 @@ export function ComplaintCreationProvider({ children }: PropsWithChildren) {
 		setAttachments([]);
 	}, []);
 
-	const enterEditMode = useCallback((complaint: ApiComplaint) => {
+	const enterEditMode = useCallback((complaint: Complaint) => {
 		setEditingComplaint(complaint);
 		setAttachments(
 			complaint.attachments.map(a => ({

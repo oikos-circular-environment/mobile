@@ -51,13 +51,13 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { compressMedia } from "@/libs/media-compression";
 import {
 	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
 	patchV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
-import { compressMedia } from "@/libs/media-compression";
 import type { ComplaintStatus, ComplaintType } from "@/libs/types/complaint";
 import { complaintTypeValues } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";

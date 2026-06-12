@@ -163,7 +163,7 @@ export default function WrapperMap({
 
 			<View className="gap-2">
 				<View className="gap-1">
-					<Heading size="sm">Localização exata da empresa</Heading>
+					<Heading size="sm">Geolocalização</Heading>
 					<Text className="text-sm text-muted-foreground">
 						Toque no mapa para ajustar o ponto com precisão ou use a localização
 						do dispositivo.

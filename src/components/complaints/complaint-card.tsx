@@ -33,12 +33,12 @@ import {
 import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import type { ApiComplaint } from "@/stores/complaints-store";
+import type { Complaint } from "@/libs/types/complaint";
 import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
 import { ComplaintMap } from "./complaint-map";
 
 interface ComplaintCardProps {
-	complaint: ApiComplaint;
+	complaint: Complaint;
 }
 
 export function ComplaintCard({ complaint }: ComplaintCardProps) {

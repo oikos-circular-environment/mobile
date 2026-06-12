@@ -11,8 +11,8 @@ import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import type { Complaint } from "@/libs/types/complaint";
 import {
-	type ApiComplaint,
 	selectFilteredComplaints,
 	useComplaintsStore,
 } from "@/stores/complaints-store";
@@ -36,7 +36,7 @@ export default function ComplaintsScreen() {
 	);
 
 	const renderItem = useCallback(
-		({ item }: { item: ApiComplaint }) => <ComplaintCard complaint={item} />,
+		({ item }: { item: Complaint }) => <ComplaintCard complaint={item} />,
 		[],
 	);
 
@@ -77,7 +77,7 @@ export default function ComplaintsScreen() {
 
 	return (
 		<View className="flex-1 bg-white">
-			<FlatList<ApiComplaint>
+			<FlatList<Complaint>
 				contentContainerClassName="gap-4 px-4 py-4 pb-8"
 				data={filteredComplaints}
 				keyExtractor={item => item.id}
