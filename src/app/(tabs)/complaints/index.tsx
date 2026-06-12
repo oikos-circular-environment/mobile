@@ -2,6 +2,8 @@ import { router } from "expo-router";
 import {
 	ListIcon,
 	LocateFixedIcon,
+	MapIcon,
+	MapPinnedIcon,
 	MinusIcon,
 	PlusIcon,
 	RecycleIcon,
@@ -21,15 +23,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
-import { ComplaintStatusChip } from "@/components/complaints/complaint-chip/complaint-status-chip";
-import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/complaint-chip/tokens";
+import { ComplaintHazardLevelFilter } from "@/components/complaints/filter-components/complaint-hazard-level";
+import { ComplaintRadiusFilter } from "@/components/complaints/filter-components/complaint-radius";
+import {
+	ComplaintStatusChip,
+	type ComplaintStatusPressableVariant,
+} from "@/components/complaints/filter-components/complaint-status-chip";
+import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/filter-components/tokens";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
-import { colors } from "@/components/style/colors";
 import {
-	WasteCategoryHazardLevel,
 	type HazardLevelVariant,
+	WasteCategoryHazardLevel,
 } from "@/components/custom/waste-category";
+import { colors } from "@/components/style/colors";
 import {
 	BottomSheet,
 	BottomSheetBackdrop,
@@ -71,21 +78,18 @@ const controlShadow = {
 	elevation: 3,
 };
 
-const STATUS_FILTER_OPTIONS: { label: string; value: ComplaintStatus | null }[] =
-	[
-		{ label: "Todos", value: null },
-		{ label: "Aberto", value: "OPEN" },
-		{ label: "Resolvido", value: "RESOLVED" },
-	];
+const STATUS_FILTER_VARIANTS: ComplaintStatusPressableVariant[] = [
+	"all",
+	"OPEN",
+	"RESOLVED",
+];
 
-const HAZARD_LEVELS: HazardLevelVariant[] = ["low", "medium", "high", "very_high"];
-
-const HAZARD_SELECTED_STYLE: Record<HazardLevelVariant, string> = {
-	low: "border-lime-400 bg-lime-100",
-	medium: "border-yellow-400 bg-yellow-100",
-	high: "border-orange-400 bg-orange-100",
-	very_high: "border-red-400 bg-red-100",
-};
+const HAZARD_LEVELS: HazardLevelVariant[] = [
+	"low",
+	"medium",
+	"high",
+	"very_high",
+];
 
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
@@ -108,9 +112,12 @@ export default function ComplaintsMapScreen() {
 	const [activeRadius, setActiveRadius] = useState(10000);
 	const [activeStatusFilter, setActiveStatusFilter] =
 		useState<ComplaintStatus | null>("OPEN");
-	const [activeCategory, setActiveCategory] = useState<WasteCategory | null>(null);
+	const [activeCategory, setActiveCategory] = useState<WasteCategory | null>(
+		null,
+	);
 	const [activeHazardLevel, setActiveHazardLevel] =
 		useState<HazardLevelVariant | null>(null);
+	const [showUserLocation, setShowUserLocation] = useState(false);
 
 	const {
 		complaints,
@@ -128,9 +135,7 @@ export default function ComplaintsMapScreen() {
 		() =>
 			complaints.filter(complaint => {
 				if (activeCategory) {
-					if (
-						!complaint.categories?.some(cat => cat.id === activeCategory.id)
-					)
+					if (!complaint.categories?.some(cat => cat.id === activeCategory.id))
 						return false;
 				}
 				if (activeHazardLevel) {
@@ -226,7 +231,7 @@ export default function ComplaintsMapScreen() {
 				ref={mapRef}
 				style={{ flex: 1 }}
 				provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-				showsUserLocation={false}
+				showsUserLocation={showUserLocation}
 				showsMyLocationButton={false}
 				showsCompass={false}
 				onPress={handleClosePanel}
@@ -335,6 +340,22 @@ export default function ComplaintsMapScreen() {
 
 				<TouchableOpacity
 					activeOpacity={0.85}
+					onPress={() => setShowUserLocation(v => !v)}
+					className={cn(
+						"h-11 w-11 items-center justify-center rounded-xl",
+						showUserLocation ? "bg-lime-800" : "bg-white",
+					)}
+					style={controlShadow}
+				>
+					{showUserLocation ? (
+						<MapPinnedIcon size={18} color={colors.white} strokeWidth={2.2} />
+					) : (
+						<MapIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
+					)}
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
 					onPress={handleResetNorth}
 					className="h-11 w-11 items-center justify-center rounded-xl bg-primary"
 					style={controlShadow}
@@ -361,7 +382,6 @@ export default function ComplaintsMapScreen() {
 						strokeWidth={2.2}
 					/>
 				</TouchableOpacity>
-
 			</View>
 
 			{/* FABs */}
@@ -474,29 +494,22 @@ export default function ComplaintsMapScreen() {
 							Periculosidade
 						</Text>
 						<View className="flex-row flex-wrap gap-2 mb-4">
-							<FilterOption
-								label="Todos"
-								active={activeHazardLevel === null}
+							<ComplaintHazardLevelFilter
+								variant="all"
+								selected={activeHazardLevel === null}
 								onPress={() => setActiveHazardLevel(null)}
 							/>
 							{HAZARD_LEVELS.map(level => (
-								<TouchableOpacity
+								<ComplaintHazardLevelFilter
 									key={level}
-									activeOpacity={0.8}
+									variant={level}
+									selected={activeHazardLevel === level}
 									onPress={() =>
 										setActiveHazardLevel(
 											activeHazardLevel === level ? null : level,
 										)
 									}
-									className={cn(
-										"rounded-xl border px-3 py-2",
-										activeHazardLevel === level
-											? HAZARD_SELECTED_STYLE[level]
-											: "border-border bg-white",
-									)}
-								>
-									<WasteCategoryHazardLevel variant={level} />
-								</TouchableOpacity>
+								/>
 							))}
 						</View>
 
@@ -505,35 +518,23 @@ export default function ComplaintsMapScreen() {
 						<Text className="text-sm font-semibold text-muted-foreground mb-3">
 							Status
 						</Text>
-						<View className="gap-2">
-							{STATUS_FILTER_OPTIONS.map(opt => {
-								const isActive = activeStatusFilter === opt.value;
-								return (
-									<TouchableOpacity
-										key={opt.label}
-										activeOpacity={0.85}
-										onPress={() => setActiveStatusFilter(opt.value)}
-										className={cn(
-											"h-12 flex-row items-center justify-between rounded-xl px-4",
-											isActive
-												? "bg-lime-800"
-												: "bg-gray-50 border border-gray-100",
-										)}
-									>
-										<Text
-											className={cn(
-												"font-semibold",
-												isActive ? "text-white" : "text-gray-800",
-											)}
-										>
-											{opt.label}
-										</Text>
-										{isActive && (
-											<View className="h-2 w-2 rounded-full bg-white" />
-										)}
-									</TouchableOpacity>
-								);
-							})}
+						<View className="flex-row flex-wrap gap-2 mb-4">
+							{STATUS_FILTER_VARIANTS.map(variant => (
+								<ComplaintStatusChip.Pressable
+									key={variant}
+									variant={variant}
+									selected={
+										variant === "all"
+											? activeStatusFilter === null
+											: activeStatusFilter === variant
+									}
+									onPress={() =>
+										setActiveStatusFilter(
+											variant === "all" ? null : (variant as ComplaintStatus),
+										)
+									}
+								/>
+							))}
 						</View>
 
 						<Divider className="mb-4" />
@@ -541,35 +542,15 @@ export default function ComplaintsMapScreen() {
 						<Text className="text-sm font-semibold text-muted-foreground mb-3">
 							Raio de busca
 						</Text>
-						<View className="gap-2">
-							{RADIUS_OPTIONS.map(({ label, value }) => {
-								const isActive = activeRadius === value;
-								return (
-									<TouchableOpacity
-										key={value}
-										activeOpacity={0.85}
-										onPress={() => setActiveRadius(value)}
-										className={cn(
-											"h-12 flex-row items-center justify-between rounded-xl px-4",
-											isActive
-												? "bg-lime-800"
-												: "bg-gray-50 border border-gray-100",
-										)}
-									>
-										<Text
-											className={cn(
-												"font-semibold",
-												isActive ? "text-white" : "text-gray-800",
-											)}
-										>
-											{label}
-										</Text>
-										{isActive && (
-											<View className="h-2 w-2 rounded-full bg-white" />
-										)}
-									</TouchableOpacity>
-								);
-							})}
+						<View className="flex-row flex-wrap gap-2">
+							{RADIUS_OPTIONS.map(({ label, value }) => (
+								<ComplaintRadiusFilter
+									key={value}
+									label={label}
+									selected={activeRadius === value}
+									onPress={() => setActiveRadius(value)}
+								/>
+							))}
 						</View>
 					</BottomSheetScrollView>
 				</BottomSheetPortal>
@@ -625,7 +606,11 @@ function FilterRow({
 					)}
 					{activeCategory && (
 						<View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-2.5 py-0.5">
-							<RecycleIcon size={10} color={colors.gray[700]} strokeWidth={2.5} />
+							<RecycleIcon
+								size={10}
+								color={colors.gray[700]}
+								strokeWidth={2.5}
+							/>
 							<Text className="text-[10px] font-semibold text-gray-700 uppercase">
 								{activeCategory.name}
 							</Text>

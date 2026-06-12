@@ -48,8 +48,8 @@ import {
 	complaintTypeValues,
 } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
-import { ComplaintStatusChip } from "../complaint-chip/complaint-status-chip";
-import { ComplaintTypeChip } from "../complaint-chip/complaint-type-chip";
+import { ComplaintStatusChip } from "../filter-components/complaint-status-chip";
+import { ComplaintTypeChip } from "../filter-components/complaint-type-chip";
 import { ComplaintVoteButtons } from "../complaint-vote-buttons";
 import { AttachmentPreview } from "./attachment-preview";
 import { ResolutionCard } from "./resolution-card";

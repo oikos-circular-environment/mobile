@@ -5,19 +5,19 @@ export {
 } from "./waste-category";
 export { WasteCategoryCaption } from "./waste-category-caption";
 export {
-	WasteCategoryChips,
 	WasteCategoryChip,
+	WasteCategoryChips,
 	WasteCategoryChipText,
 } from "./waste-category-chips";
 export { WasteCategoryContent } from "./waste-category-content";
 export { WasteCategoryDescription } from "./waste-category-description";
 export {
+	type HazardLevelVariant,
 	WasteCategoryHazardLevel,
 	WasteCategoryHazardLevelIcon,
-	WasteCategoryHazardLevelText,
-	type HazardLevelVariant,
-	type WasteCategoryHazardLevelProps,
 	type WasteCategoryHazardLevelIconProps,
+	type WasteCategoryHazardLevelProps,
+	WasteCategoryHazardLevelText,
 } from "./waste-category-hazard-level";
 export {
 	WasteCategorySubcategoryCard,

@@ -34,7 +34,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import type { Complaint } from "@/libs/types/complaint";
-import { ComplaintStatusChip } from "./complaint-chip/complaint-status-chip";
+import { ComplaintStatusChip } from "./filter-components/complaint-status-chip";
 import { ComplaintMap } from "./complaint-map";
 
 interface ComplaintCardProps {
