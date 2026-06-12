@@ -1,5 +1,5 @@
-import { NativeModules } from "react-native";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { NativeModules } from "react-native";
 
 /**
  * "evidence" — complaint/resolution media: 1920px wide, 80% quality
