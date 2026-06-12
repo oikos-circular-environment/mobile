@@ -184,7 +184,7 @@ export default function ComplaintsMapScreen() {
 				ref={mapRef}
 				style={{ flex: 1 }}
 				provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-				showsUserLocation
+				showsUserLocation={false}
 				showsMyLocationButton={false}
 				showsCompass={false}
 				onPress={handleClosePanel}
@@ -193,10 +193,10 @@ export default function ComplaintsMapScreen() {
 				{complaints.map(complaint => {
 					if (!complaint.location) return null;
 					const typeInfo = complaintTypeValues.find(
-						t => t.value === complaint.type,
+						t => t.value === "IRREGULAR_DISPOSAL",
 					);
 					const pinColor =
-						COMPLAINT_TYPE_COLORS[complaint.type as ComplaintType] ??
+						COMPLAINT_TYPE_COLORS["IRREGULAR_DISPOSAL" as ComplaintType] ??
 						colors.gray[500];
 					const isSelected = selectedMapComplaint?.id === complaint.id;
 					const Icon = typeInfo?.icon;

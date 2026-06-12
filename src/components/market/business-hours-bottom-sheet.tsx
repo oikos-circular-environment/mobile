@@ -1,7 +1,7 @@
 import BottomSheet, {
 	BottomSheetBackdrop,
-	BottomSheetScrollView,
 	type BottomSheetBackdropProps,
+	BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { forwardRef, useCallback } from "react";
 import { View } from "react-native";

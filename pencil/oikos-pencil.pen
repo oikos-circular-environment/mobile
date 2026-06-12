@@ -2036,349 +2036,163 @@
                 },
                 {
                   "type": "frame",
-                  "id": "OEdpw",
-                  "x": 29,
-                  "y": 84,
-                  "name": "Status Row",
+                  "id": "uFr0L",
+                  "x": 12,
+                  "y": 16,
+                  "name": "Search Row",
+                  "width": "fill_container(398)",
                   "gap": 8,
+                  "alignItems": "center",
                   "children": [
                     {
                       "type": "frame",
-                      "id": "mXsFV",
-                      "name": "Aberta",
-                      "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
-                      "fill": "#fef9c3",
-                      "cornerRadius": 999,
-                      "gap": 5,
+                      "id": "X78VR5",
+                      "name": "Search Input",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 42,
+                      "fill": "#ffffff",
+                      "cornerRadius": 8,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
+                      "gap": 8,
                       "padding": [
-                        4,
-                        10
+                        0,
+                        12
                       ],
                       "alignItems": "center",
                       "children": [
                         {
-                          "type": "ellipse",
-                          "id": "Il7Xt",
-                          "name": "Dot",
-                          "fill": "#a16207",
-                          "width": 6,
-                          "height": 6
-                        },
-                        {
-                          "type": "text",
-                          "id": "df75j",
-                          "name": "Label",
-                          "fill": "#a16207",
-                          "content": "Aberta",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-caption",
-                          "fontWeight": "600"
+                          "type": "frame",
+                          "id": "lPQqS",
+                          "name": "Frame",
+                          "gap": "$spacing-1",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "AVmhq",
+                              "name": "Hazard Geral Baixa",
+                              "context": "Grau de periculosidade (ABNT NBR 10004) — src/components/companies/waste-category/waste-category-hazard-level.tsx. Variantes: BAIXA (lime/chevron-down), MÉDIA (yellow/minus), ALTA (laranja #ea580c/chevron-up), MUITO ALTA (vermelho #dc2626/chevrons-up).",
+                              "height": 21,
+                              "fill": "$lime-50",
+                              "cornerRadius": 6,
+                              "stroke": "$lime-200",
+                              "strokeWidth": 1,
+                              "strokeAlignment": "inner",
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "C3cy4",
+                                  "name": "HazardIcon",
+                                  "width": 12,
+                                  "height": 12,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$lime-600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "m3f35w",
+                                  "name": "HazardLabel",
+                                  "fill": "$lime-600",
+                                  "content": "BAIXA",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "q73aUp",
+                              "type": "ref",
+                              "ref": "hNp9X",
+                              "name": "Badge secondary",
+                              "fill": "$gray-100",
+                              "x": 68,
+                              "y": 0,
+                              "descendants": {
+                                "r9uWx": {
+                                  "fill": "$foreground",
+                                  "library": "lucide",
+                                  "icon": "recycle"
+                                },
+                                "AwdGP": {
+                                  "content": "PAPEL/PAPELÃO",
+                                  "fill": "$gray-700"
+                                }
+                              }
+                            },
+                            {
+                              "id": "VQ54g",
+                              "type": "ref",
+                              "ref": "hNp9X",
+                              "name": "Badge secondary",
+                              "fill": "$gray-100",
+                              "x": 190,
+                              "y": 0,
+                              "descendants": {
+                                "r9uWx": {
+                                  "fill": "$foreground",
+                                  "library": "lucide",
+                                  "icon": "shield"
+                                },
+                                "AwdGP": {
+                                  "content": "Todos",
+                                  "fill": "$gray-700"
+                                }
+                              }
+                            },
+                            {
+                              "id": "v6kuc",
+                              "type": "ref",
+                              "ref": "hNp9X",
+                              "name": "Badge secondary",
+                              "fill": "$gray-100",
+                              "x": 262,
+                              "y": 0,
+                              "descendants": {
+                                "r9uWx": {
+                                  "fill": "$foreground"
+                                },
+                                "AwdGP": {
+                                  "content": "2 KM",
+                                  "fill": "$gray-700"
+                                }
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
                     {
-                      "type": "frame",
-                      "id": "D27BT",
-                      "name": "Em Análise",
-                      "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
-                      "fill": "#dbeafe",
-                      "cornerRadius": 999,
-                      "gap": 5,
-                      "padding": [
-                        4,
-                        10
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "ellipse",
-                          "id": "vDo1b",
-                          "name": "Dot",
-                          "fill": "#1d4ed8",
-                          "width": 6,
-                          "height": 6
-                        },
-                        {
-                          "type": "text",
-                          "id": "ZblSO",
-                          "name": "Label",
-                          "fill": "#1d4ed8",
-                          "content": "Em Análise",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-caption",
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "ygVtk",
-                      "name": "Em Andamento",
-                      "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
-                      "fill": "#ffedd5",
-                      "cornerRadius": 999,
-                      "gap": 5,
-                      "padding": [
-                        4,
-                        10
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "ellipse",
-                          "id": "qrx5s",
-                          "name": "Dot",
-                          "fill": "#c2410c",
-                          "width": 6,
-                          "height": 6
-                        },
-                        {
-                          "type": "text",
-                          "id": "mcSuE",
-                          "name": "Label",
-                          "fill": "#c2410c",
-                          "content": "Em Andamento",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-caption",
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "H0alre",
-                      "name": "Resolvida",
-                      "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
-                      "fill": "#e4f4e6",
-                      "cornerRadius": 999,
-                      "gap": 5,
-                      "padding": [
-                        4,
-                        10
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "ellipse",
-                          "id": "P11x36",
-                          "name": "Dot",
-                          "fill": "#2f6637",
-                          "width": 6,
-                          "height": 6
-                        },
-                        {
-                          "type": "text",
-                          "id": "CpQvq",
-                          "name": "Label",
-                          "fill": "#2f6637",
-                          "content": "Resolvida",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-caption",
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "E57EP9",
-                      "name": "Cancelada",
-                      "context": "Badge de status de denúncia. Código: src/components/complaints/complaint-status.tsx. Variantes de cor na vitrine Showcase.",
-                      "fill": "#f3f4f6",
-                      "cornerRadius": 999,
-                      "gap": 5,
-                      "padding": [
-                        4,
-                        10
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "ellipse",
-                          "id": "DRNvT",
-                          "name": "Dot",
-                          "fill": "#4b5563",
-                          "width": 6,
-                          "height": 6
-                        },
-                        {
-                          "type": "text",
-                          "id": "mr8QB",
-                          "name": "Label",
-                          "fill": "#4b5563",
-                          "content": "Cancelada",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-caption",
-                          "fontWeight": "600"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "OHvEx",
-                  "x": 29,
-                  "y": 25,
-                  "name": "Options Inactive Row",
-                  "gap": 8,
-                  "children": [
-                    {
-                      "id": "wVnSE",
+                      "id": "B49s1",
                       "type": "ref",
-                      "ref": "HJWAT",
-                      "name": "Todos"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "cVs1i",
-                      "name": "Descarte Irregular inactive",
-                      "fill": "#ffffff",
-                      "cornerRadius": 8,
-                      "stroke": "#e5e7eb",
-                      "strokeWidth": 1,
-                      "strokeAlignment": "inner",
-                      "gap": 8,
-                      "padding": [
-                        10,
-                        14
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "JZ3fa",
-                          "name": "Icon",
-                          "width": 16,
-                          "height": 16,
-                          "icon": "trash-2",
-                          "library": "lucide",
-                          "fill": "#6b7280"
+                      "ref": "J7k5q",
+                      "width": 42,
+                      "name": "Btn Primary Ícone only",
+                      "x": 356,
+                      "y": 0,
+                      "height": 42,
+                      "descendants": {
+                        "Dscnu": {
+                          "enabled": true,
+                          "icon": "settings-2",
+                          "library": "lucide"
                         },
-                        {
-                          "type": "text",
-                          "id": "ywz7P",
-                          "name": "Label",
-                          "fill": "#374151",
-                          "content": "Descarte Irregular",
-                          "fontFamily": "Inter",
-                          "fontSize": 14,
-                          "fontWeight": "500"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "UrsXW",
-                      "name": "Queimadas inactive",
-                      "fill": "#ffffff",
-                      "cornerRadius": 8,
-                      "stroke": "#e5e7eb",
-                      "strokeWidth": 1,
-                      "strokeAlignment": "inner",
-                      "gap": 8,
-                      "padding": [
-                        10,
-                        14
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "gwLg3",
-                          "name": "Icon",
-                          "width": 16,
-                          "height": 16,
-                          "icon": "flame",
-                          "library": "lucide",
-                          "fill": "#6b7280"
+                        "M3upe": {
+                          "enabled": false
                         },
-                        {
-                          "type": "text",
-                          "id": "AwZu7",
-                          "name": "Label",
-                          "fill": "#374151",
-                          "content": "Queimadas",
-                          "fontFamily": "Inter",
-                          "fontSize": 14,
-                          "fontWeight": "500"
+                        "DrcR6": {
+                          "enabled": false
                         }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "UGcTt",
-                      "name": "Desmatamento inactive",
-                      "fill": "#ffffff",
-                      "cornerRadius": 8,
-                      "stroke": "#e5e7eb",
-                      "strokeWidth": 1,
-                      "strokeAlignment": "inner",
-                      "gap": 8,
-                      "padding": [
-                        10,
-                        14
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "qozUl",
-                          "name": "Icon",
-                          "width": 16,
-                          "height": 16,
-                          "icon": "trees",
-                          "library": "lucide",
-                          "fill": "#6b7280"
-                        },
-                        {
-                          "type": "text",
-                          "id": "p29wp",
-                          "name": "Label",
-                          "fill": "#374151",
-                          "content": "Desmatamento",
-                          "fontFamily": "Inter",
-                          "fontSize": 14,
-                          "fontWeight": "500"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "A22EG",
-                      "name": "Terreno Baldio inactive",
-                      "fill": "#ffffff",
-                      "cornerRadius": 8,
-                      "stroke": "#e5e7eb",
-                      "strokeWidth": 1,
-                      "strokeAlignment": "inner",
-                      "gap": 8,
-                      "padding": [
-                        10,
-                        14
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "Ve0SX",
-                          "name": "Icon",
-                          "width": 16,
-                          "height": 16,
-                          "icon": "shrub",
-                          "library": "lucide",
-                          "fill": "#6b7280"
-                        },
-                        {
-                          "type": "text",
-                          "id": "JJJDN",
-                          "name": "Label",
-                          "fill": "#374151",
-                          "content": "Terreno Baldio",
-                          "fontFamily": "Inter",
-                          "fontSize": 14,
-                          "fontWeight": "500"
-                        }
-                      ]
+                      }
                     }
                   ]
                 }
@@ -14387,7 +14201,7 @@
                                       "ref": "hNp9X",
                                       "name": "Badge secondary",
                                       "fill": "$gray-100",
-                                      "x": 65,
+                                      "x": 81,
                                       "y": 0,
                                       "descendants": {
                                         "AwdGP": {
@@ -14402,7 +14216,7 @@
                                       "ref": "hNp9X",
                                       "name": "Badge secondary",
                                       "fill": "$gray-100",
-                                      "x": 126,
+                                      "x": 158,
                                       "y": 0,
                                       "descendants": {
                                         "AwdGP": {
@@ -18294,7 +18108,7 @@
                                   "context": "Badge/tag — src/components/ui/badge. Variantes: secondary, success, destructive, outline. Texto Caption 11/600.",
                                   "reusable": true,
                                   "fill": "$primary",
-                                  "cornerRadius": "$radius-full",
+                                  "cornerRadius": "$radius-sm",
                                   "gap": 4,
                                   "padding": [
                                     3,
@@ -18302,6 +18116,15 @@
                                   ],
                                   "alignItems": "center",
                                   "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "r9uWx",
+                                      "width": 12,
+                                      "height": 12,
+                                      "icon": "radar",
+                                      "library": "lucide",
+                                      "fill": "$primary-foreground"
+                                    },
                                     {
                                       "type": "text",
                                       "id": "AwdGP",
@@ -18322,6 +18145,9 @@
                                   "name": "Badge secondary",
                                   "fill": "$gray-100",
                                   "descendants": {
+                                    "r9uWx": {
+                                      "fill": "$foreground"
+                                    },
                                     "AwdGP": {
                                       "content": "Secondary",
                                       "fill": "$gray-700"
@@ -18335,6 +18161,9 @@
                                   "name": "Badge success",
                                   "fill": "$green-100",
                                   "descendants": {
+                                    "r9uWx": {
+                                      "fill": "$foreground"
+                                    },
                                     "AwdGP": {
                                       "content": "Aberto",
                                       "fill": "$green-700"
@@ -18348,6 +18177,9 @@
                                   "name": "Badge destructive",
                                   "fill": "#fee2e2",
                                   "descendants": {
+                                    "r9uWx": {
+                                      "fill": "$foreground"
+                                    },
                                     "AwdGP": {
                                       "content": "Fechado",
                                       "fill": "#dc2626"
@@ -18364,6 +18196,9 @@
                                   "strokeAlignment": "inner",
                                   "strokeWidth": 1,
                                   "descendants": {
+                                    "r9uWx": {
+                                      "fill": "$foreground"
+                                    },
                                     "AwdGP": {
                                       "content": "Outline",
                                       "fill": "$foreground"
