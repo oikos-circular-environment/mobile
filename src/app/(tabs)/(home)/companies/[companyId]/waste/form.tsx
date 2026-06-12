@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -18,7 +17,9 @@ import {
 } from "@/components/companies/waste/waste-form-schema";
 import {
 	WasteCategory,
+	WasteCategoryChip,
 	WasteCategoryChips,
+	WasteCategoryChipText,
 	WasteCategoryContent,
 } from "@/components/custom/waste-category";
 import { colors } from "@/components/style/colors";
@@ -111,7 +112,6 @@ export default function WasteFormScreen() {
 			unit: w.unit,
 			quantity: w.quantity,
 			waste_category_id: w.waste_category_id,
-			observations: w.observations ?? null,
 		});
 
 		const updatedWastes = initialData?.id
@@ -341,7 +341,21 @@ export default function WasteFormScreen() {
 								})
 							}
 						>
-							<WasteCategoryChips />
+							<ScrollView
+								horizontal
+								showsHorizontalScrollIndicator={false}
+								contentContainerClassName="gap-2 py-0.5"
+							>
+								<WasteCategoryChips>
+									{category => (
+										<WasteCategoryChip key={category.id} category={category}>
+											<WasteCategoryChipText>
+												{category.name}
+											</WasteCategoryChipText>
+										</WasteCategoryChip>
+									)}
+								</WasteCategoryChips>
+							</ScrollView>
 							<WasteCategoryContent />
 						</WasteCategory>
 					</VStack>

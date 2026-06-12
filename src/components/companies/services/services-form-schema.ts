@@ -26,9 +26,6 @@ export const serviceFormSchema = z.object({
 		.transform(parseDecimalInput)
 		.pipe(z.number().min(0.001, "Informe uma quantidade maior que zero.")),
 	unit: z.enum(measurementValues),
-	observations: z
-		.string()
-		.max(500, "As observações devem ter até 500 caracteres."),
 });
 
 export type ServiceFormInput = z.input<typeof serviceFormSchema>;

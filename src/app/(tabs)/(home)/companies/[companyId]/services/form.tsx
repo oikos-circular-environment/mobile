@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -18,7 +17,9 @@ import {
 } from "@/components/companies/services/services-form-schema";
 import {
 	WasteCategory,
+	WasteCategoryChip,
 	WasteCategoryChips,
+	WasteCategoryChipText,
 	WasteCategoryContent,
 } from "@/components/custom/waste-category";
 import { colors } from "@/components/style/colors";
@@ -84,7 +85,6 @@ export default function ServiceFormScreen() {
 			price: initialData?.price ?? "0,00",
 			quantity: initialData?.quantity ?? "1,00",
 			unit: initialData?.unit ?? "KG",
-			observations: initialData?.observations ?? "",
 		},
 		mode: "onChange",
 	});
@@ -99,7 +99,6 @@ export default function ServiceFormScreen() {
 			quantity: data.quantity,
 			unit: data.unit,
 			waste_category_id: data.waste_category_id,
-			observations: data.observations.trim() || null,
 		};
 
 		const mapExisting = (s: NonNullable<typeof services>[number]) => ({
@@ -109,7 +108,6 @@ export default function ServiceFormScreen() {
 			quantity: s.quantity,
 			unit: s.unit,
 			waste_category_id: s.waste_category_id,
-			observations: s.observations ?? null,
 		});
 
 		const updatedServices = initialData?.id
@@ -320,35 +318,6 @@ export default function ServiceFormScreen() {
 						</FormControl>
 					</HStack>
 
-					<FormControl
-						isInvalid={!!formState.errors.observations}
-						className="gap-2"
-					>
-						<FormControlLabel>
-							<FormControlLabelText className="text-sm">
-								Observações
-							</FormControlLabelText>
-						</FormControlLabel>
-						<Controller
-							control={control}
-							name="observations"
-							render={({ field: { value, onChange, onBlur } }) => (
-								<Input className="items-start min-h-24">
-									<InputField
-										value={value}
-										onBlur={onBlur}
-										onChangeText={onChange}
-										placeholder="Observações adicionais do serviço"
-										multiline
-										numberOfLines={4}
-										textAlignVertical="top"
-										className="h-24 py-3"
-									/>
-								</Input>
-							)}
-						/>
-					</FormControl>
-
 					<VStack space="lg">
 						<Heading size="sm">Categoria de resíduo</Heading>
 
@@ -372,7 +341,21 @@ export default function ServiceFormScreen() {
 								})
 							}
 						>
-							<WasteCategoryChips />
+							<ScrollView
+								horizontal
+								showsHorizontalScrollIndicator={false}
+								contentContainerClassName="gap-2 py-0.5"
+							>
+								<WasteCategoryChips>
+									{category => (
+										<WasteCategoryChip key={category.id} category={category}>
+											<WasteCategoryChipText>
+												{category.name}
+											</WasteCategoryChipText>
+										</WasteCategoryChip>
+									)}
+								</WasteCategoryChips>
+							</ScrollView>
 							<WasteCategoryContent />
 						</WasteCategory>
 					</VStack>

@@ -541,7 +541,6 @@ export type GetV1CompaniesResponses = {
 					}>;
 				};
 				quantity: number;
-				observations?: string | null;
 				created_at: Date;
 				updated_at: Date;
 			}>;
@@ -572,7 +571,6 @@ export type GetV1CompaniesResponses = {
 					}>;
 				};
 				quantity: number;
-				observations?: string | null;
 				created_at: Date;
 				updated_at: Date;
 			}>;
@@ -1076,7 +1074,6 @@ export type GetV1CompaniesByIdWastesResponses = {
 				}>;
 			};
 			quantity: number;
-			observations?: string | null;
 			created_at: Date;
 			updated_at: Date;
 		}>;
@@ -1095,7 +1092,6 @@ export type PutV1CompaniesByIdWastesData = {
 			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_category_id: string;
 			quantity: number;
-			observations?: string | null;
 		}>;
 	};
 	path: {
@@ -1167,7 +1163,6 @@ export type PutV1CompaniesByIdWastesResponses = {
 				}>;
 			};
 			quantity: number;
-			observations?: string | null;
 			created_at: Date;
 			updated_at: Date;
 		}>;
@@ -1240,7 +1235,6 @@ export type GetV1CompaniesByIdServicesResponses = {
 				}>;
 			};
 			quantity: number;
-			observations?: string | null;
 			created_at: Date;
 			updated_at: Date;
 		}>;
@@ -1259,7 +1253,6 @@ export type PutV1CompaniesByIdServicesData = {
 			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
 			waste_category_id: string;
 			quantity: number;
-			observations?: string | null;
 		}>;
 	};
 	path: {
@@ -1331,7 +1324,6 @@ export type PutV1CompaniesByIdServicesResponses = {
 				}>;
 			};
 			quantity: number;
-			observations?: string | null;
 			created_at: Date;
 			updated_at: Date;
 		}>;
@@ -3151,7 +3143,6 @@ export type GetV1MarketResponses = {
 				waste_category_id: string;
 				quantity: number;
 				description: string | null;
-				observations: string | null;
 				waste_category: {
 					id: string;
 					name: string;
@@ -3166,7 +3157,6 @@ export type GetV1MarketResponses = {
 				waste_category_id: string;
 				quantity: number;
 				description: string | null;
-				observations: string | null;
 				waste_category: {
 					id: string;
 					name: string;

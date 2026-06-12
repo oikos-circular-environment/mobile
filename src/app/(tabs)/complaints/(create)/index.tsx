@@ -22,6 +22,16 @@ import { useAttachmentRemove } from "@/components/complaints/hooks/use-attachmen
 import { useEditComplaint } from "@/components/complaints/hooks/use-edit-complaint";
 import type { MediaItem } from "@/components/complaints/hooks/use-submit-complaints";
 import { useSubmitComplaints } from "@/components/complaints/hooks/use-submit-complaints";
+import {
+	type HazardLevelVariant,
+	WasteCategory,
+	WasteCategoryChip,
+	WasteCategoryChips,
+	WasteCategoryChipText,
+	WasteCategoryContent,
+	WasteCategoryHazardLevel,
+	WasteCategoryHazardLevelIcon,
+} from "@/components/custom/waste-category";
 import { GooglePlacesInput } from "@/components/google-places-input";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
@@ -65,10 +75,6 @@ import {
 } from "@/libs/google/reverse-geocode";
 import { mask } from "@/libs/mask";
 import type { Geospatial } from "@/libs/types/complaint";
-import {
-	WasteCategory,
-	WasteCategoryChips,
-} from "@/components/custom/waste-category";
 
 const schema = z.object({
 	observations: z.string().max(500, "Máximo de 500 caracteres.").optional(),
@@ -799,7 +805,30 @@ export default function ComplaintCreateScreen() {
 							setSelectedCategoryIds(cats.map(c => c.id))
 						}
 					>
-						<WasteCategoryChips />
+						<ScrollView
+							horizontal
+							showsHorizontalScrollIndicator={false}
+							contentContainerClassName="gap-2 py-0.5"
+						>
+							<WasteCategoryChips>
+								{category => (
+									<WasteCategoryChip key={category.id} category={category}>
+										<WasteCategoryChipText>
+											{category.name}
+										</WasteCategoryChipText>
+										{category.hazard_levels.map(hazard => (
+											<WasteCategoryHazardLevel
+												key={hazard}
+												variant={hazard.toLowerCase() as HazardLevelVariant}
+											>
+												<WasteCategoryHazardLevelIcon />
+											</WasteCategoryHazardLevel>
+										))}
+									</WasteCategoryChip>
+								)}
+							</WasteCategoryChips>
+						</ScrollView>
+						<WasteCategoryContent />
 					</WasteCategory>
 				</View>
 
