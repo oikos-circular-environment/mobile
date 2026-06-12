@@ -64,7 +64,7 @@ Key conventions (from RNTL v14 docs):
 These rules are enforced project-wide (`.github/copilot-instructions.md`):
 
 - **Components**: Use `gluestack-ui v5`. Prefer Gluestack primitives over raw React Native ones. All Gluestack wrappers live in `src/components/ui/`.
-- **Styling**: Use `NativeWind` (`className` prop). No inline styles unless strictly necessary.
+- **Styling**: Use `NativeWind` (`className` prop). No inline styles unless strictly necessary. Any `className` with conditional logic **must** use `cn` from `@/libs/utils` — never template literals (e.g. `` `base ${cond ? "a" : "b"}` ``). Use `cn("base", cond && "modifier")` or `cn("base", cond ? "a" : "b")`.
 - **Theme**: Primary color is `lime-800`. Do not introduce competing primary palettes.
 - **Icons**: Use `lucide-react-native` exclusively.
 - **Navigation**: Bottom tabs via `@react-navigation/bottom-tabs`. The main nav has 5 fixed actions: `market`, `complaints`, `home`, `donations`, `learn`. New screens must integrate without changing this structure.

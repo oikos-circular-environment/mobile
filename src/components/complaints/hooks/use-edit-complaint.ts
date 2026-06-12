@@ -15,6 +15,7 @@ export type EditComplaintPayload = {
 	geospatial: Geospatial;
 	observations: string | null;
 	newMedia: { id: string; uri: string; mediaType: "photo" | "video" }[];
+	waste_category_ids: string[];
 };
 
 export function useEditComplaint() {
@@ -28,10 +29,12 @@ export function useEditComplaint() {
 			geospatial,
 			observations,
 			newMedia,
+			waste_category_ids,
 		}: EditComplaintPayload) => {
 			await patchV1ComplaintsById({
 				path: { id },
 				body: {
+					waste_category_ids,
 					observations,
 					geospatial: {
 						heading: geospatial.heading,

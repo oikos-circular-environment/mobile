@@ -18,6 +18,7 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
+import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import { useAttachmentRemove } from "@/components/complaints/hooks/use-attachment-remove";
 import { useEditComplaint } from "@/components/complaints/hooks/use-edit-complaint";
 import type { MediaItem } from "@/components/complaints/hooks/use-submit-complaints";
@@ -52,8 +53,10 @@ import {
 	ModalFooter,
 	ModalHeader,
 } from "@/components/ui/modal";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
@@ -64,6 +67,7 @@ import {
 } from "@/libs/google/reverse-geocode";
 import { mask } from "@/libs/mask";
 import type { Geospatial } from "@/libs/types/complaint";
+import { cn } from "@/libs/utils";
 
 const schema = z.object({
 	observations: z.string().max(500, "Máximo de 500 caracteres.").optional(),
@@ -98,6 +102,9 @@ export default function ComplaintCreateScreen() {
 
 	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
 	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
+	const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+
+	const { categories, isLoading: isLoadingCategories } = useWasteCategories();
 
 	const { mutateAsync: submitComplaint, isPending: isSubmitting } =
 		useSubmitComplaints();
@@ -154,6 +161,7 @@ export default function ComplaintCreateScreen() {
 			latitude: String(g.location.coords.latitude),
 			longitude: String(g.location.coords.longitude),
 		});
+		setSelectedCategoryIds(editingComplaint.categories.map(c => c.id));
 	}, [editingComplaint, reset]);
 
 	// Auto-fill from device geolocation (create mode only)
@@ -317,6 +325,14 @@ export default function ComplaintCreateScreen() {
 			return;
 		}
 
+		if (selectedCategoryIds.length === 0) {
+			toast.warning(
+				"Selecione pelo menos uma categoria",
+				"Identifique os tipos de resíduos presentes no local.",
+			);
+			return;
+		}
+
 		const coordsFallback = editingComplaint?.geospatial.location.coords;
 
 		const geospatial: Geospatial = {
@@ -373,6 +389,7 @@ export default function ComplaintCreateScreen() {
 				geospatial,
 				observations: data.observations?.trim() || null,
 				newMedia,
+				waste_category_ids: selectedCategoryIds,
 			});
 
 			router.replace("/(tabs)/complaints/list");
@@ -387,9 +404,11 @@ export default function ComplaintCreateScreen() {
 			geospatial,
 			observations: data.observations?.trim() || null,
 			media: localMedia,
+			waste_category_ids: selectedCategoryIds,
 		});
 
 		clearDraft();
+		setSelectedCategoryIds([]);
 		reset();
 		router.replace("/(tabs)/complaints/list");
 	});
@@ -427,7 +446,7 @@ export default function ComplaintCreateScreen() {
 
 				{/* Localização */}
 				<View className="gap-1 pt-1">
-					<Heading size="md">Localização do ocorrido</Heading>
+					<Heading size="sm">Localização do ocorrido</Heading>
 					<Text className="text-sm text-gray-500">
 						{isEditMode
 							? "Ajuste pelo mapa, busca de endereço ou CEP se necessário."
@@ -461,7 +480,13 @@ export default function ComplaintCreateScreen() {
 
 				<Divider />
 
-				{/* CEP */}
+				<VStack>
+					<Heading size="sm">Endereço</Heading>
+					<Text size="sm" className="text-muted-foreground">
+						Os dados puxados de forma automáticas, podem ser incoerentes. Caso
+						haja necessidade, faça a modificação manualmente.
+					</Text>
+				</VStack>
 				<FormControl isInvalid={!!errors.postalCode} className="gap-1">
 					<FormControlLabel>
 						<FormControlLabelText>CEP *</FormControlLabelText>
@@ -652,7 +677,7 @@ export default function ComplaintCreateScreen() {
 
 				{/* Mídias */}
 				<View className="gap-2 pt-1">
-					<Heading size="md">Fotos e vídeos</Heading>
+					<Heading size="sm">Fotos e vídeos</Heading>
 					<Text className="text-sm text-gray-500">
 						{isEditMode
 							? "Adicione novas mídias ou remova as existentes."
@@ -728,10 +753,11 @@ export default function ComplaintCreateScreen() {
 					)}
 				</View>
 
-				{/* Observações */}
 				<FormControl isInvalid={!!errors.observations} className="gap-1">
 					<FormControlLabel>
-						<FormControlLabelText>Observações</FormControlLabelText>
+						<FormControlLabelText>
+							<Heading size="sm"> Observações</Heading>
+						</FormControlLabelText>
 					</FormControlLabel>
 					<Controller
 						control={control}
@@ -759,6 +785,57 @@ export default function ComplaintCreateScreen() {
 						</FormControlError>
 					)}
 				</FormControl>
+
+				{/* Categorias */}
+				<View className="gap-2 pt-1">
+					<Heading size="sm">Categorias identificadas</Heading>
+					<Text className="text-sm text-gray-500">
+						Selecione os tipos de resíduos que você consegue identificar no
+						local.
+					</Text>
+					{isLoadingCategories ? (
+						<View className="flex-row flex-wrap gap-2">
+							{Array.from({ length: 6 }).map((_, i) => (
+								<Skeleton
+									key={i}
+									startColor="bg-gray-200"
+									className="h-8 rounded-lg"
+									style={{ width: 80 + (i % 3) * 24 }}
+								/>
+							))}
+						</View>
+					) : (
+						<View className="flex-row flex-wrap gap-2">
+							{categories.map(cat => {
+								const active = selectedCategoryIds.includes(cat.id);
+								return (
+									<TouchableOpacity
+										key={cat.id}
+										activeOpacity={0.8}
+										onPress={() =>
+											setSelectedCategoryIds(prev =>
+												active
+													? prev.filter(id => id !== cat.id)
+													: [...prev, cat.id],
+											)
+										}
+										className={cn(
+											"rounded-md px-4 py-2",
+											active ? "bg-lime-800" : "border border-border bg-white",
+										)}
+									>
+										<Text
+											size="sm"
+											className={cn("font-semibold", active && "text-white")}
+										>
+											{cat.name}
+										</Text>
+									</TouchableOpacity>
+								);
+							})}
+						</View>
+					)}
+				</View>
 
 				{/* Ações */}
 				<View className="flex-row gap-3 pt-2">

@@ -21,6 +21,7 @@ export type SubmitComplaintPayload = {
 	geospatial: Geospatial;
 	observations: string | null;
 	media: MediaItem[];
+	waste_category_ids: string[];
 };
 
 export function useSubmitComplaints() {
@@ -31,11 +32,12 @@ export function useSubmitComplaints() {
 			geospatial,
 			observations,
 			media,
+			waste_category_ids,
 		}: SubmitComplaintPayload) => {
 			const res = await postV1Complaints({
 				body: {
 					date: new Date().toISOString(),
-					type: "IRREGULAR_DISPOSAL",
+					waste_category_ids,
 					observations,
 					geospatial: {
 						heading: geospatial.heading,
