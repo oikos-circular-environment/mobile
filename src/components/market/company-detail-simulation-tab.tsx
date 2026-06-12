@@ -22,12 +22,12 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useCompanyDetail } from "@/contexts/company-detail-context";
 import {
 	getMarketCheckoutDraft,
 	type MarketCheckoutItemDraft,
 	type MarketSimulationItemType,
 } from "@/libs/memory/market-simulations";
-import type { MarketCompany } from "@/libs/types/market";
 import { HStack } from "../ui/hstack";
 import { VStack } from "../ui/vstack";
 
@@ -37,7 +37,6 @@ type SimulationSelection = {
 };
 
 type CompanyDetailSimulationTabProps = {
-	company: MarketCompany;
 	selectedItem: SimulationSelection | null;
 };
 
@@ -106,9 +105,9 @@ const simulationSchema = z.object({
 type SimulationFormValues = z.infer<typeof simulationSchema>;
 
 export function CompanyDetailSimulationTab({
-	company,
 	selectedItem,
 }: CompanyDetailSimulationTabProps) {
+	const { company } = useCompanyDetail();
 	const [activeItemType, setActiveItemType] =
 		useState<MarketSimulationItemType>(selectedItem?.itemType ?? "waste");
 	const [selectedCatalogItemId, setSelectedCatalogItemId] = useState(

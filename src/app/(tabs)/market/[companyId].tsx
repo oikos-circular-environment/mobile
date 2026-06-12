@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { CompanyDetailGeneralTab } from "@/components/market/company-detail-general-tab";
 import { CompanyDetailSimulationTab } from "@/components/market/company-detail-simulation-tab";
+import { CompanyDetailProvider } from "@/contexts/company-detail-context";
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -132,7 +133,17 @@ export default function MarketCompanyDetailScreen() {
 	}
 
 	return (
-		<>
+		<CompanyDetailProvider
+			company={company}
+			isOpenNow={isOpenNow}
+			currentBusinessHour={currentBusinessHour}
+			currentDayLabel={getDayLabel(currentDayOfWeek)}
+			currentTimeLabel={currentTimeLabel}
+			onSelectSimulationItem={(itemType, itemId) => {
+				setSelectedSimulationItem({ itemType, itemId });
+				setActiveTab("simulation");
+			}}
+		>
 			<Stack.Screen
 				options={{ title: company.corporate_name, headerShown: false }}
 			/>
@@ -220,26 +231,15 @@ export default function MarketCompanyDetailScreen() {
 						</Card>
 
 						{activeTab === "general" ? (
-							<CompanyDetailGeneralTab
-								company={company}
-								currentDayLabel={getDayLabel(currentDayOfWeek)}
-								currentTimeLabel={currentTimeLabel}
-								isOpenNow={isOpenNow}
-								currentBusinessHour={currentBusinessHour}
-								onSelectSimulationItem={(itemType, itemId) => {
-									setSelectedSimulationItem({ itemType, itemId });
-									setActiveTab("simulation");
-								}}
-							/>
+							<CompanyDetailGeneralTab />
 						) : (
 							<CompanyDetailSimulationTab
-								company={company}
 								selectedItem={currentSimulationItem}
 							/>
 						)}
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-		</>
+		</CompanyDetailProvider>
 	);
 }
