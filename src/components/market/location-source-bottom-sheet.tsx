@@ -1,22 +1,16 @@
-import type * as Location from "expo-location";
-import {
-	CheckIcon,
-	ChevronDown,
-	MapPinIcon,
-	User2Icon,
-} from "lucide-react-native";
-import { useCallback, useRef } from "react";
-import { Pressable, View } from "react-native";
 import BottomSheet, {
 	BottomSheetBackdrop,
-	BottomSheetView,
 	type BottomSheetBackdropProps,
+	BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import type * as Location from "expo-location";
+import { CheckIcon, MapPinIcon, User2Icon } from "lucide-react-native";
+import { useCallback } from "react";
+import { Pressable, View } from "react-native";
 import { colors } from "@/components/style/colors";
-import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
-import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
+import { SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuthContext } from "@/contexts/auth-context";
@@ -96,16 +90,9 @@ function OptionRow({
 }
 
 export function LocationSourceBottomSheet() {
-	const sheetRef = useRef<BottomSheet>(null);
-	const { locationSource, setLocationSource } = useMarket();
+	const { locationSheetRef, locationSource, setLocationSource } = useMarket();
 	const { location, addresses } = useGeospatial();
 	const { user, isAuthenticated } = useAuthContext();
-
-	const triggerText = addresses[0]
-		? [addresses[0].streetNumber, addresses[0].street, addresses[0].district]
-				.filter(Boolean)
-				.join(", ")
-		: null;
 
 	const currentAddressText = addresses[0]
 		? formatGeocodedAddress(addresses[0])
@@ -129,7 +116,7 @@ export function LocationSourceBottomSheet() {
 
 	const selectOption = (source: LocationSource) => {
 		setLocationSource(source);
-		sheetRef.current?.close();
+		locationSheetRef.current?.close();
 	};
 
 	const backdropComponent = useCallback(
@@ -144,29 +131,8 @@ export function LocationSourceBottomSheet() {
 	);
 
 	return (
-		<>
-			<Pressable
-				className="p-0 border-0 rounded-none"
-				onPress={() => sheetRef.current?.snapToIndex(0)}
-			>
-				<HStack className="items-center gap-2">
-					<Card className="shadow-none p-2 bg-primary rounded-lg items-center justify-center">
-						<MapPinIcon size={14} color={colors.white} />
-					</Card>
-					{triggerText ? (
-						<Text className="flex-1 text-sm font-medium" numberOfLines={1}>
-							{triggerText}
-						</Text>
-					) : (
-						<View className="flex-1">
-							<Skeleton className="h-4" />
-						</View>
-					)}
-					<ChevronDown size={14} className="text-muted-foreground" />
-				</HStack>
-			</Pressable>
-			<BottomSheet
-				ref={sheetRef}
+		<BottomSheet
+				ref={locationSheetRef}
 				index={-1}
 				snapPoints={["44%"]}
 				enablePanDownToClose
@@ -218,7 +184,6 @@ export function LocationSourceBottomSheet() {
 						</HStack>
 					)}
 				</BottomSheetView>
-			</BottomSheet>
-		</>
+		</BottomSheet>
 	);
 }

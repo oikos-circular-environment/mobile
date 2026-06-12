@@ -1,3 +1,4 @@
+import type BottomSheet from "@gorhom/bottom-sheet";
 import {
 	CornerUpRight,
 	Hammer,
@@ -6,7 +7,7 @@ import {
 	Recycle,
 	TriangleAlert,
 } from "lucide-react-native";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useRef } from "react";
 import { Linking, View } from "react-native";
 import { BusinessHoursBottomSheet } from "@/components/market/business-hours-bottom-sheet";
 import { colors } from "@/components/style/colors";
@@ -116,8 +117,7 @@ export function CompanyDetailGeneralTab({
 	currentBusinessHour,
 	onSelectSimulationItem,
 }: CompanyDetailGeneralTabProps) {
-	const [isBusinessHoursBottomSheetOpen, setIsBusinessHoursBottomSheetOpen] =
-		useState(false);
+	const businessHoursSheetRef = useRef<BottomSheet>(null);
 	const address = company.address;
 
 	return (
@@ -189,7 +189,7 @@ export function CompanyDetailGeneralTab({
 						mais detalhes.
 					</Text>
 
-					<Pressable onPress={() => setIsBusinessHoursBottomSheetOpen(true)}>
+					<Pressable onPress={() => businessHoursSheetRef.current?.snapToIndex(0)}>
 						<Card className="gap-2 rounded-lg border-gray-200 shadow-none h-18 justify-center">
 							<View className="flex-row items-center justify-between gap-2">
 								<View>
@@ -294,8 +294,7 @@ export function CompanyDetailGeneralTab({
 			</View>
 
 			<BusinessHoursBottomSheet
-				isOpen={isBusinessHoursBottomSheetOpen}
-				onClose={() => setIsBusinessHoursBottomSheetOpen(false)}
+				ref={businessHoursSheetRef}
 				businessHours={company.business_hours}
 			/>
 		</>

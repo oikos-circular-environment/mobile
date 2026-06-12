@@ -30,11 +30,19 @@ jest.mock("@/contexts/market-context");
 jest.mock("@/contexts/geospatial-context");
 jest.mock("@/libs/market/is-company-open");
 
-jest.mock("@/components/market/list-header-market", () => ({
+jest.mock("@/components/market/market-list-header", () => ({
 	MarketListHeader: () => {
 		const { View } = require("react-native");
 		return <View testID="market-list-header" />;
 	},
+}));
+
+jest.mock("@/components/market/location-source-bottom-sheet", () => ({
+	LocationSourceBottomSheet: () => null,
+}));
+
+jest.mock("@/components/market/radius-bottom-sheet", () => ({
+	RadiusBottomSheet: () => null,
 }));
 
 
@@ -62,6 +70,10 @@ const defaultMarket = {
 	fetchNextPage: jest.fn(),
 	isError: false,
 	getCompanyById: jest.fn(),
+	locationSheetRef: { current: null },
+	radiusSheetRef: { current: null },
+	openLocationSheet: jest.fn(),
+	openRadiusSheet: jest.fn(),
 };
 
 

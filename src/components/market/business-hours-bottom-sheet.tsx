@@ -1,10 +1,10 @@
-import { useCallback, useRef } from "react";
-import { View } from "react-native";
 import BottomSheet, {
 	BottomSheetBackdrop,
 	BottomSheetScrollView,
 	type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
+import { forwardRef, useCallback } from "react";
+import { View } from "react-native";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -13,21 +13,16 @@ import { daysOfWeek } from "@/libs/types/business-hour";
 import type { MarketBusinessHour } from "@/libs/types/market";
 
 type BusinessHoursBottomSheetProps = {
-	isOpen: boolean;
-	onClose: () => void;
 	businessHours: MarketBusinessHour[] | null;
 };
 
 const getDayLabel = (day: string) =>
 	daysOfWeek.find(item => item.value === day)?.label ?? "Dia não informado";
 
-export function BusinessHoursBottomSheet({
-	isOpen,
-	onClose,
-	businessHours,
-}: BusinessHoursBottomSheetProps) {
-	const ref = useRef<BottomSheet>(null);
-
+export const BusinessHoursBottomSheet = forwardRef<
+	BottomSheet,
+	BusinessHoursBottomSheetProps
+>(function BusinessHoursBottomSheet({ businessHours }, ref) {
 	const backdropComponent = useCallback(
 		(props: BottomSheetBackdropProps) => (
 			<BottomSheetBackdrop
@@ -43,10 +38,9 @@ export function BusinessHoursBottomSheet({
 	return (
 		<BottomSheet
 			ref={ref}
-			index={isOpen ? 0 : -1}
+			index={-1}
 			snapPoints={["60%"]}
 			enablePanDownToClose
-			onClose={onClose}
 			backdropComponent={backdropComponent}
 		>
 			<BottomSheetScrollView
@@ -93,4 +87,4 @@ export function BusinessHoursBottomSheet({
 			</BottomSheetScrollView>
 		</BottomSheet>
 	);
-}
+});

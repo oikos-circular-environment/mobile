@@ -1,10 +1,13 @@
-import { render, screen } from "@testing-library/react-native";
-import type React from "react";
+import { act, render, screen } from "@testing-library/react-native";
+import { createRef } from "react";
+import type BottomSheet from "@gorhom/bottom-sheet";
 import { useMarket } from "@/contexts/market-context";
 
 jest.mock("@/contexts/market-context");
 
 const setAppliedFilters = jest.fn();
+const radiusSheetRef = createRef<BottomSheet>();
+const locationSheetRef = createRef<BottomSheet>();
 
 const defaultMarket = {
 	appliedFilters: { query: "", radius: "2000", category: undefined },
@@ -20,6 +23,10 @@ const defaultMarket = {
 	fetchNextPage: jest.fn(),
 	isError: false,
 	getCompanyById: jest.fn(),
+	radiusSheetRef,
+	locationSheetRef,
+	openLocationSheet: jest.fn(),
+	openRadiusSheet: jest.fn(),
 };
 
 function setupMarket(overrides: Partial<typeof defaultMarket> = {}) {
@@ -48,17 +55,20 @@ describe("RadiusBottomSheet", () => {
 		return await render(<RadiusBottomSheet />);
 	}
 
+	async function openSheet() {
+		await act(async () => {
+			radiusSheetRef.current?.snapToIndex(0);
+		});
+	}
+
 	describe("abertura", () => {
-		it("exibe as opções de raio ao pressionar o botão", async () => {
+		it("exibe as opções de raio ao abrir o sheet", async () => {
 			await renderSheet();
 
-			// Trigger button shows current radius; options are hidden
-			expect(screen.getByText("2 km")).toBeOnTheScreen();
 			expect(screen.queryByText("5 km")).not.toBeOnTheScreen();
 			expect(screen.queryByText("10 km")).not.toBeOnTheScreen();
 
-			const userEvent = require("@testing-library/react-native").userEvent;
-			await userEvent.press(screen.getByText("2 km"));
+			await openSheet();
 
 			expect(screen.getByText("5 km")).toBeOnTheScreen();
 			expect(screen.getByText("10 km")).toBeOnTheScreen();
@@ -77,9 +87,7 @@ describe("RadiusBottomSheet", () => {
 				},
 			});
 			await renderSheet();
-
-			const userEvent = require("@testing-library/react-native").userEvent;
-			await userEvent.press(screen.getByText("10 km"));
+			await openSheet();
 
 			expect(
 				screen.getByLabelText("Raio de busca: 10 km (selecionado)"),
@@ -90,9 +98,9 @@ describe("RadiusBottomSheet", () => {
 	describe("seleção", () => {
 		it("chama setAppliedFilters com o valor selecionado", async () => {
 			await renderSheet();
+			await openSheet();
 
 			const userEvent = require("@testing-library/react-native").userEvent;
-			await userEvent.press(screen.getByText("2 km"));
 			await userEvent.press(screen.getByText("10 km"));
 
 			expect(setAppliedFilters).toHaveBeenCalledWith(
@@ -102,12 +110,11 @@ describe("RadiusBottomSheet", () => {
 
 		it("fecha o bottom sheet após selecionar um raio", async () => {
 			await renderSheet();
-
-			const userEvent = require("@testing-library/react-native").userEvent;
-			await userEvent.press(screen.getByText("2 km"));
+			await openSheet();
 
 			expect(screen.getByText("5 km")).toBeOnTheScreen();
 
+			const userEvent = require("@testing-library/react-native").userEvent;
 			await userEvent.press(screen.getByText("10 km"));
 
 			expect(screen.queryByText("5 km")).not.toBeOnTheScreen();

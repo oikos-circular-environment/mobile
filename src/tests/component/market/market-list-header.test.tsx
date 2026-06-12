@@ -1,12 +1,23 @@
 import { render, screen } from "@testing-library/react-native";
-import type React from "react";
+import { createRef } from "react";
+import type BottomSheet from "@gorhom/bottom-sheet";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
+import { makeAddress, makeProfile, makeUser } from "@/tests/factories";
 
 jest.mock("@/contexts/auth-context");
 jest.mock("@/contexts/geospatial-context");
 jest.mock("@/contexts/market-context");
+
+jest.mock("@/components/market/radius-bottom-sheet", () => ({
+	formatRadiusLabel: (value: string) => `${Number(value) / 1000} km`,
+	RadiusBottomSheet: () => null,
+}));
+
+const setAppliedFilters = jest.fn();
+const radiusSheetRef = createRef<BottomSheet>();
+const locationSheetRef = createRef<BottomSheet>();
 
 const defaultAuth = {
 	user: null,
@@ -18,8 +29,6 @@ const defaultAuth = {
 	signOut: jest.fn(),
 	updateUserProfile: jest.fn(),
 };
-
-const setAppliedFilters = jest.fn();
 
 const defaultGeospatial = {
 	currentDate: new Date("2025-06-05T12:00:00"),
@@ -45,13 +54,14 @@ const defaultMarket = {
 	fetchNextPage: jest.fn(),
 	isError: false,
 	getCompanyById: jest.fn(),
+	radiusSheetRef,
+	locationSheetRef,
+	openLocationSheet: jest.fn(),
+	openRadiusSheet: jest.fn(),
 };
 
 function setupAuth(overrides: Partial<typeof defaultAuth> = {}) {
-	jest.mocked(useAuthContext).mockReturnValue({
-		...defaultAuth,
-		...overrides,
-	});
+	jest.mocked(useAuthContext).mockReturnValue({ ...defaultAuth, ...overrides });
 }
 
 function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
@@ -82,12 +92,78 @@ describe("MarketListHeader", () => {
 	});
 
 	const { MarketListHeader } = jest.requireActual(
-		"@/components/market/list-header-market",
+		"@/components/market/market-list-header",
 	);
 
 	async function renderHeader() {
 		return await render(<MarketListHeader />);
 	}
+
+	describe("trigger de localização", () => {
+		it("exibe endereço geocodificado quando locationSource é 'current'", async () => {
+			setupGeospatial({
+				addresses: [
+					{
+						streetNumber: "123",
+						street: "Rua das Flores",
+						district: "Centro",
+					} as never,
+				],
+			});
+			setupMarket({ locationSource: "current" });
+
+			await renderHeader();
+
+			expect(
+				screen.getByText("123, Rua das Flores, Centro"),
+			).toBeOnTheScreen();
+		});
+
+		it("exibe endereço do perfil quando locationSource é 'profile'", async () => {
+			const address = makeAddress({
+				street: "Av. Paulista",
+				number: "1000",
+				district: "Bela Vista",
+			});
+			setupAuth({ user: makeUser({ profile: makeProfile({ address }) }) });
+			setupMarket({ locationSource: "profile" });
+
+			await renderHeader();
+
+			expect(
+				screen.getByText("Av. Paulista, 1000, Bela Vista"),
+			).toBeOnTheScreen();
+		});
+
+		it("exibe endereço geocodificado mesmo com perfil preenchido quando locationSource é 'current'", async () => {
+			setupGeospatial({
+				addresses: [
+					{
+						streetNumber: "42",
+						street: "Rua GPS",
+						district: "Bairro GPS",
+					} as never,
+				],
+			});
+			const address = makeAddress({ street: "Av. Perfil", number: "999" });
+			setupAuth({ user: makeUser({ profile: makeProfile({ address }) }) });
+			setupMarket({ locationSource: "current" });
+
+			await renderHeader();
+
+			expect(screen.getByText("42, Rua GPS, Bairro GPS")).toBeOnTheScreen();
+			expect(screen.queryByText(/Av\. Perfil/)).not.toBeOnTheScreen();
+		});
+
+		it("exibe skeleton quando locationSource é 'current' sem endereço geocodificado", async () => {
+			setupGeospatial({ addresses: [] });
+			setupMarket({ locationSource: "current" });
+
+			await renderHeader();
+
+			expect(screen.queryByText(/Rua|Av\./)).not.toBeOnTheScreen();
+		});
+	});
 
 	describe("botão de raio", () => {
 		it("exibe '2 km' quando appliedFilters.radius é '2000'", async () => {

@@ -9,7 +9,9 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
-import { MarketListHeader } from "@/components/market/list-header-market";
+import { LocationSourceBottomSheet } from "@/components/market/location-source-bottom-sheet";
+import { MarketListHeader } from "@/components/market/market-list-header";
+import { RadiusBottomSheet } from "@/components/market/radius-bottom-sheet";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -231,6 +233,8 @@ export default function MarketScreen() {
 					)
 				}
 			/>
+			<LocationSourceBottomSheet />
+			<RadiusBottomSheet />
 		</KeyboardAvoidingView>
 	);
 }

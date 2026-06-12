@@ -15,9 +15,12 @@ import { MarketProvider } from "@/contexts/market-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { getV1Market } from "@/libs/oikos-sdk";
 import {
+	makeAddress,
 	makeCompany,
 	makeCompanyList,
+	makeProfile,
 	makeService,
+	makeUser,
 	makeWaste,
 } from "@/tests/factories";
 
@@ -52,16 +55,34 @@ jest.mock("@/libs/market/is-company-open", () => ({
 	isCompanyOpenNow: jest.fn(() => true),
 }));
 
-// Stub sem dependências nativas — expõe botões testáveis de raio
+// Stub sem dependências nativas — expõe botões para mudar locationSource
 jest.mock("@/components/market/location-source-bottom-sheet", () => ({
 	LocationSourceBottomSheet: () => {
-		const { View } = require("react-native");
-		return <View testID="location-source-stub" />;
+		const { useMarket } = require("@/contexts/market-context");
+		const { Pressable, Text, View } = require("react-native");
+		const { setLocationSource } = useMarket();
+		return (
+			<View testID="location-source-stub">
+				<Pressable
+					testID="select-current-location"
+					onPress={() => setLocationSource("current")}
+				>
+					<Text>Usar localização atual</Text>
+				</Pressable>
+				<Pressable
+					testID="select-profile-location"
+					onPress={() => setLocationSource("profile")}
+				>
+					<Text>Usar endereço do perfil</Text>
+				</Pressable>
+			</View>
+		);
 	},
 }));
 
 // Stub com botões de raio que chamam setAppliedFilters diretamente
 jest.mock("@/components/market/radius-bottom-sheet", () => ({
+	formatRadiusLabel: (value: string) => `${Number(value) / 1000} km`,
 	RadiusBottomSheet: function MockRadiusBottomSheet() {
 		const { useMarket } = require("@/contexts/market-context");
 		const { Pressable, Text, View } = require("react-native");
@@ -270,6 +291,94 @@ describe("Market — filtros (integração)", () => {
 					}),
 				);
 			});
+		});
+	});
+
+
+	describe("trigger de localização", () => {
+		const geocodedAddress = {
+			streetNumber: "50",
+			street: "Rua GPS",
+			district: "Bairro GPS",
+		} as never;
+
+		it("exibe endereço geocodificado quando locationSource é 'current'", async () => {
+			setupGeospatial({ addresses: [geocodedAddress] });
+			mockMarketResponse([]);
+			await renderMarket();
+
+			expect(
+				await screen.findByText("50, Rua GPS, Bairro GPS"),
+			).toBeOnTheScreen();
+		});
+
+		it("atualiza trigger para endereço do perfil ao mudar locationSource para 'profile'", async () => {
+			const address = makeAddress({
+				street: "Av. Paulista",
+				number: "1000",
+				district: "Bela Vista",
+				latitude: -23.56,
+				longitude: -46.65,
+			});
+			setupAuth({
+				isAuthenticated: true,
+				user: makeUser({ profile: makeProfile({ address }) }),
+			});
+			setupGeospatial({
+				addresses: [geocodedAddress],
+				location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
+			});
+			mockMarketResponse([]);
+			await renderMarket();
+
+			expect(
+				await screen.findByText("50, Rua GPS, Bairro GPS"),
+			).toBeOnTheScreen();
+
+			await act(async () => {
+				fireEvent.press(screen.getByTestId("select-profile-location"));
+			});
+
+			expect(
+				screen.getByText("Av. Paulista, 1000, Bela Vista"),
+			).toBeOnTheScreen();
+			expect(
+				screen.queryByText("50, Rua GPS, Bairro GPS"),
+			).not.toBeOnTheScreen();
+		});
+
+		it("volta ao endereço geocodificado ao mudar locationSource para 'current'", async () => {
+			const address = makeAddress({
+				street: "Av. Paulista",
+				number: "1000",
+				district: "Bela Vista",
+				latitude: -23.56,
+				longitude: -46.65,
+			});
+			setupAuth({
+				isAuthenticated: true,
+				user: makeUser({ profile: makeProfile({ address }) }),
+			});
+			setupGeospatial({
+				addresses: [geocodedAddress],
+				location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
+			});
+			mockMarketResponse([]);
+			await renderMarket();
+
+			await act(async () => {
+				fireEvent.press(screen.getByTestId("select-profile-location"));
+			});
+			expect(screen.getByText("Av. Paulista, 1000, Bela Vista")).toBeOnTheScreen();
+
+			await act(async () => {
+				fireEvent.press(screen.getByTestId("select-current-location"));
+			});
+
+			expect(screen.getByText("50, Rua GPS, Bairro GPS")).toBeOnTheScreen();
+			expect(
+				screen.queryByText("Av. Paulista, 1000, Bela Vista"),
+			).not.toBeOnTheScreen();
 		});
 	});
 

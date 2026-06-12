@@ -1,11 +1,11 @@
-import { CheckIcon, NavigationIcon } from "lucide-react-native";
-import { useCallback, useRef, useState } from "react";
-import { Pressable } from "react-native";
 import BottomSheet, {
 	BottomSheetBackdrop,
-	BottomSheetView,
 	type BottomSheetBackdropProps,
+	BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { CheckIcon } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useMarket } from "@/contexts/market-context";
 import { colors } from "../style/colors";
@@ -21,7 +21,7 @@ const radiusOptions = [
 	{ value: "40000", label: "40 km" },
 ] as const;
 
-function formatRadiusLabel(value: string) {
+export function formatRadiusLabel(value: string) {
 	const km = Number(value) / 1000;
 	return `${km} km`;
 }
@@ -54,9 +54,8 @@ function RadiusOption({
 }
 
 export function RadiusBottomSheet() {
-	const { appliedFilters, setAppliedFilters } = useMarket();
+	const { appliedFilters, setAppliedFilters, radiusSheetRef } = useMarket();
 	const [localRadius, setLocalRadius] = useState(appliedFilters.radius);
-	const sheetRef = useRef<BottomSheet>(null);
 
 	const backdropComponent = useCallback(
 		(props: BottomSheetBackdropProps) => (
@@ -70,42 +69,33 @@ export function RadiusBottomSheet() {
 	);
 
 	return (
-		<>
-			<Pressable
-				className="flex-1 flex-row items-center justify-center gap-2"
-				onPress={() => sheetRef.current?.snapToIndex(0)}
-			>
-				<NavigationIcon size={14} />
-				<Text>{formatRadiusLabel(appliedFilters.radius)}</Text>
-			</Pressable>
-			<BottomSheet
-				ref={sheetRef}
-				index={-1}
-				snapPoints={["50%"]}
-				enablePanDownToClose
-				backdropComponent={backdropComponent}
-			>
-				<BottomSheetView>
-					<VStack className="gap-2 p-4">
-						{radiusOptions.map(option => (
-							<RadiusOption
-								key={option.value}
-								value={option.value}
-								label={option.label}
-								isSelected={localRadius === option.value}
-								onSelect={value => {
-									setLocalRadius(value);
-									setAppliedFilters({
-										...appliedFilters,
-										radius: value,
-									});
-									sheetRef.current?.close();
-								}}
-							/>
-						))}
-					</VStack>
-				</BottomSheetView>
-			</BottomSheet>
-		</>
+		<BottomSheet
+			ref={radiusSheetRef}
+			index={-1}
+			snapPoints={["50%"]}
+			enablePanDownToClose
+			backdropComponent={backdropComponent}
+		>
+			<BottomSheetView>
+				<VStack className="gap-2 p-4">
+					{radiusOptions.map(option => (
+						<RadiusOption
+							key={option.value}
+							value={option.value}
+							label={option.label}
+							isSelected={localRadius === option.value}
+							onSelect={value => {
+								setLocalRadius(value);
+								setAppliedFilters({
+									...appliedFilters,
+									radius: value,
+								});
+								radiusSheetRef.current?.close();
+							}}
+						/>
+					))}
+				</VStack>
+			</BottomSheetView>
+		</BottomSheet>
 	);
 }

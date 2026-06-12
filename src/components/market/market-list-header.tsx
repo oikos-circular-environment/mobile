@@ -1,14 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	AlertCircleIcon,
+	ChevronDown,
+	MapPinIcon,
+	NavigationIcon,
 	RecycleIcon,
 	Search,
 	WrenchIcon,
 } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
-import { LocationSourceBottomSheet } from "@/components/market/location-source-bottom-sheet";
-import { RadiusBottomSheet } from "@/components/market/radius-bottom-sheet";
+import { formatRadiusLabel } from "@/components/market/radius-bottom-sheet";
+import { colors } from "@/components/style/colors";
+import { Card } from "@/components/ui/card";
 import {
 	FormControl,
 	FormControlError,
@@ -18,18 +22,45 @@ import {
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Pressable } from "@/components/ui/pressable";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
+import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 import {
 	type MarketFilterValues,
 	marketFilterSchema,
 	useMarket,
 } from "@/contexts/market-context";
 import { cn } from "@/libs/utils";
-import { colors } from "../style/colors";
-import { Pressable } from "../ui/pressable";
 
 export function MarketListHeader() {
-	const { appliedFilters, setAppliedFilters, companies } = useMarket();
+	const {
+		appliedFilters,
+		setAppliedFilters,
+		companies,
+		locationSource,
+		openLocationSheet,
+		openRadiusSheet,
+	} = useMarket();
+	const { addresses } = useGeospatial();
+	const { user } = useAuthContext();
+
+	const profileAddress = user?.profile?.address ?? null;
+	const triggerText =
+		locationSource === "profile" && profileAddress
+			? [profileAddress.street, profileAddress.number, profileAddress.district]
+					.filter(Boolean)
+					.join(", ")
+			: addresses[0]
+				? [
+						addresses[0].streetNumber,
+						addresses[0].street,
+						addresses[0].district,
+					]
+						.filter(Boolean)
+						.join(", ")
+				: null;
 
 	const {
 		control,
@@ -47,7 +78,26 @@ export function MarketListHeader() {
 
 	return (
 		<View className="gap-4 pt-2 pb-2">
-			<LocationSourceBottomSheet />
+			<Pressable
+				className="border border-border bg-card p-2 rounded-md "
+				onPress={openLocationSheet}
+			>
+				<HStack className="items-center gap-2">
+					<Card className="shadow-none p-2 bg-primary rounded-lg items-center justify-center">
+						<MapPinIcon size={14} color={colors.white} />
+					</Card>
+					{triggerText ? (
+						<Text className="flex-1 text-sm font-medium" numberOfLines={1}>
+							{triggerText}
+						</Text>
+					) : (
+						<View className="flex-1">
+							<Skeleton className="h-4" />
+						</View>
+					)}
+					<ChevronDown size={14} className="text-muted-foreground" />
+				</HStack>
+			</Pressable>
 
 			<FormControl isInvalid={!!errors.query}>
 				<Controller
@@ -128,7 +178,13 @@ export function MarketListHeader() {
 						Serviços
 					</Text>
 				</Pressable>
-				<RadiusBottomSheet />
+				<Pressable
+					className="flex-1 flex-row gap-2 itens-center justify-center rounded-md p-4 border border-border"
+					onPress={openRadiusSheet}
+				>
+					<NavigationIcon size={14} />
+					<Text>{formatRadiusLabel(appliedFilters.radius)}</Text>
+				</Pressable>
 			</View>
 
 			<HStack className="items-end justify-between">
