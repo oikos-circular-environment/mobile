@@ -5,18 +5,14 @@ import {
 	MapPinIcon,
 	User2Icon,
 } from "lucide-react-native";
-import { type ReactNode, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { Pressable, View } from "react-native";
-import { colors } from "@/components/style/colors";
-import {
-	BottomSheet,
+import BottomSheet, {
 	BottomSheetBackdrop,
-	BottomSheetDragIndicator,
-	BottomSheetPortal,
-	type BottomSheetRef,
-	BottomSheetScrollView,
-	BottomSheetTrigger,
-} from "@/components/ui/bottomsheet";
+	BottomSheetView,
+	type BottomSheetBackdropProps,
+} from "@gorhom/bottom-sheet";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
@@ -44,7 +40,7 @@ function formatProfileAddress(addr: Address): string {
 }
 
 type OptionRowProps = {
-	icon: ReactNode;
+	icon: React.ReactNode;
 	iconBg: string;
 	title: string;
 	address: string | undefined;
@@ -100,7 +96,7 @@ function OptionRow({
 }
 
 export function LocationSourceBottomSheet() {
-	const sheetRef = useRef<BottomSheetRef>(null);
+	const sheetRef = useRef<BottomSheet>(null);
 	const { locationSource, setLocationSource } = useMarket();
 	const { location, addresses } = useGeospatial();
 	const { user, isAuthenticated } = useAuthContext();
@@ -136,9 +132,23 @@ export function LocationSourceBottomSheet() {
 		sheetRef.current?.close();
 	};
 
+	const backdropComponent = useCallback(
+		(props: BottomSheetBackdropProps) => (
+			<BottomSheetBackdrop
+				{...props}
+				appearsOnIndex={0}
+				disappearsOnIndex={-1}
+			/>
+		),
+		[],
+	);
+
 	return (
-		<BottomSheet ref={sheetRef}>
-			<BottomSheetTrigger className="p-0 border-0 rounded-none">
+		<>
+			<Pressable
+				className="p-0 border-0 rounded-none"
+				onPress={() => sheetRef.current?.snapToIndex(0)}
+			>
 				<HStack className="items-center gap-2">
 					<Card className="shadow-none p-2 bg-primary rounded-lg items-center justify-center">
 						<MapPinIcon size={14} color={colors.white} />
@@ -154,19 +164,15 @@ export function LocationSourceBottomSheet() {
 					)}
 					<ChevronDown size={14} className="text-muted-foreground" />
 				</HStack>
-			</BottomSheetTrigger>
-			<BottomSheetPortal
+			</Pressable>
+			<BottomSheet
+				ref={sheetRef}
+				index={-1}
 				snapPoints={["44%"]}
-				backdropComponent={BottomSheetBackdrop}
-				handleComponent={BottomSheetDragIndicator}
+				enablePanDownToClose
+				backdropComponent={backdropComponent}
 			>
-				<BottomSheetScrollView
-					contentContainerStyle={{
-						gap: 12,
-						paddingHorizontal: 16,
-						paddingBottom: 32,
-					}}
-				>
+				<BottomSheetView style={{ padding: 16 }}>
 					<Heading size="sm" className="text-base text-gray-900">
 						Selecionar localização
 					</Heading>
@@ -211,8 +217,8 @@ export function LocationSourceBottomSheet() {
 							</VStack>
 						</HStack>
 					)}
-				</BottomSheetScrollView>
-			</BottomSheetPortal>
-		</BottomSheet>
+				</BottomSheetView>
+			</BottomSheet>
+		</>
 	);
 }

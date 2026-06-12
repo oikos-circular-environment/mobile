@@ -1,14 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { View } from "react-native";
-import { Badge, BadgeText } from "@/components/ui/badge";
-import {
-	BottomSheet,
+import BottomSheet, {
 	BottomSheetBackdrop,
-	BottomSheetDragIndicator,
-	BottomSheetPortal,
-	type BottomSheetRef,
 	BottomSheetScrollView,
-} from "@/components/ui/bottomsheet";
+	type BottomSheetBackdropProps,
+} from "@gorhom/bottom-sheet";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -29,66 +26,71 @@ export function BusinessHoursBottomSheet({
 	onClose,
 	businessHours,
 }: BusinessHoursBottomSheetProps) {
-	const ref = useRef<BottomSheetRef>(null);
+	const ref = useRef<BottomSheet>(null);
 
-	useEffect(() => {
-		if (isOpen) {
-			ref.current?.open();
-		} else {
-			ref.current?.close();
-		}
-	}, [isOpen]);
+	const backdropComponent = useCallback(
+		(props: BottomSheetBackdropProps) => (
+			<BottomSheetBackdrop
+				{...props}
+				appearsOnIndex={0}
+				disappearsOnIndex={-1}
+				pressBehavior="close"
+			/>
+		),
+		[],
+	);
 
 	return (
-		<BottomSheet ref={ref} onClose={onClose}>
-			<BottomSheetPortal
-				snapPoints={["60%"]}
-				backdropComponent={BottomSheetBackdrop}
-				handleComponent={BottomSheetDragIndicator}
+		<BottomSheet
+			ref={ref}
+			index={isOpen ? 0 : -1}
+			snapPoints={["60%"]}
+			enablePanDownToClose
+			onClose={onClose}
+			backdropComponent={backdropComponent}
+		>
+			<BottomSheetScrollView
+				contentContainerStyle={{
+					gap: 16,
+					paddingHorizontal: 16,
+					paddingBottom: 32,
+				}}
 			>
-				<BottomSheetScrollView
-					contentContainerStyle={{
-						gap: 16,
-						paddingHorizontal: 16,
-						paddingBottom: 32,
-					}}
-				>
-					<View className="gap-1">
-						<Heading size="md" className="text-base text-gray-950">
-							Horários de funcionamento
-						</Heading>
-						<Text className="text-sm text-gray-500">
-							Confira os horários de funcionamento para planejar sua visita.
-						</Text>
-					</View>
-					<View className="gap-2">
-						{(businessHours ?? []).map(item => (
-							<Card key={item.id} className="shadow-none h-18 justify-center">
-								<View className="flex-row items-center justify-between">
-									<Text className="text-sm font-semibold text-gray-900">
-										{getDayLabel(item.day_of_week)}
-									</Text>
-									<View>
-										{!item.is_open || !item.time_slots.length ? (
-											<Badge variant="destructive">
-												<BadgeText>Fechado</BadgeText>
-											</Badge>
-										) : (
-											<View className="items-end gap-0.5">
-												{item.time_slots.map(slot => (
-													<Text key={slot.id} className="text-xs text-gray-700">
-														{slot.start_time} - {slot.end_time}
-													</Text>
-												))}
-											</View>
-										)}
-									</View>
+				<View className="gap-1">
+					<Heading size="md" className="text-base text-gray-950">
+						Horários de funcionamento
+					</Heading>
+					<Text className="text-sm text-gray-500">
+						Confira os horários de funcionamento para planejar sua visita.
+					</Text>
+				</View>
+				<View className="gap-2">
+					{(businessHours ?? []).map(item => (
+						<Card key={item.id} className="shadow-none h-18 justify-center">
+							<View className="flex-row items-center justify-between">
+								<Text className="text-sm font-semibold text-gray-900">
+									{getDayLabel(item.day_of_week)}
+								</Text>
+								<View>
+									{!item.is_open || !item.time_slots.length ? (
+										<Badge variant="destructive">
+											<BadgeText>Fechado</BadgeText>
+										</Badge>
+									) : (
+										<View className="items-end gap-0.5">
+											{item.time_slots.map(slot => (
+												<Text key={slot.id} className="text-xs text-gray-700">
+													{slot.start_time} - {slot.end_time}
+												</Text>
+											))}
+										</View>
+									)}
 								</View>
-							</Card>
-						))}
-					</View>
-				</BottomSheetScrollView>
-			</BottomSheetPortal>
+							</View>
+						</Card>
+					))}
+				</View>
+			</BottomSheetScrollView>
 		</BottomSheet>
 	);
 }

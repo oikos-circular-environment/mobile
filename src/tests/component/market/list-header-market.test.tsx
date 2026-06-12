@@ -1,46 +1,23 @@
 import { render, screen } from "@testing-library/react-native";
 import type React from "react";
+import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
 
-// ---------------------------------------------------------------------------
-// Mock bottomsheet — RadiusBottomSheet and LocationSourceBottomSheet both
-// render <BottomSheet> which provides BottomSheetContext. We need a minimal
-// mock so the trigger buttons render without throwing.
-// ---------------------------------------------------------------------------
-jest.mock("@/components/ui/bottomsheet", () => {
-	const ReactMock = require("react");
-	const { View: RNView } = require("react-native");
-
-	const MockCtx = ReactMock.createContext(null);
-
-	return {
-		BottomSheetContext: MockCtx,
-		BottomSheet: ({ children }: { children: React.ReactNode }) => {
-			const [isVisible] = ReactMock.useState(false);
-			const ctx = ReactMock.useMemo(
-				() => ({
-					isVisible,
-					setIsVisible: () => {},
-					handleOpen: () => {},
-					handleClose: () => {},
-					bottomSheetRef: { current: null },
-					handleSheetChanges: () => {},
-					currentIndex: -1,
-				}),
-				[isVisible],
-			);
-			return <MockCtx.Provider value={ctx}>{children}</MockCtx.Provider>;
-		},
-		BottomSheetPortal: () => null,
-		BottomSheetBackdrop: RNView,
-		BottomSheetDragIndicator: RNView,
-		BottomSheetScrollView: RNView,
-	};
-});
-
+jest.mock("@/contexts/auth-context");
 jest.mock("@/contexts/geospatial-context");
 jest.mock("@/contexts/market-context");
+
+const defaultAuth = {
+	user: null,
+	isAuthenticated: false,
+	isLoading: false,
+	needsProfileCompletion: false,
+	signIn: jest.fn(),
+	signUp: jest.fn(),
+	signOut: jest.fn(),
+	updateUserProfile: jest.fn(),
+};
 
 const setAppliedFilters = jest.fn();
 
@@ -70,6 +47,13 @@ const defaultMarket = {
 	getCompanyById: jest.fn(),
 };
 
+function setupAuth(overrides: Partial<typeof defaultAuth> = {}) {
+	jest.mocked(useAuthContext).mockReturnValue({
+		...defaultAuth,
+		...overrides,
+	});
+}
+
 function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
 	jest.mocked(useGeospatial).mockReturnValue({
 		...defaultGeospatial,
@@ -87,6 +71,7 @@ function setupMarket(overrides: Partial<typeof defaultMarket> = {}) {
 describe("MarketListHeader", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
+		setupAuth();
 		setupGeospatial();
 		setupMarket();
 	});

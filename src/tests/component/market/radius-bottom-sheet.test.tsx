@@ -2,47 +2,6 @@ import { render, screen } from "@testing-library/react-native";
 import type React from "react";
 import { useMarket } from "@/contexts/market-context";
 
-// ---------------------------------------------------------------------------
-// Mock @/components/ui/bottomsheet — provides BottomSheetContext with working
-// handleOpen/handleClose so that RadiusTrigger and RadiusOption can interact
-// with visibility state, and BottomSheetPortal only renders when open.
-// ---------------------------------------------------------------------------
-jest.mock("@/components/ui/bottomsheet", () => {
-	const ReactMock = require("react");
-	const { View: RNView, ScrollView: RNScrollView } = require("react-native");
-
-	const MockCtx = ReactMock.createContext(null);
-
-	return {
-		BottomSheetContext: MockCtx,
-		BottomSheet: ({ children }: { children: React.ReactNode }) => {
-			const [isVisible, setIsVisible] = ReactMock.useState(false);
-			const ctx = ReactMock.useMemo(
-				() => ({
-					isVisible,
-					setIsVisible,
-					handleOpen: () => setIsVisible(true),
-					handleClose: () => setIsVisible(false),
-					bottomSheetRef: { current: null },
-					handleSheetChanges: () => {},
-					currentIndex: -1,
-				}),
-				[isVisible],
-			);
-
-			return <MockCtx.Provider value={ctx}>{children}</MockCtx.Provider>;
-		},
-		BottomSheetPortal: ({ children }: { children: React.ReactNode }) => {
-			const { isVisible } = ReactMock.useContext(MockCtx);
-			if (!isVisible) return null;
-			return <RNView>{children}</RNView>;
-		},
-		BottomSheetBackdrop: RNView,
-		BottomSheetDragIndicator: RNView,
-		BottomSheetScrollView: RNScrollView,
-	};
-});
-
 jest.mock("@/contexts/market-context");
 
 const setAppliedFilters = jest.fn();
@@ -101,7 +60,6 @@ describe("RadiusBottomSheet", () => {
 			const userEvent = require("@testing-library/react-native").userEvent;
 			await userEvent.press(screen.getByText("2 km"));
 
-			// Options now visible
 			expect(screen.getByText("5 km")).toBeOnTheScreen();
 			expect(screen.getByText("10 km")).toBeOnTheScreen();
 			expect(screen.getByText("15 km")).toBeOnTheScreen();

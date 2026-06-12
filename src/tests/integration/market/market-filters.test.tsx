@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+	act,
 	fireEvent,
 	render,
 	screen,
@@ -257,8 +258,10 @@ describe("Market — filtros (integração)", () => {
 			const input = screen.getByPlaceholderText(
 				"Empresas, resíduos ou serviços",
 			);
-			fireEvent.changeText(input, "Recicladora");
-			fireEvent(input, "submitEditing");
+			await act(async () => {
+				fireEvent.changeText(input, "Recicladora");
+				fireEvent(input, "submitEditing");
+			});
 
 			await waitFor(() => {
 				expect(getV1Market).toHaveBeenCalledWith(
@@ -272,14 +275,16 @@ describe("Market — filtros (integração)", () => {
 
 
 	describe("filtro de raio", () => {
-		it("chama API com radius=10000 ao selecionar 10 km", async () => {
+		it("chama API com radius correto ao selecionar raio", async () => {
 			mockMarketResponse([makeCompany()]);
 			await renderMarket();
 
 			await waitFor(() => {
 				expect(screen.getByTestId("radius-btn-10000")).toBeOnTheScreen();
 			});
-			fireEvent.press(screen.getByTestId("radius-btn-10000"));
+			await act(async () => {
+				fireEvent.press(screen.getByTestId("radius-btn-10000"));
+			});
 
 			await waitFor(() => {
 				expect(getV1Market).toHaveBeenCalledWith(
@@ -288,16 +293,10 @@ describe("Market — filtros (integração)", () => {
 					}),
 				);
 			});
-		});
 
-		it("chama API com radius=20000 ao selecionar 20 km", async () => {
-			mockMarketResponse([makeCompany()]);
-			await renderMarket();
-
-			await waitFor(() => {
-				expect(screen.getByTestId("radius-btn-20000")).toBeOnTheScreen();
+			await act(async () => {
+				fireEvent.press(screen.getByTestId("radius-btn-20000"));
 			});
-			fireEvent.press(screen.getByTestId("radius-btn-20000"));
 
 			await waitFor(() => {
 				expect(getV1Market).toHaveBeenCalledWith(

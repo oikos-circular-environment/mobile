@@ -1,15 +1,11 @@
 import { CheckIcon, NavigationIcon } from "lucide-react-native";
-import { useContext, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Pressable } from "react-native";
-import {
-	BottomSheet,
+import BottomSheet, {
 	BottomSheetBackdrop,
-	BottomSheetContext,
-	BottomSheetDragIndicator,
-	BottomSheetPortal,
-	BottomSheetScrollView,
-	BottomSheetTrigger,
-} from "@/components/ui/bottomsheet";
+	BottomSheetView,
+	type BottomSheetBackdropProps,
+} from "@gorhom/bottom-sheet";
 import { Text } from "@/components/ui/text";
 import { useMarket } from "@/contexts/market-context";
 import { colors } from "../style/colors";
@@ -41,17 +37,12 @@ function RadiusOption({
 	isSelected: boolean;
 	onSelect: (value: string) => void;
 }) {
-	const { handleClose } = useContext(BottomSheetContext);
-
 	return (
 		<Pressable
 			className={`flex-row items-center justify-between p-3 rounded-xl ${
 				isSelected ? "bg-primary" : "bg-background border border-border"
 			}`}
-			onPress={() => {
-				onSelect(value);
-				handleClose();
-			}}
+			onPress={() => onSelect(value)}
 			accessibilityLabel={`Raio de busca: ${label}${isSelected ? " (selecionado)" : ""}`}
 		>
 			<Text className={isSelected ? "text-primary-foreground" : undefined}>
@@ -65,19 +56,36 @@ function RadiusOption({
 export function RadiusBottomSheet() {
 	const { appliedFilters, setAppliedFilters } = useMarket();
 	const [localRadius, setLocalRadius] = useState(appliedFilters.radius);
+	const sheetRef = useRef<BottomSheet>(null);
+
+	const backdropComponent = useCallback(
+		(props: BottomSheetBackdropProps) => (
+			<BottomSheetBackdrop
+				{...props}
+				appearsOnIndex={0}
+				disappearsOnIndex={-1}
+			/>
+		),
+		[],
+	);
 
 	return (
-		<BottomSheet>
-			<BottomSheetTrigger className="flex-1 flex-row items-center justify-center gap-2">
+		<>
+			<Pressable
+				className="flex-1 flex-row items-center justify-center gap-2"
+				onPress={() => sheetRef.current?.snapToIndex(0)}
+			>
 				<NavigationIcon size={14} />
 				<Text>{formatRadiusLabel(appliedFilters.radius)}</Text>
-			</BottomSheetTrigger>
-			<BottomSheetPortal
+			</Pressable>
+			<BottomSheet
+				ref={sheetRef}
+				index={-1}
 				snapPoints={["50%"]}
-				backdropComponent={BottomSheetBackdrop}
-				handleComponent={BottomSheetDragIndicator}
+				enablePanDownToClose
+				backdropComponent={backdropComponent}
 			>
-				<BottomSheetScrollView contentContainerClassName="pb-12">
+				<BottomSheetView>
 					<VStack className="gap-2 p-4">
 						{radiusOptions.map(option => (
 							<RadiusOption
@@ -91,12 +99,13 @@ export function RadiusBottomSheet() {
 										...appliedFilters,
 										radius: value,
 									});
+									sheetRef.current?.close();
 								}}
 							/>
 						))}
 					</VStack>
-				</BottomSheetScrollView>
-			</BottomSheetPortal>
-		</BottomSheet>
+				</BottomSheetView>
+			</BottomSheet>
+		</>
 	);
 }

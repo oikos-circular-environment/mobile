@@ -1,8 +1,5 @@
-import React from "react";
+import React, { useState, useImperativeHandle } from "react";
 import { ScrollView, View } from "react-native";
-
-// Minimal mock for @gorhom/bottom-sheet — renders children as plain Views
-// so tests can verify content without native gesture/animation modules.
 
 export const BottomSheetScrollView = ScrollView;
 
@@ -22,10 +19,41 @@ export const BottomSheetSectionList = View;
 
 type BottomSheetProps = {
 	children?: React.ReactNode;
+	index?: number;
+	snapPoints?: (string | number)[];
+	enablePanDownToClose?: boolean;
+	enableDynamicSizing?: boolean;
+	backdropComponent?: React.ComponentType<unknown>;
+	onChange?: (index: number) => void;
+	onClose?: () => void;
+	style?: object;
+	backgroundStyle?: object;
+	handleIndicatorStyle?: object;
 };
 
 const GorhomBottomSheet = React.forwardRef<unknown, BottomSheetProps>(
-	({ children }, ref) => {
+	({ children, index = -1, onChange, onClose }, ref) => {
+		const [currentIndex, setCurrentIndex] = useState(index);
+
+		useImperativeHandle(ref, () => ({
+			snapToIndex: (idx: number) => {
+				setCurrentIndex(idx);
+				onChange?.(idx);
+			},
+			close: () => {
+				setCurrentIndex(-1);
+				onChange?.(-1);
+				onClose?.();
+			},
+			open: () => {
+				setCurrentIndex(0);
+				onChange?.(0);
+			},
+			expand: () => setCurrentIndex(0),
+			collapse: () => setCurrentIndex(-1),
+		}));
+
+		if (currentIndex < 0) return null;
 		return <View>{children}</View>;
 	},
 );
