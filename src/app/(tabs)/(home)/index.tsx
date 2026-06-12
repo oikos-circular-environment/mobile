@@ -220,7 +220,7 @@ export default function HomeScreen() {
 									item.business_hours,
 									currentDate,
 								);
-								const initials = item.business_name
+								const initials = (item.business_name ?? "")
 									.split(" ")
 									.slice(0, 2)
 									.map(w => w[0]?.toUpperCase() ?? "")
@@ -262,9 +262,9 @@ export default function HomeScreen() {
 														)}
 
 														<View className="gap-1">
-															<Text className="font-bold uppercase">
-																{item.business_name}
-															</Text>
+														<Text className="font-bold uppercase">
+															{item.business_name ?? item.corporate_name}
+														</Text>
 															<Text className="text-xs text-muted-foreground">
 																{item.identity_type === "CNPJ"
 																	? item.identity
