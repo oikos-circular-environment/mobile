@@ -1793,7 +1793,9 @@ export type GetV1ComplaintsMapData = {
 		lat: number;
 		lon: number;
 		radius?: number;
-		status?: "OPEN" | "RESOLVED" | "CANCELED";
+		status?: "OPEN" | "RESOLVED";
+		waste_category_id?: string;
+		hazard_level?: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
 	};
 	url: "/v1/complaints/map";
 };

@@ -10,7 +10,7 @@ import {
 	SearchIcon,
 	Settings2Icon,
 } from "lucide-react-native";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	Image,
 	Platform,
@@ -91,6 +91,20 @@ const HAZARD_LEVELS: HazardLevelVariant[] = [
 	"very_high",
 ];
 
+type FilterState = {
+	status: "OPEN" | "RESOLVED" | null;
+	category: WasteCategory | null;
+	hazardLevel: HazardLevelVariant | null;
+	radius: number;
+};
+
+const DEFAULT_FILTERS: FilterState = {
+	status: "OPEN",
+	category: null,
+	hazardLevel: null,
+	radius: 10000,
+};
+
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
 	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
@@ -109,15 +123,20 @@ export default function ComplaintsMapScreen() {
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [mapHeading, setMapHeading] = useState(0);
-	const [activeRadius, setActiveRadius] = useState(10000);
-	const [activeStatusFilter, setActiveStatusFilter] =
-		useState<ComplaintStatus | null>("OPEN");
-	const [activeCategory, setActiveCategory] = useState<WasteCategory | null>(
-		null,
-	);
-	const [activeHazardLevel, setActiveHazardLevel] =
-		useState<HazardLevelVariant | null>(null);
 	const [showUserLocation, setShowUserLocation] = useState(false);
+
+	const [appliedFilters, setAppliedFilters] =
+		useState<FilterState>(DEFAULT_FILTERS);
+	const [draftFilters, setDraftFilters] =
+		useState<FilterState>(DEFAULT_FILTERS);
+
+	const hazardLevelForApi = appliedFilters.hazardLevel
+		? (appliedFilters.hazardLevel.toUpperCase() as
+				| "LOW"
+				| "MEDIUM"
+				| "HIGH"
+				| "VERY_HIGH")
+		: null;
 
 	const {
 		complaints,
@@ -126,32 +145,11 @@ export default function ComplaintsMapScreen() {
 		setSelectedMapComplaint,
 	} = useComplaintsMap({
 		userLocation,
-		activeTypeFilter: null,
-		activeStatusFilter,
-		radius: activeRadius,
+		status: appliedFilters.status,
+		wasteCategoryId: appliedFilters.category?.id ?? null,
+		hazardLevel: hazardLevelForApi,
+		radius: appliedFilters.radius,
 	});
-
-	const filteredComplaints = useMemo(
-		() =>
-			complaints.filter(complaint => {
-				if (activeCategory) {
-					if (!complaint.categories?.some(cat => cat.id === activeCategory.id))
-						return false;
-				}
-				if (activeHazardLevel) {
-					if (
-						!complaint.categories?.some(cat =>
-							cat.hazard_levels?.some(
-								h => h.toLowerCase() === activeHazardLevel,
-							),
-						)
-					)
-						return false;
-				}
-				return true;
-			}),
-		[complaints, activeCategory, activeHazardLevel],
-	);
 
 	useEffect(() => {
 		if (!location || hasAnimatedRef.current) return;
@@ -166,6 +164,22 @@ export default function ComplaintsMapScreen() {
 			600,
 		);
 	}, [location]);
+
+	const handleOpenFilterSheet = () => {
+		setDraftFilters(appliedFilters);
+		filterSheetRef.current?.open();
+	};
+
+	const handleApplyFilters = () => {
+		setAppliedFilters(draftFilters);
+		filterSheetRef.current?.close();
+	};
+
+	const handleClearFilters = () => {
+		setAppliedFilters(DEFAULT_FILTERS);
+		setDraftFilters(DEFAULT_FILTERS);
+		filterSheetRef.current?.close();
+	};
 
 	const handleMarkerPress = (complaint: MapComplaint) => {
 		suppressMapPressRef.current = true;
@@ -237,7 +251,7 @@ export default function ComplaintsMapScreen() {
 				onPress={handleClosePanel}
 				onRegionChangeComplete={handleRegionChangeComplete}
 			>
-				{filteredComplaints.map(complaint => {
+				{complaints.map(complaint => {
 					if (!complaint.location) return null;
 					const typeInfo = complaintTypeValues.find(
 						t => t.value === "IRREGULAR_DISPOSAL",
@@ -286,13 +300,7 @@ export default function ComplaintsMapScreen() {
 				style={{ top: 32 }}
 				pointerEvents="box-none"
 			>
-				<FilterRow
-					activeCategory={activeCategory}
-					activeHazardLevel={activeHazardLevel}
-					activeStatusFilter={activeStatusFilter}
-					activeRadius={activeRadius}
-					onPress={() => filterSheetRef.current?.open()}
-				/>
+				<FilterRow filters={appliedFilters} onPress={handleOpenFilterSheet} />
 			</View>
 
 			{/* Loading indicator */}
@@ -471,18 +479,21 @@ export default function ComplaintsMapScreen() {
 						<View className="flex-row flex-wrap gap-2 mb-4">
 							<FilterOption
 								label="Todos"
-								active={activeCategory === null}
-								onPress={() => setActiveCategory(null)}
+								active={draftFilters.category === null}
+								onPress={() =>
+									setDraftFilters(prev => ({ ...prev, category: null }))
+								}
 							/>
 							{categories.map(cat => (
 								<FilterOption
 									key={cat.id}
 									label={cat.name}
-									active={activeCategory?.id === cat.id}
+									active={draftFilters.category?.id === cat.id}
 									onPress={() =>
-										setActiveCategory(
-											activeCategory?.id === cat.id ? null : cat,
-										)
+										setDraftFilters(prev => ({
+											...prev,
+											category: prev.category?.id === cat.id ? null : cat,
+										}))
 									}
 								/>
 							))}
@@ -496,18 +507,21 @@ export default function ComplaintsMapScreen() {
 						<View className="flex-row flex-wrap gap-2 mb-4">
 							<ComplaintHazardLevelFilter
 								variant="all"
-								selected={activeHazardLevel === null}
-								onPress={() => setActiveHazardLevel(null)}
+								selected={draftFilters.hazardLevel === null}
+								onPress={() =>
+									setDraftFilters(prev => ({ ...prev, hazardLevel: null }))
+								}
 							/>
 							{HAZARD_LEVELS.map(level => (
 								<ComplaintHazardLevelFilter
 									key={level}
 									variant={level}
-									selected={activeHazardLevel === level}
+									selected={draftFilters.hazardLevel === level}
 									onPress={() =>
-										setActiveHazardLevel(
-											activeHazardLevel === level ? null : level,
-										)
+										setDraftFilters(prev => ({
+											...prev,
+											hazardLevel: prev.hazardLevel === level ? null : level,
+										}))
 									}
 								/>
 							))}
@@ -525,13 +539,17 @@ export default function ComplaintsMapScreen() {
 									variant={variant}
 									selected={
 										variant === "all"
-											? activeStatusFilter === null
-											: activeStatusFilter === variant
+											? draftFilters.status === null
+											: draftFilters.status === variant
 									}
 									onPress={() =>
-										setActiveStatusFilter(
-											variant === "all" ? null : (variant as ComplaintStatus),
-										)
+										setDraftFilters(prev => ({
+											...prev,
+											status:
+												variant === "all"
+													? null
+													: (variant as "OPEN" | "RESOLVED"),
+										}))
 									}
 								/>
 							))}
@@ -542,16 +560,39 @@ export default function ComplaintsMapScreen() {
 						<Text className="text-sm font-semibold text-muted-foreground mb-3">
 							Raio de busca
 						</Text>
-						<View className="flex-row flex-wrap gap-2">
+						<View className="flex-row flex-wrap gap-2 mb-6">
 							{RADIUS_OPTIONS.map(({ label, value }) => (
 								<ComplaintRadiusFilter
 									key={value}
 									label={label}
-									selected={activeRadius === value}
-									onPress={() => setActiveRadius(value)}
+									selected={draftFilters.radius === value}
+									onPress={() =>
+										setDraftFilters(prev => ({ ...prev, radius: value }))
+									}
 								/>
 							))}
 						</View>
+
+						<HStack className="gap-3">
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={handleClearFilters}
+								className="flex-1 h-11 items-center justify-center rounded-xl border border-border bg-white"
+							>
+								<Text className="text-sm font-semibold text-foreground">
+									Limpar
+								</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								activeOpacity={0.85}
+								onPress={handleApplyFilters}
+								className="flex-1 h-11 items-center justify-center rounded-xl bg-lime-800"
+							>
+								<Text className="text-sm font-semibold text-white">
+									Aplicar
+								</Text>
+							</TouchableOpacity>
+						</HStack>
 					</BottomSheetScrollView>
 				</BottomSheetPortal>
 			</BottomSheet>
@@ -560,27 +601,18 @@ export default function ComplaintsMapScreen() {
 }
 
 type FilterRowProps = {
-	activeCategory: WasteCategory | null;
-	activeHazardLevel: HazardLevelVariant | null;
-	activeStatusFilter: ComplaintStatus | null;
-	activeRadius: number;
+	filters: FilterState;
 	onPress: () => void;
 };
 
-function FilterRow({
-	activeCategory,
-	activeHazardLevel,
-	activeStatusFilter,
-	activeRadius,
-	onPress,
-}: FilterRowProps) {
+function FilterRow({ filters, onPress }: FilterRowProps) {
 	const radiusLabel =
-		RADIUS_OPTIONS.find(o => o.value === activeRadius)?.label ?? "10 km";
+		RADIUS_OPTIONS.find(o => o.value === filters.radius)?.label ?? "10 km";
 
 	const hasActiveFilter =
-		activeCategory !== null ||
-		activeHazardLevel !== null ||
-		activeStatusFilter !== null;
+		filters.category !== null ||
+		filters.hazardLevel !== null ||
+		filters.status !== null;
 
 	return (
 		<HStack className="gap-2 items-center" pointerEvents="auto">
@@ -601,10 +633,10 @@ function FilterRow({
 							Todos os filtros
 						</Text>
 					)}
-					{activeHazardLevel && (
-						<WasteCategoryHazardLevel variant={activeHazardLevel} />
+					{filters.hazardLevel && (
+						<WasteCategoryHazardLevel variant={filters.hazardLevel} />
 					)}
-					{activeCategory && (
+					{filters.category && (
 						<View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-2.5 py-0.5">
 							<RecycleIcon
 								size={10}
@@ -612,12 +644,15 @@ function FilterRow({
 								strokeWidth={2.5}
 							/>
 							<Text className="text-[10px] font-semibold text-gray-700 uppercase">
-								{activeCategory.name}
+								{filters.category.name}
 							</Text>
 						</View>
 					)}
-					{activeStatusFilter && (
-						<ComplaintStatusChip status={activeStatusFilter} size="xs" />
+					{filters.status && (
+						<ComplaintStatusChip
+							status={filters.status as ComplaintStatus}
+							size="xs"
+						/>
 					)}
 					<View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-2.5 py-0.5">
 						<Text className="text-[10px] font-semibold text-gray-700">

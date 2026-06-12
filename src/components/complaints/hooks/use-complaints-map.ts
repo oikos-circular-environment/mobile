@@ -6,24 +6,28 @@ import {
 	getV1ComplaintsMap,
 	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
-import type { ComplaintStatus, ComplaintType } from "@/libs/types/complaint";
+import type { ComplaintStatus } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 export type { MapComplaint } from "@/libs/types/complaint";
 
 type VoteType = "RESOLVED" | "NOT_RESOLVED";
 
+type HazardLevel = "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+
 type Params = {
 	userLocation: { lat: number; lon: number } | null;
-	activeTypeFilter: ComplaintType | null;
-	activeStatusFilter: ComplaintStatus | null;
+	status: "OPEN" | "RESOLVED" | null;
+	wasteCategoryId: string | null;
+	hazardLevel: HazardLevel | null;
 	radius: number;
 };
 
 export function useComplaintsMap({
 	userLocation,
-	activeTypeFilter,
-	activeStatusFilter,
+	status,
+	wasteCategoryId,
+	hazardLevel,
 	radius,
 }: Params) {
 	const { isAuthenticated } = useAuthContext();
@@ -44,8 +48,9 @@ export function useComplaintsMap({
 			"map",
 			userLocation?.lat ?? 0,
 			userLocation?.lon ?? 0,
-			activeTypeFilter,
-			activeStatusFilter,
+			status,
+			wasteCategoryId,
+			hazardLevel,
 			radius,
 		],
 		queryFn: async () => {
@@ -54,8 +59,9 @@ export function useComplaintsMap({
 					lat: userLocation?.lat ?? 0,
 					lon: userLocation?.lon ?? 0,
 					radius,
-					...(activeTypeFilter ? { type: activeTypeFilter } : {}),
-					...(activeStatusFilter ? { status: activeStatusFilter } : {}),
+					...(status ? { status } : {}),
+					...(wasteCategoryId ? { waste_category_id: wasteCategoryId } : {}),
+					...(hazardLevel ? { hazard_level: hazardLevel } : {}),
 				},
 			});
 			return res.data;
@@ -123,3 +129,5 @@ export function useComplaintsMap({
 		isPendingVote: voteMutation.isPending,
 	};
 }
+
+export type { ComplaintStatus };
