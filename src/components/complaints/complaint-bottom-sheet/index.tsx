@@ -42,15 +42,10 @@ import {
 	getV1ComplaintsByIdVotes,
 	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
-import {
-	type ComplaintStatus,
-	type ComplaintType,
-	complaintTypeValues,
-} from "@/libs/types/complaint";
+import type { ComplaintStatus } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
-import { ComplaintStatusChip } from "../filter-components/complaint-status-chip";
-import { ComplaintTypeChip } from "../filter-components/complaint-type-chip";
 import { ComplaintVoteButtons } from "../complaint-vote-buttons";
+import { ComplaintStatusBadge } from "../filter-components/complaint-status-chip";
 import { AttachmentPreview } from "./attachment-preview";
 import { ResolutionCard } from "./resolution-card";
 import { ResolutionCardSkeleton } from "./resolution-card-skeleton";
@@ -180,7 +175,7 @@ export function ComplaintBottomSheet() {
 
 	if (!complaint) return null;
 
-	const typeInfo = complaintTypeValues.find(t => t.value === complaint.type);
+	// const typeInfo = complaintTypeValues.find(t => t.value === complaint.type);
 	const resolutions = resolutionsData?.resolutions ?? [];
 
 	const attachmentObservationMap: Record<string, string | null> =
@@ -232,7 +227,7 @@ export function ComplaintBottomSheet() {
 
 	const complaintRouteContext = {
 		id: complaint.id,
-		type: complaint.type,
+		// type: complaint.type,
 		status: complaint.status,
 		address: getAddress(complaint) ?? "",
 		date:
@@ -322,7 +317,7 @@ export function ComplaintBottomSheet() {
 							</View>
 
 							{/* Title */}
-							<Text
+							{/* <Text
 								className="text-xl font-bold text-gray-900"
 								style={{ fontFamily: "Oswald_700Bold" }}
 								numberOfLines={2}
@@ -330,16 +325,16 @@ export function ComplaintBottomSheet() {
 								{typeInfo?.description?.toLocaleUpperCase() ??
 									typeInfo?.label ??
 									complaint.type}
-							</Text>
+							</Text> */}
 
 							{/* Badges + distance */}
 							<HStack className="w-full items-center justify-between">
 								<View className="flex-row items-center gap-1.5">
-									<ComplaintTypeChip
+									{/* <ComplaintTypeChip
 										type={complaint.type as ComplaintType}
 										size="sm"
-									/>
-									<ComplaintStatusChip
+									/> */}
+									<ComplaintStatusBadge
 										status={complaint.status as ComplaintStatus}
 										size="sm"
 									/>

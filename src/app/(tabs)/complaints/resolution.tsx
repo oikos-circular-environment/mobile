@@ -30,8 +30,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker-bottom-sheet";
-import { ComplaintStatusChip } from "@/components/complaints/filter-components/complaint-status-chip";
-import { ComplaintTypeChip } from "@/components/complaints/filter-components/complaint-type-chip";
+import { ComplaintStatusBadge } from "@/components/complaints/filter-components/complaint-status-chip";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
@@ -58,7 +57,7 @@ import {
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
-import type { ComplaintStatus, ComplaintType } from "@/libs/types/complaint";
+import type { ComplaintStatus } from "@/libs/types/complaint";
 import { complaintTypeValues } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
@@ -298,11 +297,8 @@ export default function ComplaintResolutionScreen() {
 						</Text>
 
 						<View className="flex-row items-center gap-1.5">
-							{type && (
-								<ComplaintTypeChip type={type as ComplaintType} size="sm" />
-							)}
 							{status && (
-								<ComplaintStatusChip
+								<ComplaintStatusBadge
 									status={status as ComplaintStatus}
 									size="sm"
 								/>

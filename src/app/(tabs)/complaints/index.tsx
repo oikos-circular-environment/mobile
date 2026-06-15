@@ -1,41 +1,36 @@
 import { router } from "expo-router";
 import {
+	ChevronDownIcon,
+	ChevronsUpIcon,
+	ChevronUpIcon,
 	ListIcon,
 	LocateFixedIcon,
 	MapIcon,
 	MapPinnedIcon,
 	MinusIcon,
 	PlusIcon,
+	RadarIcon,
 	RecycleIcon,
-	SearchIcon,
-	Settings2Icon,
+	ShieldCheckIcon,
+	ShieldIcon,
+	Trash2Icon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import {
-	Image,
-	Platform,
-	ScrollView,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { Image, Platform, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
-import { ComplaintHazardLevelFilter } from "@/components/complaints/filter-components/complaint-hazard-level";
-import { ComplaintRadiusFilter } from "@/components/complaints/filter-components/complaint-radius";
 import {
-	ComplaintStatusChip,
-	type ComplaintStatusPressableVariant,
-} from "@/components/complaints/filter-components/complaint-status-chip";
-import { COMPLAINT_TYPE_COLORS } from "@/components/complaints/filter-components/tokens";
+	ComplaintFilterRow,
+	ComplaintPressableFilter,
+	ComplaintPressableFilterIcon,
+	ComplaintPressableFilterText,
+} from "@/components/complaints/complaint-pressable-filter";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
-import {
-	type HazardLevelVariant,
-	WasteCategoryHazardLevel,
-} from "@/components/custom/waste-category";
+import type { HazardLevelVariant } from "@/components/custom/waste-category";
 import { colors } from "@/components/style/colors";
 import {
 	BottomSheet,
@@ -53,10 +48,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
-import {
-	type ComplaintStatus,
-	complaintTypeValues,
-} from "@/libs/types/complaint";
 import type { WasteCategory } from "@/libs/types/waste-category";
 import { cn } from "@/libs/utils";
 
@@ -78,18 +69,19 @@ const controlShadow = {
 	elevation: 3,
 };
 
-const STATUS_FILTER_VARIANTS: ComplaintStatusPressableVariant[] = [
-	"all",
-	"OPEN",
-	"RESOLVED",
-];
+const STATUS_OPTIONS = [
+	{ key: "all", label: "Todos", icon: null },
+	{ key: "OPEN", label: "Aberta", icon: ShieldIcon },
+	{ key: "RESOLVED", label: "Resolvida", icon: ShieldCheckIcon },
+] as const;
 
-const HAZARD_LEVELS: HazardLevelVariant[] = [
-	"low",
-	"medium",
-	"high",
-	"very_high",
-];
+const HAZARD_OPTIONS = [
+	{ key: "all", label: "Todos", icon: null },
+	{ key: "low", label: "Baixa", icon: ChevronDownIcon },
+	{ key: "medium", label: "Média", icon: MinusIcon },
+	{ key: "high", label: "Alta", icon: ChevronUpIcon },
+	{ key: "very_high", label: "Muito alta", icon: ChevronsUpIcon },
+] as const;
 
 type FilterState = {
 	status: "OPEN" | "RESOLVED" | null;
@@ -253,13 +245,10 @@ export default function ComplaintsMapScreen() {
 			>
 				{complaints.map(complaint => {
 					if (!complaint.location) return null;
-					const typeInfo = complaintTypeValues.find(
-						t => t.value === "IRREGULAR_DISPOSAL",
-					);
-					const pinColor =
-						COMPLAINT_TYPE_COLORS.IRREGULAR_DISPOSAL ?? colors.gray[500];
+
+					const pinColor = colors.amber[500];
 					const isSelected = selectedMapComplaint?.id === complaint.id;
-					const Icon = typeInfo?.icon;
+					const Icon = Trash2Icon;
 					return (
 						<Marker
 							key={complaint.id}
@@ -300,7 +289,16 @@ export default function ComplaintsMapScreen() {
 				style={{ top: 32 }}
 				pointerEvents="box-none"
 			>
-				<FilterRow filters={appliedFilters} onPress={handleOpenFilterSheet} />
+				<ComplaintFilterRow
+					status={appliedFilters.status}
+					categoryName={appliedFilters.category?.name ?? null}
+					hazardLevel={appliedFilters.hazardLevel}
+					radiusLabel={
+						RADIUS_OPTIONS.find(o => o.value === appliedFilters.radius)
+							?.label ?? "10 km"
+					}
+					onPress={handleOpenFilterSheet}
+				/>
 			</View>
 
 			{/* Loading indicator */}
@@ -474,28 +472,36 @@ export default function ComplaintsMapScreen() {
 						</Heading>
 
 						<Text className="text-sm font-semibold text-muted-foreground mb-3">
-							Categorias
+							Categorias de resíduos
 						</Text>
 						<View className="flex-row flex-wrap gap-2 mb-4">
-							<FilterOption
-								label="Todos"
-								active={draftFilters.category === null}
+							<ComplaintPressableFilter
+								selected={draftFilters.category === null}
 								onPress={() =>
 									setDraftFilters(prev => ({ ...prev, category: null }))
 								}
-							/>
+							>
+								<ComplaintPressableFilterIcon as={RecycleIcon} />
+								<ComplaintPressableFilterText>
+									Todos
+								</ComplaintPressableFilterText>
+							</ComplaintPressableFilter>
 							{categories.map(cat => (
-								<FilterOption
+								<ComplaintPressableFilter
 									key={cat.id}
-									label={cat.name}
-									active={draftFilters.category?.id === cat.id}
+									selected={draftFilters.category?.id === cat.id}
 									onPress={() =>
 										setDraftFilters(prev => ({
 											...prev,
 											category: prev.category?.id === cat.id ? null : cat,
 										}))
 									}
-								/>
+								>
+									<ComplaintPressableFilterIcon as={RecycleIcon} />
+									<ComplaintPressableFilterText>
+										{cat.name}
+									</ComplaintPressableFilterText>
+								</ComplaintPressableFilter>
 							))}
 						</View>
 
@@ -505,25 +511,27 @@ export default function ComplaintsMapScreen() {
 							Periculosidade
 						</Text>
 						<View className="flex-row flex-wrap gap-2 mb-4">
-							<ComplaintHazardLevelFilter
-								variant="all"
-								selected={draftFilters.hazardLevel === null}
-								onPress={() =>
-									setDraftFilters(prev => ({ ...prev, hazardLevel: null }))
-								}
-							/>
-							{HAZARD_LEVELS.map(level => (
-								<ComplaintHazardLevelFilter
-									key={level}
-									variant={level}
-									selected={draftFilters.hazardLevel === level}
+							{HAZARD_OPTIONS.map(({ key, label, icon }) => (
+								<ComplaintPressableFilter
+									key={key}
+									selected={
+										key === "all"
+											? draftFilters.hazardLevel === null
+											: draftFilters.hazardLevel === key
+									}
 									onPress={() =>
 										setDraftFilters(prev => ({
 											...prev,
-											hazardLevel: prev.hazardLevel === level ? null : level,
+											hazardLevel:
+												key === "all" ? null : (key as HazardLevelVariant),
 										}))
 									}
-								/>
+								>
+									{icon && <ComplaintPressableFilterIcon as={icon} />}
+									<ComplaintPressableFilterText>
+										{label}
+									</ComplaintPressableFilterText>
+								</ComplaintPressableFilter>
 							))}
 						</View>
 
@@ -533,25 +541,27 @@ export default function ComplaintsMapScreen() {
 							Status
 						</Text>
 						<View className="flex-row flex-wrap gap-2 mb-4">
-							{STATUS_FILTER_VARIANTS.map(variant => (
-								<ComplaintStatusChip.Pressable
-									key={variant}
-									variant={variant}
+							{STATUS_OPTIONS.map(({ key, label, icon }) => (
+								<ComplaintPressableFilter
+									key={key}
 									selected={
-										variant === "all"
+										key === "all"
 											? draftFilters.status === null
-											: draftFilters.status === variant
+											: draftFilters.status === key
 									}
 									onPress={() =>
 										setDraftFilters(prev => ({
 											...prev,
 											status:
-												variant === "all"
-													? null
-													: (variant as "OPEN" | "RESOLVED"),
+												key === "all" ? null : (key as "OPEN" | "RESOLVED"),
 										}))
 									}
-								/>
+								>
+									{icon && <ComplaintPressableFilterIcon as={icon} />}
+									<ComplaintPressableFilterText>
+										{label}
+									</ComplaintPressableFilterText>
+								</ComplaintPressableFilter>
 							))}
 						</View>
 
@@ -562,14 +572,18 @@ export default function ComplaintsMapScreen() {
 						</Text>
 						<View className="flex-row flex-wrap gap-2 mb-6">
 							{RADIUS_OPTIONS.map(({ label, value }) => (
-								<ComplaintRadiusFilter
+								<ComplaintPressableFilter
 									key={value}
-									label={label}
 									selected={draftFilters.radius === value}
 									onPress={() =>
 										setDraftFilters(prev => ({ ...prev, radius: value }))
 									}
-								/>
+								>
+									<ComplaintPressableFilterIcon as={RadarIcon} />
+									<ComplaintPressableFilterText>
+										{label}
+									</ComplaintPressableFilterText>
+								</ComplaintPressableFilter>
 							))}
 						</View>
 
@@ -597,113 +611,5 @@ export default function ComplaintsMapScreen() {
 				</BottomSheetPortal>
 			</BottomSheet>
 		</View>
-	);
-}
-
-type FilterRowProps = {
-	filters: FilterState;
-	onPress: () => void;
-};
-
-function FilterRow({ filters, onPress }: FilterRowProps) {
-	const radiusLabel =
-		RADIUS_OPTIONS.find(o => o.value === filters.radius)?.label ?? "10 km";
-
-	const hasActiveFilter =
-		filters.category !== null ||
-		filters.hazardLevel !== null ||
-		filters.status !== null;
-
-	return (
-		<HStack className="gap-2 items-center" pointerEvents="auto">
-			<TouchableOpacity
-				activeOpacity={0.9}
-				onPress={onPress}
-				className="flex-1 flex-row items-center gap-2 bg-white rounded-xl px-3 border border-border"
-				style={{ height: 42 }}
-			>
-				<SearchIcon size={16} color={colors.gray[400]} strokeWidth={2} />
-				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					contentContainerClassName="gap-1.5 items-center py-2"
-				>
-					{!hasActiveFilter && (
-						<Text className="text-sm text-muted-foreground">
-							Todos os filtros
-						</Text>
-					)}
-					{filters.hazardLevel && (
-						<WasteCategoryHazardLevel variant={filters.hazardLevel} />
-					)}
-					{filters.category && (
-						<View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-2.5 py-0.5">
-							<RecycleIcon
-								size={10}
-								color={colors.gray[700]}
-								strokeWidth={2.5}
-							/>
-							<Text className="text-[10px] font-semibold text-gray-700 uppercase">
-								{filters.category.name}
-							</Text>
-						</View>
-					)}
-					{filters.status && (
-						<ComplaintStatusChip
-							status={filters.status as ComplaintStatus}
-							size="xs"
-						/>
-					)}
-					<View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-2.5 py-0.5">
-						<Text className="text-[10px] font-semibold text-gray-700">
-							{radiusLabel}
-						</Text>
-					</View>
-				</ScrollView>
-			</TouchableOpacity>
-
-			<TouchableOpacity
-				activeOpacity={0.85}
-				onPress={onPress}
-				className="h-[42px] w-[42px] items-center justify-center rounded-xl bg-lime-800"
-				style={{
-					shadowColor: colors.black,
-					shadowOffset: { width: 0, height: 2 },
-					shadowOpacity: 0.2,
-					shadowRadius: 3,
-					elevation: 3,
-				}}
-			>
-				<Settings2Icon size={18} color={colors.white} strokeWidth={2} />
-			</TouchableOpacity>
-		</HStack>
-	);
-}
-
-type FilterOptionProps = {
-	label: string;
-	active: boolean;
-	onPress: () => void;
-};
-
-function FilterOption({ label, active, onPress }: FilterOptionProps) {
-	return (
-		<TouchableOpacity
-			onPress={onPress}
-			activeOpacity={0.8}
-			className={cn(
-				"h-9 px-4 rounded-xl border items-center justify-center",
-				active ? "bg-lime-800 border-lime-800" : "bg-white border-border",
-			)}
-		>
-			<Text
-				className={cn(
-					"text-sm font-medium",
-					active ? "text-white" : "text-foreground",
-				)}
-			>
-				{label}
-			</Text>
-		</TouchableOpacity>
 	);
 }

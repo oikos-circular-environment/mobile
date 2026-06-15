@@ -34,8 +34,8 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import type { Complaint } from "@/libs/types/complaint";
-import { ComplaintStatusChip } from "./filter-components/complaint-status-chip";
 import { ComplaintMap } from "./complaint-map";
+import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
 
 interface ComplaintCardProps {
 	complaint: Complaint;
@@ -144,7 +144,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 										className="flex flex-col flex-1 items-center justify-between"
 										{...triggerProps}
 									>
-										<ComplaintStatusChip
+										<ComplaintStatusBadge
 											status={complaint.status}
 											size="sm"
 											iconOnly
