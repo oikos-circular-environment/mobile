@@ -1,13 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format, formatDistanceToNowStrict } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { router } from "expo-router";
 import {
 	AlertTriangleIcon,
-	CalendarIcon,
-	CrosshairIcon,
 	InfoIcon,
-	MapPinIcon,
 	PlayIcon,
 	PlusIcon,
 } from "lucide-react-native";
@@ -19,7 +14,7 @@ import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
-import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import {
 	BottomSheet,
 	BottomSheetBackdrop,
@@ -42,22 +37,20 @@ import {
 	getV1ComplaintsByIdVotes,
 	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
-import type { ComplaintStatus } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
+import { ComplaintDetailsHeader } from "../complaint-details-header";
 import { ComplaintVoteButtons } from "../complaint-vote-buttons";
-import { ComplaintStatusBadge } from "../filter-components/complaint-status-chip";
-import { AttachmentPreview } from "./attachment-preview";
+import { MapComplaintAttachmentPreview } from "./attachment-preview";
 import { ResolutionCard } from "./resolution-card";
 import { ResolutionCardSkeleton } from "./resolution-card-skeleton";
-import type { Attachment } from "./utils";
-import { formatDistance, getAddress, haversineKm } from "./utils";
+import type { MapComplaintMapComplaintAttachment } from "@/libs/types/complaint";
 
 export function ComplaintBottomSheet() {
 	const ref = useRef<BottomSheetRef>(null);
-	const [previewAttachment, setPreviewAttachment] = useState<Attachment | null>(
+	const [previewMapComplaintAttachment, setPreviewMapComplaintAttachment] = useState<MapComplaintAttachment | null>(
 		null,
 	);
-	const [selectedAttachmentId, setSelectedAttachmentId] = useState<
+	const [selectedMapComplaintAttachmentId, setSelectedMapComplaintAttachmentId] = useState<
 		string | null
 	>(null);
 	const [showAuthModal, setShowAuthModal] = useState(false);
@@ -96,7 +89,7 @@ export function ComplaintBottomSheet() {
 	const complaintId = complaint?.id ?? "";
 
 	useEffect(() => {
-		setSelectedAttachmentId(null);
+		setSelectedMapComplaintAttachmentId(null);
 	}, []);
 
 	const { data: resolutionsData, isLoading: isLoadingResolutions } = useQuery({
@@ -175,35 +168,9 @@ export function ComplaintBottomSheet() {
 
 	if (!complaint) return null;
 
-	// const typeInfo = complaintTypeValues.find(t => t.value === complaint.type);
 	const resolutions = resolutionsData?.resolutions ?? [];
 
-	const attachmentObservationMap: Record<string, string | null> =
-		Object.fromEntries(
-			complaint.attachments.map(a => [a.id, complaint.observations]),
-		);
-
-	const allAttachments = complaint.attachments;
-	const address = getAddress(complaint);
-	const dateLabel = format(
-		new Date(complaint.created_at),
-		"d 'de' MMMM 'de' yyyy 'às' HH:mm",
-		{ locale: ptBR },
-	);
-	const coords = complaint.location
-		? `${complaint.location.lat.toFixed(4)}, ${complaint.location.lon.toFixed(4)}`
-		: null;
-	const distanceLabel =
-		userLocation && complaint.location
-			? formatDistance(
-					haversineKm(
-						userLocation.lat,
-						userLocation.lon,
-						complaint.location.lat,
-						complaint.location.lon,
-					),
-				)
-			: null;
+	const allMapComplaintAttachments = complaint.attachments;
 
 	const currentVote = userVotes[complaintId];
 	const resolvedVotes = complaint.vote_counts.resolved;
@@ -225,16 +192,7 @@ export function ComplaintBottomSheet() {
 		voteMutation.mutate({ voteType: next, previousVote: previous });
 	};
 
-	const complaintRouteContext = {
-		id: complaint.id,
-		// type: complaint.type,
-		status: complaint.status,
-		address: getAddress(complaint) ?? "",
-		date:
-			complaint.created_at instanceof Date
-				? complaint.created_at.toISOString()
-				: String(complaint.created_at),
-	};
+	const complaintRouteContext = { id: complaint.id };
 
 	const handleAddResolution = () => {
 		if (!isAuthenticated) {
@@ -295,10 +253,10 @@ export function ComplaintBottomSheet() {
 
 	return (
 		<>
-			<AttachmentPreview
-				visible={!!previewAttachment}
-				attachment={previewAttachment}
-				onClose={() => setPreviewAttachment(null)}
+			<MapComplaintAttachmentPreview
+				visible={!!previewMapComplaintAttachment}
+				attachment={previewMapComplaintAttachment}
+				onClose={() => setPreviewMapComplaintAttachment(null)}
 			/>
 
 			<BottomSheet ref={ref} onClose={onClose}>
@@ -309,116 +267,34 @@ export function ComplaintBottomSheet() {
 				>
 					<BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
 						{/* Info + actions */}
-						<View className={`items-start gap-2.5 px-4`}>
-							<View>
-								<Badge variant="outline" className="w-min">
-									<BadgeText>{complaint.id}</BadgeText>
-								</Badge>
-							</View>
-
-							{/* Title */}
-							{/* <Text
-								className="text-xl font-bold text-gray-900"
-								style={{ fontFamily: "Oswald_700Bold" }}
-								numberOfLines={2}
-							>
-								{typeInfo?.description?.toLocaleUpperCase() ??
-									typeInfo?.label ??
-									complaint.type}
-							</Text> */}
-
-							{/* Badges + distance */}
-							<HStack className="w-full items-center justify-between">
-								<View className="flex-row items-center gap-1.5">
-									{/* <ComplaintTypeChip
-										type={complaint.type as ComplaintType}
-										size="sm"
-									/> */}
-									<ComplaintStatusBadge
-										status={complaint.status as ComplaintStatus}
-										size="sm"
-									/>
-								</View>
-
-								{distanceLabel && (
-									<Badge className="flex-row items-center gap-1 rounded-xl bg-gray-100 px-2 py-1">
-										<BadgeIcon as={MapPinIcon} className="text-gray-500" />
-										<BadgeText className="text-gray-500">
-											{distanceLabel}
-										</BadgeText>
-									</Badge>
-								)}
-							</HStack>
-
-							{address && (
-								<View className="flex-row items-center gap-1.5">
-									<MapPinIcon
-										size={13}
-										color={colors.gray[500]}
-										strokeWidth={2}
-									/>
-									<Text className="flex-1  text-gray-500" numberOfLines={1}>
-										{address}
-									</Text>
-								</View>
-							)}
-
-							<View className="flex-row items-center gap-1.5">
-								<CalendarIcon
-									size={13}
-									color={colors.gray[500]}
-									strokeWidth={2}
-								/>
-								<Text className=" text-gray-500">
-									{dateLabel} • Aberto à{" "}
-									{formatDistanceToNowStrict(complaint.created_at, {
-										locale: ptBR,
-									})}
-								</Text>
-							</View>
-
-							{coords && (
-								<View className="flex-row items-center gap-1.5">
-									<CrosshairIcon
-										size={13}
-										color={colors.gray[500]}
-										strokeWidth={2}
-									/>
-									<Text className=" text-gray-500">{coords}</Text>
-								</View>
-							)}
-
-							{complaint.observations && (
-								<View className="gap-1">
-									<Heading size="sm">Observações</Heading>
-									<Text className="leading-5 text-gray-600">
-										{complaint.observations}
-									</Text>
-								</View>
-							)}
+						<View className="items-start gap-2.5 px-4">
+							<ComplaintDetailsHeader
+								complaint={complaint}
+								userLocation={userLocation}
+							/>
 
 							<HStack className="gap-2">
 								<Heading size="sm">Anexos</Heading>
 								<Badge variant="outline">
-									<BadgeText>{allAttachments.length}</BadgeText>
+									<BadgeText>{allMapComplaintAttachments.length}</BadgeText>
 								</Badge>
 							</HStack>
 
-							{allAttachments.length > 0 && (
+							{allMapComplaintAttachments.length > 0 && (
 								<ScrollView
 									horizontal
 									showsHorizontalScrollIndicator={false}
 									contentContainerClassName="gap-2"
 								>
-									{allAttachments.map(att => {
-										const isSelected = selectedAttachmentId === att.id;
+									{allMapComplaintAttachments.map(att => {
+										const isSelected = selectedMapComplaintAttachmentId === att.id;
 										return (
 											<TouchableOpacity
 												key={att.id}
 												activeOpacity={0.85}
 												onPress={() => {
-													setPreviewAttachment(att);
-													setSelectedAttachmentId(att.id);
+													setPreviewMapComplaintAttachment(att);
+													setSelectedMapComplaintAttachmentId(att.id);
 												}}
 												className="h-[110px] w-[110px] overflow-hidden rounded-lg bg-gray-100"
 												style={

@@ -176,8 +176,6 @@ export default function ComplaintsMapScreen() {
 		}
 	};
 
-	console.log({ latitude: userLocation?.lat, longitude: userLocation?.lon });
-	console.log(appliedFilters);
 	return (
 		<View className="flex-1">
 			<MapView

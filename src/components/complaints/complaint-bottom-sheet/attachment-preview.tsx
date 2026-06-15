@@ -4,19 +4,19 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ImagePreviewViewer } from "@/components/medias-preview/image-preview-viewer";
 import { VideoPreviewPlayer } from "@/components/medias-preview/video-preview-player";
 import { colors } from "@/components/style/colors";
-import type { Attachment } from "./utils";
+import type { MapComplaintMapComplaintAttachment } from "@/libs/types/complaint";
 
-export type AttachmentPreviewProps = {
+export type MapComplaintAttachmentPreviewProps = {
 	visible: boolean;
-	attachment: Attachment | null;
+	attachment: MapComplaintAttachment | null;
 	onClose: () => void;
 };
 
-export function AttachmentPreview({
+export function MapComplaintAttachmentPreview({
 	visible,
 	attachment,
 	onClose,
-}: AttachmentPreviewProps) {
+}: MapComplaintAttachmentPreviewProps) {
 	const insets = useSafeAreaInsets();
 	return (
 		<Modal

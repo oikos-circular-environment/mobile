@@ -1,18 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {
 	AlertCircleIcon,
 	AlertTriangleIcon,
 	BuildingIcon,
-	CalendarIcon,
 	ChevronDownIcon,
 	ImageIcon,
 	InfoIcon,
-	MapPinIcon,
 	X,
 	XIcon,
 } from "lucide-react-native";
@@ -30,7 +26,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker-bottom-sheet";
-import { ComplaintStatusBadge } from "@/components/complaints/filter-components/complaint-status-chip";
+import { ComplaintDetailsHeader } from "@/components/complaints/complaint-details-header";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
@@ -53,12 +49,11 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { compressMedia } from "@/libs/media-compression";
 import {
 	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
+	getV1ComplaintsByIdPublic,
 	patchV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
-import type { ComplaintStatus } from "@/libs/types/complaint";
-import { complaintTypeValues } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 const MIN_ATTACHMENTS = 1;
@@ -83,13 +78,7 @@ const resolutionSchema = z.object({
 type ResolutionFormValues = z.infer<typeof resolutionSchema>;
 
 export default function ComplaintResolutionScreen() {
-	const { id, type, status, address, date } = useLocalSearchParams<{
-		id: string;
-		type: string;
-		status: string;
-		address: string;
-		date: string;
-	}>();
+	const { id } = useLocalSearchParams<{ id: string }>();
 	const insets = useSafeAreaInsets();
 	const { user, isAuthenticated } = useAuthContext();
 	const queryClient = useQueryClient();
@@ -146,17 +135,14 @@ export default function ComplaintResolutionScreen() {
 	const description = watch("description");
 	const charCount = description.length;
 
-	const typeInfo = complaintTypeValues.find(v => v.value === type);
-	const title =
-		typeInfo?.description?.toLocaleUpperCase() ??
-		typeInfo?.label?.toLocaleUpperCase() ??
-		type;
-
-	const dateLabel = date
-		? format(new Date(date), "d 'de' MMMM 'de' yyyy, 'às' HH:mm", {
-				locale: ptBR,
-			})
-		: null;
+	const { data: complaintData } = useQuery({
+		queryKey: ["complaint", "public", id],
+		queryFn: async () => {
+			const res = await getV1ComplaintsByIdPublic({ path: { id: id! } });
+			return res.data;
+		},
+		enabled: !!id,
+	});
 
 	const handlePickMedia = async () => {
 		const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -289,47 +275,8 @@ export default function ComplaintResolutionScreen() {
 						<View className="flex-1 items-center justify-center">
 							<View className="w-8 h-1 bg-gray-500 rounded-sm" />
 						</View>
-						<Text
-							className="text-2xl font-bold text-gray-950"
-							style={{ fontFamily: "Oswald_700Bold" }}
-						>
-							{title}
-						</Text>
-
-						<View className="flex-row items-center gap-1.5">
-							{status && (
-								<ComplaintStatusBadge
-									status={status as ComplaintStatus}
-									size="sm"
-								/>
-							)}
-						</View>
-
-						{!!address && (
-							<View className="flex-row items-center gap-1.5">
-								<MapPinIcon
-									size={13}
-									color={colors.gray[500]}
-									strokeWidth={2}
-								/>
-								<Text
-									className="flex-1 text-sm text-gray-500"
-									numberOfLines={1}
-								>
-									{address}
-								</Text>
-							</View>
-						)}
-
-						{!!dateLabel && (
-							<View className="flex-row items-center gap-1.5">
-								<CalendarIcon
-									size={13}
-									color={colors.gray[500]}
-									strokeWidth={2}
-								/>
-								<Text className="text-sm text-gray-500">{dateLabel}</Text>
-							</View>
+						{complaintData?.complaint && (
+							<ComplaintDetailsHeader complaint={complaintData.complaint} />
 						)}
 					</View>
 

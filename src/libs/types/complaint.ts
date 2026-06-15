@@ -25,6 +25,7 @@ export type ComplaintVoteCounts = Complaint["vote_counts"];
 
 export type MapComplaint =
 	GetV1ComplaintsMapResponses[200]["complaints"][number];
+export type MapComplaintAttachment = MapComplaint["attachments"][number];
 
 export type ComplaintDashboard =
 	GetV1ComplaintsDashboardResponses[200]["dashboard"];
