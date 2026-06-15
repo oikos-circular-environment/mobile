@@ -7,7 +7,6 @@ import {
 	getV1CompaniesByIdServicesResponseTransformer,
 	getV1CompaniesByIdWastesResponseTransformer,
 	getV1CompaniesResponseTransformer,
-	getV1ComplaintsByIdPublicResponseTransformer,
 	getV1ComplaintsByIdResolutionsResponseTransformer,
 	getV1ComplaintsByIdResponseTransformer,
 	getV1ComplaintsByIdVotesResponseTransformer,
@@ -72,9 +71,6 @@ import type {
 	GetV1CompaniesResponses,
 	GetV1ComplaintsByIdData,
 	GetV1ComplaintsByIdErrors,
-	GetV1ComplaintsByIdPublicData,
-	GetV1ComplaintsByIdPublicErrors,
-	GetV1ComplaintsByIdPublicResponses,
 	GetV1ComplaintsByIdResolutionsData,
 	GetV1ComplaintsByIdResolutionsErrors,
 	GetV1ComplaintsByIdResolutionsResponses,
@@ -115,9 +111,9 @@ import type {
 	PatchV1ComplaintsByIdCanceledResponses,
 	PatchV1ComplaintsByIdData,
 	PatchV1ComplaintsByIdErrors,
-	PatchV1ComplaintsByIdResolutionsData,
-	PatchV1ComplaintsByIdResolutionsErrors,
-	PatchV1ComplaintsByIdResolutionsResponses,
+	PatchV1ComplaintsByIdResolutionsByResolutionIdData,
+	PatchV1ComplaintsByIdResolutionsByResolutionIdErrors,
+	PatchV1ComplaintsByIdResolutionsByResolutionIdResponses,
 	PatchV1ComplaintsByIdResolvedData,
 	PatchV1ComplaintsByIdResolvedErrors,
 	PatchV1ComplaintsByIdResolvedResponses,
@@ -761,24 +757,6 @@ export const getV1ComplaintsMap = <ThrowOnError extends boolean = false>(
 	});
 
 /**
- * Get public complaint detail
- */
-export const getV1ComplaintsByIdPublic = <ThrowOnError extends boolean = false>(
-	options: Options<GetV1ComplaintsByIdPublicData, ThrowOnError>,
-) =>
-	(options.client ?? client).get<
-		GetV1ComplaintsByIdPublicResponses,
-		GetV1ComplaintsByIdPublicErrors,
-		ThrowOnError
-	>({
-		responseTransformer: getV1ComplaintsByIdPublicResponseTransformer,
-		responseType: "json",
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/complaints/{id}/public",
-		...options,
-	});
-
-/**
  * Get complaint by id
  *
  * Returns the full complaint data for the authenticated user.
@@ -973,28 +951,6 @@ export const getV1ComplaintsByIdResolutions = <
 	});
 
 /**
- * Update resolution
- */
-export const patchV1ComplaintsByIdResolutions = <
-	ThrowOnError extends boolean = false,
->(
-	options: Options<PatchV1ComplaintsByIdResolutionsData, ThrowOnError>,
-) =>
-	(options.client ?? client).patch<
-		PatchV1ComplaintsByIdResolutionsResponses,
-		PatchV1ComplaintsByIdResolutionsErrors,
-		ThrowOnError
-	>({
-		security: [{ scheme: "bearer", type: "http" }],
-		url: "/v1/complaints/{id}/resolutions",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
-	});
-
-/**
  * Submit resolution
  */
 export const postV1ComplaintsByIdResolutions = <
@@ -1009,6 +965,31 @@ export const postV1ComplaintsByIdResolutions = <
 	>({
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/complaints/{id}/resolutions",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
+ * Update resolution
+ */
+export const patchV1ComplaintsByIdResolutionsByResolutionId = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<
+		PatchV1ComplaintsByIdResolutionsByResolutionIdData,
+		ThrowOnError
+	>,
+) =>
+	(options.client ?? client).patch<
+		PatchV1ComplaintsByIdResolutionsByResolutionIdResponses,
+		PatchV1ComplaintsByIdResolutionsByResolutionIdErrors,
+		ThrowOnError
+	>({
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/complaints/{id}/resolutions/{resolutionId}",
 		...options,
 		headers: {
 			"Content-Type": "application/json",

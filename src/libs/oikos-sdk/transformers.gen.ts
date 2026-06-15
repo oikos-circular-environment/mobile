@@ -5,7 +5,6 @@ import type {
 	GetV1CompaniesByIdServicesResponse,
 	GetV1CompaniesByIdWastesResponse,
 	GetV1CompaniesResponse,
-	GetV1ComplaintsByIdPublicResponse,
 	GetV1ComplaintsByIdResolutionsResponse,
 	GetV1ComplaintsByIdResponse,
 	GetV1ComplaintsByIdVotesResponse,
@@ -323,26 +322,6 @@ export const getV1ComplaintsMapResponseTransformer = async (
 		item.created_at = new Date(item.created_at);
 		return item;
 	});
-	return data;
-};
-
-export const getV1ComplaintsByIdPublicResponseTransformer = async (
-	data: any,
-): Promise<GetV1ComplaintsByIdPublicResponse> => {
-	data.complaint.date = new Date(data.complaint.date);
-	data.complaint.attachments = data.complaint.attachments.map((item: any) => {
-		item.created_at = new Date(item.created_at);
-		return item;
-	});
-	data.complaint.resolutions = data.complaint.resolutions.map((item: any) => {
-		item.attachments = item.attachments.map((item: any) => {
-			item.created_at = new Date(item.created_at);
-			return item;
-		});
-		item.created_at = new Date(item.created_at);
-		return item;
-	});
-	data.complaint.created_at = new Date(data.complaint.created_at);
 	return data;
 };
 

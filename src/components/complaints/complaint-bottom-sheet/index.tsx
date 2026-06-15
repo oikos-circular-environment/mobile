@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import {
 	AlertTriangleIcon,
-	InfoIcon,
+	ArrowRightIcon,
+	LockKeyholeIcon,
 	PlayIcon,
 	PlusIcon,
 } from "lucide-react-native";
@@ -23,9 +25,18 @@ import {
 	type BottomSheetRef,
 	BottomSheetScrollView,
 } from "@/components/ui/bottomsheet";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import {
+	Modal,
+	ModalBackdrop,
+	ModalBody,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+} from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuthContext } from "@/contexts/auth-context";
@@ -37,25 +48,26 @@ import {
 	getV1ComplaintsByIdVotes,
 	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
+import type { MapComplaintAttachment } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 import { ComplaintDetailsHeader } from "../complaint-details-header";
 import { ComplaintVoteButtons } from "../complaint-vote-buttons";
 import { MapComplaintAttachmentPreview } from "./attachment-preview";
 import { ResolutionCard } from "./resolution-card";
 import { ResolutionCardSkeleton } from "./resolution-card-skeleton";
-import type { MapComplaintMapComplaintAttachment } from "@/libs/types/complaint";
 
 export function ComplaintBottomSheet() {
 	const ref = useRef<BottomSheetRef>(null);
-	const [previewMapComplaintAttachment, setPreviewMapComplaintAttachment] = useState<MapComplaintAttachment | null>(
-		null,
-	);
-	const [selectedMapComplaintAttachmentId, setSelectedMapComplaintAttachmentId] = useState<
-		string | null
-	>(null);
+	const [previewMapComplaintAttachment, setPreviewMapComplaintAttachment] =
+		useState<MapComplaintAttachment | null>(null);
+	const [
+		selectedMapComplaintAttachmentId,
+		setSelectedMapComplaintAttachmentId,
+	] = useState<string | null>(null);
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showProfileModal, setShowProfileModal] = useState(false);
-	const { isAuthenticated, needsProfileCompletion, user } = useAuthContext();
+	const [showVoteGuide, setShowVoteGuide] = useState(false);
+	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
 	const { location } = useGeospatial();
 
 	const complaint = useComplaintsStore(s => s.selectedMapComplaint);
@@ -119,9 +131,6 @@ export function ComplaintBottomSheet() {
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", complaintId],
 			});
-			queryClient.invalidateQueries({
-				queryKey: ["complaint", "public", complaintId],
-			});
 			toast.success("Resolução removida.", "Sua resolução foi excluída.");
 		},
 		onError: () => {
@@ -169,6 +178,9 @@ export function ComplaintBottomSheet() {
 	if (!complaint) return null;
 
 	const resolutions = resolutionsData?.resolutions ?? [];
+
+	const showResolutionsLocked =
+		!isAuthenticated && complaint.resolution_count > 0;
 
 	const allMapComplaintAttachments = complaint.attachments;
 
@@ -287,7 +299,8 @@ export function ComplaintBottomSheet() {
 									contentContainerClassName="gap-2"
 								>
 									{allMapComplaintAttachments.map(att => {
-										const isSelected = selectedMapComplaintAttachmentId === att.id;
+										const isSelected =
+											selectedMapComplaintAttachmentId === att.id;
 										return (
 											<TouchableOpacity
 												key={att.id}
@@ -329,14 +342,22 @@ export function ComplaintBottomSheet() {
 								<VStack className="gap-2">
 									<Heading size="sm">Seu voto importa!</Heading>
 									<Alert className="flex-row items-start gap-2 rounded-lg border border-sky-700 bg-sky-50 p-3">
-										<AlertIcon as={InfoIcon} className="text-sky-700" />
+										{/* <AlertIcon as={InfoIcon} className="text-sky-700" /> */}
 										<AlertText className="text-sky-700">
-											Votos trazem uma dinamica, de modo que coloca o poder de
-											decisão nas mãos da sociedade. Você votando ajuda a marcar
-											essa denúncia como resolvida ou não, ajudando assim uma
-											atualização e respostas mais rápida dos orgãos
-											competentes.
+											Compreenda como seu voto ajuda o ecosistema e como
+											funciona nosso sistema de votação e resolução.
 										</AlertText>
+										<Button
+											size="icon"
+											variant="ghost"
+											className="shadown-none"
+											onPress={() => setShowVoteGuide(true)}
+										>
+											<ButtonIcon
+												as={ArrowRightIcon}
+												className="text-sky-700"
+											/>
+										</Button>
 									</Alert>
 								</VStack>
 								<ComplaintVoteButtons
@@ -349,7 +370,12 @@ export function ComplaintBottomSheet() {
 								/>
 
 								<VStack className="w-full gap-2">
-									<Text className="font-bold text-gray-800">Resoluções</Text>
+									<HStack space="md">
+										<Text className="font-bold text-gray-800">Resoluções</Text>
+										<Badge variant="secondary">
+											<BadgeText>{complaint.resolution_count}</BadgeText>
+										</Badge>
+									</HStack>
 									<Alert className="flex-row items-start gap-2 rounded-lg border border-amber-700 bg-amber-50 p-3">
 										<AlertIcon
 											as={AlertTriangleIcon}
@@ -362,29 +388,69 @@ export function ComplaintBottomSheet() {
 										</AlertText>
 									</Alert>
 
-									{isLoadingResolutions ? (
-										<>
-											<ResolutionCardSkeleton />
-											<ResolutionCardSkeleton />
-										</>
-									) : (
-										resolutions.map(resolution => {
-											const isOwnResolution =
-												isAuthenticated &&
-												resolution.resolver_company === null &&
-												resolution.resolver_user_profile.display_name ===
-													user?.profile.display_name;
-											return (
+									<View className="relative my-4">
+										{showResolutionsLocked ? (
+											Array.from({
+												length: Math.min(complaint.resolution_count, 3),
+											}).map((_, i) => <ResolutionCardSkeleton key={i} />)
+										) : isLoadingResolutions ? (
+											<>
+												<ResolutionCardSkeleton />
+												<ResolutionCardSkeleton />
+											</>
+										) : resolutions.length > 0 ? (
+											resolutions.map(resolution => (
 												<ResolutionCard
 													key={resolution.id}
 													resolution={resolution}
-													isOwnResolution={isOwnResolution}
+													isOwnResolution={
+														isAuthenticated && resolution.is_owner
+													}
 													onEdit={() => handleEditResolution(resolution)}
 													onDelete={() => deleteMutation.mutate()}
 												/>
-											);
-										})
-									)}
+											))
+										) : (
+											<Text className="py-4 text-center text-sm text-gray-500">
+												Nenhuma resolução cadastrada para esta denúncia.
+											</Text>
+										)}
+
+										{showResolutionsLocked && (
+											<BlurView
+												intensity={15}
+												tint="light"
+												experimentalBlurMethod="dimezisBlurView"
+												style={{
+													position: "absolute",
+													top: 0,
+													left: 0,
+													right: 0,
+													bottom: 0,
+													alignItems: "center",
+													justifyContent: "center",
+													gap: 12,
+													borderRadius: 8,
+												}}
+											>
+												<LockKeyholeIcon size={16} color={colors.gray[600]} />
+												<Text className="text-center text-sm text-gray-600">
+													É preciso estar autenticado para ver as resoluções
+												</Text>
+												<Button
+													className="bg-lime-800"
+													onPress={() => {
+														onClose();
+														router.push("/(tabs)/(home)/sign-in");
+													}}
+												>
+													<ButtonText className="font-semibold">
+														Registrar-se
+													</ButtonText>
+												</Button>
+											</BlurView>
+										)}
+									</View>
 								</VStack>
 
 								<TouchableOpacity
@@ -417,6 +483,57 @@ export function ComplaintBottomSheet() {
 				onClose={() => setShowProfileModal(false)}
 				description="Para interagir com denúncias você precisa finalizar o seu cadastro."
 			/>
+
+			<Modal
+				isOpen={showVoteGuide}
+				onClose={() => setShowVoteGuide(false)}
+				useRNModal
+			>
+				<ModalBackdrop />
+				<ModalContent className="gap-4">
+					<ModalHeader>
+						<Heading size="xl">Como funciona a votação?</Heading>
+					</ModalHeader>
+					<ModalBody>
+						<VStack className="gap-3">
+							<Text>
+								Qualquer usuário autenticado pode votar se uma denúncia está
+								resolvida ou não. Você pode mudar seu voto a qualquer momento —
+								apenas o último voto é considerado.
+							</Text>
+							<Text>
+								O voto do autor da denúncia tem peso 2, enquanto os demais
+								usuários têm peso 1.
+							</Text>
+							<Divider />
+							<Heading size="sm">Quórum para resolução</Heading>
+							<Text>
+								Para uma denúncia ser marcada como resolvida, a diferença entre
+								os votos a favor e contra precisa ser de no mínimo 5 votos
+								(considerando os pesos).
+							</Text>
+							<Text>
+								Quando esse número é atingido, inicia-se uma janela de 24 horas.
+								Durante esse período, outros usuários ainda podem votar contra e
+								reverter o processo.
+							</Text>
+							<Text>
+								Após 24 horas sem reversão, a denúncia é automaticamente marcada
+								como resolvida. Esse mecanismo garante que a decisão seja justa
+								e reflita o consenso da comunidade.
+							</Text>
+						</VStack>
+					</ModalBody>
+					<ModalFooter>
+						<Button
+							className="flex-1 bg-lime-800"
+							onPress={() => setShowVoteGuide(false)}
+						>
+							<ButtonText className="font-semibold">Entendi</ButtonText>
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
 		</>
 	);
 }

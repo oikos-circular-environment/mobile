@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ImagePreviewViewer } from "@/components/medias-preview/image-preview-viewer";
 import { VideoPreviewPlayer } from "@/components/medias-preview/video-preview-player";
 import { colors } from "@/components/style/colors";
-import type { MapComplaintMapComplaintAttachment } from "@/libs/types/complaint";
+import type { MapComplaintAttachment } from "@/libs/types/complaint";
 
 export type MapComplaintAttachmentPreviewProps = {
 	visible: boolean;

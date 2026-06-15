@@ -49,7 +49,7 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { compressMedia } from "@/libs/media-compression";
 import {
 	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
-	getV1ComplaintsByIdPublic,
+	getV1ComplaintsById,
 	patchV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
@@ -136,10 +136,18 @@ export default function ComplaintResolutionScreen() {
 	const charCount = description.length;
 
 	const { data: complaintData } = useQuery({
-		queryKey: ["complaint", "public", id],
+		queryKey: ["complaint", id],
 		queryFn: async () => {
-			const res = await getV1ComplaintsByIdPublic({ path: { id: id! } });
-			return res.data;
+			const res = await getV1ComplaintsById({ path: { id: id! } });
+			const complaint = res.data?.complaint;
+			if (!complaint) return null;
+			const location = complaint.geospatial?.location?.coords
+				? {
+						lat: complaint.geospatial.location.coords.latitude,
+						lon: complaint.geospatial.location.coords.longitude,
+					}
+				: null;
+			return { complaint: { ...complaint, location } };
 		},
 		enabled: !!id,
 	});
@@ -221,7 +229,7 @@ export default function ComplaintResolutionScreen() {
 			}
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["complaint", "public", id] });
+			queryClient.invalidateQueries({ queryKey: ["complaint", id] });
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", id],
 			});

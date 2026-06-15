@@ -1878,138 +1878,6 @@ export type GetV1ComplaintsMapResponses = {
 export type GetV1ComplaintsMapResponse =
 	GetV1ComplaintsMapResponses[keyof GetV1ComplaintsMapResponses];
 
-export type GetV1ComplaintsByIdPublicData = {
-	body?: never;
-	path: {
-		id: string;
-	};
-	query?: never;
-	url: "/v1/complaints/{id}/public";
-};
-
-export type GetV1ComplaintsByIdPublicErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type GetV1ComplaintsByIdPublicError =
-	GetV1ComplaintsByIdPublicErrors[keyof GetV1ComplaintsByIdPublicErrors];
-
-export type GetV1ComplaintsByIdPublicResponses = {
-	/**
-	 * Default Response
-	 */
-	200: {
-		complaint: {
-			id: string;
-			status: "OPEN" | "RESOLVED" | "CANCELED";
-			date: Date;
-			observations: string | null;
-			geospatial: {
-				heading: {
-					trueHeading: number;
-					magHeading: number;
-					accuracy: number;
-				} | null;
-				location: {
-					coords: {
-						latitude: number;
-						longitude: number;
-						altitude: number | null;
-						accuracy: number | null;
-						altitudeAccuracy: number | null;
-						heading: number | null;
-						speed: number | null;
-					};
-					timestamp: number;
-					mocked?: boolean;
-				};
-				addresses: {
-					city: string | null;
-					district: string | null;
-					streetNumber: string | null;
-					street: string | null;
-					region: string | null;
-					subregion: string | null;
-					country: string | null;
-					postalCode: string | null;
-					name: string | null;
-					isoCountryCode: string | null;
-					timezone: string | null;
-					formattedAddress?: string | null;
-				};
-			};
-			location: {
-				lat: number;
-				lon: number;
-			} | null;
-			attachments: Array<{
-				id: string;
-				url: string;
-				file_name: string;
-				path: string;
-				base64: string;
-				metadata: {
-					[key: string]: unknown;
-				} | null;
-				type: "PHOTO" | "VIDEO";
-				created_at: Date;
-			}>;
-			categories: Array<{
-				id: string;
-				name: string;
-				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
-			}>;
-			vote_counts: {
-				resolved: number;
-				not_resolved: number;
-			};
-			resolutions: Array<{
-				id: string;
-				description: string;
-				resolver:
-					| {
-							type: "company";
-							corporate_name: string;
-							business_name: string;
-							avatar_url: string | null;
-					  }
-					| {
-							type: "profile";
-							full_name: string;
-							display_name: string;
-							avatar_url: string | null;
-					  };
-				attachments: Array<{
-					id: string;
-					url: string;
-					file_name: string;
-					created_at: Date;
-				}>;
-				created_at: Date;
-			}>;
-			created_at: Date;
-		};
-	};
-};
-
-export type GetV1ComplaintsByIdPublicResponse =
-	GetV1ComplaintsByIdPublicResponses[keyof GetV1ComplaintsByIdPublicResponses];
-
 export type GetV1ComplaintsByIdData = {
 	body?: never;
 	path: {
@@ -2695,6 +2563,7 @@ export type GetV1ComplaintsByIdResolutionsResponses = {
 			id: string;
 			description: string;
 			company_id: string | null;
+			is_owner: boolean;
 			resolver_user_profile: {
 				type: "profile";
 				full_name: string;
@@ -2721,58 +2590,6 @@ export type GetV1ComplaintsByIdResolutionsResponses = {
 
 export type GetV1ComplaintsByIdResolutionsResponse =
 	GetV1ComplaintsByIdResolutionsResponses[keyof GetV1ComplaintsByIdResolutionsResponses];
-
-export type PatchV1ComplaintsByIdResolutionsData = {
-	body: {
-		description: string;
-		company_id?: string;
-	};
-	path: {
-		id: string;
-	};
-	query?: never;
-	url: "/v1/complaints/{id}/resolutions";
-};
-
-export type PatchV1ComplaintsByIdResolutionsErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	422: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type PatchV1ComplaintsByIdResolutionsError =
-	PatchV1ComplaintsByIdResolutionsErrors[keyof PatchV1ComplaintsByIdResolutionsErrors];
-
-export type PatchV1ComplaintsByIdResolutionsResponses = {
-	/**
-	 * Default Response
-	 */
-	204: void;
-};
-
-export type PatchV1ComplaintsByIdResolutionsResponse =
-	PatchV1ComplaintsByIdResolutionsResponses[keyof PatchV1ComplaintsByIdResolutionsResponses];
 
 export type PostV1ComplaintsByIdResolutionsData = {
 	body: {
@@ -2825,6 +2642,58 @@ export type PostV1ComplaintsByIdResolutionsResponses = {
 
 export type PostV1ComplaintsByIdResolutionsResponse =
 	PostV1ComplaintsByIdResolutionsResponses[keyof PostV1ComplaintsByIdResolutionsResponses];
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdData = {
+	body: {
+		description: string;
+	};
+	path: {
+		id: string;
+		resolutionId: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions/{resolutionId}";
+};
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	422: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdError =
+	PatchV1ComplaintsByIdResolutionsByResolutionIdErrors[keyof PatchV1ComplaintsByIdResolutionsByResolutionIdErrors];
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdResponses = {
+	/**
+	 * Default Response
+	 */
+	204: void;
+};
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdResponse =
+	PatchV1ComplaintsByIdResolutionsByResolutionIdResponses[keyof PatchV1ComplaintsByIdResolutionsByResolutionIdResponses];
 
 export type PostV1ComplaintsByIdResolutionsAttachmentsData = {
 	body?: never;
