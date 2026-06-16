@@ -616,7 +616,7 @@ export type PostV1CompaniesResponses = {
 	/**
 	 * Default Response
 	 */
-	200: {
+	201: {
 		company: {
 			id: string;
 			user_id: string;

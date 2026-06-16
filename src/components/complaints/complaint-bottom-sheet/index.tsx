@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import {
 	AlertTriangleIcon,
 	ArrowRightIcon,
+	InfoIcon,
 	LockKeyholeIcon,
 	PlayIcon,
 	PlusIcon,
@@ -342,7 +343,7 @@ export function ComplaintBottomSheet() {
 								<VStack className="gap-2">
 									<Heading size="sm">Seu voto importa!</Heading>
 									<Alert className="flex-row items-start gap-2 rounded-lg border border-sky-700 bg-sky-50 p-3">
-										{/* <AlertIcon as={InfoIcon} className="text-sky-700" /> */}
+										<AlertIcon as={InfoIcon} className="text-sky-700" />
 										<AlertText className="text-sky-700">
 											Compreenda como seu voto ajuda o ecosistema e como
 											funciona nosso sistema de votação e resolução.
