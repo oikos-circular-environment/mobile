@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calculator, Trash2 } from "lucide-react-native";
+import { AlertCircleIcon, Calculator, Trash2 } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
@@ -15,18 +15,19 @@ import { DecimalInput, DecimalInputField } from "@/components/ui/decimal-input";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useCompanyDetail } from "@/contexts/company-detail-context";
 import {
 	getMarketCheckoutDraft,
 	type MarketCheckoutItemDraft,
 	type MarketSimulationItemType,
 } from "@/libs/memory/market-simulations";
-import type { MarketCompany } from "@/libs/types/market";
 import { HStack } from "../ui/hstack";
 import { VStack } from "../ui/vstack";
 
@@ -36,7 +37,6 @@ type SimulationSelection = {
 };
 
 type CompanyDetailSimulationTabProps = {
-	company: MarketCompany;
 	selectedItem: SimulationSelection | null;
 };
 
@@ -105,9 +105,9 @@ const simulationSchema = z.object({
 type SimulationFormValues = z.infer<typeof simulationSchema>;
 
 export function CompanyDetailSimulationTab({
-	company,
 	selectedItem,
 }: CompanyDetailSimulationTabProps) {
+	const { company } = useCompanyDetail();
 	const [activeItemType, setActiveItemType] =
 		useState<MarketSimulationItemType>(selectedItem?.itemType ?? "waste");
 	const [selectedCatalogItemId, setSelectedCatalogItemId] = useState(
@@ -294,6 +294,7 @@ export function CompanyDetailSimulationTab({
 									/>
 								</DecimalInput>
 								<FormControlError>
+									<FormControlErrorIcon as={AlertCircleIcon} />
 									<FormControlErrorText>
 										{errors.quantity?.message}
 									</FormControlErrorText>
@@ -392,11 +393,11 @@ export function CompanyDetailSimulationTab({
 									</HStack>
 								</VStack>
 
-								{item.note ? (
+								{item.note && (
 									<Text className="text-xs text-gray-500">
 										Obs.: {item.note}
 									</Text>
-								) : null}
+								)}
 							</Card>
 						</ReanimatedSwipeable>
 					))

@@ -1,6 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
-import { ArrowLeftIcon, Eye, EyeOff } from "lucide-react-native";
+import {
+	AlertCircleIcon,
+	ArrowLeftIcon,
+	Eye,
+	EyeOff,
+} from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -18,6 +23,7 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -51,8 +57,8 @@ export default function SignInScreen() {
 		},
 	});
 
-	const onSubmit = async (data: SignInFormValues) => {
-		await signIn(data);
+	const onSubmit = (data: SignInFormValues) => {
+		signIn(data);
 	};
 
 	return (
@@ -137,6 +143,7 @@ export default function SignInScreen() {
 						/>
 						{errors.email?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.email.message}
 								</FormControlErrorText>
@@ -166,6 +173,7 @@ export default function SignInScreen() {
 									<InputSlot
 										onPress={() => setShowPassword(prev => !prev)}
 										className="pr-1"
+										testID="toggle-password"
 									>
 										<InputIcon
 											as={showPassword ? Eye : EyeOff}
@@ -177,6 +185,7 @@ export default function SignInScreen() {
 						/>
 						{errors.password?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.password.message}
 								</FormControlErrorText>

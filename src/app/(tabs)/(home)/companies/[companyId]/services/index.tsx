@@ -1,0 +1,175 @@
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { HammerIcon, PlusIcon } from "lucide-react-native";
+import { useEffect } from "react";
+import { FlatList, View } from "react-native";
+import { useSaveServices } from "@/components/companies/hooks/use-save-services";
+import { ServiceSkeleton } from "@/components/companies/services/service-skeleton";
+import {
+	type HazardLevelVariant,
+	WasteCategoryHazardLevel,
+} from "@/components/custom/waste-category";
+import { colors } from "@/components/style/colors";
+import { Badge, BadgeText } from "@/components/ui/badge";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { SwipeableCard } from "@/components/ui/swipeable-card";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { useCompaniesStore } from "@/stores/companies-store";
+
+export default function ServicesIndexScreen() {
+	const { companyId } = useLocalSearchParams<{ companyId: string }>();
+	const company = useCompaniesStore(s =>
+		s.companies.find(c => c.id === companyId),
+	);
+	const services = company?.services;
+	const isLoadingServices = useCompaniesStore(s => !s.isLoaded);
+	const router = useRouter();
+
+	const { mutateAsync: saveServices } = useSaveServices(companyId);
+
+	useEffect(() => {
+		if (!isLoadingServices && services && services.length === 0) {
+			router.replace({
+				pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
+				params: { companyId },
+			});
+		}
+	}, [services, isLoadingServices, router, companyId]);
+
+	if (isLoadingServices) {
+		return (
+			<View className="flex-1 bg-white p-4">
+				<ServiceSkeleton />
+			</View>
+		);
+	}
+
+	const handleEdit = (id: string) => {
+		router.push({
+			pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
+			params: { companyId, id },
+		});
+	};
+
+	const handleCreate = () => {
+		router.push({
+			pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
+			params: { companyId },
+		});
+	};
+
+	const handleDelete = async (id: string) => {
+		const remaining = (services ?? [])
+			.filter(s => s.id !== id)
+			.map(s => ({
+				name: s.name,
+				description: s.description ?? null,
+				price: s.price,
+				quantity: s.quantity,
+				unit: s.unit,
+				waste_category_id: s.waste_category_id,
+				observations: s.observations ?? null,
+			}));
+		await saveServices({ services: remaining });
+	};
+
+	return (
+		<FlatList
+			data={services}
+			keyExtractor={item => item.id}
+			contentContainerClassName="flex-1 gap-4 p-4 bg-white"
+			ListHeaderComponent={
+				<VStack space="md">
+					<Card className="bg-gray-100 p-4 shadow-none">
+						<View className="flex-row items-center gap-4">
+							<View className="flex-1 gap-1">
+								<Heading>Serviços</Heading>
+								<Text className="text-sm text-gray-500" selectable>
+									Gerencie os Serviços que a sua empresa coleta.
+								</Text>
+							</View>
+
+							<View className="size-14 items-center justify-center rounded-lg bg-lime-800">
+								<HammerIcon size={24} color={colors.white} strokeWidth={2.25} />
+							</View>
+						</View>
+					</Card>
+
+					<Button
+						testID="btn-new"
+						className="w-full gap-2"
+						onPress={handleCreate}
+					>
+						<PlusIcon size={16} color={colors.white} />
+						<ButtonText>Novo resíduo</ButtonText>
+					</Button>
+
+					<VStack>
+						<Heading size="md">Meus Serviços</Heading>
+						<Text size="sm" className="text-muted-foreground">
+							Clique sobre o resíduo para editar, arraste da direta para
+							esquerda para deletar
+						</Text>
+					</VStack>
+				</VStack>
+			}
+			renderItem={({ item }) => (
+				<SwipeableCard
+					onPress={() => handleEdit(item.id)}
+					onDelete={() => handleDelete(item.id)}
+				>
+					<Card className="shadow-none gap-2">
+						<VStack space="sm">
+							<HStack className="justify-between">
+								<Heading size="sm">{item.name}</Heading>
+								<Text className="font-bold text-primary-600">
+									{new Intl.NumberFormat("pt-BR", {
+										style: "currency",
+										currency: "BRL",
+									}).format(item.price)}
+									<Text size="xs" className="text-muted-foreground">
+										/{item.unit}
+									</Text>
+								</Text>
+							</HStack>
+							{item.description && (
+								<Text
+									size="sm"
+									className="text-muted-foreground text-justify"
+									numberOfLines={2}
+								>
+									{item.description}
+								</Text>
+							)}
+							<View className="flex-row flex-wrap gap-2 mt-2">
+								<Badge variant="secondary">
+									<BadgeText>{item.unit}</BadgeText>
+								</Badge>
+								<Badge variant="secondary">
+									<BadgeText>{item.waste_category.name}</BadgeText>
+								</Badge>
+
+								{item.waste_category.hazard_levels.map(hazard_level => (
+									<WasteCategoryHazardLevel
+										key={`${item.id}-${hazard_level}`}
+										variant={hazard_level.toLowerCase() as HazardLevelVariant}
+									/>
+								))}
+							</View>
+						</VStack>
+					</Card>
+				</SwipeableCard>
+			)}
+			ListEmptyComponent={
+				<View className="items-center justify-center py-8">
+					<Text className="text-muted-foreground">
+						Nenhum servço cadastrado.
+					</Text>
+				</View>
+			}
+		/>
+	);
+}

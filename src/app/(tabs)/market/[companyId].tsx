@@ -1,21 +1,27 @@
 import { format, getDay } from "date-fns";
 import { Stack, useLocalSearchParams } from "expo-router";
+import { SproutIcon } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
 	ActivityIndicator,
+	Image,
 	KeyboardAvoidingView,
 	ScrollView,
 	View,
 } from "react-native";
-import { colors } from "@/components/style/colors";
 import { CompanyDetailGeneralTab } from "@/components/market/company-detail-general-tab";
 import { CompanyDetailSimulationTab } from "@/components/market/company-detail-simulation-tab";
+import { CompanyDetailProvider } from "@/contexts/company-detail-context";
+import { colors } from "@/components/style/colors";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
+import { formatDistance } from "@/libs/format-distance";
 import {
 	getCurrentBusinessHour,
 	isCompanyOpenNow,
@@ -53,6 +59,13 @@ export default function MarketCompanyDetailScreen() {
 		useState<SelectedSimulationItem | null>(null);
 
 	const company = companyId ? getCompanyById(companyId) : undefined;
+	const isOpen = isCompanyOpenNow(company?.business_hours ?? [], currentDate);
+
+	const initials = company?.business_name
+		.split(" ")
+		.slice(0, 2)
+		.map(w => w[0]?.toUpperCase() ?? "")
+		.join("");
 
 	const currentDayOfWeek = dayOfWeekByIndex[getDay(currentDate)];
 
@@ -120,7 +133,17 @@ export default function MarketCompanyDetailScreen() {
 	}
 
 	return (
-		<>
+		<CompanyDetailProvider
+			company={company}
+			isOpenNow={isOpenNow}
+			currentBusinessHour={currentBusinessHour}
+			currentDayLabel={getDayLabel(currentDayOfWeek)}
+			currentTimeLabel={currentTimeLabel}
+			onSelectSimulationItem={(itemType, itemId) => {
+				setSelectedSimulationItem({ itemType, itemId });
+				setActiveTab("simulation");
+			}}
+		>
 			<Stack.Screen
 				options={{ title: company.corporate_name, headerShown: false }}
 			/>
@@ -134,25 +157,50 @@ export default function MarketCompanyDetailScreen() {
 				>
 					<View className="gap-4">
 						<Card className="flex-row gap-2 items-center shadow-none">
-							<View className="h-16 w-16 items-center justify-center rounded-[5px] bg-slate-950">
-								<Text className="text-sm font-semibold text-white">
-									{company.corporate_name
-										.split(" ")
-										.slice(0, 2)
-										.map(word => word[0]?.toUpperCase() ?? "")
-										.join("")}
-								</Text>
-							</View>
+							{company.avatar ? (
+								<View className="w-16 h-16 rounded-lg overflow-hidden">
+									<Image
+										source={{ uri: company.avatar }}
+										className="w-full h-full"
+										resizeMode="cover"
+									/>
+								</View>
+							) : (
+								<View className="w-16 h-16 rounded-lg bg-primary items-center justify-center">
+									{company.company_type === "COLLECTOR" ? (
+										<SproutIcon size={20} className="text-primary-foreground" />
+									) : (
+										<Text className="text-primary-foreground text-sm font-bold">
+											{initials}
+										</Text>
+									)}
+								</View>
+							)}
 
 							<View className="min-w-0 flex-1 justify-center gap-0.5">
-								<Heading className="text-xl text-gray-950">
-									{company.corporate_name}
-								</Heading>
-								{company.business_name ? (
-									<Text className="text-xs text-gray-500">
-										{company.business_name}
-									</Text>
-								) : null}
+								<Heading className="uppercase">{company.business_name}</Heading>
+
+								<Text className="text-xs text-gray-500">
+									{company.identity_type === "CNPJ"
+										? company.identity
+										: "Coletor indepedente"}
+								</Text>
+
+								<HStack space="sm">
+									<Badge variant="secondary">
+										<BadgeText>
+											{formatDistance(company.distance_in_meters)}
+										</BadgeText>
+									</Badge>
+									{company.company_type === "COLLECTOR" && (
+										<Badge variant="default">
+											<BadgeText>Coletor</BadgeText>
+										</Badge>
+									)}
+									<Badge variant={isOpen ? "default" : "destructive"}>
+										<BadgeText>{isOpen ? "Aberto" : "Fechado"}</BadgeText>
+									</Badge>
+								</HStack>
 							</View>
 						</Card>
 
@@ -183,26 +231,15 @@ export default function MarketCompanyDetailScreen() {
 						</Card>
 
 						{activeTab === "general" ? (
-							<CompanyDetailGeneralTab
-								company={company}
-								currentDayLabel={getDayLabel(currentDayOfWeek)}
-								currentTimeLabel={currentTimeLabel}
-								isOpenNow={isOpenNow}
-								currentBusinessHour={currentBusinessHour}
-								onSelectSimulationItem={(itemType, itemId) => {
-									setSelectedSimulationItem({ itemType, itemId });
-									setActiveTab("simulation");
-								}}
-							/>
+							<CompanyDetailGeneralTab />
 						) : (
 							<CompanyDetailSimulationTab
-								company={company}
 								selectedItem={currentSimulationItem}
 							/>
 						)}
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-		</>
+		</CompanyDetailProvider>
 	);
 }

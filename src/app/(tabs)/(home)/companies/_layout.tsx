@@ -1,64 +1,28 @@
 import { Stack } from "expo-router";
-import { UserCompanyProvider } from "@/contexts/user-company-context";
+import { useLoadCompanies } from "@/components/companies/hooks/use-load-companies";
 
 export default function CompaniesLayout() {
+	useLoadCompanies();
+
 	return (
-		<UserCompanyProvider>
-			<Stack
-				screenOptions={{
-					headerBackButtonDisplayMode: "minimal",
+		<Stack
+			screenOptions={{
+				headerBackButtonDisplayMode: "minimal",
+			}}
+		>
+			<Stack.Screen
+				name="index"
+				options={{
+					title: "Minhas Empresas",
+					headerShown: false,
 				}}
-			>
-				<Stack.Screen
-					name="index"
-					options={{
-						title: "Empresa",
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="company"
-					options={{
-						title: "Empresa",
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="address"
-					options={{
-						title: "Endereço",
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="business-hours"
-					options={{
-						title: "Funcionamento",
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="financial-methods"
-					options={{
-						title: "Métodos financeiros",
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="services"
-					options={{
-						title: "Serviços",
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="waste"
-					options={{
-						title: "Resíduos",
-						headerShown: false,
-					}}
-				/>
-			</Stack>
-		</UserCompanyProvider>
+			/>
+			<Stack.Screen
+				name="[companyId]"
+				options={{
+					headerShown: false,
+				}}
+			/>
+		</Stack>
 	);
 }

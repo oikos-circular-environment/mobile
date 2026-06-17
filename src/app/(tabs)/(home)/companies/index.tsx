@@ -1,199 +1,72 @@
-import type { Href } from "expo-router";
-import { Link } from "expo-router";
-import {
-	ArrowRightIcon,
-	Clock8Icon,
-	FactoryIcon,
-	LockKeyholeIcon,
-	type LucideIcon,
-	MapIcon,
-	RecycleIcon,
-	SettingsIcon,
-	WrenchIcon,
-} from "lucide-react-native";
-import { Pressable, ScrollView, View } from "react-native";
+import { useRouter } from "expo-router";
+import { BuildingIcon } from "lucide-react-native";
+import { useCallback } from "react";
+import { FlatList, View } from "react-native";
+import { CompanyCard } from "@/components/companies/company-card";
+import { CompanyCardSkeleton } from "@/components/companies/company-card-skeleton";
+import { CompanyListHeader } from "@/components/companies/company-list-header";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
-import { Heading } from "@/components/ui/heading";
-import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { Text } from "@/components/ui/text";
-import { useUserCompanyContext } from "@/contexts/user-company-context";
+import type { Company } from "@/libs/types/companies";
+import { useCompaniesStore } from "@/stores/companies-store";
 
-type CompanySetting = {
-	title: string;
-	description: string;
-	icon: LucideIcon;
-	href: Href;
-};
+export default function CompaniesListScreen() {
+	const router = useRouter();
 
-const companyOptions: CompanySetting[] = [
-	{
-		title: "Empresa",
-		description: "Informações cadastrais gerais sobre a sua empresa.",
-		icon: FactoryIcon,
-		href: "/(tabs)/(home)/companies/company",
-	},
-	{
-		title: "Endereço",
-		description: "Informe seu endereço para que as pessoas te encontre.",
-		icon: MapIcon,
-		href: "/(tabs)/(home)/companies/address",
-	},
-	{
-		title: "Funcionamento",
-		description: "Informe os dias e horários em que sua empresa está aberta.",
-		icon: Clock8Icon,
-		href: "/(tabs)/(home)/companies/business-hours",
-	},
-	{
-		title: "Serviços",
-		description: "Descreva os serviços que sua empresa oferece ao publico.",
-		icon: WrenchIcon,
-		href: "/(tabs)/(home)/companies/services",
-	},
-	{
-		title: "Gestão de resíduos",
-		description: "Configure como sua empresa lida com os tipos de resíduos.",
-		icon: RecycleIcon,
-		href: "/(tabs)/(home)/companies/waste",
-	},
-];
+	const companies = useCompaniesStore(s => s.companies);
+	const isLoading = useCompaniesStore(s => !s.isLoaded);
 
-// const premiumResources: PremiumResource[] = [
-//   {
-//     title: "Agendamentos",
-//     description: "Acompanhe e gerencie seus agendamentos de forma prática.",
-//     icon: ClipboardClockIcon,
-//   },
-//   {
-//     title: "Rotas",
-//     description:
-//       "Consulte o plano de rotas para otimizar a coleta dos seus resíduos.",
-//     icon: RouteIcon,
-//   },
-// ];
+	const handleSelectCompany = useCallback(
+		(companyId: string) => {
+			router.push({
+				pathname: "/(tabs)/(home)/companies/[companyId]",
+				params: { companyId },
+			});
+		},
+		[router],
+	);
 
-export default function CompaniesHomeScreen() {
-	const { company, completionRate } = useUserCompanyContext();
-	const isCompanyRegistered = company != null;
+	const renderItem = useCallback(
+		({ item }: { item: Company }) => (
+			<CompanyCard
+				company={item}
+				onPress={() => handleSelectCompany(item.id)}
+			/>
+		),
+		[handleSelectCompany],
+	);
+
+	const ListEmpty = useCallback(() => {
+		if (isLoading) {
+			return (
+				<View className="gap-4">
+					<CompanyCardSkeleton />
+					<CompanyCardSkeleton />
+					<CompanyCardSkeleton />
+				</View>
+			);
+		}
+		return (
+			<Card className="items-center gap-2 border-gray-100 p-6 shadow-none">
+				<BuildingIcon size={32} color={colors.gray[400]} strokeWidth={1.5} />
+				<Text className="text-center text-sm text-gray-500">
+					Nenhuma empresa cadastrada.
+				</Text>
+			</Card>
+		);
+	}, [isLoading]);
 
 	return (
-		<ScrollView
-			className="flex-1 bg-white"
-			contentContainerClassName="px-4 pb-8 pt-10"
-		>
-			<View className="gap-8">
-				<Card className="bg-secondary shadow-none">
-					<View className="flex-row items-center justify-between gap-4">
-						<View className="flex-1 gap-1">
-							<Heading className="text-lg">Configurações</Heading>
-							<Text className="text-sm text-muted-foreground leading-4">
-								Preencha as infomações da sua empresa, desta forma você está
-								apto para se expor.
-							</Text>
-						</View>
-
-						<View className="size-12 items-center justify-center rounded-lg bg-primary">
-							<SettingsIcon color={colors.white} size={20} />
-						</View>
-					</View>
-				</Card>
-
-				<View className="gap-2">
-					<View className="flex-row items-center justify-between">
-						<Heading className="text-base">Informações cadastrais</Heading>
-						<Text className="text-xs">{completionRate}%</Text>
-					</View>
-
-					<Progress value={completionRate} className="h-2">
-						<ProgressFilledTrack className="bg-lime-500" />
-					</Progress>
-
-					<View className="gap-2 pt-1">
-						{companyOptions.map((option, index) => {
-							const isLocked = index !== 0 && !isCompanyRegistered;
-
-							const cardContent = (
-								<Card className="shadow-none">
-									<View className="flex-row items-center gap-3">
-										<View className="size-8 items-center justify-center">
-											<option.icon
-												size={28}
-												strokeWidth={1.5}
-												className={
-													isLocked ? "text-muted-foreground" : undefined
-												}
-											/>
-										</View>
-
-										<View className="flex-1">
-											<Text
-												className={`text-lg font-semibold ${isLocked ? "text-muted-foreground" : "text-foreground"}`}
-											>
-												{option.title}
-											</Text>
-											<Text className="text-muted-foreground">
-												{option.description}
-											</Text>
-										</View>
-
-										{isLocked ? (
-											<LockKeyholeIcon
-												size={18}
-												className="text-muted-foreground"
-											/>
-										) : (
-											<ArrowRightIcon size={18} />
-										)}
-									</View>
-								</Card>
-							);
-
-							if (isLocked) {
-								return <View key={option.title}>{cardContent}</View>;
-							}
-
-							return (
-								<Link key={option.title} href={option.href} asChild>
-									<Pressable>{cardContent}</Pressable>
-								</Link>
-							);
-						})}
-					</View>
-				</View>
-
-				{/* <View className="gap-2">
-          <View className="flex-row items-center justify-between">
-            <Heading className="text-base">Recursos premium</Heading>
-            <View className="size-8 items-center justify-center rounded-md bg-primary/10">
-              <CrownIcon color={colors.lime[800]} size={16} />
-            </View>
-          </View>
-
-          <View className="gap-2 pt-1">
-            {premiumResources.map(resource => (
-              <Card key={resource.title} className="shadow-none">
-                <View className="flex-row items-center gap-3">
-                  <View className="size-8 items-center justify-center">
-                    <resource.icon size={28} strokeWidth={1.5} />
-                  </View>
-
-                  <View className="flex-1">
-                    <Text className="text-lg text-foreground font-semibold">
-                      {resource.title}
-                    </Text>
-                    <Text className="text-muted-foreground">
-                      {resource.description}
-                    </Text>
-                  </View>
-
-                  <CrownIcon color={colors.lime[800]} size={16} />
-                </View>
-              </Card>
-            ))}
-          </View>
-        </View> */}
-			</View>
-		</ScrollView>
+		<View className="flex-1 bg-white">
+			<FlatList<Company>
+				data={companies}
+				keyExtractor={item => item.id}
+				contentContainerClassName="gap-4 px-4 py-4 pb-8"
+				ListHeaderComponent={CompanyListHeader}
+				renderItem={renderItem}
+				ListEmptyComponent={ListEmpty}
+			/>
+		</View>
 	);
 }

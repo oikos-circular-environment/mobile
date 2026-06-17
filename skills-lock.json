@@ -1,53 +1,53 @@
 {
-  "version": 1,
-  "skills": {
-    "building-native-ui": {
-      "source": "expo/skills",
-      "sourceType": "github",
-      "computedHash": "342df93f481a0dba919f372d6c7b40d2b4bf5b51dd24363aea2e5d0bae27a6fa"
-    },
-    "dinero-best-practices": {
-      "source": "dinerojs/skills",
-      "sourceType": "github",
-      "skillPath": "skills/dinero-best-practices/SKILL.md",
-      "computedHash": "5782a3167685788e8dbd61cc594af9132e5adf29145d9f796193627093e9ce6c"
-    },
-    "dinero-currency-patterns": {
-      "source": "dinerojs/skills",
-      "sourceType": "github",
-      "skillPath": "skills/dinero-currency-patterns/SKILL.md",
-      "computedHash": "50b60a4c1523f89d64717ca10c8156a7f0e2c28667f1a6d337c31eae3902f48d"
-    },
-    "dinero-formatting": {
-      "source": "dinerojs/skills",
-      "sourceType": "github",
-      "skillPath": "skills/dinero-formatting/SKILL.md",
-      "computedHash": "8f176bd8c9cc2a9b0d587fbbed1f3adf2fb9a66597c75a0bed9721dcaf763594"
-    },
-    "expo-tailwind-setup": {
-      "source": "expo/skills",
-      "sourceType": "github",
-      "computedHash": "d39e806942fe880347f161056729b588a3cb0f1796270eebf52633fe11cfdce1"
-    },
-    "gluestack-ui-v4": {
-      "source": "gluestack/agent-skills",
-      "sourceType": "github",
-      "computedHash": "5f00d8934fef415e31bbae36b1cb8bfe59452eeff0e48dea27172d620a00c612"
-    },
-    "native-data-fetching": {
-      "source": "expo/skills",
-      "sourceType": "github",
-      "computedHash": "6c14e4efb34a9c4759e8b959f82dec328f87dd89a022957c6737086984b9b106"
-    },
-    "tailwind-design-system": {
-      "source": "wshobson/agents",
-      "sourceType": "github",
-      "computedHash": "7ff2f4650597e98ca4cd8f01231fb432ab4d187d6b12e641485aa871a04448cc"
-    },
-    "vercel-react-native-skills": {
-      "source": "vercel-labs/agent-skills",
-      "sourceType": "github",
-      "computedHash": "2e9088a7333666d8c2833b8ff58bd51b955501c42b4c7244f72b4cbf22dafcc4"
-    }
-  }
+	"version": 1,
+	"skills": {
+		"building-native-ui": {
+			"source": "expo/skills",
+			"sourceType": "github",
+			"computedHash": "342df93f481a0dba919f372d6c7b40d2b4bf5b51dd24363aea2e5d0bae27a6fa"
+		},
+		"dinero-best-practices": {
+			"source": "dinerojs/skills",
+			"sourceType": "github",
+			"skillPath": "skills/dinero-best-practices/SKILL.md",
+			"computedHash": "5782a3167685788e8dbd61cc594af9132e5adf29145d9f796193627093e9ce6c"
+		},
+		"dinero-currency-patterns": {
+			"source": "dinerojs/skills",
+			"sourceType": "github",
+			"skillPath": "skills/dinero-currency-patterns/SKILL.md",
+			"computedHash": "50b60a4c1523f89d64717ca10c8156a7f0e2c28667f1a6d337c31eae3902f48d"
+		},
+		"dinero-formatting": {
+			"source": "dinerojs/skills",
+			"sourceType": "github",
+			"skillPath": "skills/dinero-formatting/SKILL.md",
+			"computedHash": "8f176bd8c9cc2a9b0d587fbbed1f3adf2fb9a66597c75a0bed9721dcaf763594"
+		},
+		"expo-tailwind-setup": {
+			"source": "expo/skills",
+			"sourceType": "github",
+			"computedHash": "d39e806942fe880347f161056729b588a3cb0f1796270eebf52633fe11cfdce1"
+		},
+		"gluestack-ui-v4": {
+			"source": "gluestack/agent-skills",
+			"sourceType": "github",
+			"computedHash": "5f00d8934fef415e31bbae36b1cb8bfe59452eeff0e48dea27172d620a00c612"
+		},
+		"native-data-fetching": {
+			"source": "expo/skills",
+			"sourceType": "github",
+			"computedHash": "6c14e4efb34a9c4759e8b959f82dec328f87dd89a022957c6737086984b9b106"
+		},
+		"tailwind-design-system": {
+			"source": "wshobson/agents",
+			"sourceType": "github",
+			"computedHash": "7ff2f4650597e98ca4cd8f01231fb432ab4d187d6b12e641485aa871a04448cc"
+		},
+		"vercel-react-native-skills": {
+			"source": "vercel-labs/agent-skills",
+			"sourceType": "github",
+			"computedHash": "2e9088a7333666d8c2833b8ff58bd51b955501c42b4c7244f72b4cbf22dafcc4"
+		}
+	}
 }

@@ -1,89 +1,423 @@
-"use client";
-
-import { useFocusEffect } from "expo-router";
-import { ShieldIcon } from "lucide-react-native";
-import { useCallback } from "react";
-import { FlatList, View } from "react-native";
+import { router } from "expo-router";
 import {
-	ComplaintCard,
-	ComplaintCardSkeleton,
-} from "@/components/complaints/complaint-card";
-import { ComplaintListHeader } from "@/components/complaints/complaint-list-header";
+	ListIcon,
+	LocateFixedIcon,
+	MapIcon,
+	MapPinnedIcon,
+	MinusIcon,
+	PlusIcon,
+	Trash2Icon,
+} from "lucide-react-native";
+import { useEffect, useRef, useState } from "react";
+import { Image, Platform, TouchableOpacity, View } from "react-native";
+import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AuthModal } from "@/components/auth/auth-modal";
+import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
+import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
+import {
+	type BottomSheetRef,
+	ComplaintFilterBottomSheet,
+	DEFAULT_FILTERS,
+	type FilterState,
+	RADIUS_OPTIONS,
+} from "@/components/complaints/complaint-filter-bottom-sheet";
+import { ComplaintFilterRow } from "@/components/complaints/complaint-pressable-filter";
+import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
+import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
 import { Spinner } from "@/components/ui/spinner";
-import { Text } from "@/components/ui/text";
-import type { ApiComplaint } from "@/contexts/complaints-context";
-import { useComplaintsContext } from "@/contexts/complaints-context";
+import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
+import { cn } from "@/libs/utils";
 
-export default function ComplaintsScreen() {
+const controlShadow = {
+	shadowColor: colors.black,
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.15,
+	shadowRadius: 3,
+	elevation: 3,
+};
+
+export default function ComplaintsMapScreen() {
+	const insets = useSafeAreaInsets();
+	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
+	const { location } = useGeospatial();
+	const mapRef = useRef<MapView>(null);
+	const filterSheetRef = useRef<BottomSheetRef>(null);
+	const hasAnimatedRef = useRef(false);
+	const suppressMapPressRef = useRef(false);
+
+	const userLocation = location
+		? { lat: location.coords.latitude, lon: location.coords.longitude }
+		: null;
+
+	const { categories } = useWasteCategories();
+
+	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [showProfileModal, setShowProfileModal] = useState(false);
+	const [mapHeading, setMapHeading] = useState(0);
+	const [showUserLocation, setShowUserLocation] = useState(false);
+
+	const [appliedFilters, setAppliedFilters] =
+		useState<FilterState>(DEFAULT_FILTERS);
+	const [draftFilters, setDraftFilters] =
+		useState<FilterState>(DEFAULT_FILTERS);
+
+	const hazardLevelForApi = appliedFilters.hazardLevel.toUpperCase() as
+		| "ALL"
+		| "LOW"
+		| "MEDIUM"
+		| "HIGH"
+		| "VERY_HIGH";
+
 	const {
-		filteredComplaints,
-		isLoadingComplaints,
-		refetchAll,
-		fetchNextPage,
-		hasNextPage,
-		isFetchingNextPage,
-	} = useComplaintsContext();
+		complaints,
+		isLoadingMap,
+		selectedMapComplaint,
+		setSelectedMapComplaint,
+	} = useComplaintsMap({
+		userLocation,
+		status: appliedFilters.status,
+		wasteCategoryId: appliedFilters.category?.id ?? "ALL",
+		hazardLevel: hazardLevelForApi,
+		radius: appliedFilters.radius,
+	});
 
-	useFocusEffect(
-		useCallback(() => {
-			refetchAll();
-		}, [refetchAll]),
-	);
-
-	const renderItem = useCallback(
-		({ item }: { item: ApiComplaint }) => <ComplaintCard complaint={item} />,
-		[],
-	);
-
-	const ListEmpty = useCallback(() => {
-		if (isLoadingComplaints) {
-			return (
-				<View className="gap-4">
-					<ComplaintCardSkeleton />
-					<ComplaintCardSkeleton />
-					<ComplaintCardSkeleton />
-				</View>
-			);
-		}
-		return (
-			<Card className="items-center gap-2 border-gray-100 p-6 shadow-none">
-				<ShieldIcon size={32} color={colors.gray[400]} strokeWidth={1.5} />
-				<Text className="text-center text-sm text-gray-500">
-					Nenhuma denúncia encontrada.
-				</Text>
-			</Card>
+	useEffect(() => {
+		if (!location || hasAnimatedRef.current) return;
+		hasAnimatedRef.current = true;
+		mapRef.current?.animateToRegion(
+			{
+				latitude: location.coords.latitude,
+				longitude: location.coords.longitude,
+				latitudeDelta: 0.04,
+				longitudeDelta: 0.04,
+			},
+			600,
 		);
-	}, [isLoadingComplaints]);
+	}, [location]);
 
-	const ListFooter = useCallback(() => {
-		if (!isFetchingNextPage) return null;
-		return (
-			<View className="items-center py-4">
-				<Spinner />
-			</View>
+	const handleOpenFilterSheet = () => {
+		setDraftFilters(appliedFilters);
+		filterSheetRef.current?.open();
+	};
+
+	const handleApplyFilters = () => {
+		setAppliedFilters(draftFilters);
+		filterSheetRef.current?.close();
+	};
+
+	const handleClearFilters = () => {
+		setAppliedFilters(DEFAULT_FILTERS);
+		setDraftFilters(DEFAULT_FILTERS);
+		filterSheetRef.current?.close();
+	};
+
+	const handleMarkerPress = (complaint: MapComplaint) => {
+		suppressMapPressRef.current = true;
+		setSelectedMapComplaint(
+			selectedMapComplaint?.id === complaint.id ? null : complaint,
 		);
-	}, [isFetchingNextPage]);
+		setTimeout(() => {
+			suppressMapPressRef.current = false;
+		}, 100);
+	};
 
-	const handleEndReached = useCallback(() => {
-		if (hasNextPage && !isFetchingNextPage) {
-			fetchNextPage();
+	const handleClosePanel = () => {
+		if (suppressMapPressRef.current) return;
+		setSelectedMapComplaint(null);
+	};
+
+	const handleZoomIn = async () => {
+		const camera = await mapRef.current?.getCamera();
+		if (!camera) return;
+		mapRef.current?.animateCamera({
+			zoom: (camera.zoom ?? 14) + 1,
+			altitude: (camera.altitude ?? 1000) / 2,
+		});
+	};
+
+	const handleZoomOut = async () => {
+		const camera = await mapRef.current?.getCamera();
+		if (!camera) return;
+		mapRef.current?.animateCamera({
+			zoom: (camera.zoom ?? 14) - 1,
+			altitude: (camera.altitude ?? 1000) * 2,
+		});
+	};
+
+	const handleGoToLocation = () => {
+		if (!location) return;
+		mapRef.current?.animateToRegion(
+			{
+				latitude: location.coords.latitude,
+				longitude: location.coords.longitude,
+				latitudeDelta: 0.02,
+				longitudeDelta: 0.02,
+			},
+			600,
+		);
+	};
+
+	const handleResetNorth = () => {
+		mapRef.current?.animateCamera({ heading: 0 }, { duration: 300 });
+		setMapHeading(0);
+	};
+
+	const handleRegionChangeComplete = async () => {
+		const camera = await mapRef.current?.getCamera();
+		if (camera?.heading !== undefined) {
+			setMapHeading(camera.heading);
 		}
-	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+	};
 
 	return (
-		<View className="flex-1 bg-white">
-			<FlatList<ApiComplaint>
-				contentContainerClassName="gap-4 px-4 py-4 pb-8"
-				data={filteredComplaints}
-				keyExtractor={item => item.id}
-				renderItem={renderItem}
-				ListHeaderComponent={ComplaintListHeader}
-				ListEmptyComponent={ListEmpty}
-				ListFooterComponent={ListFooter}
-				onEndReached={handleEndReached}
-				onEndReachedThreshold={0.3}
+		<View className="flex-1">
+			<MapView
+				ref={mapRef}
+				style={{ flex: 1 }}
+				provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+				showsUserLocation={showUserLocation}
+				showsMyLocationButton={false}
+				showsCompass={false}
+				onPress={handleClosePanel}
+				onRegionChangeComplete={handleRegionChangeComplete}
+			>
+				{userLocation && (
+					<Circle
+						key={`${userLocation.lat}-${userLocation.lon}-${appliedFilters.radius}`}
+						center={{ latitude: userLocation.lat, longitude: userLocation.lon }}
+						radius={appliedFilters.radius}
+						strokeColor={colors.lime[500]}
+						strokeWidth={2}
+						fillColor="rgba(63, 98, 18, 0.1)"
+					/>
+				)}
+				{complaints.map(complaint => {
+					if (!complaint.location) return null;
+
+					const pinColor = colors.amber[500];
+					const isSelected = selectedMapComplaint?.id === complaint.id;
+					const Icon = Trash2Icon;
+					return (
+						<Marker
+							key={complaint.id}
+							coordinate={{
+								latitude: complaint.location.lat,
+								longitude: complaint.location.lon,
+							}}
+							onPress={() => handleMarkerPress(complaint)}
+							tracksViewChanges={false}
+						>
+							<View
+								className="w-12 h-12 rounded-full items-center justify-center border-white"
+								style={{
+									backgroundColor: pinColor,
+									borderWidth: isSelected ? 2 : 1,
+									shadowColor: colors.black,
+									shadowOffset: { width: 0, height: 2 },
+									shadowOpacity: 0.35,
+									shadowRadius: 3,
+								}}
+							>
+								{Icon && (
+									<Icon
+										size={isSelected ? 18 : 15}
+										color={colors.white}
+										strokeWidth={2.5}
+									/>
+								)}
+							</View>
+						</Marker>
+					);
+				})}
+			</MapView>
+
+			{/* Filter row */}
+			<View
+				className="absolute left-0 right-0 px-4"
+				style={{ top: 32 }}
+				pointerEvents="box-none"
+			>
+				<ComplaintFilterRow
+					status={appliedFilters.status}
+					categoryName={appliedFilters.category?.name ?? null}
+					hazardLevel={appliedFilters.hazardLevel}
+					radiusLabel={
+						RADIUS_OPTIONS.find(o => o.value === appliedFilters.radius)
+							?.label ?? "10 km"
+					}
+					onPress={handleOpenFilterSheet}
+				/>
+			</View>
+
+			{/* Loading indicator */}
+			{isLoadingMap && (
+				<View
+					className="absolute self-center items-center justify-center"
+					style={{ top: insets.top + 100 }}
+					pointerEvents="none"
+				>
+					<Card>
+						<HStack className="gap-2">
+							<Heading>Carregando denúncias</Heading>
+							<Spinner size="small" />
+						</HStack>
+					</Card>
+				</View>
+			)}
+
+			{/* Map controls — right side, vertically centered */}
+			<View
+				className="absolute right-4 gap-2 justify-center"
+				style={{
+					top: 0,
+					bottom: 0,
+				}}
+				pointerEvents="box-none"
+			>
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={handleZoomIn}
+					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+					style={controlShadow}
+				>
+					<PlusIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={handleZoomOut}
+					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+					style={controlShadow}
+				>
+					<MinusIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={() => setShowUserLocation(v => !v)}
+					className={cn(
+						"h-11 w-11 items-center justify-center rounded-xl",
+						showUserLocation ? "bg-lime-800" : "bg-white",
+					)}
+					style={controlShadow}
+				>
+					{showUserLocation ? (
+						<MapPinnedIcon size={18} color={colors.white} strokeWidth={2.2} />
+					) : (
+						<MapIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
+					)}
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={handleResetNorth}
+					className="h-11 w-11 items-center justify-center rounded-xl bg-primary"
+					style={controlShadow}
+				>
+					<Image
+						source={require("@/assets/images/compass.png")}
+						style={{
+							width: 28,
+							height: 28,
+							transform: [{ rotate: `${-mapHeading}deg` }],
+						}}
+					/>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.85}
+					onPress={handleGoToLocation}
+					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+					style={controlShadow}
+				>
+					<LocateFixedIcon
+						size={18}
+						color={colors.gray[700]}
+						strokeWidth={2.2}
+					/>
+				</TouchableOpacity>
+			</View>
+
+			{/* FABs */}
+			<View
+				className="absolute bottom-4 right-4 flex-row gap-2 items-center"
+				style={{ bottom: insets.bottom }}
+				pointerEvents="box-none"
+			>
+				<TouchableOpacity
+					activeOpacity={0.9}
+					onPress={() => {
+						if (!isAuthenticated) {
+							setShowAuthModal(true);
+							return;
+						}
+						if (needsProfileCompletion) {
+							setShowProfileModal(true);
+							return;
+						}
+						router.push("/(tabs)/complaints/list");
+					}}
+					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
+					style={{
+						shadowColor: colors.black,
+						shadowOffset: { width: 0, height: 2 },
+						shadowOpacity: 0.18,
+						shadowRadius: 4,
+						elevation: 4,
+					}}
+				>
+					<ListIcon size={20} color={colors.gray[700]} strokeWidth={2} />
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.9}
+					onPress={() => {
+						if (!isAuthenticated) {
+							setShowAuthModal(true);
+							return;
+						}
+						if (needsProfileCompletion) {
+							setShowProfileModal(true);
+							return;
+						}
+						router.push("/(tabs)/complaints/(create)");
+					}}
+					className="h-[50px] w-[50px] items-center justify-center rounded-[14px] bg-lime-800"
+					style={{
+						shadowColor: colors.black,
+						shadowOffset: { width: 0, height: 2 },
+						shadowOpacity: 0.25,
+						shadowRadius: 4,
+						elevation: 4,
+					}}
+				>
+					<PlusIcon size={24} color={colors.white} strokeWidth={2.2} />
+				</TouchableOpacity>
+			</View>
+
+			<AuthModal
+				isOpen={showAuthModal}
+				onClose={() => setShowAuthModal(false)}
+			/>
+			<ProfileCompletionModal
+				isOpen={showProfileModal}
+				onClose={() => setShowProfileModal(false)}
+				description="Para visualizar e registrar denúncias você precisa finalizar o seu cadastro."
+			/>
+
+			<ComplaintFilterBottomSheet
+				ref={filterSheetRef}
+				filters={draftFilters}
+				categories={categories}
+				onFiltersChange={setDraftFilters}
+				onApply={handleApplyFilters}
+				onClear={handleClearFilters}
 			/>
 		</View>
 	);

@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react-native";
+import { AlertCircleIcon, ArrowLeft, Eye, EyeOff } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -18,6 +18,7 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -28,13 +29,13 @@ import { useAuthContext } from "@/contexts/auth-context";
 
 const signUpSchema = z
 	.object({
-		email: z.string().email("Digite um e-mail válido."),
+		email: z.email("Digite um e-mail válido."),
 		password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
-		confirmPassword: z.string(),
+		confirm_password: z.string(),
 	})
-	.refine(data => data.password === data.confirmPassword, {
+	.refine(data => data.password === data.confirm_password, {
 		message: "As senhas não coincidem.",
-		path: ["confirmPassword"],
+		path: ["confirm_password"],
 	});
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
@@ -55,12 +56,12 @@ export default function SignUpScreen() {
 		defaultValues: {
 			email: "",
 			password: "",
-			confirmPassword: "",
+			confirm_password: "",
 		},
 	});
 
-	const onSubmit = async (data: SignUpFormValues) => {
-		await signUp(data);
+	const onSubmit = (data: SignUpFormValues) => {
+		signUp(data);
 	};
 
 	return (
@@ -144,6 +145,7 @@ export default function SignUpScreen() {
 						/>
 						{errors.email?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.email.message}
 								</FormControlErrorText>
@@ -173,6 +175,7 @@ export default function SignUpScreen() {
 									<InputSlot
 										onPress={() => setShowPassword(prev => !prev)}
 										className="pr-1"
+										testID="toggle-password"
 									>
 										<InputIcon
 											as={showPassword ? Eye : EyeOff}
@@ -184,6 +187,7 @@ export default function SignUpScreen() {
 						/>
 						{errors.password?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
 									{errors.password.message}
 								</FormControlErrorText>
@@ -191,7 +195,7 @@ export default function SignUpScreen() {
 						)}
 					</FormControl>
 
-					<FormControl isInvalid={!!errors.confirmPassword} className="gap-2">
+					<FormControl isInvalid={!!errors.confirm_password} className="gap-2">
 						<FormControlLabel>
 							<FormControlLabelText className="text-gray-500 font-medium">
 								Confirmar Senha
@@ -199,7 +203,7 @@ export default function SignUpScreen() {
 						</FormControlLabel>
 						<Controller
 							control={control}
-							name="confirmPassword"
+							name="confirm_password"
 							render={({ field: { onChange, onBlur, value } }) => (
 								<Input>
 									<InputField
@@ -213,6 +217,7 @@ export default function SignUpScreen() {
 									<InputSlot
 										onPress={() => setShowConfirmPassword(prev => !prev)}
 										className="pr-1"
+										testID="toggle-confirm-password"
 									>
 										<InputIcon
 											as={showPassword ? Eye : EyeOff}
@@ -222,10 +227,11 @@ export default function SignUpScreen() {
 								</Input>
 							)}
 						/>
-						{errors.confirmPassword?.message && (
+						{errors.confirm_password?.message && (
 							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
 								<FormControlErrorText>
-									{errors.confirmPassword.message}
+									{errors.confirm_password.message}
 								</FormControlErrorText>
 							</FormControlError>
 						)}

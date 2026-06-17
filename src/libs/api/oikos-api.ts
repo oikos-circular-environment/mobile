@@ -1,5 +1,4 @@
 import { AxiosError } from "axios";
-import { Platform } from "react-native";
 import { client } from "../oikos-sdk/client.gen";
 import {
 	clearTokens,
@@ -12,14 +11,13 @@ import {
 } from "../storage";
 
 // Development
-const baseURL = Platform.select({
-	ios: "http://192.168.18.44:3333",
-	android: "http://10.0.2.2:3333",
-});
+// const baseURL = Platform.select({
+// 	ios: "http://192.168.18.44:3333",
+// 	android: "http://10.0.2.2:3333",
+// });
 
-// Production / ngrok
-// const baseURL =
-// 	"https://d0a7-2804-250c-1049-6500-8680-5e29-2a6b-ba24.ngrok-free.app";
+// Production
+const baseURL = process.env.EXPO_PUBLIC_BASE_URL;
 
 client.setConfig({ baseURL, throwOnError: true });
 

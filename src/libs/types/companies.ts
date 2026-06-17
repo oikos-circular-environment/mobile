@@ -1,31 +1,14 @@
-import type { Address } from "./address";
-import type { BusinessHour } from "./business-hour";
-import type { Service } from "./service";
+import type { GetV1CompaniesResponses } from "@/libs/oikos-sdk";
 import type { ValueMapping } from "./value-mapping";
-import type { Waste } from "./waste";
 
-export type IdentityType = "CPF" | "CNPJ";
-
-export type CompanyType = "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
-
-export type Company = {
-	id: string;
-	identity: string;
-	identity_type: IdentityType;
-	company_type: CompanyType;
-	status: boolean; // Ativo ou Inativo
-	isHeadquarters: boolean; // Matriz ou Filial
-	business_name: string | null; // Nome Fantasia
-	corporate_name: string; // Razão Social
-	accept_appointments: boolean; // Aceita agendamentos
-	email: string | null;
-	phones: string[] | null;
-	address: Address | null;
-	started_activity_in: Date;
-	businessHours: BusinessHour[] | null; // Horário de funcionamento
-	waste: Waste[] | null; // Resíduos que a empresa trabalha
-	services: Service[] | null; // Serviços que a empresa oferece
-};
+export type Company = GetV1CompaniesResponses[200]["companies"][number];
+export type CompanyType = Company["company_type"];
+export type IdentityType = Company["identity_type"];
+export type CompanyAddress = NonNullable<Company["address"]>;
+export type CompanyBusinessHour = Company["business_hours"][number];
+export type CompanyTimeSlot = CompanyBusinessHour["time_slots"][number];
+export type CompanyWaste = Company["wastes"][number];
+export type CompanyService = Company["services"][number];
 
 export const companyTypeOptions: ValueMapping<CompanyType>[] = [
 	{ value: "ONG", label: "ONG" },

@@ -11,9 +11,32 @@ npm run ios            # Run on iOS simulator/device
 npm run lint           # Lint with Biome (auto-fixes in place)
 npm run format         # Format code with Biome
 npm run generate:api   # Regenerate API SDK from OpenAPI spec (requires backend running on localhost:3333)
+npm test               # Run Jest tests
+npm run test:coverage  # Run Jest with coverage report
 ```
 
-No test suite is configured.
+## Testing
+
+**Stack**: Jest (via `jest-expo` preset) + React Native Testing Library (RNTL v14).
+
+Tests live in `src/tests/` — **never** inside `src/app/` or alongside components:
+- `src/tests/component/` — component tests (rendered in isolation)
+- `src/tests/integration/` — integration tests (multiple components/contexts together)
+
+# React Native Testing Library in this project
+
+This project uses `@testing-library/react-native` v14. Its APIs differ from older versions.
+Before writing or changing RNTL tests, read the relevant guide in
+`node_modules/@testing-library/react-native/docs/`, starting with
+`node_modules/@testing-library/react-native/docs/guides/llm-guidelines.md`.
+Prefer those package docs over training-data assumptions, and follow deprecation notices.
+
+Key conventions (from RNTL v14 docs):
+- `render()` is **async** — always `await render(<Component />)`
+- Use `screen` object, not destructuring from `render()`
+- Prefer `userEvent` over `fireEvent`; use `jest.useFakeTimers()` in `beforeEach` to avoid 130ms press delays
+- `findBy*` for async elements; `queryBy*` ONLY for non-existence checks
+- Matchers (`toBeOnTheScreen`, `toBeDisabled`, etc.) auto-extend — no setup needed
 
 ## Architecture
 
@@ -41,7 +64,7 @@ No test suite is configured.
 These rules are enforced project-wide (`.github/copilot-instructions.md`):
 
 - **Components**: Use `gluestack-ui v5`. Prefer Gluestack primitives over raw React Native ones. All Gluestack wrappers live in `src/components/ui/`.
-- **Styling**: Use `NativeWind` (`className` prop). No inline styles unless strictly necessary.
+- **Styling**: Use `NativeWind` (`className` prop). No inline styles unless strictly necessary. Any `className` with conditional logic **must** use `cn` from `@/libs/utils` — never template literals (e.g. `` `base ${cond ? "a" : "b"}` ``). Use `cn("base", cond && "modifier")` or `cn("base", cond ? "a" : "b")`.
 - **Theme**: Primary color is `lime-800`. Do not introduce competing primary palettes.
 - **Icons**: Use `lucide-react-native` exclusively.
 - **Navigation**: Bottom tabs via `@react-navigation/bottom-tabs`. The main nav has 5 fixed actions: `market`, `complaints`, `home`, `donations`, `learn`. New screens must integrate without changing this structure.
@@ -67,3 +90,19 @@ These rules are enforced project-wide (`.github/copilot-instructions.md`):
 | Animation | `react-native-reanimated` + `@legendapp/motion` |
 | Haptics | `expo-haptics` |
 | Class merging | `clsx` + `tailwind-merge` |
+
+## Pencil design file
+
+The design source of truth is `pencil/oikos-pencil.pen` — read/edit it only through the Pencil MCP tools.
+
+**Document conventions**:
+- Screens are named after their expo-router route (e.g. `market/index`, `complaints/(create)/camera`). Screens without an implemented route get the `(proposta)` suffix.
+- Each feature lives in a top-level flow frame (`Market Flow`, `Complaints Flow`, `Auth Flow`...). Never leave loose nodes at the document root.
+- All master components live inside the `Oikos Design System` frame, named in PascalCase after the React component that implements them (`TabBar`, `FilterChip`, `CompanyCard`).
+- Every flow and master component carries a `context` property: purpose + corresponding code path.
+
+**Componentization rules (mandatory when designing)**:
+1. Before drawing, list existing components (`batch_get` with `reusable: true`) and reuse them via `ref` instances with overrides — never copy or redraw an existing pattern.
+2. Any UI that appears 2+ times (cards, chips, list rows) must first be created as a master component in the Design System, then instanced in screens.
+3. Variants (active/inactive, open/closed, collector/company) are instance overrides via `descendants` — not new components.
+4. Use the document variables (`$lime-*`, `$gray-*`, `$spacing-*`, `$radius-*`) instead of hardcoded values.

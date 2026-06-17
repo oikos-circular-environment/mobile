@@ -69,7 +69,7 @@ type BottomSheetContextValue = {
   currentIndex: number;
 };
 
-const BottomSheetContext = createContext<BottomSheetContextValue>({
+export const BottomSheetContext = createContext<BottomSheetContextValue>({
   bottomSheetRef: { current: null! },
   handleClose: () => { },
   handleOpen: () => { },
@@ -112,6 +112,7 @@ export const BottomSheet = forwardRef<BottomSheetRef, IBottomSheetRootProps>(
 
     const handleClose = useCallback(() => {
       Keyboard.dismiss();
+      setIsVisible(false);
       setCurrentIndex(-1);
     }, []);
 
@@ -193,6 +194,9 @@ type IBottomSheetPortalProps = Omit<
   className?: string;
   backgroundClassName?: string;
   handleIndicatorClassName?: string;
+  /** Render the sheet inline (no Overlay portal). Use inside modal screens to
+   *  avoid z-index conflicts with the native modal layer. */
+  disablePortal?: boolean;
 };
 
 export const BottomSheetPortal = ({
@@ -203,6 +207,7 @@ export const BottomSheetPortal = ({
   enableDynamicSizing = false,
   snapPoints,
   onChange,
+  disablePortal = false,
   ...props
 }: IBottomSheetPortalProps) => {
   const { bottomSheetRef, handleSheetChanges, isVisible, currentIndex } =
@@ -222,28 +227,34 @@ export const BottomSheetPortal = ({
       ? Math.min(currentIndex, memoizedSnapPoints.length - 1)
       : currentIndex;
 
+  const sheet = (
+    <StyledGorhomBottomSheet
+      ref={bottomSheetRef}
+      snapPoints={memoizedSnapPoints}
+      index={validIndex}
+      enableDynamicSizing={enableDynamicSizing}
+      onChange={(idx) => {
+        handleSheetChanges(idx);
+        onChange?.(idx);
+      }}
+      enablePanDownToClose={enablePanDownToClose}
+      // @ts-ignore
+      className={className}
+      // @ts-ignore
+      backgroundClassName={`${backgroundClassName} bg-background border border-border/90 rounded-xl`}
+      // @ts-ignore
+      handleIndicatorClassName={`${handleIndicatorClassName} bg-primary`}
+      {...props}
+    >
+      {props.children}
+    </StyledGorhomBottomSheet>
+  );
+
+  if (disablePortal) return sheet;
+
   return (
     <Overlay isOpen={true} isKeyboardDismissable={false} style={{ flex: 1 }}>
-      <StyledGorhomBottomSheet
-        ref={bottomSheetRef}
-        snapPoints={memoizedSnapPoints}
-        index={validIndex}
-        enableDynamicSizing={enableDynamicSizing}
-        onChange={(idx) => {
-          handleSheetChanges(idx);
-          onChange?.(idx);
-        }}
-        enablePanDownToClose={enablePanDownToClose}
-        // @ts-ignore
-        className={className}
-        // @ts-ignore
-        backgroundClassName={`${backgroundClassName} bg-background border border-border/90 rounded-xl`}
-        // @ts-ignore
-        handleIndicatorClassName={`${handleIndicatorClassName} bg-primary`}
-        {...props}
-      >
-        {props.children}
-      </StyledGorhomBottomSheet>
+      {sheet}
     </Overlay>
   );
 };
