@@ -44,7 +44,7 @@ export const RADIUS_OPTIONS = [
 ];
 
 const STATUS_OPTIONS = [
-	{ key: "all", label: "Todos", icon: null },
+	{ key: "ALL", label: "Todos", icon: null },
 	{ key: "OPEN", label: "Aberta", icon: ShieldIcon },
 	{ key: "RESOLVED", label: "Resolvida", icon: ShieldCheckIcon },
 ] as const;
@@ -58,16 +58,16 @@ const HAZARD_OPTIONS = [
 ] as const;
 
 export type FilterState = {
-	status: "OPEN" | "RESOLVED" | null;
+	status: "ALL" | "OPEN" | "RESOLVED";
 	category: WasteCategory | null;
-	hazardLevel: HazardLevelVariant | null;
+	hazardLevel: "all" | HazardLevelVariant;
 	radius: number;
 };
 
 export const DEFAULT_FILTERS: FilterState = {
 	status: "OPEN",
 	category: null,
-	hazardLevel: null,
+	hazardLevel: "all",
 	radius: 2000,
 };
 
@@ -141,16 +141,11 @@ export function ComplaintFilterBottomSheet({
 						{HAZARD_OPTIONS.map(({ key, label, icon }) => (
 							<ComplaintPressableFilter
 								key={key}
-								selected={
-									key === "all"
-										? filters.hazardLevel === null
-										: filters.hazardLevel === key
-								}
+								selected={filters.hazardLevel === key}
 								onPress={() =>
 									onFiltersChange({
 										...filters,
-										hazardLevel:
-											key === "all" ? null : (key as HazardLevelVariant),
+										hazardLevel: key,
 									})
 								}
 							>
@@ -171,15 +166,11 @@ export function ComplaintFilterBottomSheet({
 						{STATUS_OPTIONS.map(({ key, label, icon }) => (
 							<ComplaintPressableFilter
 								key={key}
-								selected={
-									key === "all"
-										? filters.status === null
-										: filters.status === key
-								}
+								selected={filters.status === key}
 								onPress={() =>
 									onFiltersChange({
 										...filters,
-										status: key === "all" ? null : (key as "OPEN" | "RESOLVED"),
+										status: key,
 									})
 								}
 							>

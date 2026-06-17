@@ -67,13 +67,12 @@ export default function ComplaintsMapScreen() {
 	const [draftFilters, setDraftFilters] =
 		useState<FilterState>(DEFAULT_FILTERS);
 
-	const hazardLevelForApi = appliedFilters.hazardLevel
-		? (appliedFilters.hazardLevel.toUpperCase() as
-				| "LOW"
-				| "MEDIUM"
-				| "HIGH"
-				| "VERY_HIGH")
-		: null;
+	const hazardLevelForApi = appliedFilters.hazardLevel.toUpperCase() as
+		| "ALL"
+		| "LOW"
+		| "MEDIUM"
+		| "HIGH"
+		| "VERY_HIGH";
 
 	const {
 		complaints,
@@ -83,7 +82,7 @@ export default function ComplaintsMapScreen() {
 	} = useComplaintsMap({
 		userLocation,
 		status: appliedFilters.status,
-		wasteCategoryId: appliedFilters.category?.id ?? null,
+		wasteCategoryId: appliedFilters.category?.id ?? "ALL",
 		hazardLevel: hazardLevelForApi,
 		radius: appliedFilters.radius,
 	});

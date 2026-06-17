@@ -3,11 +3,13 @@ import { TouchableOpacity, View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/libs/utils";
 
 type VoteButtonProps = {
 	label: string;
 	voteCount: number;
 	isActive: boolean;
+	disabled: boolean;
 	iconSide: "left" | "right";
 	activeClassName: string;
 	activeLabelColor: string;
@@ -21,6 +23,7 @@ function VoteButton({
 	label,
 	voteCount,
 	isActive,
+	disabled,
 	iconSide,
 	activeClassName,
 	activeLabelColor,
@@ -29,7 +32,11 @@ function VoteButton({
 	icon,
 	onPress,
 }: VoteButtonProps) {
-	const iconColor = isActive ? activeIconColor : colors.gray[400];
+	const iconColor = disabled
+		? colors.gray[300]
+		: isActive
+			? activeIconColor
+			: colors.gray[400];
 	const Icon =
 		icon === "thumbs-up"
 			? (props: { size: number; color: string; strokeWidth: number }) => (
@@ -43,21 +50,41 @@ function VoteButton({
 		<TouchableOpacity
 			activeOpacity={0.8}
 			onPress={onPress}
-			className={`h-14 flex-1 flex-row items-center gap-3 rounded-[10px] px-4 ${
-				isActive ? activeClassName : "border border-gray-200 bg-white"
-			}`}
+			disabled={disabled}
+			className={cn(
+				"h-14 flex-1 flex-row items-center gap-3 rounded-[10px] px-4",
+				disabled
+					? "border border-gray-100 bg-gray-50"
+					: isActive
+						? activeClassName
+						: "border border-gray-200 bg-white",
+			)}
 		>
 			{iconSide === "left" && (
 				<Icon size={16} color={iconColor} strokeWidth={2} />
 			)}
 			<View className="flex-1 items-center">
 				<Text
-					className={`text-sm font-semibold ${isActive ? activeLabelColor : "text-gray-700"}`}
+					className={cn(
+						"text-sm font-semibold",
+						disabled
+							? "text-gray-300"
+							: isActive
+								? activeLabelColor
+								: "text-gray-700",
+					)}
 				>
 					{label}
 				</Text>
 				<Text
-					className={`text-xs ${isActive ? activeCountColor : "text-gray-400"}`}
+					className={cn(
+						"text-xs",
+						disabled
+							? "text-gray-300"
+							: isActive
+								? activeCountColor
+								: "text-gray-400",
+					)}
 				>
 					{voteCount} votos
 				</Text>
@@ -75,6 +102,7 @@ type ComplaintVoteButtonsProps = {
 	isResolvedActive: boolean;
 	isNotResolvedActive: boolean;
 	isPendingVote: boolean;
+	disabled?: boolean;
 	onVote: (vote: "RESOLVED" | "NOT_RESOLVED") => void;
 };
 
@@ -84,6 +112,7 @@ export function ComplaintVoteButtons({
 	isResolvedActive,
 	isNotResolvedActive,
 	isPendingVote,
+	disabled = false,
 	onVote,
 }: ComplaintVoteButtonsProps) {
 	if (isPendingVote) {
@@ -107,6 +136,7 @@ export function ComplaintVoteButtons({
 				label="Não Resolvida"
 				voteCount={notResolvedVotes}
 				isActive={isNotResolvedActive}
+				disabled={disabled}
 				iconSide="left"
 				icon="thumbs-down"
 				activeClassName="bg-red-600 border-transparent"
@@ -119,6 +149,7 @@ export function ComplaintVoteButtons({
 				label="Resolvida"
 				voteCount={resolvedVotes}
 				isActive={isResolvedActive}
+				disabled={disabled}
 				iconSide="right"
 				icon="thumbs-up"
 				activeClassName="bg-lime-800 border-transparent"

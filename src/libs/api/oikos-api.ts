@@ -16,7 +16,7 @@ import {
 // 	android: "http://10.0.2.2:3333",
 // });
 
-// Production / ngrok
+// Production
 const baseURL = process.env.EXPO_PUBLIC_BASE_URL;
 
 client.setConfig({ baseURL, throwOnError: true });

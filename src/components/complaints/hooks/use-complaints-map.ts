@@ -13,13 +13,13 @@ export type { MapComplaint } from "@/libs/types/complaint";
 
 type VoteType = "RESOLVED" | "NOT_RESOLVED";
 
-type HazardLevel = "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+type HazardLevel = "ALL" | "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
 
 type Params = {
 	userLocation: { lat: number; lon: number } | null;
-	status: "OPEN" | "RESOLVED" | null;
-	wasteCategoryId: string | null;
-	hazardLevel: HazardLevel | null;
+	status: "ALL" | "OPEN" | "RESOLVED";
+	wasteCategoryId: "ALL" | string;
+	hazardLevel: HazardLevel;
 	radius: number;
 };
 
@@ -59,9 +59,9 @@ export function useComplaintsMap({
 					lat: userLocation?.lat ?? 0,
 					lon: userLocation?.lon ?? 0,
 					radius,
-					...(status ? { status } : {}),
-					...(wasteCategoryId ? { waste_category_id: wasteCategoryId } : {}),
-					...(hazardLevel ? { hazard_level: hazardLevel } : {}),
+					status,
+					waste_category_id: wasteCategoryId,
+					hazard_level: hazardLevel,
 				},
 			});
 			return res.data;

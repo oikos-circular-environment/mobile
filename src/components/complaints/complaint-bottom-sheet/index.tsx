@@ -8,6 +8,7 @@ import {
 	LockKeyholeIcon,
 	PlayIcon,
 	PlusIcon,
+	ShieldCheckIcon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
@@ -50,6 +51,7 @@ import {
 	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
 import type { MapComplaintAttachment } from "@/libs/types/complaint";
+import { cn } from "@/libs/utils";
 import { useComplaintsStore } from "@/stores/complaints-store";
 import { ComplaintDetailsHeader } from "../complaint-details-header";
 import { ComplaintVoteButtons } from "../complaint-vote-buttons";
@@ -340,6 +342,16 @@ export function ComplaintBottomSheet() {
 							<Divider />
 
 							<VStack className="w-full flex-1 gap-2">
+								{complaint.status === "RESOLVED" && (
+									<Alert className="flex-row items-start gap-2 rounded-lg border border-lime-700 bg-lime-50 p-3">
+										<AlertIcon as={ShieldCheckIcon} className="text-lime-700" />
+										<AlertText className="text-lime-700">
+											Esta denúncia foi encerrada. Não é mais possível
+											registrar votos ou adicionar resoluções.
+										</AlertText>
+									</Alert>
+								)}
+
 								<VStack className="gap-2">
 									<Heading size="sm">Seu voto importa!</Heading>
 									<Alert className="flex-row items-start gap-2 rounded-lg border border-sky-700 bg-sky-50 p-3">
@@ -367,6 +379,7 @@ export function ComplaintBottomSheet() {
 									isResolvedActive={isResolvedActive}
 									isNotResolvedActive={isNotResolvedActive}
 									isPendingVote={voteMutation.isPending}
+									disabled={complaint.status === "RESOLVED"}
 									onVote={handleVotePress}
 								/>
 
@@ -457,14 +470,31 @@ export function ComplaintBottomSheet() {
 								<TouchableOpacity
 									activeOpacity={0.85}
 									onPress={handleAddResolution}
-									className="h-11 flex-row items-center justify-center gap-1.5 rounded-[10px] border border-gray-200 bg-white"
+									disabled={complaint.status === "RESOLVED"}
+									className={cn(
+										"h-11 flex-row items-center justify-center gap-1.5 rounded-[10px] border",
+										complaint.status === "RESOLVED"
+											? "border-gray-100 bg-gray-50"
+											: "border-gray-200 bg-white",
+									)}
 								>
 									<PlusIcon
 										size={15}
-										color={colors.gray[700]}
+										color={
+											complaint.status === "RESOLVED"
+												? colors.gray[300]
+												: colors.gray[700]
+										}
 										strokeWidth={2}
 									/>
-									<Text className="font-semibold text-gray-700">
+									<Text
+										className={cn(
+											"font-semibold",
+											complaint.status === "RESOLVED"
+												? "text-gray-300"
+												: "text-gray-700",
+										)}
+									>
 										Adicionar Resolução
 									</Text>
 								</TouchableOpacity>

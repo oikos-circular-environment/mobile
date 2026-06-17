@@ -1,6 +1,11 @@
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, CrosshairIcon, HashIcon, MapPinIcon } from "lucide-react-native";
+import {
+	CalendarIcon,
+	CrosshairIcon,
+	HashIcon,
+	MapPinIcon,
+} from "lucide-react-native";
 import { ScrollView, View } from "react-native";
 import {
 	type HazardLevelVariant,
@@ -148,13 +153,6 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 						</WasteCategoryHazardLevel>
 					))}
 				</ScrollView>
-
-				{!!distanceLabel && (
-					<Badge className="ml-2 flex-row items-center gap-1 rounded-xl bg-gray-100 px-2 py-1">
-						<BadgeIcon as={MapPinIcon} className="text-gray-500" />
-						<BadgeText className="text-gray-500">{distanceLabel}</BadgeText>
-					</Badge>
-				)}
 			</View>
 
 			{!!address && (
@@ -175,13 +173,21 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 				<HStack space="sm">
 					<CrosshairIcon size={13} color={colors.gray[500]} strokeWidth={2} />
 					<Text className="text-gray-500">{coords}</Text>
+					{!!distanceLabel && (
+						<Badge className="ml-2 flex-row items-center gap-1 rounded-xl bg-gray-100 px-2 py-1">
+							<BadgeIcon as={MapPinIcon} className="text-gray-500" />
+							<BadgeText className="text-gray-500">{distanceLabel}</BadgeText>
+						</Badge>
+					)}
 				</HStack>
 			)}
 
 			{!!complaint.observations && (
 				<View className="gap-1">
 					<Heading size="sm">Observações</Heading>
-					<Text className="leading-5 text-gray-600">{complaint.observations}</Text>
+					<Text className="leading-5 text-gray-600">
+						{complaint.observations}
+					</Text>
 				</View>
 			)}
 		</View>

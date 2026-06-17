@@ -233,9 +233,9 @@ const STATUS_ICONS: Record<"OPEN" | "RESOLVED", React.ComponentType<object>> = {
 };
 
 export type ComplaintFilterRowProps = {
-	status: "OPEN" | "RESOLVED" | null;
+	status: "ALL" | "OPEN" | "RESOLVED";
 	categoryName: string | null;
-	hazardLevel: "low" | "medium" | "high" | "very_high" | null;
+	hazardLevel: "all" | "low" | "medium" | "high" | "very_high";
 	radiusLabel: string;
 	onPress: () => void;
 };
@@ -261,10 +261,10 @@ export function ComplaintFilterRow({
 				>
 					<Badge variant="secondary" className="gap-2">
 						<BadgeIcon
-							as={hazardLevel ? HAZARD_ICONS[hazardLevel] : RadiationIcon}
+							as={hazardLevel !== "all" ? HAZARD_ICONS[hazardLevel] : RadiationIcon}
 						/>
 						<BadgeText>
-							{hazardLevel ? HAZARD_LABELS[hazardLevel] : "Todos"}
+							{hazardLevel !== "all" ? HAZARD_LABELS[hazardLevel] : "Todos"}
 						</BadgeText>
 					</Badge>
 					<Badge variant="secondary" className="gap-2">
@@ -272,8 +272,8 @@ export function ComplaintFilterRow({
 						<BadgeText>{categoryName ?? "Todos"}</BadgeText>
 					</Badge>
 					<Badge variant="secondary" className="gap-2">
-						<BadgeIcon as={status ? STATUS_ICONS[status] : ShieldIcon} />
-						<BadgeText>{status ? STATUS_LABELS[status] : "Todos"}</BadgeText>
+						<BadgeIcon as={status !== "ALL" ? STATUS_ICONS[status] : ShieldIcon} />
+						<BadgeText>{status !== "ALL" ? STATUS_LABELS[status] : "Todos"}</BadgeText>
 					</Badge>
 					<Badge variant="secondary" className="gap-2">
 						<BadgeIcon as={RadarIcon} />
