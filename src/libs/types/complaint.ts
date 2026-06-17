@@ -1,6 +1,37 @@
 import type { CameraCapturedPicture } from "expo-camera";
+import {
+	FlameIcon,
+	ShieldCheckIcon,
+	ShieldIcon,
+	ShieldXIcon,
+	ShrubIcon,
+	TractorIcon,
+	Trash2Icon,
+} from "lucide-react-native";
+import type {
+	GetV1ComplaintsDashboardResponses,
+	GetV1ComplaintsMapResponses,
+	GetV1ComplaintsResponses,
+} from "@/libs/oikos-sdk";
 import type { ValueMapping } from "./value-mapping";
-// import type * as Location from "expo-location";
+
+// SDK-derived types
+export type Complaint =
+	GetV1ComplaintsResponses[200]["complaints"][number];
+export type ComplaintAttachment = Complaint["attachments"][number];
+export type ComplaintCategory = Complaint["categories"][number];
+export type ComplaintGeospatial = Complaint["geospatial"];
+export type ComplaintVoteCounts = Complaint["vote_counts"];
+
+export type MapComplaint =
+	GetV1ComplaintsMapResponses[200]["complaints"][number];
+export type MapComplaintAttachment = MapComplaint["attachments"][number];
+
+export type ComplaintDashboard =
+	GetV1ComplaintsDashboardResponses[200]["dashboard"];
+
+// UI/domain types
+export type ComplaintStatus = "OPEN" | "RESOLVED" | "CANCELED";
 
 export type ComplaintType =
 	| "IRREGULAR_DISPOSAL"
@@ -14,28 +45,40 @@ export const complaintTypeValues: ValueMapping<ComplaintType>[] = [
 		label: "Descarte Irregular",
 		description:
 			"Denúncias relacionadas ao descarte inadequado de resíduos, como lixo, entulho, pneus, animais mortos, entre outros.",
+		icon: Trash2Icon,
 	},
 	{
 		value: "DEFORESTATION",
 		label: "Desmatamento",
 		description:
 			"Denúncias relacionadas à remoção ilegal de vegetação, como corte de árvores, desmatamento de áreas protegidas, entre outros.",
+		icon: TractorIcon,
 	},
 	{
 		value: "BURNING",
 		label: "Queimadas",
 		description:
 			"Denúncias relacionadas a incêndios florestais, queimadas ilegais, entre outros.",
+		icon: FlameIcon,
 	},
 	{
 		value: "VACANT_LOT",
 		label: "Terreno Baldio",
 		description:
 			"Denúncias relacionadas à área urbana ou rural sem construções, edificações ou uso ativo, caracterizada pelo abandono, falta de manutenção, vegetação alta e, frequentemente, acúmulo de lixo ou entulho.",
+		icon: ShrubIcon,
 	},
 ];
 
 export type ComplaintCaptureMode = "photo" | "video";
+
+export type DraftAttachment = {
+	id: string;
+	mediaType: "photo" | "video";
+	source: "camera" | "gallery" | "api";
+	uri?: string;
+	url?: string;
+};
 
 export type CameraCapturedVideo =
 	| {
@@ -57,23 +100,30 @@ export type ComplaintCapture = {
 	updated_at: string;
 };
 
-export type ComplaintStatus =
-	| "OPEN"
-	| "IN_PROGRESS"
-	| "RESOLVED"
-	| "REJECTED"
-	| "CANCELED";
-
-export type Complaint = ComplaintCapture & {
-	status: ComplaintStatus;
-};
+export const complaintStatuses: ValueMapping<ComplaintStatus>[] = [
+	{
+		value: "OPEN",
+		label: "Aberto",
+		icon: ShieldIcon,
+	},
+	{
+		value: "RESOLVED",
+		label: "Resolvido",
+		icon: ShieldCheckIcon,
+	},
+	{
+		value: "CANCELED",
+		label: "Cancelado",
+		icon: ShieldXIcon,
+	},
+];
 
 export type Geospatial = {
 	heading: {
 		trueHeading: number;
 		magHeading: number;
 		accuracy: number;
-	};
+	} | null;
 	location: {
 		coords: {
 			latitude: number;

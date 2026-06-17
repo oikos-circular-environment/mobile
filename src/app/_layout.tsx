@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { UserProvider } from "@/contexts/auth-context";
+import { AuthContextProvider } from "@/contexts/auth-context";
 import { GeospatialProvider } from "@/contexts/geospatial-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import "react-native-reanimated";
@@ -10,13 +10,13 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
+import { FloatingDevTools } from "@buoy-gg/core";
 import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { AppSplashScreen } from "@/components/app-splash-screen";
 import { Toaster } from "@/components/toast";
-
-SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
 	anchor: "(tabs)",
@@ -32,28 +32,28 @@ export default function RootLayout() {
 
 	useEffect(() => {
 		if (loaded || error) {
-			SplashScreen.hideAsync();
+			SplashScreen.hideAsync().catch(() => {});
 		}
 	}, [loaded, error]);
 
 	if (!loaded && !error) {
-		return null;
+		return <AppSplashScreen />;
 	}
 
 	const isDevelopmentMode = process.env.NODE_ENV === "development";
 
 	return (
-		<GestureHandlerRootView style={{ flex: 1 }}>
+		<GestureHandlerRootView style={{ flex: 1, backgroundColor: "white" }}>
 			<GluestackUIProvider mode="light">
 				<QueryClientProvider client={queryClient}>
-					<UserProvider>
+					<AuthContextProvider>
 						<GeospatialProvider>
 							<NotificationProvider>
 								<SafeAreaProvider>
 									<Toaster />
 									<StatusBar style="dark" animated />
 									<SafeAreaView
-										style={{ flex: 1 }}
+										style={{ flex: 1, backgroundColor: "white" }}
 										edges={["top", "left", "right"]}
 									>
 										<Stack>
@@ -66,8 +66,8 @@ export default function RootLayout() {
 								</SafeAreaProvider>
 							</NotificationProvider>
 						</GeospatialProvider>
-					</UserProvider>
-					{/* {isDevelopmentMode && <FloatingDevTools />} */}
+					</AuthContextProvider>
+					{isDevelopmentMode && <FloatingDevTools />}
 					{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
 				</QueryClientProvider>
 			</GluestackUIProvider>

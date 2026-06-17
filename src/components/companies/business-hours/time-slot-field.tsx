@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react-native";
+import { AlertCircleIcon, Trash2 } from "lucide-react-native";
 import { type Control, Controller, type FieldErrors } from "react-hook-form";
 import { View } from "react-native";
 import type { BusinessHoursFormValues } from "@/components/companies/business-hours/business-hours-form-schema";
@@ -6,6 +6,7 @@ import { Button, ButtonIcon } from "@/components/ui/button";
 import {
 	FormControl,
 	FormControlError,
+	FormControlErrorIcon,
 	FormControlErrorText,
 	FormControlLabel,
 	FormControlLabelText,
@@ -67,6 +68,7 @@ export function TimeSlotField({
 					{errors?.businessHours?.[dayIndex]?.timeSlots?.[slotIndex]?.startTime
 						?.message && (
 						<FormControlError>
+							<FormControlErrorIcon as={AlertCircleIcon} />
 							<FormControlErrorText className="text-xs">
 								{
 									errors.businessHours?.[dayIndex]?.timeSlots?.[slotIndex]
@@ -104,6 +106,7 @@ export function TimeSlotField({
 					{errors?.businessHours?.[dayIndex]?.timeSlots?.[slotIndex]?.endTime
 						?.message && (
 						<FormControlError>
+							<FormControlErrorIcon as={AlertCircleIcon} />
 							<FormControlErrorText className="text-xs">
 								{
 									errors.businessHours?.[dayIndex]?.timeSlots?.[slotIndex]

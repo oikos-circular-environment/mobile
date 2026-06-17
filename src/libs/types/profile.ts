@@ -1,16 +1,3 @@
-import type { Address } from "./address";
-import type { Attachment } from "./attachement";
+import type { GetV1ProfilesResponses } from "@/libs/oikos-sdk";
 
-export type Profile = {
-	user_id: string;
-	full_name: string;
-	display_name: string;
-	cpf: string;
-	phone: string;
-	is_collector: boolean;
-	id: string;
-	created_at: Date;
-	updated_at: Date;
-	address: Address | null;
-	profile_image: Attachment | null;
-};
+export type Profile = NonNullable<GetV1ProfilesResponses[200]["profile"]>;

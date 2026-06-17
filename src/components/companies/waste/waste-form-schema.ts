@@ -3,6 +3,7 @@ import { parseDecimalInput } from "@/libs/mask";
 import type { Measurement } from "@/libs/types/measurement";
 
 const measurementValues = [
+	"DAY",
 	"KG",
 	"L",
 	"UNIT",
@@ -13,6 +14,7 @@ const measurementValues = [
 ] as const satisfies readonly [Measurement, ...Measurement[]];
 
 export const wasteManagementFormSchema = z.object({
+	waste_category_id: z.string().min(1, "Selecione uma categoria."),
 	name: z.string().min(1, "Nome é obrigatório."),
 	description: z.string().max(240, "A descrição deve ter até 240 caracteres."),
 	price: z
@@ -24,8 +26,6 @@ export const wasteManagementFormSchema = z.object({
 		.transform(parseDecimalInput)
 		.pipe(z.number().min(0.001, "Informe uma quantidade maior que zero.")),
 	unit: z.enum(measurementValues),
-	waste_type: z.enum(["RECYCLABLE", "GARBAGE"] as const),
-	subItems: z.array(z.string().min(1)).default([]),
 });
 
 export type WasteManagementFormInput = z.input<

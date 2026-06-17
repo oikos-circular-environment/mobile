@@ -7,9 +7,9 @@ export const createCompanies = (count: number): Company[] => {
 		() =>
 			({
 				id: faker.database.mongodbObjectId(),
+				user_id: faker.database.mongodbObjectId(),
 				corporate_name: faker.company.name(),
 				business_name: faker.company.name(),
-				accept_appointments: faker.datatype.boolean(),
 				email: faker.internet.email(),
 				phones: [faker.phone.number({ style: "national" })],
 				company_type: faker.helpers.arrayElement([
@@ -24,11 +24,13 @@ export const createCompanies = (count: number): Company[] => {
 				]) as IdentityType,
 				identity: faker.number
 					.int({ min: 10000000000, max: 99999999999 })
-					.toString(), // Mock de CPF/CNPJ
+					.toString(),
 				status: faker.datatype.boolean(),
-				isHeadquarters: faker.datatype.boolean(),
-				started_activity_in: faker.date.past({ years: 20 }), // Data aleatória nos últimos 20 anos
-				businessHours: null,
+				is_company_valid: faker.datatype.boolean(),
+				avatar: null,
+				created_at: faker.date.past({ years: 1 }),
+				updated_at: faker.date.recent(),
+				started_activity_in: faker.date.past({ years: 20 }),
 				address: {
 					id: faker.database.mongodbObjectId(),
 					street: faker.location.streetAddress(),
@@ -41,9 +43,14 @@ export const createCompanies = (count: number): Company[] => {
 					latitude: faker.location.latitude(),
 					longitude: faker.location.longitude(),
 					complement: null,
+					city_ibge_id: faker.number.int({ min: 10000, max: 99999 }),
+					state_ibge_id: faker.number.int({ min: 10, max: 99 }),
+					created_at: faker.date.past({ years: 1 }),
+					updated_at: faker.date.recent(),
 				},
-				waste: null,
-				services: null,
+				business_hours: [],
+				wastes: [],
+				services: [],
 			}) as Company,
 	);
 };

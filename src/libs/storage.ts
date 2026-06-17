@@ -28,8 +28,5 @@ export async function removeRefreshToken() {
 }
 
 export async function clearTokens() {
-	await Promise.all([
-		removeAuthToken(),
-		removeRefreshToken(),
-	]);
+	await Promise.all([removeAuthToken(), removeRefreshToken()]);
 }

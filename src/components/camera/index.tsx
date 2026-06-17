@@ -1,4 +1,5 @@
 import { CameraCaptureButton } from "./camera-capture-button";
+import { CameraFlashControl } from "./camera-flash-control";
 import { CameraGeospatialOverlay } from "./camera-geospatial-overlay";
 import { CameraMediaPreview } from "./camera-media-preview";
 import { CameraModeSelector } from "./camera-mode-selector";
@@ -11,6 +12,7 @@ export { useCameraContext } from "./context";
 
 export const Camera = Object.assign(CameraRoot, {
 	Preview: CameraPreview,
+	FlashControl: CameraFlashControl,
 	GeospatialOverlay: CameraGeospatialOverlay,
 	ModeSelector: CameraModeSelector,
 	CaptureButton: CameraCaptureButton,

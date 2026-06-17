@@ -15,31 +15,13 @@ export default function HomeStackLayout() {
 			/>
 			<Stack.Protected guard={isAuthenticated}>
 				<Stack.Screen
-					name="settings"
-					options={{ title: "Configurações", headerShown: false }}
-				/>
-			</Stack.Protected>
-			<Stack.Protected guard={isAuthenticated}>
-				<Stack.Screen
 					name="profile"
 					options={{ title: "Perfil", headerShown: false }}
 				/>
 			</Stack.Protected>
 			<Stack.Screen
-				name="notifications"
-				options={{ title: "Notificações", headerShown: false }}
-			/>
-			<Stack.Screen
-				name="plans"
-				options={{ title: "Planos", headerShown: false }}
-			/>
-			<Stack.Screen
 				name="companies"
 				options={{ title: "Empresa", headerShown: false }}
-			/>
-			<Stack.Screen
-				name="sponsors"
-				options={{ title: "Patrocinadores", headerShown: false }}
 			/>
 			<Stack.Screen
 				name="sign-in"
@@ -52,13 +34,6 @@ export default function HomeStackLayout() {
 				name="sign-up"
 				options={{
 					title: "Cadastro",
-					headerShown: false,
-				}}
-			/>
-			<Stack.Screen
-				name="verify-code"
-				options={{
-					title: "Confirmar e-mail",
 					headerShown: false,
 				}}
 			/>

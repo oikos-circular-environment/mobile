@@ -1,3 +1,4 @@
+import type BottomSheet from "@gorhom/bottom-sheet";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import {
 	createContext,
@@ -6,6 +7,7 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { z } from "zod";
@@ -47,6 +49,10 @@ type MarketContextValue = {
 	fetchNextPage: () => void;
 	isError: boolean;
 	getCompanyById: (id: string) => MarketCompany | undefined;
+	locationSheetRef: React.RefObject<BottomSheet | null>;
+	radiusSheetRef: React.RefObject<BottomSheet | null>;
+	openLocationSheet: () => void;
+	openRadiusSheet: () => void;
 };
 
 const MarketContext = createContext<MarketContextValue | null>(null);
@@ -56,7 +62,10 @@ export function MarketProvider({ children }: PropsWithChildren) {
 	const { location, isResolving } = useGeospatial();
 	const [appliedFilters, setAppliedFilters] =
 		useState<MarketFilterValues>(defaultFilters);
-	const [locationSource, setLocationSource] = useState<LocationSource>("current");
+	const [locationSource, setLocationSource] =
+		useState<LocationSource>("current");
+	const locationSheetRef = useRef<BottomSheet>(null);
+	const radiusSheetRef = useRef<BottomSheet>(null);
 
 	const profileLat = user?.profile?.address?.latitude ?? undefined;
 	const profileLon = user?.profile?.address?.longitude ?? undefined;
@@ -75,7 +84,10 @@ export function MarketProvider({ children }: PropsWithChildren) {
 
 	useEffect(() => {
 		const profileHasCoords = profileLat != null && profileLon != null;
-		if (locationSource === "profile" && (!isAuthenticated || !profileHasCoords)) {
+		if (
+			locationSource === "profile" &&
+			(!isAuthenticated || !profileHasCoords)
+		) {
 			setLocationSource("current");
 		}
 	}, [isAuthenticated, locationSource, profileLat, profileLon]);
@@ -131,6 +143,10 @@ export function MarketProvider({ children }: PropsWithChildren) {
 			fetchNextPage,
 			isError,
 			getCompanyById,
+			locationSheetRef,
+			radiusSheetRef,
+			openLocationSheet: () => locationSheetRef.current?.snapToIndex(0),
+			openRadiusSheet: () => radiusSheetRef.current?.snapToIndex(0),
 		}),
 		[
 			appliedFilters,

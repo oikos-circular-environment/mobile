@@ -45,7 +45,11 @@ function ArcSpinner() {
 				<Defs>
 					<LinearGradient id="arcGrad" x1="1" y1="0" x2="0" y2="1">
 						<Stop offset="0%" stopColor={colors.lime[800]} stopOpacity={1} />
-						<Stop offset="100%" stopColor={colors.lime[800]} stopOpacity={0.08} />
+						<Stop
+							offset="100%"
+							stopColor={colors.lime[800]}
+							stopOpacity={0.08}
+						/>
 					</LinearGradient>
 				</Defs>
 				<Circle

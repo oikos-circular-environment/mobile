@@ -139,13 +139,11 @@ export type GetV1ProfilesResponses = {
 	 */
 	200: {
 		profile: {
+			id: string;
 			user_id: string;
 			full_name: string;
 			display_name: string;
-			cpf: string;
 			phone: string;
-			is_collector: boolean;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 			address: {
@@ -160,8 +158,8 @@ export type GetV1ProfilesResponses = {
 				state_ibge_id: number;
 				state: string;
 				state_code: string;
-				latitude: number | null;
-				longitude: number | null;
+				latitude: number;
+				longitude: number;
 				created_at: Date;
 				updated_at: Date;
 			} | null;
@@ -183,9 +181,7 @@ export type PutV1ProfilesData = {
 	body: {
 		full_name: string;
 		display_name: string;
-		cpf: string;
 		phone: string;
-		is_collector?: boolean;
 		address?: {
 			zip_code: string;
 			street: string;
@@ -197,8 +193,8 @@ export type PutV1ProfilesData = {
 			state_ibge_id: number;
 			state: string;
 			state_code: string;
-			latitude?: number | null;
-			longitude?: number | null;
+			latitude: number;
+			longitude: number;
 		} | null;
 	};
 	path?: never;
@@ -211,6 +207,14 @@ export type PutV1ProfilesErrors = {
 	 * Default Response
 	 */
 	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
 		message: string;
 		code: string;
 		statusCode: number;
@@ -233,13 +237,11 @@ export type PutV1ProfilesResponses = {
 	 */
 	200: {
 		profile: {
+			id: string;
 			user_id: string;
 			full_name: string;
 			display_name: string;
-			cpf: string;
 			phone: string;
-			is_collector: boolean;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 			address: {
@@ -254,8 +256,8 @@ export type PutV1ProfilesResponses = {
 				state_ibge_id: number;
 				state: string;
 				state_code: string;
-				latitude: number | null;
-				longitude: number | null;
+				latitude: number;
+				longitude: number;
 				created_at: Date;
 				updated_at: Date;
 			} | null;
@@ -419,8 +421,8 @@ export type GetV1ProfilesAddressesResponses = {
 			state_ibge_id: number;
 			state: string;
 			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
+			latitude: number;
+			longitude: number;
 			created_at: Date;
 			updated_at: Date;
 		} | null;
@@ -456,23 +458,123 @@ export type GetV1CompaniesResponses = {
 	 * Default Response
 	 */
 	200: {
-		company: {
+		companies: Array<{
+			id: string;
 			user_id: string;
 			identity: string;
 			identity_type: "CPF" | "CNPJ";
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 			status: boolean;
-			is_headquarters: boolean;
-			business_name?: string | null;
+			business_name: string;
 			corporate_name: string;
-			accept_appointments: boolean;
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			id: string;
+			is_company_valid: boolean;
+			avatar: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				created_at: Date;
+			} | null;
 			created_at: Date;
 			updated_at: Date;
-		} | null;
+			address: {
+				id: string;
+				zip_code: string;
+				street: string;
+				number: string;
+				complement?: string | null;
+				district: string;
+				city_ibge_id: number;
+				city: string;
+				state_ibge_id: number;
+				state: string;
+				state_code: string;
+				latitude: number;
+				longitude: number;
+				created_at: Date;
+				updated_at: Date;
+			} | null;
+			business_hours: Array<{
+				id: string;
+				day_of_week:
+					| "SUNDAY"
+					| "MONDAY"
+					| "TUESDAY"
+					| "WEDNESDAY"
+					| "THURSDAY"
+					| "FRIDAY"
+					| "SATURDAY";
+				is_open: boolean;
+				time_slots: Array<{
+					id: string;
+					start_time: string;
+					end_time: string;
+				}>;
+			}>;
+			wastes: Array<{
+				id: string;
+				name: string;
+				description?: string | null;
+				price: number;
+				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				waste_category_id: string;
+				waste_category: {
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+					created_at: Date;
+					updated_at: Date;
+					subcategories: Array<{
+						id: string;
+						name: string;
+						description: string | null;
+						observations: string | null;
+						hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+						type: "INCLUDE" | "EXCLUDE";
+						created_at: Date;
+						category_id: string;
+					}>;
+				};
+				quantity: number;
+				created_at: Date;
+				updated_at: Date;
+			}>;
+			services: Array<{
+				id: string;
+				name: string;
+				description?: string | null;
+				price: number;
+				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				waste_category_id: string;
+				waste_category: {
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+					created_at: Date;
+					updated_at: Date;
+					subcategories: Array<{
+						id: string;
+						name: string;
+						description: string | null;
+						observations: string | null;
+						hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+						type: "INCLUDE" | "EXCLUDE";
+						created_at: Date;
+						category_id: string;
+					}>;
+				};
+				quantity: number;
+				created_at: Date;
+				updated_at: Date;
+			}>;
+		}>;
 	};
 };
 
@@ -485,10 +587,8 @@ export type PostV1CompaniesData = {
 		identity_type: "CPF" | "CNPJ";
 		company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 		status?: boolean;
-		is_headquarters?: boolean;
-		business_name?: string | null;
+		business_name: string;
 		corporate_name: string;
-		accept_appointments?: boolean;
 		email?: string | null;
 		phones: Array<string>;
 		started_activity_in: unknown;
@@ -507,14 +607,6 @@ export type PostV1CompaniesErrors = {
 		code: string;
 		statusCode: number;
 	};
-	/**
-	 * Default Response
-	 */
-	409: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
 };
 
 export type PostV1CompaniesError =
@@ -524,21 +616,27 @@ export type PostV1CompaniesResponses = {
 	/**
 	 * Default Response
 	 */
-	200: {
+	201: {
 		company: {
+			id: string;
 			user_id: string;
 			identity: string;
 			identity_type: "CPF" | "CNPJ";
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 			status: boolean;
-			is_headquarters: boolean;
-			business_name?: string | null;
+			business_name: string;
 			corporate_name: string;
-			accept_appointments: boolean;
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			id: string;
+			is_company_valid: boolean;
+			avatar: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				created_at: Date;
+			} | null;
 			created_at: Date;
 			updated_at: Date;
 		};
@@ -548,26 +646,26 @@ export type PostV1CompaniesResponses = {
 export type PostV1CompaniesResponse =
 	PostV1CompaniesResponses[keyof PostV1CompaniesResponses];
 
-export type PutV1CompaniesData = {
+export type PutV1CompaniesByIdData = {
 	body: {
 		identity?: string;
 		identity_type?: "CPF" | "CNPJ";
 		company_type?: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 		status?: boolean;
-		is_headquarters?: boolean;
-		business_name?: string | null;
+		business_name?: string;
 		corporate_name?: string;
-		accept_appointments?: boolean;
 		email?: string | null;
 		phones?: Array<string>;
 		started_activity_in?: unknown;
 	};
-	path?: never;
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies";
+	url: "/v1/companies/{id}";
 };
 
-export type PutV1CompaniesErrors = {
+export type PutV1CompaniesByIdErrors = {
 	/**
 	 * Default Response
 	 */
@@ -586,45 +684,55 @@ export type PutV1CompaniesErrors = {
 	};
 };
 
-export type PutV1CompaniesError =
-	PutV1CompaniesErrors[keyof PutV1CompaniesErrors];
+export type PutV1CompaniesByIdError =
+	PutV1CompaniesByIdErrors[keyof PutV1CompaniesByIdErrors];
 
-export type PutV1CompaniesResponses = {
+export type PutV1CompaniesByIdResponses = {
 	/**
 	 * Default Response
 	 */
 	200: {
 		company: {
+			id: string;
 			user_id: string;
 			identity: string;
 			identity_type: "CPF" | "CNPJ";
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
 			status: boolean;
-			is_headquarters: boolean;
-			business_name?: string | null;
+			business_name: string;
 			corporate_name: string;
-			accept_appointments: boolean;
 			email?: string | null;
 			phones: Array<string>;
 			started_activity_in: Date;
-			id: string;
+			is_company_valid: boolean;
+			avatar: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				created_at: Date;
+			} | null;
 			created_at: Date;
 			updated_at: Date;
 		} | null;
 	};
 };
 
-export type PutV1CompaniesResponse =
-	PutV1CompaniesResponses[keyof PutV1CompaniesResponses];
+export type PutV1CompaniesByIdResponse =
+	PutV1CompaniesByIdResponses[keyof PutV1CompaniesByIdResponses];
 
-export type GetV1CompaniesBusinessHoursData = {
-	body?: never;
-	path?: never;
+export type PatchV1CompaniesByIdStatusData = {
+	body: {
+		status: boolean;
+	};
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies/business-hours";
+	url: "/v1/companies/{id}/status";
 };
 
-export type GetV1CompaniesBusinessHoursErrors = {
+export type PatchV1CompaniesByIdStatusErrors = {
 	/**
 	 * Default Response
 	 */
@@ -643,10 +751,156 @@ export type GetV1CompaniesBusinessHoursErrors = {
 	};
 };
 
-export type GetV1CompaniesBusinessHoursError =
-	GetV1CompaniesBusinessHoursErrors[keyof GetV1CompaniesBusinessHoursErrors];
+export type PatchV1CompaniesByIdStatusError =
+	PatchV1CompaniesByIdStatusErrors[keyof PatchV1CompaniesByIdStatusErrors];
 
-export type GetV1CompaniesBusinessHoursResponses = {
+export type PatchV1CompaniesByIdStatusResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		company: {
+			id: string;
+			user_id: string;
+			identity: string;
+			identity_type: "CPF" | "CNPJ";
+			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
+			status: boolean;
+			business_name: string;
+			corporate_name: string;
+			email?: string | null;
+			phones: Array<string>;
+			started_activity_in: Date;
+			is_company_valid: boolean;
+			avatar: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				created_at: Date;
+			} | null;
+			created_at: Date;
+			updated_at: Date;
+		};
+	};
+};
+
+export type PatchV1CompaniesByIdStatusResponse =
+	PatchV1CompaniesByIdStatusResponses[keyof PatchV1CompaniesByIdStatusResponses];
+
+export type PostV1CompaniesByIdAvatarData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/companies/{id}/avatar";
+};
+
+export type PostV1CompaniesByIdAvatarErrors = {
+	/**
+	 * Default Response
+	 */
+	400: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	500: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PostV1CompaniesByIdAvatarError =
+	PostV1CompaniesByIdAvatarErrors[keyof PostV1CompaniesByIdAvatarErrors];
+
+export type PostV1CompaniesByIdAvatarResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		company: {
+			id: string;
+			user_id: string;
+			identity: string;
+			identity_type: "CPF" | "CNPJ";
+			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
+			status: boolean;
+			business_name: string;
+			corporate_name: string;
+			email?: string | null;
+			phones: Array<string>;
+			started_activity_in: Date;
+			is_company_valid: boolean;
+			avatar: {
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				created_at: Date;
+			} | null;
+			created_at: Date;
+			updated_at: Date;
+		};
+	};
+};
+
+export type PostV1CompaniesByIdAvatarResponse =
+	PostV1CompaniesByIdAvatarResponses[keyof PostV1CompaniesByIdAvatarResponses];
+
+export type GetV1CompaniesByIdBusinessHoursData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/companies/{id}/business-hours";
+};
+
+export type GetV1CompaniesByIdBusinessHoursErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1CompaniesByIdBusinessHoursError =
+	GetV1CompaniesByIdBusinessHoursErrors[keyof GetV1CompaniesByIdBusinessHoursErrors];
+
+export type GetV1CompaniesByIdBusinessHoursResponses = {
 	/**
 	 * Default Response
 	 */
@@ -671,10 +925,10 @@ export type GetV1CompaniesBusinessHoursResponses = {
 	};
 };
 
-export type GetV1CompaniesBusinessHoursResponse =
-	GetV1CompaniesBusinessHoursResponses[keyof GetV1CompaniesBusinessHoursResponses];
+export type GetV1CompaniesByIdBusinessHoursResponse =
+	GetV1CompaniesByIdBusinessHoursResponses[keyof GetV1CompaniesByIdBusinessHoursResponses];
 
-export type PutV1CompaniesBusinessHoursData = {
+export type PutV1CompaniesByIdBusinessHoursData = {
 	body: {
 		business_hours: Array<{
 			day_of_week:
@@ -692,12 +946,14 @@ export type PutV1CompaniesBusinessHoursData = {
 			}>;
 		}>;
 	};
-	path?: never;
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies/business-hours";
+	url: "/v1/companies/{id}/business-hours";
 };
 
-export type PutV1CompaniesBusinessHoursErrors = {
+export type PutV1CompaniesByIdBusinessHoursErrors = {
 	/**
 	 * Default Response
 	 */
@@ -724,10 +980,10 @@ export type PutV1CompaniesBusinessHoursErrors = {
 	};
 };
 
-export type PutV1CompaniesBusinessHoursError =
-	PutV1CompaniesBusinessHoursErrors[keyof PutV1CompaniesBusinessHoursErrors];
+export type PutV1CompaniesByIdBusinessHoursError =
+	PutV1CompaniesByIdBusinessHoursErrors[keyof PutV1CompaniesByIdBusinessHoursErrors];
 
-export type PutV1CompaniesBusinessHoursResponses = {
+export type PutV1CompaniesByIdBusinessHoursResponses = {
 	/**
 	 * Default Response
 	 */
@@ -752,17 +1008,19 @@ export type PutV1CompaniesBusinessHoursResponses = {
 	};
 };
 
-export type PutV1CompaniesBusinessHoursResponse =
-	PutV1CompaniesBusinessHoursResponses[keyof PutV1CompaniesBusinessHoursResponses];
+export type PutV1CompaniesByIdBusinessHoursResponse =
+	PutV1CompaniesByIdBusinessHoursResponses[keyof PutV1CompaniesByIdBusinessHoursResponses];
 
-export type GetV1CompaniesWastesData = {
+export type GetV1CompaniesByIdWastesData = {
 	body?: never;
-	path?: never;
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies/wastes";
+	url: "/v1/companies/{id}/wastes";
 };
 
-export type GetV1CompaniesWastesErrors = {
+export type GetV1CompaniesByIdWastesErrors = {
 	/**
 	 * Default Response
 	 */
@@ -781,52 +1039,69 @@ export type GetV1CompaniesWastesErrors = {
 	};
 };
 
-export type GetV1CompaniesWastesError =
-	GetV1CompaniesWastesErrors[keyof GetV1CompaniesWastesErrors];
+export type GetV1CompaniesByIdWastesError =
+	GetV1CompaniesByIdWastesErrors[keyof GetV1CompaniesByIdWastesErrors];
 
-export type GetV1CompaniesWastesResponses = {
+export type GetV1CompaniesByIdWastesResponses = {
 	/**
 	 * Default Response
 	 */
 	200: {
 		wastes: Array<{
+			id: string;
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			waste_category_id: string;
+			waste_category: {
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				created_at: Date;
+				updated_at: Date;
+				subcategories: Array<{
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+					type: "INCLUDE" | "EXCLUDE";
+					created_at: Date;
+					category_id: string;
+				}>;
+			};
 			quantity: number;
-			observations?: string | null;
-			sub_items: Array<string> | null;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 		}>;
 	};
 };
 
-export type GetV1CompaniesWastesResponse =
-	GetV1CompaniesWastesResponses[keyof GetV1CompaniesWastesResponses];
+export type GetV1CompaniesByIdWastesResponse =
+	GetV1CompaniesByIdWastesResponses[keyof GetV1CompaniesByIdWastesResponses];
 
-export type PutV1CompaniesWastesData = {
+export type PutV1CompaniesByIdWastesData = {
 	body: {
 		wastes: Array<{
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			waste_category_id: string;
 			quantity: number;
-			observations?: string | null;
-			sub_items?: Array<string> | null;
 		}>;
 	};
-	path?: never;
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies/wastes";
+	url: "/v1/companies/{id}/wastes";
 };
 
-export type PutV1CompaniesWastesErrors = {
+export type PutV1CompaniesByIdWastesErrors = {
 	/**
 	 * Default Response
 	 */
@@ -853,41 +1128,60 @@ export type PutV1CompaniesWastesErrors = {
 	};
 };
 
-export type PutV1CompaniesWastesError =
-	PutV1CompaniesWastesErrors[keyof PutV1CompaniesWastesErrors];
+export type PutV1CompaniesByIdWastesError =
+	PutV1CompaniesByIdWastesErrors[keyof PutV1CompaniesByIdWastesErrors];
 
-export type PutV1CompaniesWastesResponses = {
+export type PutV1CompaniesByIdWastesResponses = {
 	/**
 	 * Default Response
 	 */
 	200: {
 		wastes: Array<{
+			id: string;
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			waste_category_id: string;
+			waste_category: {
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				created_at: Date;
+				updated_at: Date;
+				subcategories: Array<{
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+					type: "INCLUDE" | "EXCLUDE";
+					created_at: Date;
+					category_id: string;
+				}>;
+			};
 			quantity: number;
-			observations?: string | null;
-			sub_items: Array<string> | null;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 		}>;
 	};
 };
 
-export type PutV1CompaniesWastesResponse =
-	PutV1CompaniesWastesResponses[keyof PutV1CompaniesWastesResponses];
+export type PutV1CompaniesByIdWastesResponse =
+	PutV1CompaniesByIdWastesResponses[keyof PutV1CompaniesByIdWastesResponses];
 
-export type GetV1CompaniesServicesData = {
+export type GetV1CompaniesByIdServicesData = {
 	body?: never;
-	path?: never;
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies/services";
+	url: "/v1/companies/{id}/services";
 };
 
-export type GetV1CompaniesServicesErrors = {
+export type GetV1CompaniesByIdServicesErrors = {
 	/**
 	 * Default Response
 	 */
@@ -906,52 +1200,69 @@ export type GetV1CompaniesServicesErrors = {
 	};
 };
 
-export type GetV1CompaniesServicesError =
-	GetV1CompaniesServicesErrors[keyof GetV1CompaniesServicesErrors];
+export type GetV1CompaniesByIdServicesError =
+	GetV1CompaniesByIdServicesErrors[keyof GetV1CompaniesByIdServicesErrors];
 
-export type GetV1CompaniesServicesResponses = {
+export type GetV1CompaniesByIdServicesResponses = {
 	/**
 	 * Default Response
 	 */
 	200: {
 		services: Array<{
+			id: string;
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			waste_category_id: string;
+			waste_category: {
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				created_at: Date;
+				updated_at: Date;
+				subcategories: Array<{
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+					type: "INCLUDE" | "EXCLUDE";
+					created_at: Date;
+					category_id: string;
+				}>;
+			};
 			quantity: number;
-			observations?: string | null;
-			sub_items: Array<string> | null;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 		}>;
 	};
 };
 
-export type GetV1CompaniesServicesResponse =
-	GetV1CompaniesServicesResponses[keyof GetV1CompaniesServicesResponses];
+export type GetV1CompaniesByIdServicesResponse =
+	GetV1CompaniesByIdServicesResponses[keyof GetV1CompaniesByIdServicesResponses];
 
-export type PutV1CompaniesServicesData = {
+export type PutV1CompaniesByIdServicesData = {
 	body: {
 		services: Array<{
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			waste_category_id: string;
 			quantity: number;
-			observations?: string | null;
-			sub_items?: Array<string> | null;
 		}>;
 	};
-	path?: never;
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies/services";
+	url: "/v1/companies/{id}/services";
 };
 
-export type PutV1CompaniesServicesErrors = {
+export type PutV1CompaniesByIdServicesErrors = {
 	/**
 	 * Default Response
 	 */
@@ -978,41 +1289,60 @@ export type PutV1CompaniesServicesErrors = {
 	};
 };
 
-export type PutV1CompaniesServicesError =
-	PutV1CompaniesServicesErrors[keyof PutV1CompaniesServicesErrors];
+export type PutV1CompaniesByIdServicesError =
+	PutV1CompaniesByIdServicesErrors[keyof PutV1CompaniesByIdServicesErrors];
 
-export type PutV1CompaniesServicesResponses = {
+export type PutV1CompaniesByIdServicesResponses = {
 	/**
 	 * Default Response
 	 */
 	200: {
 		services: Array<{
+			id: string;
 			name: string;
 			description?: string | null;
 			price: number;
-			unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-			waste_type: "RECYCLABLE" | "GARBAGE";
+			unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+			waste_category_id: string;
+			waste_category: {
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				created_at: Date;
+				updated_at: Date;
+				subcategories: Array<{
+					id: string;
+					name: string;
+					description: string | null;
+					observations: string | null;
+					hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+					type: "INCLUDE" | "EXCLUDE";
+					created_at: Date;
+					category_id: string;
+				}>;
+			};
 			quantity: number;
-			observations?: string | null;
-			sub_items: Array<string> | null;
-			id: string;
 			created_at: Date;
 			updated_at: Date;
 		}>;
 	};
 };
 
-export type PutV1CompaniesServicesResponse =
-	PutV1CompaniesServicesResponses[keyof PutV1CompaniesServicesResponses];
+export type PutV1CompaniesByIdServicesResponse =
+	PutV1CompaniesByIdServicesResponses[keyof PutV1CompaniesByIdServicesResponses];
 
-export type GetV1CompaniesAddressesData = {
+export type GetV1CompaniesByIdAddressesData = {
 	body?: never;
-	path?: never;
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies/addresses";
+	url: "/v1/companies/{id}/addresses";
 };
 
-export type GetV1CompaniesAddressesErrors = {
+export type GetV1CompaniesByIdAddressesErrors = {
 	/**
 	 * Default Response
 	 */
@@ -1031,10 +1361,10 @@ export type GetV1CompaniesAddressesErrors = {
 	};
 };
 
-export type GetV1CompaniesAddressesError =
-	GetV1CompaniesAddressesErrors[keyof GetV1CompaniesAddressesErrors];
+export type GetV1CompaniesByIdAddressesError =
+	GetV1CompaniesByIdAddressesErrors[keyof GetV1CompaniesByIdAddressesErrors];
 
-export type GetV1CompaniesAddressesResponses = {
+export type GetV1CompaniesByIdAddressesResponses = {
 	/**
 	 * Default Response
 	 */
@@ -1044,25 +1374,25 @@ export type GetV1CompaniesAddressesResponses = {
 			zip_code: string;
 			street: string;
 			number: string;
-			complement: string | null;
+			complement?: string | null;
 			district: string;
 			city_ibge_id: number;
 			city: string;
 			state_ibge_id: number;
 			state: string;
 			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
+			latitude: number;
+			longitude: number;
 			created_at: Date;
 			updated_at: Date;
 		} | null;
 	};
 };
 
-export type GetV1CompaniesAddressesResponse =
-	GetV1CompaniesAddressesResponses[keyof GetV1CompaniesAddressesResponses];
+export type GetV1CompaniesByIdAddressesResponse =
+	GetV1CompaniesByIdAddressesResponses[keyof GetV1CompaniesByIdAddressesResponses];
 
-export type PutV1CompaniesAddressesData = {
+export type PutV1CompaniesByIdAddressesData = {
 	body: {
 		zip_code: string;
 		street: string;
@@ -1074,15 +1404,17 @@ export type PutV1CompaniesAddressesData = {
 		state_ibge_id: number;
 		state: string;
 		state_code: string;
-		latitude?: number | null;
-		longitude?: number | null;
+		latitude: number;
+		longitude: number;
 	};
-	path?: never;
+	path: {
+		id: string;
+	};
 	query?: never;
-	url: "/v1/companies/addresses";
+	url: "/v1/companies/{id}/addresses";
 };
 
-export type PutV1CompaniesAddressesErrors = {
+export type PutV1CompaniesByIdAddressesErrors = {
 	/**
 	 * Default Response
 	 */
@@ -1101,10 +1433,10 @@ export type PutV1CompaniesAddressesErrors = {
 	};
 };
 
-export type PutV1CompaniesAddressesError =
-	PutV1CompaniesAddressesErrors[keyof PutV1CompaniesAddressesErrors];
+export type PutV1CompaniesByIdAddressesError =
+	PutV1CompaniesByIdAddressesErrors[keyof PutV1CompaniesByIdAddressesErrors];
 
-export type PutV1CompaniesAddressesResponses = {
+export type PutV1CompaniesByIdAddressesResponses = {
 	/**
 	 * Default Response
 	 */
@@ -1114,30 +1446,80 @@ export type PutV1CompaniesAddressesResponses = {
 			zip_code: string;
 			street: string;
 			number: string;
-			complement: string | null;
+			complement?: string | null;
 			district: string;
 			city_ibge_id: number;
 			city: string;
 			state_ibge_id: number;
 			state: string;
 			state_code: string;
-			latitude: number | null;
-			longitude: number | null;
+			latitude: number;
+			longitude: number;
 			created_at: Date;
 			updated_at: Date;
 		};
 	};
 };
 
-export type PutV1CompaniesAddressesResponse =
-	PutV1CompaniesAddressesResponses[keyof PutV1CompaniesAddressesResponses];
+export type PutV1CompaniesByIdAddressesResponse =
+	PutV1CompaniesByIdAddressesResponses[keyof PutV1CompaniesByIdAddressesResponses];
+
+export type GetV1CompaniesByIdValidationsData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/companies/{id}/validations";
+};
+
+export type GetV1CompaniesByIdValidationsErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1CompaniesByIdValidationsError =
+	GetV1CompaniesByIdValidationsErrors[keyof GetV1CompaniesByIdValidationsErrors];
+
+export type GetV1CompaniesByIdValidationsResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		validation: {
+			id: string;
+			company_id: string;
+			general_registration: boolean;
+			address: boolean;
+			business_hours: boolean;
+			wastes: boolean;
+			services: boolean;
+		} | null;
+	};
+};
+
+export type GetV1CompaniesByIdValidationsResponse =
+	GetV1CompaniesByIdValidationsResponses[keyof GetV1CompaniesByIdValidationsResponses];
 
 export type GetV1ComplaintsData = {
 	body?: never;
 	path?: never;
 	query?: {
-		type?: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
-		status?: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
+		status?: "OPEN" | "RESOLVED" | "CANCELED";
 		cursor?: Date;
 		limit?: number;
 	};
@@ -1165,15 +1547,15 @@ export type GetV1ComplaintsResponses = {
 	200: {
 		complaints: Array<{
 			id: string;
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			observations: string | null;
 			geospatial: {
 				heading: {
 					trueHeading: number;
 					magHeading: number;
 					accuracy: number;
-				};
+				} | null;
 				location: {
 					coords: {
 						latitude: number;
@@ -1202,16 +1584,28 @@ export type GetV1ComplaintsResponses = {
 					formattedAddress?: string | null;
 				};
 			};
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			attachment: {
+			attachments: Array<{
 				id: string;
 				url: string;
 				file_name: string;
 				path: string;
 				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
-			} | null;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
 			created_at: Date;
 		}>;
 		next_cursor: Date | null;
@@ -1224,14 +1618,13 @@ export type GetV1ComplaintsResponse =
 export type PostV1ComplaintsData = {
 	body: {
 		date: unknown;
-		type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 		observations?: string | null;
 		geospatial: {
 			heading: {
 				trueHeading: number;
 				magHeading: number;
 				accuracy: number;
-			};
+			} | null;
 			location: {
 				coords: {
 					latitude: number;
@@ -1260,6 +1653,7 @@ export type PostV1ComplaintsData = {
 				formattedAddress?: string | null;
 			};
 		};
+		waste_category_ids: Array<string>;
 	};
 	path?: never;
 	query?: never;
@@ -1271,14 +1665,6 @@ export type PostV1ComplaintsErrors = {
 	 * Default Response
 	 */
 	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
-	404: {
 		message: string;
 		code: string;
 		statusCode: number;
@@ -1295,15 +1681,15 @@ export type PostV1ComplaintsResponses = {
 	200: {
 		complaint: {
 			id: string;
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			observations: string | null;
 			geospatial: {
 				heading: {
 					trueHeading: number;
 					magHeading: number;
 					accuracy: number;
-				};
+				} | null;
 				location: {
 					coords: {
 						latitude: number;
@@ -1332,16 +1718,28 @@ export type PostV1ComplaintsResponses = {
 					formattedAddress?: string | null;
 				};
 			};
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			attachment: {
+			attachments: Array<{
 				id: string;
 				url: string;
 				file_name: string;
 				path: string;
 				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
-			} | null;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
 			created_at: Date;
 		};
 	};
@@ -1379,16 +1777,106 @@ export type GetV1ComplaintsDashboardResponses = {
 		dashboard: {
 			total: number;
 			open: number;
-			pending: number;
 			resolved: number;
 			canceled: number;
-			rejected: number;
 		};
 	};
 };
 
 export type GetV1ComplaintsDashboardResponse =
 	GetV1ComplaintsDashboardResponses[keyof GetV1ComplaintsDashboardResponses];
+
+export type GetV1ComplaintsMapData = {
+	body?: never;
+	path?: never;
+	query: {
+		lat: number;
+		lon: number;
+		radius?: number;
+		status?: "ALL" | "OPEN" | "RESOLVED";
+		waste_category_id?: "ALL" | string;
+		hazard_level?: "ALL" | "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+	};
+	url: "/v1/complaints/map";
+};
+
+export type GetV1ComplaintsMapResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		complaints: Array<{
+			id: string;
+			status: "OPEN" | "RESOLVED" | "CANCELED";
+			date: Date;
+			observations: string | null;
+			geospatial: {
+				heading: {
+					trueHeading: number;
+					magHeading: number;
+					accuracy: number;
+				} | null;
+				location: {
+					coords: {
+						latitude: number;
+						longitude: number;
+						altitude: number | null;
+						accuracy: number | null;
+						altitudeAccuracy: number | null;
+						heading: number | null;
+						speed: number | null;
+					};
+					timestamp: number;
+					mocked?: boolean;
+				};
+				addresses: {
+					city: string | null;
+					district: string | null;
+					streetNumber: string | null;
+					street: string | null;
+					region: string | null;
+					subregion: string | null;
+					country: string | null;
+					postalCode: string | null;
+					name: string | null;
+					isoCountryCode: string | null;
+					timezone: string | null;
+					formattedAddress?: string | null;
+				};
+			};
+			location: {
+				lat: number;
+				lon: number;
+			} | null;
+			attachments: Array<{
+				id: string;
+				url: string;
+				file_name: string;
+				path: string;
+				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
+				type: "PHOTO" | "VIDEO";
+				created_at: Date;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
+			created_at: Date;
+		}>;
+	};
+};
+
+export type GetV1ComplaintsMapResponse =
+	GetV1ComplaintsMapResponses[keyof GetV1ComplaintsMapResponses];
 
 export type GetV1ComplaintsByIdData = {
 	body?: never;
@@ -1428,15 +1916,15 @@ export type GetV1ComplaintsByIdResponses = {
 	200: {
 		complaint: {
 			id: string;
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			observations: string | null;
 			geospatial: {
 				heading: {
 					trueHeading: number;
 					magHeading: number;
 					accuracy: number;
-				};
+				} | null;
 				location: {
 					coords: {
 						latitude: number;
@@ -1465,16 +1953,28 @@ export type GetV1ComplaintsByIdResponses = {
 					formattedAddress?: string | null;
 				};
 			};
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			attachment: {
+			attachments: Array<{
 				id: string;
 				url: string;
 				file_name: string;
 				path: string;
 				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
-			} | null;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
 			created_at: Date;
 		};
 	};
@@ -1485,8 +1985,43 @@ export type GetV1ComplaintsByIdResponse =
 
 export type PatchV1ComplaintsByIdData = {
 	body: {
-		type?: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
+		date?: unknown;
 		observations?: string | null;
+		geospatial?: {
+			heading: {
+				trueHeading: number;
+				magHeading: number;
+				accuracy: number;
+			} | null;
+			location: {
+				coords: {
+					latitude: number;
+					longitude: number;
+					altitude: number | null;
+					accuracy: number | null;
+					altitudeAccuracy: number | null;
+					heading: number | null;
+					speed: number | null;
+				};
+				timestamp: number;
+				mocked?: boolean;
+			};
+			addresses: {
+				city: string | null;
+				district: string | null;
+				streetNumber: string | null;
+				street: string | null;
+				region: string | null;
+				subregion: string | null;
+				country: string | null;
+				postalCode: string | null;
+				name: string | null;
+				isoCountryCode: string | null;
+				timezone: string | null;
+				formattedAddress?: string | null;
+			};
+		};
+		waste_category_ids?: Array<string>;
 	};
 	path: {
 		id: string;
@@ -1524,15 +2059,15 @@ export type PatchV1ComplaintsByIdResponses = {
 	200: {
 		complaint: {
 			id: string;
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			observations: string | null;
 			geospatial: {
 				heading: {
 					trueHeading: number;
 					magHeading: number;
 					accuracy: number;
-				};
+				} | null;
 				location: {
 					coords: {
 						latitude: number;
@@ -1561,16 +2096,28 @@ export type PatchV1ComplaintsByIdResponses = {
 					formattedAddress?: string | null;
 				};
 			};
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			attachment: {
+			attachments: Array<{
 				id: string;
 				url: string;
 				file_name: string;
 				path: string;
 				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
-			} | null;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
 			created_at: Date;
 		};
 	};
@@ -1580,7 +2127,10 @@ export type PatchV1ComplaintsByIdResponse =
 	PatchV1ComplaintsByIdResponses[keyof PatchV1ComplaintsByIdResponses];
 
 export type PatchV1ComplaintsByIdResolvedData = {
-	body?: never;
+	body: {
+		description: string;
+		company_id?: string;
+	};
 	path: {
 		id: string;
 	};
@@ -1605,6 +2155,14 @@ export type PatchV1ComplaintsByIdResolvedErrors = {
 		code: string;
 		statusCode: number;
 	};
+	/**
+	 * Default Response
+	 */
+	422: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
 };
 
 export type PatchV1ComplaintsByIdResolvedError =
@@ -1617,15 +2175,15 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 	200: {
 		complaint: {
 			id: string;
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			observations: string | null;
 			geospatial: {
 				heading: {
 					trueHeading: number;
 					magHeading: number;
 					accuracy: number;
-				};
+				} | null;
 				location: {
 					coords: {
 						latitude: number;
@@ -1654,16 +2212,28 @@ export type PatchV1ComplaintsByIdResolvedResponses = {
 					formattedAddress?: string | null;
 				};
 			};
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			attachment: {
+			attachments: Array<{
 				id: string;
 				url: string;
 				file_name: string;
 				path: string;
 				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
-			} | null;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
 			created_at: Date;
 		};
 	};
@@ -1710,15 +2280,15 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 	200: {
 		complaint: {
 			id: string;
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			observations: string | null;
 			geospatial: {
 				heading: {
 					trueHeading: number;
 					magHeading: number;
 					accuracy: number;
-				};
+				} | null;
 				location: {
 					coords: {
 						latitude: number;
@@ -1747,16 +2317,28 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 					formattedAddress?: string | null;
 				};
 			};
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			attachment: {
+			attachments: Array<{
 				id: string;
 				url: string;
 				file_name: string;
 				path: string;
 				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
-			} | null;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
 			created_at: Date;
 		};
 	};
@@ -1764,6 +2346,503 @@ export type PatchV1ComplaintsByIdCanceledResponses = {
 
 export type PatchV1ComplaintsByIdCanceledResponse =
 	PatchV1ComplaintsByIdCanceledResponses[keyof PatchV1ComplaintsByIdCanceledResponses];
+
+export type DeleteV1ComplaintsByIdVotesData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/votes";
+};
+
+export type DeleteV1ComplaintsByIdVotesErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type DeleteV1ComplaintsByIdVotesError =
+	DeleteV1ComplaintsByIdVotesErrors[keyof DeleteV1ComplaintsByIdVotesErrors];
+
+export type DeleteV1ComplaintsByIdVotesResponses = {
+	/**
+	 * Default Response
+	 */
+	204: void;
+};
+
+export type DeleteV1ComplaintsByIdVotesResponse =
+	DeleteV1ComplaintsByIdVotesResponses[keyof DeleteV1ComplaintsByIdVotesResponses];
+
+export type GetV1ComplaintsByIdVotesData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/votes";
+};
+
+export type GetV1ComplaintsByIdVotesErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1ComplaintsByIdVotesError =
+	GetV1ComplaintsByIdVotesErrors[keyof GetV1ComplaintsByIdVotesErrors];
+
+export type GetV1ComplaintsByIdVotesResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		vote: {
+			id: string;
+			complaint_id: string;
+			user_id: string;
+			vote_type: "RESOLVED" | "NOT_RESOLVED";
+			created_at: Date;
+			updated_at: Date;
+		} | null;
+	};
+};
+
+export type GetV1ComplaintsByIdVotesResponse =
+	GetV1ComplaintsByIdVotesResponses[keyof GetV1ComplaintsByIdVotesResponses];
+
+export type PostV1ComplaintsByIdVotesData = {
+	body: {
+		vote_type: "RESOLVED" | "NOT_RESOLVED";
+	};
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/votes";
+};
+
+export type PostV1ComplaintsByIdVotesErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	422: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PostV1ComplaintsByIdVotesError =
+	PostV1ComplaintsByIdVotesErrors[keyof PostV1ComplaintsByIdVotesErrors];
+
+export type PostV1ComplaintsByIdVotesResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		vote: {
+			id: string;
+			complaint_id: string;
+			user_id: string;
+			vote_type: "RESOLVED" | "NOT_RESOLVED";
+			created_at: Date;
+			updated_at: Date;
+		};
+	};
+};
+
+export type PostV1ComplaintsByIdVotesResponse =
+	PostV1ComplaintsByIdVotesResponses[keyof PostV1ComplaintsByIdVotesResponses];
+
+export type DeleteV1ComplaintsByIdResolutionsData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions";
+};
+
+export type DeleteV1ComplaintsByIdResolutionsErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	422: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type DeleteV1ComplaintsByIdResolutionsError =
+	DeleteV1ComplaintsByIdResolutionsErrors[keyof DeleteV1ComplaintsByIdResolutionsErrors];
+
+export type DeleteV1ComplaintsByIdResolutionsResponses = {
+	/**
+	 * Default Response
+	 */
+	204: void;
+};
+
+export type DeleteV1ComplaintsByIdResolutionsResponse =
+	DeleteV1ComplaintsByIdResolutionsResponses[keyof DeleteV1ComplaintsByIdResolutionsResponses];
+
+export type GetV1ComplaintsByIdResolutionsData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions";
+};
+
+export type GetV1ComplaintsByIdResolutionsErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1ComplaintsByIdResolutionsError =
+	GetV1ComplaintsByIdResolutionsErrors[keyof GetV1ComplaintsByIdResolutionsErrors];
+
+export type GetV1ComplaintsByIdResolutionsResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		resolutions: Array<{
+			id: string;
+			description: string;
+			company_id: string | null;
+			is_owner: boolean;
+			resolver_user_profile: {
+				type: "profile";
+				full_name: string;
+				display_name: string;
+				avatar_url: string | null;
+			};
+			resolver_company: {
+				type: "company";
+				corporate_name: string;
+				business_name: string;
+				avatar_url: string | null;
+			} | null;
+			attachments: Array<{
+				id: string;
+				url: string;
+				file_name: string;
+				created_at: Date;
+			}>;
+			created_at: Date;
+			updated_at: Date;
+		}>;
+	};
+};
+
+export type GetV1ComplaintsByIdResolutionsResponse =
+	GetV1ComplaintsByIdResolutionsResponses[keyof GetV1ComplaintsByIdResolutionsResponses];
+
+export type PostV1ComplaintsByIdResolutionsData = {
+	body: {
+		description: string;
+		company_id?: string;
+	};
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions";
+};
+
+export type PostV1ComplaintsByIdResolutionsErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	422: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PostV1ComplaintsByIdResolutionsError =
+	PostV1ComplaintsByIdResolutionsErrors[keyof PostV1ComplaintsByIdResolutionsErrors];
+
+export type PostV1ComplaintsByIdResolutionsResponses = {
+	/**
+	 * Default Response
+	 */
+	204: void;
+};
+
+export type PostV1ComplaintsByIdResolutionsResponse =
+	PostV1ComplaintsByIdResolutionsResponses[keyof PostV1ComplaintsByIdResolutionsResponses];
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdData = {
+	body: {
+		description: string;
+	};
+	path: {
+		id: string;
+		resolutionId: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions/{resolutionId}";
+};
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	422: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdError =
+	PatchV1ComplaintsByIdResolutionsByResolutionIdErrors[keyof PatchV1ComplaintsByIdResolutionsByResolutionIdErrors];
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdResponses = {
+	/**
+	 * Default Response
+	 */
+	204: void;
+};
+
+export type PatchV1ComplaintsByIdResolutionsByResolutionIdResponse =
+	PatchV1ComplaintsByIdResolutionsByResolutionIdResponses[keyof PatchV1ComplaintsByIdResolutionsByResolutionIdResponses];
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions/attachments";
+};
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsErrors = {
+	/**
+	 * Default Response
+	 */
+	400: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	500: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsError =
+	PostV1ComplaintsByIdResolutionsAttachmentsErrors[keyof PostV1ComplaintsByIdResolutionsAttachmentsErrors];
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		attachment: {
+			id: string;
+			url: string;
+			file_name: string;
+			created_at: Date;
+		};
+	};
+};
+
+export type PostV1ComplaintsByIdResolutionsAttachmentsResponse =
+	PostV1ComplaintsByIdResolutionsAttachmentsResponses[keyof PostV1ComplaintsByIdResolutionsAttachmentsResponses];
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdData = {
+	body?: never;
+	path: {
+		id: string;
+		attachmentId: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/resolutions/attachments/{attachmentId}";
+};
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdError =
+	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors[keyof DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdErrors];
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses =
+	{
+		/**
+		 * Default Response
+		 */
+		204: void;
+	};
+
+export type DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponse =
+	DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses[keyof DeleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentIdResponses];
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdData = {
+	body?: never;
+	path: {
+		id: string;
+		attachmentId: string;
+	};
+	query?: never;
+	url: "/v1/complaints/{id}/attachments/{attachmentId}";
+};
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdError =
+	DeleteV1ComplaintsByIdAttachmentsByAttachmentIdErrors[keyof DeleteV1ComplaintsByIdAttachmentsByAttachmentIdErrors];
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponses = {
+	/**
+	 * Default Response
+	 */
+	204: void;
+};
+
+export type DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponse =
+	DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponses[keyof DeleteV1ComplaintsByIdAttachmentsByAttachmentIdResponses];
 
 export type PostV1ComplaintsByIdAttachmentsData = {
 	body?: never;
@@ -1802,14 +2881,6 @@ export type PostV1ComplaintsByIdAttachmentsErrors = {
 	/**
 	 * Default Response
 	 */
-	409: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-	/**
-	 * Default Response
-	 */
 	500: {
 		message: string;
 		code: string;
@@ -1827,15 +2898,15 @@ export type PostV1ComplaintsByIdAttachmentsResponses = {
 	200: {
 		complaint: {
 			id: string;
+			status: "OPEN" | "RESOLVED" | "CANCELED";
 			date: Date;
-			type: "IRREGULAR_DISPOSAL" | "DEFORESTATION" | "BURNING" | "VACANT_LOT";
 			observations: string | null;
 			geospatial: {
 				heading: {
 					trueHeading: number;
 					magHeading: number;
 					accuracy: number;
-				};
+				} | null;
 				location: {
 					coords: {
 						latitude: number;
@@ -1864,16 +2935,28 @@ export type PostV1ComplaintsByIdAttachmentsResponses = {
 					formattedAddress?: string | null;
 				};
 			};
-			status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "REJECTED" | "CANCELED";
-			attachment: {
+			attachments: Array<{
 				id: string;
 				url: string;
 				file_name: string;
 				path: string;
 				base64: string;
+				metadata: {
+					[key: string]: unknown;
+				} | null;
 				type: "PHOTO" | "VIDEO";
 				created_at: Date;
-			} | null;
+			}>;
+			categories: Array<{
+				id: string;
+				name: string;
+				hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			}>;
+			vote_counts: {
+				resolved: number;
+				not_resolved: number;
+			};
+			resolution_count: number;
 			created_at: Date;
 		};
 	};
@@ -1897,19 +2980,6 @@ export type GetV1MarketData = {
 	url: "/v1/market";
 };
 
-export type GetV1MarketErrors = {
-	/**
-	 * Default Response
-	 */
-	401: {
-		message: string;
-		code: string;
-		statusCode: number;
-	};
-};
-
-export type GetV1MarketError = GetV1MarketErrors[keyof GetV1MarketErrors];
-
 export type GetV1MarketResponses = {
 	/**
 	 * Default Response
@@ -1917,10 +2987,9 @@ export type GetV1MarketResponses = {
 	200: {
 		companies: Array<{
 			id: string;
-			business_name: string | null;
+			business_name: string;
 			corporate_name: string;
 			company_type: "ONG" | "COMPANY" | "GOVERNMENT" | "COLLECTOR";
-			accept_appointments: boolean;
 			status: boolean;
 			phones: Array<string>;
 			address: {
@@ -1933,30 +3002,37 @@ export type GetV1MarketResponses = {
 				city: string;
 				state: string;
 				state_code: string;
-				latitude: number | null;
-				longitude: number | null;
+				latitude: number;
+				longitude: number;
 			};
+			avatar: string | null;
 			services: Array<{
 				id: string;
 				name: string;
-				description: string | null;
 				price: number;
-				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-				waste_type: "RECYCLABLE" | "GARBAGE";
+				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				waste_category_id: string;
 				quantity: number;
-				observations: string | null;
-				sub_items: Array<string> | null;
+				description: string | null;
+				waste_category: {
+					id: string;
+					name: string;
+					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				};
 			}>;
 			wastes: Array<{
 				id: string;
 				name: string;
-				description: string | null;
 				price: number;
-				unit: "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
-				waste_type: "RECYCLABLE" | "GARBAGE";
+				unit: "DAY" | "KG" | "L" | "UNIT" | "M" | "M2" | "M3" | "ML";
+				waste_category_id: string;
 				quantity: number;
-				observations: string | null;
-				sub_items: Array<string> | null;
+				description: string | null;
+				waste_category: {
+					id: string;
+					name: string;
+					hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+				};
 			}>;
 			business_hours: Array<{
 				id: string;
@@ -1976,6 +3052,8 @@ export type GetV1MarketResponses = {
 				}>;
 			}>;
 			distance_in_meters: number;
+			identity: string | null;
+			identity_type: "CNPJ";
 		}>;
 		next_cursor: string | null;
 	};
@@ -1983,3 +3061,123 @@ export type GetV1MarketResponses = {
 
 export type GetV1MarketResponse =
 	GetV1MarketResponses[keyof GetV1MarketResponses];
+
+export type GetV1WasteCategoriesData = {
+	body?: never;
+	path?: never;
+	query?: never;
+	url: "/v1/waste-categories";
+};
+
+export type GetV1WasteCategoriesErrors = {
+	/**
+	 * Default Response
+	 */
+	500: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1WasteCategoriesError =
+	GetV1WasteCategoriesErrors[keyof GetV1WasteCategoriesErrors];
+
+export type GetV1WasteCategoriesResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		categories: Array<{
+			id: string;
+			name: string;
+			description: string | null;
+			observations: string | null;
+			hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			created_at: Date;
+			updated_at: Date;
+			subcategories: Array<{
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+				type: "INCLUDE" | "EXCLUDE";
+				created_at: Date;
+				category_id: string;
+			}>;
+		}>;
+	};
+};
+
+export type GetV1WasteCategoriesResponse =
+	GetV1WasteCategoriesResponses[keyof GetV1WasteCategoriesResponses];
+
+export type GetV1WasteCategoriesByIdData = {
+	body?: never;
+	path: {
+		id: string;
+	};
+	query?: never;
+	url: "/v1/waste-categories/{id}";
+};
+
+export type GetV1WasteCategoriesByIdErrors = {
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1WasteCategoriesByIdError =
+	GetV1WasteCategoriesByIdErrors[keyof GetV1WasteCategoriesByIdErrors];
+
+export type GetV1WasteCategoriesByIdResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		category: {
+			id: string;
+			name: string;
+			description: string | null;
+			observations: string | null;
+			hazard_levels: Array<"LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH">;
+			created_at: Date;
+			updated_at: Date;
+			subcategories: Array<{
+				id: string;
+				name: string;
+				description: string | null;
+				observations: string | null;
+				hazard_level: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+				type: "INCLUDE" | "EXCLUDE";
+				created_at: Date;
+				category_id: string;
+			}>;
+		};
+	};
+};
+
+export type GetV1WasteCategoriesByIdResponse =
+	GetV1WasteCategoriesByIdResponses[keyof GetV1WasteCategoriesByIdResponses];
+
+export type GetStorageBy__Data = {
+	body?: never;
+	path: {
+		"*": string;
+	};
+	query?: never;
+	url: "/storage/{*}";
+};
+
+export type GetStorageBy__Responses = {
+	/**
+	 * Default Response
+	 */
+	200: unknown;
+};

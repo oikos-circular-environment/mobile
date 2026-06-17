@@ -3,39 +3,42 @@ import { ArrowLeft, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ImagePreviewViewer, VideoPreviewPlayer } from "@/components/common";
+import {
+	ImagePreviewViewer,
+	VideoPreviewPlayer,
+} from "@/components/medias-preview";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
-import { useComplaintCreateContext } from "@/contexts/create-complaint-context";
+import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 
 export default function ComplaintPreviewScreen() {
-	const { captureId } = useLocalSearchParams<{ captureId?: string }>();
-	const { captures, deleteCapture } = useComplaintCreateContext();
+	const { id } = useLocalSearchParams<{ id: string }>();
+	const { attachments, removeAttachment } = useComplaintCreation();
 	const insets = useSafeAreaInsets();
 	const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-	const previewCapture = captures.find(capture => capture.id === captureId);
-	const captureUri = previewCapture?.capture.object?.uri;
+	const attachment = attachments.find(a => a.id === id);
+	const uri = attachment?.uri ?? attachment?.url;
+	const mediaType = attachment?.mediaType;
+	const canDelete = !!attachment;
 
 	const handleDeleteConfirm = () => {
-		if (!captureId) return;
-		deleteCapture(captureId);
+		if (!id) return;
+		removeAttachment(id);
 		setConfirmingDelete(false);
 		router.back();
 	};
 
 	return (
 		<View className="flex-1 bg-black">
-			{previewCapture && captureUri ? (
-				previewCapture.capture.type === "photo" ? (
-					<ImagePreviewViewer uri={captureUri} />
-				) : (
-					<VideoPreviewPlayer uri={captureUri} />
-				)
+			{uri && mediaType === "photo" ? (
+				<ImagePreviewViewer uri={uri} />
+			) : uri && mediaType === "video" ? (
+				<VideoPreviewPlayer uri={uri} />
 			) : (
 				<View className="flex-1 items-center justify-center">
 					<Text className="text-white/50">
-						Não foi possível carregar a captura.
+						Não foi possível carregar a mídia.
 					</Text>
 				</View>
 			)}
@@ -51,7 +54,7 @@ export default function ComplaintPreviewScreen() {
 					<ArrowLeft size={20} color={colors.white} strokeWidth={2.2} />
 				</TouchableOpacity>
 
-				{previewCapture && (
+				{canDelete && (
 					<TouchableOpacity
 						className="rounded-xl bg-black/50 p-3"
 						onPress={() => setConfirmingDelete(true)}
