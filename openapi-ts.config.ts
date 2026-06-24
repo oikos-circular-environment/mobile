@@ -1,7 +1,17 @@
+import "dotenv/config";
 import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
-	input: "http://localhost:3333/docs/openapi.json",
+	input: {
+		path: "https://api.oikos.company/docs/openapi.json",
+		fetch: {
+			headers: {
+				Authorization:
+					"Basic " +
+					btoa(`${process.env.ADMIN_USERNAME}:${process.env.ADMIN_PASSWORD}`),
+			},
+		},
+	},
 	output: {
 		path: "./src/libs/oikos-sdk",
 		postProcess: ["biome:format"],

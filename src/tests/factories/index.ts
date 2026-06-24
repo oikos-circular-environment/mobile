@@ -1,3 +1,4 @@
+export { makeAccount } from "./make-account";
 export { makeAddress } from "./make-address";
 export { makeBusinessHours } from "./make-business-hours";
 export { makeCompany, makeCompanyList } from "./make-company";

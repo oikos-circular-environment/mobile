@@ -14,7 +14,11 @@ import SignInScreen from "@/app/(tabs)/(home)/sign-in";
 import { toast } from "@/components/toast";
 import { AuthContextProvider, useAuthContext } from "@/contexts/auth-context";
 import { setAuthToken } from "@/libs/api/oikos-api";
-import { getV1Profiles, postV1AuthLogin } from "@/libs/oikos-sdk";
+import {
+	getV1Profiles,
+	getV1UsersMe,
+	postV1AuthLogin,
+} from "@/libs/oikos-sdk";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
@@ -24,7 +28,10 @@ jest.mock("expo-router", () => ({
 jest.mock("@/libs/oikos-sdk", () => ({
 	postV1AuthLogin: jest.fn(),
 	getV1Profiles: jest.fn(),
+	getV1UsersMe: jest.fn(),
 	postV1UsersRegister: jest.fn(),
+	deleteV1UsersMe: jest.fn(),
+	patchV1UsersMeCancelDeletion: jest.fn(),
 }));
 
 jest.mock("@/libs/storage", () => ({
@@ -107,6 +114,9 @@ describe("Fluxo de autenticação — integração", () => {
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: { profile: { id: "user-1", name: "Test User" } },
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
+			jest.mocked(getV1UsersMe).mockResolvedValue({
+				data: { user: { id: "user-1", email: "user@example.com", created_at: new Date(), deleted_at: null } },
+			} as unknown as Awaited<ReturnType<typeof getV1UsersMe>>);
 
 			const user = userEvent.setup();
 			await renderWithAuth(<SignInScreen />);
@@ -130,10 +140,12 @@ describe("Fluxo de autenticação — integração", () => {
 			jest.mocked(postV1AuthLogin).mockResolvedValue({
 				data: { token: "access-token", refreshToken: "refresh-token" },
 			} as unknown as Awaited<ReturnType<typeof postV1AuthLogin>>);
-			// empty profile: onSuccess redirects to /profile
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: {},
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
+			jest.mocked(getV1UsersMe).mockResolvedValue({
+				data: { user: { id: "user-1", email: "user@example.com", created_at: new Date(), deleted_at: null } },
+			} as unknown as Awaited<ReturnType<typeof getV1UsersMe>>);
 
 			const user = userEvent.setup();
 			await renderWithAuth(<SignInScreen />);
@@ -178,11 +190,13 @@ describe("Fluxo de autenticação — integração", () => {
 
 	describe("SignOut", () => {
 		it("reseta o estado de autenticação, navega para home e exibe toast", async () => {
-			// Seed a valid token so the auth context initializes as authenticated
 			setAuthToken("existing-access-token");
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: { profile: { id: "user-1", name: "Test User" } },
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
+			jest.mocked(getV1UsersMe).mockResolvedValue({
+				data: { user: { id: "user-1", email: "user@example.com", created_at: new Date(), deleted_at: null } },
+			} as unknown as Awaited<ReturnType<typeof getV1UsersMe>>);
 
 			await renderWithAuth(<AuthStateHarness />);
 
