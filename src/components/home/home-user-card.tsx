@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { ArrowRight, SettingsIcon, UserRoundPen } from "lucide-react-native";
+import { ArrowRight, Settings2Icon, UserRoundPen } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import OikosLogo from "@/assets/icons/icon.png";
 import { colors } from "@/components/style/colors";
@@ -64,7 +64,7 @@ export function HomeUserCard({ onOpenSettings }: HomeUserCardProps) {
 				className="size-12"
 				onPress={onOpenSettings}
 			>
-				<SettingsIcon size={18} color={colors.gray[700]} />
+				<Settings2Icon size={18} color={colors.gray[700]} />
 			</Button>
 		</Card>
 	);
