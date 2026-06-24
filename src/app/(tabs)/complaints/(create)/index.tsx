@@ -74,6 +74,13 @@ import {
 	reverseGeocode,
 } from "@/libs/google/reverse-geocode";
 import { mask } from "@/libs/mask";
+import { compressMedia } from "@/libs/media-compression";
+import {
+	formatFileSize,
+	getFileSize,
+	isValidMimeType,
+	MAX_FILE_SIZE_BYTES,
+} from "@/libs/media-validation";
 import type { Geospatial } from "@/libs/types/complaint";
 
 const schema = z.object({
@@ -198,8 +205,6 @@ export default function ComplaintCreateScreen() {
 		return () => exitEditMode();
 	}, [exitEditMode]);
 
-	// ─── Address helpers ──────────────────────────────────────────────────────
-
 	const handleAddressSelect = useCallback(
 		(fields: GoogleAddressFields) => {
 			if (fields.street)
@@ -280,8 +285,6 @@ export default function ComplaintCreateScreen() {
 		[setValue],
 	);
 
-	// ─── Gallery ─────────────────────────────────────────────────────────────
-
 	const handlePickGallery = async () => {
 		const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
 		if (!perm.granted) {
@@ -301,14 +304,27 @@ export default function ComplaintCreateScreen() {
 				const existingUris = new Set(
 					attachments.map(a => a.uri).filter(Boolean),
 				);
+				let skippedCount = 0;
 				for (const asset of result.assets) {
 					if (existingUris.has(asset.uri)) continue;
+					if (!isValidMimeType(asset.mimeType)) {
+						skippedCount++;
+						continue;
+					}
 					addAttachment({
 						id: asset.assetId ?? Crypto.randomUUID(),
 						source: "gallery",
 						mediaType: asset.type === "video" ? "video" : "photo",
 						uri: asset.uri,
+						fileSize: asset.fileSize,
+						mimeType: asset.mimeType,
 					});
+				}
+				if (skippedCount > 0) {
+					toast.warning(
+						"Arquivos ignorados",
+						`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
+					);
 				}
 			}
 		} catch {
@@ -318,8 +334,6 @@ export default function ComplaintCreateScreen() {
 			);
 		}
 	};
-
-	// ─── Submit ───────────────────────────────────────────────────────────────
 
 	const onSubmit = handleSubmit(async data => {
 		if (attachments.length === 0) {
@@ -384,16 +398,37 @@ export default function ComplaintCreateScreen() {
 			},
 		};
 
-		if (editingComplaint) {
-			const newMedia = attachments
-				.filter(a => a.source !== "api" && !!a.uri)
-				.map(a => ({ id: a.id, uri: a.uri as string, mediaType: a.mediaType }));
+		const localAttachments = attachments.filter(
+			a => a.source !== "api" && !!a.uri,
+		);
+		const compressedMedia: MediaItem[] = [];
 
+		for (const att of localAttachments) {
+			const compressedUri = await compressMedia(
+				att.uri as string,
+				att.mediaType,
+			);
+			const size = getFileSize(compressedUri);
+			if (size != null && size > MAX_FILE_SIZE_BYTES) {
+				toast.error(
+					"Arquivo muito grande",
+					`Um arquivo excede ${formatFileSize(MAX_FILE_SIZE_BYTES)} após compressão. Reduza a qualidade ou duração.`,
+				);
+				return;
+			}
+			compressedMedia.push({
+				id: att.id,
+				uri: compressedUri,
+				mediaType: att.mediaType,
+			});
+		}
+
+		if (editingComplaint) {
 			await editComplaint({
 				id: editingComplaint.id,
 				geospatial,
 				observations: data.observations?.trim() || null,
-				newMedia,
+				newMedia: compressedMedia,
 				waste_category_ids: selectedCategoryIds,
 			});
 
@@ -401,14 +436,10 @@ export default function ComplaintCreateScreen() {
 			return;
 		}
 
-		const localMedia: MediaItem[] = attachments
-			.filter(a => !!a.uri)
-			.map(a => ({ id: a.id, uri: a.uri as string, mediaType: a.mediaType }));
-
 		await submitComplaint({
 			geospatial,
 			observations: data.observations?.trim() || null,
-			media: localMedia,
+			media: compressedMedia,
 			waste_category_ids: selectedCategoryIds,
 		});
 
@@ -417,8 +448,6 @@ export default function ComplaintCreateScreen() {
 		reset();
 		router.replace("/(tabs)/complaints/list");
 	});
-
-	// ─── Render ───────────────────────────────────────────────────────────────
 
 	const isEditMode = !!editingComplaint;
 
@@ -743,6 +772,7 @@ export default function ComplaintCreateScreen() {
 												fallbackLabel={
 													attachment.mediaType === "video" ? "VÍD" : "IMG"
 												}
+												fileSizeBytes={attachment.fileSize}
 											/>
 										</TouchableOpacity>
 										<TouchableOpacity

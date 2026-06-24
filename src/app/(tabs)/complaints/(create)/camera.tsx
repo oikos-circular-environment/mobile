@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Camera } from "@/components/camera";
 import { colors } from "@/components/style/colors";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
+import { getFileSize } from "@/libs/media-validation";
 import type {
 	CameraCapturedVideo,
 	ComplaintCaptureMode,
@@ -20,18 +21,20 @@ export default function ComplaintCameraScreen() {
 
 	const cameraAttachments = attachments.filter(a => a.source === "camera");
 
-	const handleCapture = (
+	const handleCapture = async (
 		captureObject: CameraCapturedPicture | CameraCapturedVideo,
 		captureType: ComplaintCaptureMode,
 	) => {
 		const uri = captureObject?.uri;
 		if (!uri) return;
 
+		const fileSize = getFileSize(uri);
 		const attachment: DraftAttachment = {
 			id: Crypto.randomUUID(),
 			source: "camera",
 			mediaType: captureType,
 			uri,
+			fileSize,
 		};
 		addAttachment(attachment);
 	};
@@ -47,7 +50,7 @@ export default function ComplaintCameraScreen() {
 
 			<View
 				className="absolute left-0 right-0 flex-row px-5"
-				style={{ top: insets.top + 16 }}
+				style={{ top: 16 }}
 			>
 				<TouchableOpacity
 					className="rounded-xl p-3"
@@ -56,8 +59,8 @@ export default function ComplaintCameraScreen() {
 					<ArrowLeft size={20} color={colors.white} strokeWidth={2.2} />
 				</TouchableOpacity>
 			</View>
-			<Camera.RecordingTimer />
-			<Camera.FlashControl />
+			<Camera.RecordingTimer style={{ top: 16 }} />
+			<Camera.FlashControl style={{ top: 16 }} />
 			<Camera.ZoomControls style={{ bottom: insets.bottom + 180 }} />
 			<Camera.ModeSelector style={{ bottom: insets.bottom + 120 }} />
 

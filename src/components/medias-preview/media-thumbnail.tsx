@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
+import { formatFileSize, MAX_FILE_SIZE_BYTES } from "@/libs/media-validation";
+import { cn } from "@/libs/utils";
 
 type MediaThumbnailState = VideoThumbnail | "failed";
 
@@ -12,6 +14,7 @@ type MediaThumbnailProps = {
 	mediaType: "photo" | "video";
 	uri?: string;
 	fallbackLabel?: string;
+	fileSizeBytes?: number;
 };
 
 const styles = StyleSheet.create({
@@ -19,12 +22,35 @@ const styles = StyleSheet.create({
 		...StyleSheet.absoluteFillObject,
 		borderRadius: 6,
 	},
+	badge: {
+		position: "absolute",
+		bottom: 4,
+		left: 4,
+	},
 });
+
+function FileSizeBadge({ bytes }: { bytes: number }) {
+	const isOverLimit = bytes > MAX_FILE_SIZE_BYTES;
+	return (
+		<View
+			style={styles.badge}
+			className={cn(
+				"rounded px-1 py-0.5",
+				isOverLimit ? "bg-red-600" : "bg-black/60",
+			)}
+		>
+			<Text className="text-[9px] font-semibold leading-tight text-white">
+				{formatFileSize(bytes)}
+			</Text>
+		</View>
+	);
+}
 
 export function MediaThumbnail({
 	mediaType,
 	uri,
 	fallbackLabel = "MEDIA",
+	fileSizeBytes,
 }: MediaThumbnailProps) {
 	const [videoThumbnail, setVideoThumbnail] = useState<
 		MediaThumbnailState | undefined
@@ -107,6 +133,9 @@ export function MediaThumbnail({
 					onLoad={() => setPhotoState("loaded")}
 					onError={() => setPhotoState("failed")}
 				/>
+				{photoState === "loaded" && fileSizeBytes != null && (
+					<FileSizeBadge bytes={fileSizeBytes} />
+				)}
 				{photoState === "loading" && (
 					<Skeleton
 						variant="rounded"
@@ -145,10 +174,13 @@ export function MediaThumbnail({
 	}
 
 	return (
-		<Image
-			source={videoThumbnail}
-			style={{ height: "100%", width: "100%", borderRadius: 6 }}
-			contentFit="cover"
-		/>
+		<View className="flex-1">
+			<Image
+				source={videoThumbnail}
+				style={{ height: "100%", width: "100%", borderRadius: 6 }}
+				contentFit="cover"
+			/>
+			{fileSizeBytes != null && <FileSizeBadge bytes={fileSizeBytes} />}
+		</View>
 	);
 }

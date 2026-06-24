@@ -1,23 +1,20 @@
 import { ZapIcon, ZapOffIcon } from "lucide-react-native";
+import type { StyleProp, ViewStyle } from "react-native";
 import { TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { useCameraContext } from "./context";
 
 type CameraFlashControlProps = {
-	topOffset?: number;
+	style?: StyleProp<ViewStyle>;
 };
 
-export function CameraFlashControl({
-	topOffset = 16,
-}: CameraFlashControlProps) {
+export function CameraFlashControl({ style }: CameraFlashControlProps) {
 	const { flash, toggleFlash } = useCameraContext();
-	const insets = useSafeAreaInsets();
 
 	const FlashIcon = flash === "on" ? ZapIcon : ZapOffIcon;
 
 	return (
-		<View className="absolute right-5" style={{ top: insets.top + topOffset }}>
+		<View className="absolute right-5" style={style}>
 			<TouchableOpacity
 				className="rounded-xl bg-white/90 p-3"
 				onPress={toggleFlash}
