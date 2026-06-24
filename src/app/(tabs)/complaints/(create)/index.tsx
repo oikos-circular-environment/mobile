@@ -435,7 +435,7 @@ export default function ComplaintCreateScreen() {
 			<ScrollView
 				className="flex-1"
 				contentContainerClassName="gap-4 px-4 py-4 pb-8"
-				keyboardShouldPersistTaps="always"
+				keyboardShouldPersistTaps="handled"
 			>
 				{/* Info card */}
 				<Card className="flex-row items-start gap-3 bg-gray-100 p-3 shadow-none">

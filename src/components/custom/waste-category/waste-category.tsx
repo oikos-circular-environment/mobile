@@ -79,16 +79,26 @@ export function WasteCategory(props: WasteCategoryProps) {
 	}, [selectedCategory, isMulti, categories, defaultCategoryId]);
 
 	const handleSelect = (category: WasteCategoryModel) => {
-		setSelectedCategory(category);
-
 		if (isMulti) {
 			const exists = selectedCategories.some(c => c.id === category.id);
 			const updated = exists
 				? selectedCategories.filter(c => c.id !== category.id)
 				: [...selectedCategories, category];
 			setSelectedCategories(updated);
+
+			if (exists) {
+				setSelectedCategory(
+					selectedCategory?.id === category.id
+						? (updated[0] ?? null)
+						: selectedCategory,
+				);
+			} else {
+				setSelectedCategory(category);
+			}
+
 			(onChangeRef.current as (cats: WasteCategoryModel[]) => void)?.(updated);
 		} else {
+			setSelectedCategory(category);
 			(onChangeRef.current as (cat: WasteCategoryModel) => void)?.(category);
 		}
 	};
