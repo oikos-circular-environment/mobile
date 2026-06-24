@@ -3,7 +3,7 @@ import type { VideoThumbnail } from "expo-video";
 import { useVideoPlayer } from "expo-video";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 
 type MediaThumbnailState = VideoThumbnail | "failed";
@@ -11,7 +11,6 @@ type MediaThumbnailState = VideoThumbnail | "failed";
 type MediaThumbnailProps = {
 	mediaType: "photo" | "video";
 	uri?: string;
-	loadingLabel?: string;
 	fallbackLabel?: string;
 };
 
@@ -25,7 +24,6 @@ const styles = StyleSheet.create({
 export function MediaThumbnail({
 	mediaType,
 	uri,
-	loadingLabel = "Carregando",
 	fallbackLabel = "MEDIA",
 }: MediaThumbnailProps) {
 	const [videoThumbnail, setVideoThumbnail] = useState<
@@ -94,7 +92,7 @@ export function MediaThumbnail({
 	if (mediaType === "photo") {
 		if (!uri) {
 			return (
-				<View className="flex-1 items-center justify-center bg-zinc-700">
+				<View className="flex-1 items-center justify-center bg-gray-500">
 					<Text className="text-[10px] text-white/70">{fallbackLabel}</Text>
 				</View>
 			);
@@ -110,20 +108,16 @@ export function MediaThumbnail({
 					onError={() => setPhotoState("failed")}
 				/>
 				{photoState === "loading" && (
-					<View
+					<Skeleton
+						variant="rounded"
+						startColor="bg-gray-500"
 						style={styles.overlay}
-						className="items-center justify-center bg-zinc-700"
-					>
-						<Spinner size="small" color="grey" />
-						<Text className="mt-1 text-[10px] text-white/70">
-							{loadingLabel}
-						</Text>
-					</View>
+					/>
 				)}
 				{photoState === "failed" && (
 					<View
 						style={styles.overlay}
-						className="items-center justify-center bg-zinc-800"
+						className="items-center justify-center bg-gray-500"
 					>
 						<Text className="text-[10px] font-semibold text-white">
 							{fallbackLabel}
@@ -136,16 +130,13 @@ export function MediaThumbnail({
 
 	if (!uri || videoThumbnail === undefined) {
 		return (
-			<View className="flex-1 items-center justify-center bg-zinc-700">
-				<Spinner size="small" color="grey" />
-				<Text className="mt-1 text-[10px] text-white/70">{loadingLabel}</Text>
-			</View>
+			<Skeleton variant="rounded" startColor="bg-gray-500" className="flex-1" />
 		);
 	}
 
 	if (videoThumbnail === "failed") {
 		return (
-			<View className="flex-1 items-center justify-center bg-zinc-800">
+			<View className="flex-1 items-center justify-center bg-gray-500">
 				<Text className="text-[10px] font-semibold text-white">
 					{fallbackLabel}
 				</Text>
