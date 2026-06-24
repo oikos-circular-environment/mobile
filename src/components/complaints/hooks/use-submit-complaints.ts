@@ -5,6 +5,7 @@ import {
 	postV1ComplaintsByIdAttachments,
 } from "@/libs/oikos-sdk";
 import type { Geospatial } from "@/libs/types/complaint";
+import type { OnUploadProgress } from "./upload-progress";
 import {
 	COMPLAINTS_QUERY_KEY,
 	DASHBOARD_QUERY_KEY,
@@ -21,6 +22,7 @@ export type SubmitComplaintPayload = {
 	observations: string | null;
 	media: MediaItem[];
 	waste_category_ids: string[];
+	onProgress?: OnUploadProgress;
 };
 
 export function useSubmitComplaints() {
@@ -32,6 +34,7 @@ export function useSubmitComplaints() {
 			observations,
 			media,
 			waste_category_ids,
+			onProgress,
 		}: SubmitComplaintPayload) => {
 			const res = await postV1Complaints({
 				body: {
@@ -74,8 +77,14 @@ export function useSubmitComplaints() {
 			const complaintId = res.data?.complaint.id;
 			if (!complaintId) return;
 
-			for (const item of media) {
+			for (let i = 0; i < media.length; i++) {
+				const item = media[i];
 				if (!item.uri) continue;
+				onProgress?.({
+					phase: "uploading",
+					current: i + 1,
+					total: media.length,
+				});
 				const isPhoto = item.mediaType === "photo";
 				const formData = new FormData();
 				formData.append("file", {

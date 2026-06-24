@@ -18,10 +18,12 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
+import type { UploadProgress } from "@/components/complaints/hooks/upload-progress";
 import { useAttachmentRemove } from "@/components/complaints/hooks/use-attachment-remove";
 import { useEditComplaint } from "@/components/complaints/hooks/use-edit-complaint";
 import type { MediaItem } from "@/components/complaints/hooks/use-submit-complaints";
 import { useSubmitComplaints } from "@/components/complaints/hooks/use-submit-complaints";
+import { MediaUploadProgress } from "@/components/complaints/media-upload-progress";
 import {
 	type HazardLevelVariant,
 	WasteCategory,
@@ -117,6 +119,9 @@ export default function ComplaintCreateScreen() {
 	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
 	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
 	const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+	const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
+		null,
+	);
 
 	const { mutateAsync: submitComplaint, isPending: isSubmitting } =
 		useSubmitComplaints();
@@ -403,50 +408,70 @@ export default function ComplaintCreateScreen() {
 		);
 		const compressedMedia: MediaItem[] = [];
 
-		for (const att of localAttachments) {
-			const compressedUri = await compressMedia(
-				att.uri as string,
-				att.mediaType,
-			);
-			const size = getFileSize(compressedUri);
-			if (size != null && size > MAX_FILE_SIZE_BYTES) {
-				toast.error(
-					"Arquivo muito grande",
-					`Um arquivo excede ${formatFileSize(MAX_FILE_SIZE_BYTES)} após compressão. Reduza a qualidade ou duração.`,
-				);
+		try {
+			if (localAttachments.length > 0) {
+				setUploadProgress({
+					phase: "compressing",
+					current: 0,
+					total: localAttachments.length,
+				});
+
+				for (let i = 0; i < localAttachments.length; i++) {
+					const att = localAttachments[i];
+					setUploadProgress({
+						phase: "compressing",
+						current: i + 1,
+						total: localAttachments.length,
+					});
+					const compressedUri = await compressMedia(
+						att.uri as string,
+						att.mediaType,
+					);
+					const size = getFileSize(compressedUri);
+					if (size != null && size > MAX_FILE_SIZE_BYTES) {
+						toast.error(
+							"Arquivo muito grande",
+							`Um arquivo excede ${formatFileSize(MAX_FILE_SIZE_BYTES)} após compressão. Reduza a qualidade ou duração.`,
+						);
+						return;
+					}
+					compressedMedia.push({
+						id: att.id,
+						uri: compressedUri,
+						mediaType: att.mediaType,
+					});
+				}
+			}
+
+			if (editingComplaint) {
+				await editComplaint({
+					id: editingComplaint.id,
+					geospatial,
+					observations: data.observations?.trim() || null,
+					newMedia: compressedMedia,
+					waste_category_ids: selectedCategoryIds,
+					onProgress: localAttachments.length > 0 ? setUploadProgress : undefined,
+				});
+
+				router.replace("/(tabs)/complaints/list");
 				return;
 			}
-			compressedMedia.push({
-				id: att.id,
-				uri: compressedUri,
-				mediaType: att.mediaType,
-			});
-		}
 
-		if (editingComplaint) {
-			await editComplaint({
-				id: editingComplaint.id,
+			await submitComplaint({
 				geospatial,
 				observations: data.observations?.trim() || null,
-				newMedia: compressedMedia,
+				media: compressedMedia,
 				waste_category_ids: selectedCategoryIds,
+				onProgress: setUploadProgress,
 			});
 
+			clearDraft();
+			setSelectedCategoryIds([]);
+			reset();
 			router.replace("/(tabs)/complaints/list");
-			return;
+		} finally {
+			setUploadProgress(null);
 		}
-
-		await submitComplaint({
-			geospatial,
-			observations: data.observations?.trim() || null,
-			media: compressedMedia,
-			waste_category_ids: selectedCategoryIds,
-		});
-
-		clearDraft();
-		setSelectedCategoryIds([]);
-		reset();
-		router.replace("/(tabs)/complaints/list");
 	});
 
 	const isEditMode = !!editingComplaint;
@@ -456,7 +481,17 @@ export default function ComplaintCreateScreen() {
 		isEditMode &&
 		attachments.filter(a => a.source === "api").length <
 			(editingComplaint?.attachments.length ?? 0);
-	const hasChanges = isDirty || hasNewAttachments || hasRemovedAttachments;
+	const hasCategoryChanges =
+		isEditMode &&
+		(() => {
+			const original = editingComplaint?.categories.map(c => c.id) ?? [];
+			if (original.length !== selectedCategoryIds.length) return true;
+			const sorted = [...original].sort();
+			const current = [...selectedCategoryIds].sort();
+			return sorted.some((id, i) => id !== current[i]);
+		})();
+	const hasChanges =
+		isDirty || hasNewAttachments || hasRemovedAttachments || hasCategoryChanges;
 	const isSubmitDisabled = isPending || (isEditMode && !hasChanges);
 
 	return (
@@ -920,6 +955,8 @@ export default function ComplaintCreateScreen() {
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
+
+			<MediaUploadProgress progress={uploadProgress} />
 		</KeyboardAvoidingView>
 	);
 }

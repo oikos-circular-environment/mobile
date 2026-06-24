@@ -27,6 +27,8 @@ import { z } from "zod";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker-bottom-sheet";
 import { ComplaintDetailsHeader } from "@/components/complaints/complaint-details-header";
+import type { UploadProgress } from "@/components/complaints/hooks/upload-progress";
+import { MediaUploadProgress } from "@/components/complaints/media-upload-progress";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
@@ -99,6 +101,9 @@ export default function ComplaintResolutionScreen() {
 	>([]);
 	type CompressedMedia = { uri: string; name: string; type: string };
 	const compressedMediaRef = useRef<CompressedMedia[]>([]);
+	const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
+		null,
+	);
 	const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 	const [showCompanyPicker, setShowCompanyPicker] = useState(false);
 	const [existingAttachments, setExistingAttachments] = useState<
@@ -233,7 +238,14 @@ export default function ComplaintResolutionScreen() {
 				});
 			}
 
-			for (const media of compressedMediaRef.current) {
+			const mediaList = compressedMediaRef.current;
+			for (let i = 0; i < mediaList.length; i++) {
+				const media = mediaList[i];
+				setUploadProgress({
+					phase: "uploading",
+					current: i + 1,
+					total: mediaList.length,
+				});
 				const formData = new FormData();
 				formData.append("file", {
 					uri: media.uri,
@@ -247,6 +259,7 @@ export default function ComplaintResolutionScreen() {
 			}
 		},
 		onSuccess: () => {
+			setUploadProgress(null);
 			queryClient.invalidateQueries({ queryKey: ["complaint", id] });
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", id],
@@ -260,6 +273,7 @@ export default function ComplaintResolutionScreen() {
 			router.back();
 		},
 		onError: () => {
+			setUploadProgress(null);
 			toast.error(
 				"Erro",
 				`Não foi possível ${isEditMode ? "atualizar" : "publicar"} a resolução.`,
@@ -282,30 +296,46 @@ export default function ComplaintResolutionScreen() {
 			return;
 		}
 
-		const compressed: CompressedMedia[] = [];
-		for (const asset of selectedAssets) {
-			const isPhoto = asset.type === "image";
-			const ext = isPhoto ? "jpg" : "mp4";
-			const compressedUri = await compressMedia(
-				asset.uri,
-				isPhoto ? "photo" : "video",
-			);
-			const size = getFileSize(compressedUri);
-			if (size != null && size > MAX_FILE_SIZE_BYTES) {
-				toast.error(
-					"Arquivo muito grande",
-					`Um arquivo excede ${formatFileSize(MAX_FILE_SIZE_BYTES)} após compressão. Reduza a qualidade ou duração.`,
-				);
-				return;
-			}
-			compressed.push({
-				uri: compressedUri,
-				name: asset.fileName ?? `resolution_${id}_${Date.now()}.${ext}`,
-				type: isPhoto ? "image/jpeg" : "video/mp4",
+		try {
+			setUploadProgress({
+				phase: "compressing",
+				current: 0,
+				total: selectedAssets.length,
 			});
+
+			const compressed: CompressedMedia[] = [];
+			for (let i = 0; i < selectedAssets.length; i++) {
+				const asset = selectedAssets[i];
+				setUploadProgress({
+					phase: "compressing",
+					current: i + 1,
+					total: selectedAssets.length,
+				});
+				const isPhoto = asset.type === "image";
+				const ext = isPhoto ? "jpg" : "mp4";
+				const compressedUri = await compressMedia(
+					asset.uri,
+					isPhoto ? "photo" : "video",
+				);
+				const size = getFileSize(compressedUri);
+				if (size != null && size > MAX_FILE_SIZE_BYTES) {
+					toast.error(
+						"Arquivo muito grande",
+						`Um arquivo excede ${formatFileSize(MAX_FILE_SIZE_BYTES)} após compressão. Reduza a qualidade ou duração.`,
+					);
+					return;
+				}
+				compressed.push({
+					uri: compressedUri,
+					name: asset.fileName ?? `resolution_${id}_${Date.now()}.${ext}`,
+					type: isPhoto ? "image/jpeg" : "video/mp4",
+				});
+			}
+			compressedMediaRef.current = compressed;
+			mutation.mutate(data);
+		} catch {
+			setUploadProgress(null);
 		}
-		compressedMediaRef.current = compressed;
-		mutation.mutate(data);
 	};
 
 	return (
@@ -613,6 +643,8 @@ export default function ComplaintResolutionScreen() {
 				selectedCompanyId={selectedCompany?.id}
 				disablePortal
 			/>
+
+			<MediaUploadProgress progress={uploadProgress} />
 		</>
 	);
 }
