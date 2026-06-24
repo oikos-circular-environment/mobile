@@ -3,6 +3,7 @@
 import type { Client, Options as Options2, TDataShape } from "./client";
 import { client } from "./client.gen";
 import {
+	deleteV1UsersMeResponseTransformer,
 	getV1CompaniesByIdAddressesResponseTransformer,
 	getV1CompaniesByIdServicesResponseTransformer,
 	getV1CompaniesByIdWastesResponseTransformer,
@@ -14,6 +15,7 @@ import {
 	getV1ComplaintsResponseTransformer,
 	getV1ProfilesAddressesResponseTransformer,
 	getV1ProfilesResponseTransformer,
+	getV1UsersMeResponseTransformer,
 	getV1WasteCategoriesByIdResponseTransformer,
 	getV1WasteCategoriesResponseTransformer,
 	patchV1CompaniesByIdStatusResponseTransformer,
@@ -49,6 +51,9 @@ import type {
 	DeleteV1ProfilesImagesData,
 	DeleteV1ProfilesImagesErrors,
 	DeleteV1ProfilesImagesResponses,
+	DeleteV1UsersMeData,
+	DeleteV1UsersMeErrors,
+	DeleteV1UsersMeResponses,
 	GetStorageBy__Data,
 	GetStorageBy__Responses,
 	GetV1CompaniesByIdAddressesData,
@@ -94,6 +99,9 @@ import type {
 	GetV1ProfilesData,
 	GetV1ProfilesErrors,
 	GetV1ProfilesResponses,
+	GetV1UsersMeData,
+	GetV1UsersMeErrors,
+	GetV1UsersMeResponses,
 	GetV1WasteCategoriesByIdData,
 	GetV1WasteCategoriesByIdErrors,
 	GetV1WasteCategoriesByIdResponses,
@@ -118,6 +126,9 @@ import type {
 	PatchV1ComplaintsByIdResolvedErrors,
 	PatchV1ComplaintsByIdResolvedResponses,
 	PatchV1ComplaintsByIdResponses,
+	PatchV1UsersMeCancelDeletionData,
+	PatchV1UsersMeCancelDeletionErrors,
+	PatchV1UsersMeCancelDeletionResponses,
 	PostV1AuthLoginData,
 	PostV1AuthLoginErrors,
 	PostV1AuthLoginResponses,
@@ -250,6 +261,67 @@ export const postV1UsersRegister = <ThrowOnError extends boolean = false>(
 			"Content-Type": "application/json",
 			...options.headers,
 		},
+	});
+
+/**
+ * Request account deletion
+ *
+ * Schedules the authenticated user's account for deletion after a grace period.
+ */
+export const deleteV1UsersMe = <ThrowOnError extends boolean = false>(
+	options?: Options<DeleteV1UsersMeData, ThrowOnError>,
+) =>
+	(options?.client ?? client).delete<
+		DeleteV1UsersMeResponses,
+		DeleteV1UsersMeErrors,
+		ThrowOnError
+	>({
+		responseTransformer: deleteV1UsersMeResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/users/me",
+		...options,
+	});
+
+/**
+ * Get authenticated user
+ *
+ * Returns the authenticated user's account information.
+ */
+export const getV1UsersMe = <ThrowOnError extends boolean = false>(
+	options?: Options<GetV1UsersMeData, ThrowOnError>,
+) =>
+	(options?.client ?? client).get<
+		GetV1UsersMeResponses,
+		GetV1UsersMeErrors,
+		ThrowOnError
+	>({
+		responseTransformer: getV1UsersMeResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/users/me",
+		...options,
+	});
+
+/**
+ * Cancel account deletion
+ *
+ * Cancels a previously scheduled account deletion.
+ */
+export const patchV1UsersMeCancelDeletion = <
+	ThrowOnError extends boolean = false,
+>(
+	options?: Options<PatchV1UsersMeCancelDeletionData, ThrowOnError>,
+) =>
+	(options?.client ?? client).patch<
+		PatchV1UsersMeCancelDeletionResponses,
+		PatchV1UsersMeCancelDeletionErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/users/me/cancel-deletion",
+		...options,
 	});
 
 /**

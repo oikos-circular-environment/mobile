@@ -75,9 +75,18 @@ jest.mock("expo-image", () => ({
 	Image: () => null,
 }));
 
-jest.mock("@/components/auth/button-sign-out", () => {
+jest.mock("@/components/settings/settings-bottom-sheet", () => {
 	const { View: V } = require("react-native");
-	return { ButtonSignOut: () => <V testID="button-sign-out" /> };
+	return {
+		SettingsBottomSheet: require("react").forwardRef(() => (
+			<V testID="settings-bottom-sheet" />
+		)),
+	};
+});
+
+jest.mock("@/components/settings/delete-account-modal", () => {
+	const { View: V } = require("react-native");
+	return { DeleteAccountModal: () => <V testID="delete-account-modal" /> };
 });
 
 jest.mock("@/components/auth/profile-completion-modal", () => ({
@@ -132,9 +141,14 @@ const defaultAuth = {
 	isAuthenticated: false,
 	isLoading: false,
 	needsProfileCompletion: false,
+	deletionScheduledAt: null,
 	signIn: jest.fn(),
 	signUp: jest.fn(),
 	signOut: jest.fn(),
+	requestDeletion: jest.fn(),
+	cancelDeletion: jest.fn(),
+	isRequestingDeletion: false,
+	isCancellingDeletion: false,
 	updateUserProfile: jest.fn(),
 };
 
@@ -231,7 +245,6 @@ describe("HomeScreen — integração", () => {
 		await renderHome();
 
 		expect(screen.getByText("João")).toBeOnTheScreen();
-		expect(screen.getByTestId("button-sign-out")).toBeOnTheScreen();
 	});
 
 	it("renderiza card de cadastro pendente quando autenticado sem perfil", async () => {

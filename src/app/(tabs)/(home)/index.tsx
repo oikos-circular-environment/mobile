@@ -1,3 +1,4 @@
+import type BottomSheetType from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
 import type { Href } from "expo-router";
 import { Link } from "expo-router";
@@ -9,7 +10,7 @@ import {
 	Sprout,
 } from "lucide-react-native";
 import type { ComponentType } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	ActivityIndicator,
 	Animated,
@@ -22,12 +23,22 @@ import { ProfileCompletionModal } from "@/components/auth/profile-completion-mod
 import { HomeGuestCard } from "@/components/home/home-guest-card";
 import { HomeHeaderSkeleton } from "@/components/home/home-header-skeleton";
 import { HomeUserCard } from "@/components/home/home-user-card";
+import { DeleteAccountModal } from "@/components/settings/delete-account-modal";
+import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Grid, GridItem } from "@/components/ui/grid";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import {
+	Modal,
+	ModalBackdrop,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+} from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuthContext } from "@/contexts/auth-context";
@@ -78,12 +89,40 @@ function ServiceCard({
 }
 
 export default function HomeScreen() {
-	const { isAuthenticated, needsProfileCompletion, isLoading } =
-		useAuthContext();
+	const {
+		isAuthenticated,
+		needsProfileCompletion,
+		isLoading,
+		signOut,
+		requestDeletion,
+		isRequestingDeletion,
+	} = useAuthContext();
 	const [showProfileModal, setShowProfileModal] = useState(false);
+	const [showSignOutModal, setShowSignOutModal] = useState(false);
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const settingsSheetRef = useRef<BottomSheetType>(null);
 	const { location, currentDate, isResolving, permissionDenied } =
 		useGeospatial();
 	const contentOpacity = useRef(new Animated.Value(0)).current;
+
+	const handleOpenSettings = useCallback(() => {
+		settingsSheetRef.current?.snapToIndex(0);
+	}, []);
+
+	const handleSignOut = useCallback(() => {
+		settingsSheetRef.current?.close();
+		setShowSignOutModal(true);
+	}, []);
+
+	const handleDeleteAccount = useCallback(() => {
+		settingsSheetRef.current?.close();
+		setShowDeleteModal(true);
+	}, []);
+
+	const handleConfirmDeletion = useCallback(() => {
+		requestDeletion();
+		setShowDeleteModal(false);
+	}, [requestDeletion]);
 
 	const lat = location?.coords.latitude;
 	const lon = location?.coords.longitude;
@@ -126,7 +165,11 @@ export default function HomeScreen() {
 						<HomeHeaderSkeleton />
 					) : (
 						<Animated.View style={{ opacity: contentOpacity }}>
-							{isAuthenticated ? <HomeUserCard /> : <HomeGuestCard />}
+							{isAuthenticated ? (
+									<HomeUserCard onOpenSettings={handleOpenSettings} />
+								) : (
+									<HomeGuestCard />
+								)}
 						</Animated.View>
 					)}
 				</View>
@@ -335,6 +378,57 @@ export default function HomeScreen() {
 				onClose={() => setShowProfileModal(false)}
 				description="Para acessar o gerenciamento de empresas você precisa finalizar o seu cadastro."
 			/>
+
+			{isAuthenticated && (
+				<>
+					<SettingsBottomSheet
+						ref={settingsSheetRef}
+						onSignOut={handleSignOut}
+						onDeleteAccount={handleDeleteAccount}
+					/>
+
+					<Modal
+						isOpen={showSignOutModal}
+						onClose={() => setShowSignOutModal(false)}
+						useRNModal
+					>
+						<ModalBackdrop />
+						<ModalContent className="gap-4">
+							<ModalHeader className="flex-col items-start gap-1">
+								<Heading size="xl">Sair da conta</Heading>
+								<Text>
+									Você está prestes a sair da sua conta. Deseja continuar?
+								</Text>
+							</ModalHeader>
+							<ModalFooter className="gap-2">
+								<Button
+									variant="outline"
+									className="flex-1 border-gray-200"
+									onPress={() => setShowSignOutModal(false)}
+								>
+									<ButtonText className="text-gray-700">Cancelar</ButtonText>
+								</Button>
+								<Button
+									className="flex-1 bg-red-600"
+									onPress={() => {
+										setShowSignOutModal(false);
+										signOut();
+									}}
+								>
+									<ButtonText>Sair</ButtonText>
+								</Button>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
+
+					<DeleteAccountModal
+						isOpen={showDeleteModal}
+						onClose={() => setShowDeleteModal(false)}
+						onConfirm={handleConfirmDeletion}
+						isLoading={isRequestingDeletion}
+					/>
+				</>
+			)}
 		</>
 	);
 }

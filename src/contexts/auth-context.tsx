@@ -18,20 +18,28 @@ import {
 	setRefreshToken,
 } from "@/libs/api/oikos-api";
 import {
+	deleteV1UsersMe,
 	getV1Profiles,
+	getV1UsersMe,
+	patchV1UsersMeCancelDeletion,
 	postV1AuthLogin,
 	postV1UsersRegister,
 } from "@/libs/oikos-sdk";
-import type { User } from "@/libs/types/user";
+import type { Account, User } from "@/libs/types/user";
 
 type AuthContextValue = {
 	user: User | null;
 	isAuthenticated: boolean;
 	isLoading: boolean;
 	needsProfileCompletion: boolean;
+	deletionScheduledAt: Date | null;
 	signIn: (data: { email: string; password: string }) => void;
 	signUp: (data: { email: string; password: string }) => void;
 	signOut: () => void;
+	requestDeletion: () => void;
+	cancelDeletion: () => void;
+	isRequestingDeletion: boolean;
+	isCancellingDeletion: boolean;
 	updateUserProfile: (data: Partial<User>) => void;
 };
 
@@ -39,6 +47,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthContextProvider({ children }: PropsWithChildren) {
 	const [user, setUser] = useState<User | null>(null);
+	const [account, setAccount] = useState<Account | null>(null);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [isInitializing, setIsInitializing] = useState(true);
 
@@ -51,11 +60,16 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 	} = useQuery({
 		queryKey: ["user", "profile"],
 		queryFn: async () => {
-			const response = await getV1Profiles();
-			const profile = response.data?.profile;
+			const [profileResponse, userResponse] = await Promise.all([
+				getV1Profiles(),
+				getV1UsersMe(),
+			]);
+			const profile = profileResponse.data?.profile;
+			const userAccount = userResponse.data?.user ?? null;
 			setIsAuthenticated(true);
-			if (profile) {
-				setUser({ profile } as User);
+			setAccount(userAccount);
+			if (profile && userAccount) {
+				setUser({ account: userAccount, profile } as User);
 			}
 			return profile;
 		},
@@ -97,15 +111,23 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			setAuthToken(token);
 			setRefreshToken(refreshToken);
 
-			const response = await getV1Profiles();
-			return response.data;
+			const [profileResponse, userResponse] = await Promise.all([
+				getV1Profiles(),
+				getV1UsersMe(),
+			]);
+			return {
+				profile: profileResponse.data?.profile,
+				account: userResponse.data?.user,
+			};
 		},
 		onSuccess: data => {
 			setIsAuthenticated(true);
 			const profile = data?.profile;
+			const userAccount = data?.account ?? null;
+			setAccount(userAccount);
 
-			if (profile) {
-				setUser({ profile } as User);
+			if (profile && userAccount) {
+				setUser({ account: userAccount, profile } as User);
 				router.push("/(tabs)/(home)");
 			} else {
 				toast.success(
@@ -158,10 +180,70 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		},
 	});
 
+	const requestDeletionMutation = useMutation({
+		mutationKey: ["request-deletion"],
+		mutationFn: async () => {
+			const response = await deleteV1UsersMe();
+			return response.data;
+		},
+		onSuccess: data => {
+			if (data?.deleted_at) {
+				setAccount(prev =>
+					prev ? { ...prev, deleted_at: data.deleted_at } : prev,
+				);
+				setUser(prev =>
+					prev
+						? {
+								...prev,
+								account: { ...prev.account, deleted_at: data.deleted_at },
+							}
+						: prev,
+				);
+			}
+			toast.success(
+				"Exclusão agendada",
+				"Sua conta será excluída em 90 dias. Você pode cancelar a qualquer momento.",
+			);
+		},
+		onError: () => {
+			toast.error(
+				"Erro ao solicitar exclusão",
+				"Tente novamente mais tarde.",
+			);
+		},
+	});
+
+	const cancelDeletionMutation = useMutation({
+		mutationKey: ["cancel-deletion"],
+		mutationFn: async () => {
+			const response = await patchV1UsersMeCancelDeletion();
+			return response.data;
+		},
+		onSuccess: () => {
+			setAccount(prev => (prev ? { ...prev, deleted_at: null } : prev));
+			setUser(prev =>
+				prev
+					? { ...prev, account: { ...prev.account, deleted_at: null } }
+					: prev,
+			);
+			toast.success(
+				"Exclusão cancelada",
+				"Sua conta não será mais excluída.",
+			);
+		},
+		onError: () => {
+			toast.error(
+				"Erro ao cancelar exclusão",
+				"Tente novamente mais tarde.",
+			);
+		},
+	});
+
 	const signOut = useCallback(() => {
 		setAuthToken(null);
 		setRefreshToken(null);
 		setUser(null);
+		setAccount(null);
 		setIsAuthenticated(false);
 		router.navigate("/(tabs)/(home)");
 		toast.success("Você foi deslogado com sucesso!");
@@ -203,6 +285,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 				signInMutation.isPending ||
 				signUpMutation.isPending,
 			needsProfileCompletion: isAuthenticated && user === null,
+			deletionScheduledAt: account?.deleted_at ?? null,
 			signIn: (data: { email: string; password: string }) => {
 				signInMutation.mutate(data);
 			},
@@ -210,16 +293,23 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 				signUpMutation.mutate(data);
 			},
 			signOut,
+			requestDeletion: () => requestDeletionMutation.mutate(),
+			cancelDeletion: () => cancelDeletionMutation.mutate(),
+			isRequestingDeletion: requestDeletionMutation.isPending,
+			isCancellingDeletion: cancelDeletionMutation.isPending,
 			updateUserProfile,
 		}),
 		[
 			user,
+			account,
 			isAuthenticated,
 			isInitializing,
 			isLoadingProfile,
 			signInMutation,
 			signUpMutation,
 			signOut,
+			requestDeletionMutation,
+			cancelDeletionMutation,
 			updateUserProfile,
 		],
 	);

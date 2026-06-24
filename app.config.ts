@@ -6,7 +6,7 @@ const config: ExpoConfig = {
 	name: "oikos",
 	slug: "oikos",
 	version: "1.0.0",
-	orientation: "portrait",
+	orientation: "default",
 	icon: "./src/assets/icons/icon.png",
 	scheme: "oikos",
 	userInterfaceStyle: "light",
