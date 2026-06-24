@@ -5,11 +5,12 @@ import {
 	MapIcon,
 	MapPinnedIcon,
 	MinusIcon,
+	Navigation2Icon,
 	PlusIcon,
 	Trash2Icon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Image, Platform, TouchableOpacity, View } from "react-native";
+import { Platform, TouchableOpacity, View } from "react-native";
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
@@ -320,11 +321,11 @@ export default function ComplaintsMapScreen() {
 					className="h-11 w-11 items-center justify-center rounded-xl bg-primary"
 					style={controlShadow}
 				>
-					<Image
-						source={require("@/assets/images/compass.png")}
+					<Navigation2Icon
+						size={20}
+						color={colors.white}
+						strokeWidth={2.2}
 						style={{
-							width: 28,
-							height: 28,
 							transform: [{ rotate: `${-mapHeading}deg` }],
 						}}
 					/>
