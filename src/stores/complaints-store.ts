@@ -26,17 +26,6 @@ type ListActions = {
 	updateComplaint: (id: string, patch: Partial<Complaint>) => void;
 };
 
-// ─── Map Votes Slice ─────────────────────────────────────────────────────────
-
-type MapVotesState = {
-	userVotes: Record<string, "RESOLVED" | "NOT_RESOLVED">;
-};
-
-type MapVotesActions = {
-	setVote: (complaintId: string, voteType: "RESOLVED" | "NOT_RESOLVED") => void;
-	removeVote: (complaintId: string) => void;
-};
-
 // ─── Map Selection Slice ─────────────────────────────────────────────────────
 
 type VoteType = "RESOLVED" | "NOT_RESOLVED";
@@ -74,23 +63,17 @@ type ResolutionDraftActions = {
 
 type ComplaintsStoreState = ListState &
 	ListActions &
-	MapVotesState &
-	MapVotesActions &
 	MapSelectionState &
 	MapSelectionActions &
 	ResolutionDraftState &
 	ResolutionDraftActions;
 
-const INITIAL_STATE: ListState &
-	MapVotesState &
-	MapSelectionState &
-	ResolutionDraftState = {
+const INITIAL_STATE: ListState & MapSelectionState & ResolutionDraftState = {
 	complaints: [],
 	dashboard: undefined,
 	nextCursor: undefined,
 	hasNextPage: false,
 	activeFilter: null,
-	userVotes: {},
 	selectedMapComplaint: null,
 	resolutionDraft: null,
 };
@@ -146,18 +129,6 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 			return { complaints: updatedComplaints, dashboard: dash };
 		});
 	},
-
-	setVote: (complaintId, voteType) =>
-		set(state => ({
-			userVotes: { ...state.userVotes, [complaintId]: voteType },
-		})),
-
-	removeVote: complaintId =>
-		set(state => {
-			const next = { ...state.userVotes };
-			delete next[complaintId];
-			return { userVotes: next };
-		}),
 
 	setSelectedMapComplaint: complaint =>
 		set({ selectedMapComplaint: complaint }),

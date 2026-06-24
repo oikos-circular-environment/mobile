@@ -1,5 +1,4 @@
 import { Stack } from "expo-router";
-import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
 import { ComplaintCreationProvider } from "@/contexts/complaint-creation-context";
 
 export default function ComplaintsStackLayout() {
@@ -14,7 +13,6 @@ export default function ComplaintsStackLayout() {
 					options={{ headerShown: false, presentation: "modal" }}
 				/>
 			</Stack>
-			<ComplaintBottomSheet />
 		</ComplaintCreationProvider>
 	);
 }

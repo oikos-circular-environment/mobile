@@ -23,7 +23,7 @@ export const unstable_settings = {
 };
 
 const queryClient = new QueryClient();
-sessionBus.subscribe(() => queryClient.clear());
+sessionBus.subscribe(() => queryClient.resetQueries());
 
 export default function RootLayout() {
 	const [loaded, error] = useFonts({

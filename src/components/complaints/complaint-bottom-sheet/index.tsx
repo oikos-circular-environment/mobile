@@ -1,3 +1,8 @@
+import BottomSheet, {
+	BottomSheetBackdrop,
+	type BottomSheetBackdropProps,
+	BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -10,7 +15,7 @@ import {
 	PlusIcon,
 	ShieldCheckIcon,
 } from "lucide-react-native";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
@@ -19,14 +24,6 @@ import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import { Badge, BadgeText } from "@/components/ui/badge";
-import {
-	BottomSheet,
-	BottomSheetBackdrop,
-	BottomSheetDragIndicator,
-	BottomSheetPortal,
-	type BottomSheetRef,
-	BottomSheetScrollView,
-} from "@/components/ui/bottomsheet";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
@@ -45,22 +42,19 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import {
 	deleteV1ComplaintsByIdResolutions,
-	deleteV1ComplaintsByIdVotes,
 	getV1ComplaintsByIdResolutions,
-	getV1ComplaintsByIdVotes,
-	postV1ComplaintsByIdVotes,
 } from "@/libs/oikos-sdk";
 import type { MapComplaintAttachment } from "@/libs/types/complaint";
 import { cn } from "@/libs/utils";
 import { useComplaintsStore } from "@/stores/complaints-store";
 import { ComplaintDetailsHeader } from "../complaint-details-header";
-import { ComplaintVoteButtons } from "../complaint-vote-buttons";
+import { ComplaintVote, ComplaintVoteButton } from "../complaint-vote-button";
 import { MapComplaintAttachmentPreview } from "./attachment-preview";
 import { ResolutionCard } from "./resolution-card";
 import { ResolutionCardSkeleton } from "./resolution-card-skeleton";
 
 export function ComplaintBottomSheet() {
-	const ref = useRef<BottomSheetRef>(null);
+	const ref = useRef<BottomSheet>(null);
 	const [previewMapComplaintAttachment, setPreviewMapComplaintAttachment] =
 		useState<MapComplaintAttachment | null>(null);
 	const [
@@ -77,17 +71,10 @@ export function ComplaintBottomSheet() {
 	const setSelectedMapComplaint = useComplaintsStore(
 		s => s.setSelectedMapComplaint,
 	);
-	const userVotes = useComplaintsStore(s => s.userVotes);
-	const setVote = useComplaintsStore(s => s.setVote);
-	const removeVote = useComplaintsStore(s => s.removeVote);
-	const patchSelectedMapComplaintVoteCounts = useComplaintsStore(
-		s => s.patchSelectedMapComplaintVoteCounts,
-	);
 	const setResolutionDraft = useComplaintsStore(s => s.setResolutionDraft);
 
 	const queryClient = useQueryClient();
 	const isOpen = !!complaint;
-	const onClose = () => setSelectedMapComplaint(null);
 
 	const userLocation = location
 		? { lat: location.coords.latitude, lon: location.coords.longitude }
@@ -95,11 +82,31 @@ export function ComplaintBottomSheet() {
 
 	useEffect(() => {
 		if (isOpen) {
-			ref.current?.open();
+			ref.current?.snapToIndex(0);
 		} else {
 			ref.current?.close();
 		}
 	}, [isOpen]);
+
+	const handleSheetChange = useCallback(
+		(index: number) => {
+			if (index === -1) {
+				setSelectedMapComplaint(null);
+			}
+		},
+		[setSelectedMapComplaint],
+	);
+
+	const backdropComponent = useCallback(
+		(props: BottomSheetBackdropProps) => (
+			<BottomSheetBackdrop
+				{...props}
+				appearsOnIndex={0}
+				disappearsOnIndex={-1}
+			/>
+		),
+		[],
+	);
 
 	const complaintId = complaint?.id ?? "";
 
@@ -118,15 +125,6 @@ export function ComplaintBottomSheet() {
 		enabled: isOpen && !!complaintId,
 	});
 
-	const { data: voteData } = useQuery({
-		queryKey: ["complaint", "vote", complaintId],
-		queryFn: async () => {
-			const res = await getV1ComplaintsByIdVotes({ path: { id: complaintId } });
-			return res.data;
-		},
-		enabled: isOpen && !!complaintId && isAuthenticated,
-	});
-
 	const deleteMutation = useMutation({
 		mutationFn: () =>
 			deleteV1ComplaintsByIdResolutions({ path: { id: complaintId } }),
@@ -141,75 +139,15 @@ export function ComplaintBottomSheet() {
 		},
 	});
 
-	const voteMutation = useMutation({
-		mutationFn: async ({
-			voteType,
-		}: {
-			voteType: "RESOLVED" | "NOT_RESOLVED" | null;
-			previousVote: "RESOLVED" | "NOT_RESOLVED" | null;
-		}) => {
-			if (!complaintId) return;
-			if (voteType === null) {
-				await deleteV1ComplaintsByIdVotes({ path: { id: complaintId } });
-			} else {
-				await postV1ComplaintsByIdVotes({
-					path: { id: complaintId },
-					body: { vote_type: voteType },
-				});
-			}
-		},
-		onSuccess: (_, { voteType, previousVote }) => {
-			if (voteType === null) {
-				removeVote(complaintId);
-			} else {
-				setVote(complaintId, voteType);
-			}
-			patchSelectedMapComplaintVoteCounts({ previousVote, nextVote: voteType });
-		},
-		onError: () => toast.error("Erro", "Não foi possível registrar seu voto."),
-	});
-
-	useEffect(() => {
-		if (!voteData || !complaintId) return;
-		if (voteData.vote) {
-			setVote(complaintId, voteData.vote.vote_type);
-		} else {
-			removeVote(complaintId);
-		}
-	}, [voteData, complaintId, setVote, removeVote]);
-
-	if (!complaint) return null;
-
 	const resolutions = resolutionsData?.resolutions ?? [];
 
 	const showResolutionsLocked =
-		!isAuthenticated && complaint.resolution_count > 0;
+		!isAuthenticated && !!complaint && complaint.resolution_count > 0;
 
-	const allMapComplaintAttachments = complaint.attachments;
-
-	const currentVote = userVotes[complaintId];
-	const resolvedVotes = complaint.vote_counts.resolved;
-	const notResolvedVotes = complaint.vote_counts.not_resolved;
-	const isResolvedActive = isAuthenticated && currentVote === "RESOLVED";
-	const isNotResolvedActive = isAuthenticated && currentVote === "NOT_RESOLVED";
-
-	const handleVotePress = (vote: "RESOLVED" | "NOT_RESOLVED") => {
-		if (!isAuthenticated) {
-			setShowAuthModal(true);
-			return;
-		}
-		if (needsProfileCompletion) {
-			setShowProfileModal(true);
-			return;
-		}
-		const previous = userVotes[complaintId] ?? null;
-		const next = previous === vote ? null : vote;
-		voteMutation.mutate({ voteType: next, previousVote: previous });
-	};
-
-	const complaintRouteContext = { id: complaint.id };
+	const allMapComplaintAttachments = complaint?.attachments ?? [];
 
 	const handleAddResolution = () => {
+		if (!complaint) return;
 		if (!isAuthenticated) {
 			setShowAuthModal(true);
 			return;
@@ -220,7 +158,7 @@ export function ComplaintBottomSheet() {
 		}
 		router.push({
 			pathname: "/(tabs)/complaints/resolution",
-			params: complaintRouteContext,
+			params: { id: complaint.id },
 		});
 	};
 
@@ -260,9 +198,10 @@ export function ComplaintBottomSheet() {
 			...(attachmentsJson ? { attachmentsJson } : {}),
 		});
 
+		if (!complaint) return;
 		router.push({
 			pathname: "/(tabs)/complaints/resolution",
-			params: complaintRouteContext,
+			params: { id: complaint.id },
 		});
 	};
 
@@ -274,14 +213,16 @@ export function ComplaintBottomSheet() {
 				onClose={() => setPreviewMapComplaintAttachment(null)}
 			/>
 
-			<BottomSheet ref={ref} onClose={onClose}>
-				<BottomSheetPortal
-					snapPoints={["85%"]}
-					backdropComponent={BottomSheetBackdrop}
-					handleComponent={BottomSheetDragIndicator}
-				>
-					<BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
-						{/* Info + actions */}
+			<BottomSheet
+				ref={ref}
+				index={-1}
+				snapPoints={["85%"]}
+				enablePanDownToClose
+				backdropComponent={backdropComponent}
+				onChange={handleSheetChange}
+			>
+				<BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+					{complaint && (
 						<View className="items-start gap-2.5 px-4">
 							<ComplaintDetailsHeader
 								complaint={complaint}
@@ -346,42 +287,42 @@ export function ComplaintBottomSheet() {
 									<Alert className="flex-row items-start gap-2 rounded-lg border border-lime-700 bg-lime-50 p-3">
 										<AlertIcon as={ShieldCheckIcon} className="text-lime-700" />
 										<AlertText className="text-lime-700">
-											Esta denúncia foi encerrada. Não é mais possível
-											registrar votos ou adicionar resoluções.
+											Esta denúncia foi encerrada. Não é mais possível registrar
+											votos ou adicionar resoluções.
 										</AlertText>
 									</Alert>
 								)}
 
-								<VStack className="gap-2">
-									<Heading size="sm">Seu voto importa!</Heading>
-									<Alert className="flex-row items-start gap-2 rounded-lg border border-sky-700 bg-sky-50 p-3">
-										<AlertIcon as={InfoIcon} className="text-sky-700" />
-										<AlertText className="text-sky-700">
-											Compreenda como seu voto ajuda o ecosistema e como
-											funciona nosso sistema de votação e resolução.
-										</AlertText>
-										<Button
-											size="icon"
-											variant="ghost"
-											className="shadown-none"
-											onPress={() => setShowVoteGuide(true)}
-										>
-											<ButtonIcon
-												as={ArrowRightIcon}
-												className="text-sky-700"
-											/>
-										</Button>
-									</Alert>
-								</VStack>
-								<ComplaintVoteButtons
-									resolvedVotes={resolvedVotes}
-									notResolvedVotes={notResolvedVotes}
-									isResolvedActive={isResolvedActive}
-									isNotResolvedActive={isNotResolvedActive}
-									isPendingVote={voteMutation.isPending}
+								<ComplaintVote
+									complaintId={complaint.id}
 									disabled={complaint.status === "RESOLVED"}
-									onVote={handleVotePress}
-								/>
+								>
+									<VStack className="gap-2">
+										<Heading size="sm">Seu voto importa!</Heading>
+										<Alert className="flex-row items-start gap-2 rounded-lg border border-sky-700 bg-sky-50 p-3">
+											<AlertIcon as={InfoIcon} className="text-sky-700" />
+											<AlertText className="text-sky-700">
+												Compreenda como seu voto ajuda o ecosistema e como
+												funciona nosso sistema de votação e resolução.
+											</AlertText>
+											<Button
+												size="icon"
+												variant="ghost"
+												className="shadown-none"
+												onPress={() => setShowVoteGuide(true)}
+											>
+												<ButtonIcon
+													as={ArrowRightIcon}
+													className="text-sky-700"
+												/>
+											</Button>
+										</Alert>
+									</VStack>
+									<View className="flex-row gap-2">
+										<ComplaintVoteButton type="NOT_RESOLVED" />
+										<ComplaintVoteButton type="RESOLVED" />
+									</View>
+								</ComplaintVote>
 
 								<VStack className="w-full gap-2">
 									<HStack space="md">
@@ -454,7 +395,7 @@ export function ComplaintBottomSheet() {
 												<Button
 													className="bg-lime-800"
 													onPress={() => {
-														onClose();
+														setSelectedMapComplaint(null);
 														router.push("/(tabs)/(home)/sign-in");
 													}}
 												>
@@ -500,8 +441,8 @@ export function ComplaintBottomSheet() {
 								</TouchableOpacity>
 							</VStack>
 						</View>
-					</BottomSheetScrollView>
-				</BottomSheetPortal>
+					)}
+				</BottomSheetScrollView>
 			</BottomSheet>
 
 			<AuthModal

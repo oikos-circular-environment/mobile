@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
+import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
 import {
 	type BottomSheetRef,
 	ComplaintFilterBottomSheet,
@@ -411,6 +412,8 @@ export default function ComplaintsMapScreen() {
 				onClose={() => setShowProfileModal(false)}
 				description="Para visualizar e registrar denúncias você precisa finalizar o seu cadastro."
 			/>
+
+			<ComplaintBottomSheet />
 
 			<ComplaintFilterBottomSheet
 				ref={filterSheetRef}
