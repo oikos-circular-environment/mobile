@@ -3,9 +3,11 @@ import {
 	type PropsWithChildren,
 	useCallback,
 	useContext,
+	useEffect,
 	useState,
 } from "react";
 import type { Complaint, DraftAttachment } from "@/libs/types/complaint";
+import { sessionBus } from "@/libs/session-bus";
 
 type ComplaintCreationContextValue = {
 	attachments: DraftAttachment[];
@@ -53,6 +55,13 @@ export function ComplaintCreationProvider({ children }: PropsWithChildren) {
 	const exitEditMode = useCallback(() => {
 		setEditingComplaint(null);
 		setAttachments([]);
+	}, []);
+
+	useEffect(() => {
+		return sessionBus.subscribe(() => {
+			setAttachments([]);
+			setEditingComplaint(null);
+		});
 	}, []);
 
 	return (

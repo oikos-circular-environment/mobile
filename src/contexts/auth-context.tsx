@@ -17,6 +17,7 @@ import {
 	setOnUnauthenticated,
 	setRefreshToken,
 } from "@/libs/api/oikos-api";
+import { sessionBus } from "@/libs/session-bus";
 import {
 	deleteV1UsersMe,
 	getV1Profiles,
@@ -245,6 +246,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		setUser(null);
 		setAccount(null);
 		setIsAuthenticated(false);
+		sessionBus.emit();
 		router.navigate("/(tabs)/(home)");
 		toast.success("Você foi deslogado com sucesso!");
 	}, [router]);
@@ -253,6 +255,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		setOnUnauthenticated(() => {
 			setUser(null);
 			setIsAuthenticated(false);
+			sessionBus.emit();
 			toast.info("Sessão expirada", "Faça o login novamente.");
 			router.push("/sign-in");
 		});
