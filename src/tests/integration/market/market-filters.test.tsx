@@ -129,9 +129,14 @@ const defaultAuth = {
 	isAuthenticated: false,
 	isLoading: false,
 	needsProfileCompletion: false,
+	deletionScheduledAt: null,
 	signIn: jest.fn(),
 	signUp: jest.fn(),
 	signOut: jest.fn(),
+	requestDeletion: jest.fn(),
+	cancelDeletion: jest.fn(),
+	isRequestingDeletion: false,
+	isCancellingDeletion: false,
 	updateUserProfile: jest.fn(),
 };
 

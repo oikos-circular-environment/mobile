@@ -13,6 +13,7 @@ import type {
 	GetV1ComplaintsResponse,
 	GetV1ProfilesAddressesResponse,
 	GetV1ProfilesResponse,
+	GetV1UsersMeResponse,
 	GetV1WasteCategoriesByIdResponse,
 	GetV1WasteCategoriesResponse,
 	PatchV1CompaniesByIdStatusResponse,
@@ -37,6 +38,16 @@ export const deleteV1UsersMeResponseTransformer = async (
 	data: any,
 ): Promise<DeleteV1UsersMeResponse> => {
 	data.deleted_at = new Date(data.deleted_at);
+	return data;
+};
+
+export const getV1UsersMeResponseTransformer = async (
+	data: any,
+): Promise<GetV1UsersMeResponse> => {
+	data.user.created_at = new Date(data.user.created_at);
+	if (data.user.deleted_at) {
+		data.user.deleted_at = new Date(data.user.deleted_at);
+	}
 	return data;
 };
 

@@ -1,16 +1,20 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { ArrowRight, UserRoundPen } from "lucide-react-native";
+import { ArrowRight, SettingsIcon, UserRoundPen } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import OikosLogo from "@/assets/icons/icon.png";
-import { ButtonSignOut } from "@/components/auth/button-sign-out";
 import { colors } from "@/components/style/colors";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 
-export function HomeUserCard() {
+type HomeUserCardProps = {
+	onOpenSettings: () => void;
+};
+
+export function HomeUserCard({ onOpenSettings }: HomeUserCardProps) {
 	const { user } = useAuthContext();
 
 	if (user === null) {
@@ -54,7 +58,14 @@ export function HomeUserCard() {
 					</View>
 				</Pressable>
 			</Link>
-			<ButtonSignOut />
+			<Button
+				variant="secondary"
+				size="icon"
+				className="size-12"
+				onPress={onOpenSettings}
+			>
+				<SettingsIcon size={18} color={colors.gray[700]} />
+			</Button>
 		</Card>
 	);
 }

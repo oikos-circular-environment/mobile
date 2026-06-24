@@ -15,6 +15,7 @@ import {
 	getV1ComplaintsResponseTransformer,
 	getV1ProfilesAddressesResponseTransformer,
 	getV1ProfilesResponseTransformer,
+	getV1UsersMeResponseTransformer,
 	getV1WasteCategoriesByIdResponseTransformer,
 	getV1WasteCategoriesResponseTransformer,
 	patchV1CompaniesByIdStatusResponseTransformer,
@@ -98,6 +99,9 @@ import type {
 	GetV1ProfilesData,
 	GetV1ProfilesErrors,
 	GetV1ProfilesResponses,
+	GetV1UsersMeData,
+	GetV1UsersMeErrors,
+	GetV1UsersMeResponses,
 	GetV1WasteCategoriesByIdData,
 	GetV1WasteCategoriesByIdErrors,
 	GetV1WasteCategoriesByIdResponses,
@@ -273,6 +277,26 @@ export const deleteV1UsersMe = <ThrowOnError extends boolean = false>(
 		ThrowOnError
 	>({
 		responseTransformer: deleteV1UsersMeResponseTransformer,
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/users/me",
+		...options,
+	});
+
+/**
+ * Get authenticated user
+ *
+ * Returns the authenticated user's account information.
+ */
+export const getV1UsersMe = <ThrowOnError extends boolean = false>(
+	options?: Options<GetV1UsersMeData, ThrowOnError>,
+) =>
+	(options?.client ?? client).get<
+		GetV1UsersMeResponses,
+		GetV1UsersMeErrors,
+		ThrowOnError
+	>({
+		responseTransformer: getV1UsersMeResponseTransformer,
 		responseType: "json",
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/users/me",

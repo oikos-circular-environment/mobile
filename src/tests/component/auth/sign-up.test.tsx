@@ -26,6 +26,11 @@ function setupAuthMock(overrides: Record<string, unknown> = {}) {
 		isAuthenticated: false,
 		user: null,
 		needsProfileCompletion: false,
+		deletionScheduledAt: null,
+		requestDeletion: jest.fn(),
+		cancelDeletion: jest.fn(),
+		isRequestingDeletion: false,
+		isCancellingDeletion: false,
 		updateUserProfile: jest.fn(),
 		...overrides,
 	});

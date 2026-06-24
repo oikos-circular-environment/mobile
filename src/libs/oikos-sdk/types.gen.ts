@@ -163,6 +163,51 @@ export type DeleteV1UsersMeResponses = {
 export type DeleteV1UsersMeResponse =
 	DeleteV1UsersMeResponses[keyof DeleteV1UsersMeResponses];
 
+export type GetV1UsersMeData = {
+	body?: never;
+	path?: never;
+	query?: never;
+	url: "/v1/users/me";
+};
+
+export type GetV1UsersMeErrors = {
+	/**
+	 * Default Response
+	 */
+	401: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+	/**
+	 * Default Response
+	 */
+	404: {
+		message: string;
+		code: string;
+		statusCode: number;
+	};
+};
+
+export type GetV1UsersMeError = GetV1UsersMeErrors[keyof GetV1UsersMeErrors];
+
+export type GetV1UsersMeResponses = {
+	/**
+	 * Default Response
+	 */
+	200: {
+		user: {
+			id: string;
+			email: string;
+			created_at: Date;
+			deleted_at: Date | null;
+		};
+	};
+};
+
+export type GetV1UsersMeResponse =
+	GetV1UsersMeResponses[keyof GetV1UsersMeResponses];
+
 export type PatchV1UsersMeCancelDeletionData = {
 	body?: never;
 	path?: never;
