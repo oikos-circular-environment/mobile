@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -12,7 +12,7 @@ import {
 	X,
 	XIcon,
 } from "lucide-react-native";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	Image,
@@ -57,8 +57,7 @@ import {
 } from "@/libs/media-validation";
 import {
 	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
-	getV1ComplaintsById,
-	patchV1ComplaintsByIdResolutions,
+	patchV1ComplaintsByIdResolutionsByResolutionId,
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
@@ -88,13 +87,14 @@ type ResolutionFormValues = z.infer<typeof resolutionSchema>;
 export default function ComplaintResolutionScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const insets = useSafeAreaInsets();
-	const { user, isAuthenticated } = useAuthContext();
+	const { isAuthenticated } = useAuthContext();
 	const queryClient = useQueryClient();
 
 	const resolutionDraft = useComplaintsStore(s => s.resolutionDraft);
 	const clearResolutionDraft = useComplaintsStore(s => s.clearResolutionDraft);
 
 	const isEditMode = !!resolutionDraft;
+	const resolutionId = resolutionDraft?.resolutionId;
 
 	const [selectedAssets, setSelectedAssets] = useState<
 		ImagePicker.ImagePickerAsset[]
@@ -148,22 +148,16 @@ export default function ComplaintResolutionScreen() {
 	const description = watch("description");
 	const charCount = description.length;
 
-	const { data: complaintData } = useQuery({
-		queryKey: ["complaint", id],
-		queryFn: async () => {
-			const res = await getV1ComplaintsById({ path: { id: id! } });
-			const complaint = res.data?.complaint;
-			if (!complaint) return null;
-			const location = complaint.geospatial?.location?.coords
-				? {
-						lat: complaint.geospatial.location.coords.latitude,
-						lon: complaint.geospatial.location.coords.longitude,
-					}
-				: null;
-			return { complaint: { ...complaint, location } };
-		},
-		enabled: !!id,
-	});
+	const selectedMapComplaint = useComplaintsStore(s => s.selectedMapComplaint);
+	const complaintsInList = useComplaintsStore(s => s.complaints);
+
+	const complaintForHeader = useMemo(() => {
+		if (selectedMapComplaint?.id === id) return selectedMapComplaint;
+		const found = complaintsInList.find(c => c.id === id);
+		if (!found) return null;
+		const coords = found.geospatial.location.coords;
+		return { ...found, location: { lat: coords.latitude, lon: coords.longitude } };
+	}, [selectedMapComplaint, complaintsInList, id]);
 
 	const handlePickMedia = async () => {
 		const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -213,11 +207,11 @@ export default function ComplaintResolutionScreen() {
 
 	const mutation = useMutation({
 		mutationFn: async (data: ResolutionFormValues) => {
-			if (!id || !user?.profile.id) throw new Error("Dados inválidos.");
+			if (!id) throw new Error("Dados inválidos.");
 
-			if (isEditMode) {
-				await patchV1ComplaintsByIdResolutions({
-					path: { id },
+			if (isEditMode && resolutionId) {
+				await patchV1ComplaintsByIdResolutionsByResolutionId({
+					path: { id, resolutionId },
 					body: {
 						description: data.description,
 						...(selectedCompany ? { company_id: selectedCompany.id } : {}),
@@ -260,7 +254,6 @@ export default function ComplaintResolutionScreen() {
 		},
 		onSuccess: () => {
 			setUploadProgress(null);
-			queryClient.invalidateQueries({ queryKey: ["complaint", id] });
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", id],
 			});
@@ -355,8 +348,8 @@ export default function ComplaintResolutionScreen() {
 						<View className="flex-1 items-center justify-center">
 							<View className="w-8 h-1 bg-gray-500 rounded-sm" />
 						</View>
-						{complaintData?.complaint && (
-							<ComplaintDetailsHeader complaint={complaintData.complaint} />
+						{complaintForHeader && (
+							<ComplaintDetailsHeader complaint={complaintForHeader} />
 						)}
 					</View>
 
@@ -518,7 +511,7 @@ export default function ComplaintResolutionScreen() {
 						<ScrollView
 							horizontal
 							showsHorizontalScrollIndicator={false}
-							contentContainerClassName="gap-2"
+							contentContainerClassName="gap-2 my-2"
 							nestedScrollEnabled
 							keyboardShouldPersistTaps="always"
 						>

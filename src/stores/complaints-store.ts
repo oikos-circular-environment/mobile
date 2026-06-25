@@ -7,8 +7,6 @@ import type {
 	MapComplaint,
 } from "@/libs/types/complaint";
 
-// ─── List Slice ──────────────────────────────────────────────────────────────
-
 type ListState = {
 	complaints: Complaint[];
 	dashboard: ComplaintDashboard | undefined;
@@ -26,8 +24,6 @@ type ListActions = {
 	updateComplaint: (id: string, patch: Partial<Complaint>) => void;
 };
 
-// ─── Map Selection Slice ─────────────────────────────────────────────────────
-
 type VoteType = "RESOLVED" | "NOT_RESOLVED";
 
 type MapSelectionState = {
@@ -42,9 +38,8 @@ type MapSelectionActions = {
 	}) => void;
 };
 
-// ─── Resolution Draft Slice ───────────────────────────────────────────────────
-
 export type ResolutionDraft = {
+	resolutionId: string;
 	description: string;
 	companyJson?: string;
 	attachmentsJson?: string;
@@ -58,8 +53,6 @@ type ResolutionDraftActions = {
 	setResolutionDraft: (draft: ResolutionDraft) => void;
 	clearResolutionDraft: () => void;
 };
-
-// ─── Store ───────────────────────────────────────────────────────────────────
 
 type ComplaintsStoreState = ListState &
 	ListActions &
@@ -157,8 +150,6 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 }));
 
 sessionBus.subscribe(() => useComplaintsStore.setState(INITIAL_STATE));
-
-// ─── Selectors ───────────────────────────────────────────────────────────────
 
 export const selectFilteredComplaints = (state: ComplaintsStoreState) => {
 	if (!state.activeFilter) return state.complaints;

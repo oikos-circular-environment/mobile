@@ -193,6 +193,7 @@ export function ComplaintBottomSheet() {
 				: undefined;
 
 		setResolutionDraft({
+			resolutionId: resolution.id,
 			description: resolution.description,
 			...(companyJson ? { companyJson } : {}),
 			...(attachmentsJson ? { attachmentsJson } : {}),
