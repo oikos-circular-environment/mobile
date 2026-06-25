@@ -9,8 +9,8 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import {
+	formatAltitude,
 	formatHeading,
-	formatMeters,
 	formatSexagesimalCoordinate,
 } from "@/libs/geospatial";
 
@@ -82,7 +82,7 @@ export function CameraGeospatialOverlay({
 	);
 
 	const altitudeFormatted = useMemo(
-		() => formatMeters(location?.coords.altitude),
+		() => formatAltitude(location?.coords.altitude),
 		[location?.coords.altitude],
 	);
 

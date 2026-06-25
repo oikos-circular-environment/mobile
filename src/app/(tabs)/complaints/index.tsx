@@ -17,6 +17,7 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
+import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
 import {
 	type BottomSheetRef,
 	ComplaintFilterBottomSheet,
@@ -132,6 +133,20 @@ export default function ComplaintsMapScreen() {
 	const handleClosePanel = () => {
 		if (suppressMapPressRef.current) return;
 		setSelectedMapComplaint(null);
+	};
+
+	const handleComplaintListItemPress = (complaint: MapComplaint) => {
+		if (!complaint.location) return;
+		mapRef.current?.animateToRegion(
+			{
+				latitude: complaint.location.lat,
+				longitude: complaint.location.lon,
+				latitudeDelta: 0.01,
+				longitudeDelta: 0.01,
+			},
+			500,
+		);
+		setSelectedMapComplaint(complaint);
 	};
 
 	const handleZoomIn = async () => {
@@ -411,6 +426,12 @@ export default function ComplaintsMapScreen() {
 				isOpen={showProfileModal}
 				onClose={() => setShowProfileModal(false)}
 				description="Para visualizar e registrar denúncias você precisa finalizar o seu cadastro."
+			/>
+
+			<ComplaintsListBottomSheet
+				complaints={complaints}
+				userLocation={userLocation}
+				onSelectComplaint={handleComplaintListItemPress}
 			/>
 
 			<ComplaintBottomSheet />
