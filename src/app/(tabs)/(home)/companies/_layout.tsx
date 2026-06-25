@@ -14,7 +14,7 @@ export default function CompaniesLayout() {
 				name="index"
 				options={{
 					title: "Minhas Empresas",
-					headerShown: false,
+					headerShown: true,
 				}}
 			/>
 			<Stack.Screen

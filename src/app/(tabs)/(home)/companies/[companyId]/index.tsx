@@ -1,7 +1,8 @@
 import type { Href } from "expo-router";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
 	ArrowRightIcon,
+	ChevronLeftIcon,
 	Clock8Icon,
 	FactoryIcon,
 	HammerIcon,
@@ -36,6 +37,7 @@ type CompanySetting = {
 };
 
 export default function CompanyHubScreen() {
+	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const company = useCompaniesStore(s =>
 		s.companies.find(c => c.id === companyId),
@@ -52,7 +54,7 @@ export default function CompanyHubScreen() {
 			title: "Empresa",
 			description: "Informações cadastrais gerais sobre a sua empresa.",
 			icon: FactoryIcon,
-			href: `/(tabs)/(home)/companies/${companyId}/company` as Href,
+			href: { pathname: "/(tabs)/(home)/companies/[companyId]/company", params: { companyId } },
 			validation: {
 				is_validation: validation?.general_registration ?? false,
 				description: "Todos os dados obrigatórios devem ser preenchidos",
@@ -62,7 +64,7 @@ export default function CompanyHubScreen() {
 			title: "Endereço",
 			description: "Informe seu endereço para que as pessoas te encontre.",
 			icon: MapIcon,
-			href: `/(tabs)/(home)/companies/${companyId}/address` as Href,
+			href: { pathname: "/(tabs)/(home)/companies/[companyId]/address", params: { companyId } },
 			validation: {
 				is_validation: validation?.address ?? false,
 				description: "Todos os dados obrigatórios devem ser preenchidos.",
@@ -72,7 +74,7 @@ export default function CompanyHubScreen() {
 			title: "Funcionamento",
 			description: "Informe os dias e horários em que sua empresa está aberta.",
 			icon: Clock8Icon,
-			href: `/(tabs)/(home)/companies/${companyId}/business-hours` as Href,
+			href: { pathname: "/(tabs)/(home)/companies/[companyId]/business-hours", params: { companyId } },
 			validation: {
 				is_validation: validation?.business_hours ?? false,
 				description: "Deve abrir ao menos 1x na semana.",
@@ -82,7 +84,7 @@ export default function CompanyHubScreen() {
 			title: "Serviços",
 			description: "Descreva os serviços que sua empresa oferece ao publico.",
 			icon: HammerIcon,
-			href: `/(tabs)/(home)/companies/${companyId}/services` as Href,
+			href: { pathname: "/(tabs)/(home)/companies/[companyId]/services", params: { companyId } },
 			validation: {
 				is_validation: validation?.services ?? false,
 				description:
@@ -94,7 +96,7 @@ export default function CompanyHubScreen() {
 			description:
 				"Caso seja um ponto de coleta de resíduo, especifique com quais resíduos você trabalha.",
 			icon: RecycleIcon,
-			href: `/(tabs)/(home)/companies/${companyId}/waste` as Href,
+			href: { pathname: "/(tabs)/(home)/companies/[companyId]/waste", params: { companyId } },
 			validation: {
 				is_validation: validation?.wastes ?? false,
 				description:
@@ -104,10 +106,23 @@ export default function CompanyHubScreen() {
 	];
 
 	return (
-		<ScrollView
-			className="flex-1 bg-white"
-			contentContainerClassName="px-4 pb-8 pt-10"
-		>
+		<>
+			<Stack.Screen
+				options={{
+					headerLeft: () => (
+						<Pressable
+							onPress={() => router.back()}
+							className="flex-row justify-center items-center"
+						>
+							<ChevronLeftIcon size={24} className="text-foreground" />
+						</Pressable>
+					),
+				}}
+			/>
+			<ScrollView
+				className="flex-1 bg-white"
+				contentContainerClassName="px-4 pb-8 pt-10"
+			>
 			<View className="gap-8">
 				<Card className="bg-secondary shadow-none">
 					<View className="flex-row items-center justify-between gap-4">
@@ -210,5 +225,6 @@ export default function CompanyHubScreen() {
 				</View>
 			</View>
 		</ScrollView>
+		</>
 	);
 }

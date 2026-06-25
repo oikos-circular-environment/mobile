@@ -1,6 +1,5 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { HammerIcon, PlusIcon } from "lucide-react-native";
-import { useEffect } from "react";
+import { Redirect, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { ChevronLeftIcon, HammerIcon, PlusIcon } from "lucide-react-native";
 import { FlatList, View } from "react-native";
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
 import { ServiceSkeleton } from "@/components/companies/services/service-skeleton";
@@ -10,6 +9,7 @@ import {
 } from "@/components/custom/waste-category";
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
+import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -30,20 +30,22 @@ export default function ServicesIndexScreen() {
 
 	const { mutateAsync: saveServices } = useSaveServices(companyId);
 
-	useEffect(() => {
-		if (!isLoadingServices && services && services.length === 0) {
-			router.replace({
-				pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
-				params: { companyId },
-			});
-		}
-	}, [services, isLoadingServices, router, companyId]);
-
 	if (isLoadingServices) {
 		return (
 			<View className="flex-1 bg-white p-4">
 				<ServiceSkeleton />
 			</View>
+		);
+	}
+
+	if (services?.length === 0) {
+		return (
+			<Redirect
+				href={{
+					pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
+					params: { companyId },
+				}}
+			/>
 		);
 	}
 
@@ -77,8 +79,18 @@ export default function ServicesIndexScreen() {
 	};
 
 	return (
-		<FlatList
-			data={services}
+		<>
+			<Stack.Screen
+				options={{
+					headerLeft: () => (
+						<Pressable onPress={() => router.back()} className="flex-row justify-center items-center">
+							<ChevronLeftIcon size={24} className="text-foreground" />
+						</Pressable>
+					),
+				}}
+			/>
+			<FlatList
+				data={services}
 			keyExtractor={item => item.id}
 			contentContainerClassName="flex-1 gap-4 p-4 bg-white"
 			ListHeaderComponent={
@@ -171,5 +183,6 @@ export default function ServicesIndexScreen() {
 				</View>
 			}
 		/>
+		</>
 	);
 }
