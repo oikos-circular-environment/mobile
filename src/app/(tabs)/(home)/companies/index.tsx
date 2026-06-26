@@ -63,11 +63,8 @@ export default function CompaniesListScreen() {
 			<Stack.Screen
 				options={{
 					headerLeft: () => (
-						<Pressable
-							onPress={() => router.back()}
-							className="flex-row justify-center items-center"
-						>
-							<ChevronLeftIcon size={24} className="text-foreground" />
+						<Pressable onPress={() => router.back()} className="pl-1">
+							<ChevronLeftIcon size={24} />
 						</Pressable>
 					),
 				}}
