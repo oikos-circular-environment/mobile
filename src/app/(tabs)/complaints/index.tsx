@@ -10,7 +10,12 @@ import {
 	Trash2Icon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Platform, TouchableOpacity, View } from "react-native";
+import {
+	Platform,
+	TouchableOpacity,
+	useWindowDimensions,
+	View,
+} from "react-native";
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
@@ -45,8 +50,11 @@ const controlShadow = {
 	elevation: 3,
 };
 
+const LIST_SHEET_MIN_SNAP_RATIO = 0.15;
+
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
+	const { height: windowHeight } = useWindowDimensions();
 	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
 	const { location } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
@@ -363,8 +371,10 @@ export default function ComplaintsMapScreen() {
 
 			{/* FABs */}
 			<View
-				className="absolute bottom-4 right-4 flex-row gap-2 items-center"
-				style={{ bottom: insets.bottom }}
+				className="absolute right-4 flex-row gap-2 items-center"
+				style={{
+					bottom: windowHeight * LIST_SHEET_MIN_SNAP_RATIO + 12,
+				}}
 				pointerEvents="box-none"
 			>
 				<TouchableOpacity
