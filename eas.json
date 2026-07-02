@@ -19,10 +19,22 @@
 		},
 		"production": {
 			"autoIncrement": true,
-			"environment": "production"
+			"environment": "production",
+			"channel": "production"
 		}
 	},
 	"submit": {
-		"production": {}
+		"production": {
+			"android": {
+				"serviceAccountKeyPath": "./docs/oikos-circular-economy-76798dd51e52.json",
+				"track": "alpha"
+			},
+			"ios": {
+				"ascAppId": "6786017565",
+				"ascApiKeyPath": "./docs/AuthKey_WH824CT5G7.p8",
+				"ascApiKeyIssuerId": "4c9b4692-ac79-43ae-b954-21bac9566bec",
+				"ascApiKeyId": "WH824CT5G7"
+			}
+		}
 	}
 }

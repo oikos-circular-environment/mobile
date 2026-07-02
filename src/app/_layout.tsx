@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { sessionBus } from "@/libs/session-bus";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
@@ -22,6 +23,7 @@ export const unstable_settings = {
 };
 
 const queryClient = new QueryClient();
+sessionBus.subscribe(() => queryClient.resetQueries());
 
 export default function RootLayout() {
 	const [loaded, error] = useFonts({

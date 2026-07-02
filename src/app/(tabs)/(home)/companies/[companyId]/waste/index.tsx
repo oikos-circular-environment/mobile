@@ -1,6 +1,5 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { PlusIcon, RecycleIcon } from "lucide-react-native";
-import { useEffect } from "react";
+import { Redirect, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { ChevronLeftIcon, PlusIcon, RecycleIcon } from "lucide-react-native";
 import { FlatList, View } from "react-native";
 import { useSaveWastes } from "@/components/companies/hooks/use-save-wastes";
 import { WasteSkeleton } from "@/components/companies/waste/waste-skeleton";
@@ -10,6 +9,7 @@ import {
 } from "@/components/custom/waste-category";
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
+import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -30,20 +30,22 @@ export default function WasteIndexScreen() {
 
 	const { mutateAsync: saveWastes } = useSaveWastes(companyId);
 
-	useEffect(() => {
-		if (!isLoadingWastes && wastes && wastes.length === 0) {
-			router.replace({
-				pathname: "/(tabs)/(home)/companies/[companyId]/waste/form",
-				params: { companyId },
-			});
-		}
-	}, [wastes, isLoadingWastes, router, companyId]);
-
 	if (isLoadingWastes) {
 		return (
 			<View className="flex-1 bg-white p-4">
 				<WasteSkeleton />
 			</View>
+		);
+	}
+
+	if (wastes?.length === 0) {
+		return (
+			<Redirect
+				href={{
+					pathname: "/(tabs)/(home)/companies/[companyId]/waste/form",
+					params: { companyId },
+				}}
+			/>
 		);
 	}
 
@@ -77,8 +79,18 @@ export default function WasteIndexScreen() {
 	};
 
 	return (
-		<FlatList
-			data={wastes}
+		<>
+			<Stack.Screen
+				options={{
+					headerLeft: () => (
+						<Pressable onPress={() => router.back()} className="flex-row justify-center items-center">
+							<ChevronLeftIcon size={24} className="text-foreground" />
+						</Pressable>
+					),
+				}}
+			/>
+			<FlatList
+				data={wastes}
 			keyExtractor={item => item.id}
 			contentContainerClassName="flex-1 gap-4 p-4 bg-white"
 			ListHeaderComponent={
@@ -175,5 +187,6 @@ export default function WasteIndexScreen() {
 				</View>
 			}
 		/>
+		</>
 	);
 }

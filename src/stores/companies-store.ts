@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { sessionBus } from "@/libs/session-bus";
 import type {
 	Company,
 	CompanyAddress,
@@ -30,10 +31,14 @@ type CompaniesActions = {
 	updateWastes: (companyId: string, wastes: CompanyWaste[]) => void;
 };
 
+const INITIAL_STATE: CompaniesState = {
+	companies: [],
+	isLoaded: false,
+};
+
 export const useCompaniesStore = create<CompaniesState & CompaniesActions>(
 	set => ({
-		companies: [],
-		isLoaded: false,
+		...INITIAL_STATE,
 
 		setCompanies: companies => set({ companies, isLoaded: true }),
 
@@ -87,3 +92,5 @@ export const useCompaniesStore = create<CompaniesState & CompaniesActions>(
 			})),
 	}),
 );
+
+sessionBus.subscribe(() => useCompaniesStore.setState(INITIAL_STATE));

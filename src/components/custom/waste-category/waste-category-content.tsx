@@ -19,6 +19,8 @@ import { WasteCategorySubcategoryCard } from "./waste-category-subcategory-card"
 export function WasteCategoryContent() {
 	const { selectedWasteCategory } = useWasteCategoryContext();
 
+	if (!selectedWasteCategory) return null;
+
 	return (
 		<VStack space="md">
 			<Text size="sm" className="font-semibold text-muted-foreground">

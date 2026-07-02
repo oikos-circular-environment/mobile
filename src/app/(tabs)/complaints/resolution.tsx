@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -12,7 +12,7 @@ import {
 	X,
 	XIcon,
 } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	Image,
@@ -27,6 +27,8 @@ import { z } from "zod";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker-bottom-sheet";
 import { ComplaintDetailsHeader } from "@/components/complaints/complaint-details-header";
+import type { UploadProgress } from "@/components/complaints/hooks/upload-progress";
+import { MediaUploadProgress } from "@/components/complaints/media-upload-progress";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
@@ -48,9 +50,14 @@ import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { compressMedia } from "@/libs/media-compression";
 import {
+	formatFileSize,
+	getFileSize,
+	isValidMimeType,
+	MAX_FILE_SIZE_BYTES,
+} from "@/libs/media-validation";
+import {
 	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
-	getV1ComplaintsById,
-	patchV1ComplaintsByIdResolutions,
+	patchV1ComplaintsByIdResolutionsByResolutionId,
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
@@ -80,17 +87,23 @@ type ResolutionFormValues = z.infer<typeof resolutionSchema>;
 export default function ComplaintResolutionScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const insets = useSafeAreaInsets();
-	const { user, isAuthenticated } = useAuthContext();
+	const { isAuthenticated } = useAuthContext();
 	const queryClient = useQueryClient();
 
 	const resolutionDraft = useComplaintsStore(s => s.resolutionDraft);
 	const clearResolutionDraft = useComplaintsStore(s => s.clearResolutionDraft);
 
 	const isEditMode = !!resolutionDraft;
+	const resolutionId = resolutionDraft?.resolutionId;
 
 	const [selectedAssets, setSelectedAssets] = useState<
 		ImagePicker.ImagePickerAsset[]
 	>([]);
+	type CompressedMedia = { uri: string; name: string; type: string };
+	const compressedMediaRef = useRef<CompressedMedia[]>([]);
+	const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
+		null,
+	);
 	const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 	const [showCompanyPicker, setShowCompanyPicker] = useState(false);
 	const [existingAttachments, setExistingAttachments] = useState<
@@ -135,22 +148,16 @@ export default function ComplaintResolutionScreen() {
 	const description = watch("description");
 	const charCount = description.length;
 
-	const { data: complaintData } = useQuery({
-		queryKey: ["complaint", id],
-		queryFn: async () => {
-			const res = await getV1ComplaintsById({ path: { id: id! } });
-			const complaint = res.data?.complaint;
-			if (!complaint) return null;
-			const location = complaint.geospatial?.location?.coords
-				? {
-						lat: complaint.geospatial.location.coords.latitude,
-						lon: complaint.geospatial.location.coords.longitude,
-					}
-				: null;
-			return { complaint: { ...complaint, location } };
-		},
-		enabled: !!id,
-	});
+	const selectedMapComplaint = useComplaintsStore(s => s.selectedMapComplaint);
+	const complaintsInList = useComplaintsStore(s => s.complaints);
+
+	const complaintForHeader = useMemo(() => {
+		if (selectedMapComplaint?.id === id) return selectedMapComplaint;
+		const found = complaintsInList.find(c => c.id === id);
+		if (!found) return null;
+		const coords = found.geospatial.location.coords;
+		return { ...found, location: { lat: coords.latitude, lon: coords.longitude } };
+	}, [selectedMapComplaint, complaintsInList, id]);
 
 	const handlePickMedia = async () => {
 		const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -168,13 +175,29 @@ export default function ComplaintResolutionScreen() {
 			orderedSelection: true,
 		});
 		if (!result.canceled) {
-			setSelectedAssets(prev => {
-				const existingUris = new Set(prev.map(a => a.uri));
-				return [
-					...prev,
-					...result.assets.filter(a => !existingUris.has(a.uri)),
-				];
-			});
+			const existingUris = new Set(selectedAssets.map(a => a.uri));
+			const validAssets: ImagePicker.ImagePickerAsset[] = [];
+			let skippedCount = 0;
+
+			for (const asset of result.assets) {
+				if (existingUris.has(asset.uri)) continue;
+				if (!isValidMimeType(asset.mimeType)) {
+					skippedCount++;
+					continue;
+				}
+				validAssets.push(asset);
+			}
+
+			if (validAssets.length > 0) {
+				setSelectedAssets(prev => [...prev, ...validAssets]);
+			}
+
+			if (skippedCount > 0) {
+				toast.warning(
+					"Arquivos ignorados",
+					`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
+				);
+			}
 		}
 	};
 
@@ -184,11 +207,11 @@ export default function ComplaintResolutionScreen() {
 
 	const mutation = useMutation({
 		mutationFn: async (data: ResolutionFormValues) => {
-			if (!id || !user?.profile.id) throw new Error("Dados inválidos.");
+			if (!id) throw new Error("Dados inválidos.");
 
-			if (isEditMode) {
-				await patchV1ComplaintsByIdResolutions({
-					path: { id },
+			if (isEditMode && resolutionId) {
+				await patchV1ComplaintsByIdResolutionsByResolutionId({
+					path: { id, resolutionId },
 					body: {
 						description: data.description,
 						...(selectedCompany ? { company_id: selectedCompany.id } : {}),
@@ -209,18 +232,19 @@ export default function ComplaintResolutionScreen() {
 				});
 			}
 
-			for (const asset of selectedAssets) {
-				const isPhoto = asset.type === "image";
-				const ext = isPhoto ? "jpg" : "mp4";
-				const compressedUri = await compressMedia(
-					asset.uri,
-					isPhoto ? "photo" : "video",
-				);
+			const mediaList = compressedMediaRef.current;
+			for (let i = 0; i < mediaList.length; i++) {
+				const media = mediaList[i];
+				setUploadProgress({
+					phase: "uploading",
+					current: i + 1,
+					total: mediaList.length,
+				});
 				const formData = new FormData();
 				formData.append("file", {
-					uri: compressedUri,
-					name: asset.fileName ?? `resolution_${id}_${Date.now()}.${ext}`,
-					type: isPhoto ? "image/jpeg" : "video/mp4",
+					uri: media.uri,
+					name: media.name,
+					type: media.type,
 				} as unknown as Blob);
 				await postV1ComplaintsByIdResolutionsAttachments({
 					path: { id },
@@ -229,7 +253,7 @@ export default function ComplaintResolutionScreen() {
 			}
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["complaint", id] });
+			setUploadProgress(null);
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", id],
 			});
@@ -242,6 +266,7 @@ export default function ComplaintResolutionScreen() {
 			router.back();
 		},
 		onError: () => {
+			setUploadProgress(null);
 			toast.error(
 				"Erro",
 				`Não foi possível ${isEditMode ? "atualizar" : "publicar"} a resolução.`,
@@ -255,7 +280,7 @@ export default function ComplaintResolutionScreen() {
 		(isEditMode || selectedAssets.length >= MIN_ATTACHMENTS) &&
 		!mutation.isPending;
 
-	const onSubmit = (data: ResolutionFormValues) => {
+	const onSubmit = async (data: ResolutionFormValues) => {
 		if (!isEditMode && selectedAssets.length < MIN_ATTACHMENTS) {
 			toast.error(
 				"Anexos insuficientes",
@@ -263,7 +288,47 @@ export default function ComplaintResolutionScreen() {
 			);
 			return;
 		}
-		mutation.mutate(data);
+
+		try {
+			setUploadProgress({
+				phase: "compressing",
+				current: 0,
+				total: selectedAssets.length,
+			});
+
+			const compressed: CompressedMedia[] = [];
+			for (let i = 0; i < selectedAssets.length; i++) {
+				const asset = selectedAssets[i];
+				setUploadProgress({
+					phase: "compressing",
+					current: i + 1,
+					total: selectedAssets.length,
+				});
+				const isPhoto = asset.type === "image";
+				const ext = isPhoto ? "jpg" : "mp4";
+				const compressedUri = await compressMedia(
+					asset.uri,
+					isPhoto ? "photo" : "video",
+				);
+				const size = getFileSize(compressedUri);
+				if (size != null && size > MAX_FILE_SIZE_BYTES) {
+					toast.error(
+						"Arquivo muito grande",
+						`Um arquivo excede ${formatFileSize(MAX_FILE_SIZE_BYTES)} após compressão. Reduza a qualidade ou duração.`,
+					);
+					return;
+				}
+				compressed.push({
+					uri: compressedUri,
+					name: asset.fileName ?? `resolution_${id}_${Date.now()}.${ext}`,
+					type: isPhoto ? "image/jpeg" : "video/mp4",
+				});
+			}
+			compressedMediaRef.current = compressed;
+			mutation.mutate(data);
+		} catch {
+			setUploadProgress(null);
+		}
 	};
 
 	return (
@@ -283,8 +348,8 @@ export default function ComplaintResolutionScreen() {
 						<View className="flex-1 items-center justify-center">
 							<View className="w-8 h-1 bg-gray-500 rounded-sm" />
 						</View>
-						{complaintData?.complaint && (
-							<ComplaintDetailsHeader complaint={complaintData.complaint} />
+						{complaintForHeader && (
+							<ComplaintDetailsHeader complaint={complaintForHeader} />
 						)}
 					</View>
 
@@ -446,7 +511,7 @@ export default function ComplaintResolutionScreen() {
 						<ScrollView
 							horizontal
 							showsHorizontalScrollIndicator={false}
-							contentContainerClassName="gap-2"
+							contentContainerClassName="gap-2 my-2"
 							nestedScrollEnabled
 							keyboardShouldPersistTaps="always"
 						>
@@ -510,6 +575,7 @@ export default function ComplaintResolutionScreen() {
 											mediaType={asset.type === "video" ? "video" : "photo"}
 											uri={asset.uri}
 											fallbackLabel={asset.type === "video" ? "VÍD" : "IMG"}
+											fileSizeBytes={asset.fileSize}
 										/>
 									</View>
 									<TouchableOpacity
@@ -570,6 +636,8 @@ export default function ComplaintResolutionScreen() {
 				selectedCompanyId={selectedCompany?.id}
 				disablePortal
 			/>
+
+			<MediaUploadProgress progress={uploadProgress} />
 		</>
 	);
 }

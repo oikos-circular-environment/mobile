@@ -17,6 +17,8 @@ import { colors } from "@/components/style/colors";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { getDistance } from "geolib";
+import { formatDistance } from "@/libs/format-distance";
 import { HStack } from "../ui/hstack";
 import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
 
@@ -76,26 +78,6 @@ function deriveAddress(complaint: HeaderComplaint): string | null {
 	return [streetPart, addresses.district].filter(Boolean).join(" — ") || null;
 }
 
-function haversineKm(
-	lat1: number,
-	lon1: number,
-	lat2: number,
-	lon2: number,
-): number {
-	const R = 6371;
-	const dLat = ((lat2 - lat1) * Math.PI) / 180;
-	const dLon = ((lon2 - lon1) * Math.PI) / 180;
-	const a =
-		Math.sin(dLat / 2) ** 2 +
-		Math.cos((lat1 * Math.PI) / 180) *
-			Math.cos((lat2 * Math.PI) / 180) *
-			Math.sin(dLon / 2) ** 2;
-	return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function formatDist(km: number): string {
-	return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`;
-}
 
 export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 	const createdAt = new Date(complaint.created_at);
@@ -108,12 +90,10 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 		: null;
 	const distanceLabel =
 		userLocation && complaint.location
-			? formatDist(
-					haversineKm(
-						userLocation.lat,
-						userLocation.lon,
-						complaint.location.lat,
-						complaint.location.lon,
+			? formatDistance(
+					getDistance(
+						{ latitude: userLocation.lat, longitude: userLocation.lon },
+						{ latitude: complaint.location.lat, longitude: complaint.location.lon },
 					),
 				)
 			: null;

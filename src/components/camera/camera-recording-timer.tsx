@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import type { StyleProp, ViewStyle } from "react-native";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { useCameraContext } from "./context";
 
@@ -10,11 +10,14 @@ function formatDuration(totalSeconds: number): string {
 	return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function CameraRecordingTimer() {
+type CameraRecordingTimerProps = {
+	style?: StyleProp<ViewStyle>;
+};
+
+export function CameraRecordingTimer({ style }: CameraRecordingTimerProps) {
 	const { isRecording } = useCameraContext();
 	const [elapsed, setElapsed] = useState(0);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const insets = useSafeAreaInsets();
 
 	useEffect(() => {
 		if (isRecording) {
@@ -42,7 +45,7 @@ export function CameraRecordingTimer() {
 	return (
 		<View
 			className="absolute left-0 right-0 items-center"
-			style={{ top: insets.top + 16 }}
+			style={style}
 			pointerEvents="none"
 		>
 			<View className="flex-row items-center gap-2 rounded-xl bg-red-600 px-4 py-2">

@@ -3,6 +3,7 @@ import { ShieldIcon } from "lucide-react-native";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
+import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
 import { ComplaintCard } from "@/components/complaints/complaint-card";
 import { ComplaintCardSkeleton } from "@/components/complaints/complaint-card-skeleton";
 import { ComplaintListHeader } from "@/components/complaints/complaint-list-header";
@@ -88,6 +89,7 @@ export default function ComplaintsScreen() {
 				onEndReached={handleEndReached}
 				onEndReachedThreshold={0.3}
 			/>
+			<ComplaintBottomSheet />
 		</View>
 	);
 }

@@ -8,7 +8,7 @@ export default function MarketStackLayout() {
 				<Stack.Screen name="index" options={{ headerShown: false }} />
 				<Stack.Screen
 					name="[companyId]"
-					options={{ headerShown: false, title: "Empresa" }}
+					options={{ headerShown: true, title: "Empresa" }}
 				/>
 			</Stack>
 		</MarketProvider>

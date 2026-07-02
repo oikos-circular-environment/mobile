@@ -76,6 +76,7 @@ export function CameraMediaPreview({
 										fallbackLabel={
 											attachment.mediaType === "video" ? "VIDEO" : "FOTO"
 										}
+										fileSizeBytes={attachment.fileSize}
 									/>
 								</View>
 							</View>

@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { CompanyDetailGeneralTab } from "@/components/market/company-detail-general-tab";
 import { CompanyDetailSimulationTab } from "@/components/market/company-detail-simulation-tab";
-import { CompanyDetailProvider } from "@/contexts/company-detail-context";
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -19,6 +18,7 @@ import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { CompanyDetailProvider } from "@/contexts/company-detail-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
 import { formatDistance } from "@/libs/format-distance";
@@ -145,7 +145,11 @@ export default function MarketCompanyDetailScreen() {
 			}}
 		>
 			<Stack.Screen
-				options={{ title: company.corporate_name, headerShown: false }}
+				options={{
+					title: company.corporate_name.toUpperCase(),
+					headerShown: true,
+					headerBackButtonDisplayMode: "minimal",
+				}}
 			/>
 
 			<KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">

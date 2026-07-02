@@ -1,12 +1,11 @@
 import { create } from "zustand";
+import { sessionBus } from "@/libs/session-bus";
 import type {
 	Complaint,
 	ComplaintDashboard,
 	ComplaintStatus,
 	MapComplaint,
 } from "@/libs/types/complaint";
-
-// ─── List Slice ──────────────────────────────────────────────────────────────
 
 type ListState = {
 	complaints: Complaint[];
@@ -25,19 +24,6 @@ type ListActions = {
 	updateComplaint: (id: string, patch: Partial<Complaint>) => void;
 };
 
-// ─── Map Votes Slice ─────────────────────────────────────────────────────────
-
-type MapVotesState = {
-	userVotes: Record<string, "RESOLVED" | "NOT_RESOLVED">;
-};
-
-type MapVotesActions = {
-	setVote: (complaintId: string, voteType: "RESOLVED" | "NOT_RESOLVED") => void;
-	removeVote: (complaintId: string) => void;
-};
-
-// ─── Map Selection Slice ─────────────────────────────────────────────────────
-
 type VoteType = "RESOLVED" | "NOT_RESOLVED";
 
 type MapSelectionState = {
@@ -52,9 +38,8 @@ type MapSelectionActions = {
 	}) => void;
 };
 
-// ─── Resolution Draft Slice ───────────────────────────────────────────────────
-
 export type ResolutionDraft = {
+	resolutionId: string;
 	description: string;
 	companyJson?: string;
 	attachmentsJson?: string;
@@ -69,24 +54,25 @@ type ResolutionDraftActions = {
 	clearResolutionDraft: () => void;
 };
 
-// ─── Store ───────────────────────────────────────────────────────────────────
-
 type ComplaintsStoreState = ListState &
 	ListActions &
-	MapVotesState &
-	MapVotesActions &
 	MapSelectionState &
 	MapSelectionActions &
 	ResolutionDraftState &
 	ResolutionDraftActions;
 
-export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
-	// ── List ──
+const INITIAL_STATE: ListState & MapSelectionState & ResolutionDraftState = {
 	complaints: [],
 	dashboard: undefined,
 	nextCursor: undefined,
 	hasNextPage: false,
 	activeFilter: null,
+	selectedMapComplaint: null,
+	resolutionDraft: null,
+};
+
+export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
+	...INITIAL_STATE,
 
 	setComplaints: (complaints, nextCursor) =>
 		set({ complaints, nextCursor, hasNextPage: !!nextCursor }),
@@ -137,24 +123,6 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 		});
 	},
 
-	// ── Map Votes ──
-	userVotes: {},
-
-	setVote: (complaintId, voteType) =>
-		set(state => ({
-			userVotes: { ...state.userVotes, [complaintId]: voteType },
-		})),
-
-	removeVote: complaintId =>
-		set(state => {
-			const next = { ...state.userVotes };
-			delete next[complaintId];
-			return { userVotes: next };
-		}),
-
-	// ── Map Selection ──
-	selectedMapComplaint: null,
-
 	setSelectedMapComplaint: complaint =>
 		set({ selectedMapComplaint: complaint }),
 
@@ -176,15 +144,12 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 			};
 		}),
 
-	// ── Resolution Draft ──
-	resolutionDraft: null,
-
 	setResolutionDraft: draft => set({ resolutionDraft: draft }),
 
 	clearResolutionDraft: () => set({ resolutionDraft: null }),
 }));
 
-// ─── Selectors ───────────────────────────────────────────────────────────────
+sessionBus.subscribe(() => useComplaintsStore.setState(INITIAL_STATE));
 
 export const selectFilteredComplaints = (state: ComplaintsStoreState) => {
 	if (!state.activeFilter) return state.complaints;

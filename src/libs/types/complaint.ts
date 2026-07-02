@@ -16,8 +16,7 @@ import type {
 import type { ValueMapping } from "./value-mapping";
 
 // SDK-derived types
-export type Complaint =
-	GetV1ComplaintsResponses[200]["complaints"][number];
+export type Complaint = GetV1ComplaintsResponses[200]["complaints"][number];
 export type ComplaintAttachment = Complaint["attachments"][number];
 export type ComplaintCategory = Complaint["categories"][number];
 export type ComplaintGeospatial = Complaint["geospatial"];
@@ -78,6 +77,8 @@ export type DraftAttachment = {
 	source: "camera" | "gallery" | "api";
 	uri?: string;
 	url?: string;
+	fileSize?: number;
+	mimeType?: string;
 };
 
 export type CameraCapturedVideo =

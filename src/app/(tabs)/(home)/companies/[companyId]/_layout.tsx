@@ -11,41 +11,39 @@ export default function CompanyLayout() {
 				name="index"
 				options={{
 					title: "Empresa",
-					headerShown: false,
+					headerShown: true,
 				}}
 			/>
 			<Stack.Screen
 				name="company"
 				options={{
 					title: "Empresa",
-					headerShown: false,
+					headerShown: true,
 				}}
 			/>
 			<Stack.Screen
 				name="address"
 				options={{
 					title: "Endereço",
-					headerShown: false,
+					headerShown: true,
 				}}
 			/>
 			<Stack.Screen
 				name="business-hours"
 				options={{
 					title: "Funcionamento",
-					headerShown: false,
+					headerShown: true,
 				}}
 			/>
 			<Stack.Screen
 				name="services"
 				options={{
-					title: "Serviços",
 					headerShown: false,
 				}}
 			/>
 			<Stack.Screen
 				name="waste"
 				options={{
-					title: "Resíduos",
 					headerShown: false,
 				}}
 			/>
