@@ -126,10 +126,10 @@ export default function HomeScreen() {
 					) : (
 						<Animated.View style={{ opacity: contentOpacity }}>
 							{isAuthenticated ? (
-									<HomeUserCard onOpenSettings={handleOpenSettings} />
-								) : (
-									<HomeGuestCard />
-								)}
+								<HomeUserCard onOpenSettings={handleOpenSettings} />
+							) : (
+								<HomeGuestCard />
+							)}
 						</Animated.View>
 					)}
 				</View>
@@ -171,7 +171,6 @@ export default function HomeScreen() {
 						)}
 					</Grid>
 				</View>
-
 			</ScrollView>
 			<ProfileCompletionModal
 				isOpen={showProfileModal}

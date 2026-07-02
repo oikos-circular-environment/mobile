@@ -17,7 +17,6 @@ import {
 	setOnUnauthenticated,
 	setRefreshToken,
 } from "@/libs/api/oikos-api";
-import { sessionBus } from "@/libs/session-bus";
 import {
 	deleteV1UsersMe,
 	getV1Profiles,
@@ -26,6 +25,7 @@ import {
 	postV1AuthLogin,
 	postV1UsersRegister,
 } from "@/libs/oikos-sdk";
+import { sessionBus } from "@/libs/session-bus";
 import type { Account, User } from "@/libs/types/user";
 
 type AuthContextValue = {
@@ -207,10 +207,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			);
 		},
 		onError: () => {
-			toast.error(
-				"Erro ao solicitar exclusão",
-				"Tente novamente mais tarde.",
-			);
+			toast.error("Erro ao solicitar exclusão", "Tente novamente mais tarde.");
 		},
 	});
 
@@ -227,16 +224,10 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 					? { ...prev, account: { ...prev.account, deleted_at: null } }
 					: prev,
 			);
-			toast.success(
-				"Exclusão cancelada",
-				"Sua conta não será mais excluída.",
-			);
+			toast.success("Exclusão cancelada", "Sua conta não será mais excluída.");
 		},
 		onError: () => {
-			toast.error(
-				"Erro ao cancelar exclusão",
-				"Tente novamente mais tarde.",
-			);
+			toast.error("Erro ao cancelar exclusão", "Tente novamente mais tarde.");
 		},
 	});
 

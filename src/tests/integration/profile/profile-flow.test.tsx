@@ -155,7 +155,6 @@ async function renderProfile() {
 	return component;
 }
 
-
 describe("ProfileScreen — integração", () => {
 	beforeEach(() => {
 		jest.mocked(useRouter).mockReturnValue(mockRouter as any);

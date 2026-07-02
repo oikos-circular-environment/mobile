@@ -12,6 +12,7 @@ import {
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
 	router: { push: jest.fn() },
+	Stack: { Screen: () => null },
 }));
 
 jest.mock("@/stores/companies-store", () => ({

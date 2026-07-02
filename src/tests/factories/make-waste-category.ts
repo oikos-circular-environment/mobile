@@ -9,10 +9,9 @@ export function makeWasteCategory(
 		name: faker.commerce.department(),
 		description: null,
 		observations: null,
-		hazard_levels: faker.helpers.arrayElements<WasteCategory["hazard_levels"][number]>(
-			["LOW", "MEDIUM", "HIGH", "VERY_HIGH"],
-			{ min: 0, max: 2 },
-		),
+		hazard_levels: faker.helpers.arrayElements<
+			WasteCategory["hazard_levels"][number]
+		>(["LOW", "MEDIUM", "HIGH", "VERY_HIGH"], { min: 0, max: 2 }),
 		created_at: faker.date.past({ years: 1 }),
 		updated_at: faker.date.recent(),
 		subcategories: [],

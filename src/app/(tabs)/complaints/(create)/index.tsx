@@ -450,7 +450,8 @@ export default function ComplaintCreateScreen() {
 					observations: data.observations?.trim() || null,
 					newMedia: compressedMedia,
 					waste_category_ids: selectedCategoryIds,
-					onProgress: localAttachments.length > 0 ? setUploadProgress : undefined,
+					onProgress:
+						localAttachments.length > 0 ? setUploadProgress : undefined,
 				});
 
 				router.replace("/(tabs)/complaints/list");

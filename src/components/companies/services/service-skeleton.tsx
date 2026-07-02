@@ -1,6 +1,6 @@
+import { View } from "react-native";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { View } from "react-native";
 
 export function ServiceSkeleton() {
 	return (

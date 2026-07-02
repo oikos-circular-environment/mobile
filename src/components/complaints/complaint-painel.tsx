@@ -1,10 +1,6 @@
 "use client";
 
-import {
-	ShieldCheckIcon,
-	ShieldIcon,
-	ShieldXIcon,
-} from "lucide-react-native";
+import { ShieldCheckIcon, ShieldIcon, ShieldXIcon } from "lucide-react-native";
 import type { ComponentType } from "react";
 import { View } from "react-native";
 import { colors } from "@/components/style/colors";

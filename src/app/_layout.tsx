@@ -1,11 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { sessionBus } from "@/libs/session-bus";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { AuthContextProvider } from "@/contexts/auth-context";
 import { GeospatialProvider } from "@/contexts/geospatial-context";
 import { NotificationProvider } from "@/contexts/notification-context";
+import { sessionBus } from "@/libs/session-bus";
 import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";

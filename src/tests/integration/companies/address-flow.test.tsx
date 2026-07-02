@@ -153,7 +153,13 @@ function createQueryClient() {
 	});
 }
 
-function setupStore(company: Company = makeStoreCompany({ id: "company-1", address: mockAddress }), isLoaded = true) {
+function setupStore(
+	company: Company = makeStoreCompany({
+		id: "company-1",
+		address: mockAddress,
+	}),
+	isLoaded = true,
+) {
 	jest
 		.mocked(useCompaniesStore)
 		.mockImplementation(selector =>

@@ -1,6 +1,6 @@
+import type BottomSheet from "@gorhom/bottom-sheet";
 import { render, screen } from "@testing-library/react-native";
 import { createRef } from "react";
-import type BottomSheet from "@gorhom/bottom-sheet";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
@@ -119,9 +119,7 @@ describe("MarketListHeader", () => {
 
 			await renderHeader();
 
-			expect(
-				screen.getByText("123, Rua das Flores, Centro"),
-			).toBeOnTheScreen();
+			expect(screen.getByText("123, Rua das Flores, Centro")).toBeOnTheScreen();
 		});
 
 		it("exibe endereço do perfil quando locationSource é 'profile'", async () => {

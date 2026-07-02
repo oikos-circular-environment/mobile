@@ -16,6 +16,16 @@ import { makeStoreCompany } from "@/tests/factories";
 jest.mock("expo-router", () => ({
 	useLocalSearchParams: jest.fn(),
 	useRouter: jest.fn(),
+	Stack: { Screen: () => null },
+	Redirect: ({ href }: { href: unknown }) => {
+		const React = require("react");
+		const { Text } = require("react-native");
+		return React.createElement(
+			Text,
+			{ testID: "redirect" },
+			JSON.stringify(href),
+		);
+	},
 }));
 
 jest.mock("@/stores/companies-store", () => ({
@@ -167,8 +177,8 @@ describe("WasteIndexScreen — integração", () => {
 	it("redireciona para o formulário quando empresa não tem resíduos", async () => {
 		setupStore(makeStoreCompany({ id: "company-1", wastes: [] }));
 		await renderScreen();
-		expect(mockReplace).toHaveBeenCalledWith(
-			expect.objectContaining({
+		expect(screen.getByTestId("redirect")).toHaveTextContent(
+			JSON.stringify({
 				pathname: "/(tabs)/(home)/companies/[companyId]/waste/form",
 				params: { companyId: "company-1" },
 			}),

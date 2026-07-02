@@ -3,9 +3,6 @@ import { render, screen, userEvent } from "@testing-library/react-native";
 import type React from "react";
 import HomeScreen from "@/app/(tabs)/(home)";
 import { useAuthContext } from "@/contexts/auth-context";
-import { useGeospatial } from "@/contexts/geospatial-context";
-import { isCompanyOpenNow } from "@/libs/market/is-company-open";
-import { getV1Market } from "@/libs/oikos-sdk";
 
 jest.mock("expo-router", () => ({
 	Link: ({
@@ -26,16 +23,6 @@ jest.mock("expo-router", () => ({
 }));
 
 jest.mock("@/contexts/auth-context");
-
-jest.mock("@/contexts/geospatial-context");
-
-jest.mock("@/libs/oikos-sdk", () => ({
-	getV1Market: jest.fn(),
-}));
-
-jest.mock("@/libs/market/is-company-open", () => ({
-	isCompanyOpenNow: jest.fn(),
-}));
 
 jest.mock("@/components/ui/grid", () => ({
 	Grid: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -112,65 +99,9 @@ const defaultAuth = {
 	updateUserProfile: jest.fn(),
 };
 
-const defaultGeospatial = {
-	currentDate: new Date("2025-06-05T12:00:00"),
-	heading: null,
-	location: null,
-	addresses: [],
-	permissionDenied: false,
-	isResolving: false,
-	reverseGeocodeError: false,
-};
-
-const mockCompany = {
-	id: "company-1",
-	business_name: null,
-	corporate_name: "Recicladora Verde Ltda",
-	company_type: "COLLECTOR",
-	accept_appointments: true,
-	status: true,
-	phones: ["11999999999"],
-	address: {
-		id: "addr-1",
-		zip_code: "01310100",
-		street: "Rua Augusta",
-		number: "500",
-		complement: null,
-		district: "Consolação",
-		city: "São Paulo",
-		state: "São Paulo",
-		state_code: "SP",
-		latitude: -23.55,
-		longitude: -46.63,
-	},
-	wastes: [
-		{
-			id: "w-1",
-			name: "Papel",
-			description: null,
-			price: 0,
-			unit: "KG",
-			waste_type: "RECYCLABLE",
-			quantity: 0,
-			observations: null,
-			sub_items: null,
-		},
-	],
-	services: [],
-	business_hours: [],
-	distance_in_meters: 500,
-};
-
 function setupAuth(overrides: Partial<typeof defaultAuth> = {}) {
 	jest.mocked(useAuthContext).mockReturnValue({
 		...defaultAuth,
-		...overrides,
-	});
-}
-
-function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
-	jest.mocked(useGeospatial).mockReturnValue({
-		...defaultGeospatial,
 		...overrides,
 	});
 }
@@ -193,11 +124,6 @@ describe("HomeScreen — componente", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
 		setupAuth();
-		setupGeospatial();
-		jest.mocked(getV1Market).mockResolvedValue({
-			data: { companies: [], next_cursor: null },
-		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
-		jest.mocked(isCompanyOpenNow).mockReturnValue(true);
 	});
 
 	afterEach(() => {
@@ -289,161 +215,6 @@ describe("HomeScreen — componente", () => {
 
 		expect(screen.getByTestId("modal-description")).toHaveTextContent(
 			"Para acessar o gerenciamento de empresas você precisa finalizar o seu cadastro.",
-		);
-	});
-
-	it("exibe mensagem de localização indisponível quando permissionDenied", async () => {
-		setupGeospatial({ permissionDenied: true });
-		await renderHome();
-
-		expect(screen.getByText("Localização indisponível")).toBeOnTheScreen();
-	});
-
-	it("exibe loader de localização enquanto isResolving", async () => {
-		setupGeospatial({ isResolving: true, location: null });
-		await renderHome();
-
-		expect(screen.getByText("Obtendo localização…")).toBeOnTheScreen();
-	});
-
-	it("exibe loader de localização quando location ainda não está pronto", async () => {
-		setupGeospatial({ isResolving: false, location: null });
-		await renderHome();
-
-		expect(screen.getByText("Obtendo localização…")).toBeOnTheScreen();
-	});
-
-	it("não chama getV1Market quando location não está disponível", async () => {
-		await renderHome();
-
-		expect(getV1Market).not.toHaveBeenCalled();
-	});
-
-	it("exibe loader de empresas durante o carregamento da query", async () => {
-		setupGeospatial({
-			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
-		});
-		let resolveQuery!: (value: unknown) => void;
-		jest.mocked(getV1Market).mockImplementation(
-			() =>
-				new Promise(resolve => {
-					resolveQuery = resolve;
-				}) as unknown as ReturnType<typeof getV1Market>,
-		);
-		await renderHome();
-
-		expect(screen.getByText("Buscando empresas…")).toBeOnTheScreen();
-
-		resolveQuery({ data: { companies: [] as never[], next_cursor: null } });
-	});
-
-	it("chama getV1Market com coordenadas corretas após localização pronta", async () => {
-		setupGeospatial({
-			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
-		});
-		await renderHome();
-
-		expect(getV1Market).toHaveBeenCalledWith({
-			query: { lat: -23.55, lon: -46.63, radius: 2000, limit: 5 },
-		});
-	});
-
-	it("exibe mensagem de nenhuma empresa quando lista retorna vazia", async () => {
-		setupGeospatial({
-			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
-		});
-		await renderHome();
-
-		expect(
-			await screen.findByText("Nenhuma empresa encontrada em até 2 km."),
-		).toBeOnTheScreen();
-	});
-
-	it("renderiza lista de empresas quando há dados", async () => {
-		setupGeospatial({
-			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
-		});
-		jest.mocked(getV1Market).mockResolvedValue({
-			data: { companies: [mockCompany], next_cursor: null },
-		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
-		await renderHome();
-
-		expect(await screen.findByText("Recicladora Verde Ltda")).toBeOnTheScreen();
-		expect(screen.getByText("Papel")).toBeOnTheScreen();
-		expect(screen.getByText("500 m")).toBeOnTheScreen();
-	});
-
-	it("formata distância em km quando >= 1000 metros", async () => {
-		const farCompany = {
-			...mockCompany,
-			id: "company-2",
-			corporate_name: "Coleta Seletiva S.A.",
-			distance_in_meters: 1200,
-			wastes: [
-				{
-					id: "w-2",
-					name: "Plástico",
-					description: null,
-					price: 0,
-					unit: "KG",
-					waste_type: "RECYCLABLE",
-					quantity: 0,
-					observations: null,
-					sub_items: null,
-				},
-			],
-		};
-		setupGeospatial({
-			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
-		});
-		jest.mocked(getV1Market).mockResolvedValue({
-			data: { companies: [farCompany], next_cursor: null },
-		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
-		await renderHome();
-
-		expect(await screen.findByText("1,2 km")).toBeOnTheScreen();
-	});
-
-	it("exibe badge Aberto baseado em isCompanyOpenNow", async () => {
-		jest.mocked(isCompanyOpenNow).mockReturnValue(true);
-		setupGeospatial({
-			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
-		});
-		jest.mocked(getV1Market).mockResolvedValue({
-			data: { companies: [mockCompany], next_cursor: null },
-		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
-		await renderHome();
-
-		expect(await screen.findByText("Aberto")).toBeOnTheScreen();
-	});
-
-	it("exibe badge Fechado baseado em isCompanyOpenNow", async () => {
-		jest.mocked(isCompanyOpenNow).mockReturnValue(false);
-		setupGeospatial({
-			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
-		});
-		jest.mocked(getV1Market).mockResolvedValue({
-			data: { companies: [mockCompany], next_cursor: null },
-		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
-		await renderHome();
-
-		expect(await screen.findByText("Fechado")).toBeOnTheScreen();
-	});
-
-	it("chama isCompanyOpenNow com business_hours e currentDate", async () => {
-		setupGeospatial({
-			location: { coords: { latitude: -23.55, longitude: -46.63 } } as never,
-			currentDate: new Date("2025-06-05T15:00:00"),
-		});
-		jest.mocked(getV1Market).mockResolvedValue({
-			data: { companies: [mockCompany], next_cursor: null },
-		} as unknown as Awaited<ReturnType<typeof getV1Market>>);
-		await renderHome();
-
-		await screen.findByText("Recicladora Verde Ltda");
-		expect(isCompanyOpenNow).toHaveBeenCalledWith(
-			mockCompany.business_hours,
-			new Date("2025-06-05T15:00:00"),
 		);
 	});
 });

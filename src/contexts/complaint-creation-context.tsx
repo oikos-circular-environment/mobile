@@ -6,8 +6,8 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import type { Complaint, DraftAttachment } from "@/libs/types/complaint";
 import { sessionBus } from "@/libs/session-bus";
+import type { Complaint, DraftAttachment } from "@/libs/types/complaint";
 
 type ComplaintCreationContextValue = {
 	attachments: DraftAttachment[];

@@ -14,11 +14,7 @@ import SignInScreen from "@/app/(tabs)/(home)/sign-in";
 import { toast } from "@/components/toast";
 import { AuthContextProvider, useAuthContext } from "@/contexts/auth-context";
 import { setAuthToken } from "@/libs/api/oikos-api";
-import {
-	getV1Profiles,
-	getV1UsersMe,
-	postV1AuthLogin,
-} from "@/libs/oikos-sdk";
+import { getV1Profiles, getV1UsersMe, postV1AuthLogin } from "@/libs/oikos-sdk";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
@@ -115,7 +111,14 @@ describe("Fluxo de autenticação — integração", () => {
 				data: { profile: { id: "user-1", name: "Test User" } },
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
 			jest.mocked(getV1UsersMe).mockResolvedValue({
-				data: { user: { id: "user-1", email: "user@example.com", created_at: new Date(), deleted_at: null } },
+				data: {
+					user: {
+						id: "user-1",
+						email: "user@example.com",
+						created_at: new Date(),
+						deleted_at: null,
+					},
+				},
 			} as unknown as Awaited<ReturnType<typeof getV1UsersMe>>);
 
 			const user = userEvent.setup();
@@ -144,7 +147,14 @@ describe("Fluxo de autenticação — integração", () => {
 				data: {},
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
 			jest.mocked(getV1UsersMe).mockResolvedValue({
-				data: { user: { id: "user-1", email: "user@example.com", created_at: new Date(), deleted_at: null } },
+				data: {
+					user: {
+						id: "user-1",
+						email: "user@example.com",
+						created_at: new Date(),
+						deleted_at: null,
+					},
+				},
 			} as unknown as Awaited<ReturnType<typeof getV1UsersMe>>);
 
 			const user = userEvent.setup();
@@ -195,7 +205,14 @@ describe("Fluxo de autenticação — integração", () => {
 				data: { profile: { id: "user-1", name: "Test User" } },
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
 			jest.mocked(getV1UsersMe).mockResolvedValue({
-				data: { user: { id: "user-1", email: "user@example.com", created_at: new Date(), deleted_at: null } },
+				data: {
+					user: {
+						id: "user-1",
+						email: "user@example.com",
+						created_at: new Date(),
+						deleted_at: null,
+					},
+				},
 			} as unknown as Awaited<ReturnType<typeof getV1UsersMe>>);
 
 			await renderWithAuth(<AuthStateHarness />);

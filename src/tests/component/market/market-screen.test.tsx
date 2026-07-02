@@ -6,7 +6,6 @@ import { useMarket } from "@/contexts/market-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { makeCompany, makeCompanyList } from "@/tests/factories";
 
-
 jest.mock("expo-router", () => ({
 	Link: ({
 		children,
@@ -45,7 +44,6 @@ jest.mock("@/components/market/radius-bottom-sheet", () => ({
 	RadiusBottomSheet: () => null,
 }));
 
-
 const defaultGeospatial = {
 	currentDate: new Date("2026-06-11T10:00:00"),
 	heading: null,
@@ -76,7 +74,6 @@ const defaultMarket = {
 	openRadiusSheet: jest.fn(),
 };
 
-
 function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
 	jest
 		.mocked(useGeospatial)
@@ -91,7 +88,6 @@ async function renderScreen() {
 	return await render(<MarketScreen />);
 }
 
-
 describe("MarketScreen", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -104,7 +100,6 @@ describe("MarketScreen", () => {
 		jest.useRealTimers();
 		jest.clearAllMocks();
 	});
-
 
 	describe("estados da lista", () => {
 		it("não exibe cards de empresa durante carregamento (isPending=true)", async () => {
@@ -146,7 +141,6 @@ describe("MarketScreen", () => {
 			expect(screen.getByText("Endereço não configurado")).toBeOnTheScreen();
 		});
 	});
-
 
 	describe("cards de empresa", () => {
 		it("renderiza 25 empresas geradas pela factory", async () => {
@@ -208,7 +202,6 @@ describe("MarketScreen", () => {
 			expect(screen.getByText("Coleta domiciliar")).toBeOnTheScreen();
 		});
 	});
-
 
 	describe("paginação", () => {
 		it("exibe botão Carregar mais quando hasNextPage=true", async () => {

@@ -1,5 +1,6 @@
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { getDistance } from "geolib";
 import {
 	CalendarIcon,
 	CrosshairIcon,
@@ -17,7 +18,6 @@ import { colors } from "@/components/style/colors";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { getDistance } from "geolib";
 import { formatDistance } from "@/libs/format-distance";
 import { HStack } from "../ui/hstack";
 import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
@@ -78,7 +78,6 @@ function deriveAddress(complaint: HeaderComplaint): string | null {
 	return [streetPart, addresses.district].filter(Boolean).join(" — ") || null;
 }
 
-
 export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 	const createdAt = new Date(complaint.created_at);
 	const address = deriveAddress(complaint);
@@ -93,7 +92,10 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 			? formatDistance(
 					getDistance(
 						{ latitude: userLocation.lat, longitude: userLocation.lon },
-						{ latitude: complaint.location.lat, longitude: complaint.location.lon },
+						{
+							latitude: complaint.location.lat,
+							longitude: complaint.location.lon,
+						},
 					),
 				)
 			: null;

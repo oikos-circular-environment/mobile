@@ -156,7 +156,10 @@ export default function ComplaintResolutionScreen() {
 		const found = complaintsInList.find(c => c.id === id);
 		if (!found) return null;
 		const coords = found.geospatial.location.coords;
-		return { ...found, location: { lat: coords.latitude, lon: coords.longitude } };
+		return {
+			...found,
+			location: { lat: coords.latitude, lon: coords.longitude },
+		};
 	}, [selectedMapComplaint, complaintsInList, id]);
 
 	const handlePickMedia = async () => {

@@ -88,9 +88,10 @@ const StyledUIIcon = styled(UIIcon, {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-type IWasteCategoryHazardLevelProps =
-	React.ComponentPropsWithoutRef<typeof ContextView> &
-		VariantProps<typeof hazardLevelStyle>;
+type IWasteCategoryHazardLevelProps = React.ComponentPropsWithoutRef<
+	typeof ContextView
+> &
+	VariantProps<typeof hazardLevelStyle>;
 
 export function WasteCategoryHazardLevel({
 	variant,
@@ -116,18 +117,23 @@ export function WasteCategoryHazardLevel({
 
 // ─── Icon ─────────────────────────────────────────────────────────────────────
 
-type IWasteCategoryHazardLevelIconProps =
-	React.ComponentPropsWithoutRef<typeof PrimitiveIcon> &
-		VariantProps<typeof hazardLevelIconStyle> & {
-			size?: number;
-		};
+type IWasteCategoryHazardLevelIconProps = React.ComponentPropsWithoutRef<
+	typeof PrimitiveIcon
+> &
+	VariantProps<typeof hazardLevelIconStyle> & {
+		size?: number;
+	};
 
 export const WasteCategoryHazardLevelIcon = React.forwardRef<
 	React.ComponentRef<typeof Svg>,
 	IWasteCategoryHazardLevelIconProps
->(function WasteCategoryHazardLevelIcon({ as, size, className, ...props }, ref) {
+>(function WasteCategoryHazardLevelIcon(
+	{ as, size, className, ...props },
+	ref,
+) {
 	const { variant: parentVariant } = useStyleContext(SCOPE);
-	const IconComponent = as ?? DEFAULT_ICONS[parentVariant as HazardLevelVariant];
+	const IconComponent =
+		as ?? DEFAULT_ICONS[parentVariant as HazardLevelVariant];
 
 	if (typeof size === "number") {
 		return (
@@ -156,14 +162,18 @@ export const WasteCategoryHazardLevelIcon = React.forwardRef<
 
 // ─── Text ─────────────────────────────────────────────────────────────────────
 
-type IWasteCategoryHazardLevelTextProps =
-	React.ComponentPropsWithoutRef<typeof Text> &
-		VariantProps<typeof hazardLevelTextStyle>;
+type IWasteCategoryHazardLevelTextProps = React.ComponentPropsWithoutRef<
+	typeof Text
+> &
+	VariantProps<typeof hazardLevelTextStyle>;
 
 export const WasteCategoryHazardLevelText = React.forwardRef<
 	React.ComponentRef<typeof Text>,
 	IWasteCategoryHazardLevelTextProps
->(function WasteCategoryHazardLevelText({ children, className, ...props }, ref) {
+>(function WasteCategoryHazardLevelText(
+	{ children, className, ...props },
+	ref,
+) {
 	const { variant: parentVariant } = useStyleContext(SCOPE);
 	return (
 		<Text
@@ -184,6 +194,6 @@ WasteCategoryHazardLevelIcon.displayName = "WasteCategoryHazardLevelIcon";
 WasteCategoryHazardLevelText.displayName = "WasteCategoryHazardLevelText";
 
 export type {
-	IWasteCategoryHazardLevelProps as WasteCategoryHazardLevelProps,
 	IWasteCategoryHazardLevelIconProps as WasteCategoryHazardLevelIconProps,
+	IWasteCategoryHazardLevelProps as WasteCategoryHazardLevelProps,
 };

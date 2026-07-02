@@ -1,9 +1,7 @@
 import { faker } from "@faker-js/faker";
 import type { Company } from "@/libs/types/companies";
 
-export function makeStoreCompany(
-	overrides: Partial<Company> = {},
-): Company {
+export function makeStoreCompany(overrides: Partial<Company> = {}): Company {
 	return {
 		id: faker.string.uuid(),
 		user_id: faker.string.uuid(),

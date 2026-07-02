@@ -9,13 +9,23 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import ServicesIndexScreen from "@/app/(tabs)/(home)/companies/[companyId]/services/index";
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
-import { makeStoreCompany } from "@/tests/factories";
 import type { Company } from "@/stores/companies-store";
 import { useCompaniesStore } from "@/stores/companies-store";
+import { makeStoreCompany } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
 	useLocalSearchParams: jest.fn(),
 	useRouter: jest.fn(),
+	Stack: { Screen: () => null },
+	Redirect: ({ href }: { href: unknown }) => {
+		const React = require("react");
+		const { Text } = require("react-native");
+		return React.createElement(
+			Text,
+			{ testID: "redirect" },
+			JSON.stringify(href),
+		);
+	},
 }));
 
 jest.mock("@/stores/companies-store", () => ({
@@ -167,8 +177,8 @@ describe("ServicesIndexScreen — integração", () => {
 	it("redireciona para o formulário quando empresa não tem serviços", async () => {
 		setupStore(makeStoreCompany({ id: "company-1", services: [] }));
 		await renderScreen();
-		expect(mockReplace).toHaveBeenCalledWith(
-			expect.objectContaining({
+		expect(screen.getByTestId("redirect")).toHaveTextContent(
+			JSON.stringify({
 				pathname: "/(tabs)/(home)/companies/[companyId]/services/form",
 				params: { companyId: "company-1" },
 			}),

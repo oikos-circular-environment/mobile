@@ -1,6 +1,4 @@
-import BottomSheet, {
-	BottomSheetFlatList,
-} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";

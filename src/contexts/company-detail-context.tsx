@@ -28,7 +28,10 @@ const CompanyDetailContext = createContext<CompanyDetailContextValue | null>(
 );
 
 type CompanyDetailProviderProps = PropsWithChildren<
-	Omit<CompanyDetailContextValue, "businessHoursSheetRef" | "openBusinessHoursSheet">
+	Omit<
+		CompanyDetailContextValue,
+		"businessHoursSheetRef" | "openBusinessHoursSheet"
+	>
 >;
 
 export function CompanyDetailProvider({
