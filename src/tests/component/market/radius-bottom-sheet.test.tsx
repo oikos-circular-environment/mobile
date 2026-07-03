@@ -1,6 +1,6 @@
+import type BottomSheet from "@gorhom/bottom-sheet";
 import { act, render, screen } from "@testing-library/react-native";
 import { createRef } from "react";
-import type BottomSheet from "@gorhom/bottom-sheet";
 import { useMarket } from "@/contexts/market-context";
 
 jest.mock("@/contexts/market-context");

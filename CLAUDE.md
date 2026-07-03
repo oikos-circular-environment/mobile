@@ -78,6 +78,10 @@ These rules are enforced project-wide (`.github/copilot-instructions.md`):
 </KeyboardAvoidingView>
 ```
 
+## Session Reset
+
+When the user logs out (or a 401 forces logout), `sessionBus.emit()` fires from `auth-context.tsx`. Any store, context, or module that holds user-specific data must subscribe to the session bus (`src/libs/session-bus.ts`) to reset its state. Zustand stores subscribe at module level; React Contexts subscribe via `useEffect` inside the provider.
+
 ## Key Libraries
 
 | Purpose | Library |

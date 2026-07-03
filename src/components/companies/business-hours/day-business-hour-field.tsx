@@ -8,8 +8,8 @@ import {
 import { View } from "react-native";
 import type { BusinessHoursFormValues } from "@/components/companies/business-hours/business-hours-form-schema";
 import { TimeSlotField } from "@/components/companies/business-hours/time-slot-field";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { colors } from "@/components/style/colors";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 

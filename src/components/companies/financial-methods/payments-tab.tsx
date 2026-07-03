@@ -6,6 +6,7 @@ import {
 	type UseFormReturn,
 } from "react-hook-form";
 import { View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import {
 	Checkbox,
@@ -21,7 +22,6 @@ import {
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
-import { colors } from "@/components/style/colors";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import {

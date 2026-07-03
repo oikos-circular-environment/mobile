@@ -3,16 +3,18 @@ import type { VideoThumbnail } from "expo-video";
 import { useVideoPlayer } from "expo-video";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
+import { formatFileSize, MAX_FILE_SIZE_BYTES } from "@/libs/media-validation";
+import { cn } from "@/libs/utils";
 
 type MediaThumbnailState = VideoThumbnail | "failed";
 
 type MediaThumbnailProps = {
 	mediaType: "photo" | "video";
 	uri?: string;
-	loadingLabel?: string;
 	fallbackLabel?: string;
+	fileSizeBytes?: number;
 };
 
 const styles = StyleSheet.create({
@@ -20,13 +22,35 @@ const styles = StyleSheet.create({
 		...StyleSheet.absoluteFillObject,
 		borderRadius: 6,
 	},
+	badge: {
+		position: "absolute",
+		bottom: 4,
+		left: 4,
+	},
 });
+
+function FileSizeBadge({ bytes }: { bytes: number }) {
+	const isOverLimit = bytes > MAX_FILE_SIZE_BYTES;
+	return (
+		<View
+			style={styles.badge}
+			className={cn(
+				"rounded px-1 py-0.5",
+				isOverLimit ? "bg-red-600" : "bg-black/60",
+			)}
+		>
+			<Text className="text-[9px] font-semibold leading-tight text-white">
+				{formatFileSize(bytes)}
+			</Text>
+		</View>
+	);
+}
 
 export function MediaThumbnail({
 	mediaType,
 	uri,
-	loadingLabel = "Carregando",
 	fallbackLabel = "MEDIA",
+	fileSizeBytes,
 }: MediaThumbnailProps) {
 	const [videoThumbnail, setVideoThumbnail] = useState<
 		MediaThumbnailState | undefined
@@ -94,7 +118,7 @@ export function MediaThumbnail({
 	if (mediaType === "photo") {
 		if (!uri) {
 			return (
-				<View className="flex-1 items-center justify-center bg-zinc-700">
+				<View className="flex-1 items-center justify-center bg-gray-500">
 					<Text className="text-[10px] text-white/70">{fallbackLabel}</Text>
 				</View>
 			);
@@ -109,21 +133,20 @@ export function MediaThumbnail({
 					onLoad={() => setPhotoState("loaded")}
 					onError={() => setPhotoState("failed")}
 				/>
+				{photoState === "loaded" && fileSizeBytes != null && (
+					<FileSizeBadge bytes={fileSizeBytes} />
+				)}
 				{photoState === "loading" && (
-					<View
+					<Skeleton
+						variant="rounded"
+						startColor="bg-gray-500"
 						style={styles.overlay}
-						className="items-center justify-center bg-zinc-700"
-					>
-						<Spinner size="small" color="grey" />
-						<Text className="mt-1 text-[10px] text-white/70">
-							{loadingLabel}
-						</Text>
-					</View>
+					/>
 				)}
 				{photoState === "failed" && (
 					<View
 						style={styles.overlay}
-						className="items-center justify-center bg-zinc-800"
+						className="items-center justify-center bg-gray-500"
 					>
 						<Text className="text-[10px] font-semibold text-white">
 							{fallbackLabel}
@@ -136,16 +159,13 @@ export function MediaThumbnail({
 
 	if (!uri || videoThumbnail === undefined) {
 		return (
-			<View className="flex-1 items-center justify-center bg-zinc-700">
-				<Spinner size="small" color="grey" />
-				<Text className="mt-1 text-[10px] text-white/70">{loadingLabel}</Text>
-			</View>
+			<Skeleton variant="rounded" startColor="bg-gray-500" className="flex-1" />
 		);
 	}
 
 	if (videoThumbnail === "failed") {
 		return (
-			<View className="flex-1 items-center justify-center bg-zinc-800">
+			<View className="flex-1 items-center justify-center bg-gray-500">
 				<Text className="text-[10px] font-semibold text-white">
 					{fallbackLabel}
 				</Text>
@@ -154,10 +174,13 @@ export function MediaThumbnail({
 	}
 
 	return (
-		<Image
-			source={videoThumbnail}
-			style={{ height: "100%", width: "100%", borderRadius: 6 }}
-			contentFit="cover"
-		/>
+		<View className="flex-1">
+			<Image
+				source={videoThumbnail}
+				style={{ height: "100%", width: "100%", borderRadius: 6 }}
+				contentFit="cover"
+			/>
+			{fileSizeBytes != null && <FileSizeBadge bytes={fileSizeBytes} />}
+		</View>
 	);
 }

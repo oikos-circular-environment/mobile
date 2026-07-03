@@ -22,11 +22,8 @@ export const SettingsBottomSheet = forwardRef<
 	BottomSheet,
 	SettingsBottomSheetProps
 >(({ onSignOut, onDeleteAccount }, ref) => {
-	const {
-		deletionScheduledAt,
-		cancelDeletion,
-		isCancellingDeletion,
-	} = useAuthContext();
+	const { deletionScheduledAt, cancelDeletion, isCancellingDeletion } =
+		useAuthContext();
 
 	const backdropComponent = useCallback(
 		(props: BottomSheetBackdropProps) => (

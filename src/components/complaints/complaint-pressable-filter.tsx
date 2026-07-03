@@ -261,7 +261,11 @@ export function ComplaintFilterRow({
 				>
 					<Badge variant="secondary" className="gap-2">
 						<BadgeIcon
-							as={hazardLevel !== "all" ? HAZARD_ICONS[hazardLevel] : RadiationIcon}
+							as={
+								hazardLevel !== "all"
+									? HAZARD_ICONS[hazardLevel]
+									: RadiationIcon
+							}
 						/>
 						<BadgeText>
 							{hazardLevel !== "all" ? HAZARD_LABELS[hazardLevel] : "Todos"}
@@ -272,8 +276,12 @@ export function ComplaintFilterRow({
 						<BadgeText>{categoryName ?? "Todos"}</BadgeText>
 					</Badge>
 					<Badge variant="secondary" className="gap-2">
-						<BadgeIcon as={status !== "ALL" ? STATUS_ICONS[status] : ShieldIcon} />
-						<BadgeText>{status !== "ALL" ? STATUS_LABELS[status] : "Todos"}</BadgeText>
+						<BadgeIcon
+							as={status !== "ALL" ? STATUS_ICONS[status] : ShieldIcon}
+						/>
+						<BadgeText>
+							{status !== "ALL" ? STATUS_LABELS[status] : "Todos"}
+						</BadgeText>
 					</Badge>
 					<Badge variant="secondary" className="gap-2">
 						<BadgeIcon as={RadarIcon} />

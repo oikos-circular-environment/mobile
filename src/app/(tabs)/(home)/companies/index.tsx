@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import { BuildingIcon } from "lucide-react-native";
+import { Stack, useRouter } from "expo-router";
+import { BuildingIcon, ChevronLeftIcon } from "lucide-react-native";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
 import { CompanyCard } from "@/components/companies/company-card";
@@ -7,6 +7,7 @@ import { CompanyCardSkeleton } from "@/components/companies/company-card-skeleto
 import { CompanyListHeader } from "@/components/companies/company-list-header";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
@@ -58,15 +59,26 @@ export default function CompaniesListScreen() {
 	}, [isLoading]);
 
 	return (
-		<View className="flex-1 bg-white">
-			<FlatList<Company>
-				data={companies}
-				keyExtractor={item => item.id}
-				contentContainerClassName="gap-4 px-4 py-4 pb-8"
-				ListHeaderComponent={CompanyListHeader}
-				renderItem={renderItem}
-				ListEmptyComponent={ListEmpty}
+		<>
+			<Stack.Screen
+				options={{
+					headerLeft: () => (
+						<Pressable onPress={() => router.back()} className="pl-1">
+							<ChevronLeftIcon size={24} />
+						</Pressable>
+					),
+				}}
 			/>
-		</View>
+			<View className="flex-1 bg-white">
+				<FlatList<Company>
+					data={companies}
+					keyExtractor={item => item.id}
+					contentContainerClassName="gap-4 px-4 py-4 pb-8"
+					ListHeaderComponent={CompanyListHeader}
+					renderItem={renderItem}
+					ListEmptyComponent={ListEmpty}
+				/>
+			</View>
+		</>
 	);
 }

@@ -24,7 +24,6 @@ import {
 	makeWaste,
 } from "@/tests/factories";
 
-
 jest.mock("expo-router", () => ({
 	Link: ({
 		children,
@@ -111,7 +110,6 @@ jest.mock("@/components/market/radius-bottom-sheet", () => ({
 	},
 }));
 
-
 const COORDS = { latitude: -23.55, longitude: -46.63 };
 
 const defaultGeospatial = {
@@ -139,7 +137,6 @@ const defaultAuth = {
 	isCancellingDeletion: false,
 	updateUserProfile: jest.fn(),
 };
-
 
 function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
 	jest
@@ -173,7 +170,6 @@ async function renderMarket() {
 	);
 }
 
-
 describe("Market — filtros (integração)", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -187,7 +183,6 @@ describe("Market — filtros (integração)", () => {
 		jest.useRealTimers();
 		jest.clearAllMocks();
 	});
-
 
 	describe("carga de dados", () => {
 		it("renderiza lista com 25 empresas e exibe contador correto", async () => {
@@ -211,7 +206,6 @@ describe("Market — filtros (integração)", () => {
 			).toBeOnTheScreen();
 		});
 	});
-
 
 	describe("filtro de categoria", () => {
 		it("chama API com category=waste ao pressionar Resíduos", async () => {
@@ -273,7 +267,6 @@ describe("Market — filtros (integração)", () => {
 		});
 	});
 
-
 	describe("filtro de texto", () => {
 		it("chama API com q preenchido ao submeter busca", async () => {
 			mockMarketResponse([makeCompany()]);
@@ -298,7 +291,6 @@ describe("Market — filtros (integração)", () => {
 			});
 		});
 	});
-
 
 	describe("trigger de localização", () => {
 		const geocodedAddress = {
@@ -374,7 +366,9 @@ describe("Market — filtros (integração)", () => {
 			await act(async () => {
 				fireEvent.press(screen.getByTestId("select-profile-location"));
 			});
-			expect(screen.getByText("Av. Paulista, 1000, Bela Vista")).toBeOnTheScreen();
+			expect(
+				screen.getByText("Av. Paulista, 1000, Bela Vista"),
+			).toBeOnTheScreen();
 
 			await act(async () => {
 				fireEvent.press(screen.getByTestId("select-current-location"));
@@ -386,7 +380,6 @@ describe("Market — filtros (integração)", () => {
 			).not.toBeOnTheScreen();
 		});
 	});
-
 
 	describe("filtro de raio", () => {
 		it("chama API com radius correto ao selecionar raio", async () => {

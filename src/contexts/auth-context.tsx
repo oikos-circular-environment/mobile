@@ -25,6 +25,7 @@ import {
 	postV1AuthLogin,
 	postV1UsersRegister,
 } from "@/libs/oikos-sdk";
+import { sessionBus } from "@/libs/session-bus";
 import type { Account, User } from "@/libs/types/user";
 
 type AuthContextValue = {
@@ -206,10 +207,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			);
 		},
 		onError: () => {
-			toast.error(
-				"Erro ao solicitar exclusão",
-				"Tente novamente mais tarde.",
-			);
+			toast.error("Erro ao solicitar exclusão", "Tente novamente mais tarde.");
 		},
 	});
 
@@ -226,16 +224,10 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 					? { ...prev, account: { ...prev.account, deleted_at: null } }
 					: prev,
 			);
-			toast.success(
-				"Exclusão cancelada",
-				"Sua conta não será mais excluída.",
-			);
+			toast.success("Exclusão cancelada", "Sua conta não será mais excluída.");
 		},
 		onError: () => {
-			toast.error(
-				"Erro ao cancelar exclusão",
-				"Tente novamente mais tarde.",
-			);
+			toast.error("Erro ao cancelar exclusão", "Tente novamente mais tarde.");
 		},
 	});
 
@@ -245,6 +237,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		setUser(null);
 		setAccount(null);
 		setIsAuthenticated(false);
+		sessionBus.emit();
 		router.navigate("/(tabs)/(home)");
 		toast.success("Você foi deslogado com sucesso!");
 	}, [router]);
@@ -253,6 +246,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		setOnUnauthenticated(() => {
 			setUser(null);
 			setIsAuthenticated(false);
+			sessionBus.emit();
 			toast.info("Sessão expirada", "Faça o login novamente.");
 			router.push("/sign-in");
 		});

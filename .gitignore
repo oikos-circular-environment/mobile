@@ -18,6 +18,9 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# Store credentials
+docs/oikos-circular-economy-*.json
+
 # Metro
 .metro-health-check*
 
@@ -33,6 +36,7 @@ yarn-error.*
 # env files
 .env
 .env*.local
+.env.eas
 
 # typescript
 *.tsbuildinfo

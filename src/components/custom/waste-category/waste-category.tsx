@@ -22,7 +22,9 @@ type WasteCategoryMultiProps = WasteCategoryBaseProps & {
 	onSelectionChange?: (categories: WasteCategoryModel[]) => void;
 };
 
-export type WasteCategoryProps = WasteCategorySingleProps | WasteCategoryMultiProps;
+export type WasteCategoryProps =
+	| WasteCategorySingleProps
+	| WasteCategoryMultiProps;
 
 export function WasteCategory(props: WasteCategoryProps) {
 	const { children, selectionMode = "single", ...viewProps } = props;
@@ -60,7 +62,8 @@ export function WasteCategory(props: WasteCategoryProps) {
 			(onChangeRef.current as (cats: WasteCategoryModel[]) => void)?.(initial);
 		} else {
 			const initial =
-				(defaultCategoryId && categories.find(c => c.id === defaultCategoryId)) ||
+				(defaultCategoryId &&
+					categories.find(c => c.id === defaultCategoryId)) ||
 				categories[0];
 			setSelectedCategory(initial);
 			(onChangeRef.current as (cat: WasteCategoryModel) => void)?.(initial);
@@ -71,7 +74,8 @@ export function WasteCategory(props: WasteCategoryProps) {
 		if (selectedCategory !== null) return selectedCategory;
 		if (!isMulti && categories.length > 0) {
 			return (
-				(defaultCategoryId && categories.find(c => c.id === defaultCategoryId)) ||
+				(defaultCategoryId &&
+					categories.find(c => c.id === defaultCategoryId)) ||
 				categories[0]
 			);
 		}
@@ -79,16 +83,26 @@ export function WasteCategory(props: WasteCategoryProps) {
 	}, [selectedCategory, isMulti, categories, defaultCategoryId]);
 
 	const handleSelect = (category: WasteCategoryModel) => {
-		setSelectedCategory(category);
-
 		if (isMulti) {
 			const exists = selectedCategories.some(c => c.id === category.id);
 			const updated = exists
 				? selectedCategories.filter(c => c.id !== category.id)
 				: [...selectedCategories, category];
 			setSelectedCategories(updated);
+
+			if (exists) {
+				setSelectedCategory(
+					selectedCategory?.id === category.id
+						? (updated[0] ?? null)
+						: selectedCategory,
+				);
+			} else {
+				setSelectedCategory(category);
+			}
+
 			(onChangeRef.current as (cats: WasteCategoryModel[]) => void)?.(updated);
 		} else {
+			setSelectedCategory(category);
 			(onChangeRef.current as (cat: WasteCategoryModel) => void)?.(category);
 		}
 	};

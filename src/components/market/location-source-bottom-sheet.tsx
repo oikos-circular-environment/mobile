@@ -132,58 +132,58 @@ export function LocationSourceBottomSheet() {
 
 	return (
 		<BottomSheet
-				ref={locationSheetRef}
-				index={-1}
-				snapPoints={["44%"]}
-				enablePanDownToClose
-				backdropComponent={backdropComponent}
-			>
-				<BottomSheetView style={{ padding: 16 }}>
-					<Heading size="sm" className="text-base text-gray-900">
-						Selecionar localização
-					</Heading>
+			ref={locationSheetRef}
+			index={-1}
+			snapPoints={["44%"]}
+			enablePanDownToClose
+			backdropComponent={backdropComponent}
+		>
+			<BottomSheetView style={{ padding: 16 }}>
+				<Heading size="sm" className="text-base text-gray-900">
+					Selecionar localização
+				</Heading>
 
+				<OptionRow
+					icon={<MapPinIcon size={14} color={colors.white} />}
+					iconBg={colors.lime[800]}
+					title="Localização atual"
+					address={currentAddressText}
+					lat={currentLat}
+					lon={currentLon}
+					isSelected={locationSource === "current"}
+					onPress={() => selectOption("current")}
+				/>
+
+				{profileSelectable ? (
 					<OptionRow
-						icon={<MapPinIcon size={14} color={colors.white} />}
+						icon={<User2Icon size={14} color={colors.white} />}
 						iconBg={colors.lime[800]}
-						title="Localização atual"
-						address={currentAddressText}
-						lat={currentLat}
-						lon={currentLon}
-						isSelected={locationSource === "current"}
-						onPress={() => selectOption("current")}
+						title="Endereço do perfil"
+						address={profileAddressText ?? ""}
+						lat={profileLat}
+						lon={profileLon}
+						isSelected={locationSource !== "current"}
+						onPress={() => selectOption("profile")}
 					/>
-
-					{profileSelectable ? (
-						<OptionRow
-							icon={<User2Icon size={14} color={colors.white} />}
-							iconBg={colors.lime[800]}
-							title="Endereço do perfil"
-							address={profileAddressText ?? ""}
-							lat={profileLat}
-							lon={profileLon}
-							isSelected={locationSource !== "current"}
-							onPress={() => selectOption("profile")}
-						/>
-					) : (
-						<HStack className="gap-3 p-3 rounded-lg items-center bg-gray-50">
-							<View
-								className="p-2 rounded-lg items-center justify-center"
-								style={{ backgroundColor: colors.gray[300] }}
-							>
-								<User2Icon size={14} color={colors.white} />
-							</View>
-							<VStack className="flex-1 gap-1">
-								<Text className="text-sm font-semibold text-gray-400">
-									Endereço do perfil
-								</Text>
-								<Text className="text-xs text-gray-400">
-									{disabledProfileMessage}
-								</Text>
-							</VStack>
-						</HStack>
-					)}
-				</BottomSheetView>
+				) : (
+					<HStack className="gap-3 p-3 rounded-lg items-center bg-gray-50">
+						<View
+							className="p-2 rounded-lg items-center justify-center"
+							style={{ backgroundColor: colors.gray[300] }}
+						>
+							<User2Icon size={14} color={colors.white} />
+						</View>
+						<VStack className="flex-1 gap-1">
+							<Text className="text-sm font-semibold text-gray-400">
+								Endereço do perfil
+							</Text>
+							<Text className="text-xs text-gray-400">
+								{disabledProfileMessage}
+							</Text>
+						</VStack>
+					</HStack>
+				)}
+			</BottomSheetView>
 		</BottomSheet>
 	);
 }

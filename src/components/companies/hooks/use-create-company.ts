@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
-import { useCompaniesStore } from "@/stores/companies-store";
 import type { PostV1CompaniesData } from "@/libs/oikos-sdk";
 import { postV1Companies } from "@/libs/oikos-sdk";
+import { useCompaniesStore } from "@/stores/companies-store";
 
 type CreateCompanyBody = PostV1CompaniesData["body"];
 

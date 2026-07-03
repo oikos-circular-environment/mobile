@@ -4,7 +4,6 @@ import {
 } from "@/libs/market/is-company-open";
 import type { MarketBusinessHour } from "@/libs/types/market";
 
-
 const christianCesarHours: MarketBusinessHour[] = [
 	{ id: "9c7d31f2", day_of_week: "SUNDAY", is_open: false, time_slots: [] },
 	{
@@ -94,7 +93,6 @@ const oikosHours: MarketBusinessHour[] = [
 // 11/jun/2026 (quinta-feira) 10:48 — cenário do bug report
 const thu_10h48 = new Date(2026, 5, 11, 10, 48, 0);
 
-
 describe("isCompanyOpenNow — dados reais da API", () => {
 	it("Christian Cesar: THURSDAY is_open=true → retorna true às 10:48", () => {
 		expect(isCompanyOpenNow(christianCesarHours, thu_10h48)).toBe(true);
@@ -134,7 +132,6 @@ describe("isCompanyOpenNow — dados reais da API", () => {
 		expect(isCompanyOpenNow(christianCesarHours, sun_10h)).toBe(false);
 	});
 });
-
 
 describe("isCompanyOpenNow — lógica", () => {
 	const thursdayOpen: MarketBusinessHour[] = [

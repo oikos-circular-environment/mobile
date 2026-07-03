@@ -5,6 +5,7 @@ import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { AuthContextProvider } from "@/contexts/auth-context";
 import { GeospatialProvider } from "@/contexts/geospatial-context";
 import { NotificationProvider } from "@/contexts/notification-context";
+import { sessionBus } from "@/libs/session-bus";
 import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -22,6 +23,7 @@ export const unstable_settings = {
 };
 
 const queryClient = new QueryClient();
+sessionBus.subscribe(() => queryClient.resetQueries());
 
 export default function RootLayout() {
 	const [loaded, error] = useFonts({

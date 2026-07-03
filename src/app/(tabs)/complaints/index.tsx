@@ -10,12 +10,18 @@ import {
 	Trash2Icon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Platform, TouchableOpacity, View } from "react-native";
+import {
+	Platform,
+	TouchableOpacity,
+	useWindowDimensions,
+	View,
+} from "react-native";
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
+import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
 import {
 	type BottomSheetRef,
 	ComplaintFilterBottomSheet,
@@ -24,6 +30,7 @@ import {
 	RADIUS_OPTIONS,
 } from "@/components/complaints/complaint-filter-bottom-sheet";
 import { ComplaintFilterRow } from "@/components/complaints/complaint-pressable-filter";
+import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
 import { colors } from "@/components/style/colors";
@@ -43,8 +50,11 @@ const controlShadow = {
 	elevation: 3,
 };
 
+const LIST_SHEET_MIN_SNAP_RATIO = 0.15;
+
 export default function ComplaintsMapScreen() {
 	const insets = useSafeAreaInsets();
+	const { height: windowHeight } = useWindowDimensions();
 	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
 	const { location } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
@@ -131,6 +141,20 @@ export default function ComplaintsMapScreen() {
 	const handleClosePanel = () => {
 		if (suppressMapPressRef.current) return;
 		setSelectedMapComplaint(null);
+	};
+
+	const handleComplaintListItemPress = (complaint: MapComplaint) => {
+		if (!complaint.location) return;
+		mapRef.current?.animateToRegion(
+			{
+				latitude: complaint.location.lat,
+				longitude: complaint.location.lon,
+				latitudeDelta: 0.01,
+				longitudeDelta: 0.01,
+			},
+			500,
+		);
+		setSelectedMapComplaint(complaint);
 	};
 
 	const handleZoomIn = async () => {
@@ -347,8 +371,10 @@ export default function ComplaintsMapScreen() {
 
 			{/* FABs */}
 			<View
-				className="absolute bottom-4 right-4 flex-row gap-2 items-center"
-				style={{ bottom: insets.bottom }}
+				className="absolute right-4 flex-row gap-2 items-center"
+				style={{
+					bottom: windowHeight * LIST_SHEET_MIN_SNAP_RATIO + 12,
+				}}
 				pointerEvents="box-none"
 			>
 				<TouchableOpacity
@@ -411,6 +437,14 @@ export default function ComplaintsMapScreen() {
 				onClose={() => setShowProfileModal(false)}
 				description="Para visualizar e registrar denúncias você precisa finalizar o seu cadastro."
 			/>
+
+			<ComplaintsListBottomSheet
+				complaints={complaints}
+				userLocation={userLocation}
+				onSelectComplaint={handleComplaintListItemPress}
+			/>
+
+			<ComplaintBottomSheet />
 
 			<ComplaintFilterBottomSheet
 				ref={filterSheetRef}

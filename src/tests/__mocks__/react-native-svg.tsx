@@ -39,6 +39,7 @@ export const Image = NullComponent;
 export const ClipPath = NullComponent;
 export const Defs = ({ children }: { children?: React.ReactNode }) =>
 	React.createElement(View, null, children);
+// biome-ignore lint/suspicious/noShadowRestrictedNames: mock precisa ter o mesmo nome do componente <Symbol> real do react-native-svg
 export const Symbol = NullComponent;
 export const Mask = NullComponent;
 export const LinearGradient = NullComponent;

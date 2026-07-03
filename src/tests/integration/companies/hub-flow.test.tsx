@@ -20,6 +20,12 @@ jest.mock("expo-router", () => ({
 		return <>{children}</>;
 	},
 	useLocalSearchParams: jest.fn(),
+	useRouter: jest.fn(() => ({
+		back: jest.fn(),
+		push: jest.fn(),
+		replace: jest.fn(),
+	})),
+	Stack: { Screen: () => null },
 }));
 
 jest.mock("@/stores/companies-store", () => ({

@@ -12,7 +12,9 @@
 			"!**/next",
 			"!**/old",
 			"!app.json",
-			"!**/ui"
+			"!**/ui",
+			"!src/libs/oikos-sdk",
+			"!src/libs/brasil-api-sdk"
 		]
 	},
 	"linter": {

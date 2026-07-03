@@ -7,6 +7,7 @@ import { makeCompany } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
+	Stack: { Screen: () => null },
 }));
 
 jest.mock("@/stores/companies-store", () => ({
