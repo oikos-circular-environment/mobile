@@ -1,0 +1,52 @@
+name: Build and submit
+
+on:
+  push:
+    branches: ['production']
+
+jobs:
+  quality:
+    name: Quality checks
+    type: custom
+    steps:
+      - run: npm ci
+      - run: npx biome ci .
+      - run: npm test
+  version:
+    name: Bump app version
+    type: custom
+    needs: [quality]
+    steps:
+      - run: |
+          CURRENT=$(eas env:get production --variable-name APP_VERSION --format short --non-interactive | cut -d'=' -f2)
+          NEXT=$(echo "$CURRENT" | awk -F. '{printf "%d.%d.%d", $1, $2, $3+1}')
+          eas env:update production --variable-name APP_VERSION --value "$NEXT" --non-interactive
+          echo "Bumped app version: $CURRENT -> $NEXT"
+  build_android:
+    name: Build Android app
+    type: build
+    needs: [version]
+    params:
+      platform: android
+      profile: production
+  build_ios:
+    name: Build iOS app
+    type: build
+    needs: [version]
+    params:
+      platform: ios
+      profile: production
+  submit_android:
+    name: Submit Android
+    type: submit
+    needs: [build_android]
+    params:
+      build_id: ${{ needs.build_android.outputs.build_id }}
+      profile: production
+  submit_ios:
+    name: Submit iOS
+    type: submit
+    needs: [build_ios]
+    params:
+      build_id: ${{ needs.build_ios.outputs.build_id }}
+      profile: production
