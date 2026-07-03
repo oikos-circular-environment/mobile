@@ -18,6 +18,8 @@ jobs:
     type: custom
     needs: [quality]
     steps:
+      - uses: eas/checkout
+      - run: npm ci
       - run: |
           CURRENT=$(npx eas-cli@latest env:get production --variable-name APP_VERSION --format short --non-interactive | cut -d'=' -f2)
           NEXT=$(echo "$CURRENT" | awk -F. '{printf "%d.%d.%d", $1, $2, $3+1}')
