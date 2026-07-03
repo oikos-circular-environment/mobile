@@ -12,17 +12,27 @@ jobs:
       - run: npm ci
       - run: npx biome ci .
       - run: npm test
+  version:
+    name: Bump app version
+    type: custom
+    needs: [quality]
+    steps:
+      - run: |
+          CURRENT=$(eas env:get production --variable-name APP_VERSION --format short --non-interactive | cut -d'=' -f2)
+          NEXT=$(echo "$CURRENT" | awk -F. '{printf "%d.%d.%d", $1, $2, $3+1}')
+          eas env:update production --variable-name APP_VERSION --value "$NEXT" --non-interactive
+          echo "Bumped app version: $CURRENT -> $NEXT"
   build_android:
     name: Build Android app
     type: build
-    needs: [quality]
+    needs: [version]
     params:
       platform: android
       profile: production
   build_ios:
     name: Build iOS app
     type: build
-    needs: [quality]
+    needs: [version]
     params:
       platform: ios
       profile: production
