@@ -147,9 +147,38 @@ confirmação visual do usuário rodando o app em dev.
     `npx expo export -p ios` antes/depois — confirma que só isso resolve o
     bundling sem precisar reinstalar `@react-navigation/*` (que reintroduziria
     o conflito com expo-router 56) nem arriscar o salto major pro buoy-gg 5.0.0.
+- [x] **Achado e corrigido (não relacionado ao buoy-gg)**: reload no Expo Go e
+  reload pelo terminal disparavam
+  `Error: AppContextLost: The app context has been lost
+  (at ExpoModulesCore/AsyncFunctionDefinition.swift:187)` no cleanup do
+  `geospatial-context.tsx` (`headingSubscription?.remove()`).
+  - **Causa raiz** (confirmada via `gh` no repo oficial expo/expo,
+    [issue #46975](https://github.com/expo/expo/issues/46975)): `expo-location`'s
+    `unregisterCallback` chama `ExpoLocation.removeWatchAsync(id)` sem `await`/`.catch()`
+    (fire-and-forget) — se o Fast Refresh derruba o `AppContext` nativo antes dessa
+    promise resolver, ela rejeita com `AppContextLost`, e como não temos handle
+    JS pra essa promise (a assinatura pública `remove(): void` não a expõe),
+    **não tem como capturar isso do nosso lado**. Confirmado por engenheiro da
+    própria Expo: "we did not see it on prior architectures, even though the
+    code path existed" — piora especificamente em Fabric+TurboModules
+    (New Architecture), que é exatamente o que ganhamos no SDK 55/56. Fix já
+    está mesclado upstream ([PR #47080](https://github.com/expo/expo/pull/47080)/
+    [#47098](https://github.com/expo/expo/pull/47098)) mas **ainda não
+    publicado** em nenhuma versão (confirmado no CHANGELOG.md do
+    `expo-modules-core` no branch `main`: aparece em "Unpublished", não em
+    `56.0.19` que é o que temos instalado, nem no `57.0.2` mais recente do npm).
+  - Confirmado que o app nunca chama `Updates.reloadAsync()` em código próprio
+    (`grep` em `src/` não encontrou nenhuma chamada) — ou seja, o cenário de
+    crash em **produção** do issue #46975 (via `Updates.reloadAsync()`) não nos
+    afeta; isso só aparece em reload de desenvolvimento (Fast Refresh/`r`).
+  - **Fix aplicado**: `LogBox.ignoreLogs([...])` gated por `__DEV__` em
+    `src/contexts/geospatial-context.tsx`, com comentário linkando a issue e a
+    PR upstream — remover quando o fix for publicado numa versão nova do
+    `expo-modules-core`.
 - [ ] **Validar visualmente**: rodar o app em dev e confirmar que o overlay do
   buoy aparece (com os 7 tools restantes); confirmar que não aparece em build
-  de produção (`isDevelopmentMode` gate) — pendente do usuário.
+  de produção (`isDevelopmentMode` gate); confirmar que o erro `AppContextLost`
+  não aparece mais em reload — pendente do usuário.
 - Fora: mudanças de produto/config no próprio buoy-gg além de religar o que já existia.
 
 **Referências de spec:** epic-brief.md → Escopo (dentro); tech-plan.md →
