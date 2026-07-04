@@ -2,7 +2,7 @@
 
 ```mermaid
 graph LR
-    T1[Ticket 1: Upgrade para SDK 55 ✅] --> T2[Ticket 2: Upgrade para SDK 56 🔄]
+    T1[Ticket 1: Upgrade para SDK 55 ✅] --> T2[Ticket 2: Upgrade para SDK 56 ✅]
     T2 --> T3[Ticket 3: Reativar buoy-gg ⏳]
     T3 --> T4[Ticket 4: Regressão final + dry-run EAS ⏳]
 ```
@@ -52,8 +52,8 @@ changes (linhas SDK 55).
 
 ## Ticket 2 — Upgrade para SDK 56
 
-**Status:** 🔄 Em andamento — parte automatizada concluída, faltam 2 confirmações
-do usuário (device support do iOS 16.4 e teste manual) antes de fechar o ticket.
+**Status:** ✅ Concluído — usuário confirmou device support do iOS 16.4 e teste
+manual passando.
 
 **Escopo:**
 - [x] `npx expo install expo@^56.0.0` + `npx expo install --fix`.
@@ -88,7 +88,7 @@ do usuário (device support do iOS 16.4 e teste manual) antes de fechar o ticket
 - [x] Confirmar Node da imagem EAS Build atende mínimo 20.19.4 (local já é v24.15.0).
 - [x] `npx expo-doctor` limpo (21/21), `npm test` verde (23/23 suítes, 201/201
   testes), `biome ci` sem erros.
-- [ ] **Smoke test manual do usuário** — pendente.
+- [x] **Smoke test manual do usuário** — confirmado ok pelo usuário.
 - Fora: reativação do buoy-gg (ticket separado, testado só contra o 56 final).
 
 **Nota sobre `tsc --noEmit`:** rodei fora do escopo formal do ticket (não há script
