@@ -88,7 +88,6 @@
 		"@buoy-gg/highlight-updates": "^2.1.15",
 		"@buoy-gg/network": "^2.1.15",
 		"@buoy-gg/react-query": "^2.1.15",
-		"@buoy-gg/route-events": "^2.1.15",
 		"@buoy-gg/storage": "^2.1.15",
 		"@faker-js/faker": "^10.3.0",
 		"@hey-api/openapi-ts": "0.97.1",

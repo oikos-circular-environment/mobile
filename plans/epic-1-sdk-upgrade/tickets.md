@@ -124,9 +124,32 @@ confirmação visual do usuário rodando o app em dev.
   se explicitamente pedido. Uso simples sem init é válido.
 - [x] `npx expo-doctor` limpo (21/21), `npm test` verde (23/23 suítes, 201/201
   testes), `biome lint` sem novos erros.
+- [x] **Achado e corrigido**: bundling do iOS quebrava com
+  `Unable to resolve module @react-navigation/core from
+  .../@buoy-gg/route-events/lib/module/useRouteObserverReactNavigation.js`.
+  Causa: `@buoy-gg/route-events@2.1.15` faz `import ... from "@react-navigation/core"`
+  no topo do arquivo (fora de qualquer try/catch), e removemos todo
+  `@react-navigation/*` no Ticket 2 (exigência do expo-router 56). O
+  try/catch que o `autoDiscoverPresets.js` do `@buoy-gg/core` usa pra
+  "pacote opcional" só protege contra erro em runtime — não ajuda quando o
+  Metro tenta resolver estaticamente o import no bundle time, que falha
+  independente de try/catch.
+  - Investigado via `gh` no repo oficial: [issue #87](https://github.com/Buoy-gg/buoy/issues/87)
+    relata sintoma parecido em SDK 56 beta, fechada dizendo "tenta a versão
+    mais nova" (buoy-gg pulou de 2.1.15 pra 5.0.0, repo moveu pra
+    `LovesWorking/react-native-buoy`, licença agora é "Proprietary" mas uso
+    simples em dev continua grátis). Baixei o tarball do
+    `@buoy-gg/route-events@5.0.0` e confirmei que **o mesmo import estático
+    problemático continua existindo** — o upgrade major não teria resolvido
+    isso de verdade.
+  - **Fix aplicado**: removido `@buoy-gg/route-events` do `package.json` (não
+    usamos observação de rota, só os outros 7 tools). Testado com
+    `npx expo export -p ios` antes/depois — confirma que só isso resolve o
+    bundling sem precisar reinstalar `@react-navigation/*` (que reintroduziria
+    o conflito com expo-router 56) nem arriscar o salto major pro buoy-gg 5.0.0.
 - [ ] **Validar visualmente**: rodar o app em dev e confirmar que o overlay do
-  buoy aparece; confirmar que não aparece em build de produção
-  (`isDevelopmentMode` gate) — pendente do usuário.
+  buoy aparece (com os 7 tools restantes); confirmar que não aparece em build
+  de produção (`isDevelopmentMode` gate) — pendente do usuário.
 - Fora: mudanças de produto/config no próprio buoy-gg além de religar o que já existia.
 
 **Referências de spec:** epic-brief.md → Escopo (dentro); tech-plan.md →

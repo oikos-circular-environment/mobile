@@ -11,13 +11,13 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
+import { FloatingDevTools } from "@buoy-gg/core";
 import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { AppSplashScreen } from "@/components/app-splash-screen";
 import { Toaster } from "@/components/toast";
-import { FloatingDevTools } from "@buoy-gg/core";
 
 export const unstable_settings = {
 	anchor: "(tabs)",
