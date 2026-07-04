@@ -82,6 +82,13 @@ const config: ExpoConfig = {
 		"expo-image",
 		"expo-web-browser",
 		"expo-status-bar",
+		[
+			"react-native-maps",
+			{
+				iosGoogleMapsApiKey: googleMapsApiKey,
+				androidGoogleMapsApiKey: googleMapsApiKey,
+			},
+		],
 	],
 	experiments: {
 		typedRoutes: true,

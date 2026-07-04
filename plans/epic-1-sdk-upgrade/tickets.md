@@ -212,15 +212,51 @@ Arquitetura de Componentes.
 
 ## Ticket 4 — Regressão final + dry-run de build/submit EAS
 
-**Status:** ⏳ Não iniciado — bloqueado pelo Ticket 3.
+**Status:** 🔄 Em andamento — decisão do usuário: dry-run só do profile
+`production`, Android + iOS (não todos os 3 profiles).
 
 **Escopo:**
-- [ ] Rodar a suíte de testes uma última vez.
+- [x] Rodar a suíte de testes uma última vez (23/23 suítes, 201/201 testes).
 - [ ] Smoke test manual completo (Android + iOS) das áreas críticas com o buoy-gg
   ativo em dev.
-- [ ] Dry-run de build nos 3 profiles (`development`, `preview`, `production`) via
-  `.eas/workflows/build-and-submit.yml` / `eas.json`.
-- Fora: submit real às lojas (fica a critério do usuário decidir quando submeter).
+- [x] **Achado e corrigido**: build de produção do iOS falhou no `pod install`
+  com `No podspec found for 'react-native-google-maps' in .../react-native-maps`.
+  - **Causa raiz** (confirmada via `gh` no repo oficial expo/expo,
+    [issue #42423](https://github.com/expo/expo/issues/42423)): o
+    `react-native-maps@1.23.0+` removeu o podspec legado
+    `react-native-google-maps.podspec` (confirmado baixando os tarballs do npm:
+    existia na `1.20.1`, sumiu entre a `1.21.0` e a `1.24.0`). O plugin
+    embutido do próprio Expo (`@expo/config-plugins`'s `IOSConfig.Maps.withMaps`,
+    disparado automaticamente só por termos `ios.config.googleMapsApiKey`
+    setado) ainda referencia esse nome de pod legado e não foi atualizado.
+  - **Fix oficial** (confirmado pelo próprio time da Expo nos comentários da
+    issue): parar de depender do plugin implícito do Expo e listar
+    `"react-native-maps"` explicitamente em `plugins` no `app.config.ts`, com
+    `iosGoogleMapsApiKey`/`androidGoogleMapsApiKey` — isso faz o
+    `createLegacyPlugin`/`withStaticPlugin` do Expo usar o plugin **próprio**
+    do `react-native-maps` (que já usa o nome de subspec correto,
+    `react-native-maps/Google`) em vez do fallback legado quebrado.
+  - **Achado extra durante o fix**: o plugin do próprio `react-native-maps`
+    também quebrava a avaliação do config com
+    `Cannot find module '@expo/config-plugins/build/plugins/ios-plugins'`
+    — mesma classe de problema do `react-native-compressor` no Ticket 2
+    (`@expo/config-plugins` não existe mais como pacote standalone no SDK 56,
+    só como `expo/config-plugins`). Diferente do compressor (cujo plugin era
+    um no-op e pôde ser removido), o plugin do maps é necessário de verdade,
+    então instalamos `@expo/config-plugins@56.0.11` como dependency explícita
+    pra satisfazer esse import. `expo-doctor` acusa isso como
+    "should not be installed directly" — mas a própria mensagem do doctor diz
+    "If you installed `@expo/config-plugins` to fulfill a peer dependency for
+    a config plugin, the plugin's maintainer should switch to the
+    `expo/config-plugins` import, and you can ignore this warning" — é
+    exatamente nosso caso, então aceitamos ficar em 20/21 nesse item
+    especificamente.
+  - `expo-doctor` (20/21, warning aceitável documentado acima), `npx expo config`
+    avalia sem erro, `npm test` (23/23 suítes) e `biome ci` limpos depois do fix.
+- [ ] Rebuild do iOS com o fix, dry-run de build no profile `production`
+  (Android + iOS, conforme decisão do usuário) — em andamento.
+- Fora: submit real às lojas (fica a critério do usuário decidir quando submeter);
+  os outros 2 profiles (`development`, `preview`) ficam fora por decisão do usuário.
 
 **Referências de spec:** epic-brief.md → Critérios de sucesso.
 
