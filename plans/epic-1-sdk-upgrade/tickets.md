@@ -202,6 +202,21 @@ runtime (Metro não faz type-check; `npm test` passa 100%).
   estável dos componentes wrapped (`bottomsheet`, `checkbox` etc.) seja livre de
   breaking changes — precisa de uma passada de validação dedicada, não só bump
   de versão.
+  **Previsão de estável do NativeWind v5 (checado em 2026-07-04 via `gh` na
+  [nativewind/nativewind](https://github.com/nativewind/nativewind))**: existe
+  um plano de release ativo —
+  [discussão #1818](https://github.com/nativewind/nativewind/discussions/1818),
+  postada em 2026-06-17. Escopo do 5.0 é deliberadamente mínimo (só `filter`,
+  `mix-blend-mode` e bugs bloqueantes; tudo mais fica pra depois). Timeline
+  original: auditoria de PRs/issues + guia de migração v4→v5 (~1 semana) → corte
+  de um Release Candidate → **~2 semanas de "bake"** só com correção de bugs →
+  promoção pra `latest`. **Na prática está atrasado em relação a esse plano**:
+  nenhum RC foi publicado ainda (última tag continua `5.0.0-preview.4`, de
+  15/05), e o v4 ainda recebe patch novo (`4.2.6` em 22/06, depois do post do
+  plano). Estimativa realista: estável não deve sair antes de meados/final de
+  julho de 2026, dado que nem o RC saiu. Bônus: já existe uma
+  [discussão sobre a v6](https://github.com/nativewind/nativewind/discussions/1819)
+  (upstream pra Yoga/React Native), mas é early-stage, não bloqueia nada agora.
 - [ ] **Grupo 7 — tipagem de mocks só em teste** (≈38 erros, sem afetar
   runtime): `Company` não exportado de `@/stores/companies-store` (7 arquivos
   de teste), mocks com tipos incompatíveis (`User`, literal `"profile"` vs
