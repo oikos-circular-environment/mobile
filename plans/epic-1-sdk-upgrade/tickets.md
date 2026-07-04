@@ -188,8 +188,20 @@ runtime (Metro não faz type-check; `npm test` passa 100%).
 - [ ] **Grupo 6 — gluestack-ui v5 alpha** (≈27 erros): `bottomsheet`, `checkbox`,
   `toast`, `spinner`, `select-actionsheet`, `modal`, `button`, `badge`, `avatar`
   em `src/components/ui/`. Tipos instáveis de lib pré-release
-  (`@gluestack-ui/core: ^5.0.0-alpha.0`) — resolução provavelmente vem de
-  esperar uma versão estável, não de patch manual.
+  (`@gluestack-ui/core: ^5.0.0-alpha.0`, `@gluestack-ui/utils: ^5.0.1-alpha.0`).
+  **Atualização (2026-07-04): release estável já existe** —
+  [v5.0.0 no GitHub](https://github.com/gluestack/gluestack-ui/releases/tag/v5.0.0),
+  `@gluestack-ui/core@5.0.15` e `@gluestack-ui/utils@5.0.6` publicados no npm
+  (nossa versão pinada é `^5.0.0-alpha.0`/`^5.0.1-alpha.0`, não pega o estável
+  automaticamente). Novidades da v5 estável: integração completa com
+  NativeWind v5 (Tailwind v4) e "Expo Router first". Breaking change conhecido
+  (suporte a Next.js removido) **não nos afeta** — projeto é só Expo. NativeWind
+  em si ainda não tem release estável (`nativewind@5.0.0-preview.4` continua
+  sendo a última, igual à instalada); `react-native-css` tem um patch novo
+  (`3.0.7`, estamos em `3.0.6`). Não há confirmação de que a migração alpha→
+  estável dos componentes wrapped (`bottomsheet`, `checkbox` etc.) seja livre de
+  breaking changes — precisa de uma passada de validação dedicada, não só bump
+  de versão.
 - [ ] **Grupo 7 — tipagem de mocks só em teste** (≈38 erros, sem afetar
   runtime): `Company` não exportado de `@/stores/companies-store` (7 arquivos
   de teste), mocks com tipos incompatíveis (`User`, literal `"profile"` vs
