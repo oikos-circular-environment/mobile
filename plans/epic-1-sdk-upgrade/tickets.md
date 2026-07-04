@@ -3,8 +3,8 @@
 ```mermaid
 graph LR
     T1[Ticket 1: Upgrade para SDK 55 ✅] --> T2[Ticket 2: Upgrade para SDK 56 ✅]
-    T2 --> T3[Ticket 3: Reativar buoy-gg ⏳]
-    T3 --> T4[Ticket 4: Regressão final + dry-run EAS ⏳]
+    T2 --> T3[Ticket 3: Reativar buoy-gg ✅]
+    T3 --> T4[Ticket 4: Regressão final + dry-run EAS 🔄]
     T4 --> T5[Ticket 5: Cleanup de dívida técnica de TypeScript ⏳]
 ```
 
@@ -112,8 +112,8 @@ estável na 55.
 
 ## Ticket 3 — Reativar `@buoy-gg/*` (devtools em modo dev)
 
-**Status:** 🔄 Em andamento — código restaurado e validado por automação, falta
-confirmação visual do usuário rodando o app em dev.
+**Status:** ✅ Concluído — usuário confirmou visualmente: bolinha aparece,
+toque abre o menu de ferramentas, sem erro `AppContextLost` no reload.
 
 **Escopo:**
 - [x] Em `src/app/_layout.tsx`: restaurar `import { FloatingDevTools } from "@buoy-gg/core"`
@@ -199,11 +199,8 @@ confirmação visual do usuário rodando o app em dev.
   - **Fix aplicado**: bump de todos os 8 pacotes `@buoy-gg/*` restantes de
     `^2.1.15` pra `^5.0.0`. `expo-doctor` (21/21), `npx expo export -p ios`
     (bundle ok), `npm test` (23/23 suítes) e `biome ci` limpos depois do bump.
-- [ ] **Validar visualmente**: rodar o app em dev e confirmar que o overlay do
-  buoy aparece **e que tocar nele abre o menu de ferramentas** (com os 7 tools
-  restantes); confirmar que não aparece em build de produção
-  (`isDevelopmentMode` gate); confirmar que o erro `AppContextLost` não aparece
-  mais em reload — pendente do usuário.
+- [x] **Validado visualmente pelo usuário**: overlay do buoy aparece, toque
+  abre o menu de ferramentas, sem erro `AppContextLost` no reload.
 - Fora: mudanças de produto/config no próprio buoy-gg além de religar o que já existia.
 
 **Referências de spec:** epic-brief.md → Escopo (dentro); tech-plan.md →
