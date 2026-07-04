@@ -29,10 +29,9 @@
 				"track": "alpha"
 			},
 			"ios": {
-				"ascAppId": "6786017565",
-				"ascApiKeyIssuerId": "4c9b4692-ac79-43ae-b954-21bac9566bec",
-				"ascApiKeyId": "WH824CT5G7"
+				"ascAppId": "6786017565"
 			}
 		}
 	}
+
 }
