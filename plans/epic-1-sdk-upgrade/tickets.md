@@ -79,8 +79,8 @@ do usuário (device support do iOS 16.4 e teste manual) antes de fechar o ticket
   (`standard-navigation`) é ESM e não estava no `transformIgnorePatterns` do Jest —
   adicionada.
 - [ ] Validar deployment target iOS (16.4) não quebra build EAS.
-- [ ] **Confirmar com o usuário que dropar suporte a iPhone 7/7+, 6s/6s+, SE 1ª
-  geração, iPad mini 4, iPad Air 2 é aceitável** — decisão de produto pendente.
+- [x] **Confirmar com o usuário que dropar suporte a iPhone 7/7+, 6s/6s+, SE 1ª
+  geração, iPad mini 4, iPad Air 2 é aceitável** — usuário confirmou que sim.
 - [ ] Observar `react-native-reanimated`/`react-native-worklets` sob Hermes V1 (novo
   default) — atenção a valores numéricos soltos em arrays de `style` (gotcha
   documentado no Reanimated 4.2.1+). Sem sinal de problema nos testes automatizados;
