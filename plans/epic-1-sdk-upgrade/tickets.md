@@ -5,6 +5,7 @@ graph LR
     T1[Ticket 1: Upgrade para SDK 55 ✅] --> T2[Ticket 2: Upgrade para SDK 56 ✅]
     T2 --> T3[Ticket 3: Reativar buoy-gg ⏳]
     T3 --> T4[Ticket 4: Regressão final + dry-run EAS ⏳]
+    T4 --> T5[Ticket 5: Cleanup de dívida técnica de TypeScript ⏳]
 ```
 
 Sem ticket de cobertura de testes nova — só roda a suíte Jest existente a cada
@@ -111,7 +112,7 @@ estável na 55.
 
 ## Ticket 3 — Reativar `@buoy-gg/*` (devtools em modo dev)
 
-**Status:** ⏳ Não iniciado — bloqueado pelo Ticket 2.
+**Status:** ⏳ Não iniciado — pronto pra começar (Ticket 2 concluído).
 
 **Escopo:**
 - [ ] Em `src/app/_layout.tsx`: restaurar `import { FloatingDevTools } from "@buoy-gg/core"`
@@ -143,3 +144,59 @@ Arquitetura de Componentes.
 **Referências de spec:** epic-brief.md → Critérios de sucesso.
 
 **Dependências:** Ticket 3.
+
+---
+
+## Ticket 5 — Cleanup de dívida técnica de TypeScript (85 erros pré-existentes)
+
+**Status:** ⏳ Não iniciado — backlog, roda depois do Ticket 4. Não bloqueia o
+fechamento do Epic 1; é uma "atualização geral" separada, a critério do usuário
+sobre quando entrar nela.
+
+**Contexto:** rodando `npx tsc --noEmit` (fora do fluxo normal do projeto — não
+existe script de typecheck nem gate de CI para isso) apareceram 85 erros.
+**Confirmado que não são causados por este upgrade**: mesma contagem (85) tanto
+com TypeScript 6.0.3 (pós-upgrade) quanto revertendo para 5.9.2 (testado e
+restaurado). É dívida técnica pré-existente, sem gate de CI hoje, sem efeito no
+runtime (Metro não faz type-check; `npm test` passa 100%).
+
+**Escopo (por categoria, para triagem futura):**
+
+- [ ] **Grupo 1 — `StyleSheet.absoluteFillObject` renomeado para `absoluteFill`**
+  (17 erros / 5 arquivos): `src/app/(tabs)/(home)/sign-in.tsx`,
+  `src/app/(tabs)/(home)/sign-up.tsx`, `src/components/camera/camera-preview.tsx`
+  (x2), `src/components/medias-preview/media-thumbnail.tsx`. Fix mecânico,
+  baixíssimo risco — find & replace.
+- [ ] **Grupo 2 — import morto** (12 erros / 2 arquivos):
+  `src/components/companies/financial-methods/payments-tab.tsx` e
+  `receipts-tab.tsx` importam `@/libs/types/financial-method`, que não existe.
+- [ ] **Grupo 3 — dependência nunca instalada** (4 erros / 2 arquivos):
+  `src/components/ui/date-time-picker/index.tsx` e `index.web.tsx` importam
+  `@react-native-community/datetimepicker`, que não é dependência do projeto.
+  Verificar se o componente é usado em algum lugar antes de decidir entre
+  instalar a dependência ou remover o componente morto.
+- [ ] **Grupo 4 — campo `observations` ausente no SDK gerado** (4 erros):
+  `src/app/(tabs)/(home)/companies/[companyId]/services/index.tsx` e
+  `waste/index.tsx`, mais `src/tests/factories/make-service.ts` e
+  `make-waste.ts`. Provável spec da OpenAPI desatualizado — checar se
+  `npm run generate:api` (precisa do backend rodando em localhost:3333)
+  resolve.
+- [ ] **Grupo 5 — `global` sem tipo** (3 erros): `src/libs/media-compression.ts`,
+  `src/tests/integration/companies/address-flow.test.tsx`,
+  `src/tests/integration/profile/profile-flow.test.tsx`. Provavelmente deveria
+  ser `globalThis`.
+- [ ] **Grupo 6 — gluestack-ui v5 alpha** (≈27 erros): `bottomsheet`, `checkbox`,
+  `toast`, `spinner`, `select-actionsheet`, `modal`, `button`, `badge`, `avatar`
+  em `src/components/ui/`. Tipos instáveis de lib pré-release
+  (`@gluestack-ui/core: ^5.0.0-alpha.0`) — resolução provavelmente vem de
+  esperar uma versão estável, não de patch manual.
+- [ ] **Grupo 7 — tipagem de mocks só em teste** (≈38 erros, sem afetar
+  runtime): `Company` não exportado de `@/stores/companies-store` (7 arquivos
+  de teste), mocks com tipos incompatíveis (`User`, literal `"profile"` vs
+  `"current"`, arrays `never[]`) em `market-screen.test.tsx` e outros.
+
+**Referências de spec:** discussão com o usuário em 2026-07-04 sobre os 85 erros
+de `tsc --noEmit` encontrados durante o Ticket 2.
+
+**Dependências:** nenhuma tecnicamente (é debt independente), mas por decisão do
+usuário roda só depois de fechar os Tickets 3 e 4 deste epic.
