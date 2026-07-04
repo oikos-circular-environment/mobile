@@ -1,6 +1,13 @@
 import { notifyManager } from "@tanstack/query-core";
 import { configure } from "@testing-library/react-native";
 
+jest.mock("react-native-worklets", () =>
+	require("react-native-worklets/src/mock"),
+);
+jest.mock("react-native-reanimated", () =>
+	require("react-native-reanimated/mock"),
+);
+
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 // Make TanStack Query notifications synchronous so state updates from

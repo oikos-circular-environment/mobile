@@ -81,6 +81,9 @@ const config: ExpoConfig = {
 		],
 		"expo-secure-store",
 		"react-native-compressor",
+		"expo-font",
+		"expo-image",
+		"expo-web-browser",
 	],
 	experiments: {
 		typedRoutes: true,
