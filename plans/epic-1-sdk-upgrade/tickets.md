@@ -241,6 +241,11 @@ iOS, profile `production`); falta só o smoke test manual.
     (`@expo/config-plugins` não existe mais como pacote standalone no SDK 56,
     só como `expo/config-plugins`). Diferente do compressor (cujo plugin era
     um no-op e pôde ser removido), o plugin do maps é necessário de verdade.
+    **Confirmado via `gh` que é um bug conhecido e ainda em aberto**:
+    [react-native-maps/react-native-maps#5927](https://github.com/react-native-maps/react-native-maps/issues/5927)
+    (aberta 19/06/2026, sem PR vinculado). O "workaround atual" documentado lá
+    é exatamente a mesma coisa que tentamos primeiro (`npx expo install
+    @expo/config-plugins`) — confirma que não é peculiaridade nossa.
   - **Primeira tentativa**: instalar `@expo/config-plugins@56.0.11` como
     dependency explícita pra satisfazer o import. Funcionou (build de
     produção do iOS terminou com `FINISHED` — confirmado direto no log via
