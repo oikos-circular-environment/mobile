@@ -212,13 +212,11 @@ Arquitetura de Componentes.
 
 ## Ticket 4 — Regressão final + dry-run de build/submit EAS
 
-**Status:** 🔄 Em andamento — decisão do usuário: dry-run só do profile
-`production`, Android + iOS (não todos os 3 profiles).
+**Status:** 🔄 Em andamento — dry-run de build concluído com sucesso (Android +
+iOS, profile `production`); falta só o smoke test manual.
 
 **Escopo:**
 - [x] Rodar a suíte de testes uma última vez (23/23 suítes, 201/201 testes).
-- [ ] Smoke test manual completo (Android + iOS) das áreas críticas com o buoy-gg
-  ativo em dev.
 - [x] **Achado e corrigido**: build de produção do iOS falhou no `pod install`
   com `No podspec found for 'react-native-google-maps' in .../react-native-maps`.
   - **Causa raiz** (confirmada via `gh` no repo oficial expo/expo,
@@ -284,6 +282,10 @@ Arquitetura de Componentes.
     abrir isso com os mantenedores.
 - [x] Rebuild do iOS com o fix aplicado — `eas build --profile production
   --platform ios`, status `FINISHED` (build `aafb0f2f`).
+- [x] **Dry-run de build concluído**: Android (`7557be2b`) e iOS (`aafb0f2f`)
+  no profile `production`, ambos `FINISHED`.
+- [ ] Smoke test manual completo (Android + iOS) das áreas críticas com o
+  buoy-gg ativo em dev — pendente do usuário.
 - Fora: submit real às lojas (fica a critério do usuário decidir quando submeter);
   os outros 2 profiles (`development`, `preview`) ficam fora por decisão do usuário.
 
