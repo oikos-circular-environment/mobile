@@ -17,6 +17,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { AppSplashScreen } from "@/components/app-splash-screen";
 import { Toaster } from "@/components/toast";
+import { FloatingDevTools } from "@buoy-gg/core";
 
 export const unstable_settings = {
 	anchor: "(tabs)",
@@ -68,8 +69,7 @@ export default function RootLayout() {
 							</NotificationProvider>
 						</GeospatialProvider>
 					</AuthContextProvider>
-					{/* {isDevelopmentMode && <FloatingDevTools />} */}
-					{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
+					{isDevelopmentMode && <FloatingDevTools />}
 				</QueryClientProvider>
 			</GluestackUIProvider>
 		</GestureHandlerRootView>

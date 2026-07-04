@@ -112,14 +112,21 @@ estável na 55.
 
 ## Ticket 3 — Reativar `@buoy-gg/*` (devtools em modo dev)
 
-**Status:** ⏳ Não iniciado — pronto pra começar (Ticket 2 concluído).
+**Status:** 🔄 Em andamento — código restaurado e validado por automação, falta
+confirmação visual do usuário rodando o app em dev.
 
 **Escopo:**
-- [ ] Em `src/app/_layout.tsx`: restaurar `import { FloatingDevTools } from "@buoy-gg/core"`
-  e descomentar `{isDevelopmentMode && <FloatingDevTools />}`; remover a linha
+- [x] Em `src/app/_layout.tsx`: restaurar `import { FloatingDevTools } from "@buoy-gg/core"`
+  e descomentar `{isDevelopmentMode && <FloatingDevTools />}`; removida a linha
   comentada duplicada (variante `userRole`) deixada do commit original (`1ba2b1a`).
-- [ ] Validar que funciona em build de desenvolvimento e que **não** aparece/roda em
-  build de produção (`isDevelopmentMode` gate).
+- [x] Confirmado que `FloatingDevTools` não exige `Buoy.init()`/license key pra
+  funcionar — `requireLicense` é `false` por padrão, só mostra modal de licença
+  se explicitamente pedido. Uso simples sem init é válido.
+- [x] `npx expo-doctor` limpo (21/21), `npm test` verde (23/23 suítes, 201/201
+  testes), `biome lint` sem novos erros.
+- [ ] **Validar visualmente**: rodar o app em dev e confirmar que o overlay do
+  buoy aparece; confirmar que não aparece em build de produção
+  (`isDevelopmentMode` gate) — pendente do usuário.
 - Fora: mudanças de produto/config no próprio buoy-gg além de religar o que já existia.
 
 **Referências de spec:** epic-brief.md → Escopo (dentro); tech-plan.md →
