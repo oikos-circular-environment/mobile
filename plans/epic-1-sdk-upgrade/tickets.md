@@ -2,7 +2,7 @@
 
 ```mermaid
 graph LR
-    T1[Ticket 1: Upgrade para SDK 55 ✅] --> T2[Ticket 2: Upgrade para SDK 56 ⏳]
+    T1[Ticket 1: Upgrade para SDK 55 ✅] --> T2[Ticket 2: Upgrade para SDK 56 🔄]
     T2 --> T3[Ticket 3: Reativar buoy-gg ⏳]
     T3 --> T4[Ticket 4: Regressão final + dry-run EAS ⏳]
 ```
@@ -18,8 +18,7 @@ o trabalho, este arquivo é a fonte de verdade de onde paramos.
 
 ## Ticket 1 — Upgrade para SDK 55
 
-**Status:** 🔄 Em andamento — parte automatizada concluída, falta confirmação de
-teste manual do usuário para fechar o ticket.
+**Status:** ✅ Concluído — usuário confirmou teste manual passando.
 
 **Escopo:**
 - [x] `npx expo install expo@^55.0.0` + `npx expo install --fix`.
@@ -40,9 +39,8 @@ teste manual do usuário para fechar o ticket.
 - [x] `npx expo-doctor` limpo (19/19 checks).
 - [x] `npm test` verde (23/23 suítes, 201/201 testes, suíte existente sem testes novos).
 - [x] `npx biome ci .` limpo (0 erros, só warnings pré-existentes).
-- [ ] **Smoke test manual do usuário** (auth, câmera/mídia, mapa/geolocalização,
-  gestures/teclado/safe-area/guards) — em andamento pelo usuário, sem confirmação
-  ainda.
+- [x] **Smoke test manual do usuário** (auth, câmera/mídia, mapa/geolocalização,
+  gestures/teclado/safe-area/guards) — confirmado ok pelo usuário.
 - Fora: qualquer mudança do SDK 56 (codemod de router, Hermes V1 default).
 
 **Referências de spec:** tech-plan.md → Abordagem Arquitetural, tabela de breaking
@@ -54,29 +52,54 @@ changes (linhas SDK 55).
 
 ## Ticket 2 — Upgrade para SDK 56
 
-**Status:** ⏳ Não iniciado — bloqueado até o usuário confirmar que o app está
-estável na 55 (Ticket 1).
+**Status:** 🔄 Em andamento — parte automatizada concluída, faltam 2 confirmações
+do usuário (device support do iOS 16.4 e teste manual) antes de fechar o ticket.
 
 **Escopo:**
-- [ ] `npx expo install expo@56` + `npx expo install --fix`.
-- [ ] Rodar `npx expo-codemod sdk-56-expo-router-react-navigation-replace src` (sem
-  imports diretos de `@react-navigation/*` em `src/`, não deve alterar nada — roda
-  como rede de segurança).
-- [ ] Remover `@expo/vector-icons` do `package.json` (dependência direta não usada em
-  nenhum lugar do `src/` — confirmado via grep; o projeto usa `lucide-react-native`
-  exclusivamente).
-- [ ] Housekeeping cosmético: remover `newArchEnabled`/`edgeToEdgeEnabled` de
-  `app.config.ts` (schema não aceita mais como configurável, viram mandatórios;
-  hoje são aceitos silenciosamente mas não fazem mais nada).
+- [x] `npx expo install expo@^56.0.0` + `npx expo install --fix`.
+- [x] Rodar `npx expo-codemod sdk-56-expo-router-react-navigation-replace src` —
+  0 alterações (confirma ausência de imports diretos de `@react-navigation/*`).
+- [x] Remover `@expo/vector-icons` do `package.json` (não usado em `src/`).
+- [x] Housekeeping cosmético: remover `newArchEnabled`/`edgeToEdgeEnabled` de
+  `app.config.ts`.
+- [x] **Achado extra não previsto**: `react-native-compressor` (todas as versões,
+  inclusive a 2.0.2) quebra a avaliação do config com
+  `Cannot find module '@expo/config-plugins'` — o plugin dele é um no-op
+  (`config => config`) em todas as versões, então foi removido de `plugins` em
+  `app.config.ts` sem perda funcional (o módulo nativo continua linkado normalmente).
+- [x] **Achado extra**: `expo-doctor` apontou `expo-constants` como peer dependency
+  obrigatória do `expo-router` — tinha sido removida por engano (achava que não
+  tinha uso, mas é exigida internamente); reinstalada.
+- [x] **Achado extra**: `expo-doctor` apontou que os pacotes `@react-navigation/*`
+  (bottom-tabs, elements, native) não podem mais coexistir com expo-router 56 —
+  removidos do `package.json`.
+- [x] **Achado extra**: `jest-expo` 56 exige `@react-native/jest-preset` como peer
+  dependency nova (preset que antes vinha embutido) — instalada.
+- [x] **Achado extra**: nova dependência transitiva do expo-router
+  (`standard-navigation`) é ESM e não estava no `transformIgnorePatterns` do Jest —
+  adicionada.
 - [ ] Validar deployment target iOS (16.4) não quebra build EAS.
 - [ ] **Confirmar com o usuário que dropar suporte a iPhone 7/7+, 6s/6s+, SE 1ª
   geração, iPad mini 4, iPad Air 2 é aceitável** — decisão de produto pendente.
 - [ ] Observar `react-native-reanimated`/`react-native-worklets` sob Hermes V1 (novo
   default) — atenção a valores numéricos soltos em arrays de `style` (gotcha
-  documentado no Reanimated 4.2.1+).
-- [ ] Confirmar Node da imagem EAS Build atende mínimo 20.19.4 (local já é v24.15.0).
-- [ ] `npx expo-doctor` limpo, `npm test` verde.
+  documentado no Reanimated 4.2.1+). Sem sinal de problema nos testes automatizados;
+  falta validação manual de gestures.
+- [x] Confirmar Node da imagem EAS Build atende mínimo 20.19.4 (local já é v24.15.0).
+- [x] `npx expo-doctor` limpo (21/21), `npm test` verde (23/23 suítes, 201/201
+  testes), `biome ci` sem erros.
+- [ ] **Smoke test manual do usuário** — pendente.
 - Fora: reativação do buoy-gg (ticket separado, testado só contra o 56 final).
+
+**Nota sobre `tsc --noEmit`:** rodei fora do escopo formal do ticket (não há script
+de typecheck no projeto nem gate de CI pra isso) e encontrei 85 erros de TypeScript.
+Confirmado que **não são causados por este upgrade**: o mesmo número de erros
+aparece tanto com TypeScript 6.0.3 quanto voltando pra 5.9.2 (testado e revertido).
+São majoritariamente incompatibilidades de tipos de libs de UI (`@gluestack-ui`,
+`@gorhom/bottom-sheet`, `react-native-svg`) e alguns bugs de código pré-existentes
+(ex: `src/components/ui/date-time-picker` importa `@react-native-community/datetimepicker`,
+que **não é nem dependência do projeto** — nunca foi instalado). Dívida técnica
+pré-existente, não bloqueante pra este epic; documentando aqui pra não se perder.
 
 **Referências de spec:** tech-plan.md → Abordagem Arquitetural, tabela de breaking
 changes (linhas SDK 56).

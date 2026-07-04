@@ -10,7 +10,6 @@ const config: ExpoConfig = {
 	icon: "./src/assets/icons/icon.png",
 	scheme: "oikos",
 	userInterfaceStyle: "light",
-	newArchEnabled: true,
 	ios: {
 		bundleIdentifier: "com.oikos",
 		supportsTablet: true,
@@ -27,7 +26,6 @@ const config: ExpoConfig = {
 			backgroundColor: "#274E2D",
 			foregroundImage: "./src/assets/icons/android-icon.png",
 		},
-		edgeToEdgeEnabled: true,
 		predictiveBackGestureEnabled: false,
 		config: {
 			googleMaps: {
@@ -80,10 +78,10 @@ const config: ExpoConfig = {
 			},
 		],
 		"expo-secure-store",
-		"react-native-compressor",
 		"expo-font",
 		"expo-image",
 		"expo-web-browser",
+		"expo-status-bar",
 	],
 	experiments: {
 		typedRoutes: true,
