@@ -242,19 +242,48 @@ Arquitetura de Componentes.
     — mesma classe de problema do `react-native-compressor` no Ticket 2
     (`@expo/config-plugins` não existe mais como pacote standalone no SDK 56,
     só como `expo/config-plugins`). Diferente do compressor (cujo plugin era
-    um no-op e pôde ser removido), o plugin do maps é necessário de verdade,
-    então instalamos `@expo/config-plugins@56.0.11` como dependency explícita
-    pra satisfazer esse import. `expo-doctor` acusa isso como
-    "should not be installed directly" — mas a própria mensagem do doctor diz
-    "If you installed `@expo/config-plugins` to fulfill a peer dependency for
-    a config plugin, the plugin's maintainer should switch to the
-    `expo/config-plugins` import, and you can ignore this warning" — é
-    exatamente nosso caso, então aceitamos ficar em 20/21 nesse item
-    especificamente.
-  - `expo-doctor` (20/21, warning aceitável documentado acima), `npx expo config`
-    avalia sem erro, `npm test` (23/23 suítes) e `biome ci` limpos depois do fix.
-- [ ] Rebuild do iOS com o fix, dry-run de build no profile `production`
-  (Android + iOS, conforme decisão do usuário) — em andamento.
+    um no-op e pôde ser removido), o plugin do maps é necessário de verdade.
+  - **Primeira tentativa**: instalar `@expo/config-plugins@56.0.11` como
+    dependency explícita pra satisfazer o import. Funcionou (build de
+    produção do iOS terminou com `FINISHED` — confirmado direto no log via
+    `gh`/`eas build:list`), mas o `expo-doctor` acusa isso como
+    "should not be installed directly" (`DirectPackageInstallCheck`, hardcoded
+    no código-fonte do `expo-doctor`, sem opção de exclusão via config, ao
+    contrário do `reactNativeDirectoryCheck`). **Achado importante**: essa
+    checagem roda como fase própria (`RUN_EXPO_DOCTOR`) dentro do próprio
+    `eas build`, mas **não bloqueia o build** — é só diagnóstico. Confirmado
+    lendo o log real do build: `RUN_EXPO_DOCTOR` falhou 1/21 e o build seguiu
+    normalmente até compilar no Xcode e terminar com sucesso.
+  - **Fix definitivo (mais limpo, adotado)**: em vez de aceitar o warning,
+    usamos [`patch-package`](https://www.npmjs.com/package/patch-package)
+    pra corrigir o `react-native-maps` na origem:
+    1. Editamos diretamente (isso é normal nesse fluxo — não é pra ficar
+       assim, é só o passo intermediário) `node_modules/react-native-maps/plugin/build/android.js`
+       e `ios.js`, trocando os `require("@expo/config-plugins...")` por
+       `require("expo/config-plugins")` (o sub-export correto pro SDK 56),
+       acessando `AndroidConfig.Manifest` e `CodeGenerator` (que têm
+       `mergeContents`/`removeContents`) a partir dele em vez dos caminhos
+       internos antigos (`build/android/Manifest`, `build/utils/generateCode`).
+    2. Rodamos `npx patch-package react-native-maps`, que compara os arquivos
+       editados com uma cópia limpa baixada do npm e gera
+       `patches/react-native-maps+1.27.2.patch` — esse arquivo (comitado no
+       git) é o artefato real e persistente, não os arquivos em `node_modules`
+       em si (que continuam descartáveis/reproduzíveis como sempre).
+    3. Adicionamos `"postinstall": "patch-package"` no `package.json` — isso
+       reaplica o patch automaticamente a cada `npm install` (local, CI, ou no
+       próprio `eas build`), garantindo que o fix sobrevive a qualquer
+       reinstalação do zero.
+    4. Removemos `@expo/config-plugins` de `dependencies` (não precisa mais
+       dele, já que o patch usa `expo/config-plugins`).
+  - `expo-doctor` voltou a **21/21** depois do patch. `npx expo config` avalia
+    sem erro, `npm test` (23/23 suítes) e `biome ci` limpos.
+  - **Nota de manutenção**: esse patch deve ser removido quando
+    `react-native-maps` atualizar seu plugin pra usar `expo/config-plugins`
+    diretamente (é um problema conhecido da lib, não nosso) — vale rodar
+    `npx patch-package react-native-maps --create-issue` em algum momento pra
+    abrir isso com os mantenedores.
+- [x] Rebuild do iOS com o fix aplicado — `eas build --profile production
+  --platform ios`, status `FINISHED` (build `aafb0f2f`).
 - Fora: submit real às lojas (fica a critério do usuário decidir quando submeter);
   os outros 2 profiles (`development`, `preview`) ficam fora por decisão do usuário.
 
