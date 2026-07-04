@@ -175,10 +175,35 @@ confirmação visual do usuário rodando o app em dev.
     `src/contexts/geospatial-context.tsx`, com comentário linkando a issue e a
     PR upstream — remover quando o fix for publicado numa versão nova do
     `expo-modules-core`.
+- [x] **Achado e corrigido**: usuário reportou que a bolinha do buoy aparecia,
+  mas tocar nela não abria o menu de ferramentas. Bate exatamente com
+  [issue #87](https://github.com/Buoy-gg/buoy/issues/87) do buoy-gg
+  ("Admin pill tap is inert on Expo SDK 56 beta / RN 0.85") — mesma versão de
+  SDK/RN que a nossa, fechada só depois de subir pra uma versão bem mais nova
+  que a `2.1.15` que tínhamos.
+  - **Achado extra sobre versionamento**: o npm mostra `@buoy-gg/core@5.0.0`
+    como `latest` (publicado há 3 dias), mas a página de Releases do GitHub em
+    `Buoy-gg/buoy` trava em "v3 — Latest". Investigado via `gh`: o campo
+    `repository` do pacote no npm aponta pra `LovesWorking/react-native-buoy`
+    (repo novo, pra onde o mantenedor migrou o desenvolvimento ativo) — o repo
+    antigo (`Buoy-gg/buoy`) simplesmente parou de receber tags de GitHub
+    Release após a v3.0.1, mas o pacote continuou sendo publicado no npm a
+    partir do repo novo. `dist-tags.latest` do npm é a fonte de verdade real
+    de qual versão é instalada, não a página de Releases desatualizada.
+  - Conferido que nenhum dos 7 sub-pacotes que usamos (`debug-borders`, `env`,
+    `events`, `highlight-updates`, `network`, `react-query`, `storage`) tem
+    dependência de `@react-navigation/*` na v5.0.0 (só `@buoy-gg/shared-ui`,
+    `floating-tools-core`, `license`, e peer deps já satisfeitas como
+    `@tanstack/react-query`/`@react-native-async-storage/async-storage`) —
+    sem risco de reintroduzir o problema do Ticket 3 anterior.
+  - **Fix aplicado**: bump de todos os 8 pacotes `@buoy-gg/*` restantes de
+    `^2.1.15` pra `^5.0.0`. `expo-doctor` (21/21), `npx expo export -p ios`
+    (bundle ok), `npm test` (23/23 suítes) e `biome ci` limpos depois do bump.
 - [ ] **Validar visualmente**: rodar o app em dev e confirmar que o overlay do
-  buoy aparece (com os 7 tools restantes); confirmar que não aparece em build
-  de produção (`isDevelopmentMode` gate); confirmar que o erro `AppContextLost`
-  não aparece mais em reload — pendente do usuário.
+  buoy aparece **e que tocar nele abre o menu de ferramentas** (com os 7 tools
+  restantes); confirmar que não aparece em build de produção
+  (`isDevelopmentMode` gate); confirmar que o erro `AppContextLost` não aparece
+  mais em reload — pendente do usuário.
 - Fora: mudanças de produto/config no próprio buoy-gg além de religar o que já existia.
 
 **Referências de spec:** epic-brief.md → Escopo (dentro); tech-plan.md →
