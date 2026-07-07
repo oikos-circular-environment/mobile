@@ -7,8 +7,8 @@ não crash/analytics/replay.
 | Epic | Escopo | Status |
 |---|---|---|
 | [epic-1-sdk-upgrade](./epic-1-sdk-upgrade/) | Upgrade Expo SDK 54 → 55 → 56 (bloqueia os demais) | PR aberta (#62) |
-| [epic-5-appstore-rejection-fix](./epic-5-appstore-rejection-fix/) | Correção da rejeição da Apple (Guidelines 5.1.5 + 2.1(a)) — bloqueia o lançamento | **Urgente — furou a fila, prioridade sobre Epic 2** |
-| [epic-2-eas-observe](./epic-2-eas-observe/) | EAS Observe — performance monitoring (cold/warm start, TTFR, TTI, bundle load por rota) + Error Boundary | Brief pronto, pausado até Epic 5 fechar |
+| [epic-5-appstore-rejection-fix](./epic-5-appstore-rejection-fix/) | Correção da rejeição da Apple (Guidelines 5.1.5 + 2.1(a)) — bloqueia o lançamento | Fix commitado (`fix/appstore-rejection-location-block`); validação em iPad e resubmissão adiadas por decisão do usuário |
+| [epic-2-eas-observe](./epic-2-eas-observe/) | EAS Observe — performance monitoring (cold/warm start, TTFR, TTI, bundle load por rota) + Error Boundary | Brief pronto — retomado (Epic 5 travou em validação/resubmissão) |
 | [epic-3-observability](./epic-3-observability/) | Crash reporting + product analytics (Sentry/BugSnag, PostHog/Amplitude/Firebase Analytics) | Aguarda decisão de ferramenta |
 | [epic-4-bundle-analysis](./epic-4-bundle-analysis/) | Bundle analysis (Expo Atlas) | Backlog — não será executado agora |
 

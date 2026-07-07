@@ -80,7 +80,10 @@ iPad); tech-plan.md → Arquitetura de Componentes (ponto de integração/valida
 
 ## Ticket 3 — Build de produção e resubmissão
 
-**Status:** ⏳ Não iniciado
+**Status:** ⏸️ Bloqueado por decisão do usuário — não resubmeter agora. Ticket 1
+(o fix em si) está pronto e commitado (`fix/appstore-rejection-location-block`);
+falta só a validação em iPad (Ticket 2, adiada) antes de gerar a build e
+reenviar. Retomar quando o container macOS estiver disponível.
 
 **Escopo:**
 - [ ] Gerar build `eas build --profile production` (Android + iOS) com as
