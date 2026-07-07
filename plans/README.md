@@ -8,7 +8,7 @@ não crash/analytics/replay.
 |---|---|---|
 | [epic-1-sdk-upgrade](./epic-1-sdk-upgrade/) | Upgrade Expo SDK 54 → 55 → 56 (bloqueia os demais) | PR aberta (#62) |
 | [epic-5-appstore-rejection-fix](./epic-5-appstore-rejection-fix/) | Correção da rejeição da Apple (Guidelines 5.1.5 + 2.1(a)) — bloqueia o lançamento | Fix commitado (`fix/appstore-rejection-location-block`); validação em iPad e resubmissão adiadas por decisão do usuário |
-| [epic-2-eas-observe](./epic-2-eas-observe/) | EAS Observe — performance monitoring (cold/warm start, TTFR, TTI, bundle load por rota) + Error Boundary | Brief pronto — retomado (Epic 5 travou em validação/resubmissão) |
+| [epic-2-eas-observe](./epic-2-eas-observe/) | EAS Observe — performance monitoring (cold/warm start, TTFR, TTI, bundle load por rota) + Error Boundary | Tickets 1-4 commitados (`feat/eas-observe-foundation`); falta só Ticket 5 (build de produção + verificação via EAS CLI) |
 | [epic-3-observability](./epic-3-observability/) | Crash reporting + product analytics (Sentry/BugSnag, PostHog/Amplitude/Firebase Analytics) | Aguarda decisão de ferramenta |
 | [epic-4-bundle-analysis](./epic-4-bundle-analysis/) | Bundle analysis (Expo Atlas) | Backlog — não será executado agora |
 
