@@ -78,14 +78,19 @@ Arquitetura de Componentes (`_layout.tsx`, `error-boundary.tsx`,
 
 ## Ticket 3 — Instrumentação de Market
 
-**Status:** ⏳ Não iniciado
+**Status:** ✅ Concluído
 
 **Escopo:**
-- [ ] `useRouteInteractive()` em `market/index.tsx` e `market/[companyId].tsx`.
-- [ ] Evento `market.filter_applied` quando `setAppliedFilters` é chamado
+- [x] `useRouteInteractive()` em `market/index.tsx` e `market/[companyId].tsx`.
+- [x] Evento `market.filter_applied` quando `setAppliedFilters` é chamado
   (`market-context.tsx`), com atributos `radius`/`category`/`hasQuery`.
-- [ ] Evento `market.location_source_changed` quando `setLocationSource` muda
-  entre `"current"`/`"profile"`.
+  Implementado envolvendo o setter em `handleSetAppliedFilters` — o context
+  expõe o wrapper no lugar do `useState` setter cru, sem mudar a interface
+  pública (`setAppliedFilters` continua o nome exposto).
+- [x] Evento `market.location_source_changed` quando `setLocationSource` muda
+  entre `"current"`/`"profile"` (mesmo padrão de wrapper,
+  `handleSetLocationSource`).
+- [x] `npm test` (23/23 suítes, 201/201 testes) e `biome check` sem regressão.
 
 **Referências de spec:** tech-plan.md → Modelo de Dados (tabela `market`);
 Arquitetura de Componentes (pontos de integração).

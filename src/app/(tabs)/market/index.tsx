@@ -24,6 +24,7 @@ import { useMarket } from "@/contexts/market-context";
 import { formatDistance } from "@/libs/format-distance";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import type { MarketCompany } from "@/libs/types/market";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 function CompanyCardSkeleton() {
 	return (
@@ -151,6 +152,7 @@ function CompanyCardItem({
 }
 
 export default function MarketScreen() {
+	useRouteInteractive();
 	const { currentDate, permissionDenied } = useGeospatial();
 	const {
 		locationSource,
