@@ -63,7 +63,9 @@ import {
 } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
 import { compressImage } from "@/libs/media-compression";
+import { logProfileEvent } from "@/libs/observe-events";
 import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 
 const profileSchema = z.object({
@@ -94,6 +96,7 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileScreen() {
+	useRouteInteractive();
 	const { user, updateUserProfile } = useAuthContext();
 	const router = useRouter();
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
@@ -240,8 +243,10 @@ export default function ProfileScreen() {
 			if (response.data?.profile) {
 				updateUserProfile({ profile: response.data.profile });
 			}
+			logProfileEvent("profile.updated", { success: true });
 		},
 		onError: () => {
+			logProfileEvent("profile.updated", { success: false });
 			toast.error(
 				"Erro ao salvar",
 				"Ocorreu um problema ao atualizar seu perfil.",
@@ -281,8 +286,10 @@ export default function ProfileScreen() {
 					},
 				},
 			});
+			logProfileEvent("profile.avatar_updated", { success: true });
 		},
 		onError: () => {
+			logProfileEvent("profile.avatar_updated", { success: false });
 			toast.error(
 				"Erro ao salvar imagem",
 				"Ocorreu um problema ao atualizar sua foto.",

@@ -18,6 +18,7 @@ import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { type DayOfWeek, daysOfWeek } from "@/libs/types/business-hour";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 const defaultBusinessHours: BusinessHoursFormValues["businessHours"] = [
@@ -107,6 +108,7 @@ const defaultBusinessHours: BusinessHoursFormValues["businessHours"] = [
 ];
 
 export default function CompanyBusinessHoursScreen() {
+	useRouteInteractive();
 	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const company = useCompaniesStore(s =>

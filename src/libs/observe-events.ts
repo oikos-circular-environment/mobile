@@ -23,7 +23,8 @@ export type CompanyEventName =
 	| "company.address_updated"
 	| "company.hours_updated"
 	| "company.service_saved"
-	| "company.waste_saved";
+	| "company.waste_saved"
+	| "company.avatar_updated";
 
 export function logCompanyEvent(
 	name: CompanyEventName,

@@ -26,6 +26,7 @@ import {
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 const signUpSchema = z
 	.object({
@@ -41,6 +42,7 @@ const signUpSchema = z
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpScreen() {
+	useRouteInteractive();
 	const { signUp, isLoading } = useAuthContext();
 	const router = useRouter();
 	const { width: screenWidth } = useWindowDimensions();

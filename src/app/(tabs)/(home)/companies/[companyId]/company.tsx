@@ -70,6 +70,7 @@ import {
 	companyTypeOptions,
 	identityTypeOptions,
 } from "@/libs/types/companies";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 
@@ -130,6 +131,7 @@ const companySchema = z
 type CompanyFormData = z.infer<typeof companySchema>;
 
 export default function CompanyGeneralInfoScreen() {
+	useRouteInteractive();
 	const { user } = useAuthContext();
 	const [useProfileData, setUseProfileData] = useState(false);
 	const [avatarPreviewUri, setAvatarPreviewUri] = useState<string | null>(null);

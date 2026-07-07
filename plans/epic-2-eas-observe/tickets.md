@@ -49,18 +49,25 @@ Arquitetura de Componentes (`_layout.tsx`, `error-boundary.tsx`,
 
 ## Ticket 2 — Instrumentação de Profile + Companies
 
-**Status:** ⏳ Não iniciado
+**Status:** ✅ Concluído
 
 **Escopo:**
-- [ ] `useRouteInteractive()` em `profile.tsx`, `sign-in.tsx`, `sign-up.tsx`,
+- [x] `useRouteInteractive()` em `profile.tsx`, `sign-in.tsx`, `sign-up.tsx`,
   `companies/index.tsx` e nas subpáginas de `companies/[companyId]/*`
-  (`index`, `company`, `address`, `business-hours`, `services/*`, `waste/*`).
-- [ ] Eventos `profile.updated`/`profile.avatar_updated` no
+  (`index`, `company`, `address`, `business-hours`, `services/index`,
+  `services/form`, `waste/index`, `waste/form`).
+- [x] Eventos `profile.updated`/`profile.avatar_updated` no
   `onSuccess`/`onError` de `profileMutation`/`profileAvatarMutation`
   (`profile.tsx`).
-- [ ] Eventos `company.*` (created/updated/address_updated/hours_updated/
-  service_saved/waste_saved) nas mutations correspondentes de
-  `companies/[companyId]/*.tsx`.
+- [x] Eventos `company.*` (created/updated/address_updated/hours_updated/
+  service_saved/waste_saved) nas mutations correspondentes — implementado nos
+  hooks reutilizáveis (`use-create-company.ts`, `use-save-company.ts`,
+  `use-save-address.ts`, `use-save-business-hours.ts`,
+  `use-save-services.ts`, `use-save-wastes.ts`), não nos componentes de tela.
+  Bônus: `company.avatar_updated` também adicionado em
+  `use-upload-company-avatar.ts` (mesma categoria do `profile.avatar_updated`,
+  não estava na taxonomia original mas é consistente com ela).
+- [x] `npm test` (23/23 suítes, 201/201 testes) e `biome check` sem regressão.
 
 **Referências de spec:** tech-plan.md → Modelo de Dados (tabela `profile`/
 `company`); Arquitetura de Componentes (pontos de integração).

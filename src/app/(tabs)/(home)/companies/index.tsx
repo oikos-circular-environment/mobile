@@ -10,9 +10,11 @@ import { Card } from "@/components/ui/card";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import type { Company } from "@/libs/types/companies";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function CompaniesListScreen() {
+	useRouteInteractive();
 	const router = useRouter();
 
 	const companies = useCompaniesStore(s => s.companies);

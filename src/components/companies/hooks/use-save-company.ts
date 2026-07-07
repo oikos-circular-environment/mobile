@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
+import { logCompanyEvent } from "@/libs/observe-events";
 import type { PutV1CompaniesByIdData } from "@/libs/oikos-sdk";
 import { putV1CompaniesById } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
@@ -16,9 +17,11 @@ export function useSaveCompany(companyId: string) {
 			if (data.data?.company) {
 				updateCompany(companyId, data.data.company);
 			}
+			logCompanyEvent("company.updated", { success: true, companyId });
 			toast.success("Empresa salva com sucesso!");
 		},
 		onError: () => {
+			logCompanyEvent("company.updated", { success: false, companyId });
 			toast.error("Erro ao salvar empresa", "Tente novamente.");
 		},
 	});
