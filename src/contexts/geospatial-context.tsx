@@ -8,18 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { Linking, LogBox } from "react-native";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
-import {
-	Modal,
-	ModalBackdrop,
-	ModalBody,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-} from "@/components/ui/modal";
-import { Text } from "@/components/ui/text";
+import { LogBox } from "react-native";
 
 type GeospatialContextValue = {
 	currentDate: Date;
@@ -113,11 +102,19 @@ export function GeospatialProvider({ children }: PropsWithChildren) {
 					setPermissionDenied(false);
 				}
 
-				headingSubscription = await Location.watchHeadingAsync(nextHeading => {
-					if (isMounted) {
-						setHeading(nextHeading);
-					}
-				});
+				try {
+					headingSubscription = await Location.watchHeadingAsync(
+						nextHeading => {
+							if (isMounted) {
+								setHeading(nextHeading);
+							}
+						},
+					);
+				} catch {
+					// Compass/magnetometer hardware may be absent (common on iPads) —
+					// heading just stays null, already handled gracefully by every
+					// consumer. Must not affect permissionDenied/location below.
+				}
 
 				locationSubscription = await Location.watchPositionAsync(
 					{
@@ -198,30 +195,6 @@ export function GeospatialProvider({ children }: PropsWithChildren) {
 	return (
 		<GeospatialContext.Provider value={value}>
 			{children}
-
-			<Modal isOpen={permissionDenied} onClose={() => {}} useRNModal>
-				<ModalBackdrop />
-				<ModalContent>
-					<ModalHeader className="flex-col items-start gap-1">
-						<Heading size="md" className="text-base text-gray-950">
-							Localização necessária
-						</Heading>
-						<Text className="text-sm text-gray-500">
-							O aplicativo precisa de acesso à sua localização para funcionar
-							corretamente. Habilite nas configurações do dispositivo.
-						</Text>
-					</ModalHeader>
-					<ModalBody />
-					<ModalFooter>
-						<Button
-							className="flex-1 bg-lime-800 rounded-md"
-							onPress={() => Linking.openSettings()}
-						>
-							<ButtonText>Abrir configurações</ButtonText>
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
 		</GeospatialContext.Provider>
 	);
 }

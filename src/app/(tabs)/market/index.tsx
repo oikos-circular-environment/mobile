@@ -151,7 +151,7 @@ function CompanyCardItem({
 }
 
 export default function MarketScreen() {
-	const { currentDate } = useGeospatial();
+	const { currentDate, permissionDenied } = useGeospatial();
 	const {
 		locationSource,
 		isLocationReady,
@@ -207,6 +207,18 @@ export default function MarketScreen() {
 							<Text className="text-xs text-muted-foreground">
 								Adicione um endereço no seu perfil para ver empresas próximas a
 								você.
+							</Text>
+						</View>
+					) : !isLocationReady &&
+						locationSource === "current" &&
+						permissionDenied ? (
+						<View className="p-4 gap-1">
+							<Text className="text-sm font-semibold text-foreground">
+								Localização indisponível
+							</Text>
+							<Text className="text-xs text-muted-foreground">
+								Habilite a localização do dispositivo ou use o endereço do seu
+								perfil para ver empresas próximas a você.
 							</Text>
 						</View>
 					) : isPending ? (
