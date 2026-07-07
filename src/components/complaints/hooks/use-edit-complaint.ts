@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
+import { logComplaintEvent } from "@/libs/observe-events";
 import {
 	patchV1ComplaintsById,
 	postV1ComplaintsByIdAttachments,
@@ -91,13 +92,24 @@ export function useEditComplaint() {
 				});
 			}
 		},
-		onSuccess: async (_, { id, geospatial, observations }) => {
+		onSuccess: async (_, { id, geospatial, observations, newMedia }) => {
 			updateComplaint(id, { observations, geospatial });
 			await queryClient.invalidateQueries({ queryKey: COMPLAINTS_QUERY_KEY });
 			exitEditMode();
+			logComplaintEvent("complaint.updated", {
+				success: true,
+				hasPhoto: newMedia.some(item => item.mediaType === "photo"),
+				hasVideo: newMedia.some(item => item.mediaType === "video"),
+			});
 			toast.success("Denúncia atualizada", "As alterações foram salvas.");
 		},
-		onError: () =>
-			toast.error("Erro", "Não foi possível atualizar a denúncia."),
+		onError: (_, { newMedia }) => {
+			logComplaintEvent("complaint.updated", {
+				success: false,
+				hasPhoto: newMedia.some(item => item.mediaType === "photo"),
+				hasVideo: newMedia.some(item => item.mediaType === "video"),
+			});
+			toast.error("Erro", "Não foi possível atualizar a denúncia.");
+		},
 	});
 }

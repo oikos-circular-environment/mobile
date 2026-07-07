@@ -49,8 +49,7 @@ export type ComplaintEventName =
 	| "complaint.updated"
 	| "complaint.voted"
 	| "complaint.resolved"
-	| "complaint.cancelled"
-	| "complaint.deleted";
+	| "complaint.cancelled";
 
 export function logComplaintEvent(
 	name: ComplaintEventName,

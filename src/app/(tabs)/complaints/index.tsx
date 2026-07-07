@@ -40,6 +40,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 
 const controlShadow = {
@@ -53,6 +54,7 @@ const controlShadow = {
 const LIST_SHEET_MIN_SNAP_RATIO = 0.15;
 
 export default function ComplaintsMapScreen() {
+	useRouteInteractive();
 	const insets = useSafeAreaInsets();
 	const { height: windowHeight } = useWindowDimensions();
 	const { isAuthenticated, needsProfileCompletion } = useAuthContext();

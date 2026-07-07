@@ -59,7 +59,7 @@ customizados**, que `observe-events.ts` fixa como contrato:
 | `profile` | `profile.updated`, `profile.avatar_updated` | `success`, `durationMs` |
 | `company` | `company.created`, `company.updated`, `company.address_updated`, `company.hours_updated`, `company.service_saved`, `company.waste_saved` | `success`, `companyId`, `durationMs` |
 | `market` | `market.filter_applied`, `market.location_source_changed` | `radius`, `category`, `hasQuery`, `source` |
-| `complaint` | `complaint.created`, `complaint.updated`, `complaint.voted`, `complaint.resolved`, `complaint.cancelled`, `complaint.deleted` | `success`, `complaintId`, `hasPhoto`, `hasVideo`, `durationMs` |
+| `complaint` | `complaint.created`, `complaint.updated`, `complaint.voted`, `complaint.resolved` (também cobre exclusão de resolução via `action: "deleted"`), `complaint.cancelled` | `success`, `hasPhoto`, `hasVideo`, `voteType`, `action` |
 | `app` (erros) | `app.error_boundary_triggered` | `route`, `message`, `severity` |
 
 Regra fixa em todos: só `string \| number \| boolean` nos atributos — nenhum

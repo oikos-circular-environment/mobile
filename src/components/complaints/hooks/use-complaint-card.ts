@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Alert, Linking, Platform } from "react-native";
 import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
+import { logComplaintEvent } from "@/libs/observe-events";
 import { patchV1ComplaintsByIdCanceled } from "@/libs/oikos-sdk";
 import type { Complaint, MapComplaint } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
@@ -19,9 +20,13 @@ export function useComplaintCard(complaint: Complaint) {
 			patchV1ComplaintsByIdCanceled({ path: { id: complaint.id } }),
 		onSuccess: () => {
 			shiftComplaintStatus(complaint.id, "CANCELED");
+			logComplaintEvent("complaint.cancelled", { success: true });
 			toast.success("Denúncia cancelada", "A denúncia foi cancelada.");
 		},
-		onError: () => toast.error("Erro", "Não foi possível cancelar a denúncia."),
+		onError: () => {
+			logComplaintEvent("complaint.cancelled", { success: false });
+			toast.error("Erro", "Não foi possível cancelar a denúncia.");
+		},
 	});
 
 	const coords = complaint.geospatial.location.coords;

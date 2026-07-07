@@ -13,12 +13,14 @@ import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import type { Complaint } from "@/libs/types/complaint";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import {
 	selectFilteredComplaints,
 	useComplaintsStore,
 } from "@/stores/complaints-store";
 
 export default function ComplaintsScreen() {
+	useRouteInteractive();
 	const filteredComplaints = useComplaintsStore(
 		useShallow(selectFilteredComplaints),
 	);

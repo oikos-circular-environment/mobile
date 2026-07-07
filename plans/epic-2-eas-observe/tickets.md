@@ -101,19 +101,28 @@ Arquitetura de Componentes (pontos de integração).
 
 ## Ticket 4 — Instrumentação de Complaints
 
-**Status:** ⏳ Não iniciado
+**Status:** ✅ Concluído
 
 **Escopo:**
-- [ ] `useRouteInteractive()` em `complaints/index.tsx`, `complaints/list.tsx`,
+- [x] `useRouteInteractive()` em `complaints/index.tsx`, `complaints/list.tsx`,
   `complaints/(create)/index.tsx`, `complaints/resolution.tsx`.
-- [ ] Evento `complaint.created`/`complaint.updated` em
-  `use-submit-complaints.ts`/`use-edit-complaint.ts` (atributos `hasPhoto`,
-  `hasVideo`, `durationMs`).
-- [ ] Evento `complaint.voted` em `complaint-vote.tsx` (`voteMutation`).
-- [ ] Evento `complaint.resolved` em `resolution.tsx` (`mutation`).
-- [ ] Eventos `complaint.cancelled`/`complaint.deleted` em
-  `use-complaint-card.ts` (`cancelMutation`) e `complaint-bottom-sheet/index.tsx`
-  (`deleteMutation`).
+- [x] Evento `complaint.created`/`complaint.updated` em
+  `use-submit-complaints.ts`/`use-edit-complaint.ts` (atributos `success`,
+  `hasPhoto`, `hasVideo`, derivados da lista de mídia já disponível nas
+  `variables` da mutation).
+- [x] Evento `complaint.voted` em `complaint-vote.tsx` (`voteMutation`,
+  atributo `voteType`).
+- [x] Evento `complaint.resolved` em `resolution.tsx` (`mutation`, atributo
+  `action: "created"|"updated"`).
+- [x] **Ajuste em relação ao plano original**: `use-complaint-card.ts`
+  (`cancelMutation`) usa `complaint.cancelled` como previsto — mas
+  `complaint-bottom-sheet/index.tsx` (`deleteMutation`) na verdade **exclui
+  uma resolução**, não a denúncia (`deleteV1ComplaintsByIdResolutions`).
+  Reclassificado para `complaint.resolved` com `action: "deleted"`, mantendo a
+  taxonomia consistente (todo o ciclo de vida de resolução — criar/editar/
+  excluir — no mesmo evento) em vez de inventar um `complaint.deleted` que não
+  corresponde à ação real.
+- [x] `npm test` (23/23 suítes, 201/201 testes) e `biome check` sem regressão.
 
 **Referências de spec:** tech-plan.md → Modelo de Dados (tabela `complaint`);
 Arquitetura de Componentes (pontos de integração).

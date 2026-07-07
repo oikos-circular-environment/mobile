@@ -84,6 +84,7 @@ import {
 	MAX_FILE_SIZE_BYTES,
 } from "@/libs/media-validation";
 import type { Geospatial } from "@/libs/types/complaint";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 const schema = z.object({
 	observations: z.string().max(500, "Máximo de 500 caracteres.").optional(),
@@ -106,6 +107,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function ComplaintCreateScreen() {
+	useRouteInteractive();
 	const { location, heading, addresses } = useGeospatial();
 	const {
 		attachments,
