@@ -15,7 +15,7 @@ import {
 	listIbgeMunicipios,
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
 import { makeAddress, makeStoreCompany } from "@/tests/factories";
 

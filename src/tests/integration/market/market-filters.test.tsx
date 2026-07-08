@@ -122,7 +122,7 @@ const defaultGeospatial = {
 	reverseGeocodeError: false,
 };
 
-const defaultAuth = {
+const defaultAuth: ReturnType<typeof useAuthContext> = {
 	user: null,
 	isAuthenticated: false,
 	isLoading: false,

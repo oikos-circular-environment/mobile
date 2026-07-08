@@ -4,7 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import CompanyHubScreen from "@/app/(tabs)/(home)/companies/[companyId]/index";
 import { useCompanyValidations } from "@/components/companies/hooks/use-company-validations";
 import { useToggleCompanyStatus } from "@/components/companies/hooks/use-toggle-company-status";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
 import { makeStoreCompany } from "@/tests/factories";
 

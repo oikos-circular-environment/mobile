@@ -26,7 +26,6 @@ export function makeWaste(overrides: Partial<MarketWaste> = {}): MarketWaste {
 		waste_category_id: faker.string.uuid(),
 		waste_category: makeWasteCategory(),
 		quantity: faker.number.int({ min: 0, max: 1000 }),
-		observations: null,
 		...overrides,
 	};
 }
