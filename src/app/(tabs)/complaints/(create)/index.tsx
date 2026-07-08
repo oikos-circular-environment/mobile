@@ -8,6 +8,7 @@ import {
 	ImageIcon,
 	SearchIcon,
 	ShieldAlertIcon,
+	XIcon,
 } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -579,11 +580,7 @@ export default function ComplaintCreateScreen() {
 									returnKeyType="done"
 								/>
 
-								<InputSlot
-									className="pr-3"
-									testID="cep-search-btn"
-									onPress={() => onPressSearchCep({ cep: value })}
-								>
+								<InputSlot className="pr-3" testID="cep-search-btn">
 									<InputIcon as={isLookingUpCep ? Spinner : SearchIcon} />
 								</InputSlot>
 							</Input>
@@ -819,7 +816,7 @@ export default function ComplaintCreateScreen() {
 											className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
 											onPress={() => handleRemove(attachment)}
 										>
-											<X size={12} color={colors.white} strokeWidth={2.5} />
+											<XIcon size={12} color={colors.white} strokeWidth={2.5} />
 										</TouchableOpacity>
 									</View>
 								);

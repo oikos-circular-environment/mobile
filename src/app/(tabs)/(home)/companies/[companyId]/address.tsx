@@ -244,11 +244,7 @@ export default function CompanyAddressScreen() {
 												returnKeyType="search"
 												onSubmitEditing={onPressSearchCep}
 											/>
-											<InputSlot
-												className="pr-3"
-												onPress={onPressSearchCep}
-												testID="cep-search-btn"
-											>
+											<InputSlot className="pr-3" testID="cep-search-btn">
 												<InputIcon as={isResolvingCep ? Spinner : Search} />
 											</InputSlot>
 										</Input>
