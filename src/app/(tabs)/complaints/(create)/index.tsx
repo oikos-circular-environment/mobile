@@ -70,7 +70,6 @@ import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
-import { getCepV2 } from "@/libs/brasil-api-sdk";
 import {
 	type GoogleAddressFields,
 	reverseGeocode,
@@ -84,6 +83,8 @@ import {
 	MAX_FILE_SIZE_BYTES,
 } from "@/libs/media-validation";
 import type { Geospatial } from "@/libs/types/complaint";
+import { useCepLookup } from "@/libs/use-cep-lookup";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 const schema = z.object({
 	observations: z.string().max(500, "Máximo de 500 caracteres.").optional(),
@@ -106,6 +107,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function ComplaintCreateScreen() {
+	useRouteInteractive();
 	const { location, heading, addresses } = useGeospatial();
 	const {
 		attachments,
@@ -116,7 +118,7 @@ export default function ComplaintCreateScreen() {
 	} = useComplaintCreation();
 	const hasAutoFilled = useRef(false);
 
-	const [isLookingUpCep, setIsLookingUpCep] = useState(false);
+	const { lookupCep, isLookingUpCep } = useCepLookup();
 	const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
 	const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
 	const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
@@ -264,30 +266,25 @@ export default function ComplaintCreateScreen() {
 			const digits = rawValue.replace(/\D/g, "");
 			if (digits.length !== 8) return;
 
-			setIsLookingUpCep(true);
 			try {
-				const res = await getCepV2({ path: { cep: digits } });
-				const data = res.data;
-				if (!data) return;
+				const resolved = await lookupCep(digits);
 
-				if (data.street)
-					setValue("street", data.street, { shouldValidate: true });
-				if (data.neighborhood)
-					setValue("district", data.neighborhood, { shouldValidate: true });
-				setValue("city", data.city, { shouldValidate: true });
-				setValue("region", data.state, { shouldValidate: true });
+				if (resolved.street)
+					setValue("street", resolved.street, { shouldValidate: true });
+				if (resolved.district)
+					setValue("district", resolved.district, { shouldValidate: true });
+				setValue("city", resolved.city, { shouldValidate: true });
+				setValue("region", resolved.stateCode, { shouldValidate: true });
 
-				const lat = data.location?.coordinates?.latitude;
-				const lon = data.location?.coordinates?.longitude;
-				if (lat) setValue("latitude", lat, { shouldValidate: true });
-				if (lon) setValue("longitude", lon, { shouldValidate: true });
+				if (resolved.latitude)
+					setValue("latitude", resolved.latitude, { shouldValidate: true });
+				if (resolved.longitude)
+					setValue("longitude", resolved.longitude, { shouldValidate: true });
 			} catch {
 				// silently fail — user fills manually
-			} finally {
-				setIsLookingUpCep(false);
 			}
 		},
-		[setValue],
+		[setValue, lookupCep],
 	);
 
 	const handlePickGallery = async () => {
@@ -576,6 +573,7 @@ export default function ComplaintCreateScreen() {
 										void handleCepLookup(value);
 									}}
 									maxLength={9}
+									returnKeyType="done"
 								/>
 								{isLookingUpCep && (
 									<InputSlot className="pr-3">

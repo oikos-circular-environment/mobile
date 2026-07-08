@@ -51,6 +51,13 @@ a modo desenvolvedor.
 - Implementação do EAS Observe em si (Epic 2).
 - Ferramentas de crash reporting/analytics (Epic 3).
 - Bundle analysis / Expo Atlas (Epic 4, backlog).
+- **Upgrade para o Expo SDK 57 (React Native 0.86)** — investigado (Ticket 6) e
+  **adiado por decisão do usuário**: regressão de memória confirmada no Hermes
+  V1 (`react-native-reanimated`/`worklets`, ~512KB por worklet único, já
+  presente na combinação atual RN 0.85.x + New Architecture, independente do
+  SDK 57) sem fix publicado em nenhuma versão de RN/Expo ainda, e o workaround
+  sugerido (Worklets Bundle Mode) com problema próprio de OOM em dev descoberto
+  na mesma semana da investigação. Ver Ticket 6 para os detalhes e fontes.
 
 ## Prazo
 

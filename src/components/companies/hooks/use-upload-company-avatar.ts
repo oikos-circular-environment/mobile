@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type { ImagePickerAsset } from "expo-image-picker";
 import { toast } from "@/components/toast";
 import { compressImage } from "@/libs/media-compression";
+import { logCompanyEvent } from "@/libs/observe-events";
 import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
 
@@ -36,8 +37,16 @@ export function useUploadCompanyAvatar() {
 					: avatar;
 				updateCompany(companyId, { avatar: busted });
 			}
+			logCompanyEvent("company.avatar_updated", {
+				success: true,
+				companyId,
+			});
 		},
-		onError: () => {
+		onError: (_error, { companyId }) => {
+			logCompanyEvent("company.avatar_updated", {
+				success: false,
+				companyId,
+			});
 			toast.error("Erro ao enviar imagem", "Tente novamente.");
 		},
 	});

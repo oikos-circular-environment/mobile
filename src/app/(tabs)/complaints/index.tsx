@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import {
 	ListIcon,
 	LocateFixedIcon,
+	LocateOffIcon,
 	MapIcon,
 	MapPinnedIcon,
 	MinusIcon,
@@ -33,6 +34,7 @@ import { ComplaintFilterRow } from "@/components/complaints/complaint-pressable-
 import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
+import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -40,6 +42,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 
 const controlShadow = {
@@ -53,10 +56,11 @@ const controlShadow = {
 const LIST_SHEET_MIN_SNAP_RATIO = 0.15;
 
 export default function ComplaintsMapScreen() {
+	useRouteInteractive();
 	const insets = useSafeAreaInsets();
 	const { height: windowHeight } = useWindowDimensions();
 	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
-	const { location } = useGeospatial();
+	const { location, permissionDenied } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
 	const filterSheetRef = useRef<BottomSheetRef>(null);
 	const hasAnimatedRef = useRef(false);
@@ -264,7 +268,7 @@ export default function ComplaintsMapScreen() {
 
 			{/* Filter row */}
 			<View
-				className="absolute left-0 right-0 px-4"
+				className="absolute left-0 right-0 gap-2 px-4"
 				style={{ top: 32 }}
 				pointerEvents="box-none"
 			>
@@ -278,6 +282,9 @@ export default function ComplaintsMapScreen() {
 					}
 					onPress={handleOpenFilterSheet}
 				/>
+				{permissionDenied && (
+					<LocationPermissionAlert message="Habilite a localização para ver sua posição e denúncias por perto no mapa." />
+				)}
 			</View>
 
 			{/* Loading indicator */}
@@ -361,11 +368,19 @@ export default function ComplaintsMapScreen() {
 					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
 					style={controlShadow}
 				>
-					<LocateFixedIcon
-						size={18}
-						color={colors.gray[700]}
-						strokeWidth={2.2}
-					/>
+					{permissionDenied ? (
+						<LocateOffIcon
+							size={18}
+							color={colors.red[500]}
+							strokeWidth={2.2}
+						/>
+					) : (
+						<LocateFixedIcon
+							size={18}
+							color={colors.gray[700]}
+							strokeWidth={2.2}
+						/>
+					)}
 				</TouchableOpacity>
 			</View>
 

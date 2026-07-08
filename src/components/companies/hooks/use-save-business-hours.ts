@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
+import { logCompanyEvent } from "@/libs/observe-events";
 import type { PutV1CompaniesByIdBusinessHoursData } from "@/libs/oikos-sdk";
 import { putV1CompaniesByIdBusinessHours } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
@@ -16,9 +17,11 @@ export function useSaveBusinessHours(companyId: string) {
 			if (data.data?.business_hours) {
 				updateBusinessHours(companyId, data.data.business_hours);
 			}
+			logCompanyEvent("company.hours_updated", { success: true, companyId });
 			toast.success("Horários salvos com sucesso!");
 		},
 		onError: () => {
+			logCompanyEvent("company.hours_updated", { success: false, companyId });
 			toast.error("Erro ao salvar horários", "Tente novamente.");
 		},
 	});

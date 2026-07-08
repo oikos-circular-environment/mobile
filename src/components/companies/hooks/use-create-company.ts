@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
+import { logCompanyEvent } from "@/libs/observe-events";
 import type { PostV1CompaniesData } from "@/libs/oikos-sdk";
 import { postV1Companies } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
@@ -15,9 +16,14 @@ export function useCreateCompany() {
 			if (data.data?.company) {
 				addCompany(data.data.company);
 			}
+			logCompanyEvent("company.created", {
+				success: true,
+				companyId: data.data?.company?.id ?? "",
+			});
 			toast.success("Empresa cadastrada com sucesso!");
 		},
 		onError: () => {
+			logCompanyEvent("company.created", { success: false });
 			toast.error("Erro ao cadastrar empresa", "Tente novamente.");
 		},
 	});

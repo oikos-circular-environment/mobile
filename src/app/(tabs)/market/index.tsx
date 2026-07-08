@@ -9,6 +9,7 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { LocationSourceBottomSheet } from "@/components/market/location-source-bottom-sheet";
 import { MarketListHeader } from "@/components/market/market-list-header";
 import { RadiusBottomSheet } from "@/components/market/radius-bottom-sheet";
@@ -24,6 +25,7 @@ import { useMarket } from "@/contexts/market-context";
 import { formatDistance } from "@/libs/format-distance";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import type { MarketCompany } from "@/libs/types/market";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 function CompanyCardSkeleton() {
 	return (
@@ -151,7 +153,8 @@ function CompanyCardItem({
 }
 
 export default function MarketScreen() {
-	const { currentDate } = useGeospatial();
+	useRouteInteractive();
+	const { currentDate, permissionDenied } = useGeospatial();
 	const {
 		locationSource,
 		isLocationReady,
@@ -208,6 +211,12 @@ export default function MarketScreen() {
 								Adicione um endereço no seu perfil para ver empresas próximas a
 								você.
 							</Text>
+						</View>
+					) : !isLocationReady &&
+						locationSource === "current" &&
+						permissionDenied ? (
+						<View className="p-4">
+							<LocationPermissionAlert message="Habilite a localização do dispositivo ou use o endereço do seu perfil para ver empresas próximas a você." />
 						</View>
 					) : isPending ? (
 						<View className="gap-3">

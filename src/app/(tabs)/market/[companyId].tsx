@@ -29,6 +29,7 @@ import {
 import type { MarketSimulationItemType } from "@/libs/memory/market-simulations";
 import { daysOfWeek } from "@/libs/types/business-hour";
 import type { MarketBusinessHour } from "@/libs/types/market";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 type MarketDetailTab = "general" | "simulation";
 
@@ -51,6 +52,7 @@ const dayOfWeekByIndex = [
 ] as const;
 
 export default function MarketCompanyDetailScreen() {
+	useRouteInteractive();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const { getCompanyById, isPending, isLocationReady } = useMarket();
 	const { currentDate } = useGeospatial();

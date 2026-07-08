@@ -19,7 +19,7 @@ type MediaThumbnailProps = {
 
 const styles = StyleSheet.create({
 	overlay: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		borderRadius: 6,
 	},
 	badge: {

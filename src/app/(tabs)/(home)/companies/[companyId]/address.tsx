@@ -44,6 +44,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
 import { mask } from "@/libs/mask";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 
@@ -65,6 +66,7 @@ const addressSchema = z.object({
 type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function CompanyAddressScreen() {
+	useRouteInteractive();
 	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 
@@ -236,6 +238,8 @@ export default function CompanyAddressScreen() {
 												keyboardType="number-pad"
 												maxLength={9}
 												placeholder="00000-000"
+												returnKeyType="search"
+												onSubmitEditing={onPressSearchCep}
 											/>
 											<InputSlot
 												className="pr-3"

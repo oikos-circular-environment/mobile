@@ -9,6 +9,7 @@ import { ProfileCompletionModal } from "@/components/auth/profile-completion-mod
 import { HomeGuestCard } from "@/components/home/home-guest-card";
 import { HomeHeaderSkeleton } from "@/components/home/home-header-skeleton";
 import { HomeUserCard } from "@/components/home/home-user-card";
+import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { DeleteAccountModal } from "@/components/settings/delete-account-modal";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
 import { colors } from "@/components/style/colors";
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 
 function ServiceCard({
 	label,
@@ -76,6 +78,7 @@ export default function HomeScreen() {
 		requestDeletion,
 		isRequestingDeletion,
 	} = useAuthContext();
+	const { permissionDenied } = useGeospatial();
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [showSignOutModal, setShowSignOutModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -133,6 +136,11 @@ export default function HomeScreen() {
 						</Animated.View>
 					)}
 				</View>
+
+				{/* Aviso de localização indisponível */}
+				{permissionDenied && (
+					<LocationPermissionAlert message="Habilite a localização para ver conteúdo e recomendações mais próximos de você." />
+				)}
 
 				{/* Serviços */}
 				<View className="gap-3">
