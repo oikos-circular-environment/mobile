@@ -19,7 +19,6 @@ export function makeService(
 		waste_category_id: faker.string.uuid(),
 		waste_category: makeWasteCategory(),
 		quantity: faker.number.int({ min: 0, max: 100 }),
-		observations: null,
 		...overrides,
 	};
 }

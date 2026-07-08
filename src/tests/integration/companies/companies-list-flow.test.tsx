@@ -1,7 +1,7 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
 import { router, useRouter } from "expo-router";
 import CompaniesListScreen from "@/app/(tabs)/(home)/companies/index";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
 import { makeStoreCompany } from "@/tests/factories";
 

@@ -183,7 +183,7 @@ describe("ProfileScreen", () => {
 
 	it("renderiza campos de endereço vazios quando usuário não possui endereço", async () => {
 		setupAuthMock({
-			user: { profile: { ...mockUser.profile, address: null } },
+			user: { ...mockUser, profile: { ...mockUser.profile, address: null } },
 		});
 		await renderProfile();
 
