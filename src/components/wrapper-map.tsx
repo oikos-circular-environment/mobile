@@ -15,6 +15,7 @@ import MapView, {
 	type Region,
 } from "react-native-maps";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -150,8 +151,6 @@ export default function WrapperMap({
 							provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
 							region={region}
 							onPress={handleMapSelection}
-							showsUserLocation
-							showsMyLocationButton
 							showsCompass
 							loadingEnabled
 						>
@@ -166,14 +165,12 @@ export default function WrapperMap({
 						</MapView>
 
 						<View className="absolute inset-x-0 bottom-0 flex-row items-center justify-between gap-2 bg-background/95 px-3 py-2">
-							<View className="flex-1 gap-0.5">
-								<Text className="text-xs text-muted-foreground">
-									Lat: {activeLocation.latitude.toFixed(6)}
-								</Text>
-								<Text className="text-xs text-muted-foreground">
-									Long: {activeLocation.longitude.toFixed(6)}
-								</Text>
-							</View>
+							<Badge variant="secondary">
+								<BadgeText>
+									{activeLocation.latitude.toFixed(6)},{" "}
+									{activeLocation.longitude.toFixed(6)}
+								</BadgeText>
+							</Badge>
 
 							<Button
 								variant="outline"
