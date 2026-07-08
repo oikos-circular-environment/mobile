@@ -71,11 +71,7 @@ export default function SignInScreen() {
 			>
 				{/* Header Section */}
 				<View className="h-72 rounded-b-4xl overflow-hidden">
-					<Svg
-						style={StyleSheet.absoluteFillObject}
-						width={screenWidth}
-						height={288}
-					>
+					<Svg style={StyleSheet.absoluteFill} width={screenWidth} height={288}>
 						<Defs>
 							<RadialGradient
 								id="headerGradient"
