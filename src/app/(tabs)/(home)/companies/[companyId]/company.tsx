@@ -447,7 +447,10 @@ export default function CompanyGeneralInfoScreen() {
 														: mask.cpf(text),
 												)
 											}
-											keyboardType="number-pad"
+											keyboardType="default"
+											autoCorrect={false}
+											autoCapitalize="none"
+											spellCheck={false}
 											placeholder={
 												identity_type === "CNPJ"
 													? "00.000.000/0000-00"

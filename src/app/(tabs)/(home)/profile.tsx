@@ -575,7 +575,10 @@ export default function ProfileScreen() {
 													value={value}
 													onBlur={onBlur}
 													onChangeText={text => onChange(mask.cep(text))}
-													keyboardType="number-pad"
+													keyboardType="default"
+													autoCorrect={false}
+													autoCapitalize="none"
+													spellCheck={false}
 													maxLength={9}
 													placeholder="00000-000"
 													returnKeyType="search"

@@ -28,7 +28,10 @@ export const unstable_settings = {
 const queryClient = new QueryClient();
 sessionBus.subscribe(() => queryClient.resetQueries());
 
-Observe.configure({ integrations: { "expo-router": true } });
+Observe.configure({
+	integrations: { "expo-router": true },
+	dispatchInDebug: true,
+});
 
 function RootLayout() {
 	const [loaded, error] = useFonts({

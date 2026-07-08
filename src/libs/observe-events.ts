@@ -5,7 +5,11 @@ function logEvent(
 	attributes?: ObserveAttributes,
 	severity?: "error" | "fatal",
 ) {
-	Observe.logEvent(name, { attributes, severity });
+	try {
+		Observe.logEvent(name, { attributes, severity });
+	} catch (error) {
+		console.warn(`[observe-events] failed to log "${name}"`, error);
+	}
 }
 
 export type ProfileEventName = "profile.updated" | "profile.avatar_updated";
