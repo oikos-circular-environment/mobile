@@ -586,11 +586,7 @@ export default function ProfileScreen() {
 														onPressSearchCep({ cep: value })
 													}
 												/>
-												<InputSlot
-													className="pr-3"
-													testID="cep-search-btn"
-													onPress={() => onPressSearchCep({ cep: value })}
-												>
+												<InputSlot className="pr-3" testID="cep-search-btn">
 													<InputIcon as={isLookingUpCep ? Spinner : Search} />
 												</InputSlot>
 											</Input>
