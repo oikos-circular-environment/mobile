@@ -80,9 +80,9 @@ iPad); tech-plan.md → Arquitetura de Componentes (ponto de integração/valida
 
 ## Ticket 3 — Build de produção e resubmissão
 
-**Status:** 🔄 Em andamento — usuário decidiu prosseguir sem esperar a
-validação em iPad do Ticket 2 (review da Apple é manual de qualquer forma).
-iOS já resubmetido com sucesso; Android ainda buildando.
+**Status:** ✅ Concluído (submissão técnica) — usuário decidiu prosseguir sem
+esperar a validação em iPad do Ticket 2 (review da Apple é manual de qualquer
+forma). iOS e Android resubmetidos com sucesso.
 
 **Escopo:**
 - [x] Gerar build `eas build --profile production` (Android + iOS) com as
@@ -90,15 +90,21 @@ iOS já resubmetido com sucesso; Android ainda buildando.
   `019f3f1f-98d7-70bb-9a52-e406c510bcc8`.
 - [x] iOS: build e submit concluídos com sucesso (`apple_app_id: 6786017565`).
   Usuário confirmou.
-- [ ] Android: build ainda em andamento; submit à Play Store ainda não
-  concluído.
+- [x] Android: build e submit à Play Store concluídos com sucesso
+  (`android_package_id: com.oikos`).
 - [ ] Reenviar a build para review na App Store Connect, referenciando a
   submissão anterior (`3f96db4c-ee45-422c-b5fe-eb90bd5b03a9`) na resposta ao
   time de review, se aplicável — a submissão em si já foi feita pelo
-  `submit_ios`; isso é só a resposta textual opcional ao review anterior.
+  `submit_ios`; isso é só a resposta textual opcional ao review anterior, a
+  cargo do usuário decidir se quer escrever.
 - Nota: diferente do planejado originalmente, a submissão à Play Store
-  também está acontecendo automaticamente (o workflow builda/submete as duas
-  plataformas por padrão), não é opt-in separado.
+  também aconteceu automaticamente (o workflow builda/submete as duas
+  plataformas por padrão), não foi opt-in separado.
+- **Pendente real do épico**: aguardar o resultado da review da Apple
+  (manual, prazo variável) — só aí saberemos se a correção do bloqueio de
+  localização resolveu de fato as guidelines 5.1.5/2.1(a). Validação em
+  iPad (Ticket 2) nunca foi feita; se a Apple rejeitar de novo pelo mesmo
+  motivo, isso deve ser revisitado com prioridade.
 
 **Referências de spec:** epic-brief.md → Critérios de sucesso (nova build +
 reenvio).

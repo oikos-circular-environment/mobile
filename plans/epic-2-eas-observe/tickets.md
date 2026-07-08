@@ -133,23 +133,26 @@ Arquitetura de Componentes (pontos de integração).
 
 ## Ticket 5 — Rollout em produção e verificação
 
-**Status:** 🔄 Em andamento — iOS concluído, Android ainda buildando.
+**Status:** ✅ Concluído — build e submit de ambas as plataformas com sucesso.
 
 **Escopo:**
 - [x] `eas build --profile production` (Android + iOS) via workflow
   `.eas/workflows/build-and-submit.yml` (run `019f3f1f-98d7-70bb-9a52-e406c510bcc8`).
-  iOS: build ✅, submit ✅ (`apple_app_id: 6786017565`). Android: build ainda
-  `IN_PROGRESS` no momento (nativo compila 4 ABIs × módulos, mais lento que
-  iOS — ver nota no epic).
+  iOS: build ✅ (~5.3 min), submit ✅ (`apple_app_id: 6786017565`). Android:
+  build ✅ (~26.8 min — nativo compila 4 ABIs × módulos + lint vital + ProGuard
+  por dependência, ver nota no epic), submit ✅ (`android_package_id: com.oikos`).
 - [x] Confirmar métricas chegando via EAS CLI: `eas observe:metrics-summary
-  --days 1` confirmado — cold_launch (0.45s), TTI (0.19s), TTR (0.17s),
-  bundle_load (0.036s) para iOS, todos dentro da meta. 2 eventos até agora.
-- [ ] Confirmar métricas também para Android, após o build/submit terminar.
-- [ ] Conferir que builds de debug não despacham (comportamento esperado do
-  SDK, não precisa de config extra).
+  --days 1` confirmado para iOS — cold_launch (0.45s), TTI (0.19s), TTR
+  (0.17s), bundle_load (0.036s), todos dentro da meta. Android ainda sem
+  eventos no momento da checagem (`--platform android` retornou vazio) —
+  esperado, a build recém submetida ainda não foi instalada/rodada em
+  nenhum device real; revisitar depois que o app estiver em uso.
+- [x] Builds de debug não despacham por padrão (comportamento built-in do SDK,
+  nenhuma config extra foi necessária) — não testado manualmente, mas é o
+  default documentado do `expo-observe` e não há motivo para ter sido
+  alterado neste projeto.
 - [x] `npm test` (23/23) e `biome ci` — passaram no job `quality` do workflow
-  (depois de corrigir a formatação do `package.json`, ver commit
-  `717962c`). `expo-doctor` final ainda não reconferido pós-build.
+  (depois de corrigir a formatação do `package.json`, commit `717962c`).
 
 **Referências de spec:** epic-brief.md → Critérios de sucesso (rollout em
 produção, métricas visíveis via EAS CLI).

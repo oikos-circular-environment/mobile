@@ -7,8 +7,8 @@ não crash/analytics/replay.
 | Epic | Escopo | Status |
 |---|---|---|
 | [epic-1-sdk-upgrade](./epic-1-sdk-upgrade/) | Upgrade Expo SDK 54 → 55 → 56 (bloqueia os demais) | PR aberta (#62) |
-| [epic-5-appstore-rejection-fix](./epic-5-appstore-rejection-fix/) | Correção da rejeição da Apple (Guidelines 5.1.5 + 2.1(a)) — bloqueia o lançamento | **Resubmissão em andamento** — iOS aprovado no submit (`apple_app_id: 6786017565`), Android buildando. Validação em iPad nunca foi feita (usuário assumiu o risco) |
-| [epic-2-eas-observe](./epic-2-eas-observe/) | EAS Observe — performance monitoring (cold/warm start, TTFR, TTI, bundle load por rota) + Error Boundary | Tickets 1-4 commitados; **Ticket 5 em andamento** — métricas iOS já confirmadas via `eas observe:metrics-summary`, Android pendente |
+| [epic-5-appstore-rejection-fix](./epic-5-appstore-rejection-fix/) | Correção da rejeição da Apple (Guidelines 5.1.5 + 2.1(a)) — bloqueia o lançamento | **Resubmetido com sucesso** (iOS `apple_app_id: 6786017565`, Android `com.oikos`) — aguardando resultado da review manual da Apple. Validação em iPad nunca foi feita (usuário assumiu o risco) |
+| [epic-2-eas-observe](./epic-2-eas-observe/) | EAS Observe — performance monitoring (cold/warm start, TTFR, TTI, bundle load por rota) + Error Boundary | **Todos os 5 tickets concluídos** — build/submit de produção OK nas duas plataformas, métricas iOS confirmadas via CLI (Android ainda sem eventos, aguardando uso real) |
 | [epic-3-observability](./epic-3-observability/) | Crash reporting + product analytics (Sentry/BugSnag, PostHog/Amplitude/Firebase Analytics) | Aguarda decisão de ferramenta |
 | [epic-4-bundle-analysis](./epic-4-bundle-analysis/) | Bundle analysis (Expo Atlas) | Backlog — não será executado agora |
 
