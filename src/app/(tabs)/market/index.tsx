@@ -13,6 +13,7 @@ import { LocationPermissionAlert } from "@/components/location-permission-alert"
 import { LocationSourceBottomSheet } from "@/components/market/location-source-bottom-sheet";
 import { MarketListHeader } from "@/components/market/market-list-header";
 import { RadiusBottomSheet } from "@/components/market/radius-bottom-sheet";
+import { colors } from "@/components/style/colors";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -24,6 +25,7 @@ import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
 import { formatDistance } from "@/libs/format-distance";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
+import { maskCnpj } from "@/libs/mask";
 import type { MarketCompany } from "@/libs/types/market";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 
@@ -89,7 +91,7 @@ function CompanyCardItem({
 							) : (
 								<View className="w-16 h-16 rounded-lg bg-primary items-center justify-center">
 									{company.company_type === "COLLECTOR" ? (
-										<Sprout size={20} className="text-primary-foreground" />
+										<Sprout size={20} color={colors.white} />
 									) : (
 										<Text className="text-primary-foreground text-sm font-bold">
 											{initials}
@@ -98,13 +100,13 @@ function CompanyCardItem({
 								</View>
 							)}
 
-							<View className="gap-1">
-								<Text className="font-bold uppercase">
+							<View className="flex-1 gap-1">
+								<Text className="font-bold uppercase" numberOfLines={1}>
 									{company.business_name}
 								</Text>
 								<Text className="text-xs text-muted-foreground">
 									{company.identity_type === "CNPJ"
-										? company.identity
+										? maskCnpj(company.identity!)
 										: "Coletor independete"}
 								</Text>
 								<HStack className="gap-1.5 pt-1 flex-wrap">
