@@ -72,14 +72,14 @@ export function CameraPreview() {
 				onCameraReady={handleCameraReady}
 			/>
 			<Animated.View
-				style={[StyleSheet.absoluteFillObject, blurStyle]}
+				style={[StyleSheet.absoluteFill, blurStyle]}
 				pointerEvents="none"
 			>
 				<BlurView
 					intensity={70}
 					tint="dark"
 					experimentalBlurMethod="dimezisBlurView"
-					style={StyleSheet.absoluteFillObject}
+					style={StyleSheet.absoluteFill}
 				/>
 			</Animated.View>
 		</View>

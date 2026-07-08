@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
+import { logComplaintEvent } from "@/libs/observe-events";
 import {
 	postV1Complaints,
 	postV1ComplaintsByIdAttachments,
@@ -98,15 +99,25 @@ export function useSubmitComplaints() {
 				});
 			}
 		},
-		onSuccess: async () => {
+		onSuccess: async (_, { media }) => {
 			await queryClient.invalidateQueries({ queryKey: COMPLAINTS_QUERY_KEY });
 			await queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
+			logComplaintEvent("complaint.created", {
+				success: true,
+				hasPhoto: media.some(item => item.mediaType === "photo"),
+				hasVideo: media.some(item => item.mediaType === "video"),
+			});
 			toast.success(
 				"Denúncia registrada",
 				"Sua denúncia foi enviada com sucesso.",
 			);
 		},
-		onError: () => {
+		onError: (_, { media }) => {
+			logComplaintEvent("complaint.created", {
+				success: false,
+				hasPhoto: media.some(item => item.mediaType === "photo"),
+				hasVideo: media.some(item => item.mediaType === "video"),
+			});
 			toast.error(
 				"Erro ao enviar",
 				"Não foi possível registrar a denúncia. Tente novamente.",

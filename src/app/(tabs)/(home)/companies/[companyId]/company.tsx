@@ -70,6 +70,7 @@ import {
 	companyTypeOptions,
 	identityTypeOptions,
 } from "@/libs/types/companies";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 
@@ -130,6 +131,7 @@ const companySchema = z
 type CompanyFormData = z.infer<typeof companySchema>;
 
 export default function CompanyGeneralInfoScreen() {
+	useRouteInteractive();
 	const { user } = useAuthContext();
 	const [useProfileData, setUseProfileData] = useState(false);
 	const [avatarPreviewUri, setAvatarPreviewUri] = useState<string | null>(null);
@@ -451,6 +453,10 @@ export default function CompanyGeneralInfoScreen() {
 													? "00.000.000/0000-00"
 													: "000.000.000-00"
 											}
+											{...(identity_type === "CNPJ" && {
+												returnKeyType: "search",
+												onSubmitEditing: onPressSearchCnpj,
+											})}
 										/>
 
 										{identity_type === "CNPJ" && (

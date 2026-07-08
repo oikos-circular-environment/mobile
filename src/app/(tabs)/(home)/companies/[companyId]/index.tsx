@@ -23,6 +23,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 type CompanySetting = {
@@ -37,6 +38,7 @@ type CompanySetting = {
 };
 
 export default function CompanyHubScreen() {
+	useRouteInteractive();
 	const router = useRouter();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const company = useCompaniesStore(s =>

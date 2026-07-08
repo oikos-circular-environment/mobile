@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
+import { logCompanyEvent } from "@/libs/observe-events";
 import type { PutV1CompaniesByIdAddressesData } from "@/libs/oikos-sdk";
 import { putV1CompaniesByIdAddresses } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
@@ -16,9 +17,17 @@ export function useSaveAddress(companyId: string) {
 			if (data.data?.address) {
 				updateAddress(companyId, data.data.address);
 			}
+			logCompanyEvent("company.address_updated", {
+				success: true,
+				companyId,
+			});
 			toast.success("Endereço salvo com sucesso!");
 		},
 		onError: () => {
+			logCompanyEvent("company.address_updated", {
+				success: false,
+				companyId,
+			});
 			toast.error("Erro ao salvar endereço", "Tente novamente.");
 		},
 	});

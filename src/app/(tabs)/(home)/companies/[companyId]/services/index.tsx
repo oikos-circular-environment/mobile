@@ -17,9 +17,11 @@ import { Pressable } from "@/components/ui/pressable";
 import { SwipeableCard } from "@/components/ui/swipeable-card";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function ServicesIndexScreen() {
+	useRouteInteractive();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const company = useCompaniesStore(s =>
 		s.companies.find(c => c.id === companyId),

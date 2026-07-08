@@ -10,6 +10,7 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { toast } from "@/components/toast";
 import { useAuthContext } from "@/contexts/auth-context";
+import { logComplaintEvent } from "@/libs/observe-events";
 import {
 	deleteV1ComplaintsByIdVotes,
 	getV1ComplaintsByIdVotes,
@@ -99,8 +100,19 @@ export function ComplaintVote({
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "vote", complaintId],
 			});
+
+			logComplaintEvent("complaint.voted", {
+				success: true,
+				voteType: voteType ?? "removed",
+			});
 		},
-		onError: () => toast.error("Erro", "Não foi possível registrar seu voto."),
+		onError: (_, { voteType }) => {
+			logComplaintEvent("complaint.voted", {
+				success: false,
+				voteType: voteType ?? "removed",
+			});
+			toast.error("Erro", "Não foi possível registrar seu voto.");
+		},
 	});
 
 	const handleVote = useCallback(

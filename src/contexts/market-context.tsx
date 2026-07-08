@@ -13,6 +13,7 @@ import {
 import { z } from "zod";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { logMarketEvent } from "@/libs/observe-events";
 import { getV1Market } from "@/libs/oikos-sdk";
 import type { MarketCompany } from "@/libs/types/market";
 
@@ -66,6 +67,20 @@ export function MarketProvider({ children }: PropsWithChildren) {
 		useState<LocationSource>("current");
 	const locationSheetRef = useRef<BottomSheet>(null);
 	const radiusSheetRef = useRef<BottomSheet>(null);
+
+	const handleSetAppliedFilters = useCallback((filters: MarketFilterValues) => {
+		setAppliedFilters(filters);
+		logMarketEvent("market.filter_applied", {
+			radius: filters.radius,
+			category: filters.category ?? "",
+			hasQuery: filters.query.length > 0,
+		});
+	}, []);
+
+	const handleSetLocationSource = useCallback((source: LocationSource) => {
+		setLocationSource(source);
+		logMarketEvent("market.location_source_changed", { source });
+	}, []);
 
 	const profileLat = user?.profile?.address?.latitude ?? undefined;
 	const profileLon = user?.profile?.address?.longitude ?? undefined;
@@ -131,9 +146,9 @@ export function MarketProvider({ children }: PropsWithChildren) {
 	const value = useMemo<MarketContextValue>(
 		() => ({
 			appliedFilters,
-			setAppliedFilters,
+			setAppliedFilters: handleSetAppliedFilters,
 			locationSource,
-			setLocationSource,
+			setLocationSource: handleSetLocationSource,
 			isLocationReady,
 			isResolvingLocation,
 			companies,
@@ -150,7 +165,9 @@ export function MarketProvider({ children }: PropsWithChildren) {
 		}),
 		[
 			appliedFilters,
+			handleSetAppliedFilters,
 			locationSource,
+			handleSetLocationSource,
 			isLocationReady,
 			isResolvingLocation,
 			companies,

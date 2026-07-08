@@ -55,12 +55,14 @@ import {
 	isValidMimeType,
 	MAX_FILE_SIZE_BYTES,
 } from "@/libs/media-validation";
+import { logComplaintEvent } from "@/libs/observe-events";
 import {
 	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
 	patchV1ComplaintsByIdResolutionsByResolutionId,
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 const MIN_ATTACHMENTS = 1;
@@ -85,6 +87,7 @@ const resolutionSchema = z.object({
 type ResolutionFormValues = z.infer<typeof resolutionSchema>;
 
 export default function ComplaintResolutionScreen() {
+	useRouteInteractive();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const insets = useSafeAreaInsets();
 	const { isAuthenticated } = useAuthContext();
@@ -260,6 +263,10 @@ export default function ComplaintResolutionScreen() {
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", id],
 			});
+			logComplaintEvent("complaint.resolved", {
+				success: true,
+				action: isEditMode ? "updated" : "created",
+			});
 			toast.success(
 				isEditMode ? "Resolução atualizada!" : "Resolução publicada!",
 				isEditMode
@@ -270,6 +277,10 @@ export default function ComplaintResolutionScreen() {
 		},
 		onError: () => {
 			setUploadProgress(null);
+			logComplaintEvent("complaint.resolved", {
+				success: false,
+				action: isEditMode ? "updated" : "created",
+			});
 			toast.error(
 				"Erro",
 				`Não foi possível ${isEditMode ? "atualizar" : "publicar"} a resolução.`,

@@ -15,6 +15,14 @@ npm test               # Run Jest tests
 npm run test:coverage  # Run Jest with coverage report
 ```
 
+## Expo MCP
+
+An `expo` MCP server is configured (`https://mcp.expo.dev/mcp`, project-scoped).
+Use it for: fetching current Expo/EAS library docs, checking EAS build/workflow
+status, and pulling TestFlight/Play Store crash and review data — prefer it over
+guessing at EAS CLI output or scraping docs.expo.dev by hand. Run `/mcp` once per
+session to authenticate (OAuth) if tools aren't responding.
+
 ## Testing
 
 **Stack**: Jest (via `jest-expo` preset) + React Native Testing Library (RNTL v14).

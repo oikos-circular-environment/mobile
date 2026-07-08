@@ -26,6 +26,7 @@ import {
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 const signUpSchema = z
 	.object({
@@ -41,6 +42,7 @@ const signUpSchema = z
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpScreen() {
+	useRouteInteractive();
 	const { signUp, isLoading } = useAuthContext();
 	const router = useRouter();
 	const { width: screenWidth } = useWindowDimensions();
@@ -72,11 +74,7 @@ export default function SignUpScreen() {
 			>
 				{/* Header Section */}
 				<View className="h-72 rounded-b-4xl overflow-hidden">
-					<Svg
-						style={StyleSheet.absoluteFillObject}
-						width={screenWidth}
-						height={288}
-					>
+					<Svg style={StyleSheet.absoluteFill} width={screenWidth} height={288}>
 						<Defs>
 							<RadialGradient
 								id="headerGradient"

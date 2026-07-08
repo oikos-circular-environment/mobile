@@ -40,6 +40,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { logComplaintEvent } from "@/libs/observe-events";
 import {
 	deleteV1ComplaintsByIdResolutions,
 	getV1ComplaintsByIdResolutions,
@@ -132,9 +133,17 @@ export function ComplaintBottomSheet() {
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", complaintId],
 			});
+			logComplaintEvent("complaint.resolved", {
+				success: true,
+				action: "deleted",
+			});
 			toast.success("Resolução removida.", "Sua resolução foi excluída.");
 		},
 		onError: () => {
+			logComplaintEvent("complaint.resolved", {
+				success: false,
+				action: "deleted",
+			});
 			toast.error("Erro", "Não foi possível excluir a resolução.");
 		},
 	});

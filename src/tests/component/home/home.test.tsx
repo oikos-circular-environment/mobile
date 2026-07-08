@@ -3,6 +3,7 @@ import { render, screen, userEvent } from "@testing-library/react-native";
 import type React from "react";
 import HomeScreen from "@/app/(tabs)/(home)";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 
 jest.mock("expo-router", () => ({
 	Link: ({
@@ -23,6 +24,7 @@ jest.mock("expo-router", () => ({
 }));
 
 jest.mock("@/contexts/auth-context");
+jest.mock("@/contexts/geospatial-context");
 
 jest.mock("@/components/ui/grid", () => ({
 	Grid: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -106,6 +108,22 @@ function setupAuth(overrides: Partial<typeof defaultAuth> = {}) {
 	});
 }
 
+const defaultGeospatial = {
+	currentDate: new Date("2026-06-11T10:00:00"),
+	heading: null,
+	location: null,
+	addresses: [],
+	permissionDenied: false,
+	isResolving: false,
+	reverseGeocodeError: false,
+};
+
+function setupGeospatial(overrides: Partial<typeof defaultGeospatial> = {}) {
+	jest
+		.mocked(useGeospatial)
+		.mockReturnValue({ ...defaultGeospatial, ...overrides });
+}
+
 async function renderHome() {
 	const queryClient = new QueryClient({
 		defaultOptions: {
@@ -124,6 +142,7 @@ describe("HomeScreen — componente", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
 		setupAuth();
+		setupGeospatial();
 	});
 
 	afterEach(() => {
