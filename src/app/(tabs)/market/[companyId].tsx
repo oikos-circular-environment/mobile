@@ -6,6 +6,8 @@ import {
 	ActivityIndicator,
 	Image,
 	KeyboardAvoidingView,
+	type NativeScrollEvent,
+	type NativeSyntheticEvent,
 	ScrollView,
 	View,
 } from "react-native";
@@ -59,6 +61,13 @@ export default function MarketCompanyDetailScreen() {
 	const [activeTab, setActiveTab] = useState<MarketDetailTab>("general");
 	const [selectedSimulationItem, setSelectedSimulationItem] =
 		useState<SelectedSimulationItem | null>(null);
+	const [headerCardHeight, setHeaderCardHeight] = useState(0);
+	const [showHeaderTitle, setShowHeaderTitle] = useState(false);
+
+	const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+		if (!headerCardHeight) return;
+		setShowHeaderTitle(event.nativeEvent.contentOffset.y > headerCardHeight);
+	};
 
 	const company = companyId ? getCompanyById(companyId) : undefined;
 	const isOpen = isCompanyOpenNow(company?.business_hours ?? [], currentDate);
@@ -148,7 +157,7 @@ export default function MarketCompanyDetailScreen() {
 		>
 			<Stack.Screen
 				options={{
-					title: company.corporate_name.toUpperCase(),
+					title: showHeaderTitle ? company.corporate_name.toUpperCase() : "",
 					headerShown: true,
 					headerBackButtonDisplayMode: "minimal",
 				}}
@@ -160,9 +169,16 @@ export default function MarketCompanyDetailScreen() {
 					contentContainerClassName="p-4 pb-8"
 					contentInsetAdjustmentBehavior="automatic"
 					keyboardShouldPersistTaps="handled"
+					onScroll={handleScroll}
+					scrollEventThrottle={16}
 				>
 					<View className="gap-4">
-						<Card className="flex-row gap-2 items-center shadow-none">
+						<HStack
+							className="my-4 gap-2 items-center shadow-none"
+							onLayout={event =>
+								setHeaderCardHeight(event.nativeEvent.layout.height)
+							}
+						>
 							{company.avatar ? (
 								<View className="w-16 h-16 rounded-lg overflow-hidden">
 									<Image
@@ -174,7 +190,7 @@ export default function MarketCompanyDetailScreen() {
 							) : (
 								<View className="w-16 h-16 rounded-lg bg-primary items-center justify-center">
 									{company.company_type === "COLLECTOR" ? (
-										<SproutIcon size={20} className="text-primary-foreground" />
+										<SproutIcon size={20} color={colors.white} />
 									) : (
 										<Text className="text-primary-foreground text-sm font-bold">
 											{initials}
@@ -208,7 +224,7 @@ export default function MarketCompanyDetailScreen() {
 									</Badge>
 								</HStack>
 							</View>
-						</Card>
+						</HStack>
 
 						<Card className="gap-2 rounded-lg border-gray-200 p-1 shadow-none">
 							<View className="flex-row gap-1">
