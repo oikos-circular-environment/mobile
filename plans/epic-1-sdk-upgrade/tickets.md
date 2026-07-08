@@ -6,6 +6,7 @@ graph LR
     T2 --> T3[Ticket 3: Reativar buoy-gg ✅]
     T3 --> T4[Ticket 4: Regressão final + dry-run EAS 🔄]
     T4 --> T5[Ticket 5: Cleanup de dívida técnica de TypeScript ⏳]
+    T2 --> T6[Ticket 6: Investigação SDK 57 — adiado ⏸️]
 ```
 
 Sem ticket de cobertura de testes nova — só roda a suíte Jest existente a cada
@@ -380,3 +381,85 @@ de `tsc --noEmit` encontrados durante o Ticket 2.
 
 **Dependências:** nenhuma tecnicamente (é debt independente), mas por decisão do
 usuário roda só depois de fechar os Tickets 3 e 4 deste epic.
+
+---
+
+## Ticket 6 — Investigação de upgrade para SDK 57 (adiado)
+
+**Status:** ⏸️ Adiado — decisão do usuário de **permanecer no SDK 56** por ora.
+Não é um ticket de trabalho pendente, é o registro da investigação que embasa
+essa decisão, pra não se perder e pra saber exatamente o que checar antes de
+reconsiderar.
+
+**Contexto:** a ideia original era eventualmente subir até o Expo SDK 57 (que
+traz React Native 0.86). Investigação levantou um problema sério o suficiente
+pra pausar essa ideia — não só adiar o upgrade em si, mas confirmar que
+**esperar não é uma ação neutra**: a causa raiz já existe na versão atual (56).
+
+**Escopo (achados da investigação, 2026-07-07):**
+
+- [x] **Confirmado que RN 0.86 só vem pelo Expo SDK 57 completo**, não dá pra
+  atualizar `react-native` isoladamente num projeto Expo managed. SDK 57
+  estável existe (`57.0.4` no npm) e pareia exatamente com RN 0.86.0 (versões
+  do `relatedPackages` da API do Expo confirmam). Expo caracteriza como "o
+  upgrade de SDK mais fácil que já teve" — RN 0.86 não tem breaking changes
+  documentadas vs 0.85, e trocas de dependências acopladas (`reanimated`
+  4.3→4.5, `gesture-handler` 2.31→2.32, `worklets` 0.8→0.10) seriam de baixo
+  risco isoladamente.
+- [x] **Achado bloqueante — regressão de memória do Hermes V1 com
+  `react-native-reanimated`/`react-native-worklets`.** Investigado a fundo
+  via `gh api` direto nas issues
+  [`software-mansion/react-native-reanimated#9650`](https://github.com/software-mansion/react-native-reanimated/issues/9650)
+  e [`react/react-native#57059`](https://github.com/react/react-native/issues/57059)
+  (comentários lidos até 2026-07-07, incluindo posts do próprio dia):
+  - **Causa raiz confirmada** pelo mantenedor do Reanimated (@tjzel) após
+    checar com o time do Hermes: o novo `eval` do Hermes V1 guarda metadata
+    de debug para invocações de `eval` que retornam função — mesmo em build
+    de produção. Afeta o "Legacy Eval Mode" do `react-native-worklets` (modo
+    atual/default), adicionando **~512KB de memória por worklet único usado
+    em runtime**. Confirmado em Android e iOS — relatos reais incluem
+    500MB→1.1GB de RAM em idle no iOS, e +25-30% em Android.
+  - **Fix real existe no Hermes** ([PR #2090](https://github.com/facebook/hermes/pull/2090),
+    mergeado em 2026-06-25 — a tentativa anterior, #2053, foi fechada sem
+    merge), mas **ainda não confirmado em nenhuma versão publicada de RN ou
+    Expo**. Comentário de 2026-07-04 na issue #57059 confirma: RN 0.86 ainda
+    aponta pro Hermes V1 `250829098.0.14`, anterior ao fix. Sem previsão de
+    quando isso chega numa release.
+  - **Workaround sugerido (Worklets "Bundle Mode", estável desde worklets
+    0.10.0 — a versão que o SDK 57 já traria) tem problema próprio grave e
+    muito recente**: relatos de 2026-07-01 a 2026-07-06 (literalmente a
+    semana anterior a essa investigação) mostram que em modo dev, Bundle
+    Mode carrega o bundle JS inteiro como string numa segunda runtime Hermes
+    **por worklet runtime** — em apps com bundle de 52-88MB isso causa
+    OOM/crash no dev client (2-4x o tamanho do bundle por runtime, segundo o
+    próprio mantenedor do Reanimated). Um time que testou a fundo
+    (`SirJalias`, autor original da issue #9650) decidiu pausar tanto o
+    Bundle Mode quanto o upgrade pro RN 0.86 "até isso ser esclarecido"
+    (comentário de 2026-07-06).
+- [x] **Achado crítico para a decisão: isso não é um risco só de upgrade
+  futuro.** Confirmado por outro desenvolvedor afetado (comentário de
+  2026-07-04 na issue #57059): *"nosso app em SDK 56 já tem a combinação de
+  risco RN 0.85.x + Hermes V1 + New Architecture + Reanimated/Worklets"* —
+  exatamente a combinação deste projeto **hoje**, independente de qualquer
+  decisão sobre o SDK 57. Ou seja, ficar no 56 não é necessariamente "seguro
+  por padrão" — é só a opção que não piora nada nem introduz o risco extra do
+  Bundle Mode, enquanto o fix upstream não é publicado.
+- [x] **Decisão tomada com o usuário**: permanecer no Expo SDK 56 por ora. Não
+  habilitar Worklets Bundle Mode. Não perseguir o SDK 57/RN 0.86 até uma das
+  duas coisas acontecer: (a) o fix do Hermes (#2090) aparecer numa versão
+  publicada de RN/Expo, ou (b) os relatos de OOM do Bundle Mode em dev serem
+  resolvidos/esclarecidos.
+- [ ] **Ação de acompanhamento (não bloqueante, sem prazo definido)**: revisitar
+  as duas threads (issue #9650 e #57059) periodicamente pra saber quando um
+  fix real chega numa versão publicada. Se quiser, também dá pra medir o uso
+  de memória do app atual (SDK 56) em dispositivo real pra confirmar se a
+  regressão já está de fato visível em produção — não foi pedido, fica como
+  possibilidade em aberto.
+
+**Referências de spec:** epic-brief.md → Prazo (não altera prazo do epic atual,
+é uma decisão sobre trabalho futuro fora do escopo já fechado); tech-plan.md →
+tabela de breaking changes (linha "Hermes V1 vira padrão", SDK 56 — mesma raiz
+técnica, agora aprofundada).
+
+**Dependências:** Ticket 2 (só faz sentido investigar 57 depois de já estar
+estável no 56, que é onde o projeto permanece).
