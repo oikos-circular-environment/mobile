@@ -9,6 +9,7 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { LocationSourceBottomSheet } from "@/components/market/location-source-bottom-sheet";
 import { MarketListHeader } from "@/components/market/market-list-header";
 import { RadiusBottomSheet } from "@/components/market/radius-bottom-sheet";
@@ -214,14 +215,8 @@ export default function MarketScreen() {
 					) : !isLocationReady &&
 						locationSource === "current" &&
 						permissionDenied ? (
-						<View className="p-4 gap-1">
-							<Text className="text-sm font-semibold text-foreground">
-								Localização indisponível
-							</Text>
-							<Text className="text-xs text-muted-foreground">
-								Habilite a localização do dispositivo ou use o endereço do seu
-								perfil para ver empresas próximas a você.
-							</Text>
+						<View className="p-4">
+							<LocationPermissionAlert message="Habilite a localização do dispositivo ou use o endereço do seu perfil para ver empresas próximas a você." />
 						</View>
 					) : isPending ? (
 						<View className="gap-3">
