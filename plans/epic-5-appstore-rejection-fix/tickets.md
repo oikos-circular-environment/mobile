@@ -80,22 +80,25 @@ iPad); tech-plan.md → Arquitetura de Componentes (ponto de integração/valida
 
 ## Ticket 3 — Build de produção e resubmissão
 
-**Status:** ⏸️ Bloqueado por decisão do usuário — não resubmeter agora. Ticket 1
-(o fix em si) está pronto e commitado (`fix/appstore-rejection-location-block`);
-falta só a validação em iPad (Ticket 2, adiada) antes de gerar a build e
-reenviar. Retomar quando o container macOS estiver disponível.
+**Status:** 🔄 Em andamento — usuário decidiu prosseguir sem esperar a
+validação em iPad do Ticket 2 (review da Apple é manual de qualquer forma).
+iOS já resubmetido com sucesso; Android ainda buildando.
 
 **Escopo:**
-- [ ] Gerar build `eas build --profile production` (Android + iOS) com as
-  correções do Ticket 1.
-- [ ] Conferir que a build sobe sem os problemas de `pod install`/plugins já
-  resolvidos no Epic 1 (nenhuma mudança esperada aqui, só checagem de
-  regressão).
+- [x] Gerar build `eas build --profile production` (Android + iOS) com as
+  correções do Ticket 1 — via workflow `build-and-submit.yml`, run
+  `019f3f1f-98d7-70bb-9a52-e406c510bcc8`.
+- [x] iOS: build e submit concluídos com sucesso (`apple_app_id: 6786017565`).
+  Usuário confirmou.
+- [ ] Android: build ainda em andamento; submit à Play Store ainda não
+  concluído.
 - [ ] Reenviar a build para review na App Store Connect, referenciando a
   submissão anterior (`3f96db4c-ee45-422c-b5fe-eb90bd5b03a9`) na resposta ao
-  time de review, se aplicável.
-- Fora: submissão à Play Store (Android) — só entra se o usuário decidir
-  também resubmeter lá; o bloqueio reportado foi só da Apple.
+  time de review, se aplicável — a submissão em si já foi feita pelo
+  `submit_ios`; isso é só a resposta textual opcional ao review anterior.
+- Nota: diferente do planejado originalmente, a submissão à Play Store
+  também está acontecendo automaticamente (o workflow builda/submete as duas
+  plataformas por padrão), não é opt-in separado.
 
 **Referências de spec:** epic-brief.md → Critérios de sucesso (nova build +
 reenvio).
