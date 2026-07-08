@@ -565,7 +565,10 @@ export default function ComplaintCreateScreen() {
 							<Input>
 								<InputField
 									placeholder="00000-000"
-									keyboardType="numeric"
+									keyboardType="default"
+									autoCorrect={false}
+									autoCapitalize="none"
+									spellCheck={false}
 									value={value}
 									onChangeText={v => onChange(mask.cep(v))}
 									onBlur={() => {
