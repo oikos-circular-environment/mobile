@@ -552,11 +552,6 @@ export default function CompanyAddressScreen() {
 									longitude={longitude}
 									onChange={onLocationChange}
 								/>
-								<Text className="text-xs text-muted-foreground">
-									{latitude != null && longitude != null
-										? `Ponto selecionado: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
-										: "Use o mapa para definir a localização exata da empresa."}
-								</Text>
 							</View>
 						</View>
 

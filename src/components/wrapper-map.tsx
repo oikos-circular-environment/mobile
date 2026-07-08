@@ -1,7 +1,11 @@
 "use client";
 
 import * as Location from "expo-location";
-import { LocateFixedIcon } from "lucide-react-native";
+import {
+	LocateFixedIcon,
+	LocateOffIcon,
+	MapPinIcon,
+} from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import MapView, {
@@ -10,6 +14,7 @@ import MapView, {
 	PROVIDER_GOOGLE,
 	type Region,
 } from "react-native-maps";
+import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -129,8 +134,8 @@ export default function WrapperMap({
 	}
 
 	return (
-		<View className="gap-3">
-			<View className="h-72 overflow-hidden rounded-lg border border-border">
+		<View className="gap-2">
+			<View className="h-96 overflow-hidden rounded-lg border border-border">
 				{isResolvingLocation && !selectedLocation && !deviceLocation ? (
 					<View className="flex-1 items-center justify-center gap-2 bg-muted/30">
 						<ActivityIndicator />
@@ -139,58 +144,67 @@ export default function WrapperMap({
 						</Text>
 					</View>
 				) : (
-					<MapView
-						style={{ flex: 1 }}
-						provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-						region={region}
-						onPress={handleMapSelection}
-						showsUserLocation
-						showsMyLocationButton
-						showsCompass
-						loadingEnabled
-					>
-						<Marker
-							coordinate={{
-								latitude: activeLocation.latitude,
-								longitude: activeLocation.longitude,
-							}}
-							title="Local da empresa"
-							description="Ponto selecionado"
-						/>
-					</MapView>
+					<>
+						<MapView
+							style={{ flex: 1 }}
+							provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+							region={region}
+							onPress={handleMapSelection}
+							showsUserLocation
+							showsMyLocationButton
+							showsCompass
+							loadingEnabled
+						>
+							<Marker
+								coordinate={{
+									latitude: activeLocation.latitude,
+									longitude: activeLocation.longitude,
+								}}
+								title="Local da empresa"
+								description="Ponto selecionado"
+							/>
+						</MapView>
+
+						<View className="absolute inset-x-0 bottom-0 flex-row items-center justify-between gap-2 bg-background/95 px-3 py-2">
+							<View className="flex-1 gap-0.5">
+								<Text className="text-xs text-muted-foreground">
+									Lat: {activeLocation.latitude.toFixed(6)}
+								</Text>
+								<Text className="text-xs text-muted-foreground">
+									Long: {activeLocation.longitude.toFixed(6)}
+								</Text>
+							</View>
+
+							<Button
+								variant="outline"
+								size="sm"
+								onPress={handleUseDeviceLocation}
+							>
+								<ButtonText>Usar minha localização</ButtonText>
+								<ButtonIcon as={LocateFixedIcon} />
+							</Button>
+						</View>
+					</>
 				)}
 			</View>
 
 			<View className="gap-2">
-				<View className="gap-1">
-					<Heading size="sm">Geolocalização</Heading>
-					<Text className="text-sm text-muted-foreground">
+				<Alert className="gap-3 bg-sky-100 border-sky-400">
+					<AlertIcon as={MapPinIcon} className="text-sky-400" />
+					<AlertText className="text-foreground/80">
 						Toque no mapa para ajustar o ponto com precisão ou use a localização
 						do dispositivo.
-					</Text>
-				</View>
-
-				<View className="flex-row items-center justify-between gap-2">
-					<View className="flex-1 gap-1">
-						<Text className="text-sm">
-							Latitude: {activeLocation.latitude.toFixed(6)}
-						</Text>
-						<Text className="text-sm">
-							Longitude: {activeLocation.longitude.toFixed(6)}
-						</Text>
-					</View>
-
-					<Button variant="outline" size="sm" onPress={handleUseDeviceLocation}>
-						<ButtonText>Usar minha localização</ButtonText>
-						<ButtonIcon as={LocateFixedIcon} />
-					</Button>
-				</View>
+					</AlertText>
+				</Alert>
 
 				{permissionDenied && (
-					<Text className="text-xs text-destructive">
-						Permissão de localização negada. Você ainda pode definir o ponto
-						tocando no mapa.
-					</Text>
+					<Alert className="gap-3 bg-red-50 border-red-200">
+						<AlertIcon as={LocateOffIcon} className="text-red-500" />
+						<AlertText className="text-red-500">
+							Permissão de localização negada. Você ainda pode definir o ponto
+							tocando no mapa.
+						</AlertText>
+					</Alert>
 				)}
 			</View>
 		</View>
