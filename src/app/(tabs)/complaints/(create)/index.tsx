@@ -4,10 +4,10 @@ import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import {
 	AlertCircleIcon,
-	Camera,
+	CameraIcon,
 	ImageIcon,
+	SearchIcon,
 	ShieldAlertIcon,
-	X,
 } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -55,7 +55,7 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
-import { Input, InputField, InputSlot } from "@/components/ui/input";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import {
 	Modal,
 	ModalBackdrop,
@@ -578,11 +578,14 @@ export default function ComplaintCreateScreen() {
 									maxLength={9}
 									returnKeyType="done"
 								/>
-								{isLookingUpCep && (
-									<InputSlot className="pr-3">
-										<Spinner size="small" />
-									</InputSlot>
-								)}
+
+								<InputSlot
+									className="pr-3"
+									testID="cep-search-btn"
+									onPress={() => onPressSearchCep({ cep: value })}
+								>
+									<InputIcon as={isLookingUpCep ? Spinner : SearchIcon} />
+								</InputSlot>
 							</Input>
 						)}
 					/>
@@ -762,7 +765,7 @@ export default function ComplaintCreateScreen() {
 							onPress={() => router.push("/(tabs)/complaints/(create)/camera")}
 							isDisabled={isPending}
 						>
-							<ButtonIcon as={Camera} />
+							<ButtonIcon as={CameraIcon} />
 							<ButtonText>Câmera</ButtonText>
 						</Button>
 						<Button
