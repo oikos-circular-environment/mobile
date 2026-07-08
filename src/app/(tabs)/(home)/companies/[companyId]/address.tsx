@@ -238,6 +238,8 @@ export default function CompanyAddressScreen() {
 												keyboardType="number-pad"
 												maxLength={9}
 												placeholder="00000-000"
+												returnKeyType="search"
+												onSubmitEditing={onPressSearchCep}
 											/>
 											<InputSlot
 												className="pr-3"

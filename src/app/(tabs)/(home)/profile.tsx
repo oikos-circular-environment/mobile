@@ -56,15 +56,12 @@ import { Spinner } from "@/components/ui/spinner";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
 import { useAuthContext } from "@/contexts/auth-context";
-import {
-	getCepV2,
-	listIbgeMunicipios,
-	listIbgeUfs,
-} from "@/libs/brasil-api-sdk";
+import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
 import { compressImage } from "@/libs/media-compression";
 import { logProfileEvent } from "@/libs/observe-events";
 import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
+import { useCepLookup } from "@/libs/use-cep-lookup";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 
@@ -297,40 +294,7 @@ export default function ProfileScreen() {
 		},
 	});
 
-	const getCepMutation = useMutation({
-		mutationKey: ["get", "cep", "brasil-api"],
-		mutationFn: async ({ cep }: { cep: string }) => {
-			const response = await getCepV2({ path: { cep } });
-			return response.data;
-		},
-		onSuccess: data => {
-			if (!data) return;
-			const current = control._formValues as ProfileFormValues;
-			reset(
-				{
-					...current,
-					address: {
-						...current.address,
-						zip_code: data.cep ? mask.cep(data.cep) : current.address.zip_code,
-						street: data.street || current.address.street,
-						district: data.neighborhood || current.address.district,
-						city: data.city || current.address.city,
-						state_code: data.state || current.address.state_code,
-					},
-				},
-				{ keepDefaultValues: true },
-			);
-			const uf = states?.find(s => s.sigla === data.state);
-			if (uf) {
-				setValue("address.state", uf.nome);
-				setValue("address.state_ibge_id", Number(uf.id));
-			}
-			setSelectedCity(data.city || null);
-		},
-		onError: () => {
-			toast.error("Erro ao buscar cep", "Confira o cep e tente novamente");
-		},
-	});
+	const { lookupCep, isLookingUpCep } = useCepLookup();
 
 	const onSubmit = async (data: ProfileFormValues) => {
 		try {
@@ -354,13 +318,44 @@ export default function ProfileScreen() {
 		}
 	};
 
-	const onPressSearchCep = ({ cep }: { cep: string }) => {
+	const onPressSearchCep = async ({ cep }: { cep: string }) => {
 		const cleanCep = cep.replace(/\D/g, "");
 		if (cleanCep.length !== 8) {
 			toast.error("CEP inválido", "O CEP deve conter 8 dígitos.");
 			return;
 		}
-		getCepMutation.mutate({ cep: cleanCep });
+		try {
+			const resolved = await lookupCep(cleanCep);
+			const current = control._formValues as ProfileFormValues;
+			reset(
+				{
+					...current,
+					address: {
+						...current.address,
+						zip_code: resolved.cep,
+						street: resolved.street || current.address.street,
+						district: resolved.district || current.address.district,
+						city: resolved.city || current.address.city,
+						state_code: resolved.stateCode || current.address.state_code,
+						latitude: resolved.latitude
+							? Number(resolved.latitude)
+							: current.address.latitude,
+						longitude: resolved.longitude
+							? Number(resolved.longitude)
+							: current.address.longitude,
+					},
+				},
+				{ keepDefaultValues: true },
+			);
+			const uf = states?.find(s => s.sigla === resolved.stateCode);
+			if (uf) {
+				setValue("address.state", uf.nome);
+				setValue("address.state_ibge_id", Number(uf.id));
+			}
+			setSelectedCity(resolved.city || null);
+		} catch {
+			toast.error("Erro ao buscar cep", "Confira o cep e tente novamente");
+		}
 	};
 
 	const onCancel = () => {
@@ -583,15 +578,17 @@ export default function ProfileScreen() {
 													keyboardType="number-pad"
 													maxLength={9}
 													placeholder="00000-000"
+													returnKeyType="search"
+													onSubmitEditing={() =>
+														onPressSearchCep({ cep: value })
+													}
 												/>
 												<InputSlot
 													className="pr-3"
 													testID="cep-search-btn"
 													onPress={() => onPressSearchCep({ cep: value })}
 												>
-													<InputIcon
-														as={getCepMutation.isPending ? Spinner : Search}
-													/>
+													<InputIcon as={isLookingUpCep ? Spinner : Search} />
 												</InputSlot>
 											</Input>
 										)}

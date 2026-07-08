@@ -1,13 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
-	getCepV2,
 	listIbgeMunicipios,
 	listIbgeUfs,
 	type Municipio,
 	type State,
 } from "@/libs/brasil-api-sdk";
-import { mask } from "@/libs/mask";
+import { useCepLookup } from "@/libs/use-cep-lookup";
 
 export type ResolvedCepValues = {
 	zip_code: string;
@@ -18,6 +17,8 @@ export type ResolvedCepValues = {
 	state_code: string;
 	state_ibge_id: number;
 	city_ibge_id: number;
+	latitude: number | null;
+	longitude: number | null;
 };
 
 export function useCompanyAddress(selectedStateCode: string) {
@@ -48,36 +49,37 @@ export function useCompanyAddress(selectedStateCode: string) {
 		if (selectedStateCode.length === 2) loadCities(selectedStateCode);
 	}, [selectedStateCode, loadCities]);
 
+	const { lookupCep } = useCepLookup();
+
 	const { mutateAsync: resolveCep, isPending: isResolvingCep } = useMutation({
 		mutationFn: async (cep: string) => {
-			const cepRes = await getCepV2({ path: { cep } });
-
-			if (!cepRes.data) throw new Error("CEP não encontrado");
+			const base = await lookupCep(cep);
 
 			const citiesRes = await listIbgeMunicipios({
-				path: { siglaUF: cepRes.data.state },
+				path: { siglaUF: base.stateCode },
 			});
 			const resolvedCities = (citiesRes.data ?? []).sort((a, b) =>
 				a.nome.localeCompare(b.nome),
 			);
 
-			const { state: sigla, city: cityName } = cepRes.data;
-			const uf = states?.find(s => s.sigla === sigla);
+			const uf = states?.find(s => s.sigla === base.stateCode);
 			const city = resolvedCities.find(
-				c => c.nome.toUpperCase() === cityName.toUpperCase(),
+				c => c.nome.toUpperCase() === base.city.toUpperCase(),
 			);
 
 			return {
 				cities: resolvedCities,
 				values: {
-					zip_code: mask.cep(cepRes.data.cep),
-					street: cepRes.data.street ?? "",
-					district: cepRes.data.neighborhood ?? "",
-					city: cityName,
+					zip_code: base.cep,
+					street: base.street,
+					district: base.district,
+					city: base.city,
 					state: uf?.nome ?? "",
-					state_code: sigla,
+					state_code: base.stateCode,
 					state_ibge_id: uf?.id ?? 0,
 					city_ibge_id: city ? Number(city.codigo_ibge) : 0,
+					latitude: base.latitude ? Number(base.latitude) : null,
+					longitude: base.longitude ? Number(base.longitude) : null,
 				} satisfies ResolvedCepValues,
 			};
 		},
