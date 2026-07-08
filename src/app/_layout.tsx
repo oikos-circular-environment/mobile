@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
+import { FloatingDevTools } from "@buoy-gg/core";
 import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
 import * as SplashScreen from "expo-splash-screen";
@@ -68,8 +69,7 @@ export default function RootLayout() {
 							</NotificationProvider>
 						</GeospatialProvider>
 					</AuthContextProvider>
-					{/* {isDevelopmentMode && <FloatingDevTools />} */}
-					{/* <FloatingDevTools userRole={isDevelopmentMode ? "admin" : "user"} /> */}
+					{isDevelopmentMode && <FloatingDevTools />}
 				</QueryClientProvider>
 			</GluestackUIProvider>
 		</GestureHandlerRootView>

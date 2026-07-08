@@ -8,7 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { Linking } from "react-native";
+import { Linking, LogBox } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import {
@@ -32,6 +32,18 @@ type GeospatialContextValue = {
 };
 
 const GeospatialContext = createContext<GeospatialContextValue | null>(null);
+
+if (__DEV__) {
+	// Fast Refresh can tear down the native AppContext while watchHeadingAsync/
+	// watchPositionAsync's remove() (fire-and-forget ExpoLocation.removeWatchAsync
+	// internally) is still in flight, rejecting with "AppContextLost" as an unhandled
+	// promise — there's no JS-side handle to the underlying promise to catch it
+	// ourselves. Known upstream race (https://github.com/expo/expo/issues/46975),
+	// worse on New Architecture. Fix merged upstream
+	// (https://github.com/expo/expo/pull/47080) but unreleased as of
+	// expo-modules-core 56.0.19 — remove this once it ships.
+	LogBox.ignoreLogs(["AppContextLost", "app context has been lost"]);
+}
 
 export function GeospatialProvider({ children }: PropsWithChildren) {
 	const [currentDate, setCurrentDate] = useState(new Date());
