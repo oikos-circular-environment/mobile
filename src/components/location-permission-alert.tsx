@@ -1,9 +1,11 @@
-import { LocateOffIcon } from "lucide-react-native";
+import { LocateOffIcon, SettingsIcon } from "lucide-react-native";
 import { Linking, View } from "react-native";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/libs/utils";
+import { VStack } from "./ui/vstack";
+import { HStack } from "./ui/hstack";
 
 type LocationPermissionAlertProps = {
 	title?: string;
@@ -19,22 +21,24 @@ export function LocationPermissionAlert({
 	return (
 		<Alert
 			className={cn(
-				"flex-col items-stretch gap-3 rounded-lg border border-red-200 bg-red-50 p-3",
+				"border-red-200 bg-red-50 items-center",
 				className,
 			)}
 		>
-			<View className="flex-row items-start gap-2">
+			<HStack className="flex-1 items-start gap-2">
 				<AlertIcon as={LocateOffIcon} className="text-red-500" />
 				<View className="flex-1 gap-1">
-					<AlertText className="text-red-500">{title}</AlertText>
-					<Text className="text-xs text-red-500/70">{message}</Text>
+					<AlertText className="font-semibold ">{title}</AlertText>
+					<Text className="text-xs ">{message}</Text>
 				</View>
-			</View>
+				</HStack>
 			<Button
-				className="bg-lime-800 rounded-md"
+				variant="destructive"
+				size="icon"
+				className="bg-red-500"
 				onPress={() => Linking.openSettings()}
-			>
-				<ButtonText>Abrir configurações</ButtonText>
+				>
+				<ButtonIcon as={SettingsIcon} />
 			</Button>
 		</Alert>
 	);

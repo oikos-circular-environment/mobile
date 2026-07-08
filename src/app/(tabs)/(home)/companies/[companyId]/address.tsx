@@ -235,7 +235,10 @@ export default function CompanyAddressScreen() {
 												value={value}
 												onBlur={onBlur}
 												onChangeText={text => onChange(mask.cep(text))}
-												keyboardType="number-pad"
+												keyboardType="default"
+												autoCorrect={false}
+												autoCapitalize="none"
+												spellCheck={false}
 												maxLength={9}
 												placeholder="00000-000"
 												returnKeyType="search"
@@ -549,11 +552,6 @@ export default function CompanyAddressScreen() {
 									longitude={longitude}
 									onChange={onLocationChange}
 								/>
-								<Text className="text-xs text-muted-foreground">
-									{latitude != null && longitude != null
-										? `Ponto selecionado: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
-										: "Use o mapa para definir a localização exata da empresa."}
-								</Text>
 							</View>
 						</View>
 

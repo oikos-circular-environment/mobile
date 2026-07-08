@@ -48,7 +48,7 @@ Key conventions (from RNTL v14 docs):
 
 ## Architecture
 
-**Framework**: Expo (~54) + React Native 0.81.5 + React 19. New Architecture and React Compiler are enabled.
+**Framework**: Expo (~56) + React Native 0.85.3 + React 19. New Architecture and React Compiler are enabled.
 
 **Routing**: Expo Router with file-based routing under `src/app/`. Three tabs are active: `market`, `(home)`, `complaints`. Two exist but are disabled in the UI: `donations`, `learn`. The `(home)` tab is a nested stack with auth-guarded routes (using `Stack.Protected`).
 

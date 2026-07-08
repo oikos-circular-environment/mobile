@@ -172,27 +172,6 @@ describe("CompanyAddressScreen — componente", () => {
 		expect(screen.getByTestId("input-number")).toHaveProp("value", "");
 	});
 
-	it("exibe a mensagem padrão do mapa quando lat/lon são nulos", async () => {
-		await renderScreen();
-
-		expect(
-			screen.getByText(
-				"Use o mapa para definir a localização exata da empresa.",
-			),
-		).toBeOnTheScreen();
-	});
-
-	it("toque no mapa exibe o ponto selecionado com as coordenadas corretas", async () => {
-		const user = userEvent.setup();
-		await renderScreen();
-
-		await user.press(screen.getByTestId("map-press"));
-
-		expect(
-			screen.getByText("Ponto selecionado: -23.550000, -46.630000"),
-		).toBeOnTheScreen();
-	});
-
 	it("toque no mapa torna o formulário dirty e habilita o botão Salvar", async () => {
 		const user = userEvent.setup();
 		await renderScreen();
@@ -202,28 +181,6 @@ describe("CompanyAddressScreen — componente", () => {
 		await user.press(screen.getByTestId("map-press"));
 
 		expect(screen.getByTestId("btn-save")).not.toBeDisabled();
-	});
-
-	it("toque no mapa substitui a mensagem padrão pelo texto de ponto selecionado", async () => {
-		const user = userEvent.setup();
-		await renderScreen();
-
-		expect(
-			screen.getByText(
-				"Use o mapa para definir a localização exata da empresa.",
-			),
-		).toBeOnTheScreen();
-
-		await user.press(screen.getByTestId("map-press"));
-
-		expect(
-			screen.queryByText(
-				"Use o mapa para definir a localização exata da empresa.",
-			),
-		).not.toBeOnTheScreen();
-		expect(
-			screen.getByText("Ponto selecionado: -23.550000, -46.630000"),
-		).toBeOnTheScreen();
 	});
 
 	it("botões Cancelar e Salvar estão desabilitados quando o formulário não foi alterado", async () => {
