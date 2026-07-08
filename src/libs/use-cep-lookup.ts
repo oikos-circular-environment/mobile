@@ -21,7 +21,15 @@ export function useCepLookup() {
 			if (!res.data) throw new Error("CEP não encontrado");
 
 			const data = res.data;
-			const addressLine = `${data.street ?? ""}, ${data.neighborhood ?? ""}, ${data.city}, ${data.state}, ${data.cep}`;
+			const addressLine = [
+				data.street,
+				data.neighborhood,
+				data.city,
+				data.state,
+				data.cep,
+			]
+				.filter(Boolean)
+				.join(", ");
 			const coords = await geocodeAddress(addressLine);
 
 			return {

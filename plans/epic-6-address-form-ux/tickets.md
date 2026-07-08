@@ -36,6 +36,11 @@ o trabalho, este arquivo é a fonte de verdade de onde paramos.
 
 **Validação:** `npx tsc --noEmit` e `npx biome check` limpos nos 2 arquivos novos.
 
+**Achado do `/impl-validate`:** `addressLine` inicialmente concatenava
+`street`/`neighborhood` mesmo quando vinham `null` da BrasilAPI, gerando
+segmentos vazios na query do Google (`", , Cidade, UF, ..."`). Corrigido para
+filtrar campos vazios antes de montar a string.
+
 **Referências de spec:** tech-plan.md → Abordagem Arquitetural (itens 2, 3, 5);
 Modelo de Dados (`ResolvedCepAddress`, `GeocodedCoordinates`); Arquitetura de
 Componentes (`geocodeAddress`, `useCepLookup`).
@@ -126,6 +131,11 @@ alterado).
   só a busca de dados cadastrais via CNPJ.
 
 **Validação:** `npx tsc --noEmit` limpo; `npx biome check` limpo.
+
+**Achado do `/impl-validate`:** `returnKeyType`/`onSubmitEditing` inicialmente
+ficaram no `InputField` sempre ativos (mesmo em modo CPF), mostrando o botão
+"buscar" no teclado sem ação correspondente. Corrigido para só aplicar essas
+props quando `identity_type === "CNPJ"`.
 
 **Referências de spec:** tech-plan.md → Abordagem Arquitetural (item 1).
 
