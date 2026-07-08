@@ -9,7 +9,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import ServiceFormScreen from "@/app/(tabs)/(home)/companies/[companyId]/services/form";
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
 import { makeStoreCompany } from "@/tests/factories";
 

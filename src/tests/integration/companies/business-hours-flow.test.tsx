@@ -9,7 +9,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CompanyBusinessHoursScreen from "@/app/(tabs)/(home)/companies/[companyId]/business-hours";
 import { useSaveBusinessHours } from "@/components/companies/hooks/use-save-business-hours";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
 import { makeStoreCompany } from "@/tests/factories";
 

@@ -580,7 +580,11 @@ export default function ComplaintCreateScreen() {
 									returnKeyType="done"
 								/>
 
-								<InputSlot className="pr-3" testID="cep-search-btn">
+								<InputSlot
+									className="pr-3"
+									testID="cep-search-btn"
+									onPress={() => void handleCepLookup(value)}
+								>
 									<InputIcon as={isLookingUpCep ? Spinner : SearchIcon} />
 								</InputSlot>
 							</Input>

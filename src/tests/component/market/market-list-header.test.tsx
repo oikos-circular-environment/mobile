@@ -19,7 +19,7 @@ const setAppliedFilters = jest.fn();
 const radiusSheetRef = createRef<BottomSheet>();
 const locationSheetRef = createRef<BottomSheet>();
 
-const defaultAuth = {
+const defaultAuth: ReturnType<typeof useAuthContext> = {
 	user: null,
 	isAuthenticated: false,
 	isLoading: false,
@@ -45,7 +45,7 @@ const defaultGeospatial = {
 	reverseGeocodeError: false,
 };
 
-const defaultMarket = {
+const defaultMarket: ReturnType<typeof useMarket> = {
 	appliedFilters: { query: "", radius: "2000", category: undefined },
 	setAppliedFilters,
 	locationSource: "current" as const,

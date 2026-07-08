@@ -75,7 +75,6 @@ export default function WasteIndexScreen() {
 				unit: w.unit,
 				quantity: w.quantity,
 				waste_category_id: w.waste_category_id,
-				observations: w.observations ?? null,
 			}));
 		await saveWastes({ wastes: remaining });
 	};

@@ -9,7 +9,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import WasteIndexScreen from "@/app/(tabs)/(home)/companies/[companyId]/waste/index";
 import { useSaveWastes } from "@/components/companies/hooks/use-save-wastes";
-import type { Company } from "@/stores/companies-store";
+import type { Company } from "@/libs/types/companies";
 import { useCompaniesStore } from "@/stores/companies-store";
 import { makeStoreCompany } from "@/tests/factories";
 

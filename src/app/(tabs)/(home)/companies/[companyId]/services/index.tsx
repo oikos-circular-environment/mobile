@@ -75,7 +75,6 @@ export default function ServicesIndexScreen() {
 				quantity: s.quantity,
 				unit: s.unit,
 				waste_category_id: s.waste_category_id,
-				observations: s.observations ?? null,
 			}));
 		await saveServices({ services: remaining });
 	};
