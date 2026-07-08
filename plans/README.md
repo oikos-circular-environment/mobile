@@ -11,7 +11,7 @@ não crash/analytics/replay.
 | [epic-2-eas-observe](./epic-2-eas-observe/) | EAS Observe — performance monitoring (cold/warm start, TTFR, TTI, bundle load por rota) + Error Boundary | **Todos os 5 tickets concluídos** — build/submit de produção OK nas duas plataformas, métricas iOS confirmadas via CLI (Android ainda sem eventos, aguardando uso real) |
 | [epic-3-observability](./epic-3-observability/) | Crash reporting + product analytics (Sentry/BugSnag, PostHog/Amplitude/Firebase Analytics) | Aguarda decisão de ferramenta |
 | [epic-4-bundle-analysis](./epic-4-bundle-analysis/) | Bundle analysis (Expo Atlas) | Backlog — não será executado agora |
-| [epic-6-address-form-ux](./epic-6-address-form-ux/) | UX de formulários de endereço — Enter confirma CEP/CNPJ, lat/long via Google Geocoding, hook `useCepLookup` compartilhado (profile, company, complaints) | **Código concluído** (5/5 tickets, `feat/epic-6-address-form-ux`) — typecheck/lint/suíte de testes (201/201) OK. Falta só validação manual do mapa em complaints (sem device/simulador neste ambiente) |
+| [epic-6-address-form-ux](./epic-6-address-form-ux/) | UX de formulários de endereço — Enter confirma CEP/CNPJ, lat/long via Google Geocoding, hook `useCepLookup` compartilhado (profile, company, complaints) | **PR aberta (#63)**, empilhada sobre a #62 (diff encolhe quando a #62 mergear) — typecheck/lint/suíte de testes (201/201) OK. Falta só validação manual do mapa em complaints (sem device/simulador neste ambiente) |
 
 ## Ordem de dependência
 
