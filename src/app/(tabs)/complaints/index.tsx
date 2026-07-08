@@ -65,6 +65,7 @@ export default function ComplaintsMapScreen() {
 	const filterSheetRef = useRef<BottomSheetRef>(null);
 	const hasAnimatedRef = useRef(false);
 	const suppressMapPressRef = useRef(false);
+	const [isMapReady, setIsMapReady] = useState(false);
 
 	const userLocation = location
 		? { lat: location.coords.latitude, lon: location.coords.longitude }
@@ -75,7 +76,7 @@ export default function ComplaintsMapScreen() {
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [mapHeading, setMapHeading] = useState(0);
-	const [showUserLocation, setShowUserLocation] = useState(false);
+	const [showUserLocation, setShowUserLocation] = useState(true);
 
 	const [appliedFilters, setAppliedFilters] =
 		useState<FilterState>(DEFAULT_FILTERS);
@@ -103,7 +104,7 @@ export default function ComplaintsMapScreen() {
 	});
 
 	useEffect(() => {
-		if (!location || hasAnimatedRef.current) return;
+		if (!isMapReady || !location || hasAnimatedRef.current) return;
 		hasAnimatedRef.current = true;
 		mapRef.current?.animateToRegion(
 			{
@@ -114,7 +115,7 @@ export default function ComplaintsMapScreen() {
 			},
 			600,
 		);
-	}, [location]);
+	}, [isMapReady, location]);
 
 	const handleOpenFilterSheet = () => {
 		setDraftFilters(appliedFilters);
@@ -162,6 +163,7 @@ export default function ComplaintsMapScreen() {
 	};
 
 	const handleZoomIn = async () => {
+		if (!isMapReady) return;
 		const camera = await mapRef.current?.getCamera();
 		if (!camera) return;
 		mapRef.current?.animateCamera({
@@ -171,6 +173,7 @@ export default function ComplaintsMapScreen() {
 	};
 
 	const handleZoomOut = async () => {
+		if (!isMapReady) return;
 		const camera = await mapRef.current?.getCamera();
 		if (!camera) return;
 		mapRef.current?.animateCamera({
@@ -198,6 +201,7 @@ export default function ComplaintsMapScreen() {
 	};
 
 	const handleRegionChangeComplete = async () => {
+		if (!isMapReady) return;
 		const camera = await mapRef.current?.getCamera();
 		if (camera?.heading !== undefined) {
 			setMapHeading(camera.heading);
@@ -210,6 +214,17 @@ export default function ComplaintsMapScreen() {
 				ref={mapRef}
 				style={{ flex: 1 }}
 				provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+				initialRegion={
+					location
+						? {
+								latitude: location.coords.latitude,
+								longitude: location.coords.longitude,
+								latitudeDelta: 0.04,
+								longitudeDelta: 0.04,
+							}
+						: undefined
+				}
+				onMapReady={() => setIsMapReady(true)}
 				showsUserLocation={showUserLocation}
 				showsMyLocationButton={false}
 				showsCompass={false}
