@@ -105,9 +105,9 @@ function CompanyCardItem({
 									{company.business_name}
 								</Text>
 								<Text className="text-xs text-muted-foreground">
-									{company.identity_type === "CNPJ"
-										? maskCnpj(company.identity!)
-										: "Coletor independete"}
+									{company.identity_type === "CNPJ" && company.identity
+										? maskCnpj(company.identity)
+										: "Coletor independente"}
 								</Text>
 								<HStack className="gap-1.5 pt-1 flex-wrap">
 									<Badge variant="secondary">
