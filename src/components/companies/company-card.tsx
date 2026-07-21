@@ -1,5 +1,6 @@
 import { AlertTriangleIcon, FactoryIcon } from "lucide-react-native";
 import { Image, Pressable, View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -25,7 +26,7 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 						</View>
 					) : (
 						<View className="size-18 rounded-md bg-secondary items-center justify-center">
-							<FactoryIcon size={22} className="text-muted-foreground" />
+							<FactoryIcon size={22} color={colors.gray[400]} />
 						</View>
 					)}
 
