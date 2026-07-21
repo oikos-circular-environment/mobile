@@ -1,60 +1,44 @@
-import { ActionSheetIOS, Linking, Platform } from "react-native";
-
-const GOOGLE_MAPS_IOS_SCHEME = "comgooglemaps://";
+import { Linking, Platform } from "react-native";
 
 const appleMapsUrl = (latitude: number, longitude: number) =>
-	`https://maps.apple.com/?ll=${latitude},${longitude}`;
+	`https://maps.apple.com/?daddr=${latitude},${longitude}`;
 
 const googleMapsIosUrl = (latitude: number, longitude: number) =>
-	`comgooglemaps://?q=${latitude},${longitude}`;
+	`comgooglemaps://?daddr=${latitude},${longitude}&directionsmode=driving`;
 
 const googleMapsWebUrl = (latitude: number, longitude: number) =>
-	`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+	`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 
-async function canOpenURL(url: string): Promise<boolean> {
-	try {
-		return await Linking.canOpenURL(url);
-	} catch {
-		return false;
-	}
+export async function openAppleMaps(latitude: number, longitude: number) {
+	await Linking.openURL(appleMapsUrl(latitude, longitude));
 }
 
-async function openInMapsIOS(latitude: number, longitude: number) {
-	const hasGoogleMaps = await canOpenURL(GOOGLE_MAPS_IOS_SCHEME);
-
-	if (!hasGoogleMaps) {
-		await Linking.openURL(appleMapsUrl(latitude, longitude));
+export async function openGoogleMaps(latitude: number, longitude: number) {
+	if (Platform.OS !== "ios") {
+		await Linking.openURL(googleMapsWebUrl(latitude, longitude));
 		return;
 	}
 
-	const selectedIndex = await new Promise<number>(resolve => {
-		ActionSheetIOS.showActionSheetWithOptions(
-			{
-				title: "Selecione uma ação",
-				options: ["Abrir com Mapas", "Abrir com Google Maps", "Cancelar"],
-				cancelButtonIndex: 2,
-			},
-			resolve,
-		);
-	});
-
-	if (selectedIndex === 0) {
-		await Linking.openURL(appleMapsUrl(latitude, longitude));
-	} else if (selectedIndex === 1) {
+	try {
 		await Linking.openURL(googleMapsIosUrl(latitude, longitude));
+	} catch {
+		await Linking.openURL(googleMapsWebUrl(latitude, longitude));
 	}
-}
-
-async function openInMapsAndroid(latitude: number, longitude: number) {
-	const url = `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
-	const canOpen = await canOpenURL(url);
-	await Linking.openURL(canOpen ? url : googleMapsWebUrl(latitude, longitude));
 }
 
 export async function openInMaps(latitude: number, longitude: number) {
 	if (Platform.OS === "ios") {
-		await openInMapsIOS(latitude, longitude);
+		await openAppleMaps(latitude, longitude);
 		return;
 	}
-	await openInMapsAndroid(latitude, longitude);
+
+	const url = `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
+	try {
+		const canOpen = await Linking.canOpenURL(url);
+		await Linking.openURL(
+			canOpen ? url : googleMapsWebUrl(latitude, longitude),
+		);
+	} catch {
+		await Linking.openURL(googleMapsWebUrl(latitude, longitude));
+	}
 }

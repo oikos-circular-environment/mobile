@@ -9,7 +9,7 @@ import {
 	ShieldXIcon,
 } from "lucide-react-native";
 import { useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { useComplaintCard } from "@/components/complaints/hooks/use-complaint-card";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
@@ -44,7 +44,8 @@ interface ComplaintCardProps {
 export function ComplaintCard({ complaint }: ComplaintCardProps) {
 	const {
 		cancelComplaint,
-		openInMaps,
+		openInGoogleMaps,
+		openInAppleMaps,
 		isCancelingComplaint,
 		openBottomSheet,
 		editComplaint,
@@ -223,15 +224,28 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 								<MenuSeparator />
 
 								<MenuItem
-									key="open-maps"
-									textValue="Abrir no mapa externo"
-									onPress={openInMaps}
+									key="open-google-maps"
+									textValue="Abrir no Google Maps"
+									onPress={openInGoogleMaps}
 								>
 									<View className="flex-row items-center gap-2">
 										<MapPinned size={14} strokeWidth={2.2} />
-										<MenuItemLabel>Abrir no mapa externo</MenuItemLabel>
+										<MenuItemLabel>Abrir no Google Maps</MenuItemLabel>
 									</View>
 								</MenuItem>
+
+								{Platform.OS === "ios" && (
+									<MenuItem
+										key="open-apple-maps"
+										textValue="Abrir no Apple Maps"
+										onPress={openInAppleMaps}
+									>
+										<View className="flex-row items-center gap-2">
+											<MapPinned size={14} strokeWidth={2.2} />
+											<MenuItemLabel>Abrir no Apple Maps</MenuItemLabel>
+										</View>
+									</MenuItem>
+								)}
 							</Menu>
 						</View>
 					</View>

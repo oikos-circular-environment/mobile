@@ -5,7 +5,7 @@ import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { logComplaintEvent } from "@/libs/observe-events";
 import { patchV1ComplaintsByIdCanceled } from "@/libs/oikos-sdk";
-import { openInMaps as openInMapsUrl } from "@/libs/open-in-maps";
+import { openAppleMaps, openGoogleMaps } from "@/libs/open-in-maps";
 import type { Complaint, MapComplaint } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
@@ -32,11 +32,19 @@ export function useComplaintCard(complaint: Complaint) {
 
 	const coords = complaint.geospatial.location.coords;
 
-	const openInMaps = async () => {
+	const openInGoogleMaps = async () => {
 		try {
-			await openInMapsUrl(coords.latitude, coords.longitude);
+			await openGoogleMaps(coords.latitude, coords.longitude);
 		} catch {
-			Alert.alert("Maps", "Não foi possível abrir o aplicativo de mapas.");
+			Alert.alert("Maps", "Não foi possível abrir o Google Maps.");
+		}
+	};
+
+	const openInAppleMaps = async () => {
+		try {
+			await openAppleMaps(coords.latitude, coords.longitude);
+		} catch {
+			Alert.alert("Maps", "Não foi possível abrir o Apple Maps.");
 		}
 	};
 
@@ -55,7 +63,8 @@ export function useComplaintCard(complaint: Complaint) {
 	return {
 		cancelComplaint: () => cancelMutation.mutate(),
 		isCancelingComplaint: cancelMutation.isPending,
-		openInMaps,
+		openInGoogleMaps,
+		openInAppleMaps,
 		openBottomSheet,
 		editComplaint,
 	};

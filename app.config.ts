@@ -18,7 +18,6 @@ const config: ExpoConfig = {
 		},
 		infoPlist: {
 			ITSAppUsesNonExemptEncryption: false,
-			LSApplicationQueriesSchemes: ["comgooglemaps"],
 		},
 	},
 	android: {

@@ -8,7 +8,7 @@ import {
 	HashIcon,
 	MapPinIcon,
 } from "lucide-react-native";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, Platform, ScrollView, View } from "react-native";
 import {
 	type HazardLevelVariant,
 	WasteCategoryHazardLevel,
@@ -19,9 +19,10 @@ import { colors } from "@/components/style/colors";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
 import { Text } from "@/components/ui/text";
 import { formatDistance } from "@/libs/format-distance";
-import { openInMaps } from "@/libs/open-in-maps";
+import { openAppleMaps, openGoogleMaps, openInMaps } from "@/libs/open-in-maps";
 import { HStack } from "../ui/hstack";
 import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
 
@@ -103,10 +104,13 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 				)
 			: null;
 
-	const handleOpenInMaps = async () => {
+	const handleOpenInMaps = async (provider?: "apple" | "google") => {
 		if (!complaint.location) return;
+		const { lat, lon } = complaint.location;
 		try {
-			await openInMaps(complaint.location.lat, complaint.location.lon);
+			if (provider === "apple") await openAppleMaps(lat, lon);
+			else if (provider === "google") await openGoogleMaps(lat, lon);
+			else await openInMaps(lat, lon);
 		} catch {
 			Alert.alert("Mapa", "Não foi possível abrir o aplicativo de mapas.");
 		}
@@ -128,12 +132,43 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 					DESCARTE IRREGULAR
 				</Text>
 
-				{!!complaint.location && (
-					<Button variant="outline" size="sm" onPress={handleOpenInMaps}>
-						<ButtonIcon as={ForwardIcon} />
-						<ButtonText>Abrir no mapa</ButtonText>
-					</Button>
-				)}
+				{!!complaint.location &&
+					(Platform.OS === "ios" ? (
+						<Menu
+							placement="bottom right"
+							offset={8}
+							trigger={triggerProps => (
+								<Button variant="outline" size="sm" {...triggerProps}>
+									<ButtonIcon as={ForwardIcon} />
+									<ButtonText>Abrir no mapa</ButtonText>
+								</Button>
+							)}
+						>
+							<MenuItem
+								key="apple-maps"
+								textValue="Abrir na Apple Maps"
+								onPress={() => handleOpenInMaps("apple")}
+							>
+								<MenuItemLabel>Abrir na Apple Maps</MenuItemLabel>
+							</MenuItem>
+							<MenuItem
+								key="google-maps"
+								textValue="Abrir no Google Maps"
+								onPress={() => handleOpenInMaps("google")}
+							>
+								<MenuItemLabel>Abrir no Google Maps</MenuItemLabel>
+							</MenuItem>
+						</Menu>
+					) : (
+						<Button
+							variant="outline"
+							size="sm"
+							onPress={() => handleOpenInMaps()}
+						>
+							<ButtonIcon as={ForwardIcon} />
+							<ButtonText>Abrir no mapa</ButtonText>
+						</Button>
+					))}
 			</View>
 
 			<View className="flex-row items-center justify-between">
