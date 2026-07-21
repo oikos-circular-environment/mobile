@@ -19,20 +19,24 @@ já com o PR #80 do epic-7 mergeado). Um commit por ticket.
 
 ## Ticket 1 — Limpar o patch do react-native-maps
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído.
 
 **Escopo:**
-- [ ] Remover artefatos de build capturados por engano:
+- [x] Remover artefatos de build capturados por engano:
   `rm -rf node_modules/react-native-maps/android/build`.
-- [ ] Confirmar que os 2 arquivos com mudança real
+- [x] Confirmar que os 2 arquivos com mudança real
   (`plugin/build/android.js`, `plugin/build/ios.js`) continuam com o fix
   aplicado em `node_modules` (import de `expo/config-plugins`).
-- [ ] Regenerar: `npx patch-package react-native-maps`.
-- [ ] Conferir que `patches/react-native-maps+1.27.2.patch` só contém os 2
+- [x] Regenerar: `npx patch-package react-native-maps`.
+- [x] Conferir que `patches/react-native-maps+1.27.2.patch` só contém os 2
   arquivos de mudança real (sem `android/build/**`).
 
-**Validação:** `git diff patches/react-native-maps+1.27.2.patch` mostrando só 2
-arquivos no diff.
+**Validação:** patch caiu de 807 para 30 linhas, só os 2 arquivos reais no
+diff. `npx patch-package` reaplicou limpo num `npm install` seguinte (Ticket 3).
+`tsc`/`lint`/`test` sem regressão.
+
+**Commit:** `e2b83f0` — "chore: limpa patch do react-native-maps de artefatos
+de build".
 
 **Referências de spec:** tech-plan.md → "Por que separar limpeza de patch
 antes do bump"; epic-brief.md → "Patch... estava sujo".
@@ -43,20 +47,23 @@ antes do bump"; epic-brief.md → "Patch... estava sujo".
 
 ## Ticket 2 — Remover componentes vendorizados sem nenhum uso
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído.
 
 **Escopo:**
-- [ ] Deletar `src/components/ui/avatar/`.
-- [ ] Deletar `src/components/ui/date-time-picker/` (`index.tsx`,
+- [x] Deletar `src/components/ui/avatar/`.
+- [x] Deletar `src/components/ui/date-time-picker/` (`index.tsx`,
   `index.web.tsx`, `styles.tsx`).
-- [ ] Deletar `src/components/ui/tabs/` (`index.tsx`,
+- [x] Deletar `src/components/ui/tabs/` (`index.tsx`,
   `TabsAnimatedIndicator.tsx`, `animation-config.ts`).
-- [ ] Confirmar via grep que nenhum arquivo em `src/` referencia esses 3
+- [x] Confirmar via grep que nenhum arquivo em `src/` referencia esses 3
   diretórios ou os nomes `Avatar`/`DateTimePicker`/`Tabs` (exceto o `Tabs` do
   `expo-router`, sem relação).
 
-**Validação:** `npx tsc --noEmit` (esperado: baseline cai de 27 para ~21
-erros), `npm run lint`, `npm test` (sem regressão nos 198 testes).
+**Validação:** `npx tsc --noEmit` confirmou queda de 27 → 21 erros, exatamente
+como previsto. `npm run lint` limpo, `npm test` 198/198 sem regressão.
+
+**Commit:** `2621ab1` — "chore: remove componentes ui vendorizados sem uso
+(avatar, date-time-picker, tabs)".
 
 **Referências de spec:** tech-plan.md → "Por que remover componentes
 vendorizados sem uso antes do bump"; epic-brief.md → "3 componentes
@@ -68,18 +75,26 @@ vendorizados confirmados sem nenhum uso".
 
 ## Ticket 3 — Bump de `@gluestack-ui/core` e `@gluestack-ui/utils` para estável
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído (código) — ⬜ **aguardando validação manual do
+usuário** (app local + `expo prebuild`) antes de iniciar o Ticket 4.
 
 **Escopo:**
-- [ ] `package.json`: `@gluestack-ui/core: ^5.0.0-alpha.0 → ^5.0.15`,
+- [x] `package.json`: `@gluestack-ui/core: ^5.0.0-alpha.0 → ^5.0.15`,
   `@gluestack-ui/utils: ^5.0.1-alpha.0 → ^5.0.6`.
-- [ ] `npm install` (atualiza lockfile; roda `postinstall: patch-package` já
-  com o patch limpo do Ticket 1).
-- [ ] Não tocar em nenhum arquivo de `src/components/ui/` neste ticket.
+- [x] `npm install` (atualiza lockfile; roda `postinstall: patch-package` já
+  com o patch limpo do Ticket 1 — aplicou sem erro).
+- [x] Não tocar em nenhum arquivo de `src/components/ui/` neste ticket.
 
-**Validação:** `npx tsc --noEmit` (comparar contra a baseline pós-Ticket-2 —
-anotar quais dos ~8 erros de categoria "tooling alpha" desapareceram),
-`npm run lint`, `npm test` (suíte completa).
+**Validação:** `npx tsc --noEmit` — **achado**: a contagem de erros ficou
+**igual** à baseline pós-Ticket-2 (21, mesma distribuição por arquivo). O bump
+sozinho **não eliminou** nenhum dos erros de categoria "tooling alpha"
+(`badge`, `modal`, `select-actionsheet`, `spinner`, `toast` — 1 erro cada)
+como a hipótese inicial previa; esses erros persistem mesmo na versão estável
+e precisam ser investigados na Fase 2, junto da atualização dos componentes.
+`npm run lint` limpo, `npm test` 198/198 sem regressão.
+
+**Commit:** `ea67eb6` — "chore: atualiza @gluestack-ui/core e
+@gluestack-ui/utils para versão estável".
 
 **Handoff para o usuário** (fora do que executo): rodar o app localmente
 (`npm run ios`/`npm run android`) e `expo prebuild`, para confirmar que a
