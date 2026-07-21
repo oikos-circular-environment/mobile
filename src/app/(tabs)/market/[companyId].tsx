@@ -20,8 +20,8 @@ import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useNow } from "@/contexts/clock-context";
 import { CompanyDetailProvider } from "@/contexts/company-detail-context";
-import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
 import { formatDistance } from "@/libs/format-distance";
 import {
@@ -57,7 +57,7 @@ export default function MarketCompanyDetailScreen() {
 	useRouteInteractive();
 	const { companyId } = useLocalSearchParams<{ companyId: string }>();
 	const { getCompanyById, isPending, isLocationReady } = useMarket();
-	const { currentDate } = useGeospatial();
+	const currentDate = useNow();
 	const [activeTab, setActiveTab] = useState<MarketDetailTab>("general");
 	const [selectedSimulationItem, setSelectedSimulationItem] =
 		useState<SelectedSimulationItem | null>(null);

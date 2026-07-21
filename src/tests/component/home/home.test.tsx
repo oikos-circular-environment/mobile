@@ -109,7 +109,6 @@ function setupAuth(overrides: Partial<typeof defaultAuth> = {}) {
 }
 
 const defaultGeospatial = {
-	currentDate: new Date("2026-06-11T10:00:00"),
 	heading: null,
 	location: null,
 	addresses: [],

@@ -11,7 +11,6 @@ import {
 import { LogBox } from "react-native";
 
 type GeospatialContextValue = {
-	currentDate: Date;
 	heading: Location.LocationHeadingObject | null;
 	location: Location.LocationObject | null;
 	addresses: Location.LocationGeocodedAddress[];
@@ -35,7 +34,6 @@ if (__DEV__) {
 }
 
 export function GeospatialProvider({ children }: PropsWithChildren) {
-	const [currentDate, setCurrentDate] = useState(new Date());
 	const [heading, setHeading] = useState<Location.LocationHeadingObject | null>(
 		null,
 	);
@@ -50,16 +48,6 @@ export function GeospatialProvider({ children }: PropsWithChildren) {
 	const [reverseGeocodeError, setReverseGeocodeError] = useState(false);
 
 	const lastReverseGeocodeAtRef = useRef<number>(0);
-
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setCurrentDate(new Date());
-		}, 1000);
-
-		return () => {
-			clearInterval(timer);
-		};
-	}, []);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -173,7 +161,6 @@ export function GeospatialProvider({ children }: PropsWithChildren) {
 
 	const value = useMemo(
 		() => ({
-			currentDate,
 			heading,
 			location,
 			addresses,
@@ -182,7 +169,6 @@ export function GeospatialProvider({ children }: PropsWithChildren) {
 			reverseGeocodeError,
 		}),
 		[
-			currentDate,
 			heading,
 			location,
 			addresses,
