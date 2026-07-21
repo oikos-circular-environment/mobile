@@ -128,7 +128,7 @@ export default function CompanyHubScreen() {
 				options={{
 					headerLeft: () => (
 						<Pressable onPress={() => router.back()} className="pl-1">
-							<ChevronLeftIcon size={24} className="text-foreground" />
+							<ChevronLeftIcon size={24} color={colors.gray[950]} />
 						</Pressable>
 					),
 				}}
@@ -206,10 +206,10 @@ export default function CompanyHubScreen() {
 											{isLocked ? (
 												<LockKeyholeIcon
 													size={18}
-													className="text-muted-foreground"
+													color={colors.gray[400]}
 												/>
 											) : (
-												<ArrowRightIcon size={18} />
+												<ArrowRightIcon size={18} color={colors.gray[950]} />
 											)}
 										</View>
 										{!option.validation.is_validation && (

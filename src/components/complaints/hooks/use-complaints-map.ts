@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { roundCoord } from "@/libs/geospatial";
 import { getV1ComplaintsMap } from "@/libs/oikos-sdk";
 import type { ComplaintStatus } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
@@ -27,12 +28,15 @@ export function useComplaintsMap({
 		s => s.setSelectedMapComplaint,
 	);
 
+	const lat = userLocation ? roundCoord(userLocation.lat) : 0;
+	const lon = userLocation ? roundCoord(userLocation.lon) : 0;
+
 	const { data: mapData, isLoading: isLoadingMap } = useQuery({
 		queryKey: [
 			"complaints",
 			"map",
-			userLocation?.lat ?? 0,
-			userLocation?.lon ?? 0,
+			lat,
+			lon,
 			status,
 			wasteCategoryId,
 			hazardLevel,
@@ -41,8 +45,8 @@ export function useComplaintsMap({
 		queryFn: async () => {
 			const res = await getV1ComplaintsMap({
 				query: {
-					lat: userLocation?.lat ?? 0,
-					lon: userLocation?.lon ?? 0,
+					lat,
+					lon,
 					radius,
 					status,
 					waste_category_id: wasteCategoryId,
@@ -52,6 +56,7 @@ export function useComplaintsMap({
 			return res.data;
 		},
 		enabled: !!userLocation,
+		placeholderData: keepPreviousData,
 	});
 
 	const complaints = mapData?.complaints ?? [];

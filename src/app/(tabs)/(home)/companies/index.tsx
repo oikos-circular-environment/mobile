@@ -66,7 +66,7 @@ export default function CompaniesListScreen() {
 				options={{
 					headerLeft: () => (
 						<Pressable onPress={() => router.back()} className="pl-1">
-							<ChevronLeftIcon size={24} />
+							<ChevronLeftIcon size={24} color={colors.gray[950]} />
 						</Pressable>
 					),
 				}}

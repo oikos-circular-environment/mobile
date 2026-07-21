@@ -1,6 +1,7 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
 import type React from "react";
 import MarketScreen from "@/app/(tabs)/market";
+import { useNow } from "@/contexts/clock-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
@@ -27,6 +28,7 @@ jest.mock("expo-router", () => ({
 
 jest.mock("@/contexts/market-context");
 jest.mock("@/contexts/geospatial-context");
+jest.mock("@/contexts/clock-context");
 jest.mock("@/libs/market/is-company-open");
 
 jest.mock("@/components/market/market-list-header", () => ({
@@ -45,7 +47,6 @@ jest.mock("@/components/market/radius-bottom-sheet", () => ({
 }));
 
 const defaultGeospatial = {
-	currentDate: new Date("2026-06-11T10:00:00"),
 	heading: null,
 	location: null,
 	addresses: [],
@@ -93,6 +94,7 @@ describe("MarketScreen", () => {
 		jest.useFakeTimers();
 		setupGeospatial();
 		setupMarket();
+		jest.mocked(useNow).mockReturnValue(new Date("2026-06-11T10:00:00"));
 		jest.mocked(isCompanyOpenNow).mockReturnValue(true);
 	});
 
