@@ -4,10 +4,11 @@ import { getDistance } from "geolib";
 import {
 	CalendarIcon,
 	CrosshairIcon,
+	ForwardIcon,
 	HashIcon,
 	MapPinIcon,
 } from "lucide-react-native";
-import { ScrollView, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 import {
 	type HazardLevelVariant,
 	WasteCategoryHazardLevel,
@@ -16,9 +17,11 @@ import {
 } from "@/components/custom/waste-category/waste-category-hazard-level";
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { formatDistance } from "@/libs/format-distance";
+import { openInMaps } from "@/libs/open-in-maps";
 import { HStack } from "../ui/hstack";
 import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
 
@@ -100,6 +103,15 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 				)
 			: null;
 
+	const handleOpenInMaps = async () => {
+		if (!complaint.location) return;
+		try {
+			await openInMaps(complaint.location.lat, complaint.location.lon);
+		} catch {
+			Alert.alert("Mapa", "Não foi possível abrir o aplicativo de mapas.");
+		}
+	};
+
 	return (
 		<View className="gap-2">
 			<Badge variant="outline" className="self-start">
@@ -107,13 +119,22 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 				<BadgeText>{complaint.id}</BadgeText>
 			</Badge>
 
-			<Text
-				className="text-2xl font-bold text-gray-950"
-				style={{ fontFamily: "Oswald_700Bold" }}
-				numberOfLines={2}
-			>
-				DESCARTE IRREGULAR
-			</Text>
+			<View className="flex-row items-center justify-between gap-2">
+				<Text
+					className="flex-1 shrink text-2xl font-bold text-gray-950"
+					style={{ fontFamily: "Oswald_700Bold" }}
+					numberOfLines={2}
+				>
+					DESCARTE IRREGULAR
+				</Text>
+
+				{!!complaint.location && (
+					<Button variant="outline" size="sm" onPress={handleOpenInMaps}>
+						<ButtonIcon as={ForwardIcon} />
+						<ButtonText>Abrir no mapa</ButtonText>
+					</Button>
+				)}
+			</View>
 
 			<View className="flex-row items-center justify-between">
 				<ScrollView
