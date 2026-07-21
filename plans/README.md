@@ -12,6 +12,7 @@ não crash/analytics/replay.
 | [epic-3-observability](./epic-3-observability/) | Crash reporting + product analytics (Sentry/BugSnag, PostHog/Amplitude/Firebase Analytics) | Aguarda decisão de ferramenta |
 | [epic-4-bundle-analysis](./epic-4-bundle-analysis/) | Bundle analysis (Expo Atlas) | Backlog — não será executado agora |
 | [epic-6-address-form-ux](./epic-6-address-form-ux/) | UX de formulários de endereço — Enter confirma CEP/CNPJ, lat/long via Google Geocoding, hook `useCepLookup` compartilhado (profile, company, complaints) | **PR aberta (#63)**, empilhada sobre a #62 (diff encolhe quando a #62 mergear) — typecheck/lint/suíte de testes (201/201) OK. Falta só validação manual do mapa em complaints (sem device/simulador neste ambiente) |
+| [epic-7-map-geo-stability](./epic-7-map-geo-stability/) | Estabilidade de mapa/geolocalização — ícone do norte não escapa do botão (Complaints), fim do refetch por drift de GPS em Complaints e Market (`roundCoord` + `keepPreviousData`), remoção do overlay morto da câmera e do ticker de 1s do `GeospatialContext` | **Tickets escritos** na branch `fix/map-geo-stability` (de `development`) — execução pendente por outro modelo. Independente da cadeia de observabilidade |
 
 ## Ordem de dependência
 
@@ -20,6 +21,7 @@ Epic 1 (SDK upgrade) → Epic 5 (correção rejeição Apple) → Epic 2 (EAS Ob
                                                         → Epic 3 (Observability)
 Epic 4 é independente, mas não está sendo trabalhado agora.
 Epic 6 é independente (não faz parte da cadeia de observabilidade).
+Epic 7 é independente (bugfix de mapa/geolocalização, fora da cadeia de observabilidade).
 ```
 
 Epic 5 furou a fila: o app está rejeitado na App Store e não pode ser lançado
