@@ -1,10 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Alert, Linking, Platform } from "react-native";
+import { Alert } from "react-native";
 import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { logComplaintEvent } from "@/libs/observe-events";
 import { patchV1ComplaintsByIdCanceled } from "@/libs/oikos-sdk";
+import { openAppleMaps, openGoogleMaps } from "@/libs/open-in-maps";
 import type { Complaint, MapComplaint } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
@@ -30,22 +31,20 @@ export function useComplaintCard(complaint: Complaint) {
 	});
 
 	const coords = complaint.geospatial.location.coords;
-	const latitude = coords.latitude;
-	const longitude = coords.longitude;
 
-	const mapsUrl =
-		Platform.OS === "ios"
-			? `maps://?ll=${latitude},${longitude}`
-			: `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
-
-	const fallbackUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-
-	const openInMaps = async () => {
+	const openInGoogleMaps = async () => {
 		try {
-			const canOpen = await Linking.canOpenURL(mapsUrl);
-			await Linking.openURL(canOpen ? mapsUrl : fallbackUrl);
+			await openGoogleMaps(coords.latitude, coords.longitude);
 		} catch {
-			Alert.alert("Maps", "Não foi possível abrir o aplicativo de mapas.");
+			Alert.alert("Maps", "Não foi possível abrir o Google Maps.");
+		}
+	};
+
+	const openInAppleMaps = async () => {
+		try {
+			await openAppleMaps(coords.latitude, coords.longitude);
+		} catch {
+			Alert.alert("Maps", "Não foi possível abrir o Apple Maps.");
 		}
 	};
 
@@ -64,7 +63,8 @@ export function useComplaintCard(complaint: Complaint) {
 	return {
 		cancelComplaint: () => cancelMutation.mutate(),
 		isCancelingComplaint: cancelMutation.isPending,
-		openInMaps,
+		openInGoogleMaps,
+		openInAppleMaps,
 		openBottomSheet,
 		editComplaint,
 	};
