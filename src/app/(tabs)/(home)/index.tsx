@@ -27,6 +27,7 @@ import {
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 function ServiceCard({
 	label,
@@ -70,6 +71,7 @@ function ServiceCard({
 }
 
 export default function HomeScreen() {
+	useRouteInteractive();
 	const {
 		isAuthenticated,
 		needsProfileCompletion,
