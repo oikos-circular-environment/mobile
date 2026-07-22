@@ -13,8 +13,10 @@ import type {
 	ComplaintCaptureMode,
 	DraftAttachment,
 } from "@/libs/types/complaint";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 export default function ComplaintCameraScreen() {
+	useRouteInteractive();
 	const { attachments, addAttachment, removeAttachment } =
 		useComplaintCreation();
 	const insets = useSafeAreaInsets();
