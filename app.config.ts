@@ -70,13 +70,7 @@ const config: ExpoConfig = {
 				recordAudioAndroid: true,
 			},
 		],
-		[
-			"expo-video",
-			{
-				supportsBackgroundPlayback: true,
-				supportsPictureInPicture: true,
-			},
-		],
+		"expo-video",
 		"expo-secure-store",
 		"expo-font",
 		"expo-image",
