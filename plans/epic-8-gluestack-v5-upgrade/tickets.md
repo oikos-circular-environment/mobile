@@ -111,28 +111,49 @@ revalidar).
 
 ## Ticket 4 — Atualizar componentes vendorizados (Fase 2)
 
-**Status:** ⬜ Pendente (aguarda validação manual do Ticket 3 pelo usuário).
+**Status:** ✅ Concluído.
 
 **Escopo:**
-- [ ] **Grupo A** (sobrescrita direta, com diff antes de aceitar cada um):
+- [x] **Grupo A** (sobrescrita direta, com diff antes de aceitar cada um):
   `alert`, `divider`, `progress`, `spinner`, `switch`, `pressable`, `skeleton`,
   `form-control`, `input`, `icon`, `menu`, `modal`, `toast`, `box`, `card`,
-  `heading`, `hstack`, `vstack`, `text`, `gluestack-ui-provider`. Confirmar
-  para cada um que a paleta (`bg-primary`, `text-foreground`, `bg-muted`) não
-  regride para a escala numérica do gluestack.
-- [ ] **Grupo B** (buscar template novo à parte, mesclar manualmente,
+  `heading`, `hstack`, `vstack`, `text`, `gluestack-ui-provider`. `alert`,
+  `divider`, `progress`, `box`, `hstack`, `vstack`, `pressable`, `switch`
+  ficaram byte-idênticos. Nos demais, quase todo o diff era só estilo do CLI
+  (`biome.json` tem `"!**/ui"` — o projeto ignora deliberadamente
+  `src/components/ui/` do lint/format, então o estilo single-quote/2-espaços
+  do CLI não é normalizado automaticamente; comparação feita ignorando
+  aspas/indentação para achar as mudanças reais). Únicas mudanças de conteúdo:
+  `skeleton.startColor` default `bg-accent-foreground` → `bg-accent` (maioria
+  dos usos já sobrescreve essa prop) e `FormControlLabel` ganhou props opcionais
+  aditivas (`htmlFor`, `role`). Paleta (`bg-primary`, `text-foreground`,
+  `bg-muted`) confirmada intacta em todos. Removidos `index.next.tsx` e
+  `index.uniwind.tsx` que o CLI adicionou em `gluestack-ui-provider/`
+  (variantes para Next.js e para o styling engine Uniwind, nenhum usado neste
+  projeto — `index.uniwind.tsx` inclusive importava o pacote `uniwind`, não
+  instalado).
+- [x] **Grupo B** (buscar template novo à parte, mesclar manualmente,
   preservando a lógica customizada): `badge`, `checkbox`, `grid`,
-  `select/select-actionsheet`.
-- [ ] **Não tocar** (fora do escopo do CLI): `decimal-input`,
-  `swipeable-card.tsx`, `bottomsheet` (já é wrapper direto sobre
-  `@gorhom/bottom-sheet`, não um componente do template gluestack — rodar
-  `add` aqui apagaria a API custom usada em 6+ lugares do app).
-- [ ] Rodar `npx tsc --noEmit` + `npm run lint` + `npm test` após cada
-  componente/lote, não só no final.
+  `select/select-actionsheet`. `grid` e `select` (ambos arquivos) vieram
+  byte-idênticos. `badge`/`checkbox` só tiveram diffs cosméticos — a lógica
+  customizada (dual-mode de props em `BadgeIcon`, branch
+  `Platform.OS === "web"` do checkbox) ficou intacta, verificada linha a linha.
+- [x] **Não tocado** (fora do escopo do CLI, confirmado intacto):
+  `decimal-input`, `swipeable-card.tsx`, `bottomsheet`.
+- [x] Rodado `npx tsc --noEmit` + `npm run lint` + `npm test` após cada grupo.
 
-**Validação:** suíte completa (`tsc`/`lint`/`test`) limpa ao fim de todos os
-componentes tocados; `git diff` de cada um revisado manualmente antes de
-commitar.
+**Achado**: os erros de TS pré-existentes em `modal`/`spinner`/`toast`/`badge`/
+`select-actionsheet` ("union type too complex" / "not assignable to
+undefined") persistem **mesmo nos templates mais recentes do CLI (v5.0.3)** —
+não era bug de versão alpha, é limitação real da integração gluestack-ui +
+`styled()`/`nativewind-utils`. Baseline de 21 erros de TS permanece igual em
+todo o Ticket 4 (ver "Fora de escopo").
+
+**Validação:** `tsc` (21 erros, mesma baseline em todos os commits), `lint`
+limpo, `test` 198/198 sem regressão em cada um dos 2 commits (Grupo A e
+Grupo B).
+
+**Commits:** `d71a571` (Grupo A) e `c1a0da6` (Grupo B).
 
 **Handoff final para o usuário**: development build completo
 (`eas build --profile development` ou `npm run ios`/`npm run android` locais)
@@ -150,7 +171,15 @@ para validar ponta a ponta.
 
 - Dependência fantasma `@react-native-community/datetimepicker` — moot, o
   componente que a usava foi deletado (Ticket 2).
-- Os 9 erros de TS do `bottomsheet` (mismatch com `@gorhom/bottom-sheet@5.2.14`)
+- Os 11 erros de TS do `bottomsheet` (mismatch com `@gorhom/bottom-sheet@5.2.14`)
   — orthogonal ao gluestack, não é tocado aqui.
+- Os 10 erros restantes em `badge`/`button`/`checkbox`/`modal`/
+  `select-actionsheet`/`spinner`/`toast` ("union type too complex" / "not
+  assignable to undefined" / incompatibilidade de ref `Svg`/`IPrimitiveIcon`) —
+  confirmado no Ticket 4 que persistem mesmo nos templates mais recentes do
+  CLI (v5.0.3), não são causados pela versão alpha. Corrigi-los exigiria
+  investigar a integração `styled()`/`nativewind-utils` do gluestack-ui em si
+  (upstream) ou a integração com `react-native-svg`/`lucide-react-native` via
+  ref — fora do escopo deste epic de upgrade de versão.
 - Qualquer teste em device físico/simulador ou build nativo — sem
   device/simulador neste ambiente; fica com o usuário nos dois handoffs.
