@@ -204,10 +204,7 @@ export default function CompanyHubScreen() {
 											</View>
 
 											{isLocked ? (
-												<LockKeyholeIcon
-													size={18}
-													color={colors.gray[400]}
-												/>
+												<LockKeyholeIcon size={18} color={colors.gray[400]} />
 											) : (
 												<ArrowRightIcon size={18} color={colors.gray[950]} />
 											)}
