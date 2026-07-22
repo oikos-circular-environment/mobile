@@ -1,4 +1,5 @@
 import { AxiosError } from "axios";
+import Constants from "expo-constants";
 import { client } from "../oikos-sdk/client.gen";
 import {
 	clearTokens,
@@ -18,6 +19,9 @@ import {
 
 // Production
 const baseURL = process.env.EXPO_PUBLIC_BASE_URL;
+
+const clientKey = process.env.EXPO_PUBLIC_CLIENT_API_KEY;
+const appVersion = Constants.expoConfig?.version;
 
 client.setConfig({ baseURL, throwOnError: true });
 
@@ -63,10 +67,16 @@ export function setOnUnauthenticated(callback: (() => void) | null) {
 	onUnauthenticated = callback;
 }
 
-// Request interceptor: inject Bearer token
+// Request interceptor: inject Bearer token, client-key and app version
 client.instance.interceptors.request.use(config => {
 	if (authToken) {
 		config.headers.set("Authorization", `Bearer ${authToken}`);
+	}
+	if (clientKey) {
+		config.headers.set("X-Client-Key", clientKey);
+	}
+	if (appVersion) {
+		config.headers.set("X-App-Version", appVersion);
 	}
 	return config;
 });
