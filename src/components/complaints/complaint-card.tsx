@@ -170,7 +170,11 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 									onPress={openBottomSheet}
 								>
 									<View className="flex-row items-center gap-2">
-										<EyeIcon size={14} color={colors.gray[950]} strokeWidth={2.2} />
+										<EyeIcon
+											size={14}
+											color={colors.gray[950]}
+											strokeWidth={2.2}
+										/>
 										<MenuItemLabel>Ver denúncia</MenuItemLabel>
 									</View>
 								</MenuItem>
