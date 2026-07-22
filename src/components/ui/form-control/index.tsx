@@ -1,341 +1,345 @@
-"use client";
-import { Text, View } from "react-native";
-import React from "react";
-import { createFormControl } from "@gluestack-ui/core/form-control/creator";
-import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import { withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
-import { styled } from "nativewind";
-import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
-import { UIIcon } from "@gluestack-ui/core/icon/creator";
+'use client';
+import { Text, View } from 'react-native';
+import React from 'react';
+import { createFormControl } from '@gluestack-ui/core/form-control/creator';
+import { tva } from '@gluestack-ui/utils/nativewind-utils';
+import { withStyleContext } from '@gluestack-ui/utils/nativewind-utils';
+import { styled } from 'nativewind';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+import { UIIcon } from '@gluestack-ui/core/icon/creator';
 
-const SCOPE = "FORM_CONTROL";
+const SCOPE = 'FORM_CONTROL';
 
 const formControlStyle = tva({
-	base: "flex flex-col",
+  base: 'flex flex-col',
 });
 
 const formControlErrorIconStyle = tva({
-	base: "text-destructive fill-none h-[18px] w-[18px]",
+  base: 'text-destructive fill-none h-[18px] w-[18px]',
 });
 
 const formControlErrorStyle = tva({
-	base: "flex flex-row justify-start items-center mt-1 gap-1",
+  base: 'flex flex-row justify-start items-center mt-1 gap-1',
 });
 
 const formControlErrorTextStyle = tva({
-	base: "text-destructive text-xs font-body",
-	variants: {
-		isTruncated: {
-			true: "web:truncate",
-		},
-		bold: {
-			true: "font-bold",
-		},
-		underline: {
-			true: "underline",
-		},
-		strikeThrough: {
-			true: "line-through",
-		},
-		sub: {
-			true: "text-xs",
-		},
-		italic: {
-			true: "italic",
-		},
-		highlight: {
-			true: "bg-yellow-500",
-		},
-	},
+  base: 'text-destructive text-xs font-body',
+  variants: {
+    isTruncated: {
+      true: 'web:truncate',
+    },
+    bold: {
+      true: 'font-bold',
+    },
+    underline: {
+      true: 'underline',
+    },
+    strikeThrough: {
+      true: 'line-through',
+    },
+    sub: {
+      true: 'text-xs',
+    },
+    italic: {
+      true: 'italic',
+    },
+    highlight: {
+      true: 'bg-yellow-500',
+    },
+  },
 });
 
 const formControlHelperStyle = tva({
-	base: "flex flex-row justify-start items-center mt-1 font-body",
+  base: 'flex flex-row justify-start items-center mt-1 font-body',
 });
 
 const formControlHelperTextStyle = tva({
-	base: "text-foreground/70 font-body text-sm",
-	variants: {
-		isTruncated: {
-			true: "web:truncate",
-		},
-		bold: {
-			true: "font-bold",
-		},
-		underline: {
-			true: "underline",
-		},
-		strikeThrough: {
-			true: "line-through",
-		},
-		sub: {
-			true: "text-xs",
-		},
-		italic: {
-			true: "italic",
-		},
-		highlight: {
-			true: "bg-yellow-500",
-		},
-	},
+  base: 'text-foreground/70 font-body text-sm',
+  variants: {
+    isTruncated: {
+      true: 'web:truncate',
+    },
+    bold: {
+      true: 'font-bold',
+    },
+    underline: {
+      true: 'underline',
+    },
+    strikeThrough: {
+      true: 'line-through',
+    },
+    sub: {
+      true: 'text-xs',
+    },
+    italic: {
+      true: 'italic',
+    },
+    highlight: {
+      true: 'bg-yellow-500',
+    },
+  },
 });
 
 const formControlLabelStyle = tva({
-	base: "flex flex-row justify-start items-center mb-1",
+  base: 'flex flex-row justify-start items-center mb-1',
 });
 
 const formControlLabelTextStyle = tva({
-	base: "font-medium text-foreground text-base font-body",
-	variants: {
-		isTruncated: {
-			true: "web:truncate",
-		},
-		bold: {
-			true: "font-bold",
-		},
-		underline: {
-			true: "underline",
-		},
-		strikeThrough: {
-			true: "line-through",
-		},
-		sub: {
-			true: "text-xs",
-		},
-		italic: {
-			true: "italic",
-		},
-		highlight: {
-			true: "bg-yellow-500",
-		},
-	},
+  base: 'font-medium text-foreground text-base font-body',
+  variants: {
+    isTruncated: {
+      true: 'web:truncate',
+    },
+    bold: {
+      true: 'font-bold',
+    },
+    underline: {
+      true: 'underline',
+    },
+    strikeThrough: {
+      true: 'line-through',
+    },
+    sub: {
+      true: 'text-xs',
+    },
+    italic: {
+      true: 'italic',
+    },
+    highlight: {
+      true: 'bg-yellow-500',
+    },
+  },
 });
 
 const formControlLabelAstrickStyle = tva({
-	base: "font-medium text-foreground text-base",
-	variants: {
-		isTruncated: {
-			true: "web:truncate",
-		},
-		bold: {
-			true: "font-bold",
-		},
-		underline: {
-			true: "underline",
-		},
-		strikeThrough: {
-			true: "line-through",
-		},
-		sub: {
-			true: "text-xs",
-		},
-		italic: {
-			true: "italic",
-		},
-		highlight: {
-			true: "bg-yellow-500",
-		},
-	},
+  base: 'font-medium text-foreground text-base',
+  variants: {
+    isTruncated: {
+      true: 'web:truncate',
+    },
+    bold: {
+      true: 'font-bold',
+    },
+    underline: {
+      true: 'underline',
+    },
+    strikeThrough: {
+      true: 'line-through',
+    },
+    sub: {
+      true: 'text-xs',
+    },
+    italic: {
+      true: 'italic',
+    },
+    highlight: {
+      true: 'bg-yellow-500',
+    },
+  },
 });
 
 type IFormControlLabelAstrickProps = React.ComponentPropsWithoutRef<
-	typeof Text
+  typeof Text
 > &
-	VariantProps<typeof formControlLabelAstrickStyle>;
+  VariantProps<typeof formControlLabelAstrickStyle>;
 
 const FormControlLabelAstrick = React.forwardRef<
-	React.ComponentRef<typeof Text>,
-	IFormControlLabelAstrickProps
+  React.ComponentRef<typeof Text>,
+  IFormControlLabelAstrickProps
 >(function FormControlLabelAstrick({ className, ...props }, ref) {
-	return (
-		<Text
-			ref={ref}
-			className={formControlLabelAstrickStyle({
-				class: className,
-			})}
-			{...props}
-		/>
-	);
+  return (
+    <Text
+      ref={ref}
+      className={formControlLabelAstrickStyle({
+        class: className,
+      })}
+      {...props}
+    />
+  );
 });
 
 const StyledUIIcon = styled(UIIcon, { className: "style" });
 
 export const UIFormControl = createFormControl({
-	Root: withStyleContext(View, SCOPE),
-	Error: View,
-	ErrorText: Text,
-	ErrorIcon: StyledUIIcon,
-	Label: View,
-	LabelText: Text,
-	LabelAstrick: FormControlLabelAstrick,
-	Helper: View,
-	HelperText: Text,
+  Root: withStyleContext(View, SCOPE),
+  Error: View,
+  ErrorText: Text,
+  ErrorIcon: StyledUIIcon,
+  Label: View,
+  LabelText: Text,
+  LabelAstrick: FormControlLabelAstrick,
+  Helper: View,
+  HelperText: Text,
 });
 
+
 type IFormControlProps = React.ComponentProps<typeof UIFormControl> &
-	VariantProps<typeof formControlStyle>;
+  VariantProps<typeof formControlStyle>;
 
 const FormControl = React.forwardRef<
-	React.ComponentRef<typeof UIFormControl>,
-	IFormControlProps
+  React.ComponentRef<typeof UIFormControl>,
+  IFormControlProps
 >(function FormControl({ className, ...props }, ref) {
-	return (
-		<UIFormControl
-			ref={ref}
-			className={formControlStyle({ class: className })}
-			{...props}
-		/>
-	);
+  return (
+    <UIFormControl
+      ref={ref}
+      className={formControlStyle({ class: className })}
+      {...props}
+    />
+  );
 });
 
 type IFormControlErrorProps = React.ComponentProps<typeof UIFormControl.Error> &
-	VariantProps<typeof formControlErrorStyle>;
+  VariantProps<typeof formControlErrorStyle>;
 
 const FormControlError = React.forwardRef<
-	React.ComponentRef<typeof UIFormControl.Error>,
-	IFormControlErrorProps
+  React.ComponentRef<typeof UIFormControl.Error>,
+  IFormControlErrorProps
 >(function FormControlError({ className, ...props }, ref) {
-	return (
-		<UIFormControl.Error
-			ref={ref}
-			className={formControlErrorStyle({ class: className })}
-			{...props}
-		/>
-	);
+  return (
+    <UIFormControl.Error
+      ref={ref}
+      className={formControlErrorStyle({ class: className })}
+      {...props}
+    />
+  );
 });
 
 type IFormControlErrorTextProps = React.ComponentProps<
-	typeof UIFormControl.Error.Text
+  typeof UIFormControl.Error.Text
 > &
-	VariantProps<typeof formControlErrorTextStyle>;
+  VariantProps<typeof formControlErrorTextStyle>;
 
 const FormControlErrorText = React.forwardRef<
-	React.ComponentRef<typeof UIFormControl.Error.Text>,
-	IFormControlErrorTextProps
+  React.ComponentRef<typeof UIFormControl.Error.Text>,
+  IFormControlErrorTextProps
 >(function FormControlErrorText({ className, ...props }, ref) {
-	return (
-		<UIFormControl.Error.Text
-			className={formControlErrorTextStyle({
-				class: className,
-			})}
-			ref={ref}
-			{...props}
-		/>
-	);
+  return (
+    <UIFormControl.Error.Text
+      className={formControlErrorTextStyle({
+        class: className,
+      })}
+      ref={ref}
+      {...props}
+    />
+  );
 });
 
 type IFormControlErrorIconProps = React.ComponentProps<
-	typeof UIFormControl.Error.Icon
+  typeof UIFormControl.Error.Icon
 > &
-	VariantProps<typeof formControlErrorIconStyle>;
+  VariantProps<typeof formControlErrorIconStyle>;
 
 const FormControlErrorIcon = React.forwardRef<
-	React.ComponentRef<typeof UIFormControl.Error.Icon>,
-	IFormControlErrorIconProps
+  React.ComponentRef<typeof UIFormControl.Error.Icon>,
+  IFormControlErrorIconProps
 >(function FormControlErrorIcon({ className, ...props }, ref) {
-	return (
-		<UIFormControl.Error.Icon
-			ref={ref}
-			{...props}
-			className={formControlErrorIconStyle({ class: className })}
-		/>
-	);
+  return (
+    <UIFormControl.Error.Icon
+      ref={ref}
+      {...props}
+      className={formControlErrorIconStyle({ class: className })}
+    />
+  );
 });
 
 type IFormControlLabelProps = React.ComponentProps<typeof UIFormControl.Label> &
-	VariantProps<typeof formControlLabelStyle>;
+  VariantProps<typeof formControlLabelStyle> & {
+    htmlFor?: string;
+    role?: string;
+  };
 
 const FormControlLabel = React.forwardRef<
-	React.ComponentRef<typeof UIFormControl.Label>,
-	IFormControlLabelProps
+  React.ComponentRef<typeof UIFormControl.Label>,
+  IFormControlLabelProps
 >(function FormControlLabel({ className, ...props }, ref) {
-	return (
-		<UIFormControl.Label
-			ref={ref}
-			className={formControlLabelStyle({ class: className })}
-			{...props}
-		/>
-	);
+  return (
+    <UIFormControl.Label
+      ref={ref}
+      className={formControlLabelStyle({ class: className })}
+      {...props}
+    />
+  );
 });
 
 type IFormControlLabelTextProps = React.ComponentProps<
-	typeof UIFormControl.Label.Text
+  typeof UIFormControl.Label.Text
 > &
-	VariantProps<typeof formControlLabelTextStyle>;
+  VariantProps<typeof formControlLabelTextStyle>;
 
 const FormControlLabelText = React.forwardRef<
-	React.ComponentRef<typeof UIFormControl.Label.Text>,
-	IFormControlLabelTextProps
+  React.ComponentRef<typeof UIFormControl.Label.Text>,
+  IFormControlLabelTextProps
 >(function FormControlLabelText({ className, ...props }, ref) {
-	return (
-		<UIFormControl.Label.Text
-			className={formControlLabelTextStyle({
-				class: className,
-			})}
-			ref={ref}
-			{...props}
-		/>
-	);
+  return (
+    <UIFormControl.Label.Text
+      className={formControlLabelTextStyle({
+        class: className,
+      })}
+      ref={ref}
+      {...props}
+    />
+  );
 });
 
 type IFormControlHelperProps = React.ComponentProps<
-	typeof UIFormControl.Helper
+  typeof UIFormControl.Helper
 > &
-	VariantProps<typeof formControlHelperStyle>;
+  VariantProps<typeof formControlHelperStyle>;
 
 const FormControlHelper = React.forwardRef<
-	React.ComponentRef<typeof UIFormControl.Helper>,
-	IFormControlHelperProps
+  React.ComponentRef<typeof UIFormControl.Helper>,
+  IFormControlHelperProps
 >(function FormControlHelper({ className, ...props }, ref) {
-	return (
-		<UIFormControl.Helper
-			ref={ref}
-			className={formControlHelperStyle({
-				class: className,
-			})}
-			{...props}
-		/>
-	);
+  return (
+    <UIFormControl.Helper
+      ref={ref}
+      className={formControlHelperStyle({
+        class: className,
+      })}
+      {...props}
+    />
+  );
 });
 
 type IFormControlHelperTextProps = React.ComponentProps<
-	typeof UIFormControl.Helper.Text
+  typeof UIFormControl.Helper.Text
 > &
-	VariantProps<typeof formControlHelperTextStyle>;
+  VariantProps<typeof formControlHelperTextStyle>;
 
 const FormControlHelperText = React.forwardRef<
-	React.ComponentRef<typeof UIFormControl.Helper.Text>,
-	IFormControlHelperTextProps
+  React.ComponentRef<typeof UIFormControl.Helper.Text>,
+  IFormControlHelperTextProps
 >(function FormControlHelperText({ className, ...props }, ref) {
-	return (
-		<UIFormControl.Helper.Text
-			className={formControlHelperTextStyle({
-				class: className,
-			})}
-			ref={ref}
-			{...props}
-		/>
-	);
+  return (
+    <UIFormControl.Helper.Text
+      className={formControlHelperTextStyle({
+        class: className,
+      })}
+      ref={ref}
+      {...props}
+    />
+  );
 });
 
-FormControl.displayName = "FormControl";
-FormControlError.displayName = "FormControlError";
-FormControlErrorText.displayName = "FormControlErrorText";
-FormControlErrorIcon.displayName = "FormControlErrorIcon";
-FormControlLabel.displayName = "FormControlLabel";
-FormControlLabelText.displayName = "FormControlLabelText";
-FormControlLabelAstrick.displayName = "FormControlLabelAstrick";
-FormControlHelper.displayName = "FormControlHelper";
-FormControlHelperText.displayName = "FormControlHelperText";
+FormControl.displayName = 'FormControl';
+FormControlError.displayName = 'FormControlError';
+FormControlErrorText.displayName = 'FormControlErrorText';
+FormControlErrorIcon.displayName = 'FormControlErrorIcon';
+FormControlLabel.displayName = 'FormControlLabel';
+FormControlLabelText.displayName = 'FormControlLabelText';
+FormControlLabelAstrick.displayName = 'FormControlLabelAstrick';
+FormControlHelper.displayName = 'FormControlHelper';
+FormControlHelperText.displayName = 'FormControlHelperText';
 
 export {
-	FormControl,
-	FormControlError,
-	FormControlErrorText,
-	FormControlErrorIcon,
-	FormControlLabel,
-	FormControlLabelText,
-	FormControlLabelAstrick,
-	FormControlHelper,
-	FormControlHelperText,
+  FormControl,
+  FormControlError,
+  FormControlErrorText,
+  FormControlErrorIcon,
+  FormControlLabel,
+  FormControlLabelText,
+  FormControlLabelAstrick,
+  FormControlHelper,
+  FormControlHelperText,
 };

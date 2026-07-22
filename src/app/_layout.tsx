@@ -30,7 +30,6 @@ sessionBus.subscribe(() => queryClient.resetQueries());
 
 Observe.configure({
 	integrations: { "expo-router": true },
-	dispatchInDebug: true,
 });
 
 function RootLayout() {

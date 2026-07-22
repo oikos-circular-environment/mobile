@@ -23,7 +23,7 @@ const Skeleton = forwardRef<React.ComponentRef<typeof View>, ISkeletonProps>(
       className,
       variant,
       children,
-      startColor = 'bg-accent-foreground',
+      startColor = 'bg-accent',
       isLoaded = false,
       speed = 4,
       ...props

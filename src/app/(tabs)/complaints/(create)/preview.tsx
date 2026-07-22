@@ -10,8 +10,10 @@ import {
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
+import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 export default function ComplaintPreviewScreen() {
+	useRouteInteractive();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const { attachments, removeAttachment } = useComplaintCreation();
 	const insets = useSafeAreaInsets();

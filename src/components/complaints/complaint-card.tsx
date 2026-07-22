@@ -170,7 +170,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 									onPress={openBottomSheet}
 								>
 									<View className="flex-row items-center gap-2">
-										<EyeIcon size={14} strokeWidth={2.2} />
+										<EyeIcon size={14} color={colors.gray[950]} strokeWidth={2.2} />
 										<MenuItemLabel>Ver denúncia</MenuItemLabel>
 									</View>
 								</MenuItem>
@@ -188,7 +188,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 											color={
 												complaint.status !== "OPEN"
 													? colors.gray[400]
-													: undefined
+													: colors.gray[950]
 											}
 										/>
 										<MenuItemLabel
@@ -229,7 +229,11 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 									onPress={openInGoogleMaps}
 								>
 									<View className="flex-row items-center gap-2">
-										<MapPinned size={14} strokeWidth={2.2} />
+										<MapPinned
+											size={14}
+											color={colors.gray[950]}
+											strokeWidth={2.2}
+										/>
 										<MenuItemLabel>Abrir no Google Maps</MenuItemLabel>
 									</View>
 								</MenuItem>
@@ -241,7 +245,11 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 										onPress={openInAppleMaps}
 									>
 										<View className="flex-row items-center gap-2">
-											<MapPinned size={14} strokeWidth={2.2} />
+											<MapPinned
+												size={14}
+												color={colors.gray[950]}
+												strokeWidth={2.2}
+											/>
 											<MenuItemLabel>Abrir no Apple Maps</MenuItemLabel>
 										</View>
 									</MenuItem>

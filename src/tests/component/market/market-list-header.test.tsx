@@ -36,7 +36,6 @@ const defaultAuth: ReturnType<typeof useAuthContext> = {
 };
 
 const defaultGeospatial = {
-	currentDate: new Date("2025-06-05T12:00:00"),
 	heading: null,
 	location: null,
 	addresses: [],

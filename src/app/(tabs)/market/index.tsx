@@ -21,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { useNow } from "@/contexts/clock-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
 import { formatDistance } from "@/libs/format-distance";
@@ -156,7 +157,8 @@ function CompanyCardItem({
 
 export default function MarketScreen() {
 	useRouteInteractive();
-	const { currentDate, permissionDenied } = useGeospatial();
+	const currentDate = useNow();
+	const { permissionDenied } = useGeospatial();
 	const {
 		locationSource,
 		isLocationReady,

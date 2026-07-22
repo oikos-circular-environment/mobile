@@ -10,6 +10,7 @@ import {
 import type React from "react";
 import MarketScreen from "@/app/(tabs)/market";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useNow } from "@/contexts/clock-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { MarketProvider } from "@/contexts/market-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
@@ -45,6 +46,7 @@ jest.mock("expo-router", () => ({
 
 jest.mock("@/contexts/auth-context");
 jest.mock("@/contexts/geospatial-context");
+jest.mock("@/contexts/clock-context");
 
 jest.mock("@/libs/oikos-sdk", () => ({
 	getV1Market: jest.fn(),
@@ -113,7 +115,6 @@ jest.mock("@/components/market/radius-bottom-sheet", () => ({
 const COORDS = { latitude: -23.55, longitude: -46.63 };
 
 const defaultGeospatial = {
-	currentDate: new Date("2026-06-11T10:00:00"),
 	heading: null,
 	location: { coords: COORDS } as never,
 	addresses: [],
@@ -176,6 +177,7 @@ describe("Market — filtros (integração)", () => {
 		setupGeospatial();
 		setupAuth();
 		mockMarketResponse([]);
+		jest.mocked(useNow).mockReturnValue(new Date("2026-06-11T10:00:00"));
 		jest.mocked(isCompanyOpenNow).mockReturnValue(true);
 	});
 

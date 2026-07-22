@@ -95,7 +95,7 @@ export function MarketListHeader() {
 							<Skeleton className="h-4" />
 						</View>
 					)}
-					<ChevronDown size={14} className="text-muted-foreground" />
+					<ChevronDown size={14} color={colors.gray[400]} />
 				</HStack>
 			</Pressable>
 
@@ -182,7 +182,7 @@ export function MarketListHeader() {
 					className="flex-1 flex-row gap-2 itens-center justify-center rounded-md p-4 border border-border"
 					onPress={openRadiusSheet}
 				>
-					<NavigationIcon size={14} />
+					<NavigationIcon size={14} color={colors.gray[950]} />
 					<Text>{formatRadiusLabel(appliedFilters.radius)}</Text>
 				</Pressable>
 			</View>

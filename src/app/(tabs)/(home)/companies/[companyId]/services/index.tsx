@@ -88,7 +88,7 @@ export default function ServicesIndexScreen() {
 							onPress={() => router.back()}
 							className="flex-row justify-center items-center"
 						>
-							<ChevronLeftIcon size={24} className="text-foreground" />
+							<ChevronLeftIcon size={24} color={colors.gray[950]} />
 						</Pressable>
 					),
 				}}

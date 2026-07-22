@@ -367,14 +367,9 @@ export default function ComplaintsMapScreen() {
 					className="h-11 w-11 items-center justify-center rounded-xl bg-primary"
 					style={controlShadow}
 				>
-					<Navigation2Icon
-						size={20}
-						color={colors.white}
-						strokeWidth={2.2}
-						style={{
-							transform: [{ rotate: `${-mapHeading}deg` }],
-						}}
-					/>
+					<View style={{ transform: [{ rotate: `${-mapHeading}deg` }] }}>
+						<Navigation2Icon size={20} color={colors.white} strokeWidth={2.2} />
+					</View>
 				</TouchableOpacity>
 
 				<TouchableOpacity

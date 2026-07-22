@@ -1,5 +1,5 @@
 import type BottomSheet from "@gorhom/bottom-sheet";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import {
 	createContext,
 	type PropsWithChildren,
@@ -13,6 +13,7 @@ import {
 import { z } from "zod";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { roundCoord } from "@/libs/geospatial";
 import { logMarketEvent } from "@/libs/observe-events";
 import { getV1Market } from "@/libs/oikos-sdk";
 import type { MarketCompany } from "@/libs/types/market";
@@ -85,14 +86,17 @@ export function MarketProvider({ children }: PropsWithChildren) {
 	const profileLat = user?.profile?.address?.latitude ?? undefined;
 	const profileLon = user?.profile?.address?.longitude ?? undefined;
 
-	const lat =
+	const rawLat =
 		locationSource === "current"
 			? (location?.coords.latitude ?? undefined)
 			: profileLat;
-	const lon =
+	const rawLon =
 		locationSource === "current"
 			? (location?.coords.longitude ?? undefined)
 			: profileLon;
+
+	const lat = rawLat != null ? roundCoord(rawLat) : undefined;
+	const lon = rawLon != null ? roundCoord(rawLon) : undefined;
 
 	const isLocationReady = lat != null && lon != null;
 	const isResolvingLocation = locationSource === "current" && isResolving;
@@ -131,6 +135,7 @@ export function MarketProvider({ children }: PropsWithChildren) {
 		initialPageParam: undefined as string | undefined,
 		getNextPageParam: page => page?.next_cursor ?? undefined,
 		enabled: isLocationReady,
+		placeholderData: keepPreviousData,
 	});
 
 	const companies = useMemo(
