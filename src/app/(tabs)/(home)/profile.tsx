@@ -56,6 +56,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
 import { useAuthContext } from "@/contexts/auth-context";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
 import { compressImage } from "@/libs/media-compression";
@@ -420,7 +421,14 @@ export default function ProfileScreen() {
 												className="rounded-md shadow-lg shadow-black/40"
 											>
 												<Image
-													source={value ? { uri: value } : DefaultImage}
+													source={
+														value
+															? {
+																	uri: value,
+																	headers: getAuthenticatedImageHeaders(),
+																}
+															: DefaultImage
+													}
 													style={{
 														width: 80,
 														height: 80,

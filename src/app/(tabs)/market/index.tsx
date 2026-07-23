@@ -24,6 +24,7 @@ import { VStack } from "@/components/ui/vstack";
 import { useNow } from "@/contexts/clock-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { formatDistance } from "@/libs/format-distance";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { maskCnpj } from "@/libs/mask";
@@ -84,7 +85,10 @@ function CompanyCardItem({
 							{company.avatar ? (
 								<View className="w-16 h-16 rounded-lg overflow-hidden">
 									<Image
-										source={{ uri: company.avatar }}
+										source={{
+											uri: company.avatar,
+											headers: getAuthenticatedImageHeaders(),
+										}}
 										className="w-full h-full"
 										resizeMode="cover"
 									/>
