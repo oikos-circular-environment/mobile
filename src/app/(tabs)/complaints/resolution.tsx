@@ -48,6 +48,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { compressMedia } from "@/libs/media-compression";
 import {
 	formatFileSize,
@@ -449,7 +450,10 @@ export default function ComplaintResolutionScreen() {
 							<View className="flex-row items-center gap-3 rounded-xl border border-lime-700 bg-lime-50 p-3">
 								{selectedCompany.avatar?.url ? (
 									<Image
-										source={{ uri: selectedCompany.avatar.url }}
+										source={{
+											uri: selectedCompany.avatar.url,
+											headers: getAuthenticatedImageHeaders(),
+										}}
 										style={{ width: 36, height: 36, borderRadius: 18 }}
 									/>
 								) : (

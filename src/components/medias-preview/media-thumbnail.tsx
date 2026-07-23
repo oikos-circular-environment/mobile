@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { formatFileSize, MAX_FILE_SIZE_BYTES } from "@/libs/media-validation";
 import { cn } from "@/libs/utils";
 
@@ -127,7 +128,7 @@ export function MediaThumbnail({
 		return (
 			<View className="flex-1">
 				<Image
-					source={{ uri }}
+					source={{ uri, headers: getAuthenticatedImageHeaders() }}
 					style={{ height: "100%", width: "100%", borderRadius: 6 }}
 					contentFit="cover"
 					onLoad={() => setPhotoState("loaded")}

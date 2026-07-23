@@ -67,16 +67,21 @@ export function setOnUnauthenticated(callback: (() => void) | null) {
 	onUnauthenticated = callback;
 }
 
+// Headers every authenticated request needs — also used by <Image>/expo-image
+// sources that fetch from /storage directly, bypassing this Axios instance.
+export function getAuthenticatedImageHeaders(): Record<string, string> {
+	const headers: Record<string, string> = {};
+	if (authToken) headers.Authorization = `Bearer ${authToken}`;
+	if (clientKey) headers["X-Client-Key"] = clientKey;
+	if (appVersion) headers["X-App-Version"] = appVersion;
+	return headers;
+}
+
 // Request interceptor: inject Bearer token, client-key and app version
 client.instance.interceptors.request.use(config => {
-	if (authToken) {
-		config.headers.set("Authorization", `Bearer ${authToken}`);
-	}
-	if (clientKey) {
-		config.headers.set("X-Client-Key", clientKey);
-	}
-	if (appVersion) {
-		config.headers.set("X-App-Version", appVersion);
+	const headers = getAuthenticatedImageHeaders();
+	for (const [key, value] of Object.entries(headers)) {
+		config.headers.set(key, value);
 	}
 	return config;
 });

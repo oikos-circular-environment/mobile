@@ -13,6 +13,7 @@ import {
 	BottomSheetTextInput,
 } from "@/components/ui/bottomsheet";
 import { Text } from "@/components/ui/text";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import type { GetV1CompaniesResponse } from "@/libs/oikos-sdk";
 import { getV1Companies } from "@/libs/oikos-sdk";
 
@@ -135,7 +136,10 @@ export function CompanyPickerBottomSheet({
 							>
 								{item.avatar?.url ? (
 									<Image
-										source={{ uri: item.avatar.url }}
+										source={{
+											uri: item.avatar.url,
+											headers: getAuthenticatedImageHeaders(),
+										}}
 										style={{ width: 40, height: 40, borderRadius: 20 }}
 									/>
 								) : (

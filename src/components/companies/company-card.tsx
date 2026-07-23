@@ -4,6 +4,7 @@ import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import type { Company } from "@/libs/types/companies";
 import { Badge, BadgeIcon, BadgeText } from "../ui/badge";
 
@@ -20,7 +21,10 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 					{company.avatar ? (
 						<View className="border border-gray-200 rounded-lg items-center justify-center">
 							<Image
-								source={{ uri: company.avatar.url }}
+								source={{
+									uri: company.avatar.url,
+									headers: getAuthenticatedImageHeaders(),
+								}}
 								style={{ width: 64, height: 64, borderRadius: 8 }}
 							/>
 						</View>

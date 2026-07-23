@@ -23,6 +23,7 @@ import { Text } from "@/components/ui/text";
 import { useNow } from "@/contexts/clock-context";
 import { CompanyDetailProvider } from "@/contexts/company-detail-context";
 import { useMarket } from "@/contexts/market-context";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { formatDistance } from "@/libs/format-distance";
 import {
 	getCurrentBusinessHour,
@@ -182,7 +183,10 @@ export default function MarketCompanyDetailScreen() {
 							{company.avatar ? (
 								<View className="w-16 h-16 rounded-lg overflow-hidden">
 									<Image
-										source={{ uri: company.avatar }}
+										source={{
+											uri: company.avatar,
+											headers: getAuthenticatedImageHeaders(),
+										}}
 										className="w-full h-full"
 										resizeMode="cover"
 									/>
