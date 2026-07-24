@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 
 type HomeUserCardProps = {
 	onOpenSettings: () => void;
@@ -45,7 +46,10 @@ export function HomeUserCard({ onOpenSettings }: HomeUserCardProps) {
 					<Image
 						source={
 							user.profile.profile_image
-								? user.profile.profile_image.url
+								? {
+										uri: user.profile.profile_image.url,
+										headers: getAuthenticatedImageHeaders(),
+									}
 								: OikosLogo
 						}
 						style={{ width: 40, height: 40, borderRadius: 4 }}

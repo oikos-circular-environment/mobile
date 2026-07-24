@@ -7,6 +7,7 @@ import { ResolutionAttachmentsStack } from "@/components/complaints/resolution-a
 import { colors } from "@/components/style/colors";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Text } from "@/components/ui/text";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import type { GetV1ComplaintsByIdResolutionsResponses } from "@/libs/oikos-sdk";
 import { SwipeDeleteAction } from "./swipe-delete-action";
 import { SwipeEditAction } from "./swipe-edit-action";
@@ -57,7 +58,7 @@ export function ResolutionCard({
 			<View className="flex-row items-center gap-2">
 				{avatarUrl ? (
 					<Image
-						source={{ uri: avatarUrl }}
+						source={{ uri: avatarUrl, headers: getAuthenticatedImageHeaders() }}
 						style={{ width: 32, height: 32, borderRadius: 16 }}
 					/>
 				) : (

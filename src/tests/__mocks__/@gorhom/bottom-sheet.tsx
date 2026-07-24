@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, TextInput, View } from "react-native";
 
 export const BottomSheetScrollView = ScrollView;
 
@@ -7,7 +7,7 @@ export const BottomSheetHandle = View;
 
 export const BottomSheetBackdrop = View;
 
-export const BottomSheetTextInput = View;
+export const BottomSheetTextInput = TextInput;
 
 export const BottomSheetView = View;
 

@@ -28,6 +28,7 @@ import {
 	postV1ComplaintsByIdResolutionsAttachmentsResponseTransformer,
 	postV1ComplaintsByIdVotesResponseTransformer,
 	postV1ComplaintsResponseTransformer,
+	postV1ModerationSupportResponseTransformer,
 	putV1CompaniesByIdAddressesResponseTransformer,
 	putV1CompaniesByIdResponseTransformer,
 	putV1CompaniesByIdServicesResponseTransformer,
@@ -129,9 +130,15 @@ import type {
 	PatchV1UsersMeCancelDeletionData,
 	PatchV1UsersMeCancelDeletionErrors,
 	PatchV1UsersMeCancelDeletionResponses,
+	PatchV1UsersMeChangePasswordData,
+	PatchV1UsersMeChangePasswordErrors,
+	PatchV1UsersMeChangePasswordResponses,
 	PostV1AuthLoginData,
 	PostV1AuthLoginErrors,
 	PostV1AuthLoginResponses,
+	PostV1AuthLogoutData,
+	PostV1AuthLogoutErrors,
+	PostV1AuthLogoutResponses,
 	PostV1CompaniesByIdAvatarData,
 	PostV1CompaniesByIdAvatarErrors,
 	PostV1CompaniesByIdAvatarResponses,
@@ -153,6 +160,9 @@ import type {
 	PostV1ComplaintsData,
 	PostV1ComplaintsErrors,
 	PostV1ComplaintsResponses,
+	PostV1ModerationSupportData,
+	PostV1ModerationSupportErrors,
+	PostV1ModerationSupportResponses,
 	PostV1UsersRegisterData,
 	PostV1UsersRegisterErrors,
 	PostV1UsersRegisterResponses,
@@ -211,6 +221,7 @@ export const postV1AuthLogin = <ThrowOnError extends boolean = false>(
 		ThrowOnError
 	>({
 		responseType: "json",
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
 		url: "/v1/auth/login",
 		...options,
 		headers: {
@@ -222,7 +233,7 @@ export const postV1AuthLogin = <ThrowOnError extends boolean = false>(
 /**
  * Refresh access token
  *
- * Issues a new access token and a rotated refresh token. Accepts the refresh token from the request body (mobile) or from the httpOnly cookie (web). Body takes precedence.
+ * Issues a new access token and a rotated refresh token. Accepts the refresh token from the request body (mobile) or from the httpOnly cookie (web). Body takes precedence. The presented refresh token is revoked on rotation.
  */
 export const patchV1AuthRefresh = <ThrowOnError extends boolean = false>(
 	options: Options<PatchV1AuthRefreshData, ThrowOnError>,
@@ -233,7 +244,31 @@ export const patchV1AuthRefresh = <ThrowOnError extends boolean = false>(
 		ThrowOnError
 	>({
 		responseType: "json",
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
 		url: "/v1/auth/refresh",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+
+/**
+ * Log out the current session
+ *
+ * Revokes the presented refresh token so it can no longer be rotated. Accepts the refresh token from the request body or the httpOnly cookie. Idempotent.
+ */
+export const postV1AuthLogout = <ThrowOnError extends boolean = false>(
+	options: Options<PostV1AuthLogoutData, ThrowOnError>,
+) =>
+	(options.client ?? client).post<
+		PostV1AuthLogoutResponses,
+		PostV1AuthLogoutErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/auth/logout",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
@@ -255,6 +290,7 @@ export const postV1UsersRegister = <ThrowOnError extends boolean = false>(
 		ThrowOnError
 	>({
 		responseType: "json",
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
 		url: "/v1/users/register",
 		...options,
 		headers: {
@@ -322,6 +358,31 @@ export const patchV1UsersMeCancelDeletion = <
 		security: [{ scheme: "bearer", type: "http" }],
 		url: "/v1/users/me/cancel-deletion",
 		...options,
+	});
+
+/**
+ * Change password
+ *
+ * Changes the authenticated user's password. Revokes every other session and returns a fresh token pair for the current device.
+ */
+export const patchV1UsersMeChangePassword = <
+	ThrowOnError extends boolean = false,
+>(
+	options: Options<PatchV1UsersMeChangePasswordData, ThrowOnError>,
+) =>
+	(options.client ?? client).patch<
+		PatchV1UsersMeChangePasswordResponses,
+		PatchV1UsersMeChangePasswordErrors,
+		ThrowOnError
+	>({
+		responseType: "json",
+		security: [{ scheme: "bearer", type: "http" }],
+		url: "/v1/users/me/change-password",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
 	});
 
 /**
@@ -824,6 +885,7 @@ export const getV1ComplaintsMap = <ThrowOnError extends boolean = false>(
 	>({
 		responseTransformer: getV1ComplaintsMapResponseTransformer,
 		responseType: "json",
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
 		url: "/v1/complaints/map",
 		...options,
 	});
@@ -1171,7 +1233,28 @@ export const getV1Market = <ThrowOnError extends boolean = false>(
 ) =>
 	(options.client ?? client).get<GetV1MarketResponses, unknown, ThrowOnError>({
 		responseType: "json",
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
 		url: "/v1/market",
+		...options,
+	});
+
+/**
+ * Submit a support request
+ *
+ * Receives a support request submission from the Suporte form (title, description and up to 5 images, 10MB each). Does not require authentication.
+ */
+export const postV1ModerationSupport = <ThrowOnError extends boolean = false>(
+	options?: Options<PostV1ModerationSupportData, ThrowOnError>,
+) =>
+	(options?.client ?? client).post<
+		PostV1ModerationSupportResponses,
+		PostV1ModerationSupportErrors,
+		ThrowOnError
+	>({
+		responseTransformer: postV1ModerationSupportResponseTransformer,
+		responseType: "json",
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
+		url: "/v1/moderation/support",
 		...options,
 	});
 
@@ -1190,6 +1273,7 @@ export const getV1WasteCategories = <ThrowOnError extends boolean = false>(
 	>({
 		responseTransformer: getV1WasteCategoriesResponseTransformer,
 		responseType: "json",
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
 		url: "/v1/waste-categories",
 		...options,
 	});
@@ -1209,6 +1293,7 @@ export const getV1WasteCategoriesById = <ThrowOnError extends boolean = false>(
 	>({
 		responseTransformer: getV1WasteCategoriesByIdResponseTransformer,
 		responseType: "json",
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
 		url: "/v1/waste-categories/{id}",
 		...options,
 	});
@@ -1220,4 +1305,8 @@ export const getStorageBy__ = <ThrowOnError extends boolean = false>(
 		GetStorageBy__Responses,
 		unknown,
 		ThrowOnError
-	>({ url: "/storage/{*}", ...options });
+	>({
+		security: [{ name: "X-Client-Key", type: "apiKey" }],
+		url: "/storage/{*}",
+		...options,
+	});

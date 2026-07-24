@@ -13,6 +13,7 @@ import {
 import { toast } from "@/components/toast";
 import {
 	getAuthToken,
+	getRefreshToken,
 	setAuthToken,
 	setOnUnauthenticated,
 	setRefreshToken,
@@ -22,14 +23,22 @@ import {
 	getV1Profiles,
 	getV1UsersMe,
 	patchV1UsersMeCancelDeletion,
+	patchV1UsersMeChangePassword,
 	postV1AuthLogin,
+	postV1AuthLogout,
 	postV1UsersRegister,
 } from "@/libs/oikos-sdk";
 import { sessionBus } from "@/libs/session-bus";
 import type { Account, User } from "@/libs/types/user";
 
+type ChangePasswordInput = {
+	currentPassword: string;
+	newPassword: string;
+};
+
 type AuthContextValue = {
 	user: User | null;
+	account: Account | null;
 	isAuthenticated: boolean;
 	isLoading: boolean;
 	needsProfileCompletion: boolean;
@@ -39,8 +48,13 @@ type AuthContextValue = {
 	signOut: () => void;
 	requestDeletion: () => void;
 	cancelDeletion: () => void;
+	changePassword: (
+		data: ChangePasswordInput,
+		options?: { onSuccess?: () => void },
+	) => void;
 	isRequestingDeletion: boolean;
 	isCancellingDeletion: boolean;
+	isChangingPassword: boolean;
 	updateUserProfile: (data: Partial<User>) => void;
 };
 
@@ -231,7 +245,70 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		},
 	});
 
+	const changePasswordMutation = useMutation({
+		mutationKey: ["change-password"],
+		mutationFn: async ({
+			currentPassword,
+			newPassword,
+		}: ChangePasswordInput) => {
+			const response = await patchV1UsersMeChangePassword({
+				body: {
+					current_password: currentPassword,
+					new_password: newPassword,
+				},
+			});
+			return response.data;
+		},
+		onSuccess: data => {
+			// A troca de senha derruba as outras sessões; o par novo mantém este
+			// dispositivo logado.
+			if (data?.token && data?.refreshToken) {
+				setAuthToken(data.token);
+				setRefreshToken(data.refreshToken);
+			}
+			toast.success(
+				"Senha alterada",
+				"Suas outras sessões foram desconectadas.",
+			);
+		},
+		onError: error => {
+			if (error instanceof AxiosError) {
+				switch (error.response?.data.code) {
+					case "INVALID_CREDENTIALS":
+						toast.error(
+							"Senha atual incorreta",
+							"Confira a senha atual e tente novamente.",
+						);
+						return;
+					case "SAME_PASSWORD":
+						toast.error(
+							"Escolha outra senha",
+							"A nova senha precisa ser diferente da atual.",
+						);
+						return;
+				}
+			}
+			toast.error("Erro ao alterar a senha", "Tente novamente mais tarde.");
+		},
+	});
+
 	const signOut = useCallback(() => {
+		// Best-effort: revoga o refresh token no servidor. O header vai explícito
+		// porque a sessão local é limpa logo abaixo, antes do interceptor rodar.
+		const currentAuthToken = getAuthToken();
+		const currentRefreshToken = getRefreshToken();
+
+		if (currentRefreshToken) {
+			postV1AuthLogout({
+				body: { refreshToken: currentRefreshToken },
+				headers: currentAuthToken
+					? { Authorization: `Bearer ${currentAuthToken}` }
+					: undefined,
+			}).catch(() => {
+				// Falha ao revogar não pode impedir o logout local.
+			});
+		}
+
 		setAuthToken(null);
 		setRefreshToken(null);
 		setUser(null);
@@ -272,6 +349,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 	const value = useMemo(
 		() => ({
 			user,
+			account,
 			isAuthenticated,
 			isLoading:
 				isInitializing ||
@@ -289,8 +367,17 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			signOut,
 			requestDeletion: () => requestDeletionMutation.mutate(),
 			cancelDeletion: () => cancelDeletionMutation.mutate(),
+			changePassword: (
+				data: ChangePasswordInput,
+				options?: { onSuccess?: () => void },
+			) => {
+				changePasswordMutation.mutate(data, {
+					onSuccess: () => options?.onSuccess?.(),
+				});
+			},
 			isRequestingDeletion: requestDeletionMutation.isPending,
 			isCancellingDeletion: cancelDeletionMutation.isPending,
+			isChangingPassword: changePasswordMutation.isPending,
 			updateUserProfile,
 		}),
 		[
@@ -304,6 +391,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			signOut,
 			requestDeletionMutation,
 			cancelDeletionMutation,
+			changePasswordMutation,
 			updateUserProfile,
 		],
 	);

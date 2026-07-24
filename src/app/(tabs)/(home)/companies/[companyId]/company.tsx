@@ -64,6 +64,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
+import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { getCnpj } from "@/libs/brasil-api-sdk";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
 import {
@@ -340,7 +341,10 @@ export default function CompanyGeneralInfoScreen() {
 								>
 									{(avatarPreviewUri ?? company?.avatar?.url) ? (
 										<Image
-											source={{ uri: avatarPreviewUri ?? company?.avatar?.url }}
+											source={{
+												uri: avatarPreviewUri ?? company?.avatar?.url,
+												headers: getAuthenticatedImageHeaders(),
+											}}
 											style={{ width: 80, height: 80, borderRadius: 6 }}
 										/>
 									) : (

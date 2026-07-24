@@ -13,8 +13,13 @@ import { Pressable, Text, View } from "react-native";
 import SignInScreen from "@/app/(tabs)/(home)/sign-in";
 import { toast } from "@/components/toast";
 import { AuthContextProvider, useAuthContext } from "@/contexts/auth-context";
-import { setAuthToken } from "@/libs/api/oikos-api";
-import { getV1Profiles, getV1UsersMe, postV1AuthLogin } from "@/libs/oikos-sdk";
+import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
+import {
+	getV1Profiles,
+	getV1UsersMe,
+	postV1AuthLogin,
+	postV1AuthLogout,
+} from "@/libs/oikos-sdk";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
@@ -26,8 +31,10 @@ jest.mock("@/libs/oikos-sdk", () => ({
 	getV1Profiles: jest.fn(),
 	getV1UsersMe: jest.fn(),
 	postV1UsersRegister: jest.fn(),
+	postV1AuthLogout: jest.fn().mockResolvedValue({ data: { message: "ok" } }),
 	deleteV1UsersMe: jest.fn(),
 	patchV1UsersMeCancelDeletion: jest.fn(),
+	patchV1UsersMeChangePassword: jest.fn(),
 }));
 
 jest.mock("@/libs/storage", () => ({
@@ -201,6 +208,7 @@ describe("Fluxo de autenticação — integração", () => {
 	describe("SignOut", () => {
 		it("reseta o estado de autenticação, navega para home e exibe toast", async () => {
 			setAuthToken("existing-access-token");
+			setRefreshToken("existing-refresh-token");
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: { profile: { id: "user-1", name: "Test User" } },
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
@@ -234,6 +242,11 @@ describe("Fluxo de autenticação — integração", () => {
 			expect(mockRouter.navigate).toHaveBeenCalledWith("/(tabs)/(home)");
 			expect(jest.mocked(toast.success)).toHaveBeenCalledWith(
 				"Você foi deslogado com sucesso!",
+			);
+			expect(jest.mocked(postV1AuthLogout)).toHaveBeenCalledWith(
+				expect.objectContaining({
+					body: { refreshToken: "existing-refresh-token" },
+				}),
 			);
 		});
 	});

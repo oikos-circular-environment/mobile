@@ -13,11 +13,11 @@
 			"!**/old",
 			"!app.json",
 			"!**/ui",
-			"!src/libs/oikos-sdk",
 			"!src/libs/brasil-api-sdk"
 		]
 	},
 	"linter": {
+		"includes": ["**", "!src/libs/oikos-sdk"],
 		"rules": {
 			"correctness": {
 				"noUnusedImports": {
