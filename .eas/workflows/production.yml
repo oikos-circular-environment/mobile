@@ -1,0 +1,109 @@
+name: Production
+
+on:
+  push:
+    branches: ['production']
+
+jobs:
+  quality:
+    name: Quality checks
+    type: custom
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - run: npx biome ci .
+      - run: npm test
+
+  fingerprint:
+    name: Calculate fingerprint
+    type: fingerprint
+    needs: [quality]
+    environment: production
+
+  get_build_android:
+    name: Find matching Android build
+    type: get-build
+    needs: [fingerprint]
+    params:
+      platform: android
+      channel: production
+      distribution: store
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+
+  get_build_ios:
+    name: Find matching iOS build
+    type: get-build
+    needs: [fingerprint]
+    params:
+      platform: ios
+      channel: production
+      distribution: store
+      fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
+
+  decide_native_build:
+    name: Decide if a native build is needed
+    type: custom
+    needs: [get_build_android, get_build_ios]
+    outputs:
+      needs_native_build: ${{ steps.decide.outputs.needs_native_build }}
+    steps:
+      - id: decide
+        run: |
+          if [ -z "${{ needs.get_build_android.outputs.build_id }}" ] || [ -z "${{ needs.get_build_ios.outputs.build_id }}" ]; then
+            set-output needs_native_build "true"
+          else
+            set-output needs_native_build "false"
+          fi
+
+  check_ios_version:
+    name: Check iOS version is editable on App Store
+    type: custom
+    needs: [decide_native_build]
+    if: ${{ needs.decide_native_build.outputs.needs_native_build == 'true' }}
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - run: node scripts/check-ios-app-version.mjs
+
+  build_android:
+    name: Build Android app
+    type: build
+    needs: [check_ios_version, decide_native_build]
+    if: ${{ needs.decide_native_build.outputs.needs_native_build == 'true' }}
+    params:
+      platform: android
+      profile: production
+  build_ios:
+    name: Build iOS app
+    type: build
+    needs: [check_ios_version, decide_native_build]
+    if: ${{ needs.decide_native_build.outputs.needs_native_build == 'true' }}
+    params:
+      platform: ios
+      profile: production
+  submit_android:
+    name: Submit Android
+    type: submit
+    needs: [build_android]
+    env:
+      EXPO_DEBUG: "1"
+    params:
+      build_id: ${{ needs.build_android.outputs.build_id }}
+      profile: production
+  submit_ios:
+    name: Submit iOS
+    type: submit
+    needs: [build_ios]
+    env:
+      EXPO_DEBUG: "1"
+    params:
+      build_id: ${{ needs.build_ios.outputs.build_id }}
+      profile: production
+
+  publish_update:
+    name: Publish OTA update
+    type: update
+    needs: [decide_native_build]
+    if: ${{ needs.decide_native_build.outputs.needs_native_build == 'false' }}
+    params:
+      channel: production
