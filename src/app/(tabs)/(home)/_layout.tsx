@@ -18,6 +18,7 @@ export default function HomeStackLayout() {
 					name="profile"
 					options={{ title: "Perfil", headerShown: false }}
 				/>
+				<Stack.Screen name="account/index" options={{ title: "Conta" }} />
 			</Stack.Protected>
 			<Stack.Screen
 				name="companies"

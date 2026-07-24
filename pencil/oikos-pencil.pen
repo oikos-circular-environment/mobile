@@ -1,5 +1,5 @@
 {
-  "version": "2.13",
+  "version": "2.14",
   "children": [
     {
       "type": "frame",
@@ -14802,6 +14802,759 @@
               "layout": "none"
             }
           ]
+        },
+        {
+          "type": "frame",
+          "id": "lPwII",
+          "name": "Account Flow",
+          "context": "Gerenciamento da conta do usuário (dados de acesso, não do perfil) — src/app/(tabs)/(home)/account/index.tsx, src/components/settings/settings-bottom-sheet.tsx e change-password-bottom-sheet.tsx. Aberto pelo Setting2Icon do HomeUserCard.",
+          "gap": 96,
+          "children": [
+            {
+              "id": "Bx5v4",
+              "type": "ref",
+              "ref": "cYytK",
+              "name": "(home)/index — configurações (sheet)",
+              "context": "SettingsBottomSheet reformulado — src/components/settings/settings-bottom-sheet.tsx. Antes tinha sair/excluir; agora leva a Conta + Sair. O estado de exclusão migrou para a tela de Conta.",
+              "descendants": {
+                "OpqBD": {
+                  "content": "Configurações"
+                },
+                "PMy7j": {
+                  "type": "frame",
+                  "id": "E1mgc",
+                  "name": "Configuracoes Content",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 10,
+                  "children": [
+                    {
+                      "id": "XTpVy",
+                      "type": "ref",
+                      "ref": "ALEkQ",
+                      "name": "Row Conta",
+                      "width": "fill_container",
+                      "justifyContent": "start",
+                      "alignItems": "center",
+                      "descendants": {
+                        "B0v4Ss": {
+                          "icon": "user-round"
+                        },
+                        "R2r1b": {
+                          "content": "Conta"
+                        },
+                        "PE7Cr": {
+                          "content": "E-mail, senha e exclusão da conta"
+                        },
+                        "fVdRp": {
+                          "enabled": false
+                        },
+                        "deJq5": {
+                          "enabled": true,
+                          "icon": "chevron-right",
+                          "fill": "$gray-400"
+                        }
+                      }
+                    },
+                    {
+                      "id": "V73qIS",
+                      "type": "ref",
+                      "ref": "ALEkQ",
+                      "name": "Row Sair",
+                      "width": "fill_container",
+                      "justifyContent": "start",
+                      "alignItems": "center",
+                      "descendants": {
+                        "fVqwm": {
+                          "fill": "$gray-700"
+                        },
+                        "B0v4Ss": {
+                          "icon": "log-out"
+                        },
+                        "R2r1b": {
+                          "content": "Sair da conta",
+                          "fill": "$gray-700"
+                        },
+                        "PE7Cr": {
+                          "enabled": false
+                        },
+                        "fVdRp": {
+                          "enabled": false
+                        },
+                        "deJq5": {
+                          "enabled": false
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "A1a2GE",
+              "name": "account/index",
+              "context": "Tela de Conta — src/app/(tabs)/(home)/account/index.tsx. Dados do usuário (account), não do perfil. Aberta pelo item Conta do SettingsBottomSheet.",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "id": "hxbtA",
+                  "type": "ref",
+                  "ref": "G08IN",
+                  "name": "Status Bar",
+                  "width": "fill_container"
+                },
+                {
+                  "type": "frame",
+                  "id": "GCwWr",
+                  "name": "Nav Header",
+                  "width": "fill_container",
+                  "height": 56,
+                  "stroke": "$border",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "strokeAlignment": "inner",
+                  "gap": "$spacing-2",
+                  "padding": [
+                    0,
+                    "$spacing-4"
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "jnPkj",
+                      "name": "Back",
+                      "width": 40,
+                      "height": 40,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "SOMZr",
+                          "name": "BackIcon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "chevron-left",
+                          "library": "lucide",
+                          "fill": "$foreground"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "B5mZ2",
+                      "name": "Title",
+                      "fill": "$foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Conta",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JbLi8",
+                      "name": "Spacer",
+                      "width": 40,
+                      "height": 40
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "J8tQ22",
+                  "name": "Content",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$spacing-6",
+                  "padding": [
+                    "$spacing-6",
+                    "$spacing-4",
+                    "$spacing-8",
+                    "$spacing-4"
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "SpXhN",
+                      "name": "Email Block",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$spacing-1",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Pj3gZ",
+                          "name": "EmailLabel",
+                          "fill": "$muted-foreground",
+                          "content": "E-MAIL",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-overline",
+                          "fontWeight": "600",
+                          "letterSpacing": 0.5
+                        },
+                        {
+                          "type": "text",
+                          "id": "TQ9Gy",
+                          "name": "EmailValue",
+                          "fill": "$foreground",
+                          "content": "maria.silva@email.com",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body-lg",
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Baq3e",
+                          "name": "EmailHint",
+                          "fill": "$gray-500",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "É com este e-mail que você entra no app.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "uF6Eb",
+                      "name": "Divider",
+                      "fill": "$border",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yWPmh",
+                      "name": "Security Block",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$spacing-2",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "lblZ9",
+                          "name": "SecurityLabel",
+                          "fill": "$muted-foreground",
+                          "content": "SEGURANÇA",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-overline",
+                          "fontWeight": "600",
+                          "letterSpacing": 0.5
+                        },
+                        {
+                          "id": "Mq32o",
+                          "type": "ref",
+                          "ref": "ALEkQ",
+                          "name": "Row Mudar Senha",
+                          "width": "fill_container",
+                          "justifyContent": "start",
+                          "alignItems": "center",
+                          "descendants": {
+                            "B0v4Ss": {
+                              "icon": "lock"
+                            },
+                            "R2r1b": {
+                              "content": "Mudar senha"
+                            },
+                            "PE7Cr": {
+                              "content": "As outras sessões serão desconectadas"
+                            },
+                            "fVdRp": {
+                              "enabled": false
+                            },
+                            "deJq5": {
+                              "enabled": true,
+                              "icon": "chevron-right",
+                              "fill": "$gray-400"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JPISf",
+                      "name": "Danger Block",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$spacing-2",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "L5Z5z",
+                          "name": "DangerLabel",
+                          "fill": "$muted-foreground",
+                          "content": "EXCLUSÃO DA CONTA",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-overline",
+                          "fontWeight": "600",
+                          "letterSpacing": 0.5
+                        },
+                        {
+                          "id": "P9hUW",
+                          "type": "ref",
+                          "ref": "ALEkQ",
+                          "name": "Row Excluir Conta",
+                          "width": "fill_container",
+                          "fill": "#fef2f2",
+                          "justifyContent": "start",
+                          "alignItems": "center",
+                          "descendants": {
+                            "fVqwm": {
+                              "fill": "#dc2626"
+                            },
+                            "B0v4Ss": {
+                              "icon": "trash-2"
+                            },
+                            "R2r1b": {
+                              "content": "Excluir minha conta",
+                              "fill": "#dc2626"
+                            },
+                            "PE7Cr": {
+                              "content": "Você tem 90 dias para voltar atrás",
+                              "fill": "#b91c1c"
+                            },
+                            "fVdRp": {
+                              "enabled": false
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FlShH",
+              "name": "account/index — exclusão agendada",
+              "context": "Mesma tela com deletionScheduledAt preenchido — o bloco de exclusão vira aviso + ação de cancelar (cancelDeletion do auth-context).",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "id": "JICvJ",
+                  "type": "ref",
+                  "ref": "G08IN",
+                  "name": "Status Bar",
+                  "width": "fill_container"
+                },
+                {
+                  "type": "frame",
+                  "id": "iNAaH",
+                  "name": "Nav Header",
+                  "width": "fill_container",
+                  "height": 56,
+                  "stroke": "$border",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "strokeAlignment": "inner",
+                  "gap": "$spacing-2",
+                  "padding": [
+                    0,
+                    "$spacing-4"
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "E47rE",
+                      "name": "Back",
+                      "width": 40,
+                      "height": 40,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "A71c3",
+                          "name": "BackIcon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "chevron-left",
+                          "library": "lucide",
+                          "fill": "$foreground"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "nUjn6",
+                      "name": "Title",
+                      "fill": "$foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Conta",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "IQpJZ",
+                      "name": "Spacer",
+                      "width": 40,
+                      "height": 40
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kMuWm",
+                  "name": "Content",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$spacing-6",
+                  "padding": [
+                    "$spacing-6",
+                    "$spacing-4",
+                    "$spacing-8",
+                    "$spacing-4"
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ryJWh",
+                      "name": "Email Block",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$spacing-1",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Po8zw",
+                          "name": "EmailLabel",
+                          "fill": "$muted-foreground",
+                          "content": "E-MAIL",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-overline",
+                          "fontWeight": "600",
+                          "letterSpacing": 0.5
+                        },
+                        {
+                          "type": "text",
+                          "id": "QpBqR",
+                          "name": "EmailValue",
+                          "fill": "$foreground",
+                          "content": "maria.silva@email.com",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body-lg",
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "COnFh",
+                          "name": "EmailHint",
+                          "fill": "$gray-500",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "É com este e-mail que você entra no app.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "L8r0ws",
+                      "name": "Divider",
+                      "fill": "$border",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "LhrsP",
+                      "name": "Security Block",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$spacing-2",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "fve2v",
+                          "name": "SecurityLabel",
+                          "fill": "$muted-foreground",
+                          "content": "SEGURANÇA",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-overline",
+                          "fontWeight": "600",
+                          "letterSpacing": 0.5
+                        },
+                        {
+                          "id": "ziyBn",
+                          "type": "ref",
+                          "ref": "ALEkQ",
+                          "name": "Row Mudar Senha",
+                          "width": "fill_container",
+                          "justifyContent": "start",
+                          "alignItems": "center",
+                          "descendants": {
+                            "B0v4Ss": {
+                              "icon": "lock"
+                            },
+                            "R2r1b": {
+                              "content": "Mudar senha"
+                            },
+                            "PE7Cr": {
+                              "content": "As outras sessões serão desconectadas"
+                            },
+                            "fVdRp": {
+                              "enabled": false
+                            },
+                            "deJq5": {
+                              "enabled": true,
+                              "icon": "chevron-right",
+                              "fill": "$gray-400"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "wXgOi",
+                      "name": "Danger Block",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": "$spacing-2",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "zZbct",
+                          "name": "DangerLabel",
+                          "fill": "$muted-foreground",
+                          "content": "EXCLUSÃO AGENDADA",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-overline",
+                          "fontWeight": "600",
+                          "letterSpacing": 0.5
+                        },
+                        {
+                          "id": "Ufc2t",
+                          "type": "ref",
+                          "ref": "Mp6nf",
+                          "name": "Alert Exclusao",
+                          "width": "fill_container",
+                          "fill": "#fffbeb",
+                          "descendants": {
+                            "Mp6nfIcon": {
+                              "icon": "triangle-alert",
+                              "fill": "#d97706"
+                            },
+                            "Mp6nfTitle": {
+                              "content": "Faltam 87 dias",
+                              "fill": "#b45309"
+                            },
+                            "Mp6nfDesc": {
+                              "content": "Sua conta continua funcionando normalmente até a exclusão permanente.",
+                              "fill": "#b45309",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "lineHeight": 1.4
+                            }
+                          }
+                        },
+                        {
+                          "id": "u1pLQa",
+                          "type": "ref",
+                          "ref": "ALEkQ",
+                          "name": "Row Cancelar Exclusao",
+                          "width": "fill_container",
+                          "fill": "#fffbeb",
+                          "justifyContent": "start",
+                          "alignItems": "center",
+                          "descendants": {
+                            "fVqwm": {
+                              "fill": "#d97706"
+                            },
+                            "B0v4Ss": {
+                              "icon": "undo-2"
+                            },
+                            "ViIMW": {
+                              "justifyContent": "center",
+                              "alignItems": "start"
+                            },
+                            "R2r1b": {
+                              "content": "Cancelar exclusão da conta",
+                              "fill": "#b45309"
+                            },
+                            "PE7Cr": {
+                              "enabled": false,
+                              "content": "Caso"
+                            },
+                            "fVdRp": {
+                              "enabled": false
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "dagS8",
+              "type": "ref",
+              "ref": "cYytK",
+              "name": "account/index — trocar senha (sheet)",
+              "context": "ChangePasswordBottomSheet — src/components/settings/change-password-bottom-sheet.tsx. react-hook-form + zod (mín. 6 e confirmação). Sucesso: toast + novo par de tokens grava a sessão atual; as demais sessões caem.",
+              "descendants": {
+                "OpqBD": {
+                  "content": "Mudar senha"
+                },
+                "PMy7j": {
+                  "type": "frame",
+                  "id": "p6Euq8",
+                  "name": "Trocar Senha Content",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$spacing-4",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "aoAv9",
+                      "name": "Intro",
+                      "fill": "$gray-500",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Ao trocar a senha, as outras sessões são desconectadas. Este aparelho continua logado.",
+                      "lineHeight": 1.4,
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-body-sm",
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "id": "AJ77i",
+                      "type": "ref",
+                      "ref": "PYFm3",
+                      "name": "Input Senha Atual",
+                      "width": "fill_container",
+                      "descendants": {
+                        "rTGHR": {
+                          "content": "SENHA ATUAL"
+                        },
+                        "WLFwn": {
+                          "content": "••••••••",
+                          "fill": "$foreground"
+                        },
+                        "FAMgV": {
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "faZvO",
+                              "name": "ToggleVisibility",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "eye-off",
+                              "library": "lucide",
+                              "fill": "$gray-400"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "id": "S5Q1l",
+                      "type": "ref",
+                      "ref": "PYFm3",
+                      "name": "Input Nova Senha",
+                      "width": "fill_container",
+                      "descendants": {
+                        "rTGHR": {
+                          "content": "NOVA SENHA"
+                        },
+                        "WLFwn": {
+                          "content": "••••••••",
+                          "fill": "$foreground"
+                        },
+                        "FAMgV": {
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "SRHwh",
+                              "name": "ToggleVisibility",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "eye-off",
+                              "library": "lucide",
+                              "fill": "$gray-400"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "id": "XEbgo",
+                      "type": "ref",
+                      "ref": "PYFm3",
+                      "name": "Input Confirmar Senha",
+                      "width": "fill_container",
+                      "descendants": {
+                        "rTGHR": {
+                          "content": "CONFIRMAR NOVA SENHA"
+                        },
+                        "WLFwn": {
+                          "content": "••••••••",
+                          "fill": "$foreground"
+                        },
+                        "FAMgV": {
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "SQzBG",
+                              "name": "ToggleVisibility",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "eye-off",
+                              "library": "lucide",
+                              "fill": "$gray-400"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "id": "InjXZ",
+                      "type": "ref",
+                      "ref": "J7k5q",
+                      "name": "Button Salvar",
+                      "width": "fill_container",
+                      "descendants": {
+                        "M3upe": {
+                          "content": "Salvar nova senha"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -22222,5 +22975,6 @@
   },
   "imports": {
     "9": "pencil:shadcn.lib.pen"
-  }
+  },
+  "fileToken": "f8d83b3b-fe46-47e3-8eed-9e5cd9cb913f"
 }

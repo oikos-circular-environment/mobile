@@ -1,6 +1,6 @@
 import type BottomSheetType from "@gorhom/bottom-sheet";
 import type { Href } from "expo-router";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { RecycleIcon, ShieldIcon } from "lucide-react-native";
 import type { ComponentType } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -10,7 +10,6 @@ import { HomeGuestCard } from "@/components/home/home-guest-card";
 import { HomeHeaderSkeleton } from "@/components/home/home-header-skeleton";
 import { HomeUserCard } from "@/components/home/home-user-card";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
-import { DeleteAccountModal } from "@/components/settings/delete-account-modal";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -72,18 +71,12 @@ function ServiceCard({
 
 export default function HomeScreen() {
 	useRouteInteractive();
-	const {
-		isAuthenticated,
-		needsProfileCompletion,
-		isLoading,
-		signOut,
-		requestDeletion,
-		isRequestingDeletion,
-	} = useAuthContext();
+	const { isAuthenticated, needsProfileCompletion, isLoading, signOut } =
+		useAuthContext();
 	const { permissionDenied } = useGeospatial();
+	const router = useRouter();
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [showSignOutModal, setShowSignOutModal] = useState(false);
-	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const settingsSheetRef = useRef<BottomSheetType>(null);
 	const contentOpacity = useRef(new Animated.Value(0)).current;
 
@@ -91,20 +84,15 @@ export default function HomeScreen() {
 		settingsSheetRef.current?.snapToIndex(0);
 	}, []);
 
+	const handleOpenAccount = useCallback(() => {
+		settingsSheetRef.current?.close();
+		router.push("/(tabs)/(home)/account");
+	}, [router]);
+
 	const handleSignOut = useCallback(() => {
 		settingsSheetRef.current?.close();
 		setShowSignOutModal(true);
 	}, []);
-
-	const handleDeleteAccount = useCallback(() => {
-		settingsSheetRef.current?.close();
-		setShowDeleteModal(true);
-	}, []);
-
-	const handleConfirmDeletion = useCallback(() => {
-		requestDeletion();
-		setShowDeleteModal(false);
-	}, [requestDeletion]);
 
 	useEffect(() => {
 		if (!isLoading) {
@@ -192,8 +180,8 @@ export default function HomeScreen() {
 				<>
 					<SettingsBottomSheet
 						ref={settingsSheetRef}
+						onOpenAccount={handleOpenAccount}
 						onSignOut={handleSignOut}
-						onDeleteAccount={handleDeleteAccount}
 					/>
 
 					<Modal
@@ -229,13 +217,6 @@ export default function HomeScreen() {
 							</ModalFooter>
 						</ModalContent>
 					</Modal>
-
-					<DeleteAccountModal
-						isOpen={showDeleteModal}
-						onClose={() => setShowDeleteModal(false)}
-						onConfirm={handleConfirmDeletion}
-						isLoading={isRequestingDeletion}
-					/>
 				</>
 			)}
 		</>

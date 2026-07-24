@@ -14,8 +14,7 @@
 		"generate:api": "openapi-ts",
 		"test": "jest --forceExit",
 		"test:coverage": "jest --coverage --forceExit",
-		"sync:env": "eas env:push production --path .env.eas --force",
-		"tunnel": "cloudflared tunnel run oikos-local-dev"
+		"sync:env": "eas env:push production --path .env.eas --force"
 	},
 	"dependencies": {
 		"@expo-google-fonts/oswald": "^0.4.2",
