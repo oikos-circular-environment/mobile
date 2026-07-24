@@ -288,6 +288,38 @@ O documento deve cobrir:
 ### Staged rollout (Google Play)
 Recomendado para o primeiro lançamento público: iniciar com **10–20% dos usuários**, monitorar crashes e feedback por 48–72h, depois ampliar para 100%. Isso é especialmente relevante dado que o app tem funcionalidades de localização em background — erros nessa área impactam bateria e podem gerar reviews negativos.
 
+### Versionamento sincronizado entre iOS e Android
+`app.config.ts` usa um único campo `version` (ex.: `1.0.1`), compartilhado pelas duas plataformas — não existem `ios.version`/`android.version` separados. Essa é a fonte de verdade da versão de marketing e deve ser bumpada nas duas plataformas juntas, nunca por loja.
+
+**Build numbers não precisam (nem devem) ser sincronizados**: `ios.buildNumber` e `android.versionCode` são incrementados de forma independente pelo `autoIncrement: true` do `eas.json` — cada loja tem seu próprio histórico de builds e isso é esperado. Só a `version` de marketing (o que o usuário final vê) precisa ser idêntica nas duas lojas.
+
+**Por que existe um gate automático só do lado iOS**: a Apple trava a `version` assim que uma App Store Version é aprovada/fica ao vivo — não dá pra reabrir essa versão para anexar um novo build, só criando uma nova (bump obrigatório). O Google Play **não tem essa trava**: `versionName` pode ser reenviado livremente entre uploads, só `versionCode` precisa sempre subir. Por isso o workflow de produção (`.eas/workflows/production.yml`, job `check_ios_version`) consulta a App Store Connect API antes de buildar e falha cedo se a `version` atual já estiver anexada a uma versão aprovada/ao vivo — e **os dois builds** (`build_android` e `build_ios`) dependem desse mesmo check, para que uma leva de release nunca suba pra uma loja com uma versão diferente da outra.
+
+### Build nativo condicional (fingerprint) + OTA
+
+Nem todo push para `production` precisa virar um build nativo novo. O workflow calcula um **fingerprint** do projeto (job `fingerprint`) — um hash do que é nativo: módulos nativos, plugins de config, permissões, versão do SDK. Mudanças só em JS/assets não alteram esse hash.
+
+A cada push, o workflow (job `get-build` para cada plataforma) procura no histórico do EAS um build já existente compatível com o fingerprint atual:
+- **Fingerprint bateu com um build existente** (JS-only): pula `check_ios_version`, `build_android`, `build_ios` e `submit_*` inteiramente — publica só um update OTA (`publish_update`) no canal `production`. Não passa pela App Store nem pelo Play Console.
+- **Fingerprint não bateu** (mudou algo nativo): roda o fluxo normal completo — `check_ios_version` → `build_android`/`build_ios` → `submit_android`/`submit_ios`. Se qualquer uma das duas plataformas precisar de build nativo, as duas buildam juntas (mesma lógica de sincronia da seção anterior).
+
+Isso só funciona de forma segura porque `runtimeVersion.policy` em `app.config.ts` é `"fingerprint"` (não `"appVersion"`) — o `expo-updates` no aparelho só aceita um OTA se o fingerprint do update bater com o fingerprint do binário instalado. Ou seja, a mesma checagem que decide "precisa buildar?" no CI é a que garante, em runtime, que um update nunca vai parar num binário que não tem o código nativo necessário.
+
+Bump de `version` de marketing continua só sendo necessário quando `check_ios_version` falhar (fingerprint mudou **e** a versão atual já está travada na Apple) — não a cada push.
+
+### Só existe workflow pra production
+
+`.eas/workflows/production.yml` (o descrito acima) é o único workflow do EAS no projeto — dispara em push pra `production`. Um workflow só compensa quando orquestra múltiplos steps/jobs com dependência entre si (é o caso: quality checks → fingerprint → decidir build-vs-OTA → submit); pra uma ação manual e pontual como "builda o dev client agora", ele seria só uma casca em volta do próprio `eas build`, sem ganho nenhum.
+
+**Dev client (`development`/`development-simulator`)**: continue rodando direto:
+```bash
+eas build --profile development --platform ios
+eas build --profile development-simulator --platform ios   # simulador
+eas build --profile development --platform android
+```
+
+**`preview`** (profile que já está no `eas.json`, `distribution: "internal"` sem dev client embutido): sem workflow nem uso hoje. Resolveria o caso de dar um build standalone pra alguém sem Expo dev client testar sem precisar do servidor local rodando — mas não há esse consumidor agora: development builds (com o dev client, testado com o modo desenvolvedor do iPhone habilitado) cobrem o teste em hardware real, e testers externos usam TestFlight/trilha do Play, que já passam pela loja. Se essa necessidade aparecer (ex.: dar um `.apk`/build pra alguém não-dev testar uma PR), aí sim vale um `.eas/workflows/preview.yml` disparado em `pull_request` — vale lembrar que `preview` em iOS ainda exigiria registro de UDID por aparelho (build ad-hoc), enquanto Android instala livremente via `.apk`.
+
 ---
 
 ## 6. Comparativo Rápido: Apple vs Google
