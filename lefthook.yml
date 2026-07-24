@@ -10,7 +10,7 @@ pre-commit:
             ;;
         esac
     - name: biome
-      glob: "*.{js,jsx,ts,tsx,json,jsonc}"
+      glob: "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,json,jsonc}"
       run: npx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       stage_fixed: true
 
