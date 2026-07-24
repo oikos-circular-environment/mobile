@@ -2,13 +2,15 @@ import BottomSheet, {
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
 	BottomSheetScrollView,
+	BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircleIcon, Eye, EyeOff } from "lucide-react-native";
 import { forwardRef, useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, View } from "react-native";
+import { View } from "react-native";
 import { z } from "zod";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -19,11 +21,22 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Input, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 
 const MIN_PASSWORD_LENGTH = 6;
+
+// O sheet só reposiciona sobre o teclado se o campo for o BottomSheetTextInput
+// dele — um TextInput comum (o que o InputField do gluestack renderiza) não é
+// rastreado e acaba coberto. Por isso o campo vai estilizado via style, já que
+// o componente não passa pelo NativeWind.
+const textInputStyle = {
+	flex: 1,
+	height: "100%",
+	fontSize: 16,
+	color: colors.gray[900],
+} as const;
 
 const changePasswordSchema = z
 	.object({
@@ -125,82 +138,78 @@ export const ChangePasswordBottomSheet = forwardRef<
 			enableDynamicSizing
 			enablePanDownToClose
 			keyboardBehavior="interactive"
+			keyboardBlurBehavior="restore"
 			android_keyboardInputMode="adjustResize"
 			backdropComponent={backdropComponent}
 		>
-			<KeyboardAvoidingView behavior="padding">
-				<BottomSheetScrollView
-					contentContainerStyle={{
-						gap: 16,
-						paddingHorizontal: 16,
-						paddingBottom: 32,
-					}}
-				>
-					<View className="gap-1">
-						<Heading size="md" className="text-base text-gray-950">
-							Mudar senha
-						</Heading>
-						<Text className="text-sm text-gray-500">
-							Ao trocar a senha, as outras sessões são desconectadas. Este
-							aparelho continua logado.
-						</Text>
-					</View>
+			<BottomSheetScrollView
+				contentContainerStyle={{
+					gap: 16,
+					paddingHorizontal: 16,
+					paddingBottom: 32,
+				}}
+			>
+				<View className="gap-1">
+					<Heading size="md" className="text-base text-gray-950">
+						Mudar senha
+					</Heading>
+					<Text className="text-sm text-gray-500">
+						Ao trocar a senha, as outras sessões são desconectadas. Este
+						aparelho continua logado.
+					</Text>
+				</View>
 
-					{fields.map(({ name, label }) => (
-						<FormControl
-							key={name}
-							isInvalid={!!errors[name]}
-							className="gap-2"
-						>
-							<FormControlLabel>
-								<FormControlLabelText className="text-xs font-semibold uppercase text-gray-500">
-									{label}
-								</FormControlLabelText>
-							</FormControlLabel>
-							<Controller
-								control={control}
-								name={name}
-								render={({ field: { onChange, onBlur, value } }) => (
-									<Input>
-										<InputField
-											value={value}
-											onBlur={onBlur}
-											onChangeText={onChange}
-											placeholder="••••••••"
-											secureTextEntry={!visibleFields[name]}
-											autoCapitalize="none"
-											className="text-base"
+				{fields.map(({ name, label }) => (
+					<FormControl key={name} isInvalid={!!errors[name]} className="gap-2">
+						<FormControlLabel>
+							<FormControlLabelText className="text-xs font-semibold uppercase text-gray-500">
+								{label}
+							</FormControlLabelText>
+						</FormControlLabel>
+						<Controller
+							control={control}
+							name={name}
+							render={({ field: { onChange, onBlur, value } }) => (
+								<Input>
+									<BottomSheetTextInput
+										value={value}
+										onBlur={onBlur}
+										onChangeText={onChange}
+										placeholder="••••••••"
+										placeholderTextColor={colors.gray[500]}
+										secureTextEntry={!visibleFields[name]}
+										autoCapitalize="none"
+										style={textInputStyle}
+									/>
+									<InputSlot
+										onPress={() => toggleVisibility(name)}
+										className="pr-1"
+										testID={`toggle-${name}`}
+									>
+										<InputIcon
+											as={visibleFields[name] ? Eye : EyeOff}
+											className="text-muted-foreground"
 										/>
-										<InputSlot
-											onPress={() => toggleVisibility(name)}
-											className="pr-1"
-											testID={`toggle-${name}`}
-										>
-											<InputIcon
-												as={visibleFields[name] ? Eye : EyeOff}
-												className="text-muted-foreground"
-											/>
-										</InputSlot>
-									</Input>
-								)}
-							/>
-							{errors[name]?.message && (
-								<FormControlError>
-									<FormControlErrorIcon as={AlertCircleIcon} />
-									<FormControlErrorText>
-										{errors[name].message}
-									</FormControlErrorText>
-								</FormControlError>
+									</InputSlot>
+								</Input>
 							)}
-						</FormControl>
-					))}
+						/>
+						{errors[name]?.message && (
+							<FormControlError>
+								<FormControlErrorIcon as={AlertCircleIcon} />
+								<FormControlErrorText>
+									{errors[name].message}
+								</FormControlErrorText>
+							</FormControlError>
+						)}
+					</FormControl>
+				))}
 
-					<Button size="lg" onPress={onSubmit} isDisabled={isChangingPassword}>
-						<ButtonText>Salvar nova senha</ButtonText>
-						{isChangingPassword && <ButtonSpinner />}
-					</Button>
-				</BottomSheetScrollView>
-			</KeyboardAvoidingView>
+				<Button size="lg" onPress={onSubmit} isDisabled={isChangingPassword}>
+					<ButtonText>Salvar nova senha</ButtonText>
+					{isChangingPassword && <ButtonSpinner />}
+				</Button>
+			</BottomSheetScrollView>
 		</BottomSheet>
 	);
 });
