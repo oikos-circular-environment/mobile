@@ -9,6 +9,7 @@ import { makeAddress, makeProfile, makeUser } from "@/tests/factories";
 const mockLinkPress = jest.fn();
 
 jest.mock("expo-router", () => ({
+	useRouter: () => ({ push: jest.fn(), navigate: jest.fn(), back: jest.fn() }),
 	Link: ({
 		children,
 		asChild,
@@ -62,11 +63,6 @@ jest.mock("@/components/settings/settings-bottom-sheet", () => {
 	};
 });
 
-jest.mock("@/components/settings/delete-account-modal", () => {
-	const { View: V } = require("react-native");
-	return { DeleteAccountModal: () => <V testID="delete-account-modal" /> };
-});
-
 jest.mock("@/components/auth/profile-completion-modal", () => ({
 	ProfileCompletionModal: ({
 		isOpen,
@@ -114,6 +110,9 @@ const defaultAuth = {
 	requestDeletion: jest.fn(),
 	cancelDeletion: jest.fn(),
 	isRequestingDeletion: false,
+	account: null,
+	changePassword: jest.fn(),
+	isChangingPassword: false,
 	isCancellingDeletion: false,
 	updateUserProfile: jest.fn(),
 };

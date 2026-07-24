@@ -3,7 +3,7 @@ import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
 	input: {
-		path: "https://api.oikos.company/docs/openapi.json",
+		path: "https://local.oikos.company/docs/openapi.json",
 		fetch: {
 			headers: {
 				Authorization:

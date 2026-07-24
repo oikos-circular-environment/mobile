@@ -26,6 +26,7 @@ import type {
 	PostV1ComplaintsByIdResolutionsAttachmentsResponse,
 	PostV1ComplaintsByIdVotesResponse,
 	PostV1ComplaintsResponse,
+	PostV1ModerationSupportResponse,
 	PutV1CompaniesByIdAddressesResponse,
 	PutV1CompaniesByIdResponse,
 	PutV1CompaniesByIdServicesResponse,
@@ -442,6 +443,19 @@ export const postV1ComplaintsByIdAttachmentsResponseTransformer = async (
 		return item;
 	});
 	data.complaint.created_at = new Date(data.complaint.created_at);
+	return data;
+};
+
+export const postV1ModerationSupportResponseTransformer = async (
+	data: any,
+): Promise<PostV1ModerationSupportResponse> => {
+	data.supportRequest.attachments = data.supportRequest.attachments.map(
+		(item: any) => {
+			item.created_at = new Date(item.created_at);
+			return item;
+		},
+	);
+	data.supportRequest.created_at = new Date(data.supportRequest.created_at);
 	return data;
 };
 

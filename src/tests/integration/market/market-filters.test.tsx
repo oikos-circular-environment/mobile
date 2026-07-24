@@ -135,6 +135,9 @@ const defaultAuth: ReturnType<typeof useAuthContext> = {
 	requestDeletion: jest.fn(),
 	cancelDeletion: jest.fn(),
 	isRequestingDeletion: false,
+	account: null,
+	changePassword: jest.fn(),
+	isChangingPassword: false,
 	isCancellingDeletion: false,
 	updateUserProfile: jest.fn(),
 };
