@@ -44,16 +44,23 @@ function buildJwt({ keyId, issuerId, privateKeyPem }) {
 }
 
 async function fetchAppVersionState({ appId, token, versionString }) {
-	const url = new URL(`https://api.appstoreconnect.apple.com/v1/apps/${appId}/appStoreVersions`);
+	const url = new URL(
+		`https://api.appstoreconnect.apple.com/v1/apps/${appId}/appStoreVersions`,
+	);
 	url.searchParams.set("filter[versionString]", versionString);
-	url.searchParams.set("fields[appStoreVersions]", "versionString,appVersionState");
+	url.searchParams.set(
+		"fields[appStoreVersions]",
+		"versionString,appVersionState",
+	);
 
 	const response = await fetch(url, {
 		headers: { Authorization: `Bearer ${token}` },
 	});
 
 	if (!response.ok) {
-		throw new Error(`App Store Connect API respondeu ${response.status}: ${await response.text()}`);
+		throw new Error(
+			`App Store Connect API respondeu ${response.status}: ${await response.text()}`,
+		);
 	}
 
 	const body = await response.json();
@@ -61,9 +68,13 @@ async function fetchAppVersionState({ appId, token, versionString }) {
 }
 
 function getExpoVersion() {
-	const output = execFileSync("npx", ["expo", "config", "--json", "--type", "public"], {
-		encoding: "utf-8",
-	});
+	const output = execFileSync(
+		"npx",
+		["expo", "config", "--json", "--type", "public"],
+		{
+			encoding: "utf-8",
+		},
+	);
 	return JSON.parse(output).version;
 }
 
@@ -83,7 +94,11 @@ async function main() {
 	const privateKeyPem = readFileSync(p8Path, "utf-8");
 	const version = getExpoVersion();
 	const token = buildJwt({ keyId, issuerId, privateKeyPem });
-	const state = await fetchAppVersionState({ appId, token, versionString: version });
+	const state = await fetchAppVersionState({
+		appId,
+		token,
+		versionString: version,
+	});
 
 	if (state && NON_EDITABLE_STATES.has(state)) {
 		console.error(
@@ -100,7 +115,7 @@ async function main() {
 	);
 }
 
-main().catch((error) => {
+main().catch(error => {
 	console.error(error);
 	process.exit(1);
 });
