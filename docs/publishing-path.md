@@ -305,15 +305,20 @@ A cada push, o workflow (job `get-build` para cada plataforma) procura no histó
 
 Isso só funciona de forma segura porque `runtimeVersion.policy` em `app.config.ts` é `"fingerprint"` (não `"appVersion"`) — o `expo-updates` no aparelho só aceita um OTA se o fingerprint do update bater com o fingerprint do binário instalado. Ou seja, a mesma checagem que decide "precisa buildar?" no CI é a que garante, em runtime, que um update nunca vai parar num binário que não tem o código nativo necessário.
 
-### Workflows do EAS: só production e development
-
-`.eas/workflows/production.yml` — o descrito acima, dispara em push pra `production`.
-
-`.eas/workflows/development.yml` — manual (`workflow_dispatch`), builda o dev client (`profile: development`/`development-simulator`) pra Android e/ou iOS, com input pra escolher plataforma e se o iOS é pra aparelho físico ou simulador. Sem lógica de fingerprint: como é disparado manualmente só quando dependência nativa muda, não tem redundância pra evitar.
-
-**Não existe workflow de `preview`** (profile que já está no `eas.json`, `distribution: "internal"` sem dev client embutido). Ele resolveria o caso de dar um build standalone pra alguém sem Expo dev client testar sem precisar do servidor local rodando — mas hoje não há esse consumidor: development builds (com o dev client, testado com o modo desenvolvedor do iPhone habilitado) cobrem o teste em hardware real, e testers externos usam TestFlight/trilha do Play, que já passam pela loja. Se essa necessidade aparecer (ex.: dar um `.apk`/build pra alguém não-dev testar uma PR), criar `.eas/workflows/preview.yml` nesse momento — vale lembrar que `preview` em iOS ainda exigiria registro de UDID por aparelho (build ad-hoc), enquanto Android instala livremente via `.apk`.
-
 Bump de `version` de marketing continua só sendo necessário quando `check_ios_version` falhar (fingerprint mudou **e** a versão atual já está travada na Apple) — não a cada push.
+
+### Só existe workflow pra production
+
+`.eas/workflows/production.yml` (o descrito acima) é o único workflow do EAS no projeto — dispara em push pra `production`. Um workflow só compensa quando orquestra múltiplos steps/jobs com dependência entre si (é o caso: quality checks → fingerprint → decidir build-vs-OTA → submit); pra uma ação manual e pontual como "builda o dev client agora", ele seria só uma casca em volta do próprio `eas build`, sem ganho nenhum.
+
+**Dev client (`development`/`development-simulator`)**: continue rodando direto:
+```bash
+eas build --profile development --platform ios
+eas build --profile development-simulator --platform ios   # simulador
+eas build --profile development --platform android
+```
+
+**`preview`** (profile que já está no `eas.json`, `distribution: "internal"` sem dev client embutido): sem workflow nem uso hoje. Resolveria o caso de dar um build standalone pra alguém sem Expo dev client testar sem precisar do servidor local rodando — mas não há esse consumidor agora: development builds (com o dev client, testado com o modo desenvolvedor do iPhone habilitado) cobrem o teste em hardware real, e testers externos usam TestFlight/trilha do Play, que já passam pela loja. Se essa necessidade aparecer (ex.: dar um `.apk`/build pra alguém não-dev testar uma PR), aí sim vale um `.eas/workflows/preview.yml` disparado em `pull_request` — vale lembrar que `preview` em iOS ainda exigiria registro de UDID por aparelho (build ad-hoc), enquanto Android instala livremente via `.apk`.
 
 ---
 
