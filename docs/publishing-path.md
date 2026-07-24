@@ -295,6 +295,18 @@ Recomendado para o primeiro lançamento público: iniciar com **10–20% dos usu
 
 **Por que existe um gate automático só do lado iOS**: a Apple trava a `version` assim que uma App Store Version é aprovada/fica ao vivo — não dá pra reabrir essa versão para anexar um novo build, só criando uma nova (bump obrigatório). O Google Play **não tem essa trava**: `versionName` pode ser reenviado livremente entre uploads, só `versionCode` precisa sempre subir. Por isso o workflow de produção (`.eas/workflows/build-and-submit.yml`, job `check_ios_version`) consulta a App Store Connect API antes de buildar e falha cedo se a `version` atual já estiver anexada a uma versão aprovada/ao vivo — e **os dois builds** (`build_android` e `build_ios`) dependem desse mesmo check, para que uma leva de release nunca suba pra uma loja com uma versão diferente da outra.
 
+### Build nativo condicional (fingerprint) + OTA
+
+Nem todo push para `production` precisa virar um build nativo novo. O workflow calcula um **fingerprint** do projeto (job `fingerprint`) — um hash do que é nativo: módulos nativos, plugins de config, permissões, versão do SDK. Mudanças só em JS/assets não alteram esse hash.
+
+A cada push, o workflow (job `get-build` para cada plataforma) procura no histórico do EAS um build já existente compatível com o fingerprint atual:
+- **Fingerprint bateu com um build existente** (JS-only): pula `check_ios_version`, `build_android`, `build_ios` e `submit_*` inteiramente — publica só um update OTA (`publish_update`) no canal `production`. Não passa pela App Store nem pelo Play Console.
+- **Fingerprint não bateu** (mudou algo nativo): roda o fluxo normal completo — `check_ios_version` → `build_android`/`build_ios` → `submit_android`/`submit_ios`. Se qualquer uma das duas plataformas precisar de build nativo, as duas buildam juntas (mesma lógica de sincronia da seção anterior).
+
+Isso só funciona de forma segura porque `runtimeVersion.policy` em `app.config.ts` é `"fingerprint"` (não `"appVersion"`) — o `expo-updates` no aparelho só aceita um OTA se o fingerprint do update bater com o fingerprint do binário instalado. Ou seja, a mesma checagem que decide "precisa buildar?" no CI é a que garante, em runtime, que um update nunca vai parar num binário que não tem o código nativo necessário.
+
+Bump de `version` de marketing continua só sendo necessário quando `check_ios_version` falhar (fingerprint mudou **e** a versão atual já está travada na Apple) — não a cada push.
+
 ---
 
 ## 6. Comparativo Rápido: Apple vs Google

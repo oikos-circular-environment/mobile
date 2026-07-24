@@ -97,7 +97,7 @@ const config: ExpoConfig = {
 	owner: "oikos-circular-environment",
 	platforms: ["ios", "android"],
 	runtimeVersion: {
-		policy: "appVersion",
+		policy: "fingerprint",
 	},
 	updates: {
 		url: "https://u.expo.dev/1ec73321-5c0d-469a-ae1d-407bf5345183",
