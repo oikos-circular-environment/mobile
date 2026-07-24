@@ -17,7 +17,7 @@
 		]
 	},
 	"linter": {
-		"includes": ["**", "!src/libs/oikos-sdk"],
+		"includes": ["**", "!src/libs/oikos-sdk/**"],
 		"rules": {
 			"correctness": {
 				"noUnusedImports": {
