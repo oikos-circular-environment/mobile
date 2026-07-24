@@ -288,6 +288,13 @@ O documento deve cobrir:
 ### Staged rollout (Google Play)
 Recomendado para o primeiro lançamento público: iniciar com **10–20% dos usuários**, monitorar crashes e feedback por 48–72h, depois ampliar para 100%. Isso é especialmente relevante dado que o app tem funcionalidades de localização em background — erros nessa área impactam bateria e podem gerar reviews negativos.
 
+### Versionamento sincronizado entre iOS e Android
+`app.config.ts` usa um único campo `version` (ex.: `1.0.1`), compartilhado pelas duas plataformas — não existem `ios.version`/`android.version` separados. Essa é a fonte de verdade da versão de marketing e deve ser bumpada nas duas plataformas juntas, nunca por loja.
+
+**Build numbers não precisam (nem devem) ser sincronizados**: `ios.buildNumber` e `android.versionCode` são incrementados de forma independente pelo `autoIncrement: true` do `eas.json` — cada loja tem seu próprio histórico de builds e isso é esperado. Só a `version` de marketing (o que o usuário final vê) precisa ser idêntica nas duas lojas.
+
+**Por que existe um gate automático só do lado iOS**: a Apple trava a `version` assim que uma App Store Version é aprovada/fica ao vivo — não dá pra reabrir essa versão para anexar um novo build, só criando uma nova (bump obrigatório). O Google Play **não tem essa trava**: `versionName` pode ser reenviado livremente entre uploads, só `versionCode` precisa sempre subir. Por isso o workflow de produção (`.eas/workflows/build-and-submit.yml`, job `check_ios_version`) consulta a App Store Connect API antes de buildar e falha cedo se a `version` atual já estiver anexada a uma versão aprovada/ao vivo — e **os dois builds** (`build_android` e `build_ios`) dependem desse mesmo check, para que uma leva de release nunca suba pra uma loja com uma versão diferente da outra.
+
 ---
 
 ## 6. Comparativo Rápido: Apple vs Google

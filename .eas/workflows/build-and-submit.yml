@@ -26,7 +26,7 @@ jobs:
   build_android:
     name: Build Android app
     type: build
-    needs: [quality]
+    needs: [check_ios_version]
     params:
       platform: android
       profile: production
