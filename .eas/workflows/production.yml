@@ -1,4 +1,4 @@
-name: Build and submit
+name: Production
 
 on:
   push:

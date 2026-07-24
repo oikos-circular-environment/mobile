@@ -293,7 +293,7 @@ Recomendado para o primeiro lançamento público: iniciar com **10–20% dos usu
 
 **Build numbers não precisam (nem devem) ser sincronizados**: `ios.buildNumber` e `android.versionCode` são incrementados de forma independente pelo `autoIncrement: true` do `eas.json` — cada loja tem seu próprio histórico de builds e isso é esperado. Só a `version` de marketing (o que o usuário final vê) precisa ser idêntica nas duas lojas.
 
-**Por que existe um gate automático só do lado iOS**: a Apple trava a `version` assim que uma App Store Version é aprovada/fica ao vivo — não dá pra reabrir essa versão para anexar um novo build, só criando uma nova (bump obrigatório). O Google Play **não tem essa trava**: `versionName` pode ser reenviado livremente entre uploads, só `versionCode` precisa sempre subir. Por isso o workflow de produção (`.eas/workflows/build-and-submit.yml`, job `check_ios_version`) consulta a App Store Connect API antes de buildar e falha cedo se a `version` atual já estiver anexada a uma versão aprovada/ao vivo — e **os dois builds** (`build_android` e `build_ios`) dependem desse mesmo check, para que uma leva de release nunca suba pra uma loja com uma versão diferente da outra.
+**Por que existe um gate automático só do lado iOS**: a Apple trava a `version` assim que uma App Store Version é aprovada/fica ao vivo — não dá pra reabrir essa versão para anexar um novo build, só criando uma nova (bump obrigatório). O Google Play **não tem essa trava**: `versionName` pode ser reenviado livremente entre uploads, só `versionCode` precisa sempre subir. Por isso o workflow de produção (`.eas/workflows/production.yml`, job `check_ios_version`) consulta a App Store Connect API antes de buildar e falha cedo se a `version` atual já estiver anexada a uma versão aprovada/ao vivo — e **os dois builds** (`build_android` e `build_ios`) dependem desse mesmo check, para que uma leva de release nunca suba pra uma loja com uma versão diferente da outra.
 
 ### Build nativo condicional (fingerprint) + OTA
 
@@ -304,6 +304,14 @@ A cada push, o workflow (job `get-build` para cada plataforma) procura no histó
 - **Fingerprint não bateu** (mudou algo nativo): roda o fluxo normal completo — `check_ios_version` → `build_android`/`build_ios` → `submit_android`/`submit_ios`. Se qualquer uma das duas plataformas precisar de build nativo, as duas buildam juntas (mesma lógica de sincronia da seção anterior).
 
 Isso só funciona de forma segura porque `runtimeVersion.policy` em `app.config.ts` é `"fingerprint"` (não `"appVersion"`) — o `expo-updates` no aparelho só aceita um OTA se o fingerprint do update bater com o fingerprint do binário instalado. Ou seja, a mesma checagem que decide "precisa buildar?" no CI é a que garante, em runtime, que um update nunca vai parar num binário que não tem o código nativo necessário.
+
+### Workflows do EAS: só production e development
+
+`.eas/workflows/production.yml` — o descrito acima, dispara em push pra `production`.
+
+`.eas/workflows/development.yml` — manual (`workflow_dispatch`), builda o dev client (`profile: development`/`development-simulator`) pra Android e/ou iOS, com input pra escolher plataforma e se o iOS é pra aparelho físico ou simulador. Sem lógica de fingerprint: como é disparado manualmente só quando dependência nativa muda, não tem redundância pra evitar.
+
+**Não existe workflow de `preview`** (profile que já está no `eas.json`, `distribution: "internal"` sem dev client embutido). Ele resolveria o caso de dar um build standalone pra alguém sem Expo dev client testar sem precisar do servidor local rodando — mas hoje não há esse consumidor: development builds (com o dev client, testado com o modo desenvolvedor do iPhone habilitado) cobrem o teste em hardware real, e testers externos usam TestFlight/trilha do Play, que já passam pela loja. Se essa necessidade aparecer (ex.: dar um `.apk`/build pra alguém não-dev testar uma PR), criar `.eas/workflows/preview.yml` nesse momento — vale lembrar que `preview` em iOS ainda exigiria registro de UDID por aparelho (build ad-hoc), enquanto Android instala livremente via `.apk`.
 
 Bump de `version` de marketing continua só sendo necessário quando `check_ios_version` falhar (fingerprint mudou **e** a versão atual já está travada na Apple) — não a cada push.
 
