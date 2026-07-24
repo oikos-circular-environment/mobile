@@ -14,6 +14,15 @@ jobs:
       - run: npx biome ci .
       - run: npm test
 
+  check_ios_version:
+    name: Check iOS version is editable on App Store
+    type: custom
+    needs: [quality]
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - run: node scripts/check-ios-app-version.mjs
+
   build_android:
     name: Build Android app
     type: build
@@ -24,7 +33,7 @@ jobs:
   build_ios:
     name: Build iOS app
     type: build
-    needs: [quality]
+    needs: [check_ios_version]
     params:
       platform: ios
       profile: production
