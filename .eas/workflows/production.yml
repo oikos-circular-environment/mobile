@@ -75,6 +75,20 @@ jobs:
     params:
       build_id: ${{ needs.build_android.outputs.build_id }}
       profile: production
+
+  # Publica notas da versão e trilha de destino, etapas que o `submit_android`
+  # não cobre. Ver docs/publishing-path.md.
+  publish_android:
+    name: Publish Android release notes and track
+    type: custom
+    needs: [submit_android, build_android]
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - name: Publish Android release
+        env:
+          ANDROID_VERSION_CODE: ${{ needs.build_android.outputs.app_build_version }}
+        run: node scripts/publish-android-release.mjs
   submit_ios:
     name: Submit iOS
     type: submit

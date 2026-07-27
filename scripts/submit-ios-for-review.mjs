@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * @file Publica a App Store Version da `version` atual e a envia para o App
  *   Review. Idempotente: reexecutar sobre o mesmo release não duplica nada.
@@ -9,13 +10,10 @@
  * @see docs/publishing-path.md — "Envio para o App Review"
  */
 
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import {
 	AscApiError,
 	createAscClient,
-	getExpoVersion,
 	NON_EDITABLE_VERSION_STATES,
 	OPEN_REVIEW_SUBMISSION_STATES,
 	readAscCredentialsFromEnv,
@@ -26,13 +24,15 @@ import {
 	syncScreenshots,
 	validateScreenshots,
 } from "./lib/asc-screenshots.mjs";
+import { getExpoVersion } from "./lib/expo-config.mjs";
+import {
+	readContact,
+	readStoreJson,
+	readWhatsNew,
+	STORE_DIR,
+	whatsNewPath,
+} from "./lib/store-config.mjs";
 
-const STORE_DIR = join(
-	dirname(fileURLToPath(import.meta.url)),
-	"..",
-	"store",
-	"ios",
-);
 const PENDING_SENTINEL = "__PENDENTE__";
 const BUILD_POLL_INTERVAL_MS = 30_000;
 
@@ -56,14 +56,6 @@ const step = message => console.log(`\n▸ ${message}`);
 const info = message => console.log(`  ${message}`);
 
 /**
- * @param {string} fileName Caminho relativo a `store/ios/`.
- * @returns {object}
- */
-function readJson(fileName) {
-	return JSON.parse(readFileSync(join(STORE_DIR, fileName), "utf-8"));
-}
-
-/**
  * Carrega e valida todos os dados do release de uma vez, antes de qualquer
  * chamada de rede, para que uma configuração incompleta não deixe a App Store
  * Version publicada pela metade.
@@ -76,35 +68,34 @@ function readJson(fileName) {
  * @throws {Error} Listando todos os problemas encontrados.
  */
 function loadReleaseConfig(version) {
-	const metadata = readJson("metadata.pt-BR.json");
-	const reviewDetails = readJson("review-details.json");
-
-	let whatsNew = "";
-	try {
-		whatsNew = readFileSync(
-			join(STORE_DIR, "whats-new", `${version}.md`),
-			"utf-8",
-		).trim();
-	} catch {
-		whatsNew = "";
-	}
+	const contact = readContact();
+	const metadata = {
+		...readStoreJson("ios/metadata.pt-BR.json"),
+		supportUrl: contact.supportUrl,
+	};
+	const reviewDetails = {
+		...readStoreJson("ios/review-details.json"),
+		contactEmail: contact.email,
+	};
+	const whatsNew = readWhatsNew(version, "ios");
 
 	const demoAccount = {
 		name: process.env.ASC_DEMO_ACCOUNT_NAME ?? "",
 		password: process.env.ASC_DEMO_ACCOUNT_PASSWORD ?? "",
 	};
 
-	const screenshots = collectScreenshots(join(STORE_DIR, "screenshots"));
+	const screenshots = collectScreenshots(join(STORE_DIR, "ios", "screenshots"));
 	const problems = [];
 
 	for (const [file, object] of [
-		["metadata.pt-BR.json", metadata],
-		["review-details.json", reviewDetails],
+		["ios/metadata.pt-BR.json", metadata],
+		["ios/review-details.json", reviewDetails],
+		["shared/contact.json", contact],
 	]) {
 		for (const [key, value] of Object.entries(object)) {
 			if (value === PENDING_SENTINEL) {
 				problems.push(
-					`store/ios/${file}: "${key}" ainda está como ${PENDING_SENTINEL}.`,
+					`store/${file}: "${key}" ainda está como ${PENDING_SENTINEL}.`,
 				);
 			}
 		}
@@ -112,7 +103,7 @@ function loadReleaseConfig(version) {
 
 	if (!whatsNew) {
 		problems.push(
-			`store/ios/whats-new/${version}.md não existe ou está vazio — a Apple exige "Novidades desta versão" em toda atualização.`,
+			`${whatsNewPath(version, "ios")} não existe ou está vazio — a Apple exige "Novidades desta versão" em toda atualização.`,
 		);
 	}
 

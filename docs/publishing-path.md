@@ -322,15 +322,7 @@ O `submit_ios` do workflow termina no upload do binário. Quem fecha o ciclo é 
 
 #### Onde ficam os dados do release
 
-```
-store/ios/
-├── metadata.pt-BR.json     # descrição, keywords, texto promocional, URLs, copyright
-├── review-details.json     # contato e notas para a equipe de revisão da Apple
-├── whats-new/<version>.md  # "Novidades desta versão" — um arquivo por versão
-└── screenshots/<DISPLAY_TYPE>/NN-nome.jpg
-```
-
-O prefixo numérico do arquivo (`01-`, `02-`, …) define a ordem na ficha da App Store.
+O prefixo numérico do arquivo de screenshot (`01-`, `02-`, …) define a ordem na ficha da App Store. O layout completo de `store/` está descrito em [Dados de release em `store/`](#dados-de-release-em-store).
 
 Campo ausente ou vazio nesses arquivos é **omitido do payload**, não enviado em branco — o que já estiver preenchido na App Store Connect é preservado. É assim que `contactPhone`, que não está em `review-details.json`, continua valendo o que foi cadastrado na loja.
 
@@ -362,6 +354,77 @@ npm run asc:inspect                       # estado atual na App Store Connect
 npm run asc:submit -- --dry-run --build-number=20   # valida config, não escreve nada
 npm run asc:submit -- --build-number=20 --skip-submit  # publica tudo, sem enviar pra review
 npm run asc:submit -- --build-number=20   # ciclo completo
+```
+
+### Dados de release em `store/`
+
+```
+store/
+├── shared/                      # o que é idêntico nas duas lojas
+│   ├── contact.json             # e-mail de suporte, URL de suporte, site
+│   └── whats-new/<version>.md   # notas da versão, um arquivo por versão
+├── ios/
+│   ├── metadata.pt-BR.json      # descrição, keywords, texto promocional, copyright
+│   ├── review-details.json      # contato e notas para a equipe de revisão da Apple
+│   ├── whats-new/<version>.md   # opcional: sobrescreve o texto de shared/
+│   └── screenshots/<DISPLAY_TYPE>/NN-nome.jpg
+└── android/
+    ├── release.json             # trilha, status do release, rollout, idioma
+    ├── whats-new/<version>.md   # opcional: sobrescreve o texto de shared/
+    ├── feature-graphic.jpg
+    └── screenshots/
+```
+
+**Regra de resolução das notas da versão:** vale `store/<loja>/whats-new/<version>.md` se existir; senão, `store/shared/whats-new/<version>.md`. Como a Google limita as notas a **500 caracteres** (a Apple, a 4.000), o texto compartilhado precisa caber nos 500 — se algum release exigir mais na App Store, é só criar o override em `store/ios/`.
+
+O que **não** é compartilhado, e por quê: descrição, keywords e texto promocional têm limites e campos distintos em cada loja; screenshots usam sistemas de classificação diferentes; conta de demonstração e contato de revisão só existem na Apple; trilha e rollout só existem na Google.
+
+### Publicação na Google Play
+
+O `submit_android` do workflow (que é `eas submit` por baixo) entrega o `.aab` na trilha configurada em `eas.json` — diferente do iOS, onde o binário só chega ao TestFlight. O que ele **não** faz é publicar as notas da versão nem promover entre trilhas. Disso cuida o job **`publish_android`**, que roda `scripts/publish-android-release.mjs`.
+
+Toda escrita na Play passa por uma transação chamada *edit*, e só `edits.commit` a torna pública. O script abre um edit, aplica as mudanças e:
+
+- **com `--dry-run`, ou em caso de erro** → descarta o rascunho, e a loja fica intacta;
+- **sem diferença a publicar** → descarta o rascunho e informa "nada a publicar";
+- **caso contrário** → faz o commit, publicando tudo de uma vez.
+
+Isso torna o Android mais seguro que o iOS nesse ponto: não existe estado pela metade.
+
+#### Trilha e rollout
+
+`store/android/release.json` define o destino:
+
+```json
+{ "track": "alpha", "status": "completed", "locale": "pt-BR", "defaultLanguage": "pt-BR" }
+```
+
+`status` aceita `completed`, `inProgress`, `draft` e `halted`. Para o staged rollout recomendado no primeiro lançamento público (ver [Staged rollout](#staged-rollout-google-play)), use `inProgress` com `userFraction` — que só é aceito nesse status:
+
+```json
+{ "track": "production", "status": "inProgress", "userFraction": 0.1, "locale": "pt-BR", "defaultLanguage": "pt-BR" }
+```
+
+A trilha continua em `alpha` enquanto a conta não tiver acesso liberado à produção (ver [Testadores para o Google Play](#testadores-para-o-google-play-closed-testing)). `--track=<trilha>` sobrescreve pontualmente, sem editar o arquivo.
+
+#### Credencial
+
+A service account do Google Play está no ambiente `production` do EAS como variável do tipo `file`, e é a mesma que o `eas submit` já usa:
+
+```bash
+eas env:create production --name GOOGLE_SERVICE_ACCOUNT_KEY \
+  --type file --value <caminho-do-json> --visibility secret
+```
+
+#### Rodando na mão
+
+```bash
+export GOOGLE_SERVICE_ACCOUNT_KEY=docs/<service-account>.json
+
+npm run play:inspect                       # trilhas, ficha, imagens, bundles
+npm run play:publish -- --dry-run           # mostra o diff, não publica nada
+npm run play:publish                        # abre o edit e faz o commit
+npm run play:publish -- --track=production  # sobrescreve a trilha do release.json
 ```
 
 ### Só existe workflow pra production

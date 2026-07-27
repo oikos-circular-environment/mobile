@@ -9,10 +9,10 @@
 
 import {
 	createAscClient,
-	getExpoVersion,
 	NON_EDITABLE_VERSION_STATES,
 	readAscCredentialsFromEnv,
 } from "./lib/asc-api.mjs";
+import { getExpoVersion } from "./lib/expo-config.mjs";
 
 /**
  * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client

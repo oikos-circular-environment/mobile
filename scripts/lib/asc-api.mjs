@@ -3,7 +3,6 @@
  * @see docs/publishing-path.md — "Envio para o App Review"
  */
 
-import { execFileSync } from "node:child_process";
 import { createSign } from "node:crypto";
 import { readFileSync } from "node:fs";
 
@@ -228,21 +227,6 @@ export function createAscClient({ keyId, issuerId, privateKeyPem }) {
 			}
 		},
 	};
-}
-
-/**
- * Versão de marketing declarada em `app.config.ts`, fonte de verdade única para
- * as duas lojas.
- *
- * @returns {string}
- */
-export function getExpoVersion() {
-	const output = execFileSync(
-		"npx",
-		["expo", "config", "--json", "--type", "public"],
-		{ encoding: "utf-8" },
-	);
-	return JSON.parse(output).version;
 }
 
 /**

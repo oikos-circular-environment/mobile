@@ -1,7 +1,6 @@
 {
 	"contactFirstName": "Christian",
 	"contactLastName": "Cesar Rodrigues Santos",
-	"contactEmail": "christiancnp@gmail.com",
 	"demoAccountRequired": true,
 	"notes": "O app não exige login para navegar no mapa de denúncias e no marketplace de empresas de reciclagem (Market). O login é obrigatório apenas para: registrar uma nova denúncia, votar na resolução de uma denúncia e publicar uma resolução.\n\nPara testar o fluxo completo, é necessário conceder permissão de localização (usada para marcar a ocorrência no mapa) e de câmera/microfone (usada para anexar fotos e vídeos à denúncia)."
 }

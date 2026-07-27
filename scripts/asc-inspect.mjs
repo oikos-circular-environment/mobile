@@ -8,11 +8,8 @@
  * @see docs/publishing-path.md — "Envio para o App Review"
  */
 
-import {
-	createAscClient,
-	getExpoVersion,
-	readAscCredentialsFromEnv,
-} from "./lib/asc-api.mjs";
+import { createAscClient, readAscCredentialsFromEnv } from "./lib/asc-api.mjs";
+import { getExpoVersion } from "./lib/expo-config.mjs";
 
 const heading = title =>
 	console.log(`\n── ${title} ${"─".repeat(Math.max(0, 56 - title.length))}`);

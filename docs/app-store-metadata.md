@@ -79,7 +79,7 @@ Para testar o fluxo completo, é necessário conceder permissão de localizaçã
 |---|---|
 | Nome | Christian |
 | Sobrenome | Cesar Rodrigues Santos |
-| E-mail | christiancnp@gmail.com *(confirmar se é este o e-mail a expor para a revisão da Apple)* |
+| E-mail | suporte@oikos.company |
 | Telefone | **Pendente** — informar com DDD |
 
 ---
