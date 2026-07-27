@@ -2,6 +2,11 @@
 module.exports = {
 	preset: "jest-expo",
 	testMatch: ["<rootDir>/src/tests/**/*.test.{ts,tsx}"],
+	/** O preset do jest-expo cobre .js/.jsx/.ts/.tsx; scripts/ usa .mjs. */
+	transform: {
+		...require("jest-expo/jest-preset").transform,
+		"\\.mjs$": "babel-jest",
+	},
 	moduleNameMapper: {
 		"^nativewind/jsx-runtime$": "react/jsx-runtime",
 		"^nativewind/jsx-dev-runtime$": "react/jsx-dev-runtime",

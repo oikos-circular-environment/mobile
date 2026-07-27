@@ -37,7 +37,9 @@
 				"track": "alpha"
 			},
 			"ios": {
-				"ascAppId": "6786017565"
+				"ascAppId": "6786017565",
+				"appleTeamId": "339A2VX3JG",
+				"metadataPath": "./store.config.js"
 			}
 		}
 	}
