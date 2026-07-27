@@ -1,8 +1,9 @@
 /**
- * @file Verifica a resolução dos dados de release em `store/`, em especial a
- *   precedência entre o texto comum às duas lojas e o override por loja.
+ * @file Verifica a resolução dos dados de release em `store/` e a fronteira
+ *   entre o que é configurado no EAS e o que os scripts próprios injetam.
  */
 
+import { getSubmitProfile } from "../../../scripts/lib/expo-config.mjs";
 import {
 	RELEASE_NOTES_MAX_LENGTH,
 	readContact,
@@ -40,24 +41,18 @@ describe("dados de release compartilhados", () => {
 	it("devolve vazio para uma versão sem arquivo de notas", () => {
 		expect(readWhatsNew("0.0.0-inexistente", "ios")).toBe("");
 	});
+});
 
-	it("não repete em cada loja o que já está em shared", () => {
-		const reviewDetails = readStoreJson("ios/review-details.json");
-		const metadata = readStoreJson("ios/metadata.pt-BR.json");
-		expect(reviewDetails).not.toHaveProperty("contactEmail");
-		expect(metadata).not.toHaveProperty("supportUrl");
+describe("fronteira entre EAS e scripts próprios", () => {
+	it("mantém trilha do Android só no eas.json", () => {
+		const release = readStoreJson("android/release.json");
+		expect(getSubmitProfile("android").track).toBeDefined();
+		expect(release).not.toHaveProperty("track");
+		expect(release).not.toHaveProperty("status");
+		expect(release).not.toHaveProperty("userFraction");
 	});
 
-	it("configura a trilha do Android com status válido", () => {
-		const release = readStoreJson("android/release.json");
-		expect(["completed", "inProgress", "draft", "halted"]).toContain(
-			release.status,
-		);
-		if (release.status === "inProgress") {
-			expect(release.userFraction).toBeGreaterThan(0);
-			expect(release.userFraction).toBeLessThanOrEqual(1);
-		} else {
-			expect(release.userFraction).toBeUndefined();
-		}
+	it("aponta o EAS Metadata para o store config dinâmico", () => {
+		expect(getSubmitProfile("ios").metadataPath).toBe("./store.config.js");
 	});
 });

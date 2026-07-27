@@ -1,19 +1,24 @@
 #!/usr/bin/env node
 /**
- * @file Publica as notas da versão e o destino de trilha do build já enviado
- *   pelo `eas submit`, e sincroniza os dados de contato da ficha. Idempotente:
- *   sem diferença a publicar, o rascunho é descartado sem commit.
+ * @file Publica as notas da versão e sincroniza os dados de contato da ficha —
+ *   o que o `eas submit` não cobre na Google Play. Trilha, status do release e
+ *   rollout vêm de `submit.production.android` no `eas.json`, aplicados pelo
+ *   próprio `eas submit`. Idempotente: sem diferença a publicar, o rascunho é
+ *   descartado sem commit.
  *
- * Flags: `--dry-run`, `--track=<trilha>`,
+ * Flags: `--dry-run`,
  * `--version-code=<n>` (default: variável de ambiente `ANDROID_VERSION_CODE`).
  *
  * @see docs/publishing-path.md — "Publicação na Google Play"
  */
 
-import { getAndroidPackage, getExpoVersion } from "./lib/expo-config.mjs";
+import {
+	getAndroidPackage,
+	getExpoVersion,
+	getSubmitProfile,
+} from "./lib/expo-config.mjs";
 import {
 	createPlayClient,
-	RELEASE_STATUSES,
 	readServiceAccountFromEnv,
 	withEdit,
 } from "./lib/play-api.mjs";
@@ -27,9 +32,6 @@ import {
 
 const flags = {
 	dryRun: process.argv.includes("--dry-run"),
-	track: process.argv
-		.find(argument => argument.startsWith("--track="))
-		?.split("=")[1],
 	versionCode:
 		process.argv
 			.find(argument => argument.startsWith("--version-code="))
@@ -47,8 +49,15 @@ const info = message => console.log(`  ${message}`);
  * @throws {Error} Listando todos os problemas encontrados.
  */
 function loadReleaseConfig(version) {
-	const release = { ...readStoreJson("android/release.json") };
-	if (flags.track) release.track = flags.track;
+	const submitProfile = getSubmitProfile("android");
+	const release = {
+		...readStoreJson("android/release.json"),
+		track: submitProfile.track,
+		status: submitProfile.releaseStatus ?? "completed",
+		...(submitProfile.rollout !== undefined
+			? { userFraction: submitProfile.rollout }
+			: {}),
+	};
 
 	const contact = readContact();
 	const details = {
@@ -70,22 +79,8 @@ function loadReleaseConfig(version) {
 		);
 	}
 
-	if (!RELEASE_STATUSES.includes(release.status)) {
-		problems.push(
-			`store/android/release.json: "status" inválido (${release.status}). Aceitos: ${RELEASE_STATUSES.join(", ")}.`,
-		);
-	}
-
-	const hasUserFraction = release.userFraction !== undefined;
-	if (release.status === "inProgress" && !hasUserFraction) {
-		problems.push(
-			'store/android/release.json: "status" inProgress exige "userFraction" entre 0 e 1.',
-		);
-	}
-	if (release.status !== "inProgress" && hasUserFraction) {
-		problems.push(
-			`store/android/release.json: "userFraction" só é aceito com "status" inProgress.`,
-		);
+	if (!release.track) {
+		problems.push('eas.json: submit.production.android não define "track".');
 	}
 
 	if (problems.length > 0) {

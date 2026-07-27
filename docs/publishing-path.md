@@ -309,68 +309,85 @@ Isso só funciona de forma segura porque `runtimeVersion.policy` em `app.config.
 
 Bump de `version` de marketing continua só sendo necessário quando `check_ios_version` falhar (fingerprint mudou **e** a versão atual já está travada na Apple) — não a cada push.
 
-### Envio para o App Review
+### Publicação na App Store
 
-O `submit_ios` do workflow termina no upload do binário. Quem fecha o ciclo é o job **`submit_for_review`**, que roda `scripts/submit-ios-for-review.mjs` contra a App Store Connect API (mesma chave e mesmo JWT ES256 do `check-ios-app-version.mjs`). Ele é idempotente — pode rodar de novo no mesmo release sem duplicar nada — e faz, nesta ordem:
+O release iOS é dividido entre o que o EAS já faz e o que precisamos injetar. A regra é: **tudo que o EAS cobre fica no EAS**.
 
-1. **App Store Version** — cria a versão da `version` do `app.config.ts`, ou reutiliza a existente se ainda for editável. Se já estiver aprovada/ao vivo, falha pedindo o bump (mesma regra do `check_ios_version`).
-2. **Build** — espera o processamento na Apple terminar (`processingState: VALID`) e anexa o build à versão. Isso é necessário porque o `eas submit` usa `skip_waiting_for_build_processing`, então o binário ainda está em processamento quando o job começa. Timeout padrão de 45 min, ajustável por `ASC_BUILD_WAIT_TIMEOUT_MINUTES`.
-3. **Metadata pt-BR** — descrição, keywords, texto promocional, URL de suporte e as novidades da versão.
-4. **Screenshots** — publica o que estiver em `store/ios/screenshots/`.
-5. **Informações para revisão** — contato, notas e a conta de demonstração.
-6. **App Review** — cria a `reviewSubmission`, adiciona a versão como item e marca `submitted: true`.
+| Etapa | Quem faz |
+|---|---|
+| Build | `eas build` |
+| Upload do binário para a App Store Connect | `eas submit` (`fastlane pilot`) |
+| Ficha, screenshots, revisão, categorias, classificação etária | **`eas metadata:push`** (`store.config.js`) |
+| Anexar o build à App Store Version | `scripts/submit-ios-for-review.mjs` |
+| Enviar para o App Review | `scripts/submit-ios-for-review.mjs` |
 
-#### Onde ficam os dados do release
+O job `submit_for_review` encadeia as três últimas linhas nesta ordem, e cada uma é idempotente:
 
-O prefixo numérico do arquivo de screenshot (`01-`, `02-`, …) define a ordem na ficha da App Store. O layout completo de `store/` está descrito em [Dados de release em `store/`](#dados-de-release-em-store).
+1. `node scripts/submit-ios-for-review.mjs --skip-submit` — cria ou reutiliza a App Store Version da `version` do `app.config.ts`, espera o build chegar a `processingState: VALID` e o anexa. A espera existe porque o `eas submit` faz o upload com `skip_waiting_for_build_processing`, então o binário ainda está sendo processado quando o job começa. Timeout padrão de 45 min, ajustável por `ASC_BUILD_WAIT_TIMEOUT_MINUTES`.
+2. `eas metadata:push` — publica a ficha inteira.
+3. `node scripts/submit-ios-for-review.mjs` — cria a `reviewSubmission`, adiciona a versão como item e marca `submitted: true`.
 
-Campo ausente ou vazio nesses arquivos é **omitido do payload**, não enviado em branco — o que já estiver preenchido na App Store Connect é preservado. É assim que `contactPhone`, que não está em `review-details.json`, continua valendo o que foi cadastrado na loja.
+Se a versão já estiver em `WAITING_FOR_REVIEW` ou `IN_REVIEW`, o script encerra com sucesso e não mexe em nada — é o caso de um release enviado manualmente.
 
-**Sobre o nome das pastas de screenshot:** a Apple nunca documentou os enums de `screenshotDisplayType` dos tamanhos novos — a própria App Store Connect continua classificando os assets de iPad 13" (2064×2752) como `APP_IPAD_PRO_3GEN_129` e os de iPhone 6.9" como `APP_IPHONE_67`. Por isso o display type é o **nome da pasta**, não algo inferido no código: se a Apple mudar, basta renomear a pasta. Para ver o que a ASC realmente usa neste app:
+#### `store.config.js` — a ficha da App Store
+
+O [EAS Metadata](https://docs.expo.dev/eas/metadata/) é a fonte de verdade da ficha do iOS, apontado por `submit.production.ios.metadataPath` no `eas.json`. Ele cobre título, subtítulo, descrição, keywords, texto promocional, notas da versão, URLs, **screenshots**, categorias, o questionário de classificação etária e as informações para a equipe de revisão.
+
+> A tabela "When to use EAS Metadata" da documentação do Expo ainda lista *Upload screenshots ✗*, mas a CLI já suporta — o `eas metadata:pull` baixa os screenshots e o `push` os envia. A doc está atrasada em relação ao código.
+
+Usamos o formato **dinâmico** (`store.config.js`, e não `store.config.json`) por dois motivos concretos: as notas da versão e o contato vêm de `store/shared/`, compartilhados com a Google Play; e as credenciais da conta de demonstração vêm do ambiente, para não ficarem versionadas.
+
+Para regenerar o config a partir do que está na loja — útil depois de qualquer edição manual no App Store Connect:
+
+```bash
+EXPO_APPLE_TEAM_ID=<team-id> eas metadata:pull
+```
+
+Isso escreve um `store.config.json` estático e baixa os screenshots para `store/apple/`. Trate como ferramenta de inspeção: o que vale é o `store.config.js`, e o resultado do pull deve ser conferido e reintegrado à mão, não commitado por cima.
+
+#### Screenshots
+
+Ficam em `store/ios/screenshots/<DISPLAY_TYPE>/`, e a ordem na ficha é a ordem do array em `store.config.js` — daí o prefixo numérico nos nomes.
+
+A Apple nunca documentou os enums de `screenshotDisplayType` dos tamanhos novos: a própria App Store Connect classifica os assets de iPad 13" (2064×2752) como `APP_IPAD_PRO_3GEN_129` e os de iPhone 6.9" como `APP_IPHONE_67`. Para ver o que a ASC usa de fato neste app:
 
 ```bash
 npm run asc:inspect
 ```
 
-Screenshots já publicados numa versão **não são reenviados** — ao criar uma App Store Version nova a Apple copia os da versão anterior. Para substituir, rode com `--force-screenshots`.
-
 #### Conta de demonstração
 
 Partes do app ficam atrás de login — registrar denúncia, votar na resolução e publicar resolução. A diretriz 2.1 da Apple exige que o revisor consiga exercitar todas as funcionalidades, então a App Store Connect precisa das credenciais de uma conta de teste.
 
-Essas credenciais **não ficam no repositório**: vêm do ambiente `production` do EAS, já cadastradas como `sensitive`.
+Essas credenciais **não ficam no repositório**: `store.config.js` as lê do ambiente `production` do EAS, cadastradas como `sensitive`.
 
 ```bash
 eas env:create production --name ASC_DEMO_ACCOUNT_NAME     --value <email> --visibility sensitive
 eas env:create production --name ASC_DEMO_ACCOUNT_PASSWORD --value <senha> --visibility sensitive
 ```
 
-Se as duas variáveis não estiverem no ambiente, o script apenas avisa e mantém o que já estiver cadastrado na App Store Connect — não bloqueia o release.
-
 #### Rodando na mão
 
 ```bash
-npm run asc:inspect                       # estado atual na App Store Connect
-npm run asc:submit -- --dry-run --build-number=20   # valida config, não escreve nada
-npm run asc:submit -- --build-number=20 --skip-submit  # publica tudo, sem enviar pra review
-npm run asc:submit -- --build-number=20   # ciclo completo
+npm run asc:inspect                                    # estado atual na App Store Connect
+npm run asc:submit -- --dry-run --build-number=20      # não escreve nada
+npm run asc:submit -- --build-number=20 --skip-submit  # cria a versão e anexa o build
+npm run asc:metadata                                   # publica a ficha
+npm run asc:submit -- --build-number=20                # envia para o App Review
 ```
 
 ### Dados de release em `store/`
 
 ```
+store.config.js                  # ficha da App Store (EAS Metadata)
 store/
 ├── shared/                      # o que é idêntico nas duas lojas
 │   ├── contact.json             # e-mail de suporte, URL de suporte, site
 │   └── whats-new/<version>.md   # notas da versão, um arquivo por versão
 ├── ios/
-│   ├── metadata.pt-BR.json      # descrição, keywords, texto promocional, copyright
-│   ├── review-details.json      # contato e notas para a equipe de revisão da Apple
-│   ├── whats-new/<version>.md   # opcional: sobrescreve o texto de shared/
 │   └── screenshots/<DISPLAY_TYPE>/NN-nome.jpg
 └── android/
-    ├── release.json             # trilha, status do release, rollout, idioma
-    ├── whats-new/<version>.md   # opcional: sobrescreve o texto de shared/
+    ├── release.json             # idioma da ficha e das notas da versão
     ├── feature-graphic.jpg
     └── screenshots/
 ```
@@ -379,9 +396,13 @@ store/
 
 O que **não** é compartilhado, e por quê: descrição, keywords e texto promocional têm limites e campos distintos em cada loja; screenshots usam sistemas de classificação diferentes; conta de demonstração e contato de revisão só existem na Apple; trilha e rollout só existem na Google.
 
+**Trilha, status e rollout do Android não ficam aqui** — ficam em `submit.production.android` no `eas.json`, porque o `eas submit` já os aplica. Duplicá-los criaria duas fontes de verdade para o mesmo destino.
+
 ### Publicação na Google Play
 
-O `submit_android` do workflow (que é `eas submit` por baixo) entrega o `.aab` na trilha configurada em `eas.json` — diferente do iOS, onde o binário só chega ao TestFlight. O que ele **não** faz é publicar as notas da versão nem promover entre trilhas. Disso cuida o job **`publish_android`**, que roda `scripts/publish-android-release.mjs`.
+O `submit_android` do workflow (que é `eas submit` por baixo) entrega o `.aab` na trilha configurada em `eas.json` — diferente do iOS, onde o binário só chega ao TestFlight — e já aplica `track`, `releaseStatus` e `rollout` daquele perfil. O que ele **não** faz é publicar as notas da versão nem sincronizar os dados de contato da ficha. Disso cuida o job **`publish_android`**, que roda `scripts/publish-android-release.mjs`.
+
+> O EAS Metadata **não** cobre a Google Play — está explícito no FAQ da documentação do Expo. Por isso a ficha do Android depende de código nosso, enquanto a do iOS não.
 
 Toda escrita na Play passa por uma transação chamada *edit*, e só `edits.commit` a torna pública. O script abre um edit, aplica as mudanças e:
 
@@ -393,19 +414,19 @@ Isso torna o Android mais seguro que o iOS nesse ponto: não existe estado pela 
 
 #### Trilha e rollout
 
-`store/android/release.json` define o destino:
+Ficam em `submit.production.android` no `eas.json`:
 
 ```json
-{ "track": "alpha", "status": "completed", "locale": "pt-BR", "defaultLanguage": "pt-BR" }
+{ "track": "alpha" }
 ```
 
-`status` aceita `completed`, `inProgress`, `draft` e `halted`. Para o staged rollout recomendado no primeiro lançamento público (ver [Staged rollout](#staged-rollout-google-play)), use `inProgress` com `userFraction` — que só é aceito nesse status:
+`releaseStatus` aceita `completed`, `draft`, `halted` e `inProgress`; `rollout` (0 a 1) só vale com `inProgress`. Para o staged rollout recomendado no primeiro lançamento público (ver [Staged rollout](#staged-rollout-google-play)):
 
 ```json
-{ "track": "production", "status": "inProgress", "userFraction": 0.1, "locale": "pt-BR", "defaultLanguage": "pt-BR" }
+{ "track": "production", "releaseStatus": "inProgress", "rollout": 0.1 }
 ```
 
-A trilha continua em `alpha` enquanto a conta não tiver acesso liberado à produção (ver [Testadores para o Google Play](#testadores-para-o-google-play-closed-testing)). `--track=<trilha>` sobrescreve pontualmente, sem editar o arquivo.
+A trilha continua em `alpha` enquanto a conta não tiver acesso liberado à produção (ver [Testadores para o Google Play](#testadores-para-o-google-play-closed-testing)).
 
 #### Credencial
 
@@ -421,10 +442,9 @@ eas env:create production --name GOOGLE_SERVICE_ACCOUNT_KEY \
 ```bash
 export GOOGLE_SERVICE_ACCOUNT_KEY=docs/<service-account>.json
 
-npm run play:inspect                       # trilhas, ficha, imagens, bundles
-npm run play:publish -- --dry-run           # mostra o diff, não publica nada
-npm run play:publish                        # abre o edit e faz o commit
-npm run play:publish -- --track=production  # sobrescreve a trilha do release.json
+npm run play:inspect              # trilhas, ficha, imagens, bundles
+npm run play:publish -- --dry-run  # mostra o diff, não publica nada
+npm run play:publish               # abre o edit e faz o commit
 ```
 
 ### Só existe workflow pra production

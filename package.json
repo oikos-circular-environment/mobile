@@ -16,6 +16,7 @@
 		"test:coverage": "jest --coverage --forceExit",
 		"sync:env": "eas env:push production --path .env.eas --force",
 		"asc:inspect": "node scripts/asc-inspect.mjs",
+		"asc:metadata": "eas metadata:push",
 		"asc:submit": "node scripts/submit-ios-for-review.mjs",
 		"play:inspect": "node scripts/play-inspect.mjs",
 		"play:publish": "node scripts/publish-android-release.mjs"

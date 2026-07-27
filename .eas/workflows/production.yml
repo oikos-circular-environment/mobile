@@ -99,8 +99,9 @@ jobs:
       build_id: ${{ needs.build_ios.outputs.build_id }}
       profile: production
 
-  # Publica a App Store Version e a envia para o App Review, etapas que o
-  # `submit_ios` não cobre. Ver docs/publishing-path.md.
+  # Fecha o release iOS em três etapas: anexar o build à App Store Version,
+  # publicar a ficha com o EAS Metadata e enviar para o App Review.
+  # Ver docs/publishing-path.md.
   submit_for_review:
     name: Submit iOS version for App Review
     type: custom
@@ -108,6 +109,12 @@ jobs:
     steps:
       - uses: eas/checkout
       - run: npm ci
+      - name: Attach build to App Store version
+        env:
+          IOS_BUILD_NUMBER: ${{ needs.build_ios.outputs.app_build_version }}
+        run: node scripts/submit-ios-for-review.mjs --skip-submit
+      - name: Push store metadata
+        run: npx eas metadata:push --non-interactive
       - name: Submit for review
         env:
           IOS_BUILD_NUMBER: ${{ needs.build_ios.outputs.app_build_version }}
