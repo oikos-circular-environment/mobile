@@ -258,6 +258,16 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "d0UQXP",
+                  "name": "Frame 28",
+                  "clip": true,
+                  "width": 2,
+                  "height": 5,
+                  "fill": "#FFFFFF",
+                  "layout": "none"
                 }
               ]
             },
@@ -304,7 +314,7 @@
                           "height": 48,
                           "icon": "clipboard-list",
                           "library": "lucide",
-                          "fill": "$green-700"
+                          "fill": "$lime-700"
                         },
                         {
                           "type": "text",
@@ -454,7 +464,7 @@
                           "height": 48,
                           "icon": "map-pin",
                           "library": "lucide",
-                          "fill": "$green-700"
+                          "fill": "$lime-700"
                         },
                         {
                           "type": "text",
@@ -1086,7 +1096,7 @@
                           "height": 48,
                           "icon": "log-out",
                           "library": "lucide",
-                          "fill": "$green-700"
+                          "fill": "$lime-700"
                         },
                         {
                           "type": "text",
@@ -1235,8 +1245,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — Coletor(a)",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "Coletor(a)"
@@ -1247,7 +1257,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -1438,8 +1448,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — São Paulo",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "São Paulo"
@@ -1450,7 +1460,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -1672,8 +1682,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — São Paulo",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "São Paulo"
@@ -1684,7 +1694,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -1915,8 +1925,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — 25 a 34",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "25 a 34"
@@ -1927,7 +1937,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -2198,8 +2208,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — Médio completo",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "Médio completo"
@@ -2210,7 +2220,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -2432,8 +2442,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — Trabalho em empresa de reciclagem",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "Trabalho em empresa de reciclagem"
@@ -2444,7 +2454,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -2686,8 +2696,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — Ocasionalmente",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "Ocasionalmente"
@@ -2698,7 +2708,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -2920,8 +2930,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — Avançada",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "Avançada"
@@ -2932,7 +2942,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -3064,7 +3074,7 @@
                                 {
                                   "type": "text",
                                   "id": "qDdUn",
-                                  "fill": "$green-700",
+                                  "fill": "$lime-700",
                                   "content": "S1",
                                   "fontFamily": "$font-heading",
                                   "fontSize": "$text-h4",
@@ -3113,7 +3123,7 @@
                                 {
                                   "type": "text",
                                   "id": "a84SHG",
-                                  "fill": "$green-700",
+                                  "fill": "$lime-700",
                                   "content": "S2",
                                   "fontFamily": "$font-heading",
                                   "fontSize": "$text-h4",
@@ -3162,7 +3172,7 @@
                                 {
                                   "type": "text",
                                   "id": "E0zQ8N",
-                                  "fill": "$green-700",
+                                  "fill": "$lime-700",
                                   "content": "S3",
                                   "fontFamily": "$font-heading",
                                   "fontSize": "$text-h4",
@@ -3211,7 +3221,7 @@
                                 {
                                   "type": "text",
                                   "id": "t8LiG",
-                                  "fill": "$green-700",
+                                  "fill": "$lime-700",
                                   "content": "S4",
                                   "fontFamily": "$font-heading",
                                   "fontSize": "$text-h4",
@@ -3354,7 +3364,7 @@
                                 {
                                   "type": "text",
                                   "id": "e6Im1",
-                                  "fill": "$green-700",
+                                  "fill": "$lime-700",
                                   "content": "S1",
                                   "fontFamily": "$font-heading",
                                   "fontSize": "$text-h4",
@@ -3403,7 +3413,7 @@
                                 {
                                   "type": "text",
                                   "id": "nffSS",
-                                  "fill": "$green-700",
+                                  "fill": "$lime-700",
                                   "content": "S2",
                                   "fontFamily": "$font-heading",
                                   "fontSize": "$text-h4",
@@ -3452,7 +3462,7 @@
                                 {
                                   "type": "text",
                                   "id": "RaqCI",
-                                  "fill": "$green-700",
+                                  "fill": "$lime-700",
                                   "content": "S6",
                                   "fontFamily": "$font-heading",
                                   "fontSize": "$text-h4",
@@ -3561,7 +3571,7 @@
                         {
                           "type": "text",
                           "id": "MDLr8",
-                          "fill": "$green-700",
+                          "fill": "$lime-700",
                           "content": "Etapa 2 de 4",
                           "fontFamily": "$font-heading",
                           "fontSize": "$text-overline",
@@ -4116,7 +4126,7 @@
                       "height": 36,
                       "icon": "circle-check",
                       "library": "lucide",
-                      "fill": "$green-700"
+                      "fill": "$lime-700"
                     },
                     {
                       "type": "text",
@@ -4332,7 +4342,7 @@
                   "y": 830,
                   "name": "Toast",
                   "width": 382,
-                  "fill": "$green-900",
+                  "fill": "$lime-900",
                   "cornerRadius": "$radius-lg",
                   "gap": 8,
                   "padding": 14,
@@ -4507,8 +4517,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — Bom",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "Bom"
@@ -4519,7 +4529,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -4710,8 +4720,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — Concordo",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "Concordo"
@@ -4722,7 +4732,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             },
@@ -5087,8 +5097,8 @@
                                   "ref": "I5tFGA",
                                   "name": "Option — Nem concordo nem discordo",
                                   "width": "fill_container",
-                                  "fill": "$green-50",
-                                  "stroke": "$green-300",
+                                  "fill": "$lime-50",
+                                  "stroke": "$lime-300",
                                   "descendants": {
                                     "bwfeh": {
                                       "content": "Nem concordo nem discordo"
@@ -5099,7 +5109,7 @@
                                     },
                                     "i9rWZF": {
                                       "icon": "circle-check",
-                                      "fill": "$green-700"
+                                      "fill": "$lime-700"
                                     }
                                   }
                                 },
@@ -5365,8 +5375,8 @@
                               "ref": "I5tFGA",
                               "name": "Option — Concordo totalmente",
                               "width": "fill_container",
-                              "fill": "$green-50",
-                              "stroke": "$green-300",
+                              "fill": "$lime-50",
+                              "stroke": "$lime-300",
                               "descendants": {
                                 "bwfeh": {
                                   "content": "Concordo totalmente"
@@ -5377,7 +5387,7 @@
                                 },
                                 "i9rWZF": {
                                   "icon": "circle-check",
-                                  "fill": "$green-700"
+                                  "fill": "$lime-700"
                                 }
                               }
                             }
@@ -5453,7 +5463,7 @@
                           "height": 44,
                           "icon": "party-popper",
                           "library": "lucide",
-                          "fill": "$green-700"
+                          "fill": "$lime-700"
                         },
                         {
                           "type": "text",
@@ -6613,7 +6623,7 @@
                       "fill": "$muted-foreground",
                       "textGrowth": "fixed-width",
                       "width": "fill_container",
-                      "content": "Essas respostas não podem ser editadas aqui. Para responder de novo, refaça a etapa.",
+                      "content": "Essas respostas não podem ser editadas.",
                       "textAlign": "center",
                       "fontFamily": "$font-body",
                       "fontSize": "$text-caption",
@@ -14657,7 +14667,7 @@
                           "id": "tBijw",
                           "width": 56,
                           "height": 56,
-                          "fill": "#3f6212",
+                          "fill": "$green-700",
                           "cornerRadius": 8,
                           "justifyContent": "center",
                           "alignItems": "center",
@@ -15588,7 +15598,7 @@
                               "id": "zIluh",
                               "width": 56,
                               "height": 56,
-                              "fill": "#3f6212",
+                              "fill": "$green-700",
                               "cornerRadius": 8,
                               "justifyContent": "center",
                               "alignItems": "center",
@@ -29776,11 +29786,11 @@
                         },
                         "colors": [
                           {
-                            "color": "$green-700",
+                            "color": "$lime-700",
                             "position": 0
                           },
                           {
-                            "color": "$green-900",
+                            "color": "$lime-900",
                             "position": 1
                           }
                         ]
@@ -29854,7 +29864,7 @@
                               "type": "text",
                               "id": "V8c4Wc",
                               "name": "Label",
-                              "fill": "$green-700",
+                              "fill": "$lime-700",
                               "content": "Etapa 1 de 4",
                               "fontFamily": "Inter",
                               "fontSize": 12,
@@ -29878,7 +29888,7 @@
                           "name": "BarBg",
                           "width": 382,
                           "height": 6,
-                          "fill": "$green-100",
+                          "fill": "$lime-100",
                           "cornerRadius": "$radius-full",
                           "children": [
                             {
@@ -29887,7 +29897,7 @@
                               "name": "BarFill",
                               "width": 95,
                               "height": 6,
-                              "fill": "$green-700",
+                              "fill": "$lime-700",
                               "cornerRadius": "$radius-full"
                             }
                           ]
@@ -29901,7 +29911,7 @@
                       "reusable": true,
                       "width": 120,
                       "height": 32,
-                      "fill": "$green-900",
+                      "fill": "$lime-900",
                       "cornerRadius": "$radius-full",
                       "effect": {
                         "type": "shadow",
@@ -30353,9 +30363,9 @@
                       "name": "InfoExpand",
                       "reusable": true,
                       "width": 382,
-                      "fill": "$green-50",
+                      "fill": "$lime-50",
                       "cornerRadius": "$radius-lg",
-                      "stroke": "$green-200",
+                      "stroke": "$lime-200",
                       "strokeWidth": 1,
                       "layout": "vertical",
                       "children": [
@@ -30375,7 +30385,7 @@
                               "type": "text",
                               "id": "oFN3S",
                               "name": "Label",
-                              "fill": "$green-700",
+                              "fill": "$lime-700",
                               "content": "O que é essa pesquisa?",
                               "fontFamily": "Inter",
                               "fontSize": 13,
@@ -30389,7 +30399,7 @@
                               "height": 16,
                               "icon": "chevron-up",
                               "library": "lucide",
-                              "fill": "$green-700"
+                              "fill": "$lime-700"
                             }
                           ]
                         },
@@ -30440,11 +30450,11 @@
                         },
                         "colors": [
                           {
-                            "color": "$green-700",
+                            "color": "$lime-700",
                             "position": 0
                           },
                           {
-                            "color": "$green-900",
+                            "color": "$lime-900",
                             "position": 1
                           }
                         ]
@@ -30832,7 +30842,7 @@
                               "type": "text",
                               "id": "A9XHGu",
                               "name": "Label",
-                              "fill": "$green-700",
+                              "fill": "$lime-700",
                               "content": "Categoria",
                               "fontFamily": "$font-heading",
                               "fontSize": "$text-overline",
@@ -30857,7 +30867,7 @@
                           "name": "BarBg",
                           "width": "fill_container",
                           "height": 6,
-                          "fill": "$green-100",
+                          "fill": "$lime-100",
                           "cornerRadius": "$radius-full",
                           "layout": "none",
                           "children": [
@@ -30869,7 +30879,7 @@
                               "name": "BarFill",
                               "width": 48,
                               "height": 6,
-                              "fill": "$green-700",
+                              "fill": "$lime-700",
                               "cornerRadius": "$radius-full"
                             }
                           ]
@@ -30902,7 +30912,7 @@
     },
     "border": {
       "type": "color",
-      "value": "$gray-200"
+      "value": "#e5e5e5"
     },
     "gray-200": {
       "type": "color",
@@ -30914,7 +30924,7 @@
     },
     "foreground": {
       "type": "color",
-      "value": "$gray-900"
+      "value": "#0a0a0a"
     },
     "gray-900": {
       "type": "color",
@@ -30926,7 +30936,7 @@
     },
     "muted-foreground": {
       "type": "color",
-      "value": "$gray-500"
+      "value": "#737373"
     },
     "gray-500": {
       "type": "color",
@@ -30942,7 +30952,7 @@
     },
     "lime-800": {
       "type": "color",
-      "value": "#333c12"
+      "value": "#3f6212"
     },
     "green-800": {
       "type": "color",
@@ -30958,43 +30968,43 @@
     },
     "lime-100": {
       "type": "color",
-      "value": "#ecf1db"
+      "value": "#ecfccb"
     },
     "lime-200": {
       "type": "color",
-      "value": "#d8e3b5"
+      "value": "#d9f99d"
     },
     "lime-300": {
       "type": "color",
-      "value": "#c0d18b"
+      "value": "#bef264"
     },
     "lime-400": {
       "type": "color",
-      "value": "#a4bc60"
+      "value": "#a3e635"
     },
     "lime-50": {
       "type": "color",
-      "value": "#f7f9f0"
+      "value": "#f7fee7"
     },
     "lime-500": {
       "type": "color",
-      "value": "#81982d"
+      "value": "#84cc16"
     },
     "lime-600": {
       "type": "color",
-      "value": "#667924"
+      "value": "#65a30d"
     },
     "lime-700": {
       "type": "color",
-      "value": "#4c5a1b"
+      "value": "#4d7c0f"
     },
     "lime-900": {
       "type": "color",
-      "value": "#1a1e09"
+      "value": "#365314"
     },
     "lime-950": {
       "type": "color",
-      "value": "#0d0f04"
+      "value": "#1a2e05"
     },
     "white": {
       "type": "color",
@@ -31078,11 +31088,11 @@
     },
     "card": {
       "type": "color",
-      "value": "$gray-50"
+      "value": "#ffffff"
     },
     "primary-foreground": {
       "type": "color",
-      "value": "#ffffff"
+      "value": "#fafafa"
     },
     "radius-2xl": {
       "type": "number",
@@ -31223,6 +31233,10 @@
     "text-overline": {
       "type": "number",
       "value": 11
+    },
+    "destructive": {
+      "type": "color",
+      "value": "#e7000b"
     }
   },
   "imports": {
