@@ -1,30 +1,13 @@
 #!/usr/bin/env node
-// Fecha o ciclo de release do iOS.
-//
-// O `eas submit` roda `fastlane pilot` por baixo, que só faz upload do binário
-// para a App Store Connect / TestFlight. Ele não cria a App Store Version, não
-// anexa o build, não publica metadata/screenshots e não envia para o App Review
-// — foi exatamente por isso que o build 1.0.1 (20) ficou parado depois de um
-// workflow "verde" em 24/07/2026.
-//
-// Este script faz o resto, de forma idempotente (pode rodar de novo a cada push
-// em `production` sem duplicar nada):
-//
-//   1. cria ou reutiliza a App Store Version da `version` do app.config.ts
-//   2. espera o build terminar de processar e o anexa à versão
-//   3. publica a metadata pt-BR (descrição, keywords, novidades da versão)
-//   4. publica os screenshots de store/ios/screenshots/<DISPLAY_TYPE>/
-//   5. preenche as informações para a equipe de revisão (contato + conta demo)
-//   6. envia para o App Review
-//
-// Uso:
-//   node scripts/submit-ios-for-review.mjs [flags]
-//
-//   --dry-run             não escreve nada; valida a configuração e mostra o
-//                         estado atual na App Store Connect
-//   --skip-submit         faz tudo menos o envio final (para conferir na UI)
-//   --force-screenshots   substitui os screenshots já publicados na versão
-//   --build-number=<n>    build a anexar (default: env IOS_BUILD_NUMBER)
+/**
+ * @file Publica a App Store Version da `version` atual e a envia para o App
+ *   Review. Idempotente: reexecutar sobre o mesmo release não duplica nada.
+ *
+ * Flags: `--dry-run`, `--skip-submit`, `--force-screenshots`,
+ * `--build-number=<n>` (default: variável de ambiente `IOS_BUILD_NUMBER`).
+ *
+ * @see docs/publishing-path.md — "Envio para o App Review"
+ */
 
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -53,6 +36,12 @@ const STORE_DIR = join(
 const PENDING_SENTINEL = "__PENDENTE__";
 const BUILD_POLL_INTERVAL_MS = 30_000;
 
+/**
+ * Sinaliza que a versão já está na fila da Apple e nada resta a fazer. Tratado
+ * como sucesso, para que o workflow não falhe em um release já enviado.
+ */
+class AlreadySubmittedError extends Error {}
+
 const flags = {
 	dryRun: process.argv.includes("--dry-run"),
 	skipSubmit: process.argv.includes("--skip-submit"),
@@ -66,13 +55,25 @@ const flags = {
 const step = message => console.log(`\n▸ ${message}`);
 const info = message => console.log(`  ${message}`);
 
+/**
+ * @param {string} fileName Caminho relativo a `store/ios/`.
+ * @returns {object}
+ */
 function readJson(fileName) {
 	return JSON.parse(readFileSync(join(STORE_DIR, fileName), "utf-8"));
 }
 
 /**
- * Junta tudo que o release precisa e valida de uma vez só. Falhar aqui custa
- * segundos; falhar no meio do processo deixa uma versão pela metade na ASC.
+ * Carrega e valida todos os dados do release de uma vez, antes de qualquer
+ * chamada de rede, para que uma configuração incompleta não deixe a App Store
+ * Version publicada pela metade.
+ *
+ * @param {string} version
+ * @returns {{ metadata: object, reviewDetails: object, whatsNew: string,
+ *   demoAccount: { name: string, password: string },
+ *   screenshots: Array<{ displayType: string, files: string[] }>,
+ *   warnings: string[] }}
+ * @throws {Error} Listando todos os problemas encontrados.
  */
 function loadReleaseConfig(version) {
 	const metadata = readJson("metadata.pt-BR.json");
@@ -115,13 +116,15 @@ function loadReleaseConfig(version) {
 		);
 	}
 
+	const warnings = [];
 	if (
 		reviewDetails.demoAccountRequired &&
 		!(demoAccount.name && demoAccount.password)
 	) {
-		problems.push(
-			"review-details.json pede conta de demonstração, mas ASC_DEMO_ACCOUNT_NAME/ASC_DEMO_ACCOUNT_PASSWORD não estão no ambiente. " +
-				"Cadastre com: eas env:create production --name ASC_DEMO_ACCOUNT_NAME --type sensitive",
+		warnings.push(
+			"ASC_DEMO_ACCOUNT_NAME/ASC_DEMO_ACCOUNT_PASSWORD não estão no ambiente — " +
+				"a conta de demonstração já cadastrada na App Store Connect será mantida como está. " +
+				"Para passar a gerenciá-la daqui: eas env:create production --name ASC_DEMO_ACCOUNT_NAME --type sensitive",
 		);
 	}
 
@@ -138,9 +141,22 @@ function loadReleaseConfig(version) {
 		);
 	}
 
-	return { metadata, reviewDetails, whatsNew, demoAccount, screenshots };
+	return {
+		metadata,
+		reviewDetails,
+		whatsNew,
+		demoAccount,
+		screenshots,
+		warnings,
+	};
 }
 
+/**
+ * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client
+ * @param {string} appId
+ * @param {string} versionString
+ * @returns {Promise<object|null>} A App Store Version, ou `null` se não existir.
+ */
 async function findAppStoreVersion(client, appId, versionString) {
 	const response = await client.get(`/v1/apps/${appId}/appStoreVersions`, {
 		query: {
@@ -153,11 +169,27 @@ async function findAppStoreVersion(client, appId, versionString) {
 	return response.data[0] ?? null;
 }
 
+/**
+ * Cria a App Store Version ou reutiliza a existente, quando ainda editável.
+ *
+ * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client
+ * @param {string} appId
+ * @param {string} versionString
+ * @param {object} metadata
+ * @returns {Promise<string>} O id da App Store Version.
+ * @throws {AlreadySubmittedError} Se a versão já estiver na fila da Apple.
+ * @throws {Error} Se a versão estiver em estado que não aceita alterações.
+ */
 async function ensureAppStoreVersion(client, appId, versionString, metadata) {
 	const existing = await findAppStoreVersion(client, appId, versionString);
 
 	if (existing) {
 		const state = existing.attributes.appVersionState;
+		if (state === "WAITING_FOR_REVIEW" || state === "IN_REVIEW") {
+			throw new AlreadySubmittedError(
+				`A versão ${versionString} já está na Apple (estado: ${state}) — nada a fazer.`,
+			);
+		}
 		if (NON_EDITABLE_VERSION_STATES.has(state)) {
 			throw new Error(
 				`A versão ${versionString} está em "${state}" na App Store e não aceita mais alterações. ` +
@@ -197,9 +229,17 @@ async function ensureAppStoreVersion(client, appId, versionString, metadata) {
 }
 
 /**
- * O `eas submit` usa `skip_waiting_for_build_processing`, então o binário ainda
- * está sendo processado pela Apple quando este script começa. Um build só pode
- * ser anexado a uma versão depois de virar VALID.
+ * Aguarda o build chegar a `processingState: VALID`, único estado em que a
+ * Apple permite anexá-lo a uma App Store Version. A espera é necessária porque
+ * o `eas submit` faz o upload com `skip_waiting_for_build_processing`.
+ *
+ * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client
+ * @param {string} appId
+ * @param {string} versionString Versão de marketing do trem de builds.
+ * @param {string} buildNumber
+ * @param {number} timeoutMinutes
+ * @returns {Promise<string>} O id do build.
+ * @throws {Error} Se o processamento falhar ou estourar o tempo.
  */
 async function waitForBuild(
 	client,
@@ -259,6 +299,14 @@ async function waitForBuild(
 	);
 }
 
+/**
+ * Publica a metadata do idioma declarado em `metadata.locale`.
+ *
+ * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client
+ * @param {string} appStoreVersionId
+ * @param {{ metadata: object, whatsNew: string }} config
+ * @returns {Promise<string>} O id da `appStoreVersionLocalization`.
+ */
 async function upsertLocalization(
 	client,
 	appStoreVersionId,
@@ -281,8 +329,7 @@ async function upsertLocalization(
 	};
 	if (metadata.marketingUrl) attributes.marketingUrl = metadata.marketingUrl;
 
-	// `whatsNew` é rejeitado quando a app não tem nenhuma versão publicada antes
-	// (não há "novidades" numa primeira versão). Só nesse caso reenviamos sem ele.
+	/** Payload alternativo: a Apple rejeita `whatsNew` na primeira versão do app. */
 	const withoutWhatsNew = { ...attributes, whatsNew: undefined };
 
 	if (match) {
@@ -338,6 +385,10 @@ async function upsertLocalization(
 	return created.data.id;
 }
 
+/**
+ * @param {unknown} error
+ * @returns {boolean} `true` se a Apple recusou o campo `whatsNew`.
+ */
 function isWhatsNewRejection(error) {
 	return (
 		error instanceof AscApiError &&
@@ -347,23 +398,36 @@ function isWhatsNewRejection(error) {
 	);
 }
 
+/**
+ * Publica as informações para a equipe de revisão. Campos ausentes ou vazios
+ * são omitidos do payload em vez de enviados em branco, preservando o que já
+ * estiver cadastrado na App Store Connect.
+ *
+ * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client
+ * @param {string} appStoreVersionId
+ * @param {{ reviewDetails: object, demoAccount: { name: string, password: string } }} config
+ */
 async function upsertReviewDetail(
 	client,
 	appStoreVersionId,
 	{ reviewDetails, demoAccount },
 ) {
-	const attributes = {
-		contactFirstName: reviewDetails.contactFirstName,
-		contactLastName: reviewDetails.contactLastName,
-		contactPhone: reviewDetails.contactPhone,
-		contactEmail: reviewDetails.contactEmail,
-		demoAccountRequired: reviewDetails.demoAccountRequired,
-		notes: reviewDetails.notes,
-	};
-	if (reviewDetails.demoAccountRequired) {
-		attributes.demoAccountName = demoAccount.name;
-		attributes.demoAccountPassword = demoAccount.password;
-	}
+	const attributes = Object.fromEntries(
+		Object.entries({
+			contactFirstName: reviewDetails.contactFirstName,
+			contactLastName: reviewDetails.contactLastName,
+			contactPhone: reviewDetails.contactPhone,
+			contactEmail: reviewDetails.contactEmail,
+			demoAccountRequired: reviewDetails.demoAccountRequired,
+			notes: reviewDetails.notes,
+			...(reviewDetails.demoAccountRequired
+				? {
+						demoAccountName: demoAccount.name,
+						demoAccountPassword: demoAccount.password,
+					}
+				: {}),
+		}).filter(([, value]) => value !== undefined && value !== ""),
+	);
 
 	const existing = await client.getOrNull(
 		`/v1/appStoreVersions/${appStoreVersionId}/appStoreReviewDetail`,
@@ -391,6 +455,15 @@ async function upsertReviewDetail(
 	info("Informações para a equipe de revisão criadas.");
 }
 
+/**
+ * Envia a versão para o App Review, reutilizando uma review submission aberta
+ * quando já houver uma.
+ *
+ * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client
+ * @param {string} appId
+ * @param {string} appStoreVersionId
+ * @param {string} versionString
+ */
 async function submitForReview(
 	client,
 	appId,
@@ -482,6 +555,9 @@ async function main() {
 			.map(set => `${set.displayType}=${set.files.length}`)
 			.join(", ")}.`,
 	);
+	for (const warning of config.warnings) {
+		console.warn(`  ⚠ ${warning}`);
+	}
 
 	if (!flags.buildNumber) {
 		throw new Error(
@@ -559,6 +635,10 @@ async function main() {
 }
 
 main().catch(error => {
+	if (error instanceof AlreadySubmittedError) {
+		console.log(`\n✓ ${error.message}`);
+		return;
+	}
 	console.error(`\n✖ ${error.message}`);
 	process.exit(1);
 });

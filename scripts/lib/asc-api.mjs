@@ -1,6 +1,7 @@
-// Cliente mínimo da App Store Connect API (JWT ES256 + fetch), sem dependências
-// externas. Compartilhado por check-ios-app-version.mjs, submit-ios-for-review.mjs
-// e asc-inspect.mjs.
+/**
+ * @file Cliente da App Store Connect API: autenticação JWT ES256 e requisições.
+ * @see docs/publishing-path.md — "Envio para o App Review"
+ */
 
 import { execFileSync } from "node:child_process";
 import { createSign } from "node:crypto";
@@ -9,7 +10,13 @@ import { readFileSync } from "node:fs";
 const BASE_URL = "https://api.appstoreconnect.apple.com";
 const TOKEN_TTL_SECONDS = 19 * 60;
 
-/** Estados de App Store Version que não aceitam mais um novo build. */
+/**
+ * Estados de App Store Version que não aceitam mais um novo build. Inclui os de
+ * review em andamento, em que a Apple recusa trocar o build anexado. `REJECTED`
+ * e `DEVELOPER_REJECTED` não entram: neles a versão volta a ser editável.
+ *
+ * @type {ReadonlySet<string>}
+ */
 export const NON_EDITABLE_VERSION_STATES = new Set([
 	"READY_FOR_DISTRIBUTION",
 	"READY_FOR_SALE",
@@ -17,9 +24,15 @@ export const NON_EDITABLE_VERSION_STATES = new Set([
 	"PENDING_APPLE_RELEASE",
 	"PROCESSING_FOR_APP_STORE",
 	"REPLACED_WITH_NEW_VERSION",
+	"WAITING_FOR_REVIEW",
+	"IN_REVIEW",
 ]);
 
-/** Estados de Review Submission que ainda estão em andamento na Apple. */
+/**
+ * Estados de Review Submission que ainda estão em andamento na Apple.
+ *
+ * @type {ReadonlyArray<string>}
+ */
 export const OPEN_REVIEW_SUBMISSION_STATES = [
 	"READY_FOR_REVIEW",
 	"WAITING_FOR_REVIEW",
@@ -54,10 +67,18 @@ function buildJwt({ keyId, issuerId, privateKeyPem }) {
 }
 
 /**
- * Erro que carrega a resposta estruturada da Apple, para mensagens legíveis em
- * vez de um dump de JSON cru.
+ * Erro de resposta da App Store Connect, com os `errors` da Apple formatados na
+ * mensagem.
+ *
+ * @property {number} status Código HTTP da resposta.
+ * @property {object} body Corpo da resposta, no formato de erro do JSON:API.
  */
 export class AscApiError extends Error {
+	/**
+	 * @param {number} status
+	 * @param {object} body
+	 * @param {{ method: string, path: string }} request
+	 */
 	constructor(status, body, { method, path }) {
 		const details = (body?.errors ?? [])
 			.map(error => {
@@ -78,8 +99,12 @@ export class AscApiError extends Error {
 }
 
 /**
- * Lê as credenciais da ASC do ambiente. `ASC_API_KEY_P8` é o *caminho* do
- * arquivo .p8 (é como o EAS materializa variáveis do tipo "file").
+ * Lê as credenciais da App Store Connect do ambiente. `ASC_API_KEY_P8` contém o
+ * caminho do arquivo `.p8`, não seu conteúdo — é como o EAS materializa
+ * variáveis de ambiente do tipo `file`.
+ *
+ * @returns {{ appId: string, keyId: string, issuerId: string, privateKeyPem: string }}
+ * @throws {Error} Se alguma das três variáveis não estiver definida.
  */
 export function readAscCredentialsFromEnv() {
 	const appId = process.env.ASC_APP_ID ?? "6786017565";
@@ -102,24 +127,37 @@ export function readAscCredentialsFromEnv() {
 }
 
 /**
- * Cria um cliente com renovação automática do JWT. O token expira em 20 min e
- * esperar o processamento de um build pode passar disso.
+ * Cria um cliente da App Store Connect com renovação automática do JWT, cujo
+ * TTL máximo é de 20 minutos — menos do que uma espera por processamento de
+ * build pode levar.
+ *
+ * @param {{ keyId: string, issuerId: string, privateKeyPem: string }} credentials
  */
 export function createAscClient({ keyId, issuerId, privateKeyPem }) {
 	let token = null;
 	let tokenExpiresAt = 0;
 
+	/**
+	 * Header `Authorization`, com margem de 60s antes do vencimento real para
+	 * que nenhuma requisição parta com um token prestes a expirar.
+	 *
+	 * @returns {string}
+	 */
 	function authorization() {
 		const now = Date.now();
 		if (!token || now >= tokenExpiresAt) {
 			token = buildJwt({ keyId, issuerId, privateKeyPem });
-			// Renova 60s antes do vencimento real, para não correr risco de
-			// mandar uma requisição com token expirando no meio do voo.
 			tokenExpiresAt = now + (TOKEN_TTL_SECONDS - 60) * 1000;
 		}
 		return `Bearer ${token}`;
 	}
 
+	/**
+	 * @param {string} method
+	 * @param {string} path Caminho relativo à API ou URL absoluta.
+	 * @param {{ query?: Record<string, unknown>, body?: object }} [options]
+	 * @throws {AscApiError} Em qualquer resposta fora da faixa 2xx.
+	 */
 	async function request(method, path, { query, body } = {}) {
 		const url = new URL(path.startsWith("http") ? path : `${BASE_URL}${path}`);
 		for (const [key, value] of Object.entries(query ?? {})) {
@@ -158,9 +196,11 @@ export function createAscClient({ keyId, issuerId, privateKeyPem }) {
 		patch: (path, body) => request("PATCH", path, { body }),
 		delete: path => request("DELETE", path),
 		/**
-		 * GET que devolve `null` em vez de lançar quando o recurso não existe —
-		 * vários relacionamentos da ASC (ex.: appStoreReviewDetail) respondem 404
-		 * quando ainda não foram criados.
+		 * `GET` que resolve para `null` em 404, para relacionamentos que a App
+		 * Store Connect só materializa quando preenchidos (`appStoreReviewDetail`).
+		 *
+		 * @param {string} path
+		 * @param {{ query?: Record<string, unknown> }} [options]
 		 */
 		async getOrNull(path, options) {
 			try {
@@ -170,7 +210,12 @@ export function createAscClient({ keyId, issuerId, privateKeyPem }) {
 				throw error;
 			}
 		},
-		/** Upload de asset: a URL e os headers vêm prontos da própria ASC. */
+		/**
+		 * Executa uma `uploadOperation` de asset, cuja URL e headers são
+		 * definidos pela própria App Store Connect na reserva do upload.
+		 *
+		 * @param {{ method: string, url: string, requestHeaders?: Array<{ name: string, value: string }>, body: Buffer }} operation
+		 */
 		async upload({ method, url, requestHeaders, body }) {
 			const headers = Object.fromEntries(
 				(requestHeaders ?? []).map(header => [header.name, header.value]),
@@ -185,7 +230,12 @@ export function createAscClient({ keyId, issuerId, privateKeyPem }) {
 	};
 }
 
-/** Versão de marketing declarada em app.config.ts (fonte de verdade única). */
+/**
+ * Versão de marketing declarada em `app.config.ts`, fonte de verdade única para
+ * as duas lojas.
+ *
+ * @returns {string}
+ */
 export function getExpoVersion() {
 	const output = execFileSync(
 		"npx",
@@ -195,6 +245,10 @@ export function getExpoVersion() {
 	return JSON.parse(output).version;
 }
 
+/**
+ * @param {number} ms
+ * @returns {Promise<void>}
+ */
 export function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }

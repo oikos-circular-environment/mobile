@@ -1,11 +1,7 @@
-// Upload de screenshots para a App Store Connect.
-//
-// O fluxo da Apple tem três etapas por arquivo:
-//   1. POST /v1/appScreenshots  → "reserva" o asset e devolve uploadOperations
-//   2. PUT em cada uploadOperation (o arquivo pode vir fatiado em N partes)
-//   3. PATCH /v1/appScreenshots/{id} com uploaded:true + MD5 do arquivo original
-//
-// Depois a Apple processa o asset de forma assíncrona (assetDeliveryState).
+/**
+ * @file Leitura, validação e upload dos screenshots da App Store.
+ * @see docs/publishing-path.md — "Envio para o App Review"
+ */
 
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
@@ -13,14 +9,13 @@ import { basename, join } from "node:path";
 import { sleep } from "./asc-api.mjs";
 
 /**
- * Tamanhos aceitos por display type.
+ * Resoluções aceitas por `screenshotDisplayType`, em ambas as orientações. Os
+ * tamanhos introduzidos depois da última atualização da documentação da API
+ * (iPhone 6.9" e iPad 13") reaproveitam os enums anteriores, que é como a
+ * própria App Store Connect os classifica.
  *
- * Atenção: a Apple nunca publicou os enums novos (iPhone 6.9" e iPad 13") na
- * documentação da API — a própria App Store Connect continua classificando os
- * assets de 13" como `APP_IPAD_PRO_3GEN_129` e os de 6.9" como `APP_IPHONE_67`.
- * Por isso o display type é o *nome da pasta*, não algo inferido no código:
- * se a Apple mudar, é só renomear a pasta. Use `npm run asc:inspect` para ver
- * exatamente quais display types a ASC já tem cadastrados neste app.
+ * @type {Record<string, { label: string, sizes: Array<[number, number]> }>}
+ * @see docs/publishing-path.md — "Envio para o App Review", sobre `npm run asc:inspect`
  */
 export const DISPLAY_TYPES = {
 	APP_IPHONE_65: {
@@ -52,7 +47,12 @@ export const DISPLAY_TYPES = {
 
 const IMAGE_EXTENSIONS = /\.(jpe?g|png)$/i;
 
-/** Lê largura/altura de um JPEG lendo os marcadores SOFn. */
+/**
+ * Extrai as dimensões de um JPEG a partir do primeiro marcador SOFn.
+ *
+ * @param {Buffer} buffer
+ * @returns {{ width: number, height: number } | null}
+ */
 function readJpegSize(buffer) {
 	let offset = 2;
 	while (offset < buffer.length) {
@@ -83,12 +83,22 @@ function readJpegSize(buffer) {
 	return null;
 }
 
-/** Lê largura/altura de um PNG a partir do chunk IHDR. */
+/**
+ * Extrai as dimensões de um PNG a partir do chunk IHDR.
+ *
+ * @param {Buffer} buffer
+ * @returns {{ width: number, height: number } | null}
+ */
 function readPngSize(buffer) {
 	if (buffer.toString("ascii", 12, 16) !== "IHDR") return null;
 	return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
+/**
+ * @param {string} filePath
+ * @returns {{ width: number, height: number }}
+ * @throws {Error} Se o formato não for JPEG nem PNG.
+ */
 export function readImageSize(filePath) {
 	const buffer = readFileSync(filePath);
 	const size =
@@ -103,9 +113,13 @@ export function readImageSize(filePath) {
 }
 
 /**
- * Lê `screenshotsDir` e devolve um plano por display type, já ordenado pelo
- * nome do arquivo (por isso a convenção de prefixo numérico: `01-home.jpg`).
- * A ordem dos arquivos vira a ordem na ficha da App Store.
+ * Agrupa os screenshots por `screenshotDisplayType`, que é o nome de cada
+ * subdiretório. Os arquivos vêm ordenados pelo nome, e essa ordem é a que será
+ * publicada na ficha da App Store.
+ *
+ * @param {string} screenshotsDir
+ * @returns {Array<{ displayType: string, files: string[] }>} Vazio se o
+ *   diretório não existir.
  */
 export function collectScreenshots(screenshotsDir) {
 	let entries;
@@ -131,8 +145,11 @@ export function collectScreenshots(screenshotsDir) {
 }
 
 /**
- * Valida display types e dimensões antes de qualquer chamada de rede — errar
- * isso só na hora do upload custa uma rodada inteira de workflow.
+ * Verifica display types, dimensões e a quantidade máxima por display type,
+ * antes de qualquer chamada de rede.
+ *
+ * @param {Array<{ displayType: string, files: string[] }>} sets
+ * @returns {string[]} Um problema por item; vazio quando tudo está válido.
  */
 export function validateScreenshots(sets) {
 	const problems = [];
@@ -168,6 +185,12 @@ export function validateScreenshots(sets) {
 	return problems;
 }
 
+/**
+ * @param {ReturnType<import("./asc-api.mjs").createAscClient>} client
+ * @param {string} localizationId
+ * @param {string} displayType
+ * @returns {Promise<object>} O `appScreenshotSet` existente ou recém-criado.
+ */
 async function findOrCreateScreenshotSet(client, localizationId, displayType) {
 	const existing = await client.get(
 		`/v1/appStoreVersionLocalizations/${localizationId}/appScreenshotSets`,
@@ -193,6 +216,16 @@ async function findOrCreateScreenshotSet(client, localizationId, displayType) {
 	return created.data;
 }
 
+/**
+ * Envia um screenshot em três etapas, como exige a App Store Connect: reserva o
+ * asset, executa cada `uploadOperation` devolvida na reserva e confirma o envio
+ * com o MD5 do arquivo original.
+ *
+ * @param {ReturnType<import("./asc-api.mjs").createAscClient>} client
+ * @param {string} setId
+ * @param {string} filePath
+ * @returns {Promise<string>} O id do `appScreenshot` criado.
+ */
 async function uploadOne(client, setId, filePath) {
 	const buffer = readFileSync(filePath);
 	const fileName = basename(filePath);
@@ -234,7 +267,14 @@ async function uploadOne(client, setId, filePath) {
 	return screenshotId;
 }
 
-/** Espera a Apple terminar de processar os assets recém-enviados. */
+/**
+ * Aguarda o processamento assíncrono dos assets pela App Store Connect.
+ *
+ * @param {ReturnType<import("./asc-api.mjs").createAscClient>} client
+ * @param {string[]} screenshotIds
+ * @param {{ timeoutMs?: number }} [options]
+ * @throws {Error} Se a Apple reportar erro em algum asset ou estourar o tempo.
+ */
 async function waitForAssetDelivery(
 	client,
 	screenshotIds,
@@ -276,12 +316,16 @@ async function waitForAssetDelivery(
 }
 
 /**
- * Sincroniza os screenshots de uma localization.
+ * Publica os screenshots de uma localization. Display types que já contêm
+ * imagens são preservados, salvo `force`, porque a App Store Connect copia os
+ * screenshots da versão anterior ao criar uma App Store Version.
  *
- * Por padrão, um display type que já tem imagens é deixado como está — ao criar
- * uma App Store Version nova a Apple copia os screenshots da versão anterior, e
- * reenviar tudo a cada release seria desperdício e risco. Use `force` para
- * substituir.
+ * @param {ReturnType<import("./asc-api.mjs").createAscClient>} client
+ * @param {object} options
+ * @param {string} options.localizationId
+ * @param {Array<{ displayType: string, files: string[] }>} options.sets
+ * @param {boolean} [options.force] Substitui os screenshots já publicados.
+ * @param {(message: string) => void} [options.log]
  */
 export async function syncScreenshots(
 	client,
@@ -318,8 +362,6 @@ export async function syncScreenshots(
 
 		await waitForAssetDelivery(client, uploadedIds);
 
-		// Fixa a ordem explicitamente: sem isso a ordem final depende da ordem de
-		// processamento da Apple, não da ordem dos arquivos.
 		await client.patch(
 			`/v1/appScreenshotSets/${set.id}/relationships/appScreenshots`,
 			{

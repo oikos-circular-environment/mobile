@@ -1,8 +1,11 @@
 #!/usr/bin/env node
-// Falha o workflow cedo se a `version` do app.config.ts já estiver
-// anexada a uma App Store Version que não aceita mais um novo build
-// (aprovada/ao vivo). Evita repetir o caso do build 19: enviado, mas
-// sem conseguir entrar em review porque a versão 1.0.0 já estava live.
+/**
+ * @file Interrompe o workflow antes do build quando a `version` declarada em
+ *   `app.config.ts` já está em uma App Store Version que não aceita mais um
+ *   build novo, exigindo bump de versão.
+ *
+ * @see docs/publishing-path.md — "Versionamento sincronizado entre iOS e Android"
+ */
 
 import {
 	createAscClient,
@@ -11,6 +14,13 @@ import {
 	readAscCredentialsFromEnv,
 } from "./lib/asc-api.mjs";
 
+/**
+ * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client
+ * @param {string} appId
+ * @param {string} versionString
+ * @returns {Promise<string|null>} O `appVersionState`, ou `null` se a versão
+ *   ainda não existir na App Store Connect.
+ */
 async function fetchAppVersionState(client, appId, versionString) {
 	const response = await client.get(`/v1/apps/${appId}/appStoreVersions`, {
 		query: {
@@ -28,9 +38,13 @@ async function main() {
 	const state = await fetchAppVersionState(client, credentials.appId, version);
 
 	if (state && NON_EDITABLE_VERSION_STATES.has(state)) {
+		const inReview = state === "WAITING_FOR_REVIEW" || state === "IN_REVIEW";
 		console.error(
-			`A versão ${version} já está em estado "${state}" na App Store (aprovada/ao vivo) e não aceita mais builds. ` +
-				`Faça o bump de "version" no app.config.ts (ex.: próximo patch) antes de rodar o build de produção.`,
+			`A versão ${version} está em estado "${state}" na App Store e não aceita mais builds. ` +
+				(inReview
+					? 'Ela já foi enviada e está na fila da Apple. Faça o bump de "version" no app.config.ts, ' +
+						"ou cancele o envio na App Store Connect se a intenção era substituir o build."
+					: 'Faça o bump de "version" no app.config.ts (ex.: próximo patch) antes de rodar o build de produção.'),
 		);
 		process.exit(1);
 	}

@@ -2,9 +2,7 @@
 module.exports = {
 	preset: "jest-expo",
 	testMatch: ["<rootDir>/src/tests/**/*.test.{ts,tsx}"],
-	// O preset do jest-expo só transforma .js/.jsx/.ts/.tsx. Os scripts de
-	// release em scripts/ são .mjs e precisam ser transformados para poderem
-	// ser testados (ver src/tests/unit/store-screenshots.test.ts).
+	/** O preset do jest-expo cobre .js/.jsx/.ts/.tsx; scripts/ usa .mjs. */
 	transform: {
 		...require("jest-expo/jest-preset").transform,
 		"\\.mjs$": "babel-jest",

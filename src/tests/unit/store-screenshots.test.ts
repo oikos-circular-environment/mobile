@@ -1,7 +1,7 @@
-// Garante que os screenshots versionados em store/ios/ continuam dentro da
-// spec da Apple. Um arquivo fora de tamanho só falharia hoje no meio do
-// workflow de produção, depois do build — e a versão ficaria pela metade na
-// App Store Connect.
+/**
+ * @file Verifica os screenshots versionados em `store/ios/` contra a spec da
+ *   Apple, antes que uma imagem inválida derrube o release em produção.
+ */
 
 import { join } from "node:path";
 import {
@@ -61,22 +61,15 @@ describe("screenshots da App Store", () => {
 		});
 	});
 
-	it("rejeita um arquivo fora de spec", () => {
+	it("rejeita um arquivo cujo tamanho não bate com o display type da pasta", () => {
 		const problems = validateScreenshots([
 			{
-				displayType: "APP_IPHONE_65",
-				files: [
-					join(
-						SCREENSHOTS_DIR,
-						"..",
-						"pendentes",
-						"complaints-map-590x1280-fora-de-spec.jpg",
-					),
-				],
+				displayType: "APP_IPAD_PRO_3GEN_129",
+				files: [join(SCREENSHOTS_DIR, "APP_IPHONE_65", "01-home.jpg")],
 			},
 		]);
 		expect(problems).toHaveLength(1);
-		expect(problems[0]).toContain("590x1280");
+		expect(problems[0]).toContain("1242x2688");
 	});
 
 	it("rejeita display type desconhecido", () => {

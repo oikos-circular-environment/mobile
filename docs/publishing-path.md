@@ -332,6 +332,8 @@ store/ios/
 
 O prefixo numérico do arquivo (`01-`, `02-`, …) define a ordem na ficha da App Store.
 
+Campo ausente ou vazio nesses arquivos é **omitido do payload**, não enviado em branco — o que já estiver preenchido na App Store Connect é preservado. É assim que `contactPhone`, que não está em `review-details.json`, continua valendo o que foi cadastrado na loja.
+
 **Sobre o nome das pastas de screenshot:** a Apple nunca documentou os enums de `screenshotDisplayType` dos tamanhos novos — a própria App Store Connect continua classificando os assets de iPad 13" (2064×2752) como `APP_IPAD_PRO_3GEN_129` e os de iPhone 6.9" como `APP_IPHONE_67`. Por isso o display type é o **nome da pasta**, não algo inferido no código: se a Apple mudar, basta renomear a pasta. Para ver o que a ASC realmente usa neste app:
 
 ```bash
@@ -340,14 +342,18 @@ npm run asc:inspect
 
 Screenshots já publicados numa versão **não são reenviados** — ao criar uma App Store Version nova a Apple copia os da versão anterior. Para substituir, rode com `--force-screenshots`.
 
-#### Segredos
+#### Conta de demonstração
 
-A conta de demonstração para o revisor **não fica no repositório**. Ela vem do ambiente `production` do EAS:
+Partes do app ficam atrás de login — registrar denúncia, votar na resolução e publicar resolução. A diretriz 2.1 da Apple exige que o revisor consiga exercitar todas as funcionalidades, então a App Store Connect precisa das credenciais de uma conta de teste.
+
+Essas credenciais **não ficam no repositório**: vêm do ambiente `production` do EAS, já cadastradas como `sensitive`.
 
 ```bash
-eas env:create production --name ASC_DEMO_ACCOUNT_NAME     --type sensitive
-eas env:create production --name ASC_DEMO_ACCOUNT_PASSWORD --type sensitive
+eas env:create production --name ASC_DEMO_ACCOUNT_NAME     --value <email> --visibility sensitive
+eas env:create production --name ASC_DEMO_ACCOUNT_PASSWORD --value <senha> --visibility sensitive
 ```
+
+Se as duas variáveis não estiverem no ambiente, o script apenas avisa e mantém o que já estiver cadastrado na App Store Connect — não bloqueia o release.
 
 #### Rodando na mão
 

@@ -1,14 +1,12 @@
 #!/usr/bin/env node
-// Diagnóstico read-only da App Store Connect: em que estado está a versão
-// atual, quais builds a Apple já processou e — o mais útil — quais
-// `screenshotDisplayType` a ASC de fato usa neste app.
-//
-// Esse último ponto importa porque a Apple nunca publicou os enums dos
-// tamanhos novos (iPhone 6.9" e iPad 13") na documentação da API. Em vez de
-// adivinhar, rode isto e use exatamente os nomes que aparecerem como nome de
-// pasta em store/ios/screenshots/.
-//
-//   npm run asc:inspect
+/**
+ * @file Diagnóstico read-only da App Store Connect: estado das versões, builds
+ *   processados, `screenshotDisplayType` em uso e review submissions abertas.
+ *
+ * Uso: `npm run asc:inspect`
+ *
+ * @see docs/publishing-path.md — "Envio para o App Review"
+ */
 
 import {
 	createAscClient,
