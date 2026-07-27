@@ -263,130 +263,6 @@
             },
             {
               "type": "frame",
-              "id": "HxZIT",
-              "name": "F1.3 — Home, banner com pendência de envio",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
-                  "id": "eCzEU",
-                  "type": "ref",
-                  "ref": "G08IN"
-                },
-                {
-                  "type": "frame",
-                  "id": "f9jqb1",
-                  "name": "Body",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "layout": "vertical",
-                  "gap": 24,
-                  "padding": [
-                    20,
-                    20,
-                    0,
-                    20
-                  ],
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "NQhDC",
-                      "name": "ProfileHeader",
-                      "width": "fill_container",
-                      "justifyContent": "space_between",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "Mdpmt",
-                          "fill": "$foreground",
-                          "content": "Olá, Ana",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h3",
-                          "fontWeight": "600"
-                        },
-                        {
-                          "type": "icon",
-                          "id": "P6dvM7",
-                          "width": 22,
-                          "height": 22,
-                          "icon": "settings-2",
-                          "library": "lucide",
-                          "fill": "$foreground"
-                        }
-                      ]
-                    },
-                    {
-                      "id": "cPq3w",
-                      "type": "ref",
-                      "ref": "QLHF3",
-                      "name": "SurveyInviteCard — pendência",
-                      "width": "fill_container",
-                      "descendants": {
-                        "sjbD7": {
-                          "content": "Coletor(a)"
-                        },
-                        "V1Dgn": {
-                          "content": "Continue de onde parou"
-                        },
-                        "ZKyG8": {
-                          "content": "Você está na Etapa 2 de 4."
-                        },
-                        "Tsyst": {
-                          "name": "StagesRow"
-                        },
-                        "K4Cg0c": {
-                          "icon": "circle-check"
-                        },
-                        "v3pze": {
-                          "icon": "circle-dot-dashed",
-                          "fill": "#7DC4FA"
-                        },
-                        "ZsldP": {
-                          "enabled": false,
-                          "name": "PendingIndicator"
-                        },
-                        "E60w6/9:Tr3Fv": {
-                          "content": "Continuar"
-                        }
-                      }
-                    },
-                    {
-                      "type": "frame",
-                      "id": "MLEy0",
-                      "name": "ServicesSection",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 8,
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "Y7JUk",
-                          "fill": "$foreground",
-                          "content": "Serviços",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h4",
-                          "fontWeight": "600"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "g3c0wc",
-                          "width": "fill_container",
-                          "height": 90,
-                          "fill": "$gray-100",
-                          "cornerRadius": "$radius-lg"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
               "id": "apLvV",
               "name": "F1.4 — Apresentação da pesquisa",
               "clip": true,
@@ -409,21 +285,23 @@
                     32,
                     24
                   ],
-                  "justifyContent": "space_between",
                   "children": [
                     {
                       "type": "frame",
                       "id": "sxf7p",
                       "name": "Content",
                       "width": "fill_container",
+                      "height": "fill_container",
                       "layout": "vertical",
                       "gap": 16,
+                      "justifyContent": "center",
+                      "alignItems": "center",
                       "children": [
                         {
                           "type": "icon",
                           "id": "v1Ffyo",
-                          "width": 40,
-                          "height": 40,
+                          "width": 48,
+                          "height": 48,
                           "icon": "clipboard-list",
                           "library": "lucide",
                           "fill": "$green-700"
@@ -435,8 +313,9 @@
                           "textGrowth": "fixed-width",
                           "width": "fill_container",
                           "content": "Pesquisa de usabilidade",
+                          "textAlign": "center",
                           "fontFamily": "$font-heading",
-                          "fontSize": "$text-h1",
+                          "fontSize": "$text-h2",
                           "fontWeight": "700"
                         },
                         {
@@ -447,6 +326,7 @@
                           "width": "fill_container",
                           "content": "Você vai usar o Oikos normalmente enquanto realizamos algumas tarefas guiadas. Cada etapa leva de 5 a 10 minutos, e você pode pausar e retomar quando quiser.",
                           "lineHeight": 1.5,
+                          "textAlign": "center",
                           "fontFamily": "$font-body",
                           "fontSize": "$text-body",
                           "fontWeight": "normal"
@@ -555,15 +435,16 @@
                     32,
                     24
                   ],
-                  "justifyContent": "space_between",
                   "children": [
                     {
                       "type": "frame",
                       "id": "BMpvO",
                       "name": "Content",
                       "width": "fill_container",
+                      "height": "fill_container",
                       "layout": "vertical",
                       "gap": 16,
+                      "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
@@ -652,15 +533,16 @@
                     32,
                     24
                   ],
-                  "justifyContent": "space_between",
                   "children": [
                     {
                       "type": "frame",
                       "id": "o2j78K",
                       "name": "Content",
                       "width": "fill_container",
+                      "height": "fill_container",
                       "layout": "vertical",
                       "gap": 16,
+                      "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
@@ -731,123 +613,9 @@
                               "enabled": false
                             },
                             "9:poRwU": {
-                              "content": "Voltar à home"
+                              "content": "Voltar à tela inicial"
                             }
                           }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "PWk1F",
-              "name": "F1.7 — Home, banner abandonada (retomar)",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
-                  "id": "b58VXJ",
-                  "type": "ref",
-                  "ref": "G08IN"
-                },
-                {
-                  "type": "frame",
-                  "id": "wuTlK",
-                  "name": "Body",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "layout": "vertical",
-                  "gap": 24,
-                  "padding": [
-                    20,
-                    20,
-                    0,
-                    20
-                  ],
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "EmrL6",
-                      "name": "ProfileHeader",
-                      "width": "fill_container",
-                      "justifyContent": "space_between",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "L1Fgw",
-                          "fill": "$foreground",
-                          "content": "Olá, Ana",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h3",
-                          "fontWeight": "600"
-                        },
-                        {
-                          "type": "icon",
-                          "id": "LdWQz",
-                          "width": 22,
-                          "height": 22,
-                          "icon": "settings-2",
-                          "library": "lucide",
-                          "fill": "$foreground"
-                        }
-                      ]
-                    },
-                    {
-                      "id": "I533eA",
-                      "type": "ref",
-                      "ref": "QLHF3",
-                      "name": "SurveyInviteCard — abandonada",
-                      "width": "fill_container",
-                      "descendants": {
-                        "sjbD7": {
-                          "content": "Coletor(a)"
-                        },
-                        "V1Dgn": {
-                          "content": "Notamos que você não terminou"
-                        },
-                        "ZKyG8": {
-                          "content": "Seu progresso ficou salvo. Você pode continuar de onde parou quando quiser."
-                        },
-                        "K4Cg0c": {
-                          "icon": "circle-x",
-                          "fill": "$9:--destructive"
-                        },
-                        "E60w6/9:Tr3Fv": {
-                          "content": "Retomar"
-                        }
-                      }
-                    },
-                    {
-                      "type": "frame",
-                      "id": "LiRyr",
-                      "name": "ServicesSection",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 8,
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "R0U9J",
-                          "fill": "$foreground",
-                          "content": "Serviços",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h4",
-                          "fontWeight": "600"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "AKxAm",
-                          "width": "fill_container",
-                          "height": 90,
-                          "fill": "$gray-100",
-                          "cornerRadius": "$radius-lg"
                         }
                       ]
                     }
@@ -5666,15 +5434,16 @@
                     32,
                     24
                   ],
-                  "justifyContent": "space_between",
                   "children": [
                     {
                       "type": "frame",
                       "id": "BerEJ",
                       "name": "Content",
                       "width": "fill_container",
+                      "height": "fill_container",
                       "layout": "vertical",
                       "gap": 16,
+                      "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
@@ -7198,15 +6967,16 @@
                     32,
                     24
                   ],
-                  "justifyContent": "space_between",
                   "children": [
                     {
                       "type": "frame",
                       "id": "iUq4A",
                       "name": "Content",
                       "width": "fill_container",
+                      "height": "fill_container",
                       "layout": "vertical",
                       "gap": 20,
+                      "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
