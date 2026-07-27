@@ -462,7 +462,55 @@ eas build --profile development --platform android
 
 ---
 
-## 6. Comparativo Rápido: Apple vs Google
+## 6. Divisão de responsabilidades e pendências
+
+### O que é do EAS e o que é nosso
+
+A regra é: **tudo que o EAS cobre fica no EAS**; escrevemos código só para o que sobra. A fronteira foi revista em julho/2026 contra a documentação e o comportamento real da CLI.
+
+| Etapa | App Store | Google Play |
+|---|---|---|
+| Build | `eas build` | `eas build` |
+| Upload do binário | `eas submit` | `eas submit` |
+| Trilha, status do release, rollout | — | `eas submit` (`eas.json`) |
+| Ficha, screenshots, categorias, classificação etária, informações de revisão | `eas metadata:push` (`store.config.js`) | **nosso** (`publish-android-release.mjs`) |
+| Notas da versão | `eas metadata:push` | **nosso** |
+| Anexar o build à versão da loja | **nosso** (`submit-ios-for-review.mjs`) | `eas submit` |
+| Enviar para revisão | **nosso** (`submit-ios-for-review.mjs`) | `eas submit` |
+
+Duas descobertas mudaram esse desenho:
+
+- **O EAS Metadata publica screenshots.** A tabela "When to use EAS Metadata" da documentação do Expo ainda lista *Upload screenshots ✗*, mas `eas metadata:pull` baixa as imagens e o `push` as envia. A doc está atrasada em relação à CLI.
+- **O EAS Metadata não cobre a Google Play**, e isso está explícito no FAQ do Expo. Por isso a ficha do Android depende de código nosso, enquanto a do iOS não. Se o Expo fechar essa lacuna, `scripts/publish-android-release.mjs` deve ser aposentado do mesmo jeito que o código de metadata do iOS foi.
+
+### Pendências
+
+**A automação nunca rodou ponta a ponta.** Cada etapa foi validada isoladamente contra as APIs reais (em `--dry-run` ou com leitura), mas nenhum release completo passou pelo workflow ainda. O primeiro push em `production` que exigir build nativo é o teste de verdade.
+
+**App Store**
+
+- `eas metadata:push` ainda não foi executado. A 1.0.1 está em `WAITING_FOR_REVIEW`, e alterar a ficha de uma versão na fila pode reiniciar a revisão. Roda sozinho no próximo release.
+- Quando rodar, corrige quatro divergências entre `store.config.js` e o que está na loja hoje:
+
+  | Campo | Na loja | Vai virar |
+  |---|---|---|
+  | `copyright` | `Christian Cesar Rodrigues Santos 61892896000155` | `2026 Christian Cesar Rodrigues Santos` |
+  | `subtitle` | `Oikos Economia Circular` (igual ao título) | `Economia circular de resíduos` |
+  | `review.email` | `christiancnp@gmail.com` | `suporte@oikos.company` |
+  | `releaseNotes` | `Atualização de layout e gerenciamento de conta.` | o texto de `store/shared/whats-new/<version>.md` |
+
+**Google Play**
+
+- A troca do e-mail de contato para `suporte@oikos.company` está no repositório mas não foi publicada na loja. Vale esperar a análise de acesso à produção terminar antes de mexer na ficha.
+- A trilha fica em `alpha` até o Google liberar o acesso à produção. Quando liberar, é uma linha em `submit.production.android` no `eas.json`:
+
+  ```json
+  { "track": "production", "releaseStatus": "inProgress", "rollout": 0.1 }
+  ```
+
+- Os screenshots em `store/android/screenshots/` estão fora da spec do Play (as capturas de tablet excedem o máximo de 3.840px, e a proporção das de telefone passa do limite de 2:1). Isso **não** afeta a loja hoje — as imagens publicadas foram enviadas pelo Console e são válidas. Só vira bloqueio se um dia formos automatizar o upload de imagens no Android; nesse caso, precisam ser regeradas.
+
+## 7. Comparativo Rápido: Apple vs Google
 
 | Aspecto | Apple App Store | Google Play |
 |---|---|---|
@@ -477,7 +525,7 @@ eas build --profile development --platform android
 
 ---
 
-## 6. Referências
+## 8. Referências
 
 - [Expo EAS Build — Docs oficiais](https://docs.expo.dev/build/introduction/)
 - [Expo EAS Submit — Docs oficiais](https://docs.expo.dev/submit/introduction/)

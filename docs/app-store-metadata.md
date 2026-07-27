@@ -1,9 +1,8 @@
 # Metadados — App Store Connect (Distribuição › App para iOS v1.0)
 
 > **Este documento é histórico.** A fonte de verdade dos metadados passou a ser
-> `store/ios/metadata.pt-BR.json` e `store/ios/review-details.json`, publicados
-> automaticamente pelo job `submit_for_review` (ver
-> [`publishing-path.md`](./publishing-path.md#envio-para-o-app-review)).
+> `store.config.js`, publicado por `eas metadata:push` (ver
+> [`publishing-path.md`](./publishing-path.md#publicação-na-app-store)).
 > Editar aqui não altera a ficha na App Store.
 >
 > Idioma da ficha: Português (Brasil).
@@ -44,7 +43,7 @@ reciclagem,economia circular,meio ambiente,denuncia,sustentabilidade,coleta,resi
 
 ## URL de suporte
 
-**Pendente.** Campo obrigatório para enviar a versão à revisão — precisa ser uma página real e acessível. Decisão tomada: providenciar antes do envio (opções discutidas: página estática no GitHub Pages, ou link direto de contato).
+`https://oikos.company/suporte`
 
 ## URL de marketing
 
@@ -52,8 +51,10 @@ Deixar em branco (campo opcional).
 
 ## Copyright
 
-**Pendente.** Formato final: `2026 [Nome/Razão Social]`.
-CNPJ informado: `61.892.896/0001-55`. Falta confirmar se o titular a exibir é o nome pessoal (Christian Cesar Rodrigues Santos) ou a razão social exata cadastrada nesse CNPJ.
+`2026 Christian Cesar Rodrigues Santos`
+
+A Apple espera o formato "ano + titular". O CNPJ `61.892.896/0001-55` não entra
+neste campo.
 
 ---
 
@@ -61,7 +62,9 @@ CNPJ informado: `61.892.896/0001-55`. Falta confirmar se o titular a exibir é o
 
 ### Início de sessão
 
-Login/senha de uma conta de teste serão criados via API pela equipe (conta padrão gerada especificamente para a revisão da Apple) — não gerado a partir deste documento.
+A conta de teste da revisão (`apple@oikos.company`) já existe. As credenciais
+vivem nas variáveis `ASC_DEMO_ACCOUNT_NAME` e `ASC_DEMO_ACCOUNT_PASSWORD` do
+ambiente `production` do EAS, lidas por `store.config.js` — nunca versionadas.
 
 ### Notas
 
@@ -80,14 +83,19 @@ Para testar o fluxo completo, é necessário conceder permissão de localizaçã
 | Nome | Christian |
 | Sobrenome | Cesar Rodrigues Santos |
 | E-mail | suporte@oikos.company |
-| Telefone | **Pendente** — informar com DDD |
+| Telefone | +55 65 99915-1997 |
 
 ---
 
 ## Pendências antes de enviar para revisão
 
-- [ ] Definir e publicar URL de suporte
-- [ ] Confirmar titular do Copyright (nome pessoal vs. razão social do CNPJ 61.892.896/0001-55)
-- [ ] Informar telefone de contato (com DDD)
-- [ ] Confirmar e-mail de contato exposto à revisão
-- [ ] Gerar via API a conta de teste padrão para a equipe da Apple e preencher "Nome do usuário"/"Senha" no App Store Connect
+Todas resolvidas. Os valores finais vivem em `store.config.js` e em
+`store/shared/contact.json`; o que ainda não foi publicado na loja está listado
+em [`publishing-path.md`](./publishing-path.md#pendências).
+
+- [x] URL de suporte — `https://oikos.company/suporte`
+- [x] Copyright — `2026 Christian Cesar Rodrigues Santos`
+- [x] Telefone de contato — cadastrado na App Store Connect
+- [x] E-mail de contato — `suporte@oikos.company`
+- [x] Conta de teste para a revisão — nas variáveis `ASC_DEMO_ACCOUNT_*` do
+      ambiente `production` do EAS, nunca versionadas
