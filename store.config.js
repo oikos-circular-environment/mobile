@@ -5,8 +5,8 @@
  *
  * É um config dinâmico (e não `store.config.json`) por dois motivos: as notas da
  * versão e o contato vêm de `store/shared/`, compartilhados com a Google Play; e
- * as credenciais da conta de demonstração vêm do ambiente, para não ficarem
- * versionadas.
+ * os dados pessoais exigidos pela revisão da Apple — telefone e credenciais da
+ * conta de demonstração — vêm do ambiente, para não ficarem versionados.
  *
  * @see docs/publishing-path.md — "Publicação na App Store"
  */
@@ -140,7 +140,7 @@ module.exports = () => {
 				firstName: "Christian Cesar",
 				lastName: "Rodrigues Santos",
 				email: contact.email,
-				phone: "+5565999151997",
+				phone: process.env.ASC_REVIEW_CONTACT_PHONE,
 				demoRequired: true,
 				demoUsername: process.env.ASC_DEMO_ACCOUNT_NAME,
 				demoPassword: process.env.ASC_DEMO_ACCOUNT_PASSWORD,
