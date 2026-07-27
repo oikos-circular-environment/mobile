@@ -355,16 +355,19 @@ A Apple nunca documentou os enums de `screenshotDisplayType` dos tamanhos novos:
 npm run asc:inspect
 ```
 
-#### Conta de demonstração
+#### Dados pessoais da revisão
 
-Partes do app ficam atrás de login — registrar denúncia, votar na resolução e publicar resolução. A diretriz 2.1 da Apple exige que o revisor consiga exercitar todas as funcionalidades, então a App Store Connect precisa das credenciais de uma conta de teste.
+A Apple exige um telefone de contato e, porque partes do app ficam atrás de login — registrar denúncia, votar na resolução e publicar resolução —, também as credenciais de uma conta de teste (diretriz 2.1: o revisor precisa conseguir exercitar todas as funcionalidades).
 
-Essas credenciais **não ficam no repositório**: `store.config.js` as lê do ambiente `production` do EAS, cadastradas como `sensitive`.
+Nada disso fica no repositório. `store.config.js` lê os três do ambiente `production` do EAS, cadastrados como `sensitive`:
 
 ```bash
-eas env:create production --name ASC_DEMO_ACCOUNT_NAME     --value <email> --visibility sensitive
-eas env:create production --name ASC_DEMO_ACCOUNT_PASSWORD --value <senha> --visibility sensitive
+eas env:create production --name ASC_REVIEW_CONTACT_PHONE  --value <telefone> --visibility sensitive
+eas env:create production --name ASC_DEMO_ACCOUNT_NAME     --value <email>    --visibility sensitive
+eas env:create production --name ASC_DEMO_ACCOUNT_PASSWORD --value <senha>    --visibility sensitive
 ```
+
+É por causa disso que o store config é dinâmico (`store.config.js`) e não estático: um `store.config.json` gerado por `eas metadata:pull` traz esses valores em texto plano, e é justamente o que o `.gitignore` impede de ser commitado.
 
 #### Rodando na mão
 

@@ -82,8 +82,8 @@ Para testar o fluxo completo, é necessário conceder permissão de localizaçã
 |---|---|
 | Nome | Christian |
 | Sobrenome | Cesar Rodrigues Santos |
-| E-mail | suporte@oikos.company |
-| Telefone | +55 65 99915-1997 |
+| E-mail | `suporte@oikos.company` (de `store/shared/contact.json`) |
+| Telefone | variável `ASC_REVIEW_CONTACT_PHONE` do ambiente `production` do EAS |
 
 ---
 
@@ -95,7 +95,8 @@ em [`publishing-path.md`](./publishing-path.md#pendências).
 
 - [x] URL de suporte — `https://oikos.company/suporte`
 - [x] Copyright — `2026 Christian Cesar Rodrigues Santos`
-- [x] Telefone de contato — cadastrado na App Store Connect
+- [x] Telefone de contato — na variável `ASC_REVIEW_CONTACT_PHONE` do ambiente
+      `production` do EAS, nunca versionada
 - [x] E-mail de contato — `suporte@oikos.company`
 - [x] Conta de teste para a revisão — nas variáveis `ASC_DEMO_ACCOUNT_*` do
       ambiente `production` do EAS, nunca versionadas
