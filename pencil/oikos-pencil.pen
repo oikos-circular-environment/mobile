@@ -815,7 +815,7 @@
                         },
                         "K4Cg0c": {
                           "icon": "circle-x",
-                          "fill": "#000000"
+                          "fill": "$9:--destructive"
                         },
                         "E60w6/9:Tr3Fv": {
                           "content": "Retomar"
@@ -5451,7 +5451,7 @@
         {
           "type": "frame",
           "id": "CE8nE",
-          "name": "F7 — Pausar, retomar, desistir, reiniciar",
+          "name": "F7 — Pausar, retomar, desistir e gerenciar a pesquisa",
           "gap": 64,
           "children": [
             {
@@ -5460,7 +5460,7 @@
               "name": "F7.20 — Tela de retomada",
               "clip": true,
               "width": 430,
-              "height": 932,
+              "height": 1102,
               "fill": "$background",
               "layout": "vertical",
               "children": [
@@ -5473,42 +5473,188 @@
                   "layout": "vertical",
                   "gap": 16,
                   "padding": [
-                    60,
+                    50,
                     24,
                     24,
                     24
                   ],
-                  "justifyContent": "space_between",
                   "children": [
                     {
                       "type": "frame",
-                      "id": "f7QvM",
-                      "name": "Content",
+                      "id": "vW5PE",
+                      "name": "NavHeader",
                       "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 16,
+                      "gap": 10,
+                      "alignItems": "center",
                       "children": [
                         {
-                          "type": "text",
-                          "id": "Rb4K9",
-                          "fill": "$foreground",
-                          "content": "Bem-vindo de volta",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h1",
-                          "fontWeight": "700"
+                          "type": "icon",
+                          "id": "Fcm4n",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "arrow-left",
+                          "library": "lucide",
+                          "fill": "$foreground"
                         },
                         {
                           "type": "text",
-                          "id": "PxCjb",
-                          "fill": "$muted-foreground",
-                          "content": "Você parou na Etapa 2 de 4. Veja onde ficou:",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-body",
-                          "fontWeight": "normal"
+                          "id": "JqvH1",
+                          "fill": "$foreground",
+                          "content": "Minha pesquisa",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-h3",
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "iHLUa",
+                      "name": "Content",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 20,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "LgZg1",
+                          "name": "Greeting",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "wnC1K",
+                              "fill": "$foreground",
+                              "content": "Bem-vindo de volta",
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h1",
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "A1JcL",
+                              "fill": "$muted-foreground",
+                              "content": "Você parou na Etapa 2 de 4.",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body",
+                              "fontWeight": "normal"
+                            }
+                          ]
                         },
                         {
                           "type": "frame",
-                          "id": "kEhzQ",
+                          "id": "wabJ4",
+                          "name": "PersonaRow",
+                          "width": "fill_container",
+                          "fill": "$green-50",
+                          "cornerRadius": "$radius-lg",
+                          "padding": 16,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "B8Ujrj",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "t2Dw2",
+                                  "fill": "$green-700",
+                                  "content": "SEU PERFIL",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 1
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "BPMjp",
+                                  "fill": "$foreground",
+                                  "content": "Coletor(a)",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "icon",
+                              "id": "IwiXk",
+                              "width": 24,
+                              "height": 24,
+                              "icon": "user-round",
+                              "library": "lucide",
+                              "fill": "$green-700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "CZQ0a",
+                          "name": "CodeCard",
+                          "width": "fill_container",
+                          "fill": "$gray-50",
+                          "cornerRadius": "$radius-lg",
+                          "padding": 16,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "wj6sm",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "UrUbW",
+                                  "fill": "$muted-foreground",
+                                  "content": "SEU CÓDIGO DE PARTICIPANTE",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 1
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "NGiYg",
+                                  "fill": "$foreground",
+                                  "content": "PSQ-7X29-QK41",
+                                  "fontFamily": "Inter",
+                                  "fontSize": "$text-h4",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "icon",
+                              "id": "sJORD",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "copy",
+                              "library": "lucide",
+                              "fill": "$muted-foreground"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "vnCey",
+                          "fill": "$foreground",
+                          "content": "Etapas",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-h4",
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "GyLMZ",
                           "name": "Stages",
                           "width": "fill_container",
                           "layout": "vertical",
@@ -5516,10 +5662,10 @@
                           "children": [
                             {
                               "type": "frame",
-                              "id": "mGXBU",
-                              "name": "Stage S1",
+                              "id": "WBdGG",
+                              "name": "StageDetail S1 · Exploração livre",
                               "width": "fill_container",
-                              "fill": "$green-50",
+                              "fill": "$gray-50",
                               "cornerRadius": "$radius-lg",
                               "gap": 12,
                               "padding": 14,
@@ -5527,34 +5673,150 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "gto5b",
-                                  "width": 20,
-                                  "height": 20,
+                                  "id": "E3yvb",
+                                  "width": 22,
+                                  "height": 22,
                                   "icon": "circle-check",
                                   "library": "lucide",
-                                  "fill": "$green-700"
+                                  "fill": "$primary"
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "QDDWm",
+                                  "id": "uaS0z",
                                   "width": "fill_container",
                                   "layout": "vertical",
                                   "gap": 2,
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "axOt5",
+                                      "id": "T3IjQ",
                                       "fill": "$foreground",
-                                      "content": "Exploração livre",
+                                      "content": "S1 · Exploração livre",
                                       "fontFamily": "$font-body",
                                       "fontSize": "$text-body-sm",
                                       "fontWeight": "600"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "nWqDL",
+                                      "id": "XfNiU",
                                       "fill": "$muted-foreground",
-                                      "content": "Concluída · 7 tarefas",
+                                      "content": "Concluída · toque para ver respostas",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "f5aaN",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "$gray-400"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "PnTEd",
+                              "name": "StageDetail S2 · Registro e perfil",
+                              "width": "fill_container",
+                              "fill": "$gray-50",
+                              "cornerRadius": "$radius-lg",
+                              "gap": 12,
+                              "padding": 14,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "c01lW",
+                                  "width": 22,
+                                  "height": 22,
+                                  "icon": "circle-x",
+                                  "library": "lucide",
+                                  "fill": "$9:--destructive"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "P5kzIL",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Ocb49",
+                                      "fill": "$foreground",
+                                      "content": "S2 · Registro e perfil",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "UqbcL",
+                                      "fill": "$muted-foreground",
+                                      "content": "Abandonada · toque para refazer",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "UGCTM",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "$gray-400"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "hGjnT",
+                              "name": "StageDetail S3 · Exposição ao ecossistema",
+                              "width": "fill_container",
+                              "fill": "$gray-50",
+                              "cornerRadius": "$radius-lg",
+                              "gap": 12,
+                              "padding": 14,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "KTx2F",
+                                  "width": 22,
+                                  "height": 22,
+                                  "icon": "circle-dot-dashed",
+                                  "library": "lucide",
+                                  "fill": "#7DC4FA"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "bdIuu",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "sg32N",
+                                      "fill": "$foreground",
+                                      "content": "S3 · Exposição ao ecossistema",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "LgR5F",
+                                      "fill": "$muted-foreground",
+                                      "content": "Em andamento",
                                       "fontFamily": "$font-body",
                                       "fontSize": "$text-caption",
                                       "fontWeight": "normal"
@@ -5565,8 +5827,8 @@
                             },
                             {
                               "type": "frame",
-                              "id": "rDhZz",
-                              "name": "Stage S2",
+                              "id": "OBTUp",
+                              "name": "StageDetail S4 · Busca de parceiros comerciais",
                               "width": "fill_container",
                               "fill": "$gray-50",
                               "cornerRadius": "$radius-lg",
@@ -5576,132 +5838,34 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "P4Bhs",
-                                  "width": 20,
-                                  "height": 20,
+                                  "id": "tGqdE",
+                                  "width": 22,
+                                  "height": 22,
                                   "icon": "circle-dashed",
                                   "library": "lucide",
-                                  "fill": "$gray-400"
+                                  "fill": "$yellow-600"
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "Z0JzAW",
+                                  "id": "n8F9nW",
                                   "width": "fill_container",
                                   "layout": "vertical",
                                   "gap": 2,
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "vAM4W",
+                                      "id": "ni7pe",
                                       "fill": "$foreground",
-                                      "content": "Registro e perfil",
+                                      "content": "S4 · Busca de parceiros comerciais",
                                       "fontFamily": "$font-body",
                                       "fontSize": "$text-body-sm",
                                       "fontWeight": "600"
                                     },
                                     {
                                       "type": "text",
-                                      "id": "x7L3OL",
+                                      "id": "QDuKv",
                                       "fill": "$muted-foreground",
-                                      "content": "3 tarefas",
-                                      "fontFamily": "$font-body",
-                                      "fontSize": "$text-caption",
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "OEFvs",
-                              "name": "Stage S3",
-                              "width": "fill_container",
-                              "fill": "$gray-50",
-                              "cornerRadius": "$radius-lg",
-                              "gap": 12,
-                              "padding": 14,
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "C1u5u",
-                                  "width": 20,
-                                  "height": 20,
-                                  "icon": "circle-dashed",
-                                  "library": "lucide",
-                                  "fill": "$gray-400"
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "M8owU",
-                                  "width": "fill_container",
-                                  "layout": "vertical",
-                                  "gap": 2,
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "VLR1i",
-                                      "fill": "$foreground",
-                                      "content": "Exposição ao ecossistema",
-                                      "fontFamily": "$font-body",
-                                      "fontSize": "$text-body-sm",
-                                      "fontWeight": "600"
-                                    },
-                                    {
-                                      "type": "text",
-                                      "id": "FHbcO",
-                                      "fill": "$muted-foreground",
-                                      "content": "5 tarefas",
-                                      "fontFamily": "$font-body",
-                                      "fontSize": "$text-caption",
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "B87sB",
-                              "name": "Stage S4",
-                              "width": "fill_container",
-                              "fill": "$gray-50",
-                              "cornerRadius": "$radius-lg",
-                              "gap": 12,
-                              "padding": 14,
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "mTx8T",
-                                  "width": 20,
-                                  "height": 20,
-                                  "icon": "circle-dashed",
-                                  "library": "lucide",
-                                  "fill": "$gray-400"
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "UofqQ",
-                                  "width": "fill_container",
-                                  "layout": "vertical",
-                                  "gap": 2,
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "svk7h",
-                                      "fill": "$foreground",
-                                      "content": "Busca de parceiros comerciais",
-                                      "fontFamily": "$font-body",
-                                      "fontSize": "$text-body-sm",
-                                      "fontWeight": "600"
-                                    },
-                                    {
-                                      "type": "text",
-                                      "id": "JXTfj",
-                                      "fill": "$muted-foreground",
-                                      "content": "3 tarefas",
+                                      "content": "Pendente",
                                       "fontFamily": "$font-body",
                                       "fontSize": "$text-caption",
                                       "fontWeight": "normal"
@@ -5711,60 +5875,210 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "p1NOf",
+                          "fill": "$foreground",
+                          "content": "Gerenciar pesquisa",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-h4",
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Zz6pa",
+                          "name": "ManagementCards",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "z1HdrR",
+                              "name": "ManagementCard Reiniciar toda a pesquisa",
+                              "width": "fill_container",
+                              "fill": "#ffffff",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
+                              "strokeWidth": 1,
+                              "gap": 12,
+                              "padding": 16,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "f9Ia4s",
+                                  "width": 20,
+                                  "height": 20,
+                                  "icon": "rotate-ccw",
+                                  "library": "lucide",
+                                  "fill": "$green-700"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "ok44E",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Prg1z",
+                                      "fill": "$foreground",
+                                      "content": "Reiniciar toda a pesquisa",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "uFZ5f",
+                                      "fill": "$muted-foreground",
+                                      "content": "Apaga o progresso e começa do zero",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "sHzfK",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "$gray-400"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "q5eonZ",
+                              "name": "ManagementCard Solicitar exclusão dos meus dados",
+                              "width": "fill_container",
+                              "fill": "#ffffff",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
+                              "strokeWidth": 1,
+                              "gap": 12,
+                              "padding": 16,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "Y0BOI",
+                                  "width": 20,
+                                  "height": 20,
+                                  "icon": "trash-2",
+                                  "library": "lucide",
+                                  "fill": "#000000"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "fib7G",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "VUafm",
+                                      "fill": "$foreground",
+                                      "content": "Solicitar exclusão dos meus dados",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "L6CLd",
+                                      "fill": "$muted-foreground",
+                                      "content": "Remove permanentemente suas respostas",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "PoQTw",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "$gray-400"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "yZ1C9",
+                          "name": "DangerZone",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "padding": [
+                            16,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "yYLJJ",
+                              "name": "Divider",
+                              "width": "fill_container",
+                              "height": 1,
+                              "fill": "$border"
+                            },
+                            {
+                              "type": "text",
+                              "id": "u2AzUY",
+                              "fill": "$muted-foreground",
+                              "content": "ENCERRAR PESQUISA",
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-overline",
+                              "fontWeight": "600",
+                              "letterSpacing": 1
+                            },
+                            {
+                              "id": "B1nt2v",
+                              "type": "ref",
+                              "ref": "9:YKnjc",
+                              "name": "DesistirBtn",
+                              "width": "fill_container",
+                              "descendants": {
+                                "9:PqjlB": {
+                                  "enabled": false
+                                },
+                                "9:NDadS": {
+                                  "content": "Abandonar pesquisa"
+                                }
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
                     {
-                      "type": "frame",
-                      "id": "SizHc",
-                      "name": "Actions",
+                      "id": "ew0Hc",
+                      "type": "ref",
+                      "ref": "J7k5q",
+                      "name": "ContinuarBtn",
                       "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 10,
-                      "children": [
-                        {
-                          "id": "dY8YV",
-                          "type": "ref",
-                          "ref": "J7k5q",
-                          "name": "ContinuarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "M3upe": {
-                              "content": "Continuar"
-                            }
-                          }
-                        },
-                        {
-                          "id": "jVVjl",
-                          "type": "ref",
-                          "ref": "9:3f2VW",
-                          "name": "ReiniciarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:AeXMI": {
-                              "enabled": false
-                            },
-                            "9:UZfKV": {
-                              "content": "Reiniciar"
-                            }
-                          }
-                        },
-                        {
-                          "id": "iBohi",
-                          "type": "ref",
-                          "ref": "9:YKnjc",
-                          "name": "DesistirBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:PqjlB": {
-                              "enabled": false
-                            },
-                            "9:NDadS": {
-                              "content": "Desistir"
-                            }
-                          }
+                      "x": 24,
+                      "y": 1030,
+                      "descendants": {
+                        "M3upe": {
+                          "content": "Continuar"
                         }
-                      ]
+                      }
                     }
                   ]
                 }
@@ -6006,758 +6320,11 @@
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "WSenr",
-          "name": "F8 — Encerramento",
-          "gap": 64,
-          "children": [
-            {
-              "type": "frame",
-              "id": "VCSKm",
-              "name": "F8.23 — Comentário livre",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "U8UVy",
-                  "name": "Body",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "layout": "vertical",
-                  "gap": 16,
-                  "padding": [
-                    50,
-                    24,
-                    24,
-                    24
-                  ],
-                  "justifyContent": "space_between",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "oHLt6",
-                      "name": "Content",
-                      "width": "fill_container",
-                      "height": "fill_container",
-                      "layout": "vertical",
-                      "gap": 12,
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "TjRQX",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Quer deixar algum comentário livre sobre a experiência?",
-                          "lineHeight": 1.25,
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h2",
-                          "fontWeight": "700"
-                        },
-                        {
-                          "type": "text",
-                          "id": "lykE4",
-                          "fill": "$muted-foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Opcional. Fale do que quiser: o que você adicionaria, removeria ou mudaria.",
-                          "lineHeight": 1.4,
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-body-sm",
-                          "fontWeight": "normal"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "boFt3",
-                          "name": "Textarea",
-                          "width": "fill_container",
-                          "height": "fill_container",
-                          "cornerRadius": "$radius-md",
-                          "stroke": "$border",
-                          "strokeWidth": 1,
-                          "layout": "vertical",
-                          "padding": 14,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "qqVWa",
-                              "fill": "$muted-foreground",
-                              "textGrowth": "fixed-width",
-                              "width": "fill_container",
-                              "content": "Escreva aqui, se quiser…",
-                              "fontFamily": "$font-body",
-                              "fontSize": "$text-body-sm",
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "text",
-                          "id": "k5SGq",
-                          "fill": "$muted-foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "0 / 4000",
-                          "textAlign": "right",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-caption",
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "Q59XTs",
-                      "name": "Actions",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 10,
-                      "children": [
-                        {
-                          "id": "ZEtgy",
-                          "type": "ref",
-                          "ref": "J7k5q",
-                          "name": "EnviarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "M3upe": {
-                              "content": "Enviar e finalizar"
-                            }
-                          }
-                        },
-                        {
-                          "id": "E8M5c2",
-                          "type": "ref",
-                          "ref": "9:3f2VW",
-                          "name": "PularBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:AeXMI": {
-                              "enabled": false
-                            },
-                            "9:UZfKV": {
-                              "content": "Pular"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "VIcTK",
-              "name": "F8.24 — Agradecimento",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "CfjpX",
-                  "name": "Body",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "layout": "vertical",
-                  "gap": 24,
-                  "padding": [
-                    70,
-                    24,
-                    32,
-                    24
-                  ],
-                  "justifyContent": "space_between",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "iUq4A",
-                      "name": "Content",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 20,
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "N2c4H",
-                          "width": 52,
-                          "height": 52,
-                          "icon": "party-popper",
-                          "library": "lucide",
-                          "fill": "$green-700"
-                        },
-                        {
-                          "type": "text",
-                          "id": "BvF1E",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Muito obrigado por participar!",
-                          "textAlign": "center",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h1",
-                          "fontWeight": "700"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "TVxKm",
-                          "name": "CodeCard",
-                          "width": "fill_container",
-                          "fill": "$gray-50",
-                          "cornerRadius": "$radius-lg",
-                          "layout": "vertical",
-                          "gap": 8,
-                          "padding": 20,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "m44tfY",
-                              "fill": "$muted-foreground",
-                              "content": "SEU CÓDIGO DE PARTICIPANTE",
-                              "fontFamily": "$font-heading",
-                              "fontSize": "$text-overline",
-                              "fontWeight": "600",
-                              "letterSpacing": 1
-                            },
-                            {
-                              "type": "frame",
-                              "id": "m4aVV0",
-                              "gap": 10,
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "r8wA1H",
-                                  "fill": "$foreground",
-                                  "content": "PSQ-7X29-QK41",
-                                  "fontFamily": "Inter",
-                                  "fontSize": "$text-h2",
-                                  "fontWeight": "700"
-                                },
-                                {
-                                  "type": "icon",
-                                  "id": "PExem",
-                                  "width": 20,
-                                  "height": 20,
-                                  "icon": "copy",
-                                  "library": "lucide",
-                                  "fill": "$muted-foreground"
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "text",
-                          "id": "aMttk",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Guarde este código: é ele que permite pedir a exclusão dos seus dados a qualquer momento.",
-                          "lineHeight": 1.4,
-                          "textAlign": "center",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-body-sm",
-                          "fontWeight": "normal"
-                        },
-                        {
-                          "type": "text",
-                          "id": "nBrQg",
-                          "fill": "$muted-foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "A conta que você usava antes continua ativa. Você pode voltar a ela normalmente.",
-                          "lineHeight": 1.4,
-                          "textAlign": "center",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-body-sm",
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "esz6u",
-                      "name": "Actions",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "children": [
-                        {
-                          "id": "asUG4",
-                          "type": "ref",
-                          "ref": "J7k5q",
-                          "name": "VoltarContaBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "M3upe": {
-                              "content": "Voltar para minha conta"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "fZkwg",
-          "name": "F9 — Detalhes e gerenciamento da pesquisa",
-          "gap": 64,
-          "children": [
-            {
-              "type": "frame",
-              "id": "W3mYo",
-              "name": "F9.1 — Detalhes da pesquisa",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "o1hpI",
-                  "name": "Body",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "layout": "vertical",
-                  "gap": 20,
-                  "padding": [
-                    50,
-                    24,
-                    24,
-                    24
-                  ],
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "rfYw7",
-                      "name": "NavHeader",
-                      "width": "fill_container",
-                      "gap": 10,
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "v6l2I",
-                          "width": 20,
-                          "height": 20,
-                          "icon": "arrow-left",
-                          "library": "lucide",
-                          "fill": "$foreground"
-                        },
-                        {
-                          "type": "text",
-                          "id": "N30bK",
-                          "fill": "$foreground",
-                          "content": "Detalhes da pesquisa",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h3",
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "Asr2h",
-                      "name": "PersonaRow",
-                      "width": "fill_container",
-                      "fill": "$green-50",
-                      "cornerRadius": "$radius-lg",
-                      "padding": 16,
-                      "justifyContent": "space_between",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "frame",
-                          "id": "uXLsI",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "Xd4Wz",
-                              "fill": "$green-700",
-                              "content": "SEU PERFIL",
-                              "fontFamily": "$font-heading",
-                              "fontSize": "$text-overline",
-                              "fontWeight": "600",
-                              "letterSpacing": 1
-                            },
-                            {
-                              "type": "text",
-                              "id": "tvUHY",
-                              "fill": "$foreground",
-                              "content": "Coletor(a)",
-                              "fontFamily": "$font-body",
-                              "fontSize": "$text-body",
-                              "fontWeight": "600"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "icon",
-                          "id": "Ey8A6",
-                          "width": 24,
-                          "height": 24,
-                          "icon": "user-round",
-                          "library": "lucide",
-                          "fill": "$green-700"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "A5OoeK",
-                      "name": "CodeCard",
-                      "width": "fill_container",
-                      "fill": "$gray-50",
-                      "cornerRadius": "$radius-lg",
-                      "padding": 16,
-                      "justifyContent": "space_between",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "frame",
-                          "id": "j1kO0",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "gmDUh",
-                              "fill": "$muted-foreground",
-                              "content": "SEU CÓDIGO DE PARTICIPANTE",
-                              "fontFamily": "$font-heading",
-                              "fontSize": "$text-overline",
-                              "fontWeight": "600",
-                              "letterSpacing": 1
-                            },
-                            {
-                              "type": "text",
-                              "id": "Y2YfS",
-                              "fill": "$foreground",
-                              "content": "PSQ-7X29-QK41",
-                              "fontFamily": "Inter",
-                              "fontSize": "$text-h4",
-                              "fontWeight": "600"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "icon",
-                          "id": "Z2M2ra",
-                          "width": 18,
-                          "height": 18,
-                          "icon": "copy",
-                          "library": "lucide",
-                          "fill": "$muted-foreground"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "text",
-                      "id": "HJPB2",
-                      "fill": "$foreground",
-                      "content": "Etapas",
-                      "fontFamily": "$font-heading",
-                      "fontSize": "$text-h4",
-                      "fontWeight": "600"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "CykL1",
-                      "name": "Stages",
-                      "clip": true,
-                      "width": "fill_container",
-                      "height": "fill_container",
-                      "layout": "vertical",
-                      "gap": 8,
-                      "children": [
-                        {
-                          "type": "frame",
-                          "id": "CwH4k",
-                          "name": "StageDetail S1 · Exploração livre",
-                          "width": "fill_container",
-                          "fill": "$gray-50",
-                          "cornerRadius": "$radius-lg",
-                          "gap": 12,
-                          "padding": 14,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "icon",
-                              "id": "QU697",
-                              "width": 22,
-                              "height": 22,
-                              "icon": "circle-check",
-                              "library": "lucide",
-                              "fill": "$green-700"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "g5Cpuy",
-                              "width": "fill_container",
-                              "layout": "vertical",
-                              "gap": 2,
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "r0dnb",
-                                  "fill": "$foreground",
-                                  "content": "S1 · Exploração livre",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-body-sm",
-                                  "fontWeight": "600"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "eX16Z",
-                                  "fill": "$muted-foreground",
-                                  "content": "Concluída · ver respostas",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-caption",
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "icon",
-                              "id": "qUdBY",
-                              "width": 16,
-                              "height": 16,
-                              "icon": "chevron-right",
-                              "library": "lucide",
-                              "fill": "$gray-400"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "b63USf",
-                          "name": "StageDetail S2 · Registro e perfil",
-                          "width": "fill_container",
-                          "fill": "$gray-50",
-                          "cornerRadius": "$radius-lg",
-                          "gap": 12,
-                          "padding": 14,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "icon",
-                              "id": "h8ZePw",
-                              "width": 22,
-                              "height": 22,
-                              "icon": "circle-x",
-                              "library": "lucide",
-                              "fill": "#000000"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "gIL05",
-                              "width": "fill_container",
-                              "layout": "vertical",
-                              "gap": 2,
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "GwVdg",
-                                  "fill": "$foreground",
-                                  "content": "S2 · Registro e perfil",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-body-sm",
-                                  "fontWeight": "600"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "dBan0",
-                                  "fill": "$muted-foreground",
-                                  "content": "Abandonada · pode refazer",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-caption",
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "icon",
-                              "id": "rqgIj",
-                              "width": 16,
-                              "height": 16,
-                              "icon": "chevron-right",
-                              "library": "lucide",
-                              "fill": "$gray-400"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "I1XYr",
-                          "name": "StageDetail S3 · Exposição ao ecossistema",
-                          "width": "fill_container",
-                          "fill": "$gray-50",
-                          "cornerRadius": "$radius-lg",
-                          "gap": 12,
-                          "padding": 14,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "icon",
-                              "id": "eR4ji",
-                              "width": 22,
-                              "height": 22,
-                              "icon": "circle-dashed",
-                              "library": "lucide",
-                              "fill": "$gray-400"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "gntYu",
-                              "width": "fill_container",
-                              "layout": "vertical",
-                              "gap": 2,
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "aDU3m",
-                                  "fill": "$foreground",
-                                  "content": "S3 · Exposição ao ecossistema",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-body-sm",
-                                  "fontWeight": "600"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "pXh2g",
-                                  "fill": "$muted-foreground",
-                                  "content": "Pendente",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-caption",
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "qGzS4",
-                          "name": "StageDetail S4 · Busca de parceiros comerciais",
-                          "width": "fill_container",
-                          "fill": "$gray-50",
-                          "cornerRadius": "$radius-lg",
-                          "gap": 12,
-                          "padding": 14,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "icon",
-                              "id": "p0DA5V",
-                              "width": 22,
-                              "height": 22,
-                              "icon": "circle-dashed",
-                              "library": "lucide",
-                              "fill": "$gray-400"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "sKgXW",
-                              "width": "fill_container",
-                              "layout": "vertical",
-                              "gap": 2,
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "oQhR7",
-                                  "fill": "$foreground",
-                                  "content": "S4 · Busca de parceiros comerciais",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-body-sm",
-                                  "fontWeight": "600"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "b1VYMk",
-                                  "fill": "$muted-foreground",
-                                  "content": "Pendente",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-caption",
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "XWbMO",
-                      "name": "Actions",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 10,
-                      "children": [
-                        {
-                          "id": "Pl1J3",
-                          "type": "ref",
-                          "ref": "9:3f2VW",
-                          "name": "ReiniciarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:AeXMI": {
-                              "enabled": false
-                            },
-                            "9:UZfKV": {
-                              "content": "Reiniciar toda a pesquisa"
-                            }
-                          }
-                        },
-                        {
-                          "type": "frame",
-                          "id": "u6rxYo",
-                          "name": "DeleteLink",
-                          "padding": 8,
-                          "justifyContent": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "t9wgo",
-                              "fill": "#000000",
-                              "content": "Solicitar exclusão dos meus dados",
-                              "fontFamily": "$font-body",
-                              "fontSize": "$text-body-sm",
-                              "fontWeight": "600"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
             },
             {
               "type": "frame",
               "id": "EddlD",
-              "name": "F9.2 — Respostas da etapa",
+              "name": "F7.23 — Respostas da etapa",
               "clip": true,
               "width": 430,
               "height": 932,
@@ -7068,7 +6635,7 @@
             {
               "type": "frame",
               "id": "aJjY0",
-              "name": "F9.3 — Refazer etapa",
+              "name": "F7.24 — Refazer etapa",
               "clip": true,
               "width": 430,
               "height": 932,
@@ -7180,7 +6747,7 @@
             {
               "type": "frame",
               "id": "QwLQ0",
-              "name": "F9.4 — Solicitar exclusão dos dados",
+              "name": "F7.25 — Solicitar exclusão dos dados",
               "clip": true,
               "width": 430,
               "height": 932,
@@ -7304,6 +6871,312 @@
                             },
                             "9:UZfKV": {
                               "content": "Cancelar"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "WSenr",
+          "name": "F8 — Encerramento",
+          "gap": 64,
+          "children": [
+            {
+              "type": "frame",
+              "id": "VCSKm",
+              "name": "F8.23 — Comentário livre",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "U8UVy",
+                  "name": "Body",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": [
+                    50,
+                    24,
+                    24,
+                    24
+                  ],
+                  "justifyContent": "space_between",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "oHLt6",
+                      "name": "Content",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "TjRQX",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Quer deixar algum comentário sobre a experiência?",
+                          "lineHeight": 1.25,
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-h2",
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "lykE4",
+                          "fill": "$muted-foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Opcional. Fale do que quiser: o que você adicionaria, removeria ou mudaria.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body-sm",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "boFt3",
+                          "name": "Textarea",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "cornerRadius": "$radius-md",
+                          "stroke": "$border",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "padding": 14,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "qqVWa",
+                              "fill": "$muted-foreground",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Escreva aqui, se quiser…",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "k5SGq",
+                          "fill": "$muted-foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "0 / 4000",
+                          "textAlign": "right",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Q59XTs",
+                      "name": "Actions",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 10,
+                      "children": [
+                        {
+                          "id": "ZEtgy",
+                          "type": "ref",
+                          "ref": "J7k5q",
+                          "name": "EnviarBtn",
+                          "width": "fill_container",
+                          "descendants": {
+                            "M3upe": {
+                              "content": "Enviar e finalizar"
+                            }
+                          }
+                        },
+                        {
+                          "id": "E8M5c2",
+                          "type": "ref",
+                          "ref": "9:3f2VW",
+                          "name": "PularBtn",
+                          "width": "fill_container",
+                          "descendants": {
+                            "9:AeXMI": {
+                              "enabled": false
+                            },
+                            "9:UZfKV": {
+                              "content": "Pular"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "VIcTK",
+              "name": "F8.24 — Agradecimento",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "CfjpX",
+                  "name": "Body",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 24,
+                  "padding": [
+                    70,
+                    24,
+                    32,
+                    24
+                  ],
+                  "justifyContent": "space_between",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "iUq4A",
+                      "name": "Content",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 20,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "N2c4H",
+                          "width": 52,
+                          "height": 52,
+                          "icon": "party-popper",
+                          "library": "lucide",
+                          "fill": "$green-700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "BvF1E",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Muito obrigado por participar!",
+                          "textAlign": "center",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-h1",
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "TVxKm",
+                          "name": "CodeCard",
+                          "width": "fill_container",
+                          "fill": "$gray-50",
+                          "cornerRadius": "$radius-lg",
+                          "layout": "vertical",
+                          "gap": 8,
+                          "padding": 20,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "m44tfY",
+                              "fill": "$muted-foreground",
+                              "content": "SEU CÓDIGO DE PARTICIPANTE",
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-overline",
+                              "fontWeight": "600",
+                              "letterSpacing": 1
+                            },
+                            {
+                              "type": "frame",
+                              "id": "m4aVV0",
+                              "gap": 10,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "r8wA1H",
+                                  "fill": "$foreground",
+                                  "content": "PSQ-7X29-QK41",
+                                  "fontFamily": "Inter",
+                                  "fontSize": "$text-h2",
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "PExem",
+                                  "width": 20,
+                                  "height": 20,
+                                  "icon": "copy",
+                                  "library": "lucide",
+                                  "fill": "$muted-foreground"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "aMttk",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Guarde este código: é ele que permite pedir a exclusão dos seus dados a qualquer momento.",
+                          "lineHeight": 1.4,
+                          "textAlign": "center",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body-sm",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "nBrQg",
+                          "fill": "$muted-foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "A conta que você usava antes continua ativa. Você pode voltar a ela normalmente.",
+                          "lineHeight": 1.4,
+                          "textAlign": "center",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body-sm",
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "esz6u",
+                      "name": "Actions",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "id": "asUG4",
+                          "type": "ref",
+                          "ref": "J7k5q",
+                          "name": "VoltarContaBtn",
+                          "width": "fill_container",
+                          "descendants": {
+                            "M3upe": {
+                              "content": "Voltar para minha conta"
                             }
                           }
                         }
