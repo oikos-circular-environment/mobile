@@ -510,16 +510,17 @@
                           }
                         },
                         {
-                          "id": "Z16AqJ",
+                          "id": "p9HuQ",
                           "type": "ref",
-                          "ref": "9:3f2VW",
+                          "ref": "9:C10zH",
                           "name": "AgoraNaoBtn",
+                          "height": 48,
                           "width": "fill_container",
                           "descendants": {
-                            "9:AeXMI": {
+                            "9:l8v2I": {
                               "enabled": false
                             },
-                            "9:UZfKV": {
+                            "9:poRwU": {
                               "content": "Agora não"
                             }
                           }
@@ -719,16 +720,17 @@
                           }
                         },
                         {
-                          "id": "DafVz",
+                          "id": "aLOCx",
                           "type": "ref",
-                          "ref": "9:3f2VW",
+                          "ref": "9:C10zH",
                           "name": "VoltarBtn",
+                          "height": 48,
                           "width": "fill_container",
                           "descendants": {
-                            "9:AeXMI": {
+                            "9:l8v2I": {
                               "enabled": false
                             },
-                            "9:UZfKV": {
+                            "9:poRwU": {
                               "content": "Voltar à home"
                             }
                           }
@@ -910,6 +912,199 @@
                         },
                         {
                           "type": "frame",
+                          "id": "rjcnk",
+                          "name": "InstitutionalHeader",
+                          "width": "fill_container",
+                          "fill": "$gray-50",
+                          "cornerRadius": "$radius-lg",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "gr1Hl",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 1,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "BI3GR",
+                                  "fill": "$muted-foreground",
+                                  "content": "TÍTULO DA PESQUISA",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 0.5
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "EuXPW",
+                                  "fill": "$foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Oikos — Modo Pesquisa de Usabilidade",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "d2fha",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 1,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "MSSdW",
+                                  "fill": "$muted-foreground",
+                                  "content": "INSTITUIÇÃO / PROGRAMA",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 0.5
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "F0gTi",
+                                  "fill": "$foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "[Universidade] — Programa de Pós-Graduação em [Área], Mestrado",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "fxZOU",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 1,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "DfWkB",
+                                  "fill": "$muted-foreground",
+                                  "content": "PESQUISADOR RESPONSÁVEL",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 0.5
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "kyBFM",
+                                  "fill": "$foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "[Nome do pesquisador]",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "YPYye",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 1,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "LIOMh",
+                                  "fill": "$muted-foreground",
+                                  "content": "ORIENTADOR(A)",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 0.5
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "DkVkF",
+                                  "fill": "$foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "[Nome do orientador]",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "nslse",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 1,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "j7pelj",
+                                  "fill": "$muted-foreground",
+                                  "content": "CONTATO",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 0.5
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "gHAkZ",
+                                  "fill": "$foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "[email@instituicao.edu.br]",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "U5DFg",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 1,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "bQLfw",
+                                  "fill": "$muted-foreground",
+                                  "content": "Nº DO PARECER CEP",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 0.5
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "dNY6i",
+                                  "fill": "$foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Pendente de aprovação",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
                           "id": "WraRU",
                           "name": "ScrollArea",
                           "clip": true,
@@ -1051,16 +1246,17 @@
                           "fontWeight": "normal"
                         },
                         {
-                          "id": "a7I0O",
+                          "id": "y0Jqzf",
                           "type": "ref",
-                          "ref": "9:3f2VW",
+                          "ref": "9:C10zH",
                           "name": "RecusarBtn",
+                          "height": 48,
                           "width": "fill_container",
                           "descendants": {
-                            "9:AeXMI": {
+                            "9:l8v2I": {
                               "enabled": false
                             },
-                            "9:UZfKV": {
+                            "9:poRwU": {
                               "content": "Recusar"
                             }
                           }
@@ -3605,16 +3801,17 @@
                           }
                         },
                         {
-                          "id": "h3e6E",
+                          "id": "InlC6",
                           "type": "ref",
-                          "ref": "9:3f2VW",
+                          "ref": "9:C10zH",
                           "name": "AindaNaoBtn",
+                          "height": 48,
                           "width": "fill_container",
                           "descendants": {
-                            "9:AeXMI": {
+                            "9:l8v2I": {
                               "enabled": false
                             },
-                            "9:UZfKV": {
+                            "9:poRwU": {
                               "content": "Ainda não terminei"
                             }
                           }
@@ -5283,16 +5480,17 @@
                           }
                         },
                         {
-                          "id": "wyzeu",
+                          "id": "r6oHx",
                           "type": "ref",
-                          "ref": "9:3f2VW",
+                          "ref": "9:C10zH",
                           "name": "DepoisBtn",
+                          "height": 48,
                           "width": "fill_container",
                           "descendants": {
-                            "9:AeXMI": {
+                            "9:l8v2I": {
                               "enabled": false
                             },
-                            "9:UZfKV": {
+                            "9:poRwU": {
                               "content": "Continuar depois"
                             }
                           }
@@ -5426,16 +5624,17 @@
                           }
                         },
                         {
-                          "id": "m2T8eH",
+                          "id": "Aw1nR",
                           "type": "ref",
-                          "ref": "9:3f2VW",
+                          "ref": "9:C10zH",
                           "name": "DepoisBtn",
+                          "height": 48,
                           "width": "fill_container",
                           "descendants": {
-                            "9:AeXMI": {
+                            "9:l8v2I": {
                               "enabled": false
                             },
-                            "9:UZfKV": {
+                            "9:poRwU": {
                               "content": "Continuar depois"
                             }
                           }
@@ -5460,7 +5659,7 @@
               "name": "F7.20 — Tela de retomada",
               "clip": true,
               "width": 430,
-              "height": 1102,
+              "height": 932,
               "fill": "$background",
               "layout": "vertical",
               "children": [
@@ -5662,6 +5861,71 @@
                           "children": [
                             {
                               "type": "frame",
+                              "id": "mtPAG",
+                              "name": "StageDetail Caracterização",
+                              "width": "fill_container",
+                              "fill": "$gray-50",
+                              "cornerRadius": "$radius-lg",
+                              "gap": 12,
+                              "padding": 14,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "jYnOr",
+                                  "width": 22,
+                                  "height": 22,
+                                  "icon": "circle-check",
+                                  "library": "lucide",
+                                  "fill": "$primary"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "nS9EZ",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "atSAS",
+                                      "fill": "$foreground",
+                                      "content": "Caracterização",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "X29hJ",
+                                      "fill": "$muted-foreground",
+                                      "content": "Concluída · toque para ver respostas",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "dOqvX",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "$gray-400"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "iIDLt",
+                              "type": "ref",
+                              "ref": "9:D24KC",
+                              "name": "Separator",
+                              "width": "fill_container"
+                            },
+                            {
+                              "type": "frame",
                               "id": "WBdGG",
                               "name": "StageDetail S1 · Exploração livre",
                               "width": "fill_container",
@@ -5736,7 +6000,7 @@
                                   "height": 22,
                                   "icon": "circle-x",
                                   "library": "lucide",
-                                  "fill": "$9:--destructive"
+                                  "fill": "#000000"
                                 },
                                 {
                                   "type": "frame",
@@ -5826,6 +6090,13 @@
                               ]
                             },
                             {
+                              "id": "F1QVum",
+                              "type": "ref",
+                              "ref": "9:D24KC",
+                              "name": "Separator",
+                              "width": "fill_container"
+                            },
+                            {
                               "type": "frame",
                               "id": "OBTUp",
                               "name": "StageDetail S4 · Busca de parceiros comerciais",
@@ -5873,6 +6144,55 @@
                                   ]
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "EutrR",
+                              "name": "StageDetail Comentário final",
+                              "width": "fill_container",
+                              "fill": "$gray-50",
+                              "cornerRadius": "$radius-lg",
+                              "gap": 12,
+                              "padding": 14,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "Y7kUi",
+                                  "width": 22,
+                                  "height": 22,
+                                  "icon": "circle-dashed",
+                                  "library": "lucide",
+                                  "fill": "$yellow-600"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "Q4GXMD",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "z7k97n",
+                                      "fill": "$foreground",
+                                      "content": "Comentário final",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "i2bcoF",
+                                      "fill": "$muted-foreground",
+                                      "content": "Pendente · disponível ao concluir tudo",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
                             }
                           ]
                         },
@@ -5884,136 +6204,6 @@
                           "fontFamily": "$font-heading",
                           "fontSize": "$text-h4",
                           "fontWeight": "600"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "Zz6pa",
-                          "name": "ManagementCards",
-                          "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": 10,
-                          "children": [
-                            {
-                              "type": "frame",
-                              "id": "z1HdrR",
-                              "name": "ManagementCard Reiniciar toda a pesquisa",
-                              "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": "$radius-lg",
-                              "stroke": "$border",
-                              "strokeWidth": 1,
-                              "gap": 12,
-                              "padding": 16,
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "f9Ia4s",
-                                  "width": 20,
-                                  "height": 20,
-                                  "icon": "rotate-ccw",
-                                  "library": "lucide",
-                                  "fill": "$green-700"
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "ok44E",
-                                  "width": "fill_container",
-                                  "layout": "vertical",
-                                  "gap": 2,
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "Prg1z",
-                                      "fill": "$foreground",
-                                      "content": "Reiniciar toda a pesquisa",
-                                      "fontFamily": "$font-body",
-                                      "fontSize": "$text-body-sm",
-                                      "fontWeight": "600"
-                                    },
-                                    {
-                                      "type": "text",
-                                      "id": "uFZ5f",
-                                      "fill": "$muted-foreground",
-                                      "content": "Apaga o progresso e começa do zero",
-                                      "fontFamily": "$font-body",
-                                      "fontSize": "$text-caption",
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "icon",
-                                  "id": "sHzfK",
-                                  "width": 16,
-                                  "height": 16,
-                                  "icon": "chevron-right",
-                                  "library": "lucide",
-                                  "fill": "$gray-400"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "q5eonZ",
-                              "name": "ManagementCard Solicitar exclusão dos meus dados",
-                              "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": "$radius-lg",
-                              "stroke": "$border",
-                              "strokeWidth": 1,
-                              "gap": 12,
-                              "padding": 16,
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "Y0BOI",
-                                  "width": 20,
-                                  "height": 20,
-                                  "icon": "trash-2",
-                                  "library": "lucide",
-                                  "fill": "#000000"
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "fib7G",
-                                  "width": "fill_container",
-                                  "layout": "vertical",
-                                  "gap": 2,
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "VUafm",
-                                      "fill": "$foreground",
-                                      "content": "Solicitar exclusão dos meus dados",
-                                      "fontFamily": "$font-body",
-                                      "fontSize": "$text-body-sm",
-                                      "fontWeight": "600"
-                                    },
-                                    {
-                                      "type": "text",
-                                      "id": "L6CLd",
-                                      "fill": "$muted-foreground",
-                                      "content": "Remove permanentemente suas respostas",
-                                      "fontFamily": "$font-body",
-                                      "fontSize": "$text-caption",
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "icon",
-                                  "id": "PoQTw",
-                                  "width": 16,
-                                  "height": 16,
-                                  "icon": "chevron-right",
-                                  "library": "lucide",
-                                  "fill": "$gray-400"
-                                }
-                              ]
-                            }
-                          ]
                         },
                         {
                           "type": "frame",
@@ -6030,35 +6220,66 @@
                           ],
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "yYLJJ",
-                              "name": "Divider",
-                              "width": "fill_container",
-                              "height": 1,
-                              "fill": "$border"
-                            },
-                            {
                               "type": "text",
                               "id": "u2AzUY",
                               "fill": "$muted-foreground",
-                              "content": "ENCERRAR PESQUISA",
+                              "content": "ZONA PERIGOSA",
                               "fontFamily": "$font-heading",
                               "fontSize": "$text-overline",
                               "fontWeight": "600",
                               "letterSpacing": 1
                             },
                             {
-                              "id": "B1nt2v",
+                              "id": "L21eP",
                               "type": "ref",
-                              "ref": "9:YKnjc",
-                              "name": "DesistirBtn",
+                              "ref": "ALEkQ",
+                              "name": "Row Excluir Dados",
+                              "fill": "#fef2f2",
                               "width": "fill_container",
                               "descendants": {
-                                "9:PqjlB": {
-                                  "enabled": false
+                                "fVqwm": {
+                                  "fill": "#dc2626"
                                 },
-                                "9:NDadS": {
-                                  "content": "Abandonar pesquisa"
+                                "B0v4Ss": {
+                                  "icon": "trash-2"
+                                },
+                                "R2r1b": {
+                                  "content": "Solicitar exclusão dos meus dados",
+                                  "fill": "#dc2626"
+                                },
+                                "PE7Cr": {
+                                  "content": "Apaga permanentemente suas respostas desta pesquisa",
+                                  "fill": "#b91c1c"
+                                },
+                                "fVdRp": {
+                                  "enabled": false
+                                }
+                              }
+                            },
+                            {
+                              "id": "UUOv2",
+                              "type": "ref",
+                              "ref": "ALEkQ",
+                              "name": "Row Abandonar Pesquisa",
+                              "fill": "#fef2f2",
+                              "width": "fill_container",
+                              "descendants": {
+                                "fVqwm": {
+                                  "fill": "#dc2626"
+                                },
+                                "B0v4Ss": {
+                                  "icon": "circle-x"
+                                },
+                                "R2r1b": {
+                                  "content": "Abandonar a pesquisa",
+                                  "fill": "#dc2626"
+                                },
+                                "PE7Cr": {
+                                  "content": "Você pode retomar depois de onde parou",
+                                  "fill": "#b91c1c"
+                                },
+                                "fVdRp": {
+                                  "enabled": false
                                 }
                               }
                             }
@@ -6073,249 +6294,12 @@
                       "name": "ContinuarBtn",
                       "width": "fill_container",
                       "x": 24,
-                      "y": 1030,
+                      "y": 860,
                       "descendants": {
                         "M3upe": {
                           "content": "Continuar"
                         }
                       }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "w7qMD",
-              "name": "F7.21 — Desistir",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "IOZ8J",
-                  "name": "Body",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "layout": "vertical",
-                  "gap": 20,
-                  "padding": [
-                    60,
-                    24,
-                    32,
-                    24
-                  ],
-                  "justifyContent": "space_between",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "Bcai1",
-                      "name": "Content",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 16,
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "f2eKm",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "O que impediu de continuar?",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h2",
-                          "fontWeight": "700"
-                        },
-                        {
-                          "type": "text",
-                          "id": "eUKlt",
-                          "fill": "$muted-foreground",
-                          "content": "Opcional. Ajuda a melhorar a pesquisa.",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-body-sm",
-                          "fontWeight": "normal"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "YZoSc",
-                          "width": "fill_container",
-                          "height": 120,
-                          "cornerRadius": "$radius-md",
-                          "stroke": "$border",
-                          "strokeWidth": 1,
-                          "layout": "vertical",
-                          "padding": 12,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "uc5px",
-                              "fill": "$muted-foreground",
-                              "content": "Escreva aqui, se quiser…",
-                              "fontFamily": "$font-body",
-                              "fontSize": "$text-body-sm",
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "tMhiq",
-                      "name": "Actions",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 10,
-                      "children": [
-                        {
-                          "id": "w7X3j4",
-                          "type": "ref",
-                          "ref": "9:YKnjc",
-                          "name": "DesistirBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:PqjlB": {
-                              "enabled": false
-                            },
-                            "9:NDadS": {
-                              "content": "Desistir"
-                            }
-                          }
-                        },
-                        {
-                          "id": "QjLwz",
-                          "type": "ref",
-                          "ref": "9:3f2VW",
-                          "name": "VoltarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:AeXMI": {
-                              "enabled": false
-                            },
-                            "9:UZfKV": {
-                              "content": "Voltar"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "VuxxR",
-              "name": "F7.22 — Reiniciar",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "boBrV",
-                  "name": "Body",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "layout": "vertical",
-                  "gap": 20,
-                  "padding": [
-                    60,
-                    24,
-                    32,
-                    24
-                  ],
-                  "justifyContent": "space_between",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "ltPra",
-                      "name": "Content",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 16,
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "icon",
-                          "id": "A0DSoo",
-                          "width": 44,
-                          "height": 44,
-                          "icon": "rotate-ccw",
-                          "library": "lucide",
-                          "fill": "$yellow-700"
-                        },
-                        {
-                          "type": "text",
-                          "id": "hs8o5",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Reiniciar a pesquisa?",
-                          "textAlign": "center",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h2",
-                          "fontWeight": "700"
-                        },
-                        {
-                          "type": "text",
-                          "id": "R9QQcy",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Tudo recomeça do zero, inclusive a caracterização. O progresso atual será perdido.",
-                          "lineHeight": 1.5,
-                          "textAlign": "center",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-body",
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "Imn2B",
-                      "name": "Actions",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 10,
-                      "children": [
-                        {
-                          "id": "GcTba",
-                          "type": "ref",
-                          "ref": "9:YKnjc",
-                          "name": "ReiniciarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:PqjlB": {
-                              "enabled": false
-                            },
-                            "9:NDadS": {
-                              "content": "Reiniciar"
-                            }
-                          }
-                        },
-                        {
-                          "id": "RpiIp",
-                          "type": "ref",
-                          "ref": "9:3f2VW",
-                          "name": "CancelarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:AeXMI": {
-                              "enabled": false
-                            },
-                            "9:UZfKV": {
-                              "content": "Cancelar"
-                            }
-                          }
-                        }
-                      ]
                     }
                   ]
                 }
@@ -6371,6 +6355,102 @@
                           "fontFamily": "$font-heading",
                           "fontSize": "$text-h3",
                           "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "LJCvj",
+                      "name": "TimeInfo",
+                      "width": "fill_container",
+                      "fill": "$gray-50",
+                      "cornerRadius": "$radius-lg",
+                      "gap": 12,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "S1lD0",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "OTftV",
+                              "fill": "$muted-foreground",
+                              "content": "INÍCIO",
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-overline",
+                              "fontWeight": "600",
+                              "letterSpacing": 0.5
+                            },
+                            {
+                              "type": "text",
+                              "id": "PDZn5",
+                              "fill": "$foreground",
+                              "content": "14:02",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "mpQsF",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "FJAha",
+                              "fill": "$muted-foreground",
+                              "content": "TÉRMINO",
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-overline",
+                              "fontWeight": "600",
+                              "letterSpacing": 0.5
+                            },
+                            {
+                              "type": "text",
+                              "id": "v9fV0g",
+                              "fill": "$foreground",
+                              "content": "14:11",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "rSJWB",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "xvo1b",
+                              "fill": "$muted-foreground",
+                              "content": "DURAÇÃO",
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-overline",
+                              "fontWeight": "600",
+                              "letterSpacing": 0.5
+                            },
+                            {
+                              "type": "text",
+                              "id": "ElvdV",
+                              "fill": "$foreground",
+                              "content": "9 min",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
+                              "fontWeight": "600"
+                            }
+                          ]
                         }
                       ]
                     },
@@ -6633,252 +6713,174 @@
               ]
             },
             {
-              "type": "frame",
-              "id": "aJjY0",
-              "name": "F7.24 — Refazer etapa",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
+              "id": "lDbaZ",
+              "type": "ref",
+              "ref": "cYytK",
+              "name": "F7 — Sheet: Excluir dados",
+              "descendants": {
+                "OpqBD": {
+                  "content": "Excluir meus dados da pesquisa?"
+                },
+                "PMy7j": {
                   "type": "frame",
-                  "id": "r9oJFB",
-                  "name": "Body",
+                  "id": "hyEzm",
                   "width": "fill_container",
-                  "height": "fill_container",
                   "layout": "vertical",
-                  "gap": 20,
-                  "padding": [
-                    60,
-                    24,
-                    32,
-                    24
-                  ],
-                  "justifyContent": "space_between",
+                  "gap": 16,
                   "children": [
                     {
-                      "type": "frame",
-                      "id": "R3Qhj",
-                      "name": "Content",
+                      "type": "text",
+                      "id": "tW0CJ",
+                      "fill": "$foreground",
+                      "textGrowth": "fixed-width",
                       "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 16,
+                      "content": "Todas as respostas e o progresso associados ao código abaixo serão apagados. Essa ação não pode ser desfeita.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-body-sm",
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "AyqYI",
+                      "width": "fill_container",
+                      "fill": "$gray-50",
+                      "cornerRadius": "$radius-lg",
+                      "padding": 16,
+                      "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
-                          "type": "icon",
-                          "id": "vceSe",
-                          "width": 44,
-                          "height": 44,
-                          "icon": "rotate-ccw",
-                          "library": "lucide",
-                          "fill": "$green-700"
-                        },
-                        {
                           "type": "text",
-                          "id": "U1JZ08",
+                          "id": "W757S",
                           "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Refazer a Etapa 2?",
-                          "textAlign": "center",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h2",
-                          "fontWeight": "700"
-                        },
-                        {
-                          "type": "text",
-                          "id": "p1b0id",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Registro e perfil será refeita do início. As respostas do questionário desta etapa serão substituídas pelas novas.",
-                          "lineHeight": 1.5,
-                          "textAlign": "center",
-                          "fontFamily": "$font-body",
-                          "fontSize": "$text-body",
-                          "fontWeight": "normal"
+                          "content": "PSQ-7X29-QK41",
+                          "fontFamily": "Inter",
+                          "fontSize": "$text-h4",
+                          "fontWeight": "600"
                         }
                       ]
                     },
                     {
-                      "type": "frame",
-                      "id": "lQFbM",
-                      "name": "Actions",
+                      "id": "pngPW",
+                      "type": "ref",
+                      "ref": "9:YKnjc",
+                      "name": "ExcluirBtn",
                       "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 10,
-                      "children": [
-                        {
-                          "id": "L7NYDE",
-                          "type": "ref",
-                          "ref": "J7k5q",
-                          "name": "RefazerBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "M3upe": {
-                              "content": "Refazer etapa"
-                            }
-                          }
+                      "height": 48,
+                      "descendants": {
+                        "9:PqjlB": {
+                          "enabled": false
                         },
-                        {
-                          "id": "ZtPS3",
-                          "type": "ref",
-                          "ref": "9:3f2VW",
-                          "name": "CancelarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:AeXMI": {
-                              "enabled": false
-                            },
-                            "9:UZfKV": {
-                              "content": "Cancelar"
-                            }
-                          }
+                        "9:NDadS": {
+                          "content": "Excluir meus dados"
                         }
-                      ]
+                      }
+                    },
+                    {
+                      "id": "kbSLJ",
+                      "type": "ref",
+                      "ref": "9:C10zH",
+                      "name": "CancelarBtn",
+                      "width": "fill_container",
+                      "height": 48,
+                      "descendants": {
+                        "9:l8v2I": {
+                          "enabled": false
+                        },
+                        "9:poRwU": {
+                          "content": "Cancelar"
+                        }
+                      }
                     }
                   ]
                 }
-              ]
+              }
             },
             {
-              "type": "frame",
-              "id": "QwLQ0",
-              "name": "F7.25 — Solicitar exclusão dos dados",
-              "clip": true,
-              "width": 430,
-              "height": 932,
-              "fill": "$background",
-              "layout": "vertical",
-              "children": [
-                {
+              "id": "E81Ou",
+              "type": "ref",
+              "ref": "cYytK",
+              "name": "F7 — Sheet: Abandonar pesquisa",
+              "descendants": {
+                "OpqBD": {
+                  "content": "Abandonar a pesquisa?"
+                },
+                "PMy7j": {
                   "type": "frame",
-                  "id": "k2DcU7",
-                  "name": "Body",
+                  "id": "Ya3kK",
                   "width": "fill_container",
-                  "height": "fill_container",
                   "layout": "vertical",
-                  "gap": 20,
-                  "padding": [
-                    60,
-                    24,
-                    32,
-                    24
-                  ],
-                  "justifyContent": "space_between",
+                  "gap": 16,
                   "children": [
                     {
-                      "type": "frame",
-                      "id": "EtDai",
-                      "name": "Content",
+                      "type": "text",
+                      "id": "h8itfR",
+                      "fill": "$muted-foreground",
+                      "textGrowth": "fixed-width",
                       "width": "fill_container",
+                      "content": "Opcional. O que impediu de continuar? Ajuda a melhorar a pesquisa.",
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-body-sm",
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Ot3py",
+                      "width": "fill_container",
+                      "height": 100,
+                      "cornerRadius": "$radius-md",
+                      "stroke": "$border",
+                      "strokeWidth": 1,
                       "layout": "vertical",
-                      "gap": 16,
-                      "alignItems": "center",
+                      "padding": 12,
                       "children": [
                         {
-                          "type": "icon",
-                          "id": "LqiNF",
-                          "width": 44,
-                          "height": 44,
-                          "icon": "trash-2",
-                          "library": "lucide",
-                          "fill": "#000000"
-                        },
-                        {
                           "type": "text",
-                          "id": "TzYpe",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Excluir meus dados da pesquisa?",
-                          "textAlign": "center",
-                          "fontFamily": "$font-heading",
-                          "fontSize": "$text-h2",
-                          "fontWeight": "700"
-                        },
-                        {
-                          "type": "text",
-                          "id": "UlMHi",
-                          "fill": "$foreground",
-                          "textGrowth": "fixed-width",
-                          "width": "fill_container",
-                          "content": "Todas as respostas e o progresso associados ao código abaixo serão apagados. Essa ação não pode ser desfeita.",
-                          "lineHeight": 1.5,
-                          "textAlign": "center",
+                          "id": "P6iZx",
+                          "fill": "$muted-foreground",
+                          "content": "Escreva aqui, se quiser…",
                           "fontFamily": "$font-body",
-                          "fontSize": "$text-body",
+                          "fontSize": "$text-body-sm",
                           "fontWeight": "normal"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "Z4ZLT",
-                          "width": "fill_container",
-                          "fill": "$gray-50",
-                          "cornerRadius": "$radius-lg",
-                          "padding": 16,
-                          "justifyContent": "center",
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "mTdTE",
-                              "fill": "$foreground",
-                              "content": "PSQ-7X29-QK41",
-                              "fontFamily": "Inter",
-                              "fontSize": "$text-h4",
-                              "fontWeight": "600"
-                            }
-                          ]
                         }
                       ]
                     },
                     {
-                      "type": "frame",
-                      "id": "u9gv7",
-                      "name": "Actions",
+                      "id": "AGbkY",
+                      "type": "ref",
+                      "ref": "9:YKnjc",
+                      "name": "DesistirBtn",
                       "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 10,
-                      "children": [
-                        {
-                          "id": "e9H7Y",
-                          "type": "ref",
-                          "ref": "9:YKnjc",
-                          "name": "ExcluirBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:PqjlB": {
-                              "enabled": false
-                            },
-                            "9:NDadS": {
-                              "content": "Excluir meus dados"
-                            }
-                          }
+                      "height": 48,
+                      "descendants": {
+                        "9:PqjlB": {
+                          "enabled": false
                         },
-                        {
-                          "id": "wTQ1r",
-                          "type": "ref",
-                          "ref": "9:3f2VW",
-                          "name": "CancelarBtn",
-                          "width": "fill_container",
-                          "descendants": {
-                            "9:AeXMI": {
-                              "enabled": false
-                            },
-                            "9:UZfKV": {
-                              "content": "Cancelar"
-                            }
-                          }
+                        "9:NDadS": {
+                          "content": "Sim, abandonar"
                         }
-                      ]
+                      }
+                    },
+                    {
+                      "id": "dAOGh",
+                      "type": "ref",
+                      "ref": "9:C10zH",
+                      "name": "CancelarBtn",
+                      "width": "fill_container",
+                      "height": 48,
+                      "descendants": {
+                        "9:l8v2I": {
+                          "enabled": false
+                        },
+                        "9:poRwU": {
+                          "content": "Cancelar"
+                        }
+                      }
                     }
                   ]
                 }
-              ]
+              }
             }
           ]
         },
@@ -7007,16 +7009,17 @@
                           }
                         },
                         {
-                          "id": "E8M5c2",
+                          "id": "XfYy2",
                           "type": "ref",
-                          "ref": "9:3f2VW",
+                          "ref": "9:C10zH",
                           "name": "PularBtn",
+                          "height": 48,
                           "width": "fill_container",
                           "descendants": {
-                            "9:AeXMI": {
+                            "9:l8v2I": {
                               "enabled": false
                             },
-                            "9:UZfKV": {
+                            "9:poRwU": {
                               "content": "Pular"
                             }
                           }
@@ -30822,6 +30825,7 @@
                               "type": "ref",
                               "ref": "9:e8v1X",
                               "name": "CTAButton",
+                              "height": 48,
                               "descendants": {
                                 "9:soROh": {
                                   "enabled": false
