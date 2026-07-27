@@ -5670,7 +5670,7 @@
                           "id": "wabJ4",
                           "name": "PersonaRow",
                           "width": "fill_container",
-                          "fill": "$green-50",
+                          "fill": "$lime-50",
                           "cornerRadius": "$radius-lg",
                           "padding": 16,
                           "justifyContent": "space_between",
@@ -5685,7 +5685,7 @@
                                 {
                                   "type": "text",
                                   "id": "t2Dw2",
-                                  "fill": "$green-700",
+                                  "fill": "$lime-700",
                                   "content": "SEU PERFIL",
                                   "fontFamily": "$font-heading",
                                   "fontSize": "$text-overline",
@@ -5710,7 +5710,7 @@
                               "height": 24,
                               "icon": "user-round",
                               "library": "lucide",
-                              "fill": "$green-700"
+                              "fill": "$lime-700"
                             }
                           ]
                         },
@@ -6228,6 +6228,120 @@
             },
             {
               "type": "frame",
+              "id": "C0bGj",
+              "name": "F7.24 — Refazer etapa",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "N7gV9",
+                  "name": "Body",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 20,
+                  "padding": [
+                    60,
+                    24,
+                    32,
+                    24
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "C05pK",
+                      "name": "Content",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "M5yYMV",
+                          "width": 44,
+                          "height": 44,
+                          "icon": "rotate-ccw",
+                          "library": "lucide",
+                          "fill": "$lime-700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "W91W3",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Refazer a Etapa 2?",
+                          "textAlign": "center",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-h2",
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "P0kM59",
+                          "fill": "$foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Registro e perfil será refeita do início. As respostas do questionário desta etapa serão substituídas pelas novas.",
+                          "lineHeight": 1.5,
+                          "textAlign": "center",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body",
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JEGV4",
+                      "name": "Actions",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 10,
+                      "children": [
+                        {
+                          "id": "X2HiN",
+                          "type": "ref",
+                          "ref": "J7k5q",
+                          "name": "RefazerBtn",
+                          "width": "fill_container",
+                          "descendants": {
+                            "M3upe": {
+                              "content": "Refazer etapa"
+                            }
+                          }
+                        },
+                        {
+                          "id": "nAHpr",
+                          "type": "ref",
+                          "ref": "9:C10zH",
+                          "name": "CancelarBtn",
+                          "height": 48,
+                          "width": "fill_container",
+                          "descendants": {
+                            "9:l8v2I": {
+                              "enabled": false
+                            },
+                            "9:poRwU": {
+                              "content": "Cancelar"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
               "id": "EddlD",
               "name": "F7.23 — Respostas da etapa",
               "clip": true,
@@ -6411,7 +6525,7 @@
                             {
                               "type": "frame",
                               "id": "x62X3",
-                              "fill": "$green-100",
+                              "fill": "$lime-100",
                               "cornerRadius": "$radius-full",
                               "padding": [
                                 4,
@@ -6421,7 +6535,7 @@
                                 {
                                   "type": "text",
                                   "id": "ciest",
-                                  "fill": "$green-800",
+                                  "fill": "$lime-800",
                                   "content": "Bom",
                                   "fontFamily": "$font-body",
                                   "fontSize": "$text-caption",
@@ -6457,7 +6571,7 @@
                             {
                               "type": "frame",
                               "id": "k6TXCi",
-                              "fill": "$green-100",
+                              "fill": "$lime-100",
                               "cornerRadius": "$radius-full",
                               "padding": [
                                 4,
@@ -6467,7 +6581,7 @@
                                 {
                                   "type": "text",
                                   "id": "bngbW",
-                                  "fill": "$green-800",
+                                  "fill": "$lime-800",
                                   "content": "Concordo totalmente",
                                   "fontFamily": "$font-body",
                                   "fontSize": "$text-caption",
@@ -6503,7 +6617,7 @@
                             {
                               "type": "frame",
                               "id": "kgXks",
-                              "fill": "$green-100",
+                              "fill": "$lime-100",
                               "cornerRadius": "$radius-full",
                               "padding": [
                                 4,
@@ -6513,7 +6627,7 @@
                                 {
                                   "type": "text",
                                   "id": "wXWbL",
-                                  "fill": "$green-800",
+                                  "fill": "$lime-800",
                                   "content": "Concordo",
                                   "fontFamily": "$font-body",
                                   "fontSize": "$text-caption",
@@ -6549,7 +6663,7 @@
                             {
                               "type": "frame",
                               "id": "o3mqz5",
-                              "fill": "$green-100",
+                              "fill": "$lime-100",
                               "cornerRadius": "$radius-full",
                               "padding": [
                                 4,
@@ -6559,7 +6673,7 @@
                                 {
                                   "type": "text",
                                   "id": "y2HGco",
-                                  "fill": "$green-800",
+                                  "fill": "$lime-800",
                                   "content": "Não",
                                   "fontFamily": "$font-body",
                                   "fontSize": "$text-caption",
@@ -6595,7 +6709,7 @@
                             {
                               "type": "frame",
                               "id": "d35HHG",
-                              "fill": "$green-100",
+                              "fill": "$lime-100",
                               "cornerRadius": "$radius-full",
                               "padding": [
                                 4,
@@ -6605,7 +6719,7 @@
                                 {
                                   "type": "text",
                                   "id": "r27LKr",
-                                  "fill": "$green-800",
+                                  "fill": "$lime-800",
                                   "content": "Concordo totalmente",
                                   "fontFamily": "$font-body",
                                   "fontSize": "$text-caption",
@@ -6996,7 +7110,7 @@
                           "height": 52,
                           "icon": "party-popper",
                           "library": "lucide",
-                          "fill": "$green-700"
+                          "fill": "$lime-700"
                         },
                         {
                           "type": "text",
@@ -30712,38 +30826,6 @@
                           "justifyContent": "end",
                           "alignItems": "center",
                           "children": [
-                            {
-                              "type": "frame",
-                              "id": "ZsldP",
-                              "x": 0,
-                              "y": 0,
-                              "name": "PendingIndicator",
-                              "enabled": false,
-                              "fill": "#00000000",
-                              "gap": 6,
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "W6w26",
-                                  "width": 13,
-                                  "height": 13,
-                                  "icon": "cloud-off",
-                                  "library": "lucide",
-                                  "fill": "$yellow-300"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "SZAfe",
-                                  "name": "PendingText",
-                                  "fill": "#ffffffcc",
-                                  "content": "1 bloco pendente",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-caption",
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
                             {
                               "id": "E60w6",
                               "type": "ref",
