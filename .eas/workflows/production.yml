@@ -113,7 +113,12 @@ jobs:
         env:
           IOS_BUILD_NUMBER: ${{ needs.build_ios.outputs.app_build_version }}
         run: node scripts/submit-ios-for-review.mjs --skip-submit
+      # EXPO_APPLE_TEAM_ID é redundante com o appleTeamId do eas.json, mas o
+      # comando ainda abre prompt sem ele — e prompt em CI é falha.
       - name: Push store metadata
+        env:
+          EXPO_APPLE_TEAM_ID: "339A2VX3JG"
+          EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
         run: npx eas metadata:push --non-interactive
       - name: Submit for review
         env:
