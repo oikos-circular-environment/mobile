@@ -233,6 +233,8 @@ Ou combinar build + submissão em um único comando:
 eas build --platform all --profile production --auto-submit
 ```
 
+> **`eas submit` não envia para o App Review.** Por baixo ele roda `fastlane pilot`, que faz apenas o **upload do binário** para a App Store Connect (onde ele aparece no TestFlight). Criar a App Store Version, anexar o build, publicar metadata/screenshots e clicar em *Submit for Review* são etapas separadas — automatizadas pelo job `submit_for_review` (ver seção "Envio para o App Review").
+
 ### Fase 5 — Pós-aprovação
 
 - [ ] Configurar EAS Update para OTA updates
@@ -306,6 +308,55 @@ A cada push, o workflow (job `get-build` para cada plataforma) procura no histó
 Isso só funciona de forma segura porque `runtimeVersion.policy` em `app.config.ts` é `"fingerprint"` (não `"appVersion"`) — o `expo-updates` no aparelho só aceita um OTA se o fingerprint do update bater com o fingerprint do binário instalado. Ou seja, a mesma checagem que decide "precisa buildar?" no CI é a que garante, em runtime, que um update nunca vai parar num binário que não tem o código nativo necessário.
 
 Bump de `version` de marketing continua só sendo necessário quando `check_ios_version` falhar (fingerprint mudou **e** a versão atual já está travada na Apple) — não a cada push.
+
+### Envio para o App Review
+
+O `submit_ios` do workflow termina no upload do binário. Quem fecha o ciclo é o job **`submit_for_review`**, que roda `scripts/submit-ios-for-review.mjs` contra a App Store Connect API (mesma chave e mesmo JWT ES256 do `check-ios-app-version.mjs`). Ele é idempotente — pode rodar de novo no mesmo release sem duplicar nada — e faz, nesta ordem:
+
+1. **App Store Version** — cria a versão da `version` do `app.config.ts`, ou reutiliza a existente se ainda for editável. Se já estiver aprovada/ao vivo, falha pedindo o bump (mesma regra do `check_ios_version`).
+2. **Build** — espera o processamento na Apple terminar (`processingState: VALID`) e anexa o build à versão. Isso é necessário porque o `eas submit` usa `skip_waiting_for_build_processing`, então o binário ainda está em processamento quando o job começa. Timeout padrão de 45 min, ajustável por `ASC_BUILD_WAIT_TIMEOUT_MINUTES`.
+3. **Metadata pt-BR** — descrição, keywords, texto promocional, URL de suporte e as novidades da versão.
+4. **Screenshots** — publica o que estiver em `store/ios/screenshots/`.
+5. **Informações para revisão** — contato, notas e a conta de demonstração.
+6. **App Review** — cria a `reviewSubmission`, adiciona a versão como item e marca `submitted: true`.
+
+#### Onde ficam os dados do release
+
+```
+store/ios/
+├── metadata.pt-BR.json     # descrição, keywords, texto promocional, URLs, copyright
+├── review-details.json     # contato e notas para a equipe de revisão da Apple
+├── whats-new/<version>.md  # "Novidades desta versão" — um arquivo por versão
+└── screenshots/<DISPLAY_TYPE>/NN-nome.jpg
+```
+
+O prefixo numérico do arquivo (`01-`, `02-`, …) define a ordem na ficha da App Store.
+
+**Sobre o nome das pastas de screenshot:** a Apple nunca documentou os enums de `screenshotDisplayType` dos tamanhos novos — a própria App Store Connect continua classificando os assets de iPad 13" (2064×2752) como `APP_IPAD_PRO_3GEN_129` e os de iPhone 6.9" como `APP_IPHONE_67`. Por isso o display type é o **nome da pasta**, não algo inferido no código: se a Apple mudar, basta renomear a pasta. Para ver o que a ASC realmente usa neste app:
+
+```bash
+npm run asc:inspect
+```
+
+Screenshots já publicados numa versão **não são reenviados** — ao criar uma App Store Version nova a Apple copia os da versão anterior. Para substituir, rode com `--force-screenshots`.
+
+#### Segredos
+
+A conta de demonstração para o revisor **não fica no repositório**. Ela vem do ambiente `production` do EAS:
+
+```bash
+eas env:create production --name ASC_DEMO_ACCOUNT_NAME     --type sensitive
+eas env:create production --name ASC_DEMO_ACCOUNT_PASSWORD --type sensitive
+```
+
+#### Rodando na mão
+
+```bash
+npm run asc:inspect                       # estado atual na App Store Connect
+npm run asc:submit -- --dry-run --build-number=20   # valida config, não escreve nada
+npm run asc:submit -- --build-number=20 --skip-submit  # publica tudo, sem enviar pra review
+npm run asc:submit -- --build-number=20   # ciclo completo
+```
 
 ### Só existe workflow pra production
 

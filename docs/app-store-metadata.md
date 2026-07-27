@@ -1,6 +1,11 @@
 # Metadados — App Store Connect (Distribuição › App para iOS v1.0)
 
-> Rascunho dos textos para a página "Distribuição" do App Store Connect (Oikos Economia Circular).
+> **Este documento é histórico.** A fonte de verdade dos metadados passou a ser
+> `store/ios/metadata.pt-BR.json` e `store/ios/review-details.json`, publicados
+> automaticamente pelo job `submit_for_review` (ver
+> [`publishing-path.md`](./publishing-path.md#envio-para-o-app-review)).
+> Editar aqui não altera a ficha na App Store.
+>
 > Idioma da ficha: Português (Brasil).
 
 ---

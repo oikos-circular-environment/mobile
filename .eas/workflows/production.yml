@@ -85,6 +85,21 @@ jobs:
       build_id: ${{ needs.build_ios.outputs.build_id }}
       profile: production
 
+  # `submit_ios` (fastlane pilot) só faz upload do binário. Este job cria a App
+  # Store Version, anexa o build, publica metadata/screenshots e envia para o
+  # App Review — sem ele o release fica parado na App Store Connect.
+  submit_for_review:
+    name: Submit iOS version for App Review
+    type: custom
+    needs: [submit_ios, build_ios]
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - name: Submit for review
+        env:
+          IOS_BUILD_NUMBER: ${{ needs.build_ios.outputs.app_build_version }}
+        run: node scripts/submit-ios-for-review.mjs
+
   publish_update:
     name: Publish OTA update
     type: update
