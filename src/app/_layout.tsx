@@ -17,7 +17,8 @@ import { FloatingDevTools } from "@buoy-gg/core";
 import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { AppSplashScreen } from "@/components/app-splash-screen";
 import { Toaster } from "@/components/toast";
 
@@ -32,22 +33,56 @@ Observe.configure({
 	integrations: { "expo-router": true },
 });
 
+// The splash video (src/assets/videos/splash-motion.mp4) is 10005ms long.
+// expo-video's `playToEnd` event proved unreliable (fired within ~2s instead
+// of at the actual end), so the splash duration is driven by this timer
+// instead, matched to the asset's real length.
+const SPLASH_VIDEO_DURATION_MS = 10000;
+
+// Swapping straight from AppSplashScreen (which owns a live VideoView) to the
+// full app tree in a single commit crashes Fabric natively (SIGSEGV in
+// MountingCoordinator::pullTransaction) — unmounting the video and mounting
+// the whole app tree at once is too big a single mutation. Unmounting the
+// video into a plain view first, then mounting the app tree a frame later,
+// splits it into two safe commits.
+type SplashStage = "video" | "handoff" | "app";
+
 function RootLayout() {
 	const [loaded, error] = useFonts({
 		Oswald_700Bold,
 		SpaceGrotesk_400Regular,
 	});
 	const { markInteractive } = useObserve();
+	const [stage, setStage] = useState<SplashStage>("video");
 
 	useEffect(() => {
-		if (loaded || error) {
+		const timeout = setTimeout(
+			() => setStage("handoff"),
+			SPLASH_VIDEO_DURATION_MS,
+		);
+		return () => clearTimeout(timeout);
+	}, []);
+
+	useEffect(() => {
+		if (stage === "handoff" && (loaded || error)) {
+			const raf = requestAnimationFrame(() => setStage("app"));
+			return () => cancelAnimationFrame(raf);
+		}
+	}, [stage, loaded, error]);
+
+	useEffect(() => {
+		if (stage === "app") {
 			SplashScreen.hideAsync().catch(() => {});
 			markInteractive();
 		}
-	}, [loaded, error, markInteractive]);
+	}, [stage, markInteractive]);
 
-	if (!loaded && !error) {
+	if (stage === "video") {
 		return <AppSplashScreen />;
+	}
+
+	if (stage === "handoff") {
+		return <View style={{ flex: 1, backgroundColor: "#BDAE94" }} />;
 	}
 
 	const isDevelopmentMode = process.env.NODE_ENV === "development";
