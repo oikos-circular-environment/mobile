@@ -43,24 +43,12 @@ const LETTERBOX_GAP = Math.max(
 	(SCREEN_HEIGHT - MEDIA_HEIGHT * MEDIA_SCALE) / 2,
 );
 
-export function AppSplashScreen() {
-	const videoOpacity = useSharedValue(0);
-
-	const player = useVideoPlayer(splashVideo, player => {
-		player.loop = true;
-		player.play();
-	});
-
-	// VideoView renders blank until the first frame decodes; keep the poster
-	// underneath and only reveal the video once it has something to show.
-	const handleFirstFrameRender = useCallback(() => {
-		videoOpacity.value = withTiming(1, { duration: VIDEO_FADE_IN_MS });
-	}, [videoOpacity]);
-
-	const videoAnimatedStyle = useAnimatedStyle(() => ({
-		opacity: videoOpacity.value,
-	}));
-
+// The static poster + letterbox, without the video. Used both as the base
+// layer under the video (AppSplashScreen) and, on its own, as the frozen
+// frame RootLayout shows for the one frame between unmounting the video and
+// mounting the full app tree — so that handoff doesn't look like the splash
+// content disappearing into a blank background.
+export function SplashBackdrop() {
 	return (
 		<View style={styles.container}>
 			{LETTERBOX_GAP > 0 && (
@@ -81,6 +69,35 @@ export function AppSplashScreen() {
 				</>
 			)}
 			<Image source={splashPoster} style={styles.media} resizeMode="contain" />
+		</View>
+	);
+}
+
+export function AppSplashScreen() {
+	const videoOpacity = useSharedValue(0);
+
+	// Not looped: the splash only ever shows this once, for as long as
+	// SPLASH_VIDEO_DURATION_MS in _layout.tsx (matched to this asset's real
+	// length) — looping made ExoPlayer seek back to frame 0 and restart
+	// right as it reached the end, which flashed as a visible "rewind" a
+	// moment before our own timeout cut away.
+	const player = useVideoPlayer(splashVideo, player => {
+		player.play();
+	});
+
+	// VideoView renders blank until the first frame decodes; keep the poster
+	// underneath and only reveal the video once it has something to show.
+	const handleFirstFrameRender = useCallback(() => {
+		videoOpacity.value = withTiming(1, { duration: VIDEO_FADE_IN_MS });
+	}, [videoOpacity]);
+
+	const videoAnimatedStyle = useAnimatedStyle(() => ({
+		opacity: videoOpacity.value,
+	}));
+
+	return (
+		<View style={styles.container}>
+			<SplashBackdrop />
 			<Animated.View style={[styles.media, videoAnimatedStyle]}>
 				<VideoView
 					player={player}

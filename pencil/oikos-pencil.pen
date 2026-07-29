@@ -10613,79 +10613,46 @@
                   ],
                   "children": [
                     {
-                      "type": "frame",
-                      "id": "L7PGF",
-                      "name": "Welcome Banner",
+                      "id": "NjrUv",
+                      "type": "ref",
+                      "ref": "kDWJB",
+                      "name": "HomeGuestCard",
                       "width": "fill_container",
-                      "fill": "$gray-100",
-                      "cornerRadius": "$radius-lg",
-                      "stroke": "$border",
-                      "strokeWidth": 1,
-                      "strokeAlignment": "inner",
-                      "gap": "$spacing-6",
-                      "padding": "$spacing-4",
-                      "justifyContent": "space_between",
-                      "alignItems": "center",
-                      "children": [
-                        {
+                      "layout": "vertical",
+                      "descendants": {
+                        "h4gYx": {
                           "type": "frame",
-                          "id": "oUJoZ",
-                          "name": "TextCol",
-                          "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": "$spacing-1",
+                          "id": "B0DqPl",
+                          "name": "Frame 30",
+                          "width": "fit_content(1536)",
+                          "height": "fit_content(1948)",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "Q2WUJN",
-                              "name": "Title",
-                              "fill": "$foreground",
-                              "textGrowth": "fixed-width",
-                              "width": "fill_container",
-                              "content": "Bem-Vindos a Oikos!",
-                              "fontFamily": "$font-heading",
-                              "fontSize": "$text-h2",
-                              "fontWeight": "700"
-                            },
-                            {
-                              "type": "text",
-                              "id": "xNgoj",
-                              "name": "Subtitle",
-                              "fill": "$gray-500",
-                              "textGrowth": "fixed-width",
-                              "width": "fill_container",
-                              "content": "Estamos felizes de você estar aqui conosco, colabore com o nosso ecosistema",
-                              "lineHeight": 1.4,
-                              "fontFamily": "$font-body",
-                              "fontSize": "$text-body-sm",
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "UFQfg",
-                          "name": "ArrowButton",
-                          "width": 64,
-                          "height": 64,
-                          "fill": "$primary",
-                          "cornerRadius": "$radius-lg",
-                          "justifyContent": "center",
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "icon",
-                              "id": "W55VQe",
-                              "name": "ArrowIcon",
-                              "width": 24,
-                              "height": 24,
-                              "icon": "arrow-up-right",
-                              "library": "lucide",
-                              "fill": "#ffffff"
+                              "id": "HiQiB",
+                              "type": "ref",
+                              "ref": "kDWJB/HiQiB",
+                              "width": "fill_container(398)",
+                              "height": 313,
+                              "flipX": false,
+                              "flipY": false,
+                              "x": 0,
+                              "y": 0,
+                              "fill": {
+                                "type": "image",
+                                "enabled": true,
+                                "url": "step-03.png",
+                                "mode": "fill"
+                              },
+                              "enabled": false,
+                              "descendants": {
+                                "NvsTc": {
+                                  "enabled": false
+                                }
+                              }
                             }
                           ]
                         }
-                      ]
+                      }
                     },
                     {
                       "type": "frame",
@@ -33019,6 +32986,187 @@
                   "fontWeight": "600"
                 }
               ]
+            },
+            {
+              "type": "frame",
+              "id": "O3XeNL",
+              "name": "WordCyclePills",
+              "context": "Texto animado do HomeGuestCard (guest) — alterna Reutilize/Reduza/Recicle a cada ~2s. Mesmo padrão visual do SegmentedControl (SegCtrl), mas com 3 tabs em vez de 2. Implementar com react-native-reanimated, ex. em src/components/home/word-cycle-pills.tsx. Pencil mostra só o frame estático com a 1a pill ativa.",
+              "reusable": true,
+              "height": 40,
+              "fill": "$gray-100",
+              "cornerRadius": "$radius-md",
+              "gap": 4,
+              "padding": 3,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "A6ODN",
+                  "name": "PillActive",
+                  "height": "fill_container",
+                  "fill": "$primary",
+                  "cornerRadius": 6,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "is4hR",
+                      "name": "Label",
+                      "fill": "#ffffff",
+                      "content": "Reutilize",
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-label",
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "bjpe7",
+                  "name": "PillInactive",
+                  "height": "fill_container",
+                  "cornerRadius": 6,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "QI5mG",
+                      "name": "Label",
+                      "fill": "$gray-600",
+                      "content": "Reduza",
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-label",
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Q2njc",
+                  "name": "PillInactive",
+                  "height": "fill_container",
+                  "cornerRadius": 6,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gZGWX",
+                      "name": "Label",
+                      "fill": "$gray-600",
+                      "content": "Recicle",
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-label",
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "kDWJB",
+              "type": "ref",
+              "reusable": true,
+              "ref": "y1Um8",
+              "name": "HomeGuestCard",
+              "context": "Card de boas-vindas para visitante (guest) na Home — src/components/home/home-guest-card.tsx. Botao 'Criar conta' deve linkar /sign-up; texto 'Ja tenho conta' deve linkar /sign-in (hoje o card inteiro so linka /sign-in).",
+              "width": "fill_container",
+              "descendants": {
+                "HiQiB": {
+                  "enabled": true,
+                  "height": 200,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "home-guest-tree.png",
+                    "mode": "fill"
+                  }
+                },
+                "NvsTc": {
+                  "enabled": false
+                },
+                "pkpWg": {
+                  "content": "Bem-Vindos a Oikos!"
+                },
+                "zFilG": {
+                  "content": "Estamos felizes de você estar aqui conosco, colabore com o nosso ecosistema"
+                },
+                "P5Z1Us": {
+                  "enabled": true,
+                  "gap": 8,
+                  "alignItems": "start",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "B8G0r",
+                      "name": "TaglineLabel",
+                      "fill": "$gray-500",
+                      "content": "Ajude o ecossistema:",
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-body-sm",
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "id": "PXeHv",
+                      "type": "ref",
+                      "ref": "O3XeNL",
+                      "name": "WordCycle"
+                    }
+                  ]
+                },
+                "dcznq": {
+                  "type": "frame",
+                  "id": "jlDMS",
+                  "name": "CardFooter",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "id": "lRJ9m",
+                      "type": "ref",
+                      "ref": "J7k5q",
+                      "name": "PrimaryCta",
+                      "width": "fill_container",
+                      "descendants": {
+                        "M3upe": {
+                          "content": "Criar conta"
+                        },
+                        "DrcR6": {
+                          "enabled": true
+                        }
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "IWLMN",
+                      "name": "SecondaryLink",
+                      "fill": "$primary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Já tenho conta",
+                      "textAlign": "center",
+                      "fontFamily": "$font-body",
+                      "fontSize": "$text-body-sm",
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },
