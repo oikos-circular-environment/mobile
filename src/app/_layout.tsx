@@ -2,23 +2,33 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Observe, ObserveRoot, useObserve } from "expo-observe";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withDelay,
+	withTiming,
+} from "react-native-reanimated";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { AuthContextProvider } from "@/contexts/auth-context";
 import { GeospatialProvider } from "@/contexts/geospatial-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import { sessionBus } from "@/libs/session-bus";
-import "react-native-reanimated";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "./global.css";
 import "@/libs/api/oikos-api";
 import { FloatingDevTools } from "@buoy-gg/core";
 import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
+import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import { AppSplashScreen } from "@/components/app-splash-screen";
+import { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
+import {
+	AppSplashScreen,
+	SplashBackdrop,
+} from "@/components/app-splash-screen";
 import { Toaster } from "@/components/toast";
 
 export const unstable_settings = {
@@ -32,22 +42,73 @@ Observe.configure({
 	integrations: { "expo-router": true },
 });
 
+// The splash video (src/assets/videos/splash-motion.mp4) is 10005ms long.
+// expo-video's `playToEnd` event proved unreliable (fired within ~2s instead
+// of at the actual end), so the splash duration is driven by this timer
+// instead, matched to the asset's real length.
+const SPLASH_VIDEO_DURATION_MS = 10000;
+
+// Swapping straight from AppSplashScreen (which owns a live VideoView) to the
+// full app tree in a single commit crashes Fabric natively (SIGSEGV in
+// MountingCoordinator::pullTransaction) — unmounting the video and mounting
+// the whole app tree at once is too big a single mutation. Unmounting the
+// video into a plain view first, then mounting the app tree a frame later,
+// splits it into two safe commits.
+type SplashStage = "video" | "handoff" | "app";
+
+// The app tree mounts fully-formed the instant `stage` becomes "app", which
+// reads as an abrupt cut. A frosted-glass layer over the freshly mounted
+// content, clearing over REVEAL_FADE_MS, turns that cut into a soft reveal.
+// The short linger covers the first-paint layout jitter (fonts/providers
+// settling) before the clear-up starts.
+const REVEAL_LINGER_MS = 120;
+const REVEAL_FADE_MS = 500;
+
 function RootLayout() {
 	const [loaded, error] = useFonts({
 		Oswald_700Bold,
 		SpaceGrotesk_400Regular,
 	});
 	const { markInteractive } = useObserve();
+	const [stage, setStage] = useState<SplashStage>("video");
+	const revealBlurOpacity = useSharedValue(1);
 
 	useEffect(() => {
-		if (loaded || error) {
+		const timeout = setTimeout(
+			() => setStage("handoff"),
+			SPLASH_VIDEO_DURATION_MS,
+		);
+		return () => clearTimeout(timeout);
+	}, []);
+
+	useEffect(() => {
+		if (stage === "handoff" && (loaded || error)) {
+			const raf = requestAnimationFrame(() => setStage("app"));
+			return () => cancelAnimationFrame(raf);
+		}
+	}, [stage, loaded, error]);
+
+	useEffect(() => {
+		if (stage === "app") {
 			SplashScreen.hideAsync().catch(() => {});
 			markInteractive();
+			revealBlurOpacity.value = withDelay(
+				REVEAL_LINGER_MS,
+				withTiming(0, { duration: REVEAL_FADE_MS }),
+			);
 		}
-	}, [loaded, error, markInteractive]);
+	}, [stage, markInteractive, revealBlurOpacity]);
 
-	if (!loaded && !error) {
+	const revealBlurStyle = useAnimatedStyle(() => ({
+		opacity: revealBlurOpacity.value,
+	}));
+
+	if (stage === "video") {
 		return <AppSplashScreen />;
+	}
+
+	if (stage === "handoff") {
+		return <SplashBackdrop />;
 	}
 
 	const isDevelopmentMode = process.env.NODE_ENV === "development";
@@ -82,6 +143,12 @@ function RootLayout() {
 					</QueryClientProvider>
 				</GluestackUIProvider>
 			</ErrorBoundary>
+			<Animated.View
+				style={[StyleSheet.absoluteFill, revealBlurStyle]}
+				pointerEvents="none"
+			>
+				<BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
+			</Animated.View>
 		</GestureHandlerRootView>
 	);
 }
