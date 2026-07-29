@@ -72,6 +72,7 @@ const config: ExpoConfig = {
 		],
 		"expo-video",
 		"expo-secure-store",
+		"expo-sqlite",
 		"expo-font",
 		"expo-image",
 		"expo-web-browser",
