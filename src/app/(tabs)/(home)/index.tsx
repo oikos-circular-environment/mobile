@@ -12,6 +12,8 @@ import { HomeUserCard } from "@/components/home/home-user-card";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
 import { colors } from "@/components/style/colors";
+import { useSurveyInviteBanner } from "@/components/survey/hooks/use-survey-invite-banner";
+import { SurveyBanner } from "@/components/survey/survey-banner";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Grid, GridItem } from "@/components/ui/grid";
@@ -74,6 +76,7 @@ export default function HomeScreen() {
 	const { isAuthenticated, needsProfileCompletion, isLoading, signOut } =
 		useAuthContext();
 	const { permissionDenied } = useGeospatial();
+	const surveyBanner = useSurveyInviteBanner();
 	const router = useRouter();
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [showSignOutModal, setShowSignOutModal] = useState(false);
@@ -131,6 +134,16 @@ export default function HomeScreen() {
 				{permissionDenied && (
 					<LocationPermissionAlert message="Habilite a localização para ver conteúdo e recomendações mais próximos de você." />
 				)}
+
+				{/* Convite da pesquisa de usabilidade */}
+				{surveyBanner ? (
+					<SurveyBanner
+						variant={surveyBanner.variant}
+						title={surveyBanner.title}
+						subtitle={surveyBanner.subtitle}
+						onPress={surveyBanner.onPress}
+					/>
+				) : null}
 
 				{/* Serviços */}
 				<View className="gap-3">

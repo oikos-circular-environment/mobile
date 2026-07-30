@@ -4,6 +4,7 @@ import type React from "react";
 import HomeScreen from "@/app/(tabs)/(home)";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useSurveyStore } from "@/stores/survey-store";
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({ push: jest.fn(), navigate: jest.fn(), back: jest.fn() }),
@@ -141,11 +142,38 @@ describe("HomeScreen — componente", () => {
 		jest.useFakeTimers();
 		setupAuth();
 		setupGeospatial();
+		useSurveyStore.getState().reset();
 	});
 
 	afterEach(() => {
 		jest.useRealTimers();
 		jest.clearAllMocks();
+	});
+
+	it("exibe o convite da pesquisa quando não há participação iniciada", async () => {
+		await renderHome();
+
+		expect(
+			screen.getByText("Participe e ajude a melhorar o app"),
+		).toBeOnTheScreen();
+	});
+
+	it("troca o rótulo do convite para retomada quando há participação em andamento", async () => {
+		useSurveyStore.getState().startSession("session-1");
+		await renderHome();
+
+		expect(screen.getByText("Continue de onde parou")).toBeOnTheScreen();
+		expect(
+			screen.queryByText("Participe e ajude a melhorar o app"),
+		).not.toBeOnTheScreen();
+	});
+
+	it("some o convite da pesquisa quando a participação está concluída", async () => {
+		useSurveyStore.getState().startSession("session-1");
+		useSurveyStore.getState().setStatus("COMPLETED");
+		await renderHome();
+
+		expect(screen.queryByText("Pesquisa de usabilidade")).not.toBeOnTheScreen();
 	});
 
 	it("exibe skeleton enquanto isLoading é true", async () => {

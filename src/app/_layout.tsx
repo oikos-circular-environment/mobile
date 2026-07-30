@@ -133,6 +133,13 @@ function RootLayout() {
 													name="(tabs)"
 													options={{ headerShown: false }}
 												/>
+												<Stack.Screen
+													name="survey"
+													options={{
+														headerShown: false,
+														presentation: "fullScreenModal",
+													}}
+												/>
 											</Stack>
 										</SafeAreaView>
 									</SafeAreaProvider>
