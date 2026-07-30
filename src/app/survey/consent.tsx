@@ -69,35 +69,35 @@ export default function SurveyConsentScreen() {
 	};
 
 	return (
-		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-4">
-			<Heading size="xl">Termo de consentimento</Heading>
-
-			<View className="gap-3 rounded-lg bg-gray-50 p-4">
-				<IdentificationRow
-					label="Título da pesquisa"
-					value={CONSENT_IDENTIFICATION.researchTitle}
-				/>
-				<IdentificationRow
-					label="Instituição / Programa"
-					value={CONSENT_IDENTIFICATION.institution}
-				/>
-				<IdentificationRow
-					label="Pesquisador responsável"
-					value={CONSENT_IDENTIFICATION.researcher}
-				/>
-				<IdentificationRow
-					label="Nº do parecer CEP"
-					value={CONSENT_IDENTIFICATION.cepStatus}
-				/>
-			</View>
-
+		<View className="flex-1 bg-white">
 			<ScrollView
 				testID="survey-consent-scroll"
 				className="flex-1"
 				onScroll={handleScroll}
 				scrollEventThrottle={100}
-				contentContainerClassName="gap-4 pb-2"
+				contentContainerClassName="gap-4 px-6 pb-8 pt-14"
 			>
+				<Heading size="xl">Termo de consentimento</Heading>
+
+				<View className="gap-3 rounded-lg bg-gray-50 p-4">
+					<IdentificationRow
+						label="Título da pesquisa"
+						value={CONSENT_IDENTIFICATION.researchTitle}
+					/>
+					<IdentificationRow
+						label="Instituição / Programa"
+						value={CONSENT_IDENTIFICATION.institution}
+					/>
+					<IdentificationRow
+						label="Pesquisador responsável"
+						value={CONSENT_IDENTIFICATION.researcher}
+					/>
+					<IdentificationRow
+						label="Nº do parecer CEP"
+						value={CONSENT_IDENTIFICATION.cepStatus}
+					/>
+				</View>
+
 				{CONSENT_SECTIONS.map(section => (
 					<View key={section.heading} className="gap-1.5">
 						<Text bold>{section.heading}</Text>
@@ -108,21 +108,21 @@ export default function SurveyConsentScreen() {
 						))}
 					</View>
 				))}
-			</ScrollView>
 
-			<View className="gap-2">
-				<Button disabled={!reachedEnd} onPress={handleAccept}>
-					<ButtonText>Li e aceito</ButtonText>
-				</Button>
-				{!reachedEnd ? (
-					<Text size="xs" className="text-center text-muted-foreground">
-						O botão destrava ao chegar ao fim do texto
-					</Text>
-				) : null}
-				<Button variant="outline" onPress={handleRefuse}>
-					<ButtonText>Recusar</ButtonText>
-				</Button>
-			</View>
+				<View className="gap-2 pt-2">
+					<Button disabled={!reachedEnd} onPress={handleAccept}>
+						<ButtonText>Li e aceito</ButtonText>
+					</Button>
+					{!reachedEnd ? (
+						<Text size="xs" className="text-center text-muted-foreground">
+							O botão destrava ao chegar ao fim do texto
+						</Text>
+					) : null}
+					<Button variant="outline" onPress={handleRefuse}>
+						<ButtonText>Recusar</ButtonText>
+					</Button>
+				</View>
+			</ScrollView>
 		</View>
 	);
 }
