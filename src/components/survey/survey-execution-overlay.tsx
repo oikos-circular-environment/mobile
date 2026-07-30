@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Dimensions, Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+	runOnJS,
 	useAnimatedStyle,
 	useSharedValue,
 } from "react-native-reanimated";
@@ -60,8 +61,8 @@ export function SurveyExecutionOverlay() {
 			);
 			translateX.value = 0;
 			translateY.value = 0;
-			setBaseX(nextX);
-			setBaseY(nextY);
+			runOnJS(setBaseX)(nextX);
+			runOnJS(setBaseY)(nextY);
 		});
 
 	const animatedStyle = useAnimatedStyle(() => ({
