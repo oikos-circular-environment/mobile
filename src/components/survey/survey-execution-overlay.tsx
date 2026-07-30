@@ -90,7 +90,7 @@ export function SurveyExecutionOverlay() {
 	};
 
 	const handleQuit = () => {
-		router.push("/survey/resume" as never);
+		router.push("/survey/resume");
 	};
 
 	return (

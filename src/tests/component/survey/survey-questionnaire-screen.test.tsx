@@ -1,6 +1,7 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
 import SurveyQuestionnaireScreen from "@/app/survey/questionnaire";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
+import { surveySession, surveySuiteRun } from "@/libs/survey/db/schema";
 import { createTestSurveyDb } from "@/libs/survey/db/test-client";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -87,6 +88,46 @@ function setupSuite() {
 	useSurveyExecutionStore.getState().completeCurrentTask();
 	useSurveyStore.getState().reset();
 	useSurveyStore.getState().startSession("session-1", "CITIZEN");
+
+	mockDb.delete(surveySuiteRun).run();
+	mockDb.delete(surveySession).run();
+
+	const now = "2026-07-30T10:00:00.000Z";
+	mockDb
+		.insert(surveySession)
+		.values({
+			id: "session-1",
+			protocolKey: "oikos-walkthrough",
+			protocolVersion: 1,
+			persona: "CITIZEN",
+			stateUf: "SP",
+			cityName: "São Paulo",
+			ageRange: "AGE_18_24",
+			educationLevel: "HIGHSCHOOL_COMPLETE",
+			chainRole: "NONE",
+			wasteContactFrequency: 3,
+			appExperience: 3,
+			consentVersion: "2026-07-30",
+			consentAt: now,
+			deviceOs: "ios",
+			deviceOsVersion: "18",
+			appVersion: "1.0.0",
+			screenSize: "MEDIUM",
+			startedAt: now,
+			createdAt: now,
+			updatedAt: now,
+		})
+		.run();
+	mockDb
+		.insert(surveySuiteRun)
+		.values({
+			id: "suite-run-1",
+			sessionId: "session-1",
+			suiteCode: "S1",
+			position: 0,
+			startedAt: now,
+		})
+		.run();
 }
 
 describe("SurveyQuestionnaireScreen", () => {

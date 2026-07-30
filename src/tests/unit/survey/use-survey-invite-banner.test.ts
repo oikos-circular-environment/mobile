@@ -46,11 +46,20 @@ describe("useSurveyInviteBanner", () => {
 		expect(result.current).toBeNull();
 	});
 
-	it("onPress navega para /survey", async () => {
+	it("onPress navega para /survey quando é convite", async () => {
 		const { result } = await renderHook(() => useSurveyInviteBanner());
 
 		result.current?.onPress();
 
 		expect(mockPush).toHaveBeenCalledWith("/survey");
+	});
+
+	it("onPress navega para /survey/resume quando é retomada", async () => {
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
+		const { result } = await renderHook(() => useSurveyInviteBanner());
+
+		result.current?.onPress();
+
+		expect(mockPush).toHaveBeenCalledWith("/survey/resume");
 	});
 });

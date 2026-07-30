@@ -17,7 +17,7 @@ export function useSurveyInviteBanner() {
 				title: "Continue de onde parou",
 				description: "Você tem uma pesquisa de usabilidade em andamento.",
 				ctaLabel: "Continuar",
-				onPress: () => router.push("/survey"),
+				onPress: () => router.push("/survey/resume"),
 			};
 		}
 

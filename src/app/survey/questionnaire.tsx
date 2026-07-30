@@ -1,4 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
+import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import { CloudOffIcon, InfoIcon, PartyPopperIcon } from "lucide-react-native";
 import { useMemo, useState } from "react";
@@ -12,7 +13,11 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
-import { surveyOutbox } from "@/libs/survey/db/schema";
+import {
+	surveyAnswer,
+	surveyOutbox,
+	surveySuiteRun,
+} from "@/libs/survey/db/schema";
 import { drainOutbox, enqueueCheckpoint } from "@/libs/survey/queue/outbox";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -83,6 +88,31 @@ export default function SurveyQuestionnaireScreen() {
 			const outcome =
 				doneCount === tasks.length ? "YES" : doneCount === 0 ? "NO" : "PARTIAL";
 			const now = new Date().toISOString();
+			const db = getSurveyDb();
+
+			await db
+				.update(surveySuiteRun)
+				.set({
+					finishedAt: now,
+					activeMs: suiteActiveMs,
+					wallMs: suiteActiveMs,
+					outcome,
+					synced: false,
+				})
+				.where(eq(surveySuiteRun.id, suiteRunId));
+
+			await Promise.all(
+				Object.entries(answers).map(([questionKey, value]) =>
+					db.insert(surveyAnswer).values({
+						id: Crypto.randomUUID(),
+						sessionId,
+						suiteRunId,
+						questionKey,
+						valueText: value.valueText,
+						valueNumber: value.valueNumber,
+					}),
+				),
+			);
 
 			await enqueueCheckpoint(sessionId, {
 				session_id: sessionId,
@@ -103,8 +133,6 @@ export default function SurveyQuestionnaireScreen() {
 			});
 
 			await drainOutbox(sessionId);
-
-			const db = getSurveyDb();
 			const pending = await db
 				.select()
 				.from(surveyOutbox)
