@@ -1,24 +1,128 @@
 import { useRouter } from "expo-router";
-import { View } from "react-native";
+import { useCallback, useState } from "react";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { useAuthContext } from "@/contexts/auth-context";
+import {
+	CONSENT_IDENTIFICATION,
+	CONSENT_SECTIONS,
+	CONSENT_TERM_VERSION,
+} from "@/libs/survey/consent-content";
+import { useSurveyStore } from "@/stores/survey-store";
 
-export default function SurveyConsentPlaceholderScreen() {
+const SCROLL_END_THRESHOLD_PX = 24;
+
+function IdentificationRow({ label, value }: { label: string; value: string }) {
+	return (
+		<View className="gap-0.5">
+			<Text
+				size="xs"
+				bold
+				className="uppercase tracking-wide text-muted-foreground"
+			>
+				{label}
+			</Text>
+			<Text size="sm" bold>
+				{value}
+			</Text>
+		</View>
+	);
+}
+
+export default function SurveyConsentScreen() {
 	const router = useRouter();
+	const { isAuthenticated, signOut } = useAuthContext();
+	const setConsent = useSurveyStore(s => s.setConsent);
+	const [reachedEnd, setReachedEnd] = useState(false);
+
+	const handleScroll = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+			if (reachedEnd) return;
+
+			const { layoutMeasurement, contentOffset, contentSize } =
+				event.nativeEvent;
+			const distanceToEnd =
+				contentSize.height - (layoutMeasurement.height + contentOffset.y);
+
+			if (distanceToEnd <= SCROLL_END_THRESHOLD_PX) {
+				setReachedEnd(true);
+			}
+		},
+		[reachedEnd],
+	);
+
+	const handleAccept = () => {
+		setConsent(CONSENT_TERM_VERSION, new Date().toISOString());
+
+		if (isAuthenticated) {
+			signOut();
+		}
+
+		router.replace("/survey/consent-ended");
+	};
+
+	const handleRefuse = () => {
+		router.replace("/(tabs)/(home)");
+	};
 
 	return (
-		<View className="flex-1 bg-white p-6 items-center justify-center gap-4">
-			<Heading size="xl" className="text-center">
-				Consentimento
-			</Heading>
-			<Text className="text-center text-muted-foreground">
-				Localização concedida. O termo de consentimento (M03) ainda não foi
-				implementado.
-			</Text>
-			<Button onPress={() => router.replace("/(tabs)/(home)")}>
-				<ButtonText>Voltar para a home</ButtonText>
-			</Button>
+		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-4">
+			<Heading size="xl">Termo de consentimento</Heading>
+
+			<View className="gap-3 rounded-lg bg-gray-50 p-4">
+				<IdentificationRow
+					label="Título da pesquisa"
+					value={CONSENT_IDENTIFICATION.researchTitle}
+				/>
+				<IdentificationRow
+					label="Instituição / Programa"
+					value={CONSENT_IDENTIFICATION.institution}
+				/>
+				<IdentificationRow
+					label="Pesquisador responsável"
+					value={CONSENT_IDENTIFICATION.researcher}
+				/>
+				<IdentificationRow
+					label="Nº do parecer CEP"
+					value={CONSENT_IDENTIFICATION.cepStatus}
+				/>
+			</View>
+
+			<ScrollView
+				testID="survey-consent-scroll"
+				className="flex-1"
+				onScroll={handleScroll}
+				scrollEventThrottle={100}
+				contentContainerClassName="gap-4 pb-2"
+			>
+				{CONSENT_SECTIONS.map(section => (
+					<View key={section.heading} className="gap-1.5">
+						<Text bold>{section.heading}</Text>
+						{section.paragraphs.map(paragraph => (
+							<Text key={paragraph} size="sm" className="leading-5">
+								{paragraph}
+							</Text>
+						))}
+					</View>
+				))}
+			</ScrollView>
+
+			<View className="gap-2">
+				<Button disabled={!reachedEnd} onPress={handleAccept}>
+					<ButtonText>Li e aceito</ButtonText>
+				</Button>
+				{!reachedEnd ? (
+					<Text size="xs" className="text-center text-muted-foreground">
+						O botão destrava ao chegar ao fim do texto
+					</Text>
+				) : null}
+				<Button variant="outline" onPress={handleRefuse}>
+					<ButtonText>Recusar</ButtonText>
+				</Button>
+			</View>
 		</View>
 	);
 }
