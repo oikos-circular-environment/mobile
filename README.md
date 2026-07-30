@@ -4,6 +4,8 @@
 
 A api local (`localhost:3333`) fica acessível via túnel Cloudflare em `local.oikos.company` — é o valor padrão de `EXPO_PUBLIC_BASE_URL` no `.env` e no ambiente `development` do EAS, e também a origem usada pelo `npm run generate:api`. O túnel é iniciado no repositório da **api** (`npm run tunnel`), já que é o dev server dela que ele expõe.
 
+O mesmo túnel também expõe o `survey` local (`localhost:3001`) em `survey.oikos.company` — valor padrão de `EXPO_PUBLIC_SURVEY_BASE_URL` no `.env` e no ambiente `development` do EAS. Iniciado no repositório do **survey** (`npm run tunnel`), pelo mesmo motivo.
+
 ## Observações
 
 ### iOS

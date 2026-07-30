@@ -23,6 +23,23 @@ CREATE TABLE `survey_event` (
 );
 --> statement-breakpoint
 CREATE INDEX `survey_event_session_seq` ON `survey_event` (`session_id`,`seq`);--> statement-breakpoint
+CREATE TABLE `survey_outbox` (
+	`id` text PRIMARY KEY NOT NULL,
+	`session_id` text NOT NULL,
+	`kind` text NOT NULL,
+	`suite_code` text,
+	`chunk_index` integer,
+	`chunk_total` integer,
+	`payload` text NOT NULL,
+	`status` text DEFAULT 'PENDING' NOT NULL,
+	`attempts` integer DEFAULT 0 NOT NULL,
+	`last_error` text,
+	`created_at` text NOT NULL,
+	`updated_at` text NOT NULL,
+	FOREIGN KEY (`session_id`) REFERENCES `survey_session`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE INDEX `survey_outbox_session_status` ON `survey_outbox` (`session_id`,`status`);--> statement-breakpoint
 CREATE TABLE `survey_session` (
 	`id` text PRIMARY KEY NOT NULL,
 	`protocol_key` text NOT NULL,
