@@ -139,3 +139,24 @@ export const surveyAnswer = sqliteTable("survey_answer", {
 	valueText: text("value_text"),
 	valueNumber: integer("value_number"),
 });
+
+export const surveyOutbox = sqliteTable(
+	"survey_outbox",
+	{
+		id: text("id").primaryKey(),
+		sessionId: text("session_id")
+			.notNull()
+			.references(() => surveySession.id, { onDelete: "cascade" }),
+		kind: text("kind").notNull(), // E2_SESSION|E3_CHECKPOINT|E4_FINISH|E5_ABANDON
+		suiteCode: text("suite_code"),
+		chunkIndex: integer("chunk_index"),
+		chunkTotal: integer("chunk_total"),
+		payload: text("payload", { mode: "json" }).notNull(),
+		status: text("status").notNull().default("PENDING"), // PENDING|SENDING|SENT|FAILED
+		attempts: integer("attempts").notNull().default(0),
+		lastError: text("last_error"),
+		createdAt: text("created_at").notNull(),
+		updatedAt: text("updated_at").notNull(),
+	},
+	t => [index("survey_outbox_session_status").on(t.sessionId, t.status)],
+);
