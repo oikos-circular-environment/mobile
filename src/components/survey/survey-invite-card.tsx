@@ -1,3 +1,4 @@
+import * as Clipboard from "expo-clipboard";
 import { LinearGradient } from "expo-linear-gradient";
 import {
 	ChevronRightIcon,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react-native";
 import { View } from "react-native";
 import { colors } from "@/components/style/colors";
+import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
@@ -49,6 +51,12 @@ export function SurveyInviteCard({
 	const showInfoGrid = Boolean(personaLabel || participantCode);
 	const showStages = Boolean(stages?.length);
 	const showDetailsLink = Boolean(onPressDetails);
+
+	const handleCopyParticipantCode = async () => {
+		if (!participantCode) return;
+		await Clipboard.setStringAsync(participantCode);
+		toast.success("Código copiado!");
+	};
 
 	return (
 		<View className={className}>
@@ -91,7 +99,7 @@ export function SurveyInviteCard({
 						<View className="flex-row gap-2.5">
 							{personaLabel ? (
 								<View className="flex-1 flex-row items-center justify-between gap-2 rounded-lg bg-white/10 p-3">
-									<View className="gap-0.5">
+									<View className="flex-1 gap-0.5">
 										<Text
 											size="xs"
 											bold
@@ -113,8 +121,11 @@ export function SurveyInviteCard({
 							) : null}
 
 							{participantCode ? (
-								<View className="flex-1 flex-row items-center justify-between gap-2 rounded-lg bg-white/10 p-3">
-									<View className="gap-0.5">
+								<Pressable
+									onPress={handleCopyParticipantCode}
+									className="flex-1 flex-row items-center justify-between gap-2 rounded-lg bg-white/10 p-3"
+								>
+									<View className="flex-1 gap-0.5">
 										<Text
 											size="xs"
 											bold
@@ -132,13 +143,13 @@ export function SurveyInviteCard({
 										</Text>
 									</View>
 									<CopyIcon size={16} color="#ffffffcc" />
-								</View>
+								</Pressable>
 							) : null}
 						</View>
 					) : null}
 
 					{showStages ? (
-						<View className="flex-row items-center gap-1 self-start rounded-full bg-white/[0.12] p-1">
+						<View className="w-full flex-row items-center gap-1 self-start rounded-full bg-white/[0.12] p-1">
 							{stages?.map(stage => {
 								if (stage.status === "current") {
 									return (

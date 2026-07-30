@@ -1,7 +1,21 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
+import * as Clipboard from "expo-clipboard";
 import { SurveyInviteCard } from "@/components/survey/survey-invite-card";
+import { toast } from "@/components/toast";
+
+jest.mock("expo-clipboard", () => ({
+	setStringAsync: jest.fn().mockResolvedValue(true),
+}));
+
+jest.mock("@/components/toast", () => ({
+	toast: { success: jest.fn(), error: jest.fn() },
+}));
 
 describe("SurveyInviteCard — componente", () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
 	it("exibe título e descrição no estado novo, sem badge, grid ou etapas", async () => {
 		await render(
 			<SurveyInviteCard
@@ -46,6 +60,24 @@ describe("SurveyInviteCard — componente", () => {
 		expect(screen.getByText("PSQ-7X29-QK41")).toBeOnTheScreen();
 		expect(screen.getAllByText("Coletor(a)").length).toBeGreaterThan(0);
 		expect(screen.getByText("Ver detalhes da pesquisa")).toBeOnTheScreen();
+	});
+
+	it("copia o código do participante ao tocar em 'Seu código'", async () => {
+		const user = userEvent.setup();
+		await render(
+			<SurveyInviteCard
+				title="Continue de onde parou"
+				description="Você está na Etapa 2 de 4."
+				participantCode="PSQ-7X29-QK41"
+				ctaLabel="Continuar"
+				onPressCta={jest.fn()}
+			/>,
+		);
+
+		await user.press(screen.getByText("PSQ-7X29-QK41"));
+
+		expect(Clipboard.setStringAsync).toHaveBeenCalledWith("PSQ-7X29-QK41");
+		expect(toast.success).toHaveBeenCalledWith("Código copiado!");
 	});
 
 	it("chama onPressCta e onPressDetails de forma independente", async () => {

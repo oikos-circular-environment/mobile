@@ -1,11 +1,14 @@
 import { eq } from "drizzle-orm";
+import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
-import { PartyPopperIcon } from "lucide-react-native";
+import { CopyIcon, PartyPopperIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { colors } from "@/components/style/colors";
+import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveySession } from "@/libs/survey/db/schema";
@@ -26,6 +29,12 @@ export default function SurveyThanksScreen() {
 			.where(eq(surveySession.id, sessionId))
 			.then(rows => setParticipantCode(rows[0]?.participantCode ?? null));
 	}, [sessionId]);
+
+	const handleCopyParticipantCode = async () => {
+		if (!participantCode) return;
+		await Clipboard.setStringAsync(participantCode);
+		toast.success("Código copiado!");
+	};
 
 	const handleBackToAccount = () => {
 		useSurveyExecutionStore.getState().reset();
@@ -51,19 +60,20 @@ export default function SurveyThanksScreen() {
 						Seu código de participante
 					</Text>
 					{participantCode ? (
-						<Text size="xl" bold selectable>
-							{participantCode}
-						</Text>
+						<Pressable
+							onPress={handleCopyParticipantCode}
+							className="flex-row items-center gap-2"
+						>
+							<Text size="xl" bold>
+								{participantCode}
+							</Text>
+							<CopyIcon size={18} color={colors.gray[500]} />
+						</Pressable>
 					) : (
 						<Text size="sm" className="text-muted-foreground">
 							Seu código aparece aqui assim que houver conexão.
 						</Text>
 					)}
-					{participantCode ? (
-						<Text size="xs" className="text-muted-foreground">
-							Toque e segure para copiar
-						</Text>
-					) : null}
 				</View>
 
 				<Text className="text-center leading-5" size="sm">
