@@ -1,5 +1,7 @@
+import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { AxiosError } from "axios";
 import Constants from "expo-constants";
+import { networkTelemetryBus } from "../network-telemetry-bus";
 import { client } from "../oikos-sdk/client.gen";
 import {
 	clearTokens,
@@ -101,9 +103,27 @@ function processQueue(error: unknown, token: string | null = null) {
 	failedQueue = [];
 }
 
+function emitNetworkTelemetry(
+	config: InternalAxiosRequestConfig | undefined,
+	status: number,
+) {
+	if (!config?.url) return;
+	networkTelemetryBus.emit({
+		method: (config.method ?? "get").toUpperCase(),
+		path: config.url,
+		status,
+		query: config.params,
+	});
+}
+
 client.instance.interceptors.response.use(
-	response => response,
+	(response: AxiosResponse) => {
+		emitNetworkTelemetry(response.config, response.status);
+		return response;
+	},
 	async (error: AxiosError) => {
+		emitNetworkTelemetry(error.config, error.response?.status ?? 0);
+
 		const originalRequest = error.config as {
 			_retry?: boolean;
 			url?: string;

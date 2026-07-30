@@ -1,13 +1,23 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
+import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
+import { createTestSurveyDb } from "@/libs/survey/db/test-client";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
 const mockPush = jest.fn();
+const mockDb = createTestSurveyDb();
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({ push: mockPush }),
+	usePathname: () => "/",
 }));
+
+jest.mock("@/libs/survey/db/client", () => ({
+	getSurveyDb: () => mockDb,
+}));
+
+jest.mock("@/components/survey/hooks/use-survey-protocol");
 
 describe("SurveyExecutionOverlay", () => {
 	beforeEach(() => {
@@ -15,6 +25,9 @@ describe("SurveyExecutionOverlay", () => {
 		mockPush.mockClear();
 		useSurveyExecutionStore.getState().reset();
 		useSurveyStore.getState().reset();
+		jest.mocked(useSurveyProtocol).mockReturnValue({
+			data: { tasks: [] },
+		} as never);
 	});
 
 	afterEach(() => {

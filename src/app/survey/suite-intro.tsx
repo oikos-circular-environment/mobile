@@ -1,3 +1,4 @@
+import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
 import { View } from "react-native";
@@ -5,6 +6,8 @@ import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { getSurveyDb } from "@/libs/survey/db/client";
+import { surveySuiteRun } from "@/libs/survey/db/schema";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
@@ -22,6 +25,8 @@ export default function SurveySuiteIntroScreen() {
 	const initRoteiro = useSurveyExecutionStore(s => s.initRoteiro);
 	const openSuiteIntro = useSurveyExecutionStore(s => s.openSuiteIntro);
 	const beginSuite = useSurveyExecutionStore(s => s.beginSuite);
+	const setSuiteRunId = useSurveyExecutionStore(s => s.setSuiteRunId);
+	const sessionId = useSurveyStore(s => s.sessionId);
 
 	const personaDefinition = useMemo(
 		() => protocol?.personas.find(p => p.key === persona),
@@ -57,7 +62,20 @@ export default function SurveySuiteIntroScreen() {
 		});
 	}, [protocol, suiteCode, openSuiteIntro]);
 
-	const handleBegin = () => {
+	const handleBegin = async () => {
+		if (sessionId && suiteCode) {
+			const suiteRunId = Crypto.randomUUID();
+			const now = new Date().toISOString();
+			await getSurveyDb().insert(surveySuiteRun).values({
+				id: suiteRunId,
+				sessionId,
+				suiteCode,
+				position: suiteIndex,
+				startedAt: now,
+			});
+			setSuiteRunId(suiteRunId);
+		}
+
 		beginSuite();
 		setProgress(suiteCode ?? null, tasks[0]?.code ?? null);
 		router.dismissTo("/(tabs)/(home)" as never);

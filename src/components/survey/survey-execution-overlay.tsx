@@ -8,6 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { FloatingIndicator } from "@/components/survey/floating-indicator";
 import { useSurveyActiveTimer } from "@/components/survey/hooks/use-survey-active-timer";
+import { useSurveyTaskDetection } from "@/components/survey/hooks/use-survey-task-detection";
 import { TaskCard } from "@/components/survey/task-card";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -36,6 +37,7 @@ export function SurveyExecutionOverlay() {
 	const setPaused = useSurveyExecutionStore(s => s.setPaused);
 
 	useSurveyActiveTimer();
+	useSurveyTaskDetection();
 
 	const translateX = useSharedValue(0);
 	const translateY = useSharedValue(0);
@@ -76,6 +78,11 @@ export function SurveyExecutionOverlay() {
 	const allTasksCompleted =
 		tasks.length > 0 && tasks.every(task => task.status === "done");
 	const currentTask = tasks[currentTaskIndex];
+	const checklist = tasks.map(task => ({
+		id: task.code,
+		label: task.title,
+		status: task.status,
+	}));
 
 	const handlePause = () => {
 		setPaused(true);
@@ -83,7 +90,7 @@ export function SurveyExecutionOverlay() {
 	};
 
 	const handleQuit = () => {
-		router.push("/survey/resume");
+		router.push("/survey/resume" as never);
 	};
 
 	return (
@@ -113,11 +120,11 @@ export function SurveyExecutionOverlay() {
 								totalTasks={tasks.length}
 								elapsedLabel={formatElapsed(suiteActiveMs)}
 								instruction="Você concluiu todas as tarefas desta etapa. Toque em Próximo para responder o questionário rápido sobre ela."
-								checklist={tasks}
+								checklist={checklist}
 								allTasksCompleted
 								onPause={handlePause}
 								onQuit={handleQuit}
-								onNext={() => router.push("/survey/questionnaire")}
+								onNext={() => router.push("/survey/questionnaire" as never)}
 							/>
 						) : currentTask ? (
 							<TaskCard
@@ -125,7 +132,7 @@ export function SurveyExecutionOverlay() {
 								totalTasks={tasks.length}
 								elapsedLabel={formatElapsed(suiteActiveMs)}
 								instruction={currentTask.instruction}
-								checklist={tasks}
+								checklist={checklist}
 								onPause={handlePause}
 								onQuit={handleQuit}
 							/>

@@ -14,6 +14,7 @@ type SurveyExecutionState = {
 	suiteQueue: string[];
 	suiteIndex: number;
 	suiteCode: string | null;
+	suiteRunId: string | null;
 	suiteTitle: string | null;
 	suiteObjective: string | null;
 	tasks: ExecutionTask[];
@@ -27,6 +28,7 @@ type SurveyExecutionState = {
 
 type SurveyExecutionActions = {
 	initRoteiro: (suiteCodes: string[]) => void;
+	setSuiteRunId: (id: string) => void;
 	openSuiteIntro: (suite: {
 		code: string;
 		title: string;
@@ -46,6 +48,7 @@ const INITIAL_STATE: SurveyExecutionState = {
 	suiteQueue: [],
 	suiteIndex: 0,
 	suiteCode: null,
+	suiteRunId: null,
 	suiteTitle: null,
 	suiteObjective: null,
 	tasks: [],
@@ -62,6 +65,8 @@ export const useSurveyExecutionStore = create<
 	...INITIAL_STATE,
 
 	initRoteiro: suiteCodes => set({ suiteQueue: suiteCodes, suiteIndex: 0 }),
+
+	setSuiteRunId: suiteRunId => set({ suiteRunId }),
 
 	openSuiteIntro: suite =>
 		set({
