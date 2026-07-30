@@ -164,7 +164,7 @@ export default function SurveyQuestionnaireScreen() {
 		if (remainingSuites > 0) {
 			router.replace("/survey/suite-intro");
 		} else {
-			router.replace("/survey/closing-comment" as never);
+			router.replace("/survey/closing-comment");
 		}
 	};
 

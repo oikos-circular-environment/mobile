@@ -14,6 +14,8 @@ export default function SurveyStackLayout() {
 			<Stack.Screen name="questionnaire" />
 			<Stack.Screen name="resume" />
 			<Stack.Screen name="answers" />
+			<Stack.Screen name="closing-comment" />
+			<Stack.Screen name="thanks" />
 		</Stack>
 	);
 }

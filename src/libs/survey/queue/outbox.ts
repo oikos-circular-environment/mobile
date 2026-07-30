@@ -129,11 +129,19 @@ async function sendOutboxItem(item: typeof surveyOutbox.$inferSelect) {
 					item.payload as UsabilityInputs["checkpoint"]["send"],
 				);
 				break;
-			case "E4_FINISH":
-				await surveyClient.usability.finish.mutate(
+			case "E4_FINISH": {
+				const result = await surveyClient.usability.finish.mutate(
 					item.payload as UsabilityInputs["finish"],
 				);
+				await db
+					.update(surveySession)
+					.set({
+						participantCode: result.participant_code,
+						status: "COMPLETED",
+					})
+					.where(eq(surveySession.id, item.sessionId));
 				break;
+			}
 			case "E5_ABANDON":
 				await surveyClient.usability.abandon.mutate(
 					item.payload as UsabilityInputs["abandon"],
