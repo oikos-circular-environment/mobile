@@ -38,7 +38,7 @@ export function HomeHero({
 				style={StyleSheet.absoluteFill}
 			/>
 
-			<View style={{ paddingTop: 16 }} className="gap-5 px-4 pb-6">
+			<View style={{ paddingTop: insets.top + 16 }} className="gap-5 px-4 pb-6">
 				{isLoading ? (
 					<HomeHeaderSkeleton />
 				) : isAuthenticated ? (
