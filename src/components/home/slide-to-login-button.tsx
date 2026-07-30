@@ -12,7 +12,7 @@ import Animated, {
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 
-const THUMB_SIZE = 52;
+const THUMB_SIZE = 44;
 const TRACK_PADDING = 4;
 const COMPLETE_THRESHOLD = 0.72;
 const SPRING = { damping: 18, stiffness: 200 } as const;
@@ -22,6 +22,7 @@ export function shouldCompleteSlide(
 	maxTranslate: number,
 	threshold: number = COMPLETE_THRESHOLD,
 ) {
+	"worklet";
 	if (maxTranslate <= 0) return false;
 	return translateX >= maxTranslate * threshold;
 }
@@ -72,7 +73,7 @@ export function SlideToLoginButton({
 	return (
 		<View
 			onLayout={handleLayout}
-			className="h-16 justify-center overflow-hidden rounded-full border border-white/40 bg-white/25 shadow-sm"
+			className="h-16 justify-center overflow-hidden rounded-xl border border-white/40 bg-white/25 shadow-sm"
 		>
 			<Animated.View
 				style={labelStyle}
@@ -95,7 +96,7 @@ export function SlideToLoginButton({
 							height: THUMB_SIZE,
 						},
 					]}
-					className="items-center justify-center rounded-full bg-white shadow-sm"
+					className="items-center justify-center rounded-xl bg-white shadow-sm"
 				>
 					<ArrowRightIcon size={20} color={colors.lime[800]} />
 				</Animated.View>

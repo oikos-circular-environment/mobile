@@ -1,10 +1,13 @@
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { ArrowDownLeftIcon } from "lucide-react-native";
+import { RecycleIcon, RepeatIcon, TrendingDownIcon } from "lucide-react-native";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import NatureImage from "@/assets/images/nature.png";
-import { FloatingGlassBadge } from "@/components/home/floating-glass-badge";
+import {
+	FloatingGlassBadge,
+	type FloatingGlassBadgeItem,
+} from "@/components/home/floating-glass-badge";
 import { HomeHeaderSkeleton } from "@/components/home/home-header-skeleton";
 import { HomeUserCard } from "@/components/home/home-user-card";
 import { SlideToLoginButton } from "@/components/home/slide-to-login-button";
@@ -16,6 +19,12 @@ interface HomeHeroProps {
 	onOpenSettings: () => void;
 	onPressLogin: () => void;
 }
+
+const HERO_BADGE_ITEMS: FloatingGlassBadgeItem[] = [
+	{ icon: RepeatIcon, label: "Reuse" },
+	{ icon: TrendingDownIcon, label: "Reduze" },
+	{ icon: RecycleIcon, label: "Recicle" },
+];
 
 export function HomeHero({
 	isAuthenticated,
@@ -72,8 +81,7 @@ export function HomeHero({
 					/>
 
 					<FloatingGlassBadge
-						icon={ArrowDownLeftIcon}
-						label="Reduzir"
+						items={HERO_BADGE_ITEMS}
 						style={{
 							position: "absolute",
 							right: 4,

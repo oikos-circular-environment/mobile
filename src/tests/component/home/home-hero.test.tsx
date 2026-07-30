@@ -56,9 +56,9 @@ describe("HomeHero — componente", () => {
 		expect(screen.queryByText("Iniciar sessão")).not.toBeOnTheScreen();
 	});
 
-	it("mostra o selo flutuante Reduzir", async () => {
+	it("mostra o selo flutuante dos 3 Rs, começando por Reuse", async () => {
 		await renderHero();
 
-		expect(screen.getByText("Reduzir")).toBeOnTheScreen();
+		expect(screen.getByText("Reuse")).toBeOnTheScreen();
 	});
 });
