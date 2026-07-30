@@ -157,7 +157,7 @@ describe("HomeScreen — componente", () => {
 	});
 
 	it("troca o rótulo do convite para retomada quando há participação em andamento", async () => {
-		useSurveyStore.getState().startSession("session-1");
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 		await renderHome();
 
 		expect(screen.getByText("Continue de onde parou")).toBeOnTheScreen();
@@ -167,7 +167,7 @@ describe("HomeScreen — componente", () => {
 	});
 
 	it("some o convite da pesquisa quando a participação está concluída", async () => {
-		useSurveyStore.getState().startSession("session-1");
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 		useSurveyStore.getState().setStatus("COMPLETED");
 		await renderHome();
 

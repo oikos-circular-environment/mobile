@@ -21,7 +21,7 @@ describe("useSurveyInviteBanner", () => {
 	});
 
 	it("retorna variant resume quando a sessão está IN_PROGRESS", async () => {
-		useSurveyStore.getState().startSession("session-1");
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 
 		const { result } = await renderHook(() => useSurveyInviteBanner());
 
@@ -29,7 +29,7 @@ describe("useSurveyInviteBanner", () => {
 	});
 
 	it("retorna variant resume quando a sessão foi ABANDONED", async () => {
-		useSurveyStore.getState().startSession("session-1");
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 		useSurveyStore.getState().setStatus("ABANDONED");
 
 		const { result } = await renderHook(() => useSurveyInviteBanner());
@@ -38,7 +38,7 @@ describe("useSurveyInviteBanner", () => {
 	});
 
 	it("retorna null quando a sessão está COMPLETED, para o banner sumir", async () => {
-		useSurveyStore.getState().startSession("session-1");
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 		useSurveyStore.getState().setStatus("COMPLETED");
 
 		const { result } = await renderHook(() => useSurveyInviteBanner());

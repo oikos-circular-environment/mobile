@@ -29,6 +29,7 @@ import {
 	AppSplashScreen,
 	SplashBackdrop,
 } from "@/components/app-splash-screen";
+import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
 import { Toaster } from "@/components/toast";
 
 export const unstable_settings = {
@@ -132,6 +133,7 @@ function RootLayout() {
 							</GeospatialProvider>
 						</AuthContextProvider>
 						{isDevelopmentMode && <FloatingDevTools />}
+						<SurveyExecutionOverlay />
 					</QueryClientProvider>
 				</GluestackUIProvider>
 			</ErrorBoundary>

@@ -8,6 +8,9 @@ export default function SurveyStackLayout() {
 			<Stack.Screen name="location-denied" />
 			<Stack.Screen name="consent" />
 			<Stack.Screen name="consent-ended" />
+			<Stack.Screen name="persona" />
+			<Stack.Screen name="characterization" />
+			<Stack.Screen name="suite-intro" />
 		</Stack>
 	);
 }
