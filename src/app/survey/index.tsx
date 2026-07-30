@@ -5,9 +5,20 @@ import { colors } from "@/components/style/colors";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { useGeospatial } from "@/contexts/geospatial-context";
 
 export default function SurveyPresentationScreen() {
 	const router = useRouter();
+	const { permissionDenied } = useGeospatial();
+
+	const handleContinue = () => {
+		if (permissionDenied) {
+			router.push("/survey/location-denied");
+			return;
+		}
+
+		router.push("/survey/consent");
+	};
 
 	return (
 		<View className="flex-1 bg-white p-6 pb-8 justify-between">
@@ -34,7 +45,7 @@ export default function SurveyPresentationScreen() {
 			</View>
 
 			<View className="gap-3">
-				<Button onPress={() => router.push("/survey/location")}>
+				<Button onPress={handleContinue}>
 					<ButtonText>Continuar</ButtonText>
 				</Button>
 				<Button variant="outline" onPress={() => router.back()}>
