@@ -1,15 +1,3 @@
-/**
- * Persistência local do modo pesquisa — banco isolado, exclusivo deste módulo. Nenhuma
- * tabela aqui referencia ou é referenciada por qualquer outra parte do app.
- *
- * As tabelas espelham o contrato dos endpoints E1-E5 (`plans/survey-usability-in-app/
- * 02-tech-plan.md`), não o schema MySQL do serviço `survey` — o aparelho só guarda o que
- * ele mesmo gera e envia, nunca o protocolo inteiro normalizado.
- *
- * Datas são texto ISO-8601 em UTC: SQLite não tem tipo `timestamp` nativo, e texto ISO
- * ordena e compara corretamente sem conversão.
- */
-
 import {
 	index,
 	integer,
@@ -20,11 +8,11 @@ import {
 
 /** Cabeçalho da participação — espelha o corpo/resposta de E2. Uma linha por sessão. */
 export const surveySession = sqliteTable("survey_session", {
-	id: text("id").primaryKey(), // uuid gerado no aparelho (Crypto.randomUUID())
+	id: text("id").primaryKey(),
 	protocolKey: text("protocol_key").notNull(),
 	protocolVersion: integer("protocol_version").notNull(),
 	persona: text("persona").notNull(),
-	participantCode: text("participant_code"), // nulo até E2 responder
+	participantCode: text("participant_code"),
 
 	stateUf: text("state_uf").notNull(),
 	cityName: text("city_name").notNull(),
@@ -42,7 +30,11 @@ export const surveySession = sqliteTable("survey_session", {
 	appVersion: text("app_version").notNull(),
 	screenSize: text("screen_size").notNull(),
 
-	status: text("status").notNull().default("IN_PROGRESS"), // IN_PROGRESS|COMPLETED|ABANDONED
+	status: text("status", {
+		enum: ["IN_PROGRESS", "COMPLETED", "ABANDONED"],
+	})
+		.notNull()
+		.default("IN_PROGRESS"),
 	startedAt: text("started_at").notNull(),
 	finishedAt: text("finished_at"),
 	activeMs: integer("active_ms").notNull().default(0),
@@ -53,10 +45,7 @@ export const surveySession = sqliteTable("survey_session", {
 	updatedAt: text("updated_at").notNull(),
 });
 
-/**
- * Uma execução de suíte por sessão. `synced` marca se o bloco já foi aceito pelo servidor
- * (E3) — antes disso a fila ainda tem o que enviar para esta suíte.
- */
+/** Uma execução de suíte por sessão. */
 export const surveySuiteRun = sqliteTable(
 	"survey_suite_run",
 	{
@@ -70,7 +59,7 @@ export const surveySuiteRun = sqliteTable(
 		finishedAt: text("finished_at"),
 		activeMs: integer("active_ms").notNull().default(0),
 		wallMs: integer("wall_ms").notNull().default(0),
-		outcome: text("outcome"), // YES|PARTIAL|NO
+		outcome: text("outcome", { enum: ["YES", "PARTIAL", "NO"] }),
 		synced: integer("synced", { mode: "boolean" }).notNull().default(false),
 	},
 	t => [
@@ -98,11 +87,7 @@ export const surveyTaskRun = sqliteTable(
 	t => [uniqueIndex("survey_task_run_suite_task").on(t.suiteRunId, t.taskCode)],
 );
 
-/**
- * Log de eventos somente-adição. `id` é o `client_event_id` — mesma chave usada pelo
- * servidor pra idempotência (E3). `seq` é a ordem local: o relógio do aparelho não é
- * confiável (R8), então a ordenação vem da sequência, não do timestamp.
- */
+/** Log de eventos somente-adição, ordenado por `seq`. */
 export const surveyEvent = sqliteTable(
 	"survey_event",
 	{
@@ -122,11 +107,7 @@ export const surveyEvent = sqliteTable(
 	t => [index("survey_event_session_seq").on(t.sessionId, t.seq)],
 );
 
-/**
- * Respostas de questionário, por suíte ou de fim de sessão (`suiteRunId` nulo). Chave e
- * valor, não coluna por pergunta — o conjunto de perguntas vem do protocolo baixado, não é
- * fixo no schema local.
- */
+/** Respostas de questionário, por suíte ou de fim de sessão (`suiteRunId` nulo). */
 export const surveyAnswer = sqliteTable("survey_answer", {
 	id: text("id").primaryKey(),
 	sessionId: text("session_id")
@@ -147,12 +128,18 @@ export const surveyOutbox = sqliteTable(
 		sessionId: text("session_id")
 			.notNull()
 			.references(() => surveySession.id, { onDelete: "cascade" }),
-		kind: text("kind").notNull(), // E2_SESSION|E3_CHECKPOINT|E4_FINISH|E5_ABANDON
+		kind: text("kind", {
+			enum: ["E2_SESSION", "E3_CHECKPOINT", "E4_FINISH", "E5_ABANDON"],
+		}).notNull(),
 		suiteCode: text("suite_code"),
 		chunkIndex: integer("chunk_index"),
 		chunkTotal: integer("chunk_total"),
 		payload: text("payload", { mode: "json" }).notNull(),
-		status: text("status").notNull().default("PENDING"), // PENDING|SENDING|SENT|FAILED
+		status: text("status", {
+			enum: ["PENDING", "SENDING", "SENT", "FAILED"],
+		})
+			.notNull()
+			.default("PENDING"),
 		attempts: integer("attempts").notNull().default(0),
 		lastError: text("last_error"),
 		createdAt: text("created_at").notNull(),
