@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, userEvent } from "@testing-library/react-native";
 import type React from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import HomeScreen from "@/app/(tabs)/(home)";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
@@ -147,9 +148,16 @@ async function renderHome() {
 		},
 	});
 	return await render(
-		<QueryClientProvider client={queryClient}>
-			<HomeScreen />
-		</QueryClientProvider>,
+		<SafeAreaProvider
+			initialMetrics={{
+				frame: { x: 0, y: 0, width: 375, height: 812 },
+				insets: { top: 47, left: 0, right: 0, bottom: 34 },
+			}}
+		>
+			<QueryClientProvider client={queryClient}>
+				<HomeScreen />
+			</QueryClientProvider>
+		</SafeAreaProvider>,
 	);
 }
 
@@ -166,11 +174,11 @@ describe("HomeScreen — integração", () => {
 		jest.clearAllMocks();
 	});
 
-	it("renderiza GuestCard com boas-vindas para visitante", async () => {
+	it("renderiza o botão de iniciar sessão para visitante", async () => {
 		setupAuth({ isAuthenticated: false });
 		await renderHome();
 
-		expect(screen.getByText("Bem-Vindos a Oikos!")).toBeOnTheScreen();
+		expect(screen.getByText("Iniciar sessão")).toBeOnTheScreen();
 	});
 
 	it("renderiza UserCard com nome de exibição para usuário logado", async () => {

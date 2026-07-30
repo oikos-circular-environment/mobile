@@ -3,12 +3,10 @@ import type { Href } from "expo-router";
 import { Link, useRouter } from "expo-router";
 import { RecycleIcon, ShieldIcon } from "lucide-react-native";
 import type { ComponentType } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Pressable, ScrollView, View } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import { Pressable, ScrollView, View } from "react-native";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
-import { HomeGuestCard } from "@/components/home/home-guest-card";
-import { HomeHeaderSkeleton } from "@/components/home/home-header-skeleton";
-import { HomeUserCard } from "@/components/home/home-user-card";
+import { HomeHero } from "@/components/home/home-hero";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
 import { colors } from "@/components/style/colors";
@@ -81,7 +79,6 @@ export default function HomeScreen() {
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [showSignOutModal, setShowSignOutModal] = useState(false);
 	const settingsSheetRef = useRef<BottomSheetType>(null);
-	const contentOpacity = useRef(new Animated.Value(0)).current;
 
 	const handleOpenSettings = useCallback(() => {
 		settingsSheetRef.current?.snapToIndex(0);
@@ -97,94 +94,77 @@ export default function HomeScreen() {
 		setShowSignOutModal(true);
 	}, []);
 
-	useEffect(() => {
-		if (!isLoading) {
-			Animated.timing(contentOpacity, {
-				toValue: 1,
-				duration: 400,
-				useNativeDriver: true,
-			}).start();
-		} else {
-			contentOpacity.setValue(0);
-		}
-	}, [isLoading, contentOpacity]);
+	const handlePressLogin = useCallback(() => {
+		router.push("/sign-in");
+	}, [router]);
 
 	return (
 		<>
-			<ScrollView
-				className="flex-1 bg-white"
-				contentContainerClassName="p-4 pb-8 gap-6"
-			>
-				{/* Header — perfil ou CTA de login */}
-				<View>
-					{isLoading ? (
-						<HomeHeaderSkeleton />
-					) : (
-						<Animated.View style={{ opacity: contentOpacity }}>
-							{isAuthenticated ? (
-								<HomeUserCard onOpenSettings={handleOpenSettings} />
-							) : (
-								<HomeGuestCard />
-							)}
-						</Animated.View>
+			<ScrollView className="flex-1 bg-white" contentContainerClassName="pb-8">
+				<HomeHero
+					isAuthenticated={isAuthenticated}
+					isLoading={isLoading}
+					onOpenSettings={handleOpenSettings}
+					onPressLogin={handlePressLogin}
+				/>
+
+				<View className="gap-6 px-4 pt-6">
+					{/* Aviso de localização indisponível */}
+					{permissionDenied && (
+						<LocationPermissionAlert message="Habilite a localização para ver conteúdo e recomendações mais próximos de você." />
 					)}
-				</View>
 
-				{/* Aviso de localização indisponível */}
-				{permissionDenied && (
-					<LocationPermissionAlert message="Habilite a localização para ver conteúdo e recomendações mais próximos de você." />
-				)}
+					{/* Convite da pesquisa de usabilidade */}
+					{surveyBanner ? (
+						<SurveyInviteCard
+							title={surveyBanner.title}
+							description={surveyBanner.description}
+							ctaLabel={surveyBanner.ctaLabel}
+							onPressCta={surveyBanner.onPress}
+							personaLabel={surveyBanner.personaLabel}
+							participantCode={surveyBanner.participantCode}
+							stages={surveyBanner.stages}
+							onPressDetails={surveyBanner.onPressDetails}
+						/>
+					) : null}
 
-				{/* Convite da pesquisa de usabilidade */}
-				{surveyBanner ? (
-					<SurveyInviteCard
-						title={surveyBanner.title}
-						description={surveyBanner.description}
-						ctaLabel={surveyBanner.ctaLabel}
-						onPressCta={surveyBanner.onPress}
-						personaLabel={surveyBanner.personaLabel}
-						participantCode={surveyBanner.participantCode}
-						stages={surveyBanner.stages}
-						onPressDetails={surveyBanner.onPressDetails}
-					/>
-				) : null}
-
-				{/* Serviços */}
-				<View className="gap-3">
-					<Heading>Serviços</Heading>
-					<Grid className="gap-3" _extra={{ className: "grid-cols-2" }}>
-						<GridItem _extra={{ className: "col-span-1" }}>
-							<ServiceCard
-								label="Pontos de Coleta"
-								description="Descarte seus resíduos"
-								href="/(tabs)/market"
-								Icon={RecycleIcon}
-							/>
-						</GridItem>
-						<GridItem _extra={{ className: "col-span-1" }}>
-							<ServiceCard
-								label="Denúncias"
-								description="Reporte irregularidades"
-								href="/(tabs)/complaints"
-								Icon={ShieldIcon}
-							/>
-						</GridItem>
-						{isAuthenticated && (
+					{/* Serviços */}
+					<View className="gap-3">
+						<Heading>Serviços</Heading>
+						<Grid className="gap-3" _extra={{ className: "grid-cols-2" }}>
 							<GridItem _extra={{ className: "col-span-1" }}>
 								<ServiceCard
-									label="Empresas"
-									description="Cadastre suas empresas"
-									href="/(tabs)/(home)/companies"
-									Icon={ShieldIcon}
-									onPress={
-										needsProfileCompletion
-											? () => setShowProfileModal(true)
-											: undefined
-									}
+									label="Pontos de Coleta"
+									description="Descarte seus resíduos"
+									href="/(tabs)/market"
+									Icon={RecycleIcon}
 								/>
 							</GridItem>
-						)}
-					</Grid>
+							<GridItem _extra={{ className: "col-span-1" }}>
+								<ServiceCard
+									label="Denúncias"
+									description="Reporte irregularidades"
+									href="/(tabs)/complaints"
+									Icon={ShieldIcon}
+								/>
+							</GridItem>
+							{isAuthenticated && (
+								<GridItem _extra={{ className: "col-span-1" }}>
+									<ServiceCard
+										label="Empresas"
+										description="Cadastre suas empresas"
+										href="/(tabs)/(home)/companies"
+										Icon={ShieldIcon}
+										onPress={
+											needsProfileCompletion
+												? () => setShowProfileModal(true)
+												: undefined
+										}
+									/>
+								</GridItem>
+							)}
+						</Grid>
+					</View>
 				</View>
 			</ScrollView>
 			<ProfileCompletionModal

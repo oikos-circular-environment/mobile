@@ -6,8 +6,10 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useSurveyStore } from "@/stores/survey-store";
 
+const mockPush = jest.fn();
+
 jest.mock("expo-router", () => ({
-	useRouter: () => ({ push: jest.fn(), navigate: jest.fn(), back: jest.fn() }),
+	useRouter: () => ({ push: mockPush, navigate: jest.fn(), back: jest.fn() }),
 	Link: ({
 		children,
 		asChild,
@@ -33,19 +35,32 @@ jest.mock("@/components/ui/grid", () => ({
 	GridItem: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock("@/components/home/home-guest-card", () => {
-	const { View: V } = require("react-native");
-	return { HomeGuestCard: () => <V testID="home-guest-card" /> };
-});
-
-jest.mock("@/components/home/home-user-card", () => {
-	const { View: V } = require("react-native");
-	return { HomeUserCard: () => <V testID="home-user-card" /> };
-});
-
-jest.mock("@/components/home/home-header-skeleton", () => {
-	const { View: V } = require("react-native");
-	return { HomeHeaderSkeleton: () => <V testID="home-header-skeleton" /> };
+jest.mock("@/components/home/home-hero", () => {
+	const { Pressable: P, Text: T, View: V } = require("react-native");
+	return {
+		HomeHero: ({
+			isAuthenticated,
+			isLoading,
+			onOpenSettings,
+			onPressLogin,
+		}: {
+			isAuthenticated: boolean;
+			isLoading: boolean;
+			onOpenSettings: () => void;
+			onPressLogin: () => void;
+		}) => (
+			<V testID="home-hero">
+				<T testID="home-hero-is-loading">{String(isLoading)}</T>
+				<T testID="home-hero-is-authenticated">{String(isAuthenticated)}</T>
+				<P testID="home-hero-open-settings" onPress={onOpenSettings}>
+					<T>Configurações</T>
+				</P>
+				<P testID="home-hero-press-login" onPress={onPressLogin}>
+					<T>Iniciar sessão</T>
+				</P>
+			</V>
+		),
+	};
 });
 
 jest.mock("@/components/settings/settings-bottom-sheet", () => {
@@ -177,29 +192,39 @@ describe("HomeScreen — componente", () => {
 		expect(screen.queryByText("Continue de onde parou")).not.toBeOnTheScreen();
 	});
 
-	it("exibe skeleton enquanto isLoading é true", async () => {
+	it("repassa isLoading para o HomeHero", async () => {
 		setupAuth({ isLoading: true });
 		await renderHome();
 
-		expect(screen.getByTestId("home-header-skeleton")).toBeOnTheScreen();
-		expect(screen.queryByTestId("home-guest-card")).not.toBeOnTheScreen();
-		expect(screen.queryByTestId("home-user-card")).not.toBeOnTheScreen();
+		expect(screen.getByTestId("home-hero-is-loading")).toHaveTextContent(
+			"true",
+		);
 	});
 
-	it("renderiza HomeGuestCard quando não autenticado", async () => {
+	it("repassa isAuthenticated=false para o HomeHero quando não autenticado", async () => {
 		await renderHome();
 
-		expect(screen.getByTestId("home-guest-card")).toBeOnTheScreen();
-		expect(screen.queryByTestId("home-user-card")).not.toBeOnTheScreen();
-		expect(screen.queryByTestId("home-header-skeleton")).not.toBeOnTheScreen();
+		expect(screen.getByTestId("home-hero-is-authenticated")).toHaveTextContent(
+			"false",
+		);
 	});
 
-	it("renderiza HomeUserCard quando autenticado", async () => {
+	it("repassa isAuthenticated=true para o HomeHero quando autenticado", async () => {
 		setupAuth({ isAuthenticated: true, user: {} as never });
 		await renderHome();
 
-		expect(screen.getByTestId("home-user-card")).toBeOnTheScreen();
-		expect(screen.queryByTestId("home-guest-card")).not.toBeOnTheScreen();
+		expect(screen.getByTestId("home-hero-is-authenticated")).toHaveTextContent(
+			"true",
+		);
+	});
+
+	it("navega para o login quando o HomeHero conclui o slide de iniciar sessão", async () => {
+		const user = userEvent.setup();
+		await renderHome();
+
+		await user.press(screen.getByTestId("home-hero-press-login"));
+
+		expect(mockPush).toHaveBeenCalledWith("/sign-in");
 	});
 
 	it("exibe Pontos de Coleta e Denúncias (sempre visíveis)", async () => {
