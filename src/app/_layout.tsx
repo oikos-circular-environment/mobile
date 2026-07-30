@@ -30,6 +30,7 @@ import {
 	SplashBackdrop,
 } from "@/components/app-splash-screen";
 import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
+import { SurveyMigrationsRunner } from "@/components/survey/survey-migrations-runner";
 import { Toaster } from "@/components/toast";
 import { initSurveyQueue } from "@/libs/survey/queue/network-status";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -136,6 +137,7 @@ function RootLayout() {
 							</GeospatialProvider>
 						</AuthContextProvider>
 						{isDevelopmentMode && <FloatingDevTools />}
+						<SurveyMigrationsRunner />
 						<SurveyExecutionOverlay />
 					</QueryClientProvider>
 				</GluestackUIProvider>
