@@ -9,6 +9,7 @@ import { useSurveyStore } from "@/stores/survey-store";
 const mockBack = jest.fn();
 const mockDismissTo = jest.fn();
 const mockReplace = jest.fn();
+const mockPush = jest.fn();
 const mockDb = createTestSurveyDb();
 const mockEnqueueAbandon = jest.fn().mockResolvedValue(undefined);
 const mockDrainOutbox = jest.fn().mockResolvedValue(undefined);
@@ -19,6 +20,7 @@ jest.mock("expo-router", () => ({
 		back: mockBack,
 		dismissTo: mockDismissTo,
 		replace: mockReplace,
+		push: mockPush,
 	}),
 }));
 
@@ -58,6 +60,7 @@ describe("SurveyResumeScreen", () => {
 		mockBack.mockClear();
 		mockDismissTo.mockClear();
 		mockReplace.mockClear();
+		mockPush.mockClear();
 		mockEnqueueAbandon.mockClear();
 		mockDrainOutbox.mockClear();
 		mockDeleteLocalSurveyData.mockClear();
@@ -90,6 +93,15 @@ describe("SurveyResumeScreen", () => {
 		expect(screen.getByText("Em andamento")).toBeOnTheScreen();
 		expect(screen.getByText("S2 · Registro e perfil")).toBeOnTheScreen();
 		expect(screen.getAllByText("Pendente").length).toBeGreaterThan(0);
+	});
+
+	it("toca em Caracterização e navega para a tela de respostas do rastreio", async () => {
+		const user = userEvent.setup();
+		await render(<SurveyResumeScreen />);
+
+		await user.press(screen.getByText("Caracterização"));
+
+		expect(mockPush).toHaveBeenCalledWith("/survey/characterization-answers");
 	});
 
 	it("Continuar despausa e fecha de volta para o app quando a etapa está ativa", async () => {

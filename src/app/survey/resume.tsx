@@ -145,17 +145,20 @@ export default function SurveyResumeScreen() {
 					<Heading size="md">Etapas</Heading>
 
 					<View className="gap-2">
-						<View className="flex-row items-center gap-3 rounded-lg bg-gray-50 p-3.5">
+						<Pressable
+							className="flex-row items-center gap-3 rounded-lg bg-gray-50 p-3.5"
+							onPress={() => router.push("/survey/characterization-answers")}
+						>
 							<CircleCheckIcon size={22} color={colors.lime[800]} />
 							<View className="flex-1 gap-0.5">
 								<Text size="sm" bold>
 									Caracterização
 								</Text>
 								<Text size="xs" className="text-muted-foreground">
-									Concluída
+									Concluída · toque para ver respostas
 								</Text>
 							</View>
-						</View>
+						</Pressable>
 
 						{stages.map(stage => {
 							const meta = STATUS_META[stage.status];
