@@ -142,6 +142,10 @@ export default function HomeScreen() {
 						description={surveyBanner.description}
 						ctaLabel={surveyBanner.ctaLabel}
 						onPressCta={surveyBanner.onPress}
+						personaLabel={surveyBanner.personaLabel}
+						participantCode={surveyBanner.participantCode}
+						stages={surveyBanner.stages}
+						onPressDetails={surveyBanner.onPressDetails}
 					/>
 				) : null}
 

@@ -15,7 +15,10 @@ import { colors } from "@/components/style/colors";
 import { AbandonSurveySheet } from "@/components/survey/abandon-survey-sheet";
 import { DeleteSurveyDataSheet } from "@/components/survey/delete-survey-data-sheet";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
-import { SurveyInviteCard } from "@/components/survey/survey-invite-card";
+import {
+	SurveyInviteCard,
+	type SurveyInviteStage,
+} from "@/components/survey/survey-invite-card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
@@ -81,6 +84,17 @@ export default function SurveyResumeScreen() {
 		}
 	};
 
+	const cardStages: SurveyInviteStage[] = suiteQueue.map((code, index) => ({
+		code,
+		status:
+			index < suiteIndex
+				? "done"
+				: index === suiteIndex
+					? "current"
+					: "upcoming",
+		currentLabel: code,
+	}));
+
 	const stages = suiteQueue.map(suiteCode => {
 		const suite = protocol?.suites.find(s => s.code === suiteCode);
 		const index = suiteQueue.indexOf(suiteCode);
@@ -115,6 +129,8 @@ export default function SurveyResumeScreen() {
 							: "Continue sua participação."
 					}
 					personaLabel={personaLabel}
+					participantCode={participantCode ?? undefined}
+					stages={cardStages.length > 0 ? cardStages : undefined}
 					ctaLabel="Continuar"
 					onPressCta={handleContinue}
 				/>
