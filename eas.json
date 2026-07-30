@@ -34,7 +34,7 @@
 	"submit": {
 		"production": {
 			"android": {
-				"track": "alpha"
+				"track": "production"
 			},
 			"ios": {
 				"ascAppId": "6786017565",
