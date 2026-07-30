@@ -10,6 +10,9 @@ const mockBack = jest.fn();
 const mockDismissTo = jest.fn();
 const mockReplace = jest.fn();
 const mockDb = createTestSurveyDb();
+const mockEnqueueAbandon = jest.fn().mockResolvedValue(undefined);
+const mockDrainOutbox = jest.fn().mockResolvedValue(undefined);
+const mockDeleteLocalSurveyData = jest.fn().mockResolvedValue(undefined);
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({
@@ -24,8 +27,13 @@ jest.mock("@/libs/survey/db/client", () => ({
 }));
 
 jest.mock("@/libs/survey/queue/outbox", () => ({
-	enqueueAbandon: jest.fn().mockResolvedValue(undefined),
-	drainOutbox: jest.fn().mockResolvedValue(undefined),
+	enqueueAbandon: (...args: unknown[]) => mockEnqueueAbandon(...args),
+	drainOutbox: (...args: unknown[]) => mockDrainOutbox(...args),
+}));
+
+jest.mock("@/libs/survey/delete-local-data", () => ({
+	deleteLocalSurveyData: (...args: unknown[]) =>
+		mockDeleteLocalSurveyData(...args),
 }));
 
 jest.mock("@/components/survey/hooks/use-survey-protocol");
@@ -50,6 +58,9 @@ describe("SurveyResumeScreen", () => {
 		mockBack.mockClear();
 		mockDismissTo.mockClear();
 		mockReplace.mockClear();
+		mockEnqueueAbandon.mockClear();
+		mockDrainOutbox.mockClear();
+		mockDeleteLocalSurveyData.mockClear();
 		mockDb.delete(surveySession).run();
 		useSurveyExecutionStore.getState().reset();
 		useSurveyStore.getState().reset();
@@ -99,23 +110,49 @@ describe("SurveyResumeScreen", () => {
 		expect(mockDismissTo).toHaveBeenCalledWith("/(tabs)/(home)");
 	});
 
-	it("abre o sheet de excluir dados a partir da zona perigosa", async () => {
+	it("abre o sheet de excluir dados e, ao confirmar, apaga a cópia local e volta para a home", async () => {
 		const user = userEvent.setup();
 		await render(<SurveyResumeScreen />);
 
 		await user.press(screen.getByText("Solicitar exclusão dos meus dados"));
-
 		expect(
 			screen.getByText("Excluir meus dados da pesquisa?"),
 		).toBeOnTheScreen();
+
+		await user.press(screen.getByText("Excluir meus dados"));
+
+		expect(mockDeleteLocalSurveyData).toHaveBeenCalledWith("session-1");
+		expect(useSurveyStore.getState().sessionId).toBeNull();
+		expect(mockDismissTo).toHaveBeenCalledWith("/(tabs)/(home)");
 	});
 
-	it("abre o sheet de abandonar a partir da zona perigosa", async () => {
+	it("cancelar no sheet de excluir dados não apaga nada", async () => {
+		const user = userEvent.setup();
+		await render(<SurveyResumeScreen />);
+
+		await user.press(screen.getByText("Solicitar exclusão dos meus dados"));
+		await user.press(screen.getByText("Cancelar"));
+
+		expect(mockDeleteLocalSurveyData).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText("Excluir meus dados da pesquisa?"),
+		).not.toBeOnTheScreen();
+	});
+
+	it("abre o sheet de abandonar e, ao confirmar, registra o abandono e volta para a home", async () => {
 		const user = userEvent.setup();
 		await render(<SurveyResumeScreen />);
 
 		await user.press(screen.getByText("Abandonar a pesquisa"));
-
 		expect(screen.getByText("Abandonar a pesquisa?")).toBeOnTheScreen();
+
+		await user.press(screen.getByText("Sim, abandonar"));
+
+		expect(mockEnqueueAbandon).toHaveBeenCalledWith(
+			"session-1",
+			expect.objectContaining({ session_id: "session-1" }),
+		);
+		expect(useSurveyStore.getState().status).toBe("ABANDONED");
+		expect(mockDismissTo).toHaveBeenCalledWith("/(tabs)/(home)");
 	});
 });

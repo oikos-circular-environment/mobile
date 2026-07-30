@@ -8,12 +8,18 @@ import {
 	CircleXIcon,
 	Trash2Icon,
 } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { SettingOptionRow } from "@/components/settings/setting-option-row";
 import { colors } from "@/components/style/colors";
-import { AbandonSurveySheet } from "@/components/survey/abandon-survey-sheet";
-import { DeleteSurveyDataSheet } from "@/components/survey/delete-survey-data-sheet";
+import {
+	AbandonSurveySheet,
+	type AbandonSurveySheetHandle,
+} from "@/components/survey/abandon-survey-sheet";
+import {
+	DeleteSurveyDataSheet,
+	type DeleteSurveyDataSheetHandle,
+} from "@/components/survey/delete-survey-data-sheet";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import {
 	SurveyInviteCard,
@@ -60,8 +66,8 @@ export default function SurveyResumeScreen() {
 	const isActive = useSurveyExecutionStore(s => s.isActive);
 	const setPaused = useSurveyExecutionStore(s => s.setPaused);
 
-	const [showDeleteSheet, setShowDeleteSheet] = useState(false);
-	const [showAbandonSheet, setShowAbandonSheet] = useState(false);
+	const deleteSheetRef = useRef<DeleteSurveyDataSheetHandle>(null);
+	const abandonSheetRef = useRef<AbandonSurveySheetHandle>(null);
 	const [participantCode, setParticipantCode] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -211,27 +217,23 @@ export default function SurveyResumeScreen() {
 						title="Solicitar exclusão dos meus dados"
 						description="Apaga permanentemente suas respostas desta pesquisa"
 						tone="danger"
-						onPress={() => setShowDeleteSheet(true)}
+						onPress={() => deleteSheetRef.current?.open()}
 					/>
 					<SettingOptionRow
 						icon={CircleXIcon}
 						title="Abandonar a pesquisa"
 						description="Você pode retomar depois de onde parou"
 						tone="danger"
-						onPress={() => setShowAbandonSheet(true)}
+						onPress={() => abandonSheetRef.current?.open()}
 					/>
 				</View>
 			</ScrollView>
 
 			<DeleteSurveyDataSheet
-				isOpen={showDeleteSheet}
-				onClose={() => setShowDeleteSheet(false)}
+				ref={deleteSheetRef}
 				participantCode={participantCode}
 			/>
-			<AbandonSurveySheet
-				isOpen={showAbandonSheet}
-				onClose={() => setShowAbandonSheet(false)}
-			/>
+			<AbandonSurveySheet ref={abandonSheetRef} />
 		</View>
 	);
 }
