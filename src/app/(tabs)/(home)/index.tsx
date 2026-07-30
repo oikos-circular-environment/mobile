@@ -13,7 +13,7 @@ import { LocationPermissionAlert } from "@/components/location-permission-alert"
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
 import { colors } from "@/components/style/colors";
 import { useSurveyInviteBanner } from "@/components/survey/hooks/use-survey-invite-banner";
-import { SurveyBanner } from "@/components/survey/survey-banner";
+import { SurveyInviteCard } from "@/components/survey/survey-invite-card";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Grid, GridItem } from "@/components/ui/grid";
@@ -137,11 +137,11 @@ export default function HomeScreen() {
 
 				{/* Convite da pesquisa de usabilidade */}
 				{surveyBanner ? (
-					<SurveyBanner
-						variant={surveyBanner.variant}
+					<SurveyInviteCard
 						title={surveyBanner.title}
-						subtitle={surveyBanner.subtitle}
-						onPress={surveyBanner.onPress}
+						description={surveyBanner.description}
+						ctaLabel={surveyBanner.ctaLabel}
+						onPressCta={surveyBanner.onPress}
 					/>
 				) : null}
 

@@ -1,25 +1,14 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
-import { UserIcon } from "lucide-react-native";
 import { SurveyInviteCard } from "@/components/survey/survey-invite-card";
 
-const stages = [
-	{ code: "S1", icon: UserIcon },
-	{ code: "S2", icon: UserIcon, current: true, currentLabel: "Atual" },
-	{ code: "S3", icon: UserIcon },
-];
-
 describe("SurveyInviteCard — componente", () => {
-	it("exibe persona, título, descrição e código do participante", async () => {
+	it("exibe título e descrição no estado novo, sem badge, grid ou etapas", async () => {
 		await render(
 			<SurveyInviteCard
-				personaLabel="Coletor(a)"
 				title="Ajude a melhorar o Oikos"
 				description="Participe de uma pesquisa rápida."
-				participantCode="PSQ-7X29-QK41"
-				stages={stages}
-				ctaLabel="Continuar"
+				ctaLabel="Participar"
 				onPressCta={jest.fn()}
-				onPressDetails={jest.fn()}
 			/>,
 		);
 
@@ -27,8 +16,36 @@ describe("SurveyInviteCard — componente", () => {
 		expect(
 			screen.getByText("Participe de uma pesquisa rápida."),
 		).toBeOnTheScreen();
+		expect(screen.getByText("Participar")).toBeOnTheScreen();
+		expect(screen.queryByText("Seu código")).not.toBeOnTheScreen();
+		expect(screen.queryByText("Seu perfil")).not.toBeOnTheScreen();
+		expect(
+			screen.queryByText("Ver detalhes da pesquisa"),
+		).not.toBeOnTheScreen();
+	});
+
+	it("exibe persona, código do participante e etapas quando informados", async () => {
+		await render(
+			<SurveyInviteCard
+				title="Continue de onde parou"
+				description="Você está na Etapa 2 de 4."
+				personaLabel="Coletor(a)"
+				participantCode="PSQ-7X29-QK41"
+				stages={[
+					{ code: "S1", status: "done" },
+					{ code: "S2", status: "current", currentLabel: "S2" },
+					{ code: "S3", status: "upcoming" },
+					{ code: "S4", status: "upcoming" },
+				]}
+				ctaLabel="Continuar"
+				onPressCta={jest.fn()}
+				onPressDetails={jest.fn()}
+			/>,
+		);
+
 		expect(screen.getByText("PSQ-7X29-QK41")).toBeOnTheScreen();
 		expect(screen.getAllByText("Coletor(a)").length).toBeGreaterThan(0);
+		expect(screen.getByText("Ver detalhes da pesquisa")).toBeOnTheScreen();
 	});
 
 	it("chama onPressCta e onPressDetails de forma independente", async () => {
@@ -37,10 +54,8 @@ describe("SurveyInviteCard — componente", () => {
 		const onPressDetails = jest.fn();
 		await render(
 			<SurveyInviteCard
-				personaLabel="Coletor(a)"
 				title="Título"
 				description="Descrição"
-				stages={stages}
 				ctaLabel="Continuar"
 				onPressCta={onPressCta}
 				onPressDetails={onPressDetails}
@@ -53,21 +68,5 @@ describe("SurveyInviteCard — componente", () => {
 
 		await user.press(screen.getByText("Continuar"));
 		expect(onPressCta).toHaveBeenCalledTimes(1);
-	});
-
-	it("não exibe o bloco de código quando não informado", async () => {
-		await render(
-			<SurveyInviteCard
-				personaLabel="Coletor(a)"
-				title="Título"
-				description="Descrição"
-				stages={stages}
-				ctaLabel="Continuar"
-				onPressCta={jest.fn()}
-				onPressDetails={jest.fn()}
-			/>,
-		);
-
-		expect(screen.queryByText("Seu código")).not.toBeOnTheScreen();
 	});
 });

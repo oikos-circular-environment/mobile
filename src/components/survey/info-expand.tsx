@@ -23,20 +23,22 @@ export function InfoExpand({
 	const [open, setOpen] = useState(defaultOpen);
 
 	return (
-		<View className={className}>
+		<View
+			className={cn("rounded-lg border border-lime-200 bg-lime-50", className)}
+		>
 			<Pressable
 				onPress={() => setOpen(current => !current)}
-				className="flex-row items-center justify-between py-2"
+				className="flex-row items-center justify-between p-3"
 			>
-				<Text size="sm" bold className="flex-1">
+				<Text size="sm" bold className="flex-1 text-lime-700">
 					{label}
 				</Text>
 				<View className={cn(open && "rotate-180")}>
-					<ChevronDownIcon size={16} color={colors.gray[400]} />
+					<ChevronDownIcon size={16} color={colors.lime[700]} />
 				</View>
 			</Pressable>
 
-			{open ? <View className="pb-2">{children}</View> : null}
+			{open ? <View className="gap-2 px-3 pb-3">{children}</View> : null}
 		</View>
 	);
 }

@@ -14,16 +14,19 @@ export function useSurveyInviteBanner() {
 		if (status === "IN_PROGRESS" || status === "ABANDONED") {
 			return {
 				variant: "resume" as const,
-				title: "Pesquisa de usabilidade",
-				subtitle: "Continue de onde parou",
+				title: "Continue de onde parou",
+				description: "Você tem uma pesquisa de usabilidade em andamento.",
+				ctaLabel: "Continuar",
 				onPress: () => router.push("/survey"),
 			};
 		}
 
 		return {
 			variant: "invite" as const,
-			title: "Pesquisa de usabilidade",
-			subtitle: "Participe e ajude a melhorar o app",
+			title: "Ajude a melhorar o Oikos",
+			description:
+				"Participe de uma pesquisa rápida enquanto usa o aplicativo normalmente.",
+			ctaLabel: "Participar",
 			onPress: () => router.push("/survey"),
 		};
 	}, [status, router]);

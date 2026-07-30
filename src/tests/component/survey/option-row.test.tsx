@@ -24,4 +24,10 @@ describe("OptionRow — componente", () => {
 
 		expect(onPress).toHaveBeenCalledTimes(1);
 	});
+
+	it("não quebra ao alternar para o estado selecionado", async () => {
+		await render(<OptionRow title="Coletor(a)" selected onPress={jest.fn()} />);
+
+		expect(screen.getByText("Coletor(a)")).toBeOnTheScreen();
+	});
 });

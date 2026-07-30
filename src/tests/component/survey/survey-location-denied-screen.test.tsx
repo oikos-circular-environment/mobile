@@ -22,11 +22,11 @@ describe("SurveyLocationDeniedScreen", () => {
 		jest.restoreAllMocks();
 	});
 
-	it("explica que sem localização não dá para participar e que nada foi registrado", async () => {
+	it("explica que sem localização não dá para continuar e que nenhum registro foi criado", async () => {
 		await render(<SurveyLocationDeniedScreen />);
 
-		expect(screen.getByText(/não é possível participar/i)).toBeOnTheScreen();
-		expect(screen.getByText(/nada foi registrado/i)).toBeOnTheScreen();
+		expect(screen.getByText(/não é possível continuar/i)).toBeOnTheScreen();
+		expect(screen.getByText(/nenhum registro foi criado/i)).toBeOnTheScreen();
 	});
 
 	it("abre as configurações do aparelho", async () => {
@@ -42,7 +42,7 @@ describe("SurveyLocationDeniedScreen", () => {
 		const user = userEvent.setup();
 		await render(<SurveyLocationDeniedScreen />);
 
-		await user.press(screen.getByText("Voltar"));
+		await user.press(screen.getByText("Voltar à tela inicial"));
 
 		expect(mockReplace).toHaveBeenCalledWith("/(tabs)/(home)");
 	});

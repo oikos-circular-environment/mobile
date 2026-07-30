@@ -16,12 +16,11 @@ export default function SurveyLocationDeniedScreen() {
 					<LocateOffIcon size={28} color={colors.red[500]} />
 				</View>
 				<Heading size="xl" className="text-center">
-					Não é possível participar
+					Sem localização, não é possível continuar
 				</Heading>
 				<Text className="text-center text-muted-foreground">
-					Sem acesso à localização não dá para completar as tarefas da pesquisa.
-					Nada foi registrado — você pode habilitar a localização nas
-					configurações do aparelho e tentar de novo quando quiser.
+					A pesquisa depende da sua localização para funcionar. Nenhum registro
+					foi criado.
 				</Text>
 			</View>
 
@@ -33,7 +32,7 @@ export default function SurveyLocationDeniedScreen() {
 					variant="outline"
 					onPress={() => router.replace("/(tabs)/(home)")}
 				>
-					<ButtonText>Voltar</ButtonText>
+					<ButtonText>Voltar à tela inicial</ButtonText>
 				</Button>
 			</View>
 		</View>

@@ -153,9 +153,7 @@ describe("HomeScreen — componente", () => {
 	it("exibe o convite da pesquisa quando não há participação iniciada", async () => {
 		await renderHome();
 
-		expect(
-			screen.getByText("Participe e ajude a melhorar o app"),
-		).toBeOnTheScreen();
+		expect(screen.getByText("Ajude a melhorar o Oikos")).toBeOnTheScreen();
 	});
 
 	it("troca o rótulo do convite para retomada quando há participação em andamento", async () => {
@@ -164,7 +162,7 @@ describe("HomeScreen — componente", () => {
 
 		expect(screen.getByText("Continue de onde parou")).toBeOnTheScreen();
 		expect(
-			screen.queryByText("Participe e ajude a melhorar o app"),
+			screen.queryByText("Ajude a melhorar o Oikos"),
 		).not.toBeOnTheScreen();
 	});
 
@@ -173,7 +171,10 @@ describe("HomeScreen — componente", () => {
 		useSurveyStore.getState().setStatus("COMPLETED");
 		await renderHome();
 
-		expect(screen.queryByText("Pesquisa de usabilidade")).not.toBeOnTheScreen();
+		expect(
+			screen.queryByText("Ajude a melhorar o Oikos"),
+		).not.toBeOnTheScreen();
+		expect(screen.queryByText("Continue de onde parou")).not.toBeOnTheScreen();
 	});
 
 	it("exibe skeleton enquanto isLoading é true", async () => {
