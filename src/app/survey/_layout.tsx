@@ -11,6 +11,7 @@ export default function SurveyStackLayout() {
 			<Stack.Screen name="persona" />
 			<Stack.Screen name="characterization" />
 			<Stack.Screen name="suite-intro" />
+			<Stack.Screen name="questionnaire" />
 		</Stack>
 	);
 }

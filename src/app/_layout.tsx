@@ -31,6 +31,8 @@ import {
 } from "@/components/app-splash-screen";
 import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
 import { Toaster } from "@/components/toast";
+import { initSurveyQueue } from "@/libs/survey/queue/network-status";
+import { useSurveyStore } from "@/stores/survey-store";
 
 export const unstable_settings = {
 	anchor: "(tabs)",
@@ -38,6 +40,7 @@ export const unstable_settings = {
 
 const queryClient = new QueryClient();
 sessionBus.subscribe(() => queryClient.resetQueries());
+initSurveyQueue(() => useSurveyStore.getState().sessionId);
 
 Observe.configure({
 	integrations: { "expo-router": true },

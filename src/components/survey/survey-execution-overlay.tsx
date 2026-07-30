@@ -124,7 +124,7 @@ export function SurveyExecutionOverlay() {
 								allTasksCompleted
 								onPause={handlePause}
 								onQuit={handleQuit}
-								onNext={() => router.push("/survey/questionnaire" as never)}
+								onNext={() => router.push("/survey/questionnaire")}
 							/>
 						) : currentTask ? (
 							<TaskCard
