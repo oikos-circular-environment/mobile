@@ -1,8 +1,7 @@
 import { useRouter } from "expo-router";
-import { ArrowLeftIcon, SearchIcon } from "lucide-react-native";
+import { SearchIcon } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, Pressable, ScrollView, View } from "react-native";
-import { colors } from "@/components/style/colors";
+import { BackHandler, ScrollView, View } from "react-native";
 import {
 	useSurveyCities,
 	useSurveyStates,
@@ -161,21 +160,11 @@ export default function SurveyCharacterizationScreen() {
 
 	return (
 		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-4">
-			<View className="flex-row items-center gap-2.5">
-				<Pressable
-					onPress={goToPreviousStep}
-					hitSlop={8}
-					accessibilityLabel="Voltar"
-				>
-					<ArrowLeftIcon size={20} color={colors.gray[900]} />
-				</Pressable>
-				<QHeader
-					categoryLabel="Caracterização"
-					currentIndex={stepIndex + 2}
-					totalCount={totalCount}
-					className="flex-1"
-				/>
-			</View>
+			<QHeader
+				categoryLabel="Caracterização"
+				currentIndex={stepIndex + 2}
+				totalCount={totalCount}
+			/>
 
 			<View className="gap-1">
 				<Heading size="xl">{question.label}</Heading>
@@ -271,10 +260,24 @@ export default function SurveyCharacterizationScreen() {
 				)}
 			</ScrollView>
 
-			<Button disabled={!canContinue || isSubmitting} onPress={goToNextStep}>
-				{isSubmitting ? <ButtonSpinner /> : null}
-				<ButtonText>Continuar</ButtonText>
-			</Button>
+			<View className="flex-row gap-3">
+				<Button
+					variant="outline"
+					className="flex-1"
+					onPress={goToPreviousStep}
+					disabled={isSubmitting}
+				>
+					<ButtonText>Voltar</ButtonText>
+				</Button>
+				<Button
+					className="flex-1"
+					disabled={!canContinue || isSubmitting}
+					onPress={goToNextStep}
+				>
+					{isSubmitting ? <ButtonSpinner /> : null}
+					<ButtonText>Avançar</ButtonText>
+				</Button>
+			</View>
 		</View>
 	);
 }

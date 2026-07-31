@@ -93,10 +93,10 @@ describe("SurveyCharacterizationScreen", () => {
 		await render(<SurveyCharacterizationScreen />);
 
 		expect(screen.getByText("Qual a sua faixa de idade?")).toBeOnTheScreen();
-		expect(screen.getByText("Continuar").parent).toBeDisabled();
+		expect(screen.getByText("Avançar").parent).toBeDisabled();
 
 		await user.press(screen.getByText("18 a 24 anos"));
-		await user.press(screen.getByText("Continuar"));
+		await user.press(screen.getByText("Avançar"));
 
 		expect(useSurveyDraftStore.getState().ageRange).toBe("AGE_18_24");
 		expect(
@@ -121,9 +121,9 @@ describe("SurveyCharacterizationScreen", () => {
 		await render(<SurveyCharacterizationScreen />);
 
 		await user.press(screen.getByText("18 a 24 anos"));
-		await user.press(screen.getByText("Continuar"));
+		await user.press(screen.getByText("Avançar"));
 		await user.press(screen.getByText("Muito avançada"));
-		await user.press(screen.getByText("Continuar"));
+		await user.press(screen.getByText("Avançar"));
 
 		expect(mockCreateSurveySession).toHaveBeenCalledTimes(1);
 		expect(mockReplace).toHaveBeenCalledWith("/survey/suite-intro");
@@ -136,12 +136,12 @@ describe("SurveyCharacterizationScreen", () => {
 		await render(<SurveyCharacterizationScreen />);
 
 		await user.press(screen.getByText("18 a 24 anos"));
-		await user.press(screen.getByText("Continuar"));
+		await user.press(screen.getByText("Avançar"));
 		expect(
 			screen.getByText("Qual a sua experiência com aplicativos?"),
 		).toBeOnTheScreen();
 
-		await user.press(screen.getByLabelText("Voltar"));
+		await user.press(screen.getByText("Voltar"));
 
 		expect(screen.getByText("Qual a sua faixa de idade?")).toBeOnTheScreen();
 		expect(mockBack).not.toHaveBeenCalled();
@@ -151,7 +151,7 @@ describe("SurveyCharacterizationScreen", () => {
 		const user = userEvent.setup();
 		await render(<SurveyCharacterizationScreen />);
 
-		await user.press(screen.getByLabelText("Voltar"));
+		await user.press(screen.getByText("Voltar"));
 
 		expect(mockBack).toHaveBeenCalledTimes(1);
 	});
@@ -162,7 +162,7 @@ describe("SurveyCharacterizationScreen", () => {
 		await render(<SurveyCharacterizationScreen />);
 
 		await user.press(screen.getByText("18 a 24 anos"));
-		await user.press(screen.getByText("Continuar"));
+		await user.press(screen.getByText("Avançar"));
 
 		const hardwareBackHandler = addEventListener.mock.calls.find(
 			([eventName]) => eventName === "hardwareBackPress",
