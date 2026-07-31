@@ -1,13 +1,22 @@
 import type { NetworkTelemetryEvent } from "@/libs/network-telemetry-bus";
 import { networkTelemetryBus } from "@/libs/network-telemetry-bus";
 
+/**
+ * `true` — o parâmetro precisa estar presente, com qualquer valor.
+ * `string` — o parâmetro precisa ter exatamente esse valor.
+ * `{ not: string }` — precisa estar presente com um valor diferente do informado.
+ * Existe para filtros sempre enviados na query com um valor padrão (como o raio de
+ * busca) — `true` casaria já na primeira carga, sem o participante ter alterado nada.
+ */
+export type QueryMatcher = string | true | { not: string };
+
 export type SuccessSignal =
 	| {
 			kind: "api";
 			method: string;
 			path_pattern: string;
 			status: number;
-			query?: Record<string, string | true>;
+			query?: Record<string, QueryMatcher>;
 	  }
 	| { kind: "screen"; route: string };
 
@@ -38,13 +47,16 @@ function pathMatchesPattern(path: string, pattern: string): boolean {
 }
 
 function queryMatches(
-	expected: Record<string, string | true> | undefined,
+	expected: Record<string, QueryMatcher> | undefined,
 	actual: Record<string, string> | undefined,
 ): boolean {
 	if (!expected) return true;
 	return Object.entries(expected).every(([key, value]) => {
 		const actualValue = actual?.[key];
 		if (value === true) return actualValue !== undefined;
+		if (typeof value === "object") {
+			return actualValue !== undefined && actualValue !== value.not;
+		}
 		return actualValue === value;
 	});
 }

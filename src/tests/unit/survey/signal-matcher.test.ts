@@ -163,6 +163,42 @@ describe("createTaskSignalWatcher", () => {
 		watcher.dispose();
 	});
 
+	it("casa query com { not }: exige presente e diferente do valor padrão", () => {
+		const onComplete = jest.fn();
+		const watcher = createTaskSignalWatcher(
+			{
+				mode: "any",
+				signals: [
+					{
+						kind: "api",
+						method: "GET",
+						path_pattern: "/v1/market",
+						status: 200,
+						query: { radius: { not: "2000" } },
+					},
+				],
+			},
+			onComplete,
+		);
+
+		networkTelemetryBus.emit({
+			method: "GET",
+			path: "/v1/market",
+			status: 200,
+			query: { radius: "2000" },
+		});
+		expect(onComplete).not.toHaveBeenCalled();
+
+		networkTelemetryBus.emit({
+			method: "GET",
+			path: "/v1/market",
+			status: 200,
+			query: { radius: "5000" },
+		});
+		expect(onComplete).toHaveBeenCalledTimes(1);
+		watcher.dispose();
+	});
+
 	it("casa sinal de chegada de tela (screen)", () => {
 		const onComplete = jest.fn();
 		const watcher = createTaskSignalWatcher(
