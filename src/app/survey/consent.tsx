@@ -59,9 +59,10 @@ export default function SurveyConsentScreen() {
 
 		if (isAuthenticated) {
 			signOut();
+			router.replace("/survey/consent-ended");
+		} else {
+			router.replace("/survey/persona");
 		}
-
-		router.replace("/survey/consent-ended");
 	};
 
 	const handleRefuse = () => {

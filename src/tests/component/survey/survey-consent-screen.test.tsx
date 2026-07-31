@@ -59,6 +59,18 @@ describe("SurveyConsentScreen", () => {
 		expect(mockReplace).toHaveBeenCalledWith("/survey/consent-ended");
 	});
 
+	it("deslogado, aceitar vai direto pro persona sem tela de sessão encerrada", async () => {
+		const user = userEvent.setup();
+		await render(<SurveyConsentScreen />);
+
+		await scrollToEnd(user);
+		await user.press(screen.getByText("Li e aceito"));
+
+		expect(mockSignOut).not.toHaveBeenCalled();
+		expect(useSurveyStore.getState().consentVersion).not.toBeNull();
+		expect(mockReplace).toHaveBeenCalledWith("/survey/persona");
+	});
+
 	it("recusar volta para a home sem registrar nada", async () => {
 		const user = userEvent.setup();
 		await render(<SurveyConsentScreen />);
