@@ -4,7 +4,7 @@ import BottomSheet, {
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { CheckIcon } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useMarket } from "@/contexts/market-context";
@@ -55,7 +55,6 @@ function RadiusOption({
 
 export function RadiusBottomSheet() {
 	const { appliedFilters, setAppliedFilters, radiusSheetRef } = useMarket();
-	const [localRadius, setLocalRadius] = useState(appliedFilters.radius);
 
 	const backdropComponent = useCallback(
 		(props: BottomSheetBackdropProps) => (
@@ -83,9 +82,8 @@ export function RadiusBottomSheet() {
 							key={option.value}
 							value={option.value}
 							label={option.label}
-							isSelected={localRadius === option.value}
+							isSelected={appliedFilters.radius === option.value}
 							onSelect={value => {
-								setLocalRadius(value);
 								setAppliedFilters({
 									...appliedFilters,
 									radius: value,

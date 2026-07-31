@@ -74,7 +74,13 @@ export function MarketListHeader() {
 	});
 
 	const categoryValue = watch("category");
-	const onSubmit = handleSubmit(values => setAppliedFilters(values));
+	// Só o texto da busca vem do form — raio e categoria já são aplicados
+	// direto pelos próprios controles (bottom sheet / botões), então merge
+	// aqui em vez de substituir `appliedFilters` inteiro evita que o `radius`
+	// parado nos `defaultValues` do form volte a sobrescrever o valor atual.
+	const onSubmit = handleSubmit(values =>
+		setAppliedFilters({ ...appliedFilters, query: values.query }),
+	);
 
 	return (
 		<View className="gap-4 pt-2 pb-2">
