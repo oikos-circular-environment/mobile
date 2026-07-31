@@ -1,4 +1,5 @@
-import { render, screen, userEvent } from "@testing-library/react-native";
+import { act, render, screen, userEvent } from "@testing-library/react-native";
+import { BackHandler } from "react-native";
 import SurveyCharacterizationScreen from "@/app/survey/characterization";
 import {
 	useSurveyCities,
@@ -9,10 +10,11 @@ import { useSurveyDraftStore } from "@/stores/survey-draft-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
 const mockReplace = jest.fn();
+const mockBack = jest.fn();
 const mockCreateSurveySession = jest.fn().mockResolvedValue("session-1");
 
 jest.mock("expo-router", () => ({
-	useRouter: () => ({ replace: mockReplace }),
+	useRouter: () => ({ replace: mockReplace, back: mockBack }),
 }));
 
 jest.mock("@/components/survey/hooks/use-survey-protocol");
@@ -65,6 +67,7 @@ describe("SurveyCharacterizationScreen", () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
 		mockReplace.mockClear();
+		mockBack.mockClear();
 		mockCreateSurveySession.mockClear();
 		useSurveyDraftStore.getState().reset();
 		useSurveyStore.getState().reset();
@@ -126,5 +129,59 @@ describe("SurveyCharacterizationScreen", () => {
 		expect(mockReplace).toHaveBeenCalledWith("/survey/suite-intro");
 		expect(useSurveyStore.getState().sessionId).toBe("session-1");
 		expect(useSurveyDraftStore.getState().persona).toBeNull();
+	});
+
+	it("o botão de voltar retorna pra pergunta anterior, sem resetar pra primeira", async () => {
+		const user = userEvent.setup();
+		await render(<SurveyCharacterizationScreen />);
+
+		await user.press(screen.getByText("18 a 24 anos"));
+		await user.press(screen.getByText("Continuar"));
+		expect(
+			screen.getByText("Qual a sua experiência com aplicativos?"),
+		).toBeOnTheScreen();
+
+		await user.press(screen.getByLabelText("Voltar"));
+
+		expect(screen.getByText("Qual a sua faixa de idade?")).toBeOnTheScreen();
+		expect(mockBack).not.toHaveBeenCalled();
+	});
+
+	it("voltar na primeira pergunta sai da tela em vez de ficar preso nela", async () => {
+		const user = userEvent.setup();
+		await render(<SurveyCharacterizationScreen />);
+
+		await user.press(screen.getByLabelText("Voltar"));
+
+		expect(mockBack).toHaveBeenCalledTimes(1);
+	});
+
+	it("o botão físico de voltar (Android) segue a mesma regra do botão de voltar", async () => {
+		const addEventListener = jest.spyOn(BackHandler, "addEventListener");
+		const user = userEvent.setup();
+		await render(<SurveyCharacterizationScreen />);
+
+		await user.press(screen.getByText("18 a 24 anos"));
+		await user.press(screen.getByText("Continuar"));
+
+		const hardwareBackHandler = addEventListener.mock.calls.find(
+			([eventName]) => eventName === "hardwareBackPress",
+		)?.[1] as () => boolean;
+
+		await act(async () => {
+			hardwareBackHandler();
+			await Promise.resolve();
+		});
+
+		expect(screen.getByText("Qual a sua faixa de idade?")).toBeOnTheScreen();
+		expect(mockBack).not.toHaveBeenCalled();
+
+		await act(async () => {
+			hardwareBackHandler();
+			await Promise.resolve();
+		});
+		expect(mockBack).toHaveBeenCalledTimes(1);
+
+		addEventListener.mockRestore();
 	});
 });

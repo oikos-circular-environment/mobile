@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
-import { SearchIcon } from "lucide-react-native";
-import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ArrowLeftIcon, SearchIcon } from "lucide-react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { BackHandler, Pressable, ScrollView, View } from "react-native";
+import { colors } from "@/components/style/colors";
 import {
 	useSurveyCities,
 	useSurveyStates,
@@ -45,6 +46,32 @@ export default function SurveyCharacterizationScreen() {
 	const [stepIndex, setStepIndex] = useState(0);
 	const [search, setSearch] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const stepIndexRef = useRef(stepIndex);
+	useEffect(() => {
+		stepIndexRef.current = stepIndex;
+	}, [stepIndex]);
+
+	const goToPreviousStep = () => {
+		if (stepIndexRef.current > 0) {
+			setStepIndex(current => current - 1);
+			setSearch("");
+			return;
+		}
+		router.back();
+	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: assina uma única vez — lê stepIndex sempre atual via ref, não precisa recriar a assinatura
+	useEffect(() => {
+		const subscription = BackHandler.addEventListener(
+			"hardwareBackPress",
+			() => {
+				goToPreviousStep();
+				return true;
+			},
+		);
+		return () => subscription.remove();
+	}, []);
 
 	const screenerQuestions = useMemo(
 		() =>
@@ -134,11 +161,21 @@ export default function SurveyCharacterizationScreen() {
 
 	return (
 		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-4">
-			<QHeader
-				categoryLabel="Caracterização"
-				currentIndex={stepIndex + 2}
-				totalCount={totalCount}
-			/>
+			<View className="flex-row items-center gap-2.5">
+				<Pressable
+					onPress={goToPreviousStep}
+					hitSlop={8}
+					accessibilityLabel="Voltar"
+				>
+					<ArrowLeftIcon size={20} color={colors.gray[900]} />
+				</Pressable>
+				<QHeader
+					categoryLabel="Caracterização"
+					currentIndex={stepIndex + 2}
+					totalCount={totalCount}
+					className="flex-1"
+				/>
+			</View>
 
 			<View className="gap-1">
 				<Heading size="xl">{question.label}</Heading>
