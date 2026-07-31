@@ -108,11 +108,21 @@ function emitNetworkTelemetry(
 	status: number,
 ) {
 	if (!config?.url) return;
+
+	// O SDK gerado embute baseURL + querystring na própria `config.url` (sem usar
+	// `config.params`), então extraímos pathname e query de volta a partir dela —
+	// caso contrário sinais `kind: "api"` nunca casam com `path_pattern`.
+	const url = new URL(config.url, baseURL ?? "http://localhost");
+	const query: Record<string, string> = {};
+	url.searchParams.forEach((value, key) => {
+		query[key] = value;
+	});
+
 	networkTelemetryBus.emit({
 		method: (config.method ?? "get").toUpperCase(),
-		path: config.url,
+		path: url.pathname,
 		status,
-		query: config.params,
+		query,
 	});
 }
 
