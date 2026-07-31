@@ -205,7 +205,7 @@ export const ChangePasswordBottomSheet = forwardRef<
 					</FormControl>
 				))}
 
-				<Button size="lg" onPress={onSubmit} isDisabled={isChangingPassword}>
+				<Button onPress={onSubmit} isDisabled={isChangingPassword}>
 					<ButtonText>Salvar nova senha</ButtonText>
 					{isChangingPassword && <ButtonSpinner />}
 				</Button>

@@ -76,7 +76,7 @@ export function ComplaintsListBottomSheet({
 	return (
 		<BottomSheet
 			ref={ref}
-			index={1}
+			index={0}
 			snapPoints={snapPoints}
 			enablePanDownToClose={false}
 			handleIndicatorStyle={{ backgroundColor: "#d1d5db", width: 40 }}

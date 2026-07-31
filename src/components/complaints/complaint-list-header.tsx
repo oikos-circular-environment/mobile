@@ -50,7 +50,7 @@ export function ComplaintListHeader() {
 				</Card>
 
 				<HStack className="gap-2">
-					<Button size="lg" className="flex-1" onPress={handleNewComplaint}>
+					<Button className="flex-1" onPress={handleNewComplaint}>
 						<ButtonIcon as={CameraIcon} className="text-white" />
 						<ButtonText className="text-center font-semibold text-white">
 							Nova Denúncia{" "}

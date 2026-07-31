@@ -89,6 +89,17 @@
                         "XvhF2": {
                           "enabled": false
                         },
+                        "MFpb2": {
+                          "flipX": false,
+                          "flipY": false,
+                          "width": "fill_container",
+                          "height": "fit_content",
+                          "x": 20,
+                          "y": 130
+                        },
+                        "E60w6": {
+                          "width": "fill_container"
+                        },
                         "E60w6/9:Tr3Fv": {
                           "content": "Participar"
                         }
@@ -346,6 +357,9 @@
                         },
                         "ZKyG8": {
                           "content": "Você está na Etapa 2 de 4."
+                        },
+                        "E60w6": {
+                          "width": "fill_container"
                         },
                         "E60w6/9:Tr3Fv": {
                           "content": "Continuar"
@@ -10576,6 +10590,7 @@
           "id": "Ks93M",
           "name": "Home Flow",
           "context": "Tab Home — src/app/(tabs)/(home)/. Tela inicial do app, exibida após login (initialRouteName). Banner de boas-vindas (guest) + seção Serviços com atalhos para Pontos de Coleta e Denúncias.",
+          "width": 2546,
           "gap": 96,
           "children": [
             {
@@ -10624,24 +10639,7 @@
                     12
                   ],
                   "justifyContent": "end",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "rectangle",
-                      "id": "Nmjvx",
-                      "x": 125,
-                      "y": 0,
-                      "enabled": false,
-                      "fill": {
-                        "type": "image",
-                        "enabled": true,
-                        "url": "nature-square.png",
-                        "mode": "fill"
-                      },
-                      "width": 304,
-                      "height": 297
-                    }
-                  ]
+                  "alignItems": "center"
                 },
                 {
                   "id": "y1dNxW",
@@ -10710,9 +10708,10 @@
                               "content": "OIKOS",
                               "textAlign": "center",
                               "textAlignVertical": "middle",
-                              "fontFamily": "Darker Grotesque",
-                              "fontSize": 148,
-                              "fontWeight": "900"
+                              "fontFamily": "Oswald",
+                              "fontSize": 142,
+                              "fontWeight": "900",
+                              "letterSpacing": 10
                             }
                           ]
                         },
@@ -10902,6 +10901,7 @@
                               "x": 134,
                               "y": 96,
                               "name": "TranslucendCard",
+                              "enabled": false,
                               "width": 76,
                               "height": 22,
                               "fill": "#FFFFFF40",
@@ -11075,7 +11075,14 @@
                               "type": "ref",
                               "ref": "K5bw8c",
                               "name": "Pontos de Coleta",
-                              "width": "fill_container"
+                              "width": "fill_container",
+                              "descendants": {
+                                "X6iTyx": {
+                                  "x": 172,
+                                  "y": -8,
+                                  "enabled": false
+                                }
+                              }
                             },
                             {
                               "id": "lck9c",
@@ -11084,6 +11091,11 @@
                               "name": "Denúncias",
                               "width": "fill_container",
                               "descendants": {
+                                "X6iTyx": {
+                                  "x": 174,
+                                  "y": -9,
+                                  "enabled": false
+                                },
                                 "P8Zxks": {
                                   "icon": "shield"
                                 },
@@ -11119,6 +11131,10 @@
                                   "x": 0,
                                   "y": 0,
                                   "descendants": {
+                                    "X6iTyx": {
+                                      "x": 173,
+                                      "y": -9
+                                    },
                                     "P8Zxks": {
                                       "icon": "building",
                                       "library": "lucide"
@@ -11258,7 +11274,7 @@
                           "width": "fill_container",
                           "height": 52,
                           "fill": "#FFFFFF40",
-                          "cornerRadius": 4,
+                          "cornerRadius": 8,
                           "stroke": "#FFFFFF66",
                           "strokeWidth": 0.5,
                           "strokeAlignment": "inner",
@@ -11284,7 +11300,7 @@
                           "children": [
                             {
                               "type": "rectangle",
-                              "cornerRadius": 4,
+                              "cornerRadius": 8,
                               "id": "Cl6yz",
                               "name": "Avatar",
                               "metadata": {
@@ -11340,7 +11356,7 @@
                               "width": 36,
                               "height": "fill_container",
                               "fill": "#ffffff66",
-                              "cornerRadius": 4,
+                              "cornerRadius": 8,
                               "justifyContent": "center",
                               "alignItems": "center",
                               "children": [
@@ -11370,20 +11386,17 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "Bm5ks",
-                          "layoutPosition": "absolute",
-                          "x": -20,
-                          "y": -20,
+                          "id": "raAue",
                           "name": "Oikos",
-                          "width": 429,
-                          "height": 106,
+                          "width": "fill_container",
+                          "height": 241,
                           "layout": "vertical",
                           "gap": 12,
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "S1oxy",
+                              "id": "ThJ06",
                               "layoutPosition": "absolute",
                               "x": 0,
                               "y": 12,
@@ -11404,9 +11417,10 @@
                               "content": "OIKOS",
                               "textAlign": "center",
                               "textAlignVertical": "middle",
-                              "fontFamily": "Darker Grotesque",
-                              "fontSize": 148,
-                              "fontWeight": "900"
+                              "fontFamily": "Oswald",
+                              "fontSize": 142,
+                              "fontWeight": "900",
+                              "letterSpacing": 10
                             }
                           ]
                         },
@@ -11472,7 +11486,6 @@
                               "x": 17,
                               "y": 133,
                               "name": "TranslucendCard",
-                              "enabled": false,
                               "width": 76,
                               "height": 22,
                               "fill": "#FFFFFF40",
@@ -11534,7 +11547,6 @@
                               "x": 135,
                               "y": 175,
                               "name": "TranslucendCard",
-                              "enabled": false,
                               "width": 76,
                               "height": 22,
                               "fill": "#FFFFFF40",
@@ -11658,7 +11670,7 @@
                           "id": "g0BkML",
                           "layoutPosition": "absolute",
                           "x": 0,
-                          "y": 102,
+                          "y": 118,
                           "name": "Resume/Session",
                           "width": 228,
                           "height": 106,
@@ -11970,7 +11982,8 @@
                   "type": "ref",
                   "ref": "fnnKk",
                   "name": "TabBar",
-                  "width": "fill_container"
+                  "width": "fill_container(430)",
+                  "enabled": false
                 }
               ]
             },
@@ -12717,21 +12730,406 @@
                               "type": "frame",
                               "id": "p1OYG",
                               "name": "Carousel",
-                              "width": "fill_container",
-                              "height": "fill_container",
-                              "padding": [
-                                0,
-                                0,
-                                24,
-                                0
-                              ],
+                              "clip": true,
+                              "width": 1114,
+                              "height": 357,
+                              "gap": 16,
+                              "justifyContent": "center",
+                              "alignItems": "center",
                               "children": [
                                 {
                                   "type": "frame",
                                   "id": "Jtqpe",
-                                  "name": "Frame 47",
-                                  "width": "fill_container",
-                                  "height": "fill_container",
+                                  "name": "Carousel",
+                                  "clip": true,
+                                  "width": 360,
+                                  "height": 360,
+                                  "fill": {
+                                    "type": "gradient",
+                                    "gradientType": "linear",
+                                    "enabled": true,
+                                    "rotation": 32.463656347249504,
+                                    "size": {
+                                      "height": 1.046222925432419
+                                    },
+                                    "colors": [
+                                      {
+                                        "color": "#000000",
+                                        "position": 0
+                                      },
+                                      {
+                                        "color": "#e3d9aa",
+                                        "position": 1
+                                      }
+                                    ],
+                                    "center": {
+                                      "x": 0.3574141343881081,
+                                      "y": 0.5117657968014495
+                                    }
+                                  },
+                                  "cornerRadius": 16,
+                                  "padding": 32,
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "ZfqIG",
+                                      "name": "Header",
+                                      "width": "fill_container",
+                                      "height": "fill_container",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "frame",
+                                          "id": "qaYSZ",
+                                          "name": "Frame 46",
+                                          "width": "fill_container",
+                                          "height": "fill_container",
+                                          "layout": "vertical",
+                                          "children": [
+                                            {
+                                              "type": "frame",
+                                              "id": "N0mCwx",
+                                              "name": "Oikos",
+                                              "width": "fill_container",
+                                              "layout": "vertical",
+                                              "gap": 12,
+                                              "children": [
+                                                {
+                                                  "type": "text",
+                                                  "id": "k4rG2",
+                                                  "fill": "#ffffffff",
+                                                  "effect": {
+                                                    "type": "shadow",
+                                                    "shadowType": "outer",
+                                                    "color": "#0000002e",
+                                                    "offset": {
+                                                      "x": 0,
+                                                      "y": 4
+                                                    },
+                                                    "blur": 24
+                                                  },
+                                                  "textGrowth": "fixed-width-height",
+                                                  "width": "fill_container",
+                                                  "height": 40,
+                                                  "content": "Pontos de Coleta",
+                                                  "fontFamily": "Darker Grotesque",
+                                                  "fontSize": 32,
+                                                  "fontWeight": "900"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "frame",
+                                              "id": "pzmEf",
+                                              "name": "Resume/Session",
+                                              "width": "fill_container",
+                                              "layout": "vertical",
+                                              "gap": 8,
+                                              "justifyContent": "space_between",
+                                              "children": [
+                                                {
+                                                  "type": "frame",
+                                                  "id": "ioIf1",
+                                                  "name": "Frame 45",
+                                                  "width": "fill_container",
+                                                  "children": [
+                                                    {
+                                                      "type": "text",
+                                                      "id": "g0bvC",
+                                                      "fill": "$9:--background",
+                                                      "textGrowth": "fixed-width",
+                                                      "width": "fill_container",
+                                                      "content": "Denuncie ocorrências ambientais com foto e localização, vote com a comunidade e encontre empresas de reciclagem perto de você.",
+                                                      "fontFamily": "Space Grotesk",
+                                                      "fontSize": 10,
+                                                      "fontWeight": "300"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "group",
+                                      "id": "whmOU",
+                                      "layoutPosition": "absolute",
+                                      "x": 8.098654708520371,
+                                      "y": -102.77251304109086,
+                                      "name": "Nature",
+                                      "children": [
+                                        {
+                                          "type": "rectangle",
+                                          "id": "u9bcW",
+                                          "layoutPosition": "absolute",
+                                          "x": 323.304309356713,
+                                          "y": 304.62883317376077,
+                                          "enabled": false,
+                                          "flipX": true,
+                                          "fill": {
+                                            "type": "image",
+                                            "opacity": 0.69,
+                                            "enabled": true,
+                                            "url": "cloud-2-removebg-preview.png",
+                                            "mode": "fill"
+                                          },
+                                          "width": 217.4606366506465,
+                                          "height": 122.61789511396668
+                                        },
+                                        {
+                                          "type": "rectangle",
+                                          "id": "eqG7H",
+                                          "layoutPosition": "absolute",
+                                          "x": 0,
+                                          "y": 0,
+                                          "enabled": false,
+                                          "fill": {
+                                            "type": "image",
+                                            "enabled": true,
+                                            "url": "nature-square-removebg-preview.png",
+                                            "mode": "fill"
+                                          },
+                                          "width": 429.1479820627802,
+                                          "height": 427.2467282877277
+                                        },
+                                        {
+                                          "type": "rectangle",
+                                          "id": "KABqT",
+                                          "x": 351.90134529147963,
+                                          "y": 254.92388121167755,
+                                          "flipX": true,
+                                          "fill": {
+                                            "type": "image",
+                                            "enabled": true,
+                                            "url": "Gemini_Generated_Image_a3pmya3pmya3pmya.png",
+                                            "mode": "fill"
+                                          },
+                                          "width": 286.09865470852014,
+                                          "height": 242.10647936304574
+                                        },
+                                        {
+                                          "type": "rectangle",
+                                          "id": "jWCBG",
+                                          "layoutPosition": "absolute",
+                                          "x": 111.61696394457931,
+                                          "y": 314.20835622953973,
+                                          "enabled": false,
+                                          "fill": {
+                                            "type": "image",
+                                            "opacity": 0.69,
+                                            "enabled": true,
+                                            "url": "cloud-2-removebg-preview.png",
+                                            "mode": "fill"
+                                          },
+                                          "width": 219.38506706348406,
+                                          "height": 124.53379972512244
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "FJdk0",
+                                          "x": 32.71531701823869,
+                                          "y": 254.81531328371193,
+                                          "name": "TranslucendCard",
+                                          "enabled": false,
+                                          "width": 146.25671137565607,
+                                          "height": 42.14990144542605,
+                                          "fill": "#FFFFFF40",
+                                          "cornerRadius": 4,
+                                          "stroke": "#FFFFFF66",
+                                          "strokeWidth": 0.5,
+                                          "strokeAlignment": "inner",
+                                          "effect": [
+                                            {
+                                              "type": "background_blur",
+                                              "radius": 24
+                                            },
+                                            {
+                                              "type": "shadow",
+                                              "shadowType": "outer",
+                                              "color": "#00000026",
+                                              "offset": {
+                                                "x": 0,
+                                                "y": 8
+                                              },
+                                              "blur": 24
+                                            }
+                                          ],
+                                          "gap": 4,
+                                          "padding": [
+                                            3,
+                                            8
+                                          ],
+                                          "justifyContent": "center",
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "icon",
+                                              "id": "sNRZK",
+                                              "name": "Icon",
+                                              "width": 12,
+                                              "height": 12,
+                                              "icon": "repeat",
+                                              "library": "lucide",
+                                              "fill": "$9:--accent"
+                                            },
+                                            {
+                                              "type": "text",
+                                              "id": "Tbb55",
+                                              "name": "Address",
+                                              "fill": "$9:--accent",
+                                              "content": "Reuse",
+                                              "textAlign": "center",
+                                              "textAlignVertical": "middle",
+                                              "fontFamily": "$font-body",
+                                              "fontSize": 10,
+                                              "fontWeight": "normal"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "p3wfZj",
+                                          "x": 32.90134529147963,
+                                          "y": 217.8958314267411,
+                                          "name": "TranslucendCard",
+                                          "width": 146.25671137565607,
+                                          "height": 42.14990144542605,
+                                          "fill": "#FFFFFF40",
+                                          "cornerRadius": 4,
+                                          "stroke": "#FFFFFF66",
+                                          "strokeWidth": 0.5,
+                                          "strokeAlignment": "inner",
+                                          "effect": [
+                                            {
+                                              "type": "background_blur",
+                                              "radius": 24
+                                            },
+                                            {
+                                              "type": "shadow",
+                                              "shadowType": "outer",
+                                              "color": "#00000026",
+                                              "offset": {
+                                                "x": 0,
+                                                "y": 8
+                                              },
+                                              "blur": 24
+                                            }
+                                          ],
+                                          "gap": 4,
+                                          "padding": [
+                                            3,
+                                            8
+                                          ],
+                                          "justifyContent": "center",
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "icon",
+                                              "id": "I49YkU",
+                                              "name": "Icon",
+                                              "width": 12,
+                                              "height": 12,
+                                              "icon": "recycle",
+                                              "library": "lucide",
+                                              "fill": "$9:--accent"
+                                            },
+                                            {
+                                              "type": "text",
+                                              "id": "CwTpc",
+                                              "name": "Address",
+                                              "fill": "$9:--accent",
+                                              "content": "Recicle",
+                                              "textAlign": "center",
+                                              "textAlignVertical": "middle",
+                                              "fontFamily": "$font-body",
+                                              "fontSize": 10,
+                                              "fontWeight": "normal"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "Q3lvX6",
+                                          "x": 257.8736753202352,
+                                          "y": 183.92684267094978,
+                                          "name": "TranslucendCard",
+                                          "enabled": false,
+                                          "width": 146.25671137565607,
+                                          "height": 42.14990144542605,
+                                          "fill": "#FFFFFF40",
+                                          "cornerRadius": 4,
+                                          "stroke": "#FFFFFF66",
+                                          "strokeWidth": 0.5,
+                                          "strokeAlignment": "inner",
+                                          "effect": [
+                                            {
+                                              "type": "background_blur",
+                                              "radius": 24
+                                            },
+                                            {
+                                              "type": "shadow",
+                                              "shadowType": "outer",
+                                              "color": "#00000026",
+                                              "offset": {
+                                                "x": 0,
+                                                "y": 8
+                                              },
+                                              "blur": 24
+                                            }
+                                          ],
+                                          "gap": 4,
+                                          "padding": [
+                                            3,
+                                            8
+                                          ],
+                                          "justifyContent": "center",
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "icon",
+                                              "id": "Ln3ht",
+                                              "name": "Icon",
+                                              "width": 12,
+                                              "height": 12,
+                                              "icon": "trending-down",
+                                              "library": "lucide",
+                                              "fill": "$9:--accent"
+                                            },
+                                            {
+                                              "type": "text",
+                                              "id": "lJ4m1",
+                                              "name": "Address",
+                                              "fill": "$9:--accent",
+                                              "content": "Reduze",
+                                              "textAlign": "center",
+                                              "textAlignVertical": "middle",
+                                              "fontFamily": "$font-body",
+                                              "fontSize": 10,
+                                              "fontWeight": "normal"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "gnqpc",
+                                  "name": "Carousel",
+                                  "width": 360,
+                                  "height": 360,
+                                  "fill": "#d9d9d9ff",
+                                  "cornerRadius": 16
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "vwb9h",
+                                  "name": "Carousel",
+                                  "width": 360,
+                                  "height": 360,
                                   "fill": "#d9d9d9ff",
                                   "cornerRadius": 16
                                 }
@@ -34537,10 +34935,33 @@
               "stroke": "$border",
               "strokeWidth": 1,
               "strokeAlignment": "inner",
-              "layout": "vertical",
-              "gap": "$spacing-3",
+              "gap": 16,
               "padding": "$spacing-4",
+              "alignItems": "center",
               "children": [
+                {
+                  "type": "frame",
+                  "id": "X6iTyx",
+                  "layoutPosition": "absolute",
+                  "x": 315,
+                  "y": -9,
+                  "name": "Badge",
+                  "fill": "$primary",
+                  "cornerRadius": 8,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "wcV2J",
+                      "name": "Icon",
+                      "width": 12,
+                      "height": 12,
+                      "icon": "key",
+                      "library": "lucide",
+                      "fill": "#ffffff"
+                    }
+                  ]
+                },
                 {
                   "type": "frame",
                   "id": "MUdUv",
@@ -34839,7 +35260,7 @@
                   "width": "fill_container",
                   "height": 38,
                   "fill": "#3e611152",
-                  "cornerRadius": "$radius-full",
+                  "cornerRadius": 8,
                   "stroke": "#3e611117",
                   "strokeWidth": 0.5,
                   "strokeAlignment": "inner",
@@ -34869,7 +35290,7 @@
                       "width": 32,
                       "height": "fill_container",
                       "fill": "#ffffff7d",
-                      "cornerRadius": "$radius-full",
+                      "cornerRadius": 8,
                       "stroke": "#ffffff36",
                       "strokeWidth": 0.5,
                       "strokeAlignment": "inner",

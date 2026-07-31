@@ -195,11 +195,7 @@ export default function SignInScreen() {
 						Esqueceu a senha?
 					</Text> */}
 
-					<Button
-						size="lg"
-						onPress={handleSubmit(onSubmit)}
-						isDisabled={isLoading}
-					>
+					<Button onPress={handleSubmit(onSubmit)} isDisabled={isLoading}>
 						<ButtonText>Entrar</ButtonText>
 						{isLoading && <ButtonSpinner />}
 					</Button>

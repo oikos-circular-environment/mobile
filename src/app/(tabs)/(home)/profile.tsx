@@ -541,9 +541,17 @@ export default function ProfileScreen() {
 													testID="input-phone"
 													value={value}
 													onBlur={onBlur}
-													onChangeText={text => onChange(mask.phoneBr(text))}
+													onChangeText={text => {
+														const prevDigits = (value ?? "").replace(/\D/g, "");
+														const nextDigits = text.replace(/\D/g, "");
+														onChange(
+															nextDigits.length < prevDigits.length
+																? text
+																: mask.phoneBr(text),
+														);
+													}}
 													keyboardType="phone-pad"
-													maxLength={15}
+													maxLength={16}
 													placeholder="(11) 9 9999-9999"
 												/>
 											</Input>
@@ -782,7 +790,7 @@ export default function ProfileScreen() {
 														}}
 													>
 														<SelectTrigger
-															size="sm"
+															size="xl"
 															className={cn(
 																"justify-between",
 																Platform.OS === "android" ? "px-3" : "pr-3",
@@ -890,7 +898,7 @@ export default function ProfileScreen() {
 													}}
 												>
 													<SelectTrigger
-														size="sm"
+														size="xl"
 														className={cn(
 															"justify-between",
 															Platform.OS === "android" ? "px-3" : "pr-3",

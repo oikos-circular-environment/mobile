@@ -37,8 +37,8 @@ export function HomeHero({
 
 	const wordmarkSize = Math.round(width * 0.235);
 	const wordmarkLineHeight = Math.round(wordmarkSize * 0.92);
-	const treeSize = Math.round(wordmarkSize * 2);
-	const wordmarkRowHeight = Math.round(wordmarkLineHeight + treeSize * 0.55);
+	const treeSize = Math.round(wordmarkSize * 2.6);
+	const wordmarkRowHeight = Math.round(wordmarkLineHeight + treeSize * 0.7);
 
 	return (
 		<View className="overflow-hidden">
@@ -47,7 +47,7 @@ export function HomeHero({
 				style={StyleSheet.absoluteFill}
 			/>
 
-			<View style={{ paddingTop: insets.top + 16 }} className="gap-5 px-4 pb-6">
+			<View style={{ paddingTop: 16 }} className="gap-5 px-6 pb-6">
 				{isLoading ? (
 					<HomeHeaderSkeleton />
 				) : isAuthenticated ? (
@@ -59,21 +59,28 @@ export function HomeHero({
 						numberOfLines={1}
 						style={{
 							fontFamily: "Oswald_700Bold",
-							fontSize: 158,
+							fontSize: 156,
 							lineHeight: 180,
-							letterSpacing: 7,
+							letterSpacing: 4,
 						}}
 						className="text-white"
 					>
 						OIKOS
 					</Text>
 
+					<View style={{ width: 200 }}>
+						<Text className="text-sm leading-5 text-gray-600">
+							Denuncie ocorrências ambientais com foto e localização, vote com a
+							comunidade e encontre empresas de reciclagem perto de você.
+						</Text>
+					</View>
+
 					<Image
 						source={NatureImage}
 						style={{
 							position: "absolute",
 							top: Math.round(wordmarkLineHeight * 0.4),
-							right: -Math.round(treeSize * 0.02),
+							right: -Math.round(treeSize * 0.15),
 							width: treeSize,
 							height: treeSize,
 						}}
@@ -89,11 +96,6 @@ export function HomeHero({
 						}}
 					/>
 				</View>
-
-				<Text className="text-sm leading-5 text-gray-600">
-					Denuncie ocorrências ambientais com foto e localização, vote com a
-					comunidade e encontre empresas de reciclagem perto de você.
-				</Text>
 
 				{!isLoading && !isAuthenticated ? (
 					<SlideToLoginButton onComplete={onPressLogin} />

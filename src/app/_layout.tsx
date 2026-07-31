@@ -54,13 +54,17 @@ type SplashStage = "video" | "handoff" | "app";
 const REVEAL_LINGER_MS = 120;
 const REVEAL_FADE_MS = 500;
 
+const isDevelopmentMode = process.env.NODE_ENV === "development";
+
 function RootLayout() {
 	const [loaded, error] = useFonts({
 		Oswald_700Bold,
 		SpaceGrotesk_400Regular,
 	});
 	const { markInteractive } = useObserve();
-	const [stage, setStage] = useState<SplashStage>("video");
+	const [stage, setStage] = useState<SplashStage>(
+		isDevelopmentMode ? "handoff" : "video",
+	);
 	const revealBlurOpacity = useSharedValue(1);
 
 	useEffect(() => {
@@ -100,8 +104,6 @@ function RootLayout() {
 	if (stage === "handoff") {
 		return <SplashBackdrop />;
 	}
-
-	const isDevelopmentMode = process.env.NODE_ENV === "development";
 
 	return (
 		<GestureHandlerRootView style={{ flex: 1, backgroundColor: "white" }}>

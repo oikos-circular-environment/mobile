@@ -235,11 +235,7 @@ export default function SignUpScreen() {
 						)}
 					</FormControl>
 
-					<Button
-						size="lg"
-						onPress={handleSubmit(onSubmit)}
-						isDisabled={isLoading}
-					>
+					<Button onPress={handleSubmit(onSubmit)} isDisabled={isLoading}>
 						<ButtonText>Criar Conta</ButtonText>
 						{isLoading && <ButtonSpinner />}
 					</Button>

@@ -1,7 +1,6 @@
 import * as Clipboard from "expo-clipboard";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-	ChevronRightIcon,
 	CircleCheckIcon,
 	CircleDashedIcon,
 	CircleDotDashedIcon,
@@ -50,7 +49,6 @@ export function SurveyInviteCard({
 	const showPersonaBadge = Boolean(personaLabel);
 	const showInfoGrid = Boolean(personaLabel || participantCode);
 	const showStages = Boolean(stages?.length);
-	const showDetailsLink = Boolean(onPressDetails);
 
 	const handleCopyParticipantCode = async () => {
 		if (!participantCode) return;
@@ -184,20 +182,12 @@ export function SurveyInviteCard({
 						</View>
 					) : null}
 
-					{showDetailsLink ? (
-						<Pressable
-							onPress={onPressDetails}
-							className="flex-row items-center gap-1 self-start"
-						>
-							<Text size="xs" bold className="text-white/90">
-								Ver detalhes da pesquisa
-							</Text>
-							<ChevronRightIcon size={12} color="#ffffffe6" />
-						</Pressable>
-					) : null}
-
 					<View className="flex-row justify-end">
-						<Button variant="secondary" className="h-12" onPress={onPressCta}>
+						<Button
+							variant="secondary"
+							className="flex-1 h-12"
+							onPress={onPressCta}
+						>
 							<ButtonText>{ctaLabel}</ButtonText>
 						</Button>
 					</View>

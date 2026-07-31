@@ -1,5 +1,6 @@
+import { useFocusEffect } from "expo-router";
 import { ArrowRightIcon } from "lucide-react-native";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { type LayoutChangeEvent, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -12,19 +13,19 @@ import Animated, {
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 
-const THUMB_SIZE = 44;
-const TRACK_PADDING = 4;
+const THUMB_SIZE = 40;
+const TRACK_PADDING = 6;
 const COMPLETE_THRESHOLD = 0.72;
 const SPRING = { damping: 18, stiffness: 200 } as const;
 
 export function shouldCompleteSlide(
 	translateX: number,
 	maxTranslate: number,
-	threshold: number = COMPLETE_THRESHOLD,
+	threshold?: number,
 ) {
 	"worklet";
 	if (maxTranslate <= 0) return false;
-	return translateX >= maxTranslate * threshold;
+	return translateX >= maxTranslate * (threshold ?? COMPLETE_THRESHOLD);
 }
 
 interface SlideToLoginButtonProps {
@@ -45,6 +46,13 @@ export function SlideToLoginButton({
 	const handleLayout = (e: LayoutChangeEvent) => {
 		setTrackWidth(e.nativeEvent.layout.width);
 	};
+
+	useFocusEffect(
+		useCallback(() => {
+			isCompleting.value = false;
+			translateX.value = withSpring(0, SPRING);
+		}, [isCompleting, translateX]),
+	);
 
 	const panGesture = Gesture.Pan()
 		.onUpdate(e => {

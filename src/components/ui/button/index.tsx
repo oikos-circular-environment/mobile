@@ -23,7 +23,7 @@ const UIButton = createButton({
 	Icon: StyledUIIcon,
 });
 const buttonStyle = tva({
-	base: "rounded-md flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[disabled=true]:opacity-40 gap-2 h-fit",
+	base: "rounded-md flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[disabled=true]:opacity-40 gap-2 ",
 	variants: {
 		variant: {
 			default:
@@ -38,8 +38,9 @@ const buttonStyle = tva({
 				"data-[hover=true]:bg-accent data-[active=true]:bg-accent dark:data-[hover=true]:bg-accent/50 dark:data-[active=true]:bg-accent/50",
 			link: "text-primary underline-offset-4 data-[hover=true]:underline data-[active=true]:underline",
 		},
+		// Houve mudança manual no size default passou a ter min-h-12 px-8
 		size: {
-			default: "px-4 py-2",
+			default: "min-h-12 px-8 py-2",
 			sm: "min-h-8 rounded-md px-3 text-xs",
 			lg: "min-h-10 rounded-md px-8",
 			icon: "min-h-9 min-w-9",
@@ -58,8 +59,9 @@ const buttonTextStyle = tva({
 			ghost: "text-foreground ",
 			link: "text-primary data-[hover=true]:underline data-[active=true]:underline",
 		},
+		// Houve mudança no size do default, passou a ser text-md 
 		size: {
-			default: "text-sm",
+			default: "text-md",
 			sm: "text-xs",
 			lg: "text-sm",
 			icon: "text-sm",
