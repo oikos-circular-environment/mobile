@@ -16,13 +16,22 @@ export interface SuccessRule {
 	signals: SuccessSignal[];
 }
 
-/** `:param` vira um segmento qualquer — casa `/v1/companies/:id/addresses` com `/v1/companies/abc123/addresses`. */
+/**
+ * `:param` (rotas de API) e `[param]` (rotas do expo-router) viram um segmento
+ * qualquer — casam `/v1/companies/:id/addresses` com `/v1/companies/abc123/addresses`
+ * e `/market/[companyId]` com `/market/abc123`.
+ */
 function pathMatchesPattern(path: string, pattern: string): boolean {
 	const [pathname] = path.split("?");
 	const regex = new RegExp(
 		`^${pattern
 			.split("/")
-			.map(segment => (segment.startsWith(":") ? "[^/]+" : segment))
+			.map(segment =>
+				segment.startsWith(":") ||
+				(segment.startsWith("[") && segment.endsWith("]"))
+					? "[^/]+"
+					: segment,
+			)
 			.join("/")}$`,
 	);
 	return regex.test(pathname ?? "");
@@ -89,7 +98,10 @@ export function createTaskSignalWatcher(
 
 	function notifyScreen(pathname: string) {
 		rule.signals.forEach((signal, index) => {
-			if (signal.kind === "screen" && signal.route === pathname) {
+			if (
+				signal.kind === "screen" &&
+				pathMatchesPattern(pathname, signal.route)
+			) {
 				evaluate(index);
 			}
 		});

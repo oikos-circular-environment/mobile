@@ -178,6 +178,24 @@ describe("createTaskSignalWatcher", () => {
 		watcher.dispose();
 	});
 
+	it("casa sinal de tela com segmento dinâmico ([param])", () => {
+		const onComplete = jest.fn();
+		const watcher = createTaskSignalWatcher(
+			{
+				mode: "any",
+				signals: [{ kind: "screen", route: "/market/[companyId]" }],
+			},
+			onComplete,
+		);
+
+		watcher.notifyScreen("/market");
+		expect(onComplete).not.toHaveBeenCalled();
+
+		watcher.notifyScreen("/market/3fa85f64-5717-4562-b3fc-2c963f66afa6");
+		expect(onComplete).toHaveBeenCalledTimes(1);
+		watcher.dispose();
+	});
+
 	it("dispose para de escutar novos sinais", () => {
 		const onComplete = jest.fn();
 		const watcher = createTaskSignalWatcher(
