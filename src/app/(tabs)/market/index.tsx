@@ -9,6 +9,7 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { LocationSourceBottomSheet } from "@/components/market/location-source-bottom-sheet";
 import { MarketListHeader } from "@/components/market/market-list-header";
@@ -174,6 +175,7 @@ function CompanyCardItem({
 
 export default function MarketScreen() {
 	useRouteInteractive();
+	const insets = useSafeAreaInsets();
 	const currentDate = useNow();
 	const { permissionDenied } = useGeospatial();
 	const {
@@ -215,7 +217,11 @@ export default function MarketScreen() {
 			<FlatList
 				data={companies}
 				keyExtractor={company => company.id}
-				contentContainerClassName="px-4 pb-8"
+				contentContainerStyle={{
+					paddingTop: insets.top,
+					paddingHorizontal: 16,
+					paddingBottom: 32,
+				}}
 				ListHeaderComponent={MarketListHeader}
 				ItemSeparatorComponent={() => <View className="h-3" />}
 				renderItem={({ item: company }) => (

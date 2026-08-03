@@ -2,6 +2,7 @@ import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { QHeader } from "@/components/survey/q-header";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -16,6 +17,7 @@ import { useSurveyStore } from "@/stores/survey-store";
 const MAX_LENGTH = 4000;
 
 export default function SurveyClosingCommentScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const sessionId = useSurveyStore(s => s.sessionId);
 	const setStatus = useSurveyStore(s => s.setStatus);
@@ -61,7 +63,10 @@ export default function SurveyClosingCommentScreen() {
 	};
 
 	return (
-		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-5">
+		<View
+			className="flex-1 bg-white px-6 pb-6 gap-5"
+			style={{ paddingTop: insets.top + 56 }}
+		>
 			<QHeader categoryLabel="Encerramento" currentIndex={1} totalCount={1} />
 
 			<View className="gap-2">

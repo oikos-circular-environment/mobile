@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { CopyIcon, PartyPopperIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
 export default function SurveyThanksScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const sessionId = useSurveyStore(s => s.sessionId);
 	const [participantCode, setParticipantCode] = useState<string | null>(null);
@@ -43,7 +45,10 @@ export default function SurveyThanksScreen() {
 	};
 
 	return (
-		<View className="flex-1 bg-white px-6 pb-8 pt-20 gap-5">
+		<View
+			className="flex-1 bg-white px-6 pb-8 gap-5"
+			style={{ paddingTop: insets.top + 80 }}
+		>
 			<View className="flex-1 items-center justify-center gap-5">
 				<PartyPopperIcon size={52} color={colors.lime[700]} />
 

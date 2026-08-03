@@ -118,7 +118,7 @@ function RootLayout() {
 										<StatusBar style="dark" animated />
 										<SafeAreaView
 											style={{ flex: 1, backgroundColor: "white" }}
-											edges={["top", "left", "right"]}
+											edges={["left", "right"]}
 										>
 											<Stack>
 												<Stack.Screen

@@ -20,6 +20,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 import DefaultImage from "@/assets/icons/icon.png";
 import { toast } from "@/components/toast";
@@ -95,6 +96,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileScreen() {
 	useRouteInteractive();
+	const insets = useSafeAreaInsets();
 	const { user, updateUserProfile } = useAuthContext();
 	const router = useRouter();
 	const selectedAsset = useRef<ImagePicker.ImagePickerAsset | null>(null);
@@ -400,7 +402,10 @@ export default function ProfileScreen() {
 				className="flex-1"
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 			>
-				<ScrollView className="flex-1 bg-white p-4">
+				<ScrollView
+					className="flex-1 bg-white px-4 pb-4"
+					contentContainerStyle={{ paddingTop: insets.top + 16 }}
+				>
 					<VStack className="gap-4">
 						<View className="relative mb-12">
 							<View className="h-28 items-center justify-center rounded-md bg-primary"></View>

@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -33,6 +34,7 @@ function IdentificationRow({ label, value }: { label: string; value: string }) {
 }
 
 export default function SurveyConsentScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { isAuthenticated, signOut } = useAuthContext();
 	const setConsent = useSurveyStore(s => s.setConsent);
@@ -76,7 +78,12 @@ export default function SurveyConsentScreen() {
 				className="flex-1"
 				onScroll={handleScroll}
 				scrollEventThrottle={100}
-				contentContainerClassName="gap-4 px-6 pb-8 pt-14"
+				contentContainerStyle={{
+					paddingTop: insets.top + 56,
+					gap: 16,
+					paddingHorizontal: 24,
+					paddingBottom: 32,
+				}}
 			>
 				<Heading size="xl">Termo de consentimento</Heading>
 

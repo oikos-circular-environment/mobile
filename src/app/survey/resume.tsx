@@ -10,6 +10,7 @@ import {
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SettingOptionRow } from "@/components/settings/setting-option-row";
 import { colors } from "@/components/style/colors";
 import {
@@ -56,6 +57,7 @@ const STATUS_META: Record<
 };
 
 export default function SurveyResumeScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { data: protocol } = useSurveyProtocol();
 	const persona = useSurveyStore(s => s.persona);
@@ -118,7 +120,10 @@ export default function SurveyResumeScreen() {
 	});
 
 	return (
-		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-5">
+		<View
+			className="flex-1 bg-white px-6 pb-6 gap-5"
+			style={{ paddingTop: insets.top + 56 }}
+		>
 			<View className="flex-row items-center gap-2.5">
 				<Pressable onPress={() => router.back()} hitSlop={8}>
 					<ArrowLeftIcon size={20} color={colors.gray[900]} />

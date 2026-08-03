@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeftIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { Heading } from "@/components/ui/heading";
@@ -25,6 +26,7 @@ function formatDuration(ms: number) {
 }
 
 export default function SurveyAnswersScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { suiteCode } = useLocalSearchParams<{ suiteCode: string }>();
 	const { data: protocol } = useSurveyProtocol();
@@ -69,7 +71,10 @@ export default function SurveyAnswersScreen() {
 	const suiteIndex = protocol?.suites.findIndex(s => s.code === suiteCode) ?? 0;
 
 	return (
-		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-4">
+		<View
+			className="flex-1 bg-white px-6 pb-6 gap-4"
+			style={{ paddingTop: insets.top + 56 }}
+		>
 			<View className="flex-row items-center gap-2.5">
 				<Pressable onPress={() => router.back()} hitSlop={8}>
 					<ArrowLeftIcon size={20} color={colors.gray[900]} />

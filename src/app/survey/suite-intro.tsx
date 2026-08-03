@@ -2,6 +2,7 @@ import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
 import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -12,6 +13,7 @@ import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
 export default function SurveySuiteIntroScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { data: protocol } = useSurveyProtocol();
 	const persona = useSurveyStore(s => s.persona);
@@ -86,7 +88,10 @@ export default function SurveySuiteIntroScreen() {
 	}
 
 	return (
-		<View className="flex-1 bg-white px-6 pb-8 pt-14 justify-between">
+		<View
+			className="flex-1 bg-white px-6 pb-8 justify-between"
+			style={{ paddingTop: insets.top + 56 }}
+		>
 			<View className="gap-4">
 				<Text size="xs" bold className="uppercase tracking-wider text-lime-700">
 					{`Etapa ${suiteIndex + 1} de ${suiteQueue.length}`}

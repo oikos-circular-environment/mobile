@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { ArrowLeftIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { Heading } from "@/components/ui/heading";
@@ -27,6 +28,7 @@ const SESSION_VALUE_BY_QUESTION_KEY: Record<
 };
 
 export default function SurveyCharacterizationAnswersScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { data: protocol } = useSurveyProtocol();
 	const sessionId = useSurveyStore(s => s.sessionId);
@@ -51,7 +53,10 @@ export default function SurveyCharacterizationAnswersScreen() {
 	)?.label;
 
 	return (
-		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-4">
+		<View
+			className="flex-1 bg-white px-6 pb-6 gap-4"
+			style={{ paddingTop: insets.top + 56 }}
+		>
 			<View className="flex-row items-center gap-2.5">
 				<Pressable onPress={() => router.back()} hitSlop={8}>
 					<ArrowLeftIcon size={20} color={colors.gray[900]} />

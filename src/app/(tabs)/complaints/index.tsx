@@ -284,7 +284,7 @@ export default function ComplaintsMapScreen() {
 			{/* Filter row */}
 			<View
 				className="absolute left-0 right-0 gap-2 px-4"
-				style={{ top: 32 }}
+				style={{ top: insets.top + 32 }}
 				pointerEvents="box-none"
 			>
 				<ComplaintFilterRow

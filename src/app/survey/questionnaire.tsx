@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { CloudOffIcon, InfoIcon, PartyPopperIcon } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { InfoExpand } from "@/components/survey/info-expand";
@@ -25,6 +26,7 @@ import { useSurveyStore } from "@/stores/survey-store";
 type AnswerValue = { valueText?: string; valueNumber?: number };
 
 export default function SurveyQuestionnaireScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { data: protocol } = useSurveyProtocol();
 	const sessionId = useSurveyStore(s => s.sessionId);
@@ -174,7 +176,10 @@ export default function SurveyQuestionnaireScreen() {
 
 	if (showConfirmation) {
 		return (
-			<View className="flex-1 bg-white px-6 pb-8 pt-16 justify-between">
+			<View
+				className="flex-1 bg-white px-6 pb-8 justify-between"
+				style={{ paddingTop: insets.top + 64 }}
+			>
 				<View className="flex-1 items-center justify-center gap-4">
 					<PartyPopperIcon size={44} color={colors.lime[700]} />
 					<Heading size="2xl" className="text-center">
@@ -214,7 +219,10 @@ export default function SurveyQuestionnaireScreen() {
 	}
 
 	return (
-		<View className="flex-1 bg-white px-6 pb-6 pt-14 gap-5">
+		<View
+			className="flex-1 bg-white px-6 pb-6 gap-5"
+			style={{ paddingTop: insets.top + 56 }}
+		>
 			<QHeader
 				categoryLabel={`Etapa ${suiteIndex + 1}`}
 				currentIndex={displayIndex}

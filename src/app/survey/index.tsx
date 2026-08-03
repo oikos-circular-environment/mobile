@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { ClipboardListIcon, TriangleAlertIcon } from "lucide-react-native";
 import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -8,6 +9,7 @@ import { Text } from "@/components/ui/text";
 import { useGeospatial } from "@/contexts/geospatial-context";
 
 export default function SurveyPresentationScreen() {
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { permissionDenied } = useGeospatial();
 
@@ -21,7 +23,10 @@ export default function SurveyPresentationScreen() {
 	};
 
 	return (
-		<View className="flex-1 bg-white p-6 pb-8 justify-between">
+		<View
+			className="flex-1 bg-white px-6 pb-8 justify-between"
+			style={{ paddingTop: insets.top + 24 }}
+		>
 			<View className="flex-1 items-center justify-center gap-4">
 				<ClipboardListIcon size={48} color={colors.lime[700]} />
 
