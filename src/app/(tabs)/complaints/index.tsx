@@ -8,7 +8,6 @@ import {
 	MinusIcon,
 	Navigation2Icon,
 	PlusIcon,
-	Trash2Icon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -19,6 +18,7 @@ import {
 } from "react-native";
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Path } from "react-native-svg";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
@@ -54,6 +54,37 @@ const controlShadow = {
 };
 
 const LIST_SHEET_MIN_SNAP_RATIO = 0.15;
+
+const MARKER_PIN_PATH =
+	"M4.74,21.5 A13,13 0 1 1 27.26,21.5 L18.6,36.5 A3,3 0 0 1 13.4,36.5 Z";
+
+function ComplaintMarkerPin({
+	color,
+	selected,
+}: {
+	color: string;
+	selected: boolean;
+}) {
+	return (
+		<View
+			style={{
+				shadowColor: colors.black,
+				shadowOffset: { width: 0, height: 2 },
+				shadowOpacity: 0.35,
+				shadowRadius: 3,
+			}}
+		>
+			<Svg width={30} height={38} viewBox="0 0 32 40">
+				<Path
+					d={MARKER_PIN_PATH}
+					fill={color}
+					stroke={colors.white}
+					strokeWidth={selected ? 2.5 : 1.5}
+				/>
+			</Svg>
+		</View>
+	);
+}
 
 export default function ComplaintsMapScreen() {
 	useRouteInteractive();
@@ -246,7 +277,6 @@ export default function ComplaintsMapScreen() {
 
 					const pinColor = colors.amber[500];
 					const isSelected = selectedMapComplaint?.id === complaint.id;
-					const Icon = Trash2Icon;
 					return (
 						<Marker
 							key={complaint.id}
@@ -254,28 +284,11 @@ export default function ComplaintsMapScreen() {
 								latitude: complaint.location.lat,
 								longitude: complaint.location.lon,
 							}}
+							anchor={{ x: 0.5, y: 0.95 }}
 							onPress={() => handleMarkerPress(complaint)}
 							tracksViewChanges={false}
 						>
-							<View
-								className="w-12 h-12 rounded-full items-center justify-center border-white"
-								style={{
-									backgroundColor: pinColor,
-									borderWidth: isSelected ? 2 : 1,
-									shadowColor: colors.black,
-									shadowOffset: { width: 0, height: 2 },
-									shadowOpacity: 0.35,
-									shadowRadius: 3,
-								}}
-							>
-								{Icon && (
-									<Icon
-										size={isSelected ? 18 : 15}
-										color={colors.white}
-										strokeWidth={2.5}
-									/>
-								)}
-							</View>
+							<ComplaintMarkerPin color={pinColor} selected={isSelected} />
 						</Marker>
 					);
 				})}
@@ -284,7 +297,7 @@ export default function ComplaintsMapScreen() {
 			{/* Filter row */}
 			<View
 				className="absolute left-0 right-0 gap-2 px-4"
-				style={{ top: insets.top + 32 }}
+				style={{ top: insets.top }}
 				pointerEvents="box-none"
 			>
 				<ComplaintFilterRow
@@ -322,8 +335,8 @@ export default function ComplaintsMapScreen() {
 			<View
 				className="absolute right-4 gap-2 justify-center"
 				style={{
-					top: 0,
-					bottom: 0,
+					top: insets.top,
+					bottom: windowHeight * LIST_SHEET_MIN_SNAP_RATIO + insets.bottom,
 				}}
 				pointerEvents="box-none"
 			>
