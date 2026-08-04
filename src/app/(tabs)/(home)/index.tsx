@@ -9,6 +9,8 @@ import { HomeHero } from "@/components/home/home-hero";
 import {
 	type ServiceCarouselItem,
 	ServicesCarousel,
+	ServicesCarouselSteps,
+	ServicesCarouselTrack,
 } from "@/components/home/services-carousel";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
@@ -139,10 +141,10 @@ export default function HomeScreen() {
 					{/* Serviços */}
 					<View className="gap-3">
 						<Heading>Serviços</Heading>
-						<ServicesCarousel.Root items={services} autoPlayIntervalMs={5000}>
-							<ServicesCarousel.Steps />
-							<ServicesCarousel.Track />
-						</ServicesCarousel.Root>
+						<ServicesCarousel items={services} autoPlayIntervalMs={5000}>
+							<ServicesCarouselSteps />
+							<ServicesCarouselTrack />
+						</ServicesCarousel>
 					</View>
 				</View>
 			</ScrollView>

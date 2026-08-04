@@ -4,7 +4,16 @@ import { router } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Camera } from "@/components/camera";
+import {
+	Camera,
+	CameraCaptureButton,
+	CameraFlashControl,
+	CameraMediaPreview,
+	CameraModeSelector,
+	CameraPreview,
+	CameraRecordingTimer,
+	CameraZoomControls,
+} from "@/components/camera";
 import { colors } from "@/components/style/colors";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { getFileSize } from "@/libs/media-validation";
@@ -48,7 +57,7 @@ export default function ComplaintCameraScreen() {
 
 	return (
 		<Camera onCapture={handleCapture}>
-			<Camera.Preview />
+			<CameraPreview />
 
 			<View
 				className="absolute left-0 right-0 flex-row px-5"
@@ -61,22 +70,22 @@ export default function ComplaintCameraScreen() {
 					<ArrowLeft size={20} color={colors.white} strokeWidth={2.2} />
 				</TouchableOpacity>
 			</View>
-			<Camera.RecordingTimer style={{ top: 16 }} />
-			<Camera.FlashControl style={{ top: 16 }} />
-			<Camera.ZoomControls style={{ bottom: insets.bottom + 180 }} />
-			<Camera.ModeSelector style={{ bottom: insets.bottom + 120 }} />
+			<CameraRecordingTimer style={{ top: 16 }} />
+			<CameraFlashControl style={{ top: 16 }} />
+			<CameraZoomControls style={{ bottom: insets.bottom + 180 }} />
+			<CameraModeSelector style={{ bottom: insets.bottom + 120 }} />
 
 			<View
 				className="absolute left-0 right-0 px-4"
 				style={{ bottom: insets.bottom + 10 }}
 			>
 				<View className="flex-row items-end justify-between">
-					<Camera.MediaPreview
+					<CameraMediaPreview
 						attachments={cameraAttachments}
 						onDelete={removeAttachment}
 					/>
 
-					<Camera.CaptureButton />
+					<CameraCaptureButton />
 
 					<TouchableOpacity
 						className={`h-20 w-20 items-center justify-center rounded-xl ${

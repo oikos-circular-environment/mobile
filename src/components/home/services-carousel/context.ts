@@ -30,7 +30,7 @@ export function useServicesCarouselContext() {
 	const context = useContext(ServicesCarouselContext);
 	if (!context) {
 		throw new Error(
-			"Componentes do ServicesCarousel devem ser usados dentro de <ServicesCarousel.Root>.",
+			"Componentes do ServicesCarousel devem ser usados dentro de <ServicesCarousel>.",
 		);
 	}
 	return context;

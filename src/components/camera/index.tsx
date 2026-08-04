@@ -1,20 +1,10 @@
-import { CameraCaptureButton } from "./camera-capture-button";
-import { CameraFlashControl } from "./camera-flash-control";
-import { CameraMediaPreview } from "./camera-media-preview";
-import { CameraModeSelector } from "./camera-mode-selector";
-import { CameraPreview } from "./camera-preview";
-import { CameraRecordingTimer } from "./camera-recording-timer";
-import { CameraRoot } from "./camera-root";
-import { CameraZoomControls } from "./camera-zoom-controls";
+export { Camera } from "./camera";
+export { CameraCaptureButton } from "./camera-capture-button";
+export { CameraFlashControl } from "./camera-flash-control";
+export { CameraMediaPreview } from "./camera-media-preview";
+export { CameraModeSelector } from "./camera-mode-selector";
+export { CameraPreview } from "./camera-preview";
+export { CameraRecordingTimer } from "./camera-recording-timer";
+export { CameraZoomControls } from "./camera-zoom-controls";
 
 export { useCameraContext } from "./context";
-
-export const Camera = Object.assign(CameraRoot, {
-	Preview: CameraPreview,
-	FlashControl: CameraFlashControl,
-	ModeSelector: CameraModeSelector,
-	CaptureButton: CameraCaptureButton,
-	MediaPreview: CameraMediaPreview,
-	RecordingTimer: CameraRecordingTimer,
-	ZoomControls: CameraZoomControls,
-});

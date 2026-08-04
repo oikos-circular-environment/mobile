@@ -13,17 +13,17 @@ const REFERENCE_ASPECT_RATIO = 640 / 360;
 /** Teto de largura do card em telas grandes (tablets), pra não esticar o card virando um banner desproporcional. */
 const MAX_CARD_WIDTH = 480;
 
-interface ServicesCarouselRootProps {
+interface ServicesCarouselProps {
 	items: ServiceCarouselItem[];
 	autoPlayIntervalMs?: number;
 	children: ReactNode;
 }
 
-export function ServicesCarouselRoot({
+export function ServicesCarousel({
 	items,
 	autoPlayIntervalMs = 5000,
 	children,
-}: ServicesCarouselRootProps) {
+}: ServicesCarouselProps) {
 	const [containerWidth, setContainerWidth] = useState(0);
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [isPaused, setIsPaused] = useState(false);

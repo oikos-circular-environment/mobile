@@ -19,7 +19,7 @@ import type {
 } from "@/libs/types/complaint";
 import { CameraContext } from "./context";
 
-type CameraRootProps = PropsWithChildren<{
+type CameraProps = PropsWithChildren<{
 	onCapture: (
 		object: CameraCapturedPicture | CameraCapturedVideo,
 		type: ComplaintCaptureMode,
@@ -27,11 +27,11 @@ type CameraRootProps = PropsWithChildren<{
 	defaultMode?: ComplaintCaptureMode;
 }>;
 
-export function CameraRoot({
+export function Camera({
 	children,
 	onCapture,
 	defaultMode = "photo",
-}: CameraRootProps) {
+}: CameraProps) {
 	const cameraRef = useRef<CameraView | null>(null);
 	const modeTransitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
 		null,
