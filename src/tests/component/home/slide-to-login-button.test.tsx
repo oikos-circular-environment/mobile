@@ -1,6 +1,10 @@
 import { render, screen } from "@testing-library/react-native";
 import { SlideToLoginButton } from "@/components/home/slide-to-login-button";
 
+jest.mock("expo-router", () => ({
+	useFocusEffect: (effect: () => void) => effect(),
+}));
+
 describe("SlideToLoginButton — componente", () => {
 	it("mostra o rótulo de iniciar sessão", async () => {
 		await render(<SlideToLoginButton onComplete={jest.fn()} />);

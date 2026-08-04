@@ -149,7 +149,7 @@ describe("ProfileScreen", () => {
 
 	afterEach(() => {
 		jest.useRealTimers();
-		jest.resetAllMocks();
+		jest.clearAllMocks();
 	});
 
 	it("renderiza campos preenchidos com os dados do usuário", async () => {

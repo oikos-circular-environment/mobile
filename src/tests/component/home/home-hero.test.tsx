@@ -8,6 +8,25 @@ jest.mock("expo-image", () => ({
 	Image: () => null,
 }));
 
+jest.mock("expo-router", () => ({
+	useFocusEffect: (effect: () => void) => effect(),
+	Link: ({
+		children,
+		asChild,
+	}: {
+		children: React.ReactNode;
+		asChild?: boolean;
+		href?: unknown;
+	}) => {
+		const RN = require("react-native");
+		if (asChild) {
+			const { cloneElement, Children } = require("react");
+			return cloneElement(Children.only(children));
+		}
+		return require("react").createElement(RN.Pressable, null, children);
+	},
+}));
+
 jest.mock("@/contexts/auth-context");
 
 jest.mocked(useAuthContext).mockReturnValue({

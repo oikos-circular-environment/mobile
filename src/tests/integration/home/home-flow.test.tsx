@@ -11,6 +11,7 @@ const mockLinkPress = jest.fn();
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({ push: jest.fn(), navigate: jest.fn(), back: jest.fn() }),
+	useFocusEffect: (effect: () => void) => effect(),
 	Link: ({
 		children,
 		asChild,
@@ -35,16 +36,6 @@ jest.mock("expo-router", () => ({
 
 jest.mock("@/contexts/auth-context");
 jest.mock("@/contexts/geospatial-context");
-
-jest.mock("@/components/ui/grid", () => {
-	const R = require("react");
-	return {
-		Grid: ({ children }: { children: React.ReactNode }) =>
-			R.createElement(R.Fragment, null, children),
-		GridItem: ({ children }: { children: React.ReactNode }) =>
-			R.createElement(R.Fragment, null, children),
-	};
-});
 
 jest.mock("@/components/home/home-header-skeleton", () => {
 	const { View: V } = require("react-native");
@@ -274,7 +265,7 @@ describe("HomeScreen — integração", () => {
 		expect(screen.queryByTestId("home-header-skeleton")).not.toBeOnTheScreen();
 	});
 
-	it("abre modal de finalizar cadastro ao pressionar Empresas com needsProfileCompletion", async () => {
+	it("abre modal de finalizar cadastro ao pressionar Cadastrar agora com needsProfileCompletion", async () => {
 		const user = userEvent.setup();
 		setupAuth({
 			isAuthenticated: true,
@@ -283,7 +274,7 @@ describe("HomeScreen — integração", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 
 		expect(screen.getByTestId("modal-is-open")).toHaveTextContent("true");
 		expect(screen.getByTestId("modal-description")).toHaveTextContent(
@@ -300,7 +291,7 @@ describe("HomeScreen — integração", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 		expect(screen.getByTestId("modal-is-open")).toHaveTextContent("true");
 
 		await user.press(screen.getByTestId("modal-close-btn"));
