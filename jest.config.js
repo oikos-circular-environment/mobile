@@ -13,6 +13,8 @@ module.exports = {
 		"^react-native-svg$": "<rootDir>/src/tests/__mocks__/react-native-svg.tsx",
 		"^@gorhom/bottom-sheet$":
 			"<rootDir>/src/tests/__mocks__/@gorhom/bottom-sheet.tsx",
+		"^react-native-reanimated-carousel$":
+			"<rootDir>/src/tests/__mocks__/react-native-reanimated-carousel.tsx",
 		"^@/(.*)$": "<rootDir>/src/$1",
 	},
 	setupFilesAfterEnv: ["<rootDir>/src/tests/setup.ts"],

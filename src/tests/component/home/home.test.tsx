@@ -30,11 +30,6 @@ jest.mock("expo-router", () => ({
 jest.mock("@/contexts/auth-context");
 jest.mock("@/contexts/geospatial-context");
 
-jest.mock("@/components/ui/grid", () => ({
-	Grid: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-	GridItem: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
-
 jest.mock("@/components/home/home-hero", () => {
 	const { Pressable: P, Text: T, View: V } = require("react-native");
 	return {
@@ -91,6 +86,31 @@ jest.mock("@/components/auth/profile-completion-modal", () => ({
 				</Pressable>
 				{description ? (
 					<Text testID="modal-description">{description}</Text>
+				) : null}
+			</RV>
+		);
+	},
+}));
+
+jest.mock("@/components/auth/auth-modal", () => ({
+	AuthModal: ({
+		isOpen,
+		onClose,
+		description,
+	}: {
+		isOpen: boolean;
+		onClose: () => void;
+		description?: string;
+	}) => {
+		const { Text, Pressable, View: RV } = require("react-native");
+		return (
+			<RV testID="auth-modal">
+				<Text testID="auth-modal-is-open">{String(isOpen)}</Text>
+				<Pressable testID="auth-modal-close-btn" onPress={onClose}>
+					<Text>Fechar</Text>
+				</Pressable>
+				{description ? (
+					<Text testID="auth-modal-description">{description}</Text>
 				) : null}
 			</RV>
 		);
@@ -227,23 +247,27 @@ describe("HomeScreen — componente", () => {
 		expect(mockPush).toHaveBeenCalledWith("/sign-in");
 	});
 
-	it("exibe Pontos de Coleta e Denúncias (sempre visíveis)", async () => {
+	it("exibe os 3 cards do carrossel de serviços sempre, mesmo deslogado", async () => {
 		await renderHome();
 
-		expect(screen.getByText("Pontos de Coleta")).toBeOnTheScreen();
-		expect(screen.getByText("Denúncias")).toBeOnTheScreen();
+		expect(screen.getByText("RECICLAGEM")).toBeOnTheScreen();
+		expect(screen.getByText("DENÚNCIAS")).toBeOnTheScreen();
+		expect(screen.getByText("EMPRESAS")).toBeOnTheScreen();
 	});
 
-	it("exibe card Empresas apenas quando autenticado", async () => {
+	it("abre AuthModal ao pressionar CTA de Empresas quando não autenticado", async () => {
+		const user = userEvent.setup();
 		await renderHome();
-		expect(screen.queryByText("Empresas")).not.toBeOnTheScreen();
 
-		setupAuth({ isAuthenticated: true, user: {} as never });
-		await renderHome();
-		expect(screen.getByText("Empresas")).toBeOnTheScreen();
+		await user.press(screen.getByText("Cadastrar agora"));
+
+		expect(screen.getByTestId("auth-modal-is-open")).toHaveTextContent("true");
+		expect(screen.getByTestId("auth-modal-description")).toHaveTextContent(
+			"Para cadastrar sua empresa você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente.",
+		);
 	});
 
-	it("abre modal de finalizar cadastro ao pressionar Empresas com needsProfileCompletion", async () => {
+	it("abre modal de finalizar cadastro ao pressionar CTA de Empresas com needsProfileCompletion", async () => {
 		const user = userEvent.setup();
 		setupAuth({
 			isAuthenticated: true,
@@ -252,7 +276,7 @@ describe("HomeScreen — componente", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 
 		expect(screen.getByTestId("modal-is-open")).toHaveTextContent("true");
 	});
@@ -266,7 +290,7 @@ describe("HomeScreen — componente", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 		expect(screen.getByTestId("modal-is-open")).toHaveTextContent("true");
 
 		await user.press(screen.getByTestId("modal-close-btn"));
@@ -282,7 +306,7 @@ describe("HomeScreen — componente", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 
 		expect(screen.getByTestId("modal-description")).toHaveTextContent(
 			"Para acessar o gerenciamento de empresas você precisa finalizar o seu cadastro.",

@@ -1,20 +1,20 @@
 import type BottomSheetType from "@gorhom/bottom-sheet";
-import type { Href } from "expo-router";
-import { Link, useRouter } from "expo-router";
-import { RecycleIcon, ShieldIcon } from "lucide-react-native";
-import type { ComponentType } from "react";
-import { useCallback, useRef, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { useRouter } from "expo-router";
+import { BuildingIcon, RecycleIcon, ShieldIcon } from "lucide-react-native";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { ScrollView, View } from "react-native";
+import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { HomeHero } from "@/components/home/home-hero";
+import {
+	type ServiceCarouselItem,
+	ServicesCarousel,
+} from "@/components/home/services-carousel";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
-import { colors } from "@/components/style/colors";
 import { useSurveyInviteBanner } from "@/components/survey/hooks/use-survey-invite-banner";
 import { SurveyInviteCard } from "@/components/survey/survey-invite-card";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Grid, GridItem } from "@/components/ui/grid";
 import { Heading } from "@/components/ui/heading";
 import {
 	Modal,
@@ -28,47 +28,6 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 
-function ServiceCard({
-	label,
-	description,
-	href,
-	Icon,
-	dark,
-	onPress,
-}: {
-	label: string;
-	description: string;
-	href: Href;
-	Icon: ComponentType<{ size: number; color: string }>;
-	dark?: boolean;
-	onPress?: () => void;
-}) {
-	const iconBg = dark ? "bg-gray-900" : "bg-lime-800";
-	const content = (
-		<Card className="shadow-none bg-gray-50 gap-3">
-			<View
-				className={`w-10 h-10 rounded-lg items-center justify-center ${iconBg}`}
-			>
-				<Icon size={18} color={colors.white} />
-			</View>
-			<View className="gap-0.5">
-				<Text className="font-semibold text-gray-900">{label}</Text>
-				<Text className="text-xs text-gray-500">{description}</Text>
-			</View>
-		</Card>
-	);
-
-	if (onPress) {
-		return <Pressable onPress={onPress}>{content}</Pressable>;
-	}
-
-	return (
-		<Link href={href} asChild>
-			<Pressable>{content}</Pressable>
-		</Link>
-	);
-}
-
 export default function HomeScreen() {
 	useRouteInteractive();
 	const { isAuthenticated, needsProfileCompletion, isLoading, signOut } =
@@ -77,6 +36,7 @@ export default function HomeScreen() {
 	const surveyBanner = useSurveyInviteBanner();
 	const router = useRouter();
 	const [showProfileModal, setShowProfileModal] = useState(false);
+	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showSignOutModal, setShowSignOutModal] = useState(false);
 	const settingsSheetRef = useRef<BottomSheetType>(null);
 
@@ -97,6 +57,54 @@ export default function HomeScreen() {
 	const handlePressLogin = useCallback(() => {
 		router.push("/sign-in");
 	}, [router]);
+
+	const services = useMemo<ServiceCarouselItem[]>(() => {
+		const empresasOnPress = !isAuthenticated
+			? () => setShowAuthModal(true)
+			: needsProfileCompletion
+				? () => setShowProfileModal(true)
+				: undefined;
+
+		return [
+			{
+				id: "pontos-de-coleta",
+				image: require("@/assets/images/services/pontos-de-coleta.jpg"),
+				gradientColors: ["#3e6111", "#d9d97d"],
+				title: "RECICLAGEM",
+				ctaLabel: "Reciclar agora",
+				description:
+					"Encontre pontos de coleta, coletores e empresas perto de você e dê o destino certo aos seus resíduos!",
+				stepIcon: RecycleIcon,
+				stepLabel: "Reciclar",
+				href: "/(tabs)/market",
+			},
+			{
+				id: "denuncias",
+				image: require("@/assets/images/services/denuncias.jpg"),
+				gradientColors: ["#0d1f33", "#5b7fae"],
+				title: "DENÚNCIAS",
+				ctaLabel: "Denunciar agora",
+				description:
+					"Fotografe e localize descarte irregular, acompanhe com a comunidade e ajude a manter o ambiente mais limpo e seguro!",
+				stepIcon: ShieldIcon,
+				stepLabel: "Denunciar",
+				href: "/(tabs)/complaints",
+			},
+			{
+				id: "empresas",
+				image: require("@/assets/images/services/empresas.jpg"),
+				gradientColors: ["#26241f", "#c9c4b8"],
+				title: "EMPRESAS",
+				ctaLabel: "Cadastrar agora",
+				description:
+					"Cadastre sua empresa ou ponto de coleta e ganhe visibilidade no Mercado para quem procura destinar resíduos!",
+				stepIcon: BuildingIcon,
+				stepLabel: "Empresa",
+				href: "/(tabs)/(home)/companies",
+				onPress: empresasOnPress,
+			},
+		];
+	}, [isAuthenticated, needsProfileCompletion]);
 
 	return (
 		<>
@@ -131,39 +139,10 @@ export default function HomeScreen() {
 					{/* Serviços */}
 					<View className="gap-3">
 						<Heading>Serviços</Heading>
-						<Grid className="gap-3" _extra={{ className: "grid-cols-2" }}>
-							<GridItem _extra={{ className: "col-span-1" }}>
-								<ServiceCard
-									label="Pontos de Coleta"
-									description="Descarte seus resíduos"
-									href="/(tabs)/market"
-									Icon={RecycleIcon}
-								/>
-							</GridItem>
-							<GridItem _extra={{ className: "col-span-1" }}>
-								<ServiceCard
-									label="Denúncias"
-									description="Reporte irregularidades"
-									href="/(tabs)/complaints"
-									Icon={ShieldIcon}
-								/>
-							</GridItem>
-							{isAuthenticated && (
-								<GridItem _extra={{ className: "col-span-1" }}>
-									<ServiceCard
-										label="Empresas"
-										description="Cadastre suas empresas"
-										href="/(tabs)/(home)/companies"
-										Icon={ShieldIcon}
-										onPress={
-											needsProfileCompletion
-												? () => setShowProfileModal(true)
-												: undefined
-										}
-									/>
-								</GridItem>
-							)}
-						</Grid>
+						<ServicesCarousel.Root items={services} autoPlayIntervalMs={5000}>
+							<ServicesCarousel.Steps />
+							<ServicesCarousel.Track />
+						</ServicesCarousel.Root>
 					</View>
 				</View>
 			</ScrollView>
@@ -171,6 +150,11 @@ export default function HomeScreen() {
 				isOpen={showProfileModal}
 				onClose={() => setShowProfileModal(false)}
 				description="Para acessar o gerenciamento de empresas você precisa finalizar o seu cadastro."
+			/>
+			<AuthModal
+				isOpen={showAuthModal}
+				onClose={() => setShowAuthModal(false)}
+				description="Para cadastrar sua empresa você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente."
 			/>
 
 			{isAuthenticated && (
