@@ -12,7 +12,7 @@ import {
 	whatsNewPath,
 } from "../../../scripts/lib/store-config.mjs";
 
-const VERSION = "1.0.1";
+const VERSION = "1.0.2";
 
 describe("dados de release compartilhados", () => {
 	it("expõe o mesmo contato para as duas lojas", () => {
