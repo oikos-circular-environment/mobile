@@ -74,10 +74,6 @@ export function MarketListHeader() {
 	});
 
 	const categoryValue = watch("category");
-	// Só o texto da busca vem do form — raio e categoria já são aplicados
-	// direto pelos próprios controles (bottom sheet / botões), então merge
-	// aqui em vez de substituir `appliedFilters` inteiro evita que o `radius`
-	// parado nos `defaultValues` do form volte a sobrescrever o valor atual.
 	const onSubmit = handleSubmit(values =>
 		setAppliedFilters({ ...appliedFilters, query: values.query }),
 	);
@@ -189,7 +185,7 @@ export function MarketListHeader() {
 					onPress={openRadiusSheet}
 				>
 					<NavigationIcon size={14} color={colors.gray[950]} />
-					<Text>{formatRadiusLabel(appliedFilters.radius)}</Text>
+					<Text>Raio {formatRadiusLabel(appliedFilters.radius)}</Text>
 				</Pressable>
 			</View>
 
