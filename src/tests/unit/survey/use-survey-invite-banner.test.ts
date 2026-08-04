@@ -88,7 +88,7 @@ describe("useSurveyInviteBanner", () => {
 		expect(mockPush).toHaveBeenCalledWith("/survey/resume");
 	});
 
-	it("na retomada, traz persona, código, etapas e link de detalhes — igual ao CP49r", async () => {
+	it("na retomada, traz persona, código e etapas — igual ao CP49r", async () => {
 		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 		useSurveyStore.getState().setProgress("S2", null);
 		jest.mocked(useSurveyParticipantCode).mockReturnValue("PSQ-7X29-QK41");
@@ -107,7 +107,7 @@ describe("useSurveyInviteBanner", () => {
 			{ code: "S4", status: "upcoming", currentLabel: "S4" },
 		]);
 
-		result.current?.onPressDetails?.();
+		result.current?.onPress?.();
 		expect(mockPush).toHaveBeenCalledWith("/survey/resume");
 	});
 

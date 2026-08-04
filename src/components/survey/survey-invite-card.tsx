@@ -31,7 +31,6 @@ interface SurveyInviteCardProps {
 	stages?: SurveyInviteStage[];
 	ctaLabel: string;
 	onPressCta: () => void;
-	onPressDetails?: () => void;
 	className?: string;
 }
 
@@ -43,7 +42,6 @@ export function SurveyInviteCard({
 	stages,
 	ctaLabel,
 	onPressCta,
-	onPressDetails,
 	className,
 }: SurveyInviteCardProps) {
 	const showPersonaBadge = Boolean(personaLabel);

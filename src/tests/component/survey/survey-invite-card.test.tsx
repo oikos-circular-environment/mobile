@@ -53,13 +53,11 @@ describe("SurveyInviteCard — componente", () => {
 				]}
 				ctaLabel="Continuar"
 				onPressCta={jest.fn()}
-				onPressDetails={jest.fn()}
 			/>,
 		);
 
 		expect(screen.getByText("PSQ-7X29-QK41")).toBeOnTheScreen();
 		expect(screen.getAllByText("Coletor(a)").length).toBeGreaterThan(0);
-		expect(screen.getByText("Ver detalhes da pesquisa")).toBeOnTheScreen();
 	});
 
 	it("copia o código do participante ao tocar em 'Seu código'", async () => {
@@ -78,27 +76,5 @@ describe("SurveyInviteCard — componente", () => {
 
 		expect(Clipboard.setStringAsync).toHaveBeenCalledWith("PSQ-7X29-QK41");
 		expect(toast.success).toHaveBeenCalledWith("Código copiado!");
-	});
-
-	it("chama onPressCta e onPressDetails de forma independente", async () => {
-		const user = userEvent.setup();
-		const onPressCta = jest.fn();
-		const onPressDetails = jest.fn();
-		await render(
-			<SurveyInviteCard
-				title="Título"
-				description="Descrição"
-				ctaLabel="Continuar"
-				onPressCta={onPressCta}
-				onPressDetails={onPressDetails}
-			/>,
-		);
-
-		await user.press(screen.getByText("Ver detalhes da pesquisa"));
-		expect(onPressDetails).toHaveBeenCalledTimes(1);
-		expect(onPressCta).not.toHaveBeenCalled();
-
-		await user.press(screen.getByText("Continuar"));
-		expect(onPressCta).toHaveBeenCalledTimes(1);
 	});
 });

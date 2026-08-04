@@ -47,7 +47,6 @@ export function useSurveyInviteBanner() {
 			stages: stages.length > 0 ? stages : undefined,
 			ctaLabel: "Continuar",
 			onPress: () => router.push("/survey/resume"),
-			onPressDetails: () => router.push("/survey/resume"),
 		};
 	}
 
