@@ -32,7 +32,7 @@ export function CompanyListHeader() {
 				</View>
 			</Card>
 
-			<Button size="lg" onPress={handleNewCompany}>
+			<Button onPress={handleNewCompany}>
 				<ButtonText className="flex-1 text-center font-semibold text-white">
 					Nova Empresa
 				</ButtonText>

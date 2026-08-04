@@ -4,7 +4,7 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { surveyClient } from "../api/client";
 import { getSurveyDb } from "../db/client";
-import { surveyOutbox } from "../db/schema";
+import { surveyOutbox, surveySession } from "../db/schema";
 
 type RouterInputs = inferRouterInputs<AppRouter>;
 type UsabilityInputs = RouterInputs["usability"];
@@ -114,21 +114,34 @@ async function sendOutboxItem(item: typeof surveyOutbox.$inferSelect) {
 
 	try {
 		switch (item.kind as OutboxKind) {
-			case "E2_SESSION":
-				await surveyClient.usability.session.upsert.mutate(
+			case "E2_SESSION": {
+				const result = await surveyClient.usability.session.upsert.mutate(
 					item.payload as UsabilityInputs["session"]["upsert"],
 				);
+				await db
+					.update(surveySession)
+					.set({ participantCode: result.participant_code })
+					.where(eq(surveySession.id, item.sessionId));
 				break;
+			}
 			case "E3_CHECKPOINT":
 				await surveyClient.usability.checkpoint.send.mutate(
 					item.payload as UsabilityInputs["checkpoint"]["send"],
 				);
 				break;
-			case "E4_FINISH":
-				await surveyClient.usability.finish.mutate(
+			case "E4_FINISH": {
+				const result = await surveyClient.usability.finish.mutate(
 					item.payload as UsabilityInputs["finish"],
 				);
+				await db
+					.update(surveySession)
+					.set({
+						participantCode: result.participant_code,
+						status: "COMPLETED",
+					})
+					.where(eq(surveySession.id, item.sessionId));
 				break;
+			}
 			case "E5_ABANDON":
 				await surveyClient.usability.abandon.mutate(
 					item.payload as UsabilityInputs["abandon"],

@@ -29,7 +29,11 @@ import {
 	AppSplashScreen,
 	SplashBackdrop,
 } from "@/components/app-splash-screen";
+import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
+import { SurveyMigrationsRunner } from "@/components/survey/survey-migrations-runner";
 import { Toaster } from "@/components/toast";
+import { initSurveyQueue } from "@/libs/survey/queue/network-status";
+import { useSurveyStore } from "@/stores/survey-store";
 
 export const unstable_settings = {
 	anchor: "(tabs)",
@@ -37,32 +41,20 @@ export const unstable_settings = {
 
 const queryClient = new QueryClient();
 sessionBus.subscribe(() => queryClient.resetQueries());
+initSurveyQueue(() => useSurveyStore.getState().sessionId);
 
 Observe.configure({
 	integrations: { "expo-router": true },
 });
 
-// The splash video (src/assets/videos/splash-motion.mp4) is 10005ms long.
-// expo-video's `playToEnd` event proved unreliable (fired within ~2s instead
-// of at the actual end), so the splash duration is driven by this timer
-// instead, matched to the asset's real length.
 const SPLASH_VIDEO_DURATION_MS = 10000;
 
-// Swapping straight from AppSplashScreen (which owns a live VideoView) to the
-// full app tree in a single commit crashes Fabric natively (SIGSEGV in
-// MountingCoordinator::pullTransaction) — unmounting the video and mounting
-// the whole app tree at once is too big a single mutation. Unmounting the
-// video into a plain view first, then mounting the app tree a frame later,
-// splits it into two safe commits.
 type SplashStage = "video" | "handoff" | "app";
 
-// The app tree mounts fully-formed the instant `stage` becomes "app", which
-// reads as an abrupt cut. A frosted-glass layer over the freshly mounted
-// content, clearing over REVEAL_FADE_MS, turns that cut into a soft reveal.
-// The short linger covers the first-paint layout jitter (fonts/providers
-// settling) before the clear-up starts.
 const REVEAL_LINGER_MS = 120;
 const REVEAL_FADE_MS = 500;
+
+const isDevelopmentMode = process.env.NODE_ENV === "development";
 
 function RootLayout() {
 	const [loaded, error] = useFonts({
@@ -70,7 +62,9 @@ function RootLayout() {
 		SpaceGrotesk_400Regular,
 	});
 	const { markInteractive } = useObserve();
-	const [stage, setStage] = useState<SplashStage>("video");
+	const [stage, setStage] = useState<SplashStage>(
+		isDevelopmentMode ? "handoff" : "video",
+	);
 	const revealBlurOpacity = useSharedValue(1);
 
 	useEffect(() => {
@@ -111,8 +105,6 @@ function RootLayout() {
 		return <SplashBackdrop />;
 	}
 
-	const isDevelopmentMode = process.env.NODE_ENV === "development";
-
 	return (
 		<GestureHandlerRootView style={{ flex: 1, backgroundColor: "white" }}>
 			<ErrorBoundary>
@@ -126,12 +118,19 @@ function RootLayout() {
 										<StatusBar style="dark" animated />
 										<SafeAreaView
 											style={{ flex: 1, backgroundColor: "white" }}
-											edges={["top", "left", "right"]}
+											edges={["left", "right"]}
 										>
 											<Stack>
 												<Stack.Screen
 													name="(tabs)"
 													options={{ headerShown: false }}
+												/>
+												<Stack.Screen
+													name="survey"
+													options={{
+														headerShown: false,
+														presentation: "fullScreenModal",
+													}}
 												/>
 											</Stack>
 										</SafeAreaView>
@@ -140,6 +139,8 @@ function RootLayout() {
 							</GeospatialProvider>
 						</AuthContextProvider>
 						{isDevelopmentMode && <FloatingDevTools />}
+						<SurveyMigrationsRunner />
+						<SurveyExecutionOverlay />
 					</QueryClientProvider>
 				</GluestackUIProvider>
 			</ErrorBoundary>

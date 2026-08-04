@@ -354,7 +354,11 @@ export default function ComplaintResolutionScreen() {
 			>
 				<ScrollView
 					className="flex-1 px-4"
-					contentContainerClassName="flex-col gap-4 pb-6"
+					contentContainerStyle={{
+						paddingTop: insets.top,
+						gap: 16,
+						paddingBottom: 24,
+					}}
 					keyboardShouldPersistTaps="handled"
 					showsVerticalScrollIndicator={false}
 				>

@@ -2,8 +2,8 @@ import { render, screen, userEvent } from "@testing-library/react-native";
 import { TaskCard } from "@/components/survey/task-card";
 
 const checklist = [
-	{ id: "1", label: "Criar uma conta" },
-	{ id: "2", label: "Fazer login" },
+	{ id: "1", label: "Criar uma conta", status: "done" as const },
+	{ id: "2", label: "Fazer login", status: "current" as const },
 ];
 
 describe("TaskCard — componente", () => {
@@ -91,5 +91,27 @@ describe("TaskCard — componente", () => {
 		expect(screen.queryByText(/consegui/i)).not.toBeOnTheScreen();
 		expect(screen.queryByText(/não consegui/i)).not.toBeOnTheScreen();
 		expect(screen.getAllByRole("button")).toHaveLength(2);
+	});
+
+	it("troca Desistir por Próximo quando todas as tarefas foram concluídas", async () => {
+		const user = userEvent.setup();
+		const onNext = jest.fn();
+		await render(
+			<TaskCard
+				currentTask={7}
+				totalTasks={7}
+				elapsedLabel="06:47"
+				instruction="Instrução"
+				checklist={checklist}
+				allTasksCompleted
+				onPause={jest.fn()}
+				onQuit={jest.fn()}
+				onNext={onNext}
+			/>,
+		);
+
+		expect(screen.queryByText("Desistir")).not.toBeOnTheScreen();
+		await user.press(screen.getByText("Próximo"));
+		expect(onNext).toHaveBeenCalledTimes(1);
 	});
 });

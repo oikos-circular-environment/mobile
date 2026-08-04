@@ -9,6 +9,7 @@ import {
 	ScrollView,
 	View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { LocationSourceBottomSheet } from "@/components/market/location-source-bottom-sheet";
 import { MarketListHeader } from "@/components/market/market-list-header";
@@ -63,6 +64,7 @@ function CompanyCardItem({
 	company: MarketCompany;
 	currentDate: Date;
 }) {
+	const { appliedFilters } = useMarket();
 	const isOpen = isCompanyOpenNow(company.business_hours, currentDate);
 	const initials = company.business_name
 		.split(" ")
@@ -140,18 +142,30 @@ function CompanyCardItem({
 					pointerEvents="auto"
 				>
 					<HStack space="sm">
-						{company.wastes.map(waste => (
-							<Badge key={waste.id} variant="secondary" className="gap-2">
-								<BadgeIcon as={RecycleIcon} />
-								<BadgeText>{waste.name}</BadgeText>
-							</Badge>
-						))}
-						{company.services.map(service => (
-							<Badge key={service.id} variant="secondary" className="gap-2">
-								<BadgeIcon as={HammerIcon} />
-								<BadgeText>{service.name}</BadgeText>
-							</Badge>
-						))}
+						{(!appliedFilters.category ||
+							appliedFilters.category === "waste") &&
+							company.wastes.map(waste => (
+								<Badge
+									key={waste.id}
+									variant="secondary"
+									className="px-4 py-2 gap-2"
+								>
+									<BadgeIcon as={RecycleIcon} />
+									<BadgeText>{waste.name}</BadgeText>
+								</Badge>
+							))}
+						{(!appliedFilters.category ||
+							appliedFilters.category === "services") &&
+							company.services.map(service => (
+								<Badge
+									key={service.id}
+									variant="secondary"
+									className="px-4 py-2 gap-2"
+								>
+									<BadgeIcon as={HammerIcon} />
+									<BadgeText>{service.name}</BadgeText>
+								</Badge>
+							))}
 					</HStack>
 				</ScrollView>
 			</VStack>
@@ -161,6 +175,7 @@ function CompanyCardItem({
 
 export default function MarketScreen() {
 	useRouteInteractive();
+	const insets = useSafeAreaInsets();
 	const currentDate = useNow();
 	const { permissionDenied } = useGeospatial();
 	const {
@@ -202,7 +217,11 @@ export default function MarketScreen() {
 			<FlatList
 				data={companies}
 				keyExtractor={company => company.id}
-				contentContainerClassName="px-4 pb-8"
+				contentContainerStyle={{
+					paddingTop: insets.top,
+					paddingHorizontal: 16,
+					paddingBottom: 32,
+				}}
 				ListHeaderComponent={MarketListHeader}
 				ItemSeparatorComponent={() => <View className="h-3" />}
 				renderItem={({ item: company }) => (

@@ -6,7 +6,7 @@ describe("survey-store", () => {
 	});
 
 	it("inicia uma sessão em IN_PROGRESS", () => {
-		useSurveyStore.getState().startSession("session-1");
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 
 		expect(useSurveyStore.getState()).toMatchObject({
 			sessionId: "session-1",
@@ -23,7 +23,7 @@ describe("survey-store", () => {
 	});
 
 	it("reset volta ao estado inicial", () => {
-		useSurveyStore.getState().startSession("session-1");
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 		useSurveyStore.getState().setParticipantCode("PSQ-ABCD-EFGH");
 
 		useSurveyStore.getState().reset();

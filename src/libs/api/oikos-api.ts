@@ -1,5 +1,7 @@
+import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { AxiosError } from "axios";
 import Constants from "expo-constants";
+import { networkTelemetryBus } from "../network-telemetry-bus";
 import { client } from "../oikos-sdk/client.gen";
 import {
 	clearTokens,
@@ -101,9 +103,37 @@ function processQueue(error: unknown, token: string | null = null) {
 	failedQueue = [];
 }
 
+function emitNetworkTelemetry(
+	config: InternalAxiosRequestConfig | undefined,
+	status: number,
+) {
+	if (!config?.url) return;
+
+	// O SDK gerado embute baseURL + querystring na própria `config.url` (sem usar
+	// `config.params`), então extraímos pathname e query de volta a partir dela —
+	// caso contrário sinais `kind: "api"` nunca casam com `path_pattern`.
+	const url = new URL(config.url, baseURL ?? "http://localhost");
+	const query: Record<string, string> = {};
+	url.searchParams.forEach((value, key) => {
+		query[key] = value;
+	});
+
+	networkTelemetryBus.emit({
+		method: (config.method ?? "get").toUpperCase(),
+		path: url.pathname,
+		status,
+		query,
+	});
+}
+
 client.instance.interceptors.response.use(
-	response => response,
+	(response: AxiosResponse) => {
+		emitNetworkTelemetry(response.config, response.status);
+		return response;
+	},
 	async (error: AxiosError) => {
+		emitNetworkTelemetry(error.config, error.response?.status ?? 0);
+
 		const originalRequest = error.config as {
 			_retry?: boolean;
 			url?: string;

@@ -1,4 +1,4 @@
-import { CheckIcon } from "lucide-react-native";
+import { CircleCheckIcon, CircleIcon } from "lucide-react-native";
 import { View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Pressable } from "@/components/ui/pressable";
@@ -24,24 +24,27 @@ export function OptionRow({
 		<Pressable
 			onPress={onPress}
 			className={cn(
-				"flex-row items-center justify-between gap-3 py-3",
+				"flex-row items-center gap-3 rounded-lg border border-border bg-white p-4",
+				selected && "border-lime-300 bg-lime-50",
 				className,
 			)}
 		>
-			<View className="flex-1">
+			<View className="flex-1 gap-0.5">
 				<Text size="sm" bold>
 					{title}
 				</Text>
 				{description ? (
-					<Text size="xs" className="text-muted-foreground">
+					<Text size="xs" className="leading-4 text-muted-foreground">
 						{description}
 					</Text>
 				) : null}
 			</View>
 
-			<View className={cn("size-5", !selected && "opacity-0")}>
-				<CheckIcon size={20} color={colors.lime[800]} />
-			</View>
+			{selected ? (
+				<CircleCheckIcon size={20} color={colors.lime[700]} />
+			) : (
+				<CircleIcon size={20} color={colors.gray[300]} />
+			)}
 		</Pressable>
 	);
 }

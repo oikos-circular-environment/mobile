@@ -11,8 +11,6 @@ let db: ReturnType<typeof drizzle<typeof schema>> | undefined;
 export function getSurveyDb() {
 	if (!db) {
 		const sqlite = openDatabaseSync(DATABASE_NAME);
-		// SQLite não liga cascata de exclusão por padrão — sem isso, apagar uma sessão
-		// deixaria execuções/eventos/respostas órfãos.
 		sqlite.execSync("PRAGMA foreign_keys = ON;");
 		db = drizzle(sqlite, { schema });
 	}
