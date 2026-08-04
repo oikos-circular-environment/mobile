@@ -7,16 +7,26 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import { useServicesCarouselContext } from "./context";
+import { ServicesCarouselDebugOverlay } from "./services-carousel-debug-overlay";
 import type { ServiceCarouselItem } from "./types";
 
 interface ServicesCarouselCardProps {
 	item: ServiceCarouselItem;
+	index: number;
 }
 
 const FOOTER_LABELS = ["REDUZA", "REUTILIZE", "RECICLE"];
 
-export function ServicesCarouselCard({ item }: ServicesCarouselCardProps) {
-	const { cardWidth, cardHeight, scale } = useServicesCarouselContext();
+/** Liga o overlay de debug de temporização/pausa — só pra depuração manual, não é UI final. */
+const SHOW_DEBUG_OVERLAY = true;
+
+export function ServicesCarouselCard({
+	item,
+	index,
+}: ServicesCarouselCardProps) {
+	const { cardWidth, cardHeight, scale, activeIndex } =
+		useServicesCarouselContext();
+	const isActive = index === activeIndex;
 
 	const cta = (
 		<View
@@ -61,6 +71,10 @@ export function ServicesCarouselCard({ item }: ServicesCarouselCardProps) {
 					height: cardHeight * 0.6,
 				}}
 			/>
+
+			{isActive ? (
+				<ServicesCarouselDebugOverlay isVisible={SHOW_DEBUG_OVERLAY} />
+			) : null}
 
 			<View
 				style={{ flex: 1, padding: 20 * scale }}

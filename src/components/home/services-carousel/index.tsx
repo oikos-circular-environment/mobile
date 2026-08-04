@@ -1,4 +1,5 @@
 import { ServicesCarouselCard } from "./services-carousel-card";
+import { ServicesCarouselDebugOverlay } from "./services-carousel-debug-overlay";
 import { ServicesCarouselRoot } from "./services-carousel-root";
 import { ServicesCarouselStep } from "./services-carousel-step";
 import { ServicesCarouselSteps } from "./services-carousel-steps";
@@ -10,6 +11,7 @@ export const ServicesCarousel = {
 	Step: ServicesCarouselStep,
 	Track: ServicesCarouselTrack,
 	Card: ServicesCarouselCard,
+	DebugOverlay: ServicesCarouselDebugOverlay,
 };
 
 export type { ServiceCarouselItem } from "./types";

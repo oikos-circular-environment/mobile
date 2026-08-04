@@ -26,6 +26,7 @@ export function ServicesCarouselRoot({
 }: ServicesCarouselRootProps) {
 	const [containerWidth, setContainerWidth] = useState(0);
 	const [activeIndex, setActiveIndex] = useState(0);
+	const [isPaused, setIsPaused] = useState(false);
 	const carouselRef = useRef<CarouselRef>(null);
 	const progress = useSharedValue(0);
 
@@ -52,6 +53,8 @@ export function ServicesCarouselRoot({
 			progress,
 			carouselRef,
 			autoPlayIntervalMs,
+			isPaused,
+			setIsPaused,
 			cardWidth,
 			cardHeight,
 			scale,
@@ -62,6 +65,7 @@ export function ServicesCarouselRoot({
 			activeIndex,
 			progress,
 			autoPlayIntervalMs,
+			isPaused,
 			cardWidth,
 			cardHeight,
 			scale,

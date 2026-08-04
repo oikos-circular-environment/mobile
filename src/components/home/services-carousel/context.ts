@@ -12,6 +12,9 @@ export interface ServicesCarouselContextValue {
 	progress: SharedValue<number>;
 	carouselRef: RefObject<CarouselRef | null>;
 	autoPlayIntervalMs: number;
+	/** true enquanto o usuário mantém o dedo sobre o carrossel (progress fica congelado). */
+	isPaused: boolean;
+	setIsPaused: (paused: boolean) => void;
 	/** Largura real do card já limitada ao teto de tablet e escalada a partir da referência do Pencil (360). */
 	cardWidth: number;
 	cardHeight: number;

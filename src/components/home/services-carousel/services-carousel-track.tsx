@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { View } from "react-native";
 import { cancelAnimation, Easing, withTiming } from "react-native-reanimated";
 import type { CarouselPanGesture } from "react-native-reanimated-carousel";
 import { Carousel } from "react-native-reanimated-carousel";
+import { scheduleOnRN } from "react-native-worklets";
 import { useServicesCarouselContext } from "./context";
 import { ServicesCarouselCard } from "./services-carousel-card";
 
@@ -20,15 +21,37 @@ export function ServicesCarouselTrack() {
 		progress,
 		setActiveIndex,
 		autoPlayIntervalMs,
+		isPaused,
+		setIsPaused,
 	} = useServicesCarouselContext();
+
+	// O auto-advance da própria lib reinicia do zero (5s inteiros) toda vez que o
+	// usuário solta o toque, em vez de continuar do tempo restante — por isso o
+	// avanço do card comanda por conta própria via `progress`: quando a barra
+	// (que pausa/retoma corretamente) termina, nós mesmos chamamos next().
+	const advanceToNext = useCallback(() => {
+		carouselRef.current?.next({ animated: true });
+	}, [carouselRef]);
+
+	const scheduleProgressTo1 = useCallback(
+		(durationMs: number) => {
+			progress.value = withTiming(
+				1,
+				{ duration: durationMs, easing: Easing.linear },
+				finished => {
+					if (finished) {
+						scheduleOnRN(advanceToNext);
+					}
+				},
+			);
+		},
+		[progress, advanceToNext],
+	);
 
 	const restartProgress = useCallback(() => {
 		progress.value = 0;
-		progress.value = withTiming(1, {
-			duration: autoPlayIntervalMs,
-			easing: Easing.linear,
-		});
-	}, [progress, autoPlayIntervalMs]);
+		scheduleProgressTo1(autoPlayIntervalMs);
+	}, [progress, autoPlayIntervalMs, scheduleProgressTo1]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: dispara só na montagem para animar o primeiro card
 	useEffect(() => {
@@ -52,25 +75,23 @@ export function ServicesCarouselTrack() {
 		[],
 	);
 
-	// A lib pausa o auto-advance internamente ao toque, mas a barra de progresso
-	// (nossa animação separada) não tem ideia disso — precisa ser pausada/retomada
-	// manualmente pra dar a resposta instantânea de "segurar = congela" (estilo Stories).
-	const isPausedRef = useRef(false);
-
 	const handleTouchStart = useCallback(() => {
-		isPausedRef.current = true;
+		setIsPaused(true);
 		cancelAnimation(progress);
-	}, [progress]);
+	}, [progress, setIsPaused]);
 
 	const handleTouchRelease = useCallback(() => {
-		if (!isPausedRef.current) return;
-		isPausedRef.current = false;
+		if (!isPaused) return;
+		setIsPaused(false);
 		const remainingMs = Math.max(0, (1 - progress.value) * autoPlayIntervalMs);
-		progress.value = withTiming(1, {
-			duration: remainingMs,
-			easing: Easing.linear,
-		});
-	}, [progress, autoPlayIntervalMs]);
+		scheduleProgressTo1(remainingMs);
+	}, [
+		isPaused,
+		progress,
+		autoPlayIntervalMs,
+		scheduleProgressTo1,
+		setIsPaused,
+	]);
 
 	return (
 		<View
@@ -81,13 +102,13 @@ export function ServicesCarouselTrack() {
 			<Carousel
 				ref={carouselRef}
 				loop
-				autoplay
-				autoplayInterval={autoPlayIntervalMs}
 				data={items}
 				style={{ width: cardWidth, height: cardHeight, alignSelf: "center" }}
 				onSnapToItem={handleSnapToItem}
 				onConfigurePanGesture={handleConfigurePanGesture}
-				renderItem={({ item }) => <ServicesCarouselCard item={item} />}
+				renderItem={({ item, index }) => (
+					<ServicesCarouselCard item={item} index={index} />
+				)}
 			/>
 		</View>
 	);
