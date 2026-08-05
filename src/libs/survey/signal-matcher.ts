@@ -1,5 +1,7 @@
 import type { NetworkTelemetryEvent } from "@/libs/network-telemetry-bus";
 import { networkTelemetryBus } from "@/libs/network-telemetry-bus";
+import type { UiEvent } from "@/libs/ui-event-bus";
+import { uiEventBus } from "@/libs/ui-event-bus";
 
 /**
  * `true` — o parâmetro precisa estar presente, com qualquer valor.
@@ -18,7 +20,8 @@ export type SuccessSignal =
 			status: number;
 			query?: Record<string, QueryMatcher>;
 	  }
-	| { kind: "screen"; route: string };
+	| { kind: "screen"; route: string }
+	| { kind: "event"; name: string; payload?: Record<string, QueryMatcher> };
 
 export interface SuccessRule {
 	mode: "any" | "all";
@@ -73,6 +76,15 @@ function apiSignalMatches(
 	);
 }
 
+function eventSignalMatches(
+	signal: Extract<SuccessSignal, { kind: "event" }>,
+	event: UiEvent,
+): boolean {
+	return (
+		event.name === signal.name && queryMatches(signal.payload, event.payload)
+	);
+}
+
 /**
  * Observa os sinais de uma tarefa e chama `onComplete` quando a regra é satisfeita —
  * `any` no primeiro sinal que casar, `all` só quando todos tiverem ocorrido. Nunca
@@ -108,6 +120,14 @@ export function createTaskSignalWatcher(
 		});
 	});
 
+	const unsubscribeUiEvent = uiEventBus.subscribe(event => {
+		rule.signals.forEach((signal, index) => {
+			if (signal.kind === "event" && eventSignalMatches(signal, event)) {
+				evaluate(index);
+			}
+		});
+	});
+
 	function notifyScreen(pathname: string) {
 		rule.signals.forEach((signal, index) => {
 			if (
@@ -121,6 +141,7 @@ export function createTaskSignalWatcher(
 
 	function dispose() {
 		unsubscribeNetwork();
+		unsubscribeUiEvent();
 	}
 
 	return { notifyScreen, dispose };

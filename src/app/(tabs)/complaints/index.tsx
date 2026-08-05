@@ -591,7 +591,7 @@ export default function ComplaintsMapScreen() {
 				onSelectComplaint={handleComplaintListItemPress}
 			/>
 
-			<ComplaintBottomSheet />
+			<ComplaintBottomSheet source="map" />
 
 			<ComplaintFilterBottomSheet
 				ref={filterSheetRef}

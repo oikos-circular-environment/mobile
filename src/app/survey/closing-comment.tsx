@@ -65,7 +65,7 @@ export default function SurveyClosingCommentScreen() {
 	return (
 		<View
 			className="flex-1 bg-white px-6 pb-6 gap-5"
-			style={{ paddingTop: insets.top + 56 }}
+			style={{ paddingTop: insets.top + 16 }}
 		>
 			<QHeader categoryLabel="Encerramento" currentIndex={1} totalCount={1} />
 

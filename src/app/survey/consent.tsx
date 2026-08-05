@@ -79,7 +79,7 @@ export default function SurveyConsentScreen() {
 				onScroll={handleScroll}
 				scrollEventThrottle={100}
 				contentContainerStyle={{
-					paddingTop: insets.top + 56,
+					paddingTop: insets.top + 16,
 					gap: 16,
 					paddingHorizontal: 24,
 					paddingBottom: 32,

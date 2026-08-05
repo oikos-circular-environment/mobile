@@ -163,7 +163,7 @@ export default function SurveyCharacterizationScreen() {
 	return (
 		<View
 			className="flex-1 bg-white px-6 pb-6 gap-4"
-			style={{ paddingTop: insets.top + 56 }}
+			style={{ paddingTop: insets.top + 16 }}
 		>
 			<QHeader
 				categoryLabel="Caracterização"

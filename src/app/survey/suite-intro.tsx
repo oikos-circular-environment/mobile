@@ -90,7 +90,7 @@ export default function SurveySuiteIntroScreen() {
 	return (
 		<View
 			className="flex-1 bg-white px-6 pb-8 justify-between"
-			style={{ paddingTop: insets.top + 56 }}
+			style={{ paddingTop: insets.top + 16 }}
 		>
 			<View className="gap-4">
 				<Text size="xs" bold className="uppercase tracking-wider text-lime-700">
