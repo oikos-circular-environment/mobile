@@ -82,12 +82,14 @@ jobs:
     name: Publish Android release notes and track
     type: custom
     needs: [submit_android, build_android]
+    # Outputs de outros jobs (needs.*) só resolvem em env no nível do job —
+    # em env de um step individual a expressão ${{ }} chega como string literal.
+    env:
+      ANDROID_VERSION_CODE: ${{ needs.build_android.outputs.app_build_version }}
     steps:
       - uses: eas/checkout
       - run: npm ci
       - name: Publish Android release
-        env:
-          ANDROID_VERSION_CODE: ${{ needs.build_android.outputs.app_build_version }}
         run: node scripts/publish-android-release.mjs
   submit_ios:
     name: Submit iOS
@@ -106,12 +108,14 @@ jobs:
     name: Submit iOS version for App Review
     type: custom
     needs: [submit_ios, build_ios]
+    # Outputs de outros jobs (needs.*) só resolvem em env no nível do job —
+    # em env de um step individual a expressão ${{ }} chega como string literal.
+    env:
+      IOS_BUILD_NUMBER: ${{ needs.build_ios.outputs.app_build_version }}
     steps:
       - uses: eas/checkout
       - run: npm ci
       - name: Attach build to App Store version
-        env:
-          IOS_BUILD_NUMBER: ${{ needs.build_ios.outputs.app_build_version }}
         run: node scripts/submit-ios-for-review.mjs --skip-submit
       # EXPO_APPLE_TEAM_ID é redundante com o appleTeamId do eas.json, mas o
       # comando ainda abre prompt sem ele — e prompt em CI é falha.
@@ -121,8 +125,6 @@ jobs:
           EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
         run: npx eas metadata:push --non-interactive
       - name: Submit for review
-        env:
-          IOS_BUILD_NUMBER: ${{ needs.build_ios.outputs.app_build_version }}
         run: node scripts/submit-ios-for-review.mjs
 
   publish_update:
