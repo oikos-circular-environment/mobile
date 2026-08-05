@@ -82,8 +82,6 @@ jobs:
     name: Publish Android release notes and track
     type: custom
     needs: [submit_android, build_android]
-    # Outputs de outros jobs (needs.*) só resolvem em env no nível do job —
-    # em env de um step individual a expressão ${{ }} chega como string literal.
     env:
       ANDROID_VERSION_CODE: ${{ needs.build_android.outputs.app_build_version }}
     steps:
@@ -108,8 +106,6 @@ jobs:
     name: Submit iOS version for App Review
     type: custom
     needs: [submit_ios, build_ios]
-    # Outputs de outros jobs (needs.*) só resolvem em env no nível do job —
-    # em env de um step individual a expressão ${{ }} chega como string literal.
     env:
       IOS_BUILD_NUMBER: ${{ needs.build_ios.outputs.app_build_version }}
     steps:
