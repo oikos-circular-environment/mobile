@@ -1,0 +1,121 @@
+import { render, screen } from "@testing-library/react-native";
+import * as Updates from "expo-updates";
+import {
+	DevBootDiagnostics,
+	OtaBootSplash,
+} from "@/components/boot-splash-screen";
+
+jest.mock("expo-updates", () => ({
+	checkForUpdateAsync: jest.fn(),
+	fetchUpdateAsync: jest.fn(),
+	useUpdates: jest.fn(() => ({ downloadProgress: 0 })),
+	isEmbeddedLaunch: true,
+	channel: "production",
+	runtimeVersion: "abc123",
+}));
+
+describe("boot-splash-screen", () => {
+	beforeEach(() => {
+		jest.useFakeTimers();
+		jest.mocked(Updates.checkForUpdateAsync).mockReset();
+		jest.mocked(Updates.fetchUpdateAsync).mockReset();
+	});
+
+	afterEach(() => {
+		jest.useRealTimers();
+	});
+
+	test("renders the Oikos wordmark with no progress bar before any update check resolves", async () => {
+		jest
+			.mocked(Updates.checkForUpdateAsync)
+			.mockReturnValue(new Promise(() => {}));
+		await render(<OtaBootSplash onReady={jest.fn()} />);
+
+		expect(screen.getByText("Oikos")).toBeOnTheScreen();
+		expect(screen.queryByText("Baixando melhorias")).not.toBeOnTheScreen();
+	});
+
+	test("walks through downloading, installing and ready before calling onReady when an update is available", async () => {
+		jest.mocked(Updates.checkForUpdateAsync).mockResolvedValue({
+			isAvailable: true,
+		} as Awaited<ReturnType<typeof Updates.checkForUpdateAsync>>);
+		jest
+			.mocked(Updates.fetchUpdateAsync)
+			.mockImplementation(
+				() =>
+					new Promise(resolve => setTimeout(resolve, 200)) as ReturnType<
+						typeof Updates.fetchUpdateAsync
+					>,
+			);
+		const onReady = jest.fn();
+		await render(<OtaBootSplash onReady={onReady} />);
+
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Baixando melhorias")).toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(200);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Instalando melhorias")).toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(450);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Tudo pronto")).toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(350);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(onReady).toHaveBeenCalledTimes(1);
+	});
+
+	test("calls onReady without showing progress when no update is available", async () => {
+		jest.mocked(Updates.checkForUpdateAsync).mockResolvedValue({
+			isAvailable: false,
+		} as Awaited<ReturnType<typeof Updates.checkForUpdateAsync>>);
+		const onReady = jest.fn();
+		await render(<OtaBootSplash onReady={onReady} />);
+
+		await jest.advanceTimersByTimeAsync(0);
+		expect(onReady).toHaveBeenCalledTimes(1);
+		expect(screen.queryByText("Baixando melhorias")).not.toBeOnTheScreen();
+	});
+
+	test("calls onReady after the timeout even if the check never resolves", async () => {
+		jest
+			.mocked(Updates.checkForUpdateAsync)
+			.mockReturnValue(new Promise(() => {}));
+		const onReady = jest.fn();
+		await render(<OtaBootSplash onReady={onReady} />);
+
+		expect(onReady).not.toHaveBeenCalled();
+		await jest.advanceTimersByTimeAsync(3000);
+		expect(onReady).toHaveBeenCalledTimes(1);
+	});
+
+	test("fails open and calls onReady when checkForUpdateAsync rejects", async () => {
+		jest
+			.mocked(Updates.checkForUpdateAsync)
+			.mockRejectedValue(new Error("network down"));
+		const onReady = jest.fn();
+		await render(<OtaBootSplash onReady={onReady} />);
+
+		await jest.advanceTimersByTimeAsync(0);
+		expect(onReady).toHaveBeenCalledTimes(1);
+	});
+
+	test("dev diagnostics shows env/update info and calls onReady on a timer", async () => {
+		await render(<DevBootDiagnostics onReady={jest.fn()} />);
+
+		expect(screen.getByText("Embedded launch")).toBeOnTheScreen();
+		expect(screen.getByText("true")).toBeOnTheScreen();
+		expect(screen.getByText("production")).toBeOnTheScreen();
+		expect(screen.getByText("abc123")).toBeOnTheScreen();
+	});
+
+	test("dev diagnostics calls onReady after its display timer", async () => {
+		const onReady = jest.fn();
+		await render(<DevBootDiagnostics onReady={onReady} />);
+
+		expect(onReady).not.toHaveBeenCalled();
+		await jest.advanceTimersByTimeAsync(900);
+		expect(onReady).toHaveBeenCalledTimes(1);
+	});
+});
