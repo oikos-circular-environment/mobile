@@ -4,6 +4,7 @@ import { useUpdates } from "expo-updates";
 import {
 	CloudDownloadIcon,
 	type LucideIcon,
+	SearchIcon,
 	SettingsIcon,
 	SproutIcon,
 } from "lucide-react-native";
@@ -30,12 +31,10 @@ const WORDMARK_FONT = "ReemKufi_700Bold";
 const LABEL_FONT = "SpaceGrotesk_400Regular";
 const CONTENT_WIDTH = 261;
 
-type OtaPhase = "idle" | "downloading" | "installing" | "ready";
+type OtaPhase = "checking" | "downloading" | "installing" | "ready";
 
-const PHASE_CONTENT: Record<
-	Exclude<OtaPhase, "idle">,
-	{ label: string; Icon: LucideIcon }
-> = {
+const PHASE_CONTENT: Record<OtaPhase, { label: string; Icon: LucideIcon }> = {
+	checking: { label: "Verificando se há atualizações", Icon: SearchIcon },
 	downloading: { label: "Baixando melhorias", Icon: CloudDownloadIcon },
 	installing: { label: "Instalando melhorias", Icon: SettingsIcon },
 	ready: { label: "Tudo pronto", Icon: SproutIcon },
@@ -153,7 +152,6 @@ function BootProgressStatus({
 	phase: OtaPhase;
 	progress: number;
 }) {
-	if (phase === "idle") return null;
 	const { label, Icon } = PHASE_CONTENT[phase];
 	return (
 		<>
@@ -172,7 +170,7 @@ function BootProgressStatus({
 // ERR_UPDATES_DISABLED em desenvolvimento.
 export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 	const { downloadProgress } = useUpdates();
-	const [phase, setPhase] = useState<OtaPhase>("idle");
+	const [phase, setPhase] = useState<OtaPhase>("checking");
 	const finishedRef = useRef(false);
 
 	const finish = useCallback(() => {
@@ -238,7 +236,7 @@ export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 type DevStep = { phase: OtaPhase; progress: number; holdMs: number };
 
 const DEV_PHASE_SEQUENCE: DevStep[] = [
-	{ phase: "idle", progress: 0, holdMs: 300 },
+	{ phase: "checking", progress: 0, holdMs: 300 },
 	{ phase: "downloading", progress: 35, holdMs: 450 },
 	{ phase: "downloading", progress: 85, holdMs: 400 },
 	{ phase: "installing", progress: 100, holdMs: 450 },

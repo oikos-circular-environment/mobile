@@ -32,13 +32,16 @@ describe("boot-splash-screen", () => {
 		jest.useRealTimers();
 	});
 
-	test("renders the Oikos wordmark with no progress bar before any update check resolves", async () => {
+	test("renders the wordmark and the checking status from the first frame, before any update check resolves", async () => {
 		jest
 			.mocked(Updates.checkForUpdateAsync)
 			.mockReturnValue(new Promise(() => {}));
 		await render(<OtaBootSplash onReady={jest.fn()} />);
 
 		expect(screen.getByText("Oikos")).toBeOnTheScreen();
+		expect(
+			screen.getByText("Verificando se há atualizações"),
+		).toBeOnTheScreen();
 		expect(screen.queryByText("Baixando melhorias")).not.toBeOnTheScreen();
 	});
 
@@ -73,7 +76,7 @@ describe("boot-splash-screen", () => {
 		expect(onReady).toHaveBeenCalledTimes(1);
 	});
 
-	test("calls onReady without showing progress when no update is available", async () => {
+	test("calls onReady without ever showing downloading when no update is available", async () => {
 		jest.mocked(Updates.checkForUpdateAsync).mockResolvedValue({
 			isAvailable: false,
 		} as Awaited<ReturnType<typeof Updates.checkForUpdateAsync>>);
@@ -128,6 +131,9 @@ describe("boot-splash-screen", () => {
 		await render(<DevBootDiagnostics onReady={onReady} />);
 
 		expect(screen.getByText("Oikos")).toBeOnTheScreen();
+		expect(
+			screen.getByText("Verificando se há atualizações"),
+		).toBeOnTheScreen();
 		expect(screen.queryByText("Baixando melhorias")).not.toBeOnTheScreen();
 
 		await jest.advanceTimersByTimeAsync(300);
