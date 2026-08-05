@@ -18,7 +18,6 @@ import { NotificationProvider } from "@/contexts/notification-context";
 import { sessionBus } from "@/libs/session-bus";
 import "./global.css";
 import "@/libs/api/oikos-api";
-import { FloatingDevTools } from "@buoy-gg/core";
 import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
 import { BlurView } from "expo-blur";
@@ -55,6 +54,15 @@ const REVEAL_LINGER_MS = 120;
 const REVEAL_FADE_MS = 500;
 
 const isDevelopmentMode = process.env.NODE_ENV === "development";
+
+// @buoy-gg/core drags in shared-ui/floating-tools-core/license and is only
+// ever rendered in dev. A static import would evaluate all of that on every
+// boot, dev or not — require() behind __DEV__ keeps it out of the production
+// bundle's evaluation path entirely.
+const FloatingDevTools = __DEV__
+	? (require("@buoy-gg/core") as typeof import("@buoy-gg/core"))
+			.FloatingDevTools
+	: null;
 
 function RootLayout() {
 	const [loaded, error] = useFonts({
