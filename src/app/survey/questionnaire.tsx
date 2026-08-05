@@ -18,6 +18,7 @@ import {
 	surveyAnswer,
 	surveyOutbox,
 	surveySuiteRun,
+	surveyTaskRun,
 } from "@/libs/survey/db/schema";
 import { drainOutbox, enqueueCheckpoint } from "@/libs/survey/queue/outbox";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
@@ -39,6 +40,9 @@ export default function SurveyQuestionnaireScreen() {
 	const suiteRunId = useSurveyExecutionStore(s => s.suiteRunId);
 	const suiteActiveMs = useSurveyExecutionStore(s => s.suiteActiveMs);
 	const tasks = useSurveyExecutionStore(s => s.tasks);
+	const suiteOutcomeOverride = useSurveyExecutionStore(
+		s => s.suiteOutcomeOverride,
+	);
 	const finishSuite = useSurveyExecutionStore(s => s.finishSuite);
 
 	const [stepIndex, setStepIndex] = useState(0);
@@ -88,7 +92,12 @@ export default function SurveyQuestionnaireScreen() {
 		try {
 			const doneCount = tasks.filter(t => t.status === "done").length;
 			const outcome =
-				doneCount === tasks.length ? "YES" : doneCount === 0 ? "NO" : "PARTIAL";
+				suiteOutcomeOverride ??
+				(doneCount === tasks.length
+					? "YES"
+					: doneCount === 0
+						? "NO"
+						: "PARTIAL");
 			const now = new Date().toISOString();
 			const db = getSurveyDb();
 
@@ -116,6 +125,11 @@ export default function SurveyQuestionnaireScreen() {
 				),
 			);
 
+			const taskRuns = await db
+				.select()
+				.from(surveyTaskRun)
+				.where(eq(surveyTaskRun.suiteRunId, suiteRunId));
+
 			await enqueueCheckpoint(sessionId, {
 				session_id: sessionId,
 				chunk: { index: 0, total: 1 },
@@ -128,6 +142,16 @@ export default function SurveyQuestionnaireScreen() {
 					finished_at: now,
 					outcome,
 				},
+				tasks: taskRuns.map(run => ({
+					code: run.taskCode,
+					position: run.position,
+					started_at: run.startedAt,
+					finished_at: run.finishedAt ?? undefined,
+					active_ms: run.activeMs ?? 0,
+					outcome:
+						(run.outcome as "YES" | "NO" | "PARTIAL" | null) ?? undefined,
+					auto_detected: run.autoDetected,
+				})),
 				answers: Object.entries(answers).map(([question_key, value]) => ({
 					question_key,
 					...value,

@@ -2,7 +2,10 @@ import {
 	CircleCheckIcon,
 	CircleDotDashedIcon,
 	CircleIcon,
+	CircleSlashIcon,
+	CircleXIcon,
 } from "lucide-react-native";
+import { Fragment } from "react";
 import { View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -13,7 +16,7 @@ import { cn } from "@/libs/utils";
 export interface TaskCardChecklistItem {
 	id: string;
 	label: string;
-	status: "done" | "current" | "pending";
+	status: "done" | "current" | "pending" | "skipped" | "abandoned";
 }
 
 interface TaskCardProps {
@@ -22,10 +25,15 @@ interface TaskCardProps {
 	elapsedLabel: string;
 	instruction: string;
 	checklist: TaskCardChecklistItem[];
-	allTasksCompleted?: boolean;
+	allTasksResolved?: boolean;
 	onPause: () => void;
-	onQuit: () => void;
+	/** Bottom-row action — mesmo botão que hoje troca com "Próximo" conforme o
+	 *  progresso das tarefas, agora abandonando a suíte atual em vez de navegar
+	 *  pro dashboard. */
+	onAbandonSuite: () => void;
 	onNext?: () => void;
+	onSkipTask?: () => void;
+	onAbandonTask?: () => void;
 	className?: string;
 }
 
@@ -35,10 +43,12 @@ export function TaskCard({
 	elapsedLabel,
 	instruction,
 	checklist,
-	allTasksCompleted = false,
+	allTasksResolved = false,
 	onPause,
-	onQuit,
+	onAbandonSuite,
 	onNext,
+	onSkipTask,
+	onAbandonTask,
 	className,
 }: TaskCardProps) {
 	return (
@@ -46,7 +56,7 @@ export function TaskCard({
 			<View className="gap-4">
 				<View className="flex-row items-center justify-between">
 					<Text size="sm" bold className="text-muted-foreground">
-						{allTasksCompleted
+						{allTasksResolved
 							? `${totalTasks} de ${totalTasks} concluídas`
 							: `Tarefa ${currentTask} de ${totalTasks}`}
 					</Text>
@@ -65,25 +75,50 @@ export function TaskCard({
 					</Text>
 
 					{checklist.map(item => (
-						<View key={item.id} className="flex-row items-center gap-2.5 py-2">
-							{item.status === "done" ? (
-								<CircleCheckIcon size={18} color={colors.lime[700]} />
-							) : item.status === "current" ? (
-								<CircleDotDashedIcon size={18} color="#7DC4FA" />
-							) : (
-								<CircleIcon size={18} color={colors.gray[300]} />
-							)}
-							<Text
-								size="sm"
-								bold={item.status === "current"}
-								className={cn(
-									"flex-1",
-									item.status === "pending" && "text-muted-foreground",
+						<Fragment key={item.id}>
+							<View className="flex-row items-center gap-2.5 py-2">
+								{item.status === "done" ? (
+									<CircleCheckIcon size={18} color={colors.lime[700]} />
+								) : item.status === "current" ? (
+									<CircleDotDashedIcon size={18} color="#7DC4FA" />
+								) : item.status === "abandoned" ? (
+									<CircleXIcon size={18} color={colors.red[600]} />
+								) : item.status === "skipped" ? (
+									<CircleSlashIcon size={18} color={colors.yellow[600]} />
+								) : (
+									<CircleIcon size={18} color={colors.gray[300]} />
 								)}
-							>
-								{item.label}
-							</Text>
-						</View>
+								<Text
+									size="sm"
+									bold={item.status === "current"}
+									className={cn(
+										"flex-1",
+										item.status === "pending" && "text-muted-foreground",
+									)}
+								>
+									{item.label}
+								</Text>
+							</View>
+
+							{item.status === "current" && onSkipTask && onAbandonTask ? (
+								<View className="flex-row gap-3 pb-2">
+									<Button
+										variant="destructive"
+										onPress={onAbandonTask}
+										className="flex-1"
+									>
+										<ButtonText>Abandonar</ButtonText>
+									</Button>
+									<Button
+										variant="outline"
+										onPress={onSkipTask}
+										className="flex-1"
+									>
+										<ButtonText>Pular</ButtonText>
+									</Button>
+								</View>
+							) : null}
+						</Fragment>
 					))}
 				</View>
 
@@ -91,13 +126,17 @@ export function TaskCard({
 					<Button variant="outline" onPress={onPause} className="flex-1">
 						<ButtonText>Pausar</ButtonText>
 					</Button>
-					{allTasksCompleted ? (
+					{allTasksResolved ? (
 						<Button onPress={onNext} className="flex-1">
 							<ButtonText>Próximo</ButtonText>
 						</Button>
 					) : (
-						<Button variant="destructive" onPress={onQuit} className="flex-1">
-							<ButtonText>Desistir</ButtonText>
+						<Button
+							variant="destructive"
+							onPress={onAbandonSuite}
+							className="flex-1"
+						>
+							<ButtonText>Abandonar</ButtonText>
 						</Button>
 					)}
 				</View>
