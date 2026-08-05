@@ -8,11 +8,9 @@ import {
 	SproutIcon,
 } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { Defs, RadialGradient, Rect, Stop, Svg } from "react-native-svg";
 import { colors } from "@/components/style/colors";
-import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
-import { Text } from "@/components/ui/text";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -23,6 +21,7 @@ const DEV_READY_HOLD_MS = 700;
 
 const WORDMARK_FONT = "ReemKufi_700Bold";
 const LABEL_FONT = "SpaceGrotesk_400Regular";
+const CONTENT_WIDTH = 261;
 
 type OtaPhase = "idle" | "downloading" | "installing" | "ready";
 
@@ -57,14 +56,16 @@ export function BootSplashScreen({
 	return <OtaBootSplash onReady={onReady} />;
 }
 
+// Essa tela roda antes do GluestackUIProvider/NativeWind estarem montados
+// (é a única do app nesse caso) — por isso usa só React Native puro
+// (StyleSheet, Text, View), sem className nem os wrappers de @/components/ui.
+// Um teste real mostrou o texto sumindo mesmo com a fonte carregada quando
+// misturado com esses dois, então fora do contexto do provider é melhor não
+// depender deles.
 function BootGradient() {
 	return (
 		<Svg
-			style={{
-				position: "absolute",
-				width: SCREEN_WIDTH,
-				height: SCREEN_HEIGHT,
-			}}
+			style={StyleSheet.absoluteFillObject}
 			width={SCREEN_WIDTH}
 			height={SCREEN_HEIGHT}
 		>
@@ -94,13 +95,18 @@ function BootGradient() {
 function BootWordmark({ fontSize }: { fontSize: number }) {
 	const fontFamily = isFontLoaded(WORDMARK_FONT) ? WORDMARK_FONT : undefined;
 	return (
-		<Text
-			className="text-white"
-			style={{ fontFamily, fontSize }}
-			numberOfLines={1}
-		>
+		<Text style={[styles.wordmark, { fontFamily, fontSize }]} numberOfLines={1}>
 			Oikos
 		</Text>
+	);
+}
+
+function BootProgressBar({ progress }: { progress: number }) {
+	const clamped = Math.max(0, Math.min(100, progress));
+	return (
+		<View style={styles.progressTrack}>
+			<View style={[styles.progressFill, { width: `${clamped}%` }]} />
+		</View>
 	);
 }
 
@@ -115,12 +121,10 @@ function BootProgressStatus({
 	const { label, Icon } = PHASE_CONTENT[phase];
 	return (
 		<>
-			<Progress value={progress} className="h-1 w-full">
-				<ProgressFilledTrack className="bg-white" />
-			</Progress>
-			<View className="flex-row items-center gap-2">
+			<BootProgressBar progress={progress} />
+			<View style={styles.statusRow}>
 				<Icon size={12} color="#ffffff" />
-				<Text className="text-xs text-white" style={{ fontFamily: LABEL_FONT }}>
+				<Text style={[styles.statusLabel, { fontFamily: LABEL_FONT }]}>
 					{label}
 				</Text>
 			</View>
@@ -164,10 +168,16 @@ export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 
 				setPhase("ready");
 				await wait(READY_BEAT_MS);
-			} catch {
-				// Falha silenciosa em produção: o app segue com o bundle atual.
-				// Um download parcial retoma no próximo boot (comportamento
-				// padrão do expo-updates).
+			} catch (err) {
+				// Falha silenciosa pro usuário: sem texto de erro, sem travar —
+				// pula pro mesmo estado "pronto" do caminho feliz antes de seguir
+				// pro app. O bundle atual continua rodando; um download parcial
+				// retoma no próximo boot (comportamento padrão do expo-updates).
+				console.warn("[boot-splash] checagem/download de OTA falhou", err);
+				if (!cancelled) {
+					setPhase("ready");
+					await wait(READY_BEAT_MS);
+				}
 			} finally {
 				clearTimeout(timeoutId);
 				finish();
@@ -183,10 +193,10 @@ export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 	const progressValue = Math.round((downloadProgress ?? 0) * 100);
 
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={styles.screen}>
 			<BootGradient />
-			<View className="flex-1 items-center justify-center px-8">
-				<View className="w-[261px] items-center gap-2">
+			<View style={styles.center}>
+				<View style={styles.content}>
 					<BootWordmark fontSize={96} />
 					<BootProgressStatus phase={phase} progress={progressValue} />
 				</View>
@@ -245,32 +255,98 @@ export function DevBootDiagnostics({
 	];
 
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={styles.screen}>
 			<BootGradient />
-			<View className="flex-1 items-center justify-center gap-10 px-8">
-				<View className="w-[261px] items-center gap-2">
-					<BootWordmark fontSize={96} />
-					<BootProgressStatus
-						phase={current.phase}
-						progress={current.progress}
-					/>
-				</View>
-				<View className="w-full gap-1 rounded-lg bg-black/20 p-4">
-					{rows.map(([label, value]) => (
-						<View key={label} className="flex-row gap-4">
-							<Text className="w-28 shrink-0 text-xs text-white/70">
-								{label}
-							</Text>
-							<Text
-								className="flex-1 text-right text-xs text-white"
-								numberOfLines={2}
-							>
-								{value}
-							</Text>
-						</View>
-					))}
+			<View style={styles.center}>
+				<View style={styles.devGroup}>
+					<View style={styles.content}>
+						<BootWordmark fontSize={96} />
+						<BootProgressStatus
+							phase={current.phase}
+							progress={current.progress}
+						/>
+					</View>
+					<View style={styles.debugPanel}>
+						{rows.map(([label, value]) => (
+							<View key={label} style={styles.debugRow}>
+								<Text style={styles.debugLabel}>{label}</Text>
+								<Text style={styles.debugValue} numberOfLines={2}>
+									{value}
+								</Text>
+							</View>
+						))}
+					</View>
 				</View>
 			</View>
 		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	screen: {
+		flex: 1,
+	},
+	center: {
+		flex: 1,
+		alignItems: "center",
+		justifyContent: "center",
+		paddingHorizontal: 32,
+	},
+	devGroup: {
+		width: "100%",
+		alignItems: "center",
+		gap: 40,
+	},
+	content: {
+		width: CONTENT_WIDTH,
+		alignItems: "center",
+		gap: 8,
+	},
+	wordmark: {
+		color: "#ffffff",
+	},
+	progressTrack: {
+		width: "100%",
+		height: 4,
+		borderRadius: 2,
+		backgroundColor: "rgba(255,255,255,0.2)",
+		overflow: "hidden",
+	},
+	progressFill: {
+		height: "100%",
+		borderRadius: 2,
+		backgroundColor: "#ffffff",
+	},
+	statusRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 8,
+	},
+	statusLabel: {
+		color: "#ffffff",
+		fontSize: 12,
+	},
+	debugPanel: {
+		width: "100%",
+		gap: 4,
+		borderRadius: 8,
+		backgroundColor: "rgba(0,0,0,0.2)",
+		padding: 16,
+	},
+	debugRow: {
+		flexDirection: "row",
+		gap: 16,
+	},
+	debugLabel: {
+		width: 112,
+		flexShrink: 0,
+		fontSize: 12,
+		color: "rgba(255,255,255,0.7)",
+	},
+	debugValue: {
+		flex: 1,
+		textAlign: "right",
+		fontSize: 12,
+		color: "#ffffff",
+	},
+});

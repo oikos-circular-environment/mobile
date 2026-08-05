@@ -90,7 +90,7 @@ describe("boot-splash-screen", () => {
 		expect(onReady).toHaveBeenCalledTimes(1);
 	});
 
-	test("fails open and calls onReady when checkForUpdateAsync rejects", async () => {
+	test("shows the ready state before calling onReady when checkForUpdateAsync rejects", async () => {
 		jest
 			.mocked(Updates.checkForUpdateAsync)
 			.mockRejectedValue(new Error("network down"));
@@ -98,6 +98,11 @@ describe("boot-splash-screen", () => {
 		await render(<OtaBootSplash onReady={onReady} />);
 
 		await jest.advanceTimersByTimeAsync(0);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Tudo pronto")).toBeOnTheScreen();
+		expect(onReady).not.toHaveBeenCalled();
+
+		await jest.advanceTimersByTimeAsync(350);
 		expect(onReady).toHaveBeenCalledTimes(1);
 	});
 
