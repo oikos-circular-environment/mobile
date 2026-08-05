@@ -1,5 +1,6 @@
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dimensions, Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -11,7 +12,13 @@ import { FloatingIndicator } from "@/components/survey/floating-indicator";
 import { useSurveyActiveTimer } from "@/components/survey/hooks/use-survey-active-timer";
 import { useSurveyTaskDetection } from "@/components/survey/hooks/use-survey-task-detection";
 import { TaskCard } from "@/components/survey/task-card";
-import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
+import { toast } from "@/components/toast";
+import { resolveTaskRun } from "@/libs/survey/task-run";
+import {
+	selectAllTasksResolved,
+	selectResolvedTaskCount,
+	useSurveyExecutionStore,
+} from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -33,9 +40,15 @@ export function SurveyExecutionOverlay() {
 	const isExpanded = useSurveyExecutionStore(s => s.isExpanded);
 	const tasks = useSurveyExecutionStore(s => s.tasks);
 	const currentTaskIndex = useSurveyExecutionStore(s => s.currentTaskIndex);
+	const suiteRunId = useSurveyExecutionStore(s => s.suiteRunId);
 	const suiteActiveMs = useSurveyExecutionStore(s => s.suiteActiveMs);
+	const allTasksResolved = useSurveyExecutionStore(selectAllTasksResolved);
+	const resolvedCount = useSurveyExecutionStore(selectResolvedTaskCount);
 	const setExpanded = useSurveyExecutionStore(s => s.setExpanded);
 	const setPaused = useSurveyExecutionStore(s => s.setPaused);
+	const skipCurrentTask = useSurveyExecutionStore(s => s.skipCurrentTask);
+	const abandonCurrentTask = useSurveyExecutionStore(s => s.abandonCurrentTask);
+	const abandonSuite = useSurveyExecutionStore(s => s.abandonSuite);
 
 	useSurveyActiveTimer();
 	useSurveyTaskDetection();
@@ -44,6 +57,21 @@ export function SurveyExecutionOverlay() {
 	const translateY = useSharedValue(0);
 	const [baseX, setBaseX] = useState(INDICATOR_DEFAULT_X);
 	const [baseY, setBaseY] = useState(INDICATOR_DEFAULT_Y);
+
+	const prevResolvedRef = useRef(false);
+	const skipNextCelebrationRef = useRef(false);
+
+	useEffect(() => {
+		if (allTasksResolved && !prevResolvedRef.current) {
+			if (!skipNextCelebrationRef.current) {
+				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+				toast.success("Você concluiu as tarefas desta etapa!");
+				setExpanded(true);
+			}
+			skipNextCelebrationRef.current = false;
+		}
+		prevResolvedRef.current = allTasksResolved;
+	}, [allTasksResolved, setExpanded]);
 
 	const panGesture = Gesture.Pan()
 		.onUpdate(e => {
@@ -76,8 +104,6 @@ export function SurveyExecutionOverlay() {
 		return null;
 	}
 
-	const allTasksCompleted =
-		tasks.length > 0 && tasks.every(task => task.status === "done");
 	const currentTask = tasks[currentTaskIndex];
 	const checklist = tasks.map(task => ({
 		id: task.code,
@@ -90,8 +116,39 @@ export function SurveyExecutionOverlay() {
 		setExpanded(false);
 	};
 
-	const handleQuit = () => {
-		router.push("/survey/resume");
+	const handleSkipTask = () => {
+		skipCurrentTask();
+	};
+
+	const handleAbandonTask = async () => {
+		if (!currentTask) return;
+		if (suiteRunId) {
+			// Modo de falha aceito: se a gravação local falhar, a ação do participante
+			// ainda avança — o outcome sai como "não gravado" em vez de travar a suíte.
+			await resolveTaskRun(
+				suiteRunId,
+				currentTask.code,
+				currentTask.position,
+				"NO",
+			).catch(() => {});
+		}
+		abandonCurrentTask();
+	};
+
+	const handleAbandonSuite = async () => {
+		skipNextCelebrationRef.current = true;
+		if (suiteRunId) {
+			const toResolve = tasks.filter(
+				t => t.status !== "done" && t.status !== "abandoned",
+			);
+			await Promise.all(
+				toResolve.map(t =>
+					resolveTaskRun(suiteRunId, t.code, t.position, "NO").catch(() => {}),
+				),
+			);
+		}
+		abandonSuite();
+		router.push("/survey/questionnaire");
 	};
 
 	return (
@@ -115,27 +172,29 @@ export function SurveyExecutionOverlay() {
 						onPress={event => event.stopPropagation()}
 						style={{ position: "absolute", left: 20, right: 20, top: 180 }}
 					>
-						{allTasksCompleted ? (
+						{allTasksResolved ? (
 							<TaskCard
-								currentTask={tasks.length}
+								currentTask={resolvedCount}
 								totalTasks={tasks.length}
 								elapsedLabel={formatElapsed(suiteActiveMs)}
-								instruction="Você concluiu todas as tarefas desta etapa. Toque em Próximo para responder o questionário rápido sobre ela."
+								instruction="Você chegou ao fim das tarefas desta etapa. Toque em Próximo para responder o questionário rápido sobre ela."
 								checklist={checklist}
-								allTasksCompleted
+								allTasksResolved
 								onPause={handlePause}
-								onQuit={handleQuit}
 								onNext={() => router.push("/survey/questionnaire")}
+								onAbandonSuite={handleAbandonSuite}
 							/>
 						) : currentTask ? (
 							<TaskCard
-								currentTask={currentTaskIndex + 1}
+								currentTask={resolvedCount + 1}
 								totalTasks={tasks.length}
 								elapsedLabel={formatElapsed(suiteActiveMs)}
 								instruction={currentTask.instruction}
 								checklist={checklist}
 								onPause={handlePause}
-								onQuit={handleQuit}
+								onSkipTask={handleSkipTask}
+								onAbandonTask={handleAbandonTask}
+								onAbandonSuite={handleAbandonSuite}
 							/>
 						) : null}
 					</Pressable>
@@ -144,7 +203,7 @@ export function SurveyExecutionOverlay() {
 				<GestureDetector gesture={panGesture}>
 					<Animated.View style={[{ position: "absolute" }, animatedStyle]}>
 						<FloatingIndicator
-							completedCount={currentTaskIndex}
+							completedCount={resolvedCount}
 							totalCount={tasks.length}
 							elapsedLabel={formatElapsed(suiteActiveMs)}
 							onPress={() => setExpanded(true)}

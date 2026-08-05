@@ -1,7 +1,11 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
 import SurveyQuestionnaireScreen from "@/app/survey/questionnaire";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
-import { surveySession, surveySuiteRun } from "@/libs/survey/db/schema";
+import {
+	surveySession,
+	surveySuiteRun,
+	surveyTaskRun,
+} from "@/libs/survey/db/schema";
 import { createTestSurveyDb } from "@/libs/survey/db/test-client";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -89,6 +93,7 @@ function setupSuite() {
 	useSurveyStore.getState().reset();
 	useSurveyStore.getState().startSession("session-1", "CITIZEN");
 
+	mockDb.delete(surveyTaskRun).run();
 	mockDb.delete(surveySuiteRun).run();
 	mockDb.delete(surveySession).run();
 
@@ -126,6 +131,19 @@ function setupSuite() {
 			suiteCode: "S1",
 			position: 0,
 			startedAt: now,
+		})
+		.run();
+	mockDb
+		.insert(surveyTaskRun)
+		.values({
+			id: "task-run-1",
+			suiteRunId: "suite-run-1",
+			taskCode: "T8",
+			position: 0,
+			startedAt: now,
+			finishedAt: now,
+			outcome: "YES",
+			autoDetected: true,
 		})
 		.run();
 }
@@ -218,5 +236,42 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Continuar depois"));
 
 		expect(mockDismissTo).toHaveBeenCalledWith("/(tabs)/(home)");
+	});
+
+	it("envia o array tasks real no checkpoint, montado a partir do SQLite local", async () => {
+		const user = userEvent.setup();
+		await render(<SurveyQuestionnaireScreen />);
+
+		await user.press(screen.getByText("Ótimo"));
+		await user.press(screen.getByText("Próxima"));
+		await user.press(screen.getByText("Não"));
+		await user.press(screen.getByText("Próxima"));
+
+		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(1);
+		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		expect(payload.tasks).toEqual([
+			expect.objectContaining({
+				code: "T8",
+				position: 0,
+				outcome: "YES",
+				auto_detected: true,
+			}),
+		]);
+	});
+
+	it("outcome da suíte respeita suiteOutcomeOverride (abandonar etapa) independente da contagem de done", async () => {
+		useSurveyExecutionStore.getState().abandonSuite();
+
+		const user = userEvent.setup();
+		await render(<SurveyQuestionnaireScreen />);
+
+		await user.press(screen.getByText("Ótimo"));
+		await user.press(screen.getByText("Próxima"));
+		await user.press(screen.getByText("Não"));
+		await user.press(screen.getByText("Próxima"));
+
+		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(1);
+		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		expect(payload.suite.outcome).toBe("NO");
 	});
 });

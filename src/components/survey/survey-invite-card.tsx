@@ -30,6 +30,7 @@ interface SurveyInviteCardProps {
 	participantCode?: string;
 	stages?: SurveyInviteStage[];
 	ctaLabel: string;
+	ctaDisabled?: boolean;
 	onPressCta: () => void;
 	className?: string;
 }
@@ -41,6 +42,7 @@ export function SurveyInviteCard({
 	participantCode,
 	stages,
 	ctaLabel,
+	ctaDisabled,
 	onPressCta,
 	className,
 }: SurveyInviteCardProps) {
@@ -185,6 +187,7 @@ export function SurveyInviteCard({
 							variant="secondary"
 							className="flex-1 h-12"
 							onPress={onPressCta}
+							disabled={ctaDisabled}
 						>
 							<ButtonText>{ctaLabel}</ButtonText>
 						</Button>
