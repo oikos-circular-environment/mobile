@@ -50,6 +50,8 @@ export function useSurveyInviteBanner() {
 		};
 	}
 
+	if (!protocol) return null;
+
 	return {
 		variant: "invite" as const,
 		title: "Ajude a melhorar o Oikos",

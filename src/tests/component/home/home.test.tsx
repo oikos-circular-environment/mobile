@@ -2,9 +2,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, userEvent } from "@testing-library/react-native";
 import type React from "react";
 import HomeScreen from "@/app/(tabs)/(home)";
+import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useSurveyStore } from "@/stores/survey-store";
+
+jest.mock("@/components/survey/hooks/use-survey-protocol");
+
+const protocolFixture = {
+	key: "oikos-walkthrough",
+	version: 1,
+	personas: [],
+	suites: [],
+	tasks: [],
+	questions: [],
+};
 
 const mockPush = jest.fn();
 
@@ -178,6 +190,9 @@ describe("HomeScreen — componente", () => {
 		setupAuth();
 		setupGeospatial();
 		useSurveyStore.getState().reset();
+		jest.mocked(useSurveyProtocol).mockReturnValue({
+			data: protocolFixture,
+		} as never);
 	});
 
 	afterEach(() => {
@@ -210,6 +225,15 @@ describe("HomeScreen — componente", () => {
 			screen.queryByText("Ajude a melhorar o Oikos"),
 		).not.toBeOnTheScreen();
 		expect(screen.queryByText("Continue de onde parou")).not.toBeOnTheScreen();
+	});
+
+	it("esconde o convite quando o survey está inativo no servidor", async () => {
+		jest.mocked(useSurveyProtocol).mockReturnValue({ data: null } as never);
+		await renderHome();
+
+		expect(
+			screen.queryByText("Ajude a melhorar o Oikos"),
+		).not.toBeOnTheScreen();
 	});
 
 	it("repassa isLoading para o HomeHero", async () => {

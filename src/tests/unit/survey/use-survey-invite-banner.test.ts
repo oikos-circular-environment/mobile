@@ -119,4 +119,21 @@ describe("useSurveyInviteBanner", () => {
 
 		expect(result.current?.participantCode).toBeUndefined();
 	});
+
+	it("retorna null quando o servidor não tem versão ativa do protocolo (IDLE)", async () => {
+		jest.mocked(useSurveyProtocol).mockReturnValue({ data: null } as never);
+
+		const { result } = await renderHook(() => useSurveyInviteBanner());
+
+		expect(result.current).toBeNull();
+	});
+
+	it("retomada continua aparecendo mesmo com protocol null/erro", async () => {
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
+		jest.mocked(useSurveyProtocol).mockReturnValue({ data: null } as never);
+
+		const { result } = await renderHook(() => useSurveyInviteBanner());
+
+		expect(result.current).toMatchObject({ variant: "resume" });
+	});
 });

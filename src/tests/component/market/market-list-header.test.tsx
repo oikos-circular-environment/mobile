@@ -171,25 +171,25 @@ describe("MarketListHeader", () => {
 	});
 
 	describe("botão de raio", () => {
-		it("exibe '2 km' quando appliedFilters.radius é '2000'", async () => {
+		it("exibe 'Raio 2 km' quando appliedFilters.radius é '2000'", async () => {
 			await renderHeader();
-			expect(screen.getByText("2 km")).toBeOnTheScreen();
+			expect(screen.getByText("Raio 2 km")).toBeOnTheScreen();
 		});
 
-		it("exibe '10 km' quando appliedFilters.radius é '10000'", async () => {
+		it("exibe 'Raio 10 km' quando appliedFilters.radius é '10000'", async () => {
 			setupMarket({
 				appliedFilters: { query: "", radius: "10000", category: undefined },
 			});
 			await renderHeader();
-			expect(screen.getByText("10 km")).toBeOnTheScreen();
+			expect(screen.getByText("Raio 10 km")).toBeOnTheScreen();
 		});
 
-		it("exibe '40 km' quando appliedFilters.radius é '40000'", async () => {
+		it("exibe 'Raio 40 km' quando appliedFilters.radius é '40000'", async () => {
 			setupMarket({
 				appliedFilters: { query: "", radius: "40000", category: undefined },
 			});
 			await renderHeader();
-			expect(screen.getByText("40 km")).toBeOnTheScreen();
+			expect(screen.getByText("Raio 40 km")).toBeOnTheScreen();
 		});
 	});
 
