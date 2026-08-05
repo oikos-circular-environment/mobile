@@ -14,7 +14,7 @@ export default function SurveyConsentEndedScreen() {
 	return (
 		<View
 			className="flex-1 bg-white px-6 pb-8 justify-between"
-			style={{ paddingTop: insets.top + 24 }}
+			style={{ paddingTop: insets.top + 16 }}
 		>
 			<View className="flex-1 items-center justify-center gap-4">
 				<LogOutIcon size={48} color={colors.lime[700]} />

@@ -138,7 +138,7 @@ export default function SurveyResumeScreen() {
 	return (
 		<View
 			className="flex-1 bg-white px-6 pb-6 gap-5"
-			style={{ paddingTop: insets.top + 56 }}
+			style={{ paddingTop: insets.top + 16 }}
 		>
 			<View className="flex-row items-center gap-2.5">
 				<Pressable onPress={() => router.back()} hitSlop={8}>
