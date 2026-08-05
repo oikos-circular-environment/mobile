@@ -48,6 +48,7 @@ type SplashStage = "boot" | "app";
 
 const REVEAL_LINGER_MS = 120;
 const REVEAL_FADE_MS = 500;
+const FONTS_TIMEOUT_MS = 6000;
 
 const isDevelopmentMode = process.env.NODE_ENV === "development";
 
@@ -72,15 +73,27 @@ function RootLayout() {
 		SpaceGrotesk_400Regular,
 	});
 	const fontsReady = loaded || error;
+	const [fontsTimedOut, setFontsTimedOut] = useState(false);
+	// Se useFonts nunca resolver, RootLayout ficaria preso em `return null`
+	// pra sempre. Depois desse teto, segue mesmo sem confirmação.
+	useEffect(() => {
+		if (fontsReady) return;
+		const timeoutId = setTimeout(
+			() => setFontsTimedOut(true),
+			FONTS_TIMEOUT_MS,
+		);
+		return () => clearTimeout(timeoutId);
+	}, [fontsReady]);
+	const canRenderBoot = fontsReady || fontsTimedOut;
 	const { markInteractive } = useObserve();
 	const [stage, setStage] = useState<SplashStage>("boot");
 	const revealBlurOpacity = useSharedValue(1);
 
 	useEffect(() => {
-		if (fontsReady) {
+		if (canRenderBoot) {
 			SplashScreen.hideAsync().catch(() => {});
 		}
-	}, [fontsReady]);
+	}, [canRenderBoot]);
 
 	useEffect(() => {
 		if (stage === "app") {
@@ -96,7 +109,7 @@ function RootLayout() {
 		opacity: revealBlurOpacity.value,
 	}));
 
-	if (!fontsReady) {
+	if (!canRenderBoot) {
 		return null;
 	}
 

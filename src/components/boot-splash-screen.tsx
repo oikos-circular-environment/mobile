@@ -7,7 +7,14 @@ import {
 	SettingsIcon,
 	SproutIcon,
 } from "lucide-react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	Component,
+	type PropsWithChildren,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { Defs, RadialGradient, Rect, Stop, Svg } from "react-native-svg";
 import { colors } from "@/components/style/colors";
@@ -50,22 +57,51 @@ export function BootSplashScreen({
 	onReady,
 	fontsError,
 }: BootSplashScreenWithFontsProps) {
-	if (__DEV__) {
-		return <DevBootDiagnostics onReady={onReady} fontsError={fontsError} />;
-	}
-	return <OtaBootSplash onReady={onReady} />;
+	return (
+		<BootErrorBoundary onReady={onReady}>
+			{__DEV__ ? (
+				<DevBootDiagnostics onReady={onReady} fontsError={fontsError} />
+			) : (
+				<OtaBootSplash onReady={onReady} />
+			)}
+		</BootErrorBoundary>
+	);
 }
 
-// Essa tela roda antes do GluestackUIProvider/NativeWind estarem montados
-// (é a única do app nesse caso) — por isso usa só React Native puro
-// (StyleSheet, Text, View), sem className nem os wrappers de @/components/ui.
-// Um teste real mostrou o texto sumindo mesmo com a fonte carregada quando
-// misturado com esses dois, então fora do contexto do provider é melhor não
-// depender deles.
+const BOOT_CRASH_RECOVERY_MS = 800;
+
+// _layout.tsx's <ErrorBoundary> só existe no stage "app" — sem isso, um erro
+// aqui deixaria a splash em branco pra sempre em vez de seguir pro app.
+class BootErrorBoundary extends Component<
+	PropsWithChildren<{ onReady: () => void }>,
+	{ hasError: boolean }
+> {
+	state = { hasError: false };
+
+	static getDerivedStateFromError() {
+		return { hasError: true };
+	}
+
+	componentDidCatch(error: unknown) {
+		console.warn("[boot-splash] erro ao renderizar, seguindo pro app", error);
+		setTimeout(this.props.onReady, BOOT_CRASH_RECOVERY_MS);
+	}
+
+	render() {
+		if (this.state.hasError) {
+			return <View style={styles.screen} />;
+		}
+		return this.props.children;
+	}
+}
+
+// Este arquivo evita NativeWind/@/components/ui de propósito: é a única tela
+// do app que renderiza antes do GluestackUIProvider montar, e isso já causou
+// texto invisível mesmo com a fonte carregada.
 function BootGradient() {
 	return (
 		<Svg
-			style={StyleSheet.absoluteFillObject}
+			style={StyleSheet.absoluteFill}
 			width={SCREEN_WIDTH}
 			height={SCREEN_HEIGHT}
 		>
@@ -132,12 +168,8 @@ function BootProgressStatus({
 	);
 }
 
-// Só roda de verdade fora do __DEV__: checkForUpdateAsync/fetchUpdateAsync
-// lançam ERR_UPDATES_DISABLED em desenvolvimento (Expo Go e dev client).
-// checkAutomatically está como "NEVER" no app.config.ts — essa é a única
-// fonte de verificação de update, não existe outra rodando em paralelo.
-// Exportado (junto com DevBootDiagnostics) para os testes poderem renderizar
-// cada variante diretamente, sem depender do valor de __DEV__ no ambiente.
+// Só roda fora do __DEV__: checkForUpdateAsync/fetchUpdateAsync lançam
+// ERR_UPDATES_DISABLED em desenvolvimento.
 export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 	const { downloadProgress } = useUpdates();
 	const [phase, setPhase] = useState<OtaPhase>("idle");
@@ -169,10 +201,8 @@ export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 				setPhase("ready");
 				await wait(READY_BEAT_MS);
 			} catch (err) {
-				// Falha silenciosa pro usuário: sem texto de erro, sem travar —
-				// pula pro mesmo estado "pronto" do caminho feliz antes de seguir
-				// pro app. O bundle atual continua rodando; um download parcial
-				// retoma no próximo boot (comportamento padrão do expo-updates).
+				// Falha silenciosa: mostra o mesmo "pronto" do caminho feliz e
+				// segue. Download parcial retoma no próximo boot.
 				console.warn("[boot-splash] checagem/download de OTA falhou", err);
 				if (!cancelled) {
 					setPhase("ready");
@@ -215,11 +245,8 @@ const DEV_PHASE_SEQUENCE: DevStep[] = [
 	{ phase: "ready", progress: 100, holdMs: 0 },
 ];
 
-// Updates reais não funcionam em __DEV__, então essa tela simula a mesma
-// sequência de produção com dados mockados (idle -> baixando -> instalando ->
-// pronto), pra dar uma ideia real de como os componentes vão se comportar, e
-// mostra um painel de diagnóstico de boot embaixo — mesmo padrão de
-// FloatingDevTools, só existe no bundle dev.
+// Updates reais não funcionam em __DEV__, então simula a mesma sequência com
+// dados mockados e mostra um painel de diagnóstico embaixo.
 export function DevBootDiagnostics({
 	onReady,
 	fontsError,

@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react-native";
+import * as Font from "expo-font";
 import * as Updates from "expo-updates";
 import {
+	BootSplashScreen,
 	DevBootDiagnostics,
 	OtaBootSplash,
 } from "@/components/boot-splash-screen";
@@ -12,6 +14,11 @@ jest.mock("expo-updates", () => ({
 	isEmbeddedLaunch: true,
 	channel: "production",
 	runtimeVersion: "abc123",
+}));
+
+jest.mock("expo-font", () => ({
+	isLoaded: jest.fn(() => false),
+	getLoadedFonts: jest.fn(() => []),
 }));
 
 describe("boot-splash-screen", () => {
@@ -142,5 +149,24 @@ describe("boot-splash-screen", () => {
 
 		await jest.advanceTimersByTimeAsync(700);
 		expect(onReady).toHaveBeenCalledTimes(1);
+	});
+
+	test("recovers and calls onReady if the boot screen throws while rendering", async () => {
+		jest.mocked(Font.isLoaded).mockImplementation(() => {
+			throw new Error("boom");
+		});
+		jest.spyOn(console, "error").mockImplementation(() => {});
+		jest.spyOn(console, "warn").mockImplementation(() => {});
+		const onReady = jest.fn();
+
+		await render(<BootSplashScreen onReady={onReady} />);
+
+		expect(onReady).not.toHaveBeenCalled();
+		await jest.advanceTimersByTimeAsync(800);
+		expect(onReady).toHaveBeenCalledTimes(1);
+
+		jest.mocked(Font.isLoaded).mockReturnValue(false);
+		jest.mocked(console.error).mockRestore();
+		jest.mocked(console.warn).mockRestore();
 	});
 });
