@@ -126,6 +126,7 @@ export default function CompanyHubScreen() {
 		<>
 			<Stack.Screen
 				options={{
+					title: company?.business_name ?? "Empresa",
 					headerLeft: () => (
 						<Pressable onPress={() => router.back()} className="pl-1">
 							<ChevronLeftIcon size={24} color={colors.gray[950]} />
@@ -189,7 +190,11 @@ export default function CompanyHubScreen() {
 									<Card className="shadow-none">
 										<View className="flex-row items-center gap-3">
 											<View className="size-8 items-center justify-center">
-												<option.icon size={28} strokeWidth={1.5} />
+												<option.icon
+													size={28}
+													strokeWidth={1.5}
+													color={colors.gray[950]}
+												/>
 											</View>
 
 											<View className="flex-1">
@@ -204,7 +209,7 @@ export default function CompanyHubScreen() {
 											</View>
 
 											{isLocked ? (
-												<LockKeyholeIcon size={18} color={colors.gray[400]} />
+												<LockKeyholeIcon size={18} color={colors.gray[950]} />
 											) : (
 												<ArrowRightIcon size={18} color={colors.gray[950]} />
 											)}

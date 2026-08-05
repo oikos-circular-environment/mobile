@@ -43,14 +43,19 @@ export function useComplaintsMap({
 			radius,
 		],
 		queryFn: async () => {
+			// `waste_category_id`/`hazard_level` só são enviados quando o participante
+			// realmente escolheu um filtro — mantê-los sempre presentes (mesmo com o
+			// valor padrão "ALL") faz o sinal de telemetria de rede parecer filtrado
+			// mesmo no primeiro carregamento do mapa, sem nenhuma ação do usuário.
 			const res = await getV1ComplaintsMap({
 				query: {
 					lat,
 					lon,
 					radius,
 					status,
-					waste_category_id: wasteCategoryId,
-					hazard_level: hazardLevel,
+					waste_category_id:
+						wasteCategoryId !== "ALL" ? wasteCategoryId : undefined,
+					hazard_level: hazardLevel !== "ALL" ? hazardLevel : undefined,
 				},
 			});
 			return res.data;

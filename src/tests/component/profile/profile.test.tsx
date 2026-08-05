@@ -149,7 +149,7 @@ describe("ProfileScreen", () => {
 
 	afterEach(() => {
 		jest.useRealTimers();
-		jest.resetAllMocks();
+		jest.clearAllMocks();
 	});
 
 	it("renderiza campos preenchidos com os dados do usuário", async () => {
@@ -257,6 +257,40 @@ describe("ProfileScreen", () => {
 		expect(
 			await screen.findByText("Informe um celular valido."),
 		).toBeOnTheScreen();
+	});
+
+	it("permite apagar o telefone dígito a dígito após preencher um número válido", async () => {
+		const user = userEvent.setup();
+		setupAuthMock({ user: mockUser });
+		await renderProfile();
+
+		const phoneInput = screen.getByTestId("input-phone");
+		await user.clear(phoneInput);
+		await user.type(phoneInput, "11987654321");
+
+		expect(phoneInput).toHaveProp("value", "(11) 9 8765-4321");
+
+		const expectedSequence = [
+			"(11) 9 8765-432",
+			"(11) 9 8765-43",
+			"(11) 9 8765-4",
+			"(11) 9 8765-",
+			"(11) 9876-5",
+			"(11) 9876-",
+			"(11) 9876",
+			"(11) 987",
+			"(11) 98",
+			"(11) 9",
+			"(11) ",
+			"11",
+			"1",
+			"",
+		];
+
+		for (const expected of expectedSequence) {
+			await user.type(phoneInput, "{Backspace}");
+			expect(phoneInput).toHaveProp("value", expected);
+		}
 	});
 
 	it("botão Cancelar restaura os valores originais e fica desabilitado novamente", async () => {

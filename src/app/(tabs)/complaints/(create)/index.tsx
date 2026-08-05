@@ -18,6 +18,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 import type { UploadProgress } from "@/components/complaints/hooks/upload-progress";
 import { useAttachmentRemove } from "@/components/complaints/hooks/use-attachment-remove";
@@ -109,6 +110,7 @@ type FormValues = z.infer<typeof schema>;
 
 export default function ComplaintCreateScreen() {
 	useRouteInteractive();
+	const insets = useSafeAreaInsets();
 	const { location, heading, addresses } = useGeospatial();
 	const {
 		attachments,
@@ -497,7 +499,12 @@ export default function ComplaintCreateScreen() {
 		<KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">
 			<ScrollView
 				className="flex-1"
-				contentContainerClassName="gap-4 px-4 py-4 pb-8"
+				contentContainerStyle={{
+					paddingTop: insets.top + 16,
+					gap: 16,
+					paddingHorizontal: 16,
+					paddingBottom: 32,
+				}}
 				keyboardShouldPersistTaps="handled"
 			>
 				{/* Info card */}

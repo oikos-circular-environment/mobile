@@ -7,6 +7,13 @@ jest.mock("react-native-worklets", () =>
 jest.mock("react-native-reanimated", () =>
 	require("react-native-reanimated/mock"),
 );
+jest.mock(
+	"react-native-safe-area-context",
+	() => require("react-native-safe-area-context/jest/mock").default,
+);
+jest.mock("expo-crypto", () => ({
+	randomUUID: () => require("node:crypto").randomUUID(),
+}));
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 

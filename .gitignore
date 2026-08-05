@@ -49,3 +49,7 @@ app-example
 
 # Test
 /coverage
+
+# Gerado por `eas metadata:pull`; a fonte de verdade é store.config.js
+store.config.json
+store/apple/

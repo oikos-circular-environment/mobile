@@ -74,7 +74,9 @@ export function MarketListHeader() {
 	});
 
 	const categoryValue = watch("category");
-	const onSubmit = handleSubmit(values => setAppliedFilters(values));
+	const onSubmit = handleSubmit(values =>
+		setAppliedFilters({ ...appliedFilters, query: values.query }),
+	);
 
 	return (
 		<View className="gap-4 pt-2 pb-2">
@@ -183,7 +185,7 @@ export function MarketListHeader() {
 					onPress={openRadiusSheet}
 				>
 					<NavigationIcon size={14} color={colors.gray[950]} />
-					<Text>{formatRadiusLabel(appliedFilters.radius)}</Text>
+					<Text>Raio {formatRadiusLabel(appliedFilters.radius)}</Text>
 				</Pressable>
 			</View>
 

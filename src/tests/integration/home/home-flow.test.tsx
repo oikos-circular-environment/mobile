@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, userEvent } from "@testing-library/react-native";
 import type React from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import HomeScreen from "@/app/(tabs)/(home)";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
@@ -10,6 +11,7 @@ const mockLinkPress = jest.fn();
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({ push: jest.fn(), navigate: jest.fn(), back: jest.fn() }),
+	useFocusEffect: (effect: () => void) => effect(),
 	Link: ({
 		children,
 		asChild,
@@ -34,16 +36,6 @@ jest.mock("expo-router", () => ({
 
 jest.mock("@/contexts/auth-context");
 jest.mock("@/contexts/geospatial-context");
-
-jest.mock("@/components/ui/grid", () => {
-	const R = require("react");
-	return {
-		Grid: ({ children }: { children: React.ReactNode }) =>
-			R.createElement(R.Fragment, null, children),
-		GridItem: ({ children }: { children: React.ReactNode }) =>
-			R.createElement(R.Fragment, null, children),
-	};
-});
 
 jest.mock("@/components/home/home-header-skeleton", () => {
 	const { View: V } = require("react-native");
@@ -147,9 +139,16 @@ async function renderHome() {
 		},
 	});
 	return await render(
-		<QueryClientProvider client={queryClient}>
-			<HomeScreen />
-		</QueryClientProvider>,
+		<SafeAreaProvider
+			initialMetrics={{
+				frame: { x: 0, y: 0, width: 375, height: 812 },
+				insets: { top: 47, left: 0, right: 0, bottom: 34 },
+			}}
+		>
+			<QueryClientProvider client={queryClient}>
+				<HomeScreen />
+			</QueryClientProvider>
+		</SafeAreaProvider>,
 	);
 }
 
@@ -166,11 +165,11 @@ describe("HomeScreen — integração", () => {
 		jest.clearAllMocks();
 	});
 
-	it("renderiza GuestCard com boas-vindas para visitante", async () => {
+	it("renderiza o botão de iniciar sessão para visitante", async () => {
 		setupAuth({ isAuthenticated: false });
 		await renderHome();
 
-		expect(screen.getByText("Bem-Vindos a Oikos!")).toBeOnTheScreen();
+		expect(screen.getByText("Iniciar sessão")).toBeOnTheScreen();
 	});
 
 	it("renderiza UserCard com nome de exibição para usuário logado", async () => {
@@ -266,7 +265,7 @@ describe("HomeScreen — integração", () => {
 		expect(screen.queryByTestId("home-header-skeleton")).not.toBeOnTheScreen();
 	});
 
-	it("abre modal de finalizar cadastro ao pressionar Empresas com needsProfileCompletion", async () => {
+	it("abre modal de finalizar cadastro ao pressionar Cadastrar agora com needsProfileCompletion", async () => {
 		const user = userEvent.setup();
 		setupAuth({
 			isAuthenticated: true,
@@ -275,7 +274,7 @@ describe("HomeScreen — integração", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 
 		expect(screen.getByTestId("modal-is-open")).toHaveTextContent("true");
 		expect(screen.getByTestId("modal-description")).toHaveTextContent(
@@ -292,7 +291,7 @@ describe("HomeScreen — integração", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 		expect(screen.getByTestId("modal-is-open")).toHaveTextContent("true");
 
 		await user.press(screen.getByTestId("modal-close-btn"));

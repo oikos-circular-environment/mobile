@@ -2,11 +2,26 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, userEvent } from "@testing-library/react-native";
 import type React from "react";
 import HomeScreen from "@/app/(tabs)/(home)";
+import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useSurveyStore } from "@/stores/survey-store";
+
+jest.mock("@/components/survey/hooks/use-survey-protocol");
+
+const protocolFixture = {
+	key: "oikos-walkthrough",
+	version: 1,
+	personas: [],
+	suites: [],
+	tasks: [],
+	questions: [],
+};
+
+const mockPush = jest.fn();
 
 jest.mock("expo-router", () => ({
-	useRouter: () => ({ push: jest.fn(), navigate: jest.fn(), back: jest.fn() }),
+	useRouter: () => ({ push: mockPush, navigate: jest.fn(), back: jest.fn() }),
 	Link: ({
 		children,
 		asChild,
@@ -27,24 +42,32 @@ jest.mock("expo-router", () => ({
 jest.mock("@/contexts/auth-context");
 jest.mock("@/contexts/geospatial-context");
 
-jest.mock("@/components/ui/grid", () => ({
-	Grid: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-	GridItem: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
-
-jest.mock("@/components/home/home-guest-card", () => {
-	const { View: V } = require("react-native");
-	return { HomeGuestCard: () => <V testID="home-guest-card" /> };
-});
-
-jest.mock("@/components/home/home-user-card", () => {
-	const { View: V } = require("react-native");
-	return { HomeUserCard: () => <V testID="home-user-card" /> };
-});
-
-jest.mock("@/components/home/home-header-skeleton", () => {
-	const { View: V } = require("react-native");
-	return { HomeHeaderSkeleton: () => <V testID="home-header-skeleton" /> };
+jest.mock("@/components/home/home-hero", () => {
+	const { Pressable: P, Text: T, View: V } = require("react-native");
+	return {
+		HomeHero: ({
+			isAuthenticated,
+			isLoading,
+			onOpenSettings,
+			onPressLogin,
+		}: {
+			isAuthenticated: boolean;
+			isLoading: boolean;
+			onOpenSettings: () => void;
+			onPressLogin: () => void;
+		}) => (
+			<V testID="home-hero">
+				<T testID="home-hero-is-loading">{String(isLoading)}</T>
+				<T testID="home-hero-is-authenticated">{String(isAuthenticated)}</T>
+				<P testID="home-hero-open-settings" onPress={onOpenSettings}>
+					<T>Configurações</T>
+				</P>
+				<P testID="home-hero-press-login" onPress={onPressLogin}>
+					<T>Iniciar sessão</T>
+				</P>
+			</V>
+		),
+	};
 });
 
 jest.mock("@/components/settings/settings-bottom-sheet", () => {
@@ -75,6 +98,31 @@ jest.mock("@/components/auth/profile-completion-modal", () => ({
 				</Pressable>
 				{description ? (
 					<Text testID="modal-description">{description}</Text>
+				) : null}
+			</RV>
+		);
+	},
+}));
+
+jest.mock("@/components/auth/auth-modal", () => ({
+	AuthModal: ({
+		isOpen,
+		onClose,
+		description,
+	}: {
+		isOpen: boolean;
+		onClose: () => void;
+		description?: string;
+	}) => {
+		const { Text, Pressable, View: RV } = require("react-native");
+		return (
+			<RV testID="auth-modal">
+				<Text testID="auth-modal-is-open">{String(isOpen)}</Text>
+				<Pressable testID="auth-modal-close-btn" onPress={onClose}>
+					<Text>Fechar</Text>
+				</Pressable>
+				{description ? (
+					<Text testID="auth-modal-description">{description}</Text>
 				) : null}
 			</RV>
 		);
@@ -141,6 +189,10 @@ describe("HomeScreen — componente", () => {
 		jest.useFakeTimers();
 		setupAuth();
 		setupGeospatial();
+		useSurveyStore.getState().reset();
+		jest.mocked(useSurveyProtocol).mockReturnValue({
+			data: protocolFixture,
+		} as never);
 	});
 
 	afterEach(() => {
@@ -148,48 +200,98 @@ describe("HomeScreen — componente", () => {
 		jest.clearAllMocks();
 	});
 
-	it("exibe skeleton enquanto isLoading é true", async () => {
+	it("exibe o convite da pesquisa quando não há participação iniciada", async () => {
+		await renderHome();
+
+		expect(screen.getByText("Ajude a melhorar o Oikos")).toBeOnTheScreen();
+	});
+
+	it("troca o rótulo do convite para retomada quando há participação em andamento", async () => {
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
+		await renderHome();
+
+		expect(screen.getByText("Continue de onde parou")).toBeOnTheScreen();
+		expect(
+			screen.queryByText("Ajude a melhorar o Oikos"),
+		).not.toBeOnTheScreen();
+	});
+
+	it("some o convite da pesquisa quando a participação está concluída", async () => {
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
+		useSurveyStore.getState().setStatus("COMPLETED");
+		await renderHome();
+
+		expect(
+			screen.queryByText("Ajude a melhorar o Oikos"),
+		).not.toBeOnTheScreen();
+		expect(screen.queryByText("Continue de onde parou")).not.toBeOnTheScreen();
+	});
+
+	it("esconde o convite quando o survey está inativo no servidor", async () => {
+		jest.mocked(useSurveyProtocol).mockReturnValue({ data: null } as never);
+		await renderHome();
+
+		expect(
+			screen.queryByText("Ajude a melhorar o Oikos"),
+		).not.toBeOnTheScreen();
+	});
+
+	it("repassa isLoading para o HomeHero", async () => {
 		setupAuth({ isLoading: true });
 		await renderHome();
 
-		expect(screen.getByTestId("home-header-skeleton")).toBeOnTheScreen();
-		expect(screen.queryByTestId("home-guest-card")).not.toBeOnTheScreen();
-		expect(screen.queryByTestId("home-user-card")).not.toBeOnTheScreen();
+		expect(screen.getByTestId("home-hero-is-loading")).toHaveTextContent(
+			"true",
+		);
 	});
 
-	it("renderiza HomeGuestCard quando não autenticado", async () => {
+	it("repassa isAuthenticated=false para o HomeHero quando não autenticado", async () => {
 		await renderHome();
 
-		expect(screen.getByTestId("home-guest-card")).toBeOnTheScreen();
-		expect(screen.queryByTestId("home-user-card")).not.toBeOnTheScreen();
-		expect(screen.queryByTestId("home-header-skeleton")).not.toBeOnTheScreen();
+		expect(screen.getByTestId("home-hero-is-authenticated")).toHaveTextContent(
+			"false",
+		);
 	});
 
-	it("renderiza HomeUserCard quando autenticado", async () => {
+	it("repassa isAuthenticated=true para o HomeHero quando autenticado", async () => {
 		setupAuth({ isAuthenticated: true, user: {} as never });
 		await renderHome();
 
-		expect(screen.getByTestId("home-user-card")).toBeOnTheScreen();
-		expect(screen.queryByTestId("home-guest-card")).not.toBeOnTheScreen();
+		expect(screen.getByTestId("home-hero-is-authenticated")).toHaveTextContent(
+			"true",
+		);
 	});
 
-	it("exibe Pontos de Coleta e Denúncias (sempre visíveis)", async () => {
+	it("navega para o login quando o HomeHero conclui o slide de iniciar sessão", async () => {
+		const user = userEvent.setup();
 		await renderHome();
 
-		expect(screen.getByText("Pontos de Coleta")).toBeOnTheScreen();
-		expect(screen.getByText("Denúncias")).toBeOnTheScreen();
+		await user.press(screen.getByTestId("home-hero-press-login"));
+
+		expect(mockPush).toHaveBeenCalledWith("/sign-in");
 	});
 
-	it("exibe card Empresas apenas quando autenticado", async () => {
+	it("exibe os 3 cards do carrossel de serviços sempre, mesmo deslogado", async () => {
 		await renderHome();
-		expect(screen.queryByText("Empresas")).not.toBeOnTheScreen();
 
-		setupAuth({ isAuthenticated: true, user: {} as never });
-		await renderHome();
-		expect(screen.getByText("Empresas")).toBeOnTheScreen();
+		expect(screen.getByText("RECICLAGEM")).toBeOnTheScreen();
+		expect(screen.getByText("DENÚNCIAS")).toBeOnTheScreen();
+		expect(screen.getByText("EMPRESAS")).toBeOnTheScreen();
 	});
 
-	it("abre modal de finalizar cadastro ao pressionar Empresas com needsProfileCompletion", async () => {
+	it("abre AuthModal ao pressionar CTA de Empresas quando não autenticado", async () => {
+		const user = userEvent.setup();
+		await renderHome();
+
+		await user.press(screen.getByText("Cadastrar agora"));
+
+		expect(screen.getByTestId("auth-modal-is-open")).toHaveTextContent("true");
+		expect(screen.getByTestId("auth-modal-description")).toHaveTextContent(
+			"Para cadastrar sua empresa você precisa ter uma conta. Cadastre-se gratuitamente e ajude a proteger o meio ambiente.",
+		);
+	});
+
+	it("abre modal de finalizar cadastro ao pressionar CTA de Empresas com needsProfileCompletion", async () => {
 		const user = userEvent.setup();
 		setupAuth({
 			isAuthenticated: true,
@@ -198,7 +300,7 @@ describe("HomeScreen — componente", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 
 		expect(screen.getByTestId("modal-is-open")).toHaveTextContent("true");
 	});
@@ -212,7 +314,7 @@ describe("HomeScreen — componente", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 		expect(screen.getByTestId("modal-is-open")).toHaveTextContent("true");
 
 		await user.press(screen.getByTestId("modal-close-btn"));
@@ -228,7 +330,7 @@ describe("HomeScreen — componente", () => {
 		});
 		await renderHome();
 
-		await user.press(screen.getByText("Empresas"));
+		await user.press(screen.getByText("Cadastrar agora"));
 
 		expect(screen.getByTestId("modal-description")).toHaveTextContent(
 			"Para acessar o gerenciamento de empresas você precisa finalizar o seu cadastro.",

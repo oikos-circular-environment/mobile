@@ -2,6 +2,7 @@ import { useFocusEffect } from "expo-router";
 import { ShieldIcon } from "lucide-react-native";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
 import { ComplaintCard } from "@/components/complaints/complaint-card";
@@ -21,6 +22,7 @@ import {
 
 export default function ComplaintsScreen() {
 	useRouteInteractive();
+	const insets = useSafeAreaInsets();
 	const filteredComplaints = useComplaintsStore(
 		useShallow(selectFilteredComplaints),
 	);
@@ -81,7 +83,12 @@ export default function ComplaintsScreen() {
 	return (
 		<View className="flex-1 bg-white">
 			<FlatList<Complaint>
-				contentContainerClassName="gap-4 px-4 py-4 pb-8"
+				contentContainerStyle={{
+					paddingTop: insets.top + 16,
+					gap: 16,
+					paddingHorizontal: 16,
+					paddingBottom: 32,
+				}}
 				data={filteredComplaints}
 				keyExtractor={item => item.id}
 				renderItem={renderItem}

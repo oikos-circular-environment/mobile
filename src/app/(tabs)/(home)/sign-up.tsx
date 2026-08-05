@@ -11,6 +11,7 @@ import {
 	useWindowDimensions,
 	View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Defs, RadialGradient, Rect, Stop, Svg } from "react-native-svg";
 import { z } from "zod";
 import { colors } from "@/components/style/colors";
@@ -43,6 +44,7 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpScreen() {
 	useRouteInteractive();
+	const insets = useSafeAreaInsets();
 	const { signUp, isLoading } = useAuthContext();
 	const router = useRouter();
 	const { width: screenWidth } = useWindowDimensions();
@@ -93,7 +95,10 @@ export default function SignUpScreen() {
 							fill="url(#headerGradient)"
 						/>
 					</Svg>
-					<View className="flex-1 p-8 justify-between">
+					<View
+						className="flex-1 px-8 pb-8 justify-between"
+						style={{ paddingTop: insets.top + 32 }}
+					>
 						<Pressable
 							onPress={router.back}
 							className="w-10 h-10 rounded-full bg-white items-center justify-center"
@@ -235,11 +240,7 @@ export default function SignUpScreen() {
 						)}
 					</FormControl>
 
-					<Button
-						size="lg"
-						onPress={handleSubmit(onSubmit)}
-						isDisabled={isLoading}
-					>
+					<Button onPress={handleSubmit(onSubmit)} isDisabled={isLoading}>
 						<ButtonText>Criar Conta</ButtonText>
 						{isLoading && <ButtonSpinner />}
 					</Button>
