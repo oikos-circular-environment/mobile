@@ -1,3 +1,4 @@
+import { isLoaded as isFontLoaded } from "expo-font";
 import * as Updates from "expo-updates";
 import { useUpdates } from "expo-updates";
 import {
@@ -18,7 +19,10 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const BOOT_TIMEOUT_MS = 3000;
 const INSTALL_BEAT_MS = 450;
 const READY_BEAT_MS = 350;
-const DEV_DIAGNOSTICS_MS = 900;
+const DEV_READY_HOLD_MS = 700;
+
+const WORDMARK_FONT = "ReemKufi_700Bold";
+const LABEL_FONT = "SpaceGrotesk_400Regular";
 
 type OtaPhase = "idle" | "downloading" | "installing" | "ready";
 
@@ -78,11 +82,52 @@ function BootGradient() {
 	);
 }
 
+// Cai pra fonte do sistema se o Reem Kufi não tiver terminado de carregar —
+// numa tela de boot, texto invisível é pior que texto na fonte errada.
+function BootWordmark({ fontSize }: { fontSize: number }) {
+	const fontFamily = isFontLoaded(WORDMARK_FONT) ? WORDMARK_FONT : undefined;
+	return (
+		<Text
+			className="text-white"
+			style={{ fontFamily, fontSize }}
+			numberOfLines={1}
+		>
+			Oikos
+		</Text>
+	);
+}
+
+function BootProgressStatus({
+	phase,
+	progress,
+}: {
+	phase: OtaPhase;
+	progress: number;
+}) {
+	if (phase === "idle") return null;
+	const { label, Icon } = PHASE_CONTENT[phase];
+	return (
+		<>
+			<Progress value={progress} className="h-1 w-full">
+				<ProgressFilledTrack className="bg-white" />
+			</Progress>
+			<View className="flex-row items-center gap-2">
+				<Icon size={12} color="#ffffff" />
+				<Text className="text-xs text-white" style={{ fontFamily: LABEL_FONT }}>
+					{label}
+				</Text>
+			</View>
+		</>
+	);
+}
+
 // Só roda de verdade fora do __DEV__: checkForUpdateAsync/fetchUpdateAsync
 // lançam ERR_UPDATES_DISABLED em desenvolvimento (Expo Go e dev client).
 // checkAutomatically está como "NEVER" no app.config.ts — essa é a única
 // fonte de verificação de update, não existe outra rodando em paralelo.
-function OtaBootSplash({ onReady }: BootSplashScreenProps) {
+// Exportado (junto com DevBootDiagnostics) para os testes poderem renderizar
+// cada variante diretamente, sem depender do valor de __DEV__ no ambiente.
+export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 	const { downloadProgress } = useUpdates();
 	const [phase, setPhase] = useState<OtaPhase>("idle");
 	const finishedRef = useRef(false);
@@ -128,7 +173,6 @@ function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 		};
 	}, [finish]);
 
-	const active = phase !== "idle" ? PHASE_CONTENT[phase] : null;
 	const progressValue = Math.round((downloadProgress ?? 0) * 100);
 
 	return (
@@ -136,49 +180,50 @@ function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 			<BootGradient />
 			<View className="flex-1 items-center justify-center px-8">
 				<View className="w-[261px] items-center gap-2">
-					<Text
-						className="text-white"
-						style={{ fontFamily: "ReemKufi_700Bold", fontSize: 96 }}
-						numberOfLines={1}
-					>
-						Oikos
-					</Text>
-
-					{active && (
-						<>
-							<Progress value={progressValue} className="h-1 w-full">
-								<ProgressFilledTrack className="bg-white" />
-							</Progress>
-
-							<View className="flex-row items-center gap-2">
-								<active.Icon size={12} color="#ffffff" />
-								<Text
-									className="text-xs text-white"
-									style={{ fontFamily: "SpaceGrotesk_400Regular" }}
-								>
-									{active.label}
-								</Text>
-							</View>
-						</>
-					)}
+					<BootWordmark fontSize={96} />
+					<BootProgressStatus phase={phase} progress={progressValue} />
 				</View>
 			</View>
 		</View>
 	);
 }
 
-// Painel de diagnóstico de boot, só existe no bundle de dev (mesmo padrão de
-// FloatingDevTools em _layout.tsx). Updates reais não funcionam em __DEV__,
-// então não faz sentido mostrar a sequência de download aqui — em vez disso
-// mostra o que costuma ser causa de dor de cabeça: pra qual host o app está
-// apontando, se é um launch embutido, canal e runtime version.
-function DevBootDiagnostics({ onReady }: BootSplashScreenProps) {
+type DevStep = { phase: OtaPhase; progress: number; holdMs: number };
+
+const DEV_PHASE_SEQUENCE: DevStep[] = [
+	{ phase: "idle", progress: 0, holdMs: 300 },
+	{ phase: "downloading", progress: 35, holdMs: 450 },
+	{ phase: "downloading", progress: 85, holdMs: 400 },
+	{ phase: "installing", progress: 100, holdMs: 450 },
+	{ phase: "ready", progress: 100, holdMs: 0 },
+];
+
+// Updates reais não funcionam em __DEV__, então essa tela simula a mesma
+// sequência de produção com dados mockados (idle -> baixando -> instalando ->
+// pronto), pra dar uma ideia real de como os componentes vão se comportar, e
+// mostra um painel de diagnóstico de boot embaixo — mesmo padrão de
+// FloatingDevTools, só existe no bundle dev.
+export function DevBootDiagnostics({ onReady }: BootSplashScreenProps) {
+	const [step, setStep] = useState(0);
+	const current = DEV_PHASE_SEQUENCE[step] ??
+		DEV_PHASE_SEQUENCE.at(-1) ?? {
+			phase: "ready" as const,
+			progress: 100,
+			holdMs: 0,
+		};
+	const isLastStep = step >= DEV_PHASE_SEQUENCE.length - 1;
+
 	useEffect(() => {
-		const timeoutId = setTimeout(onReady, DEV_DIAGNOSTICS_MS);
+		if (isLastStep) {
+			const timeoutId = setTimeout(onReady, DEV_READY_HOLD_MS);
+			return () => clearTimeout(timeoutId);
+		}
+		const timeoutId = setTimeout(() => setStep(s => s + 1), current.holdMs);
 		return () => clearTimeout(timeoutId);
-	}, [onReady]);
+	}, [isLastStep, current.holdMs, onReady]);
 
 	const rows: [string, string][] = [
+		["Reem Kufi", isFontLoaded(WORDMARK_FONT) ? "carregada" : "FALTANDO"],
 		["API", process.env.EXPO_PUBLIC_BASE_URL ?? "—"],
 		["Survey", process.env.EXPO_PUBLIC_SURVEY_BASE_URL ?? "—"],
 		["Embedded launch", String(Updates.isEmbeddedLaunch)],
@@ -187,25 +232,26 @@ function DevBootDiagnostics({ onReady }: BootSplashScreenProps) {
 	];
 
 	return (
-		<View
-			className="flex-1 items-center justify-center gap-6 px-8"
-			style={{ backgroundColor: colors.lime[800] }}
-		>
-			<Text
-				className="text-white"
-				style={{ fontFamily: "ReemKufi_700Bold", fontSize: 64 }}
-			>
-				Oikos
-			</Text>
-			<View className="w-full gap-1 rounded-lg bg-black/20 p-4">
-				{rows.map(([label, value]) => (
-					<View key={label} className="flex-row justify-between gap-4">
-						<Text className="text-xs text-white/70">{label}</Text>
-						<Text className="text-xs text-white" numberOfLines={1}>
-							{value}
-						</Text>
-					</View>
-				))}
+		<View style={{ flex: 1 }}>
+			<BootGradient />
+			<View className="flex-1 items-center justify-center gap-10 px-8">
+				<View className="w-[261px] items-center gap-2">
+					<BootWordmark fontSize={96} />
+					<BootProgressStatus
+						phase={current.phase}
+						progress={current.progress}
+					/>
+				</View>
+				<View className="w-full gap-1 rounded-lg bg-black/20 p-4">
+					{rows.map(([label, value]) => (
+						<View key={label} className="flex-row justify-between gap-4">
+							<Text className="text-xs text-white/70">{label}</Text>
+							<Text className="text-xs text-white" numberOfLines={1}>
+								{value}
+							</Text>
+						</View>
+					))}
+				</View>
 			</View>
 		</View>
 	);

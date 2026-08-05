@@ -101,21 +101,41 @@ describe("boot-splash-screen", () => {
 		expect(onReady).toHaveBeenCalledTimes(1);
 	});
 
-	test("dev diagnostics shows env/update info and calls onReady on a timer", async () => {
+	test("dev diagnostics shows env/update info alongside the mocked sequence", async () => {
 		await render(<DevBootDiagnostics onReady={jest.fn()} />);
 
+		expect(screen.getByText("Reem Kufi")).toBeOnTheScreen();
 		expect(screen.getByText("Embedded launch")).toBeOnTheScreen();
 		expect(screen.getByText("true")).toBeOnTheScreen();
 		expect(screen.getByText("production")).toBeOnTheScreen();
 		expect(screen.getByText("abc123")).toBeOnTheScreen();
 	});
 
-	test("dev diagnostics calls onReady after its display timer", async () => {
+	test("dev diagnostics walks through the mocked phases before calling onReady", async () => {
 		const onReady = jest.fn();
 		await render(<DevBootDiagnostics onReady={onReady} />);
 
+		expect(screen.getByText("Oikos")).toBeOnTheScreen();
+		expect(screen.queryByText("Baixando melhorias")).not.toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(300);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Baixando melhorias")).toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(450);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Baixando melhorias")).toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(400);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Instalando melhorias")).toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(450);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Tudo pronto")).toBeOnTheScreen();
 		expect(onReady).not.toHaveBeenCalled();
-		await jest.advanceTimersByTimeAsync(900);
+
+		await jest.advanceTimersByTimeAsync(700);
 		expect(onReady).toHaveBeenCalledTimes(1);
 	});
 });
