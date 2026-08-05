@@ -101,7 +101,9 @@ function RootLayout() {
 	}
 
 	if (stage === "boot") {
-		return <BootSplashScreen onReady={() => setStage("app")} />;
+		return (
+			<BootSplashScreen onReady={() => setStage("app")} fontsError={error} />
+		);
 	}
 
 	return (

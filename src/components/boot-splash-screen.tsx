@@ -1,4 +1,4 @@
-import { isLoaded as isFontLoaded } from "expo-font";
+import { getLoadedFonts, isLoaded as isFontLoaded } from "expo-font";
 import * as Updates from "expo-updates";
 import { useUpdates } from "expo-updates";
 import {
@@ -43,9 +43,16 @@ type BootSplashScreenProps = {
 	onReady: () => void;
 };
 
-export function BootSplashScreen({ onReady }: BootSplashScreenProps) {
+type BootSplashScreenWithFontsProps = BootSplashScreenProps & {
+	fontsError?: Error | null;
+};
+
+export function BootSplashScreen({
+	onReady,
+	fontsError,
+}: BootSplashScreenWithFontsProps) {
 	if (__DEV__) {
-		return <DevBootDiagnostics onReady={onReady} />;
+		return <DevBootDiagnostics onReady={onReady} fontsError={fontsError} />;
 	}
 	return <OtaBootSplash onReady={onReady} />;
 }
@@ -203,7 +210,10 @@ const DEV_PHASE_SEQUENCE: DevStep[] = [
 // pronto), pra dar uma ideia real de como os componentes vão se comportar, e
 // mostra um painel de diagnóstico de boot embaixo — mesmo padrão de
 // FloatingDevTools, só existe no bundle dev.
-export function DevBootDiagnostics({ onReady }: BootSplashScreenProps) {
+export function DevBootDiagnostics({
+	onReady,
+	fontsError,
+}: BootSplashScreenWithFontsProps) {
 	const [step, setStep] = useState(0);
 	const current = DEV_PHASE_SEQUENCE[step] ??
 		DEV_PHASE_SEQUENCE.at(-1) ?? {
@@ -222,8 +232,11 @@ export function DevBootDiagnostics({ onReady }: BootSplashScreenProps) {
 		return () => clearTimeout(timeoutId);
 	}, [isLastStep, current.holdMs, onReady]);
 
+	const loadedFonts = getLoadedFonts();
 	const rows: [string, string][] = [
 		["Reem Kufi", isFontLoaded(WORDMARK_FONT) ? "carregada" : "FALTANDO"],
+		["useFonts error", fontsError ? fontsError.message : "—"],
+		["Fontes nativas", loadedFonts.length ? loadedFonts.join(", ") : "nenhuma"],
 		["API", process.env.EXPO_PUBLIC_BASE_URL ?? "—"],
 		["Survey", process.env.EXPO_PUBLIC_SURVEY_BASE_URL ?? "—"],
 		["Embedded launch", String(Updates.isEmbeddedLaunch)],
@@ -244,9 +257,14 @@ export function DevBootDiagnostics({ onReady }: BootSplashScreenProps) {
 				</View>
 				<View className="w-full gap-1 rounded-lg bg-black/20 p-4">
 					{rows.map(([label, value]) => (
-						<View key={label} className="flex-row justify-between gap-4">
-							<Text className="text-xs text-white/70">{label}</Text>
-							<Text className="text-xs text-white" numberOfLines={1}>
+						<View key={label} className="flex-row gap-4">
+							<Text className="w-28 shrink-0 text-xs text-white/70">
+								{label}
+							</Text>
+							<Text
+								className="flex-1 text-right text-xs text-white"
+								numberOfLines={2}
+							>
 								{value}
 							</Text>
 						</View>
