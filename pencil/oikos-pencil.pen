@@ -9603,7 +9603,7 @@
             {
               "type": "frame",
               "id": "QSyXt",
-              "name": "(home)/sign-in",
+              "name": "splash",
               "clip": true,
               "width": 430,
               "height": 932,
@@ -9613,6 +9613,720 @@
                 {
                   "type": "frame",
                   "id": "IrU9z",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "radial",
+                    "enabled": true,
+                    "rotation": 0,
+                    "size": {
+                      "width": 1,
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "$lime-800",
+                        "position": 1
+                      },
+                      {
+                        "color": "$lime-600",
+                        "position": 0
+                      }
+                    ],
+                    "center": {
+                      "y": 0.04
+                    }
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000040",
+                    "offset": {
+                      "x": 0,
+                      "y": 5
+                    },
+                    "blur": 20
+                  },
+                  "layout": "vertical",
+                  "gap": "$spacing-2",
+                  "padding": [
+                    32,
+                    16
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "cVlAj",
+                      "name": "Oikos",
+                      "fill": "#ffffffff",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Oikos",
+                      "textAlign": "center",
+                      "fontFamily": "Reem Kufi",
+                      "fontSize": 96,
+                      "fontWeight": "700"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JEekq",
+              "name": "splash",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "nvCrj",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "radial",
+                    "enabled": true,
+                    "rotation": 0,
+                    "size": {
+                      "width": 1,
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "$lime-800",
+                        "position": 1
+                      },
+                      {
+                        "color": "$lime-600",
+                        "position": 0
+                      }
+                    ],
+                    "center": {
+                      "y": 0.04
+                    }
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000040",
+                    "offset": {
+                      "x": 0,
+                      "y": 5
+                    },
+                    "blur": 20
+                  },
+                  "layout": "vertical",
+                  "gap": "$spacing-2",
+                  "padding": [
+                    32,
+                    16
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "K15mGv",
+                      "name": "Frame 48",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "KPJ5T",
+                          "name": "Oikos",
+                          "fill": "#ffffffff",
+                          "effect": {
+                            "type": "shadow",
+                            "shadowType": "outer",
+                            "color": "#00000033",
+                            "offset": {
+                              "x": 0,
+                              "y": 8
+                            },
+                            "blur": 8
+                          },
+                          "textGrowth": "fixed-width",
+                          "width": 261,
+                          "content": "Oikos",
+                          "textAlign": "center",
+                          "fontFamily": "Reem Kufi",
+                          "fontSize": 96,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "DkRIo",
+                          "name": "Progress",
+                          "width": "fill_container",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "iVgeD",
+                              "name": "Progress",
+                              "width": "fill_container",
+                              "height": "fit_content(4)",
+                              "fill": {
+                                "type": "gradient",
+                                "gradientType": "linear",
+                                "enabled": true,
+                                "rotation": -89.99999999999999,
+                                "size": {
+                                  "height": 0.9999999999999999
+                                },
+                                "colors": [
+                                  {
+                                    "color": "$lime-600",
+                                    "position": 0.38735677469478474
+                                  },
+                                  {
+                                    "color": "#ffffffff",
+                                    "position": 1
+                                  }
+                                ],
+                                "center": {
+                                  "x": 0.49999999999999994,
+                                  "y": 0.4999999999999999
+                                }
+                              },
+                              "cornerRadius": 2,
+                              "stroke": "#9da4b01e",
+                              "strokeWidth": 0.5,
+                              "strokeAlignment": "inner",
+                              "gap": 4,
+                              "justifyContent": "center"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "w6r1Ho",
+                      "name": "Logs",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "l1MjC",
+                          "name": "download",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "F2rTwt",
+                              "fill": "#ffffff",
+                              "content": "Baixando melhorias",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "ZPkXp",
+                              "name": "Icon",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "cloud-download",
+                              "library": "lucide",
+                              "fill": "$9:--background"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "vVXnh",
+                          "x": 0,
+                          "y": 15,
+                          "name": "install",
+                          "enabled": false,
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "tzXlp",
+                              "fill": "#ffffff",
+                              "content": "Instalando melhorias",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "Z2g3f",
+                              "name": "Icon",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "code-xml",
+                              "library": "lucide",
+                              "fill": "$9:--background"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "jLTUn",
+              "name": "splash",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fIF3x",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "radial",
+                    "enabled": true,
+                    "rotation": 0,
+                    "size": {
+                      "width": 1,
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "$lime-800",
+                        "position": 1
+                      },
+                      {
+                        "color": "$lime-600",
+                        "position": 0
+                      }
+                    ],
+                    "center": {
+                      "y": 0.04
+                    }
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000040",
+                    "offset": {
+                      "x": 0,
+                      "y": 5
+                    },
+                    "blur": 20
+                  },
+                  "layout": "vertical",
+                  "gap": "$spacing-2",
+                  "padding": [
+                    32,
+                    16
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "vHifd",
+                      "name": "Frame 48",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "eCO7M",
+                          "name": "Oikos",
+                          "fill": "#ffffffff",
+                          "effect": {
+                            "type": "shadow",
+                            "shadowType": "outer",
+                            "color": "#00000033",
+                            "offset": {
+                              "x": 0,
+                              "y": 8
+                            },
+                            "blur": 8
+                          },
+                          "textGrowth": "fixed-width",
+                          "width": 261,
+                          "content": "Oikos",
+                          "textAlign": "center",
+                          "fontFamily": "Reem Kufi",
+                          "fontSize": 96,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "CiaDn",
+                          "name": "Progress",
+                          "width": "fill_container",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Fl96F",
+                              "name": "Progress",
+                              "width": "fill_container",
+                              "height": "fit_content(4)",
+                              "fill": {
+                                "type": "gradient",
+                                "gradientType": "linear",
+                                "enabled": true,
+                                "rotation": -89.99999999999999,
+                                "size": {
+                                  "height": 0.9999999999999999
+                                },
+                                "colors": [
+                                  {
+                                    "color": "$lime-600",
+                                    "position": 0.38735677469478474
+                                  },
+                                  {
+                                    "color": "#ffffffff",
+                                    "position": 1
+                                  }
+                                ],
+                                "center": {
+                                  "x": 0.49999999999999994,
+                                  "y": 0.4999999999999999
+                                }
+                              },
+                              "cornerRadius": 2,
+                              "stroke": "#9da4b01e",
+                              "strokeWidth": 0.5,
+                              "strokeAlignment": "inner",
+                              "gap": 4,
+                              "justifyContent": "center"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ych5p",
+                      "name": "Logs",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "sawAc",
+                          "x": 0,
+                          "y": 0,
+                          "name": "download",
+                          "enabled": false,
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "o1Bmk",
+                              "fill": "#ffffff",
+                              "content": "Baixando melhorias",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "KMWNm",
+                              "name": "Icon",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "cloud-download",
+                              "library": "lucide",
+                              "fill": "$9:--background"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "BgLF3",
+                          "name": "install",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "T03Yp",
+                              "fill": "#ffffff",
+                              "content": "Instalando melhorias",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "CnvlU",
+                              "name": "Icon",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "settings",
+                              "library": "lucide",
+                              "fill": "$9:--background"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "aXTlX",
+              "name": "splash",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "lXfbH",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "radial",
+                    "enabled": true,
+                    "rotation": 0,
+                    "size": {
+                      "width": 1,
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "$lime-800",
+                        "position": 1
+                      },
+                      {
+                        "color": "$lime-600",
+                        "position": 0
+                      }
+                    ],
+                    "center": {
+                      "y": 0.04
+                    }
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000040",
+                    "offset": {
+                      "x": 0,
+                      "y": 5
+                    },
+                    "blur": 20
+                  },
+                  "layout": "vertical",
+                  "gap": "$spacing-2",
+                  "padding": [
+                    32,
+                    16
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "W2Vqeq",
+                      "name": "Frame 48",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "duDi3",
+                          "name": "Oikos",
+                          "fill": "#ffffffff",
+                          "effect": {
+                            "type": "shadow",
+                            "shadowType": "outer",
+                            "color": "#00000033",
+                            "offset": {
+                              "x": 0,
+                              "y": 8
+                            },
+                            "blur": 8
+                          },
+                          "textGrowth": "fixed-width",
+                          "width": 261,
+                          "content": "Oikos",
+                          "textAlign": "center",
+                          "fontFamily": "Reem Kufi",
+                          "fontSize": 96,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Vmp10",
+                          "name": "Progress",
+                          "width": "fill_container",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "V03ao3",
+                              "name": "Progress",
+                              "width": "fill_container",
+                              "height": "fit_content(4)",
+                              "fill": {
+                                "type": "gradient",
+                                "gradientType": "linear",
+                                "enabled": true,
+                                "rotation": -89.99999999999999,
+                                "size": {
+                                  "height": 0.9999999999999999
+                                },
+                                "colors": [
+                                  {
+                                    "color": "$lime-600",
+                                    "position": 0.38735677469478474
+                                  },
+                                  {
+                                    "color": "#ffffffff",
+                                    "position": 1
+                                  }
+                                ],
+                                "center": {
+                                  "x": 0.49999999999999994,
+                                  "y": 0.4999999999999999
+                                }
+                              },
+                              "cornerRadius": 2,
+                              "stroke": "#9da4b01e",
+                              "strokeWidth": 0.5,
+                              "strokeAlignment": "inner",
+                              "gap": 4,
+                              "justifyContent": "center"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Lgsi9",
+                      "name": "Logs",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "jMGCv",
+                          "x": 0,
+                          "y": 0,
+                          "name": "download",
+                          "enabled": false,
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "IDhhX",
+                              "fill": "#ffffff",
+                              "content": "Baixando melhorias",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "PGyOi",
+                              "name": "Icon",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "cloud-download",
+                              "library": "lucide",
+                              "fill": "$9:--background"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "bdg9D",
+                          "x": 0,
+                          "y": 0,
+                          "name": "install",
+                          "enabled": false,
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "M0UQC",
+                              "fill": "#ffffff",
+                              "content": "Instalando melhorias",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "i5mjn",
+                              "name": "Icon",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "settings",
+                              "library": "lucide",
+                              "fill": "$9:--background"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "MjufJ",
+                          "name": "ready",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "VdyIM",
+                              "fill": "#ffffff",
+                              "content": "Tudo pronto",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "FmgLL",
+                              "name": "Icon",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "sprout",
+                              "library": "lucide",
+                              "fill": "$9:--background"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "kf3Q5",
+              "name": "(home)/sign-in",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "X0MXh",
                   "width": "fill_container",
                   "height": 320,
                   "fill": {
@@ -9626,11 +10340,11 @@
                     },
                     "colors": [
                       {
-                        "color": "$green-900",
+                        "color": "$lime-800",
                         "position": 1
                       },
                       {
-                        "color": "$green-600",
+                        "color": "$lime-600",
                         "position": 0
                       }
                     ],
@@ -9665,13 +10379,13 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "vSQS4",
+                      "id": "WZAiu",
                       "name": "Frame 4",
                       "width": "fill_container",
                       "children": [
                         {
                           "type": "frame",
-                          "id": "R9mOey",
+                          "id": "U8ve2",
                           "name": "Frame 5",
                           "width": 43,
                           "height": 43,
@@ -9683,7 +10397,7 @@
                           "children": [
                             {
                               "type": "frame",
-                              "id": "oFQW8",
+                              "id": "Cqeme",
                               "name": "Frame",
                               "width": 21,
                               "height": 21,
@@ -9691,7 +10405,7 @@
                               "children": [
                                 {
                                   "type": "path",
-                                  "id": "V8zqX5",
+                                  "id": "HTTck",
                                   "x": 4.334677419354875,
                                   "y": 4.334677419354847,
                                   "geometry": "M7 14l-7-7 7-7m7 7l-14 0",
@@ -9708,7 +10422,7 @@
                         },
                         {
                           "type": "frame",
-                          "id": "W7DZO",
+                          "id": "fvkVy",
                           "x": 43,
                           "y": 0,
                           "name": "Frame 6",
@@ -9725,7 +10439,7 @@
                           "children": [
                             {
                               "type": "frame",
-                              "id": "VVz37",
+                              "id": "rHujx",
                               "width": 177,
                               "height": 45,
                               "fill": "$green-800",
@@ -9768,7 +10482,7 @@
                               "children": [
                                 {
                                   "type": "rectangle",
-                                  "id": "hoyAw",
+                                  "id": "CnOfx",
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
@@ -9780,13 +10494,13 @@
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "U4wDK",
+                                  "id": "Hb1cs",
                                   "name": "wrapper",
                                   "layout": "vertical",
                                   "children": [
                                     {
                                       "type": "text",
-                                      "id": "ol5P9",
+                                      "id": "I983j",
                                       "fill": "$white",
                                       "content": "Oikos",
                                       "fontFamily": "Plus Jakarta Sans",
@@ -9795,7 +10509,7 @@
                                     },
                                     {
                                       "type": "text",
-                                      "id": "FqgAx",
+                                      "id": "i10S7r",
                                       "x": 0,
                                       "y": 23,
                                       "enabled": false,
@@ -9816,7 +10530,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "Mes7V",
+                      "id": "YCpqd",
                       "name": "Frame 2",
                       "width": "fill_container",
                       "height": "fill_container",
@@ -9826,7 +10540,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "QLPDw",
+                          "id": "obgMW",
                           "fill": "$primary-foreground",
                           "textGrowth": "fixed-width-height",
                           "width": "fill_container",
@@ -9839,7 +10553,7 @@
                         },
                         {
                           "type": "text",
-                          "id": "hXpYA",
+                          "id": "JjEDc",
                           "fill": "$primary-foreground",
                           "textGrowth": "fixed-width-height",
                           "width": "fill_container",
@@ -9856,7 +10570,7 @@
                 },
                 {
                   "type": "frame",
-                  "id": "vDEFN",
+                  "id": "veXkG",
                   "width": "fill_container",
                   "height": "fill_container",
                   "layout": "vertical",
@@ -9869,7 +10583,7 @@
                   ],
                   "children": [
                     {
-                      "id": "a11aTy",
+                      "id": "ueCvi",
                       "type": "ref",
                       "ref": "PYFm3",
                       "width": "fill_container",
@@ -9887,7 +10601,7 @@
                       }
                     },
                     {
-                      "id": "LRgZH",
+                      "id": "buU3G",
                       "type": "ref",
                       "ref": "PYFm3",
                       "width": "fill_container",
@@ -9902,7 +10616,7 @@
                     },
                     {
                       "type": "text",
-                      "id": "l3eNZ9",
+                      "id": "t2J7Bm",
                       "x": 32,
                       "y": 226,
                       "enabled": false,
@@ -9914,7 +10628,7 @@
                       "fontWeight": "600"
                     },
                     {
-                      "id": "iGEeM",
+                      "id": "mNxQ1",
                       "type": "ref",
                       "ref": "J7k5q",
                       "width": "fill_container",
@@ -9928,7 +10642,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "w3Xd3X",
+                      "id": "jBolf",
                       "x": 32,
                       "y": 371,
                       "enabled": false,
@@ -9938,14 +10652,14 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "PMP22",
+                          "id": "uhey5",
                           "width": "fill_container",
                           "height": 1,
                           "fill": "$border"
                         },
                         {
                           "type": "text",
-                          "id": "h02qyr",
+                          "id": "eGoLa",
                           "fill": "$muted-foreground",
                           "content": "ou entre com",
                           "fontFamily": "Inter",
@@ -9954,7 +10668,7 @@
                         },
                         {
                           "type": "frame",
-                          "id": "RHMUh",
+                          "id": "qCMf2",
                           "width": "fill_container",
                           "height": 1,
                           "fill": "$border"
@@ -9963,7 +10677,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "q1h1V",
+                      "id": "v5I2y",
                       "x": 32,
                       "y": 371,
                       "enabled": false,
@@ -9972,7 +10686,7 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "KQ9eX",
+                          "id": "Ruk0l",
                           "width": "fill_container",
                           "height": 56,
                           "cornerRadius": 16,
@@ -9985,7 +10699,7 @@
                           "children": [
                             {
                               "type": "rectangle",
-                              "id": "q1HZ5",
+                              "id": "CjPd1",
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
@@ -9997,7 +10711,7 @@
                             },
                             {
                               "type": "text",
-                              "id": "EDERH",
+                              "id": "BuYxR",
                               "fill": "$black",
                               "content": "Facebook",
                               "fontFamily": "Poppins",
@@ -10008,13 +10722,13 @@
                         },
                         {
                           "type": "frame",
-                          "id": "f3dNeB",
+                          "id": "iBqg9",
                           "width": "fill_container",
                           "gap": 16,
                           "children": [
                             {
                               "type": "frame",
-                              "id": "woJfw",
+                              "id": "jbnGq",
                               "width": "fill_container",
                               "height": 56,
                               "cornerRadius": 16,
@@ -10027,7 +10741,7 @@
                               "children": [
                                 {
                                   "type": "rectangle",
-                                  "id": "Ttz7E",
+                                  "id": "m1dX6v",
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
@@ -10039,7 +10753,7 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "uOYWK",
+                                  "id": "AigUZ",
                                   "fill": "$black",
                                   "content": "Facebook",
                                   "fontFamily": "Poppins",
@@ -10054,14 +10768,14 @@
                     },
                     {
                       "type": "frame",
-                      "id": "xVTwP",
+                      "id": "X51m4",
                       "width": "fill_container",
                       "gap": 4,
                       "justifyContent": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "B50ofC",
+                          "id": "DgQfj",
                           "fill": "$muted-foreground",
                           "content": "Não tem uma conta?",
                           "fontFamily": "Space Grotesk",
@@ -10070,7 +10784,7 @@
                         },
                         {
                           "type": "text",
-                          "id": "IBrNJ",
+                          "id": "e6XJ8W",
                           "fill": "$black",
                           "content": "Cadastre-se",
                           "fontFamily": "Space Grotesk",
@@ -10109,11 +10823,11 @@
                     },
                     "colors": [
                       {
-                        "color": "$green-900",
+                        "color": "$lime-800",
                         "position": 1
                       },
                       {
-                        "color": "$green-600",
+                        "color": "$lime-600",
                         "position": 0
                       }
                     ],
