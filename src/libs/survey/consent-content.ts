@@ -13,7 +13,6 @@ export const CONSENT_IDENTIFICATION = {
 	researcher: "Christian Cesar Rodrigues Santos",
 	advisor: "Fábio Basso e Maicon Bernardino",
 	contact: "christiansantos.aluno@unipampa.edu.br",
-	cepStatus: "Pendente de aprovação",
 };
 
 export interface ConsentSection {
