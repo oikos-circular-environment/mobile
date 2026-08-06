@@ -6,6 +6,7 @@
 
 import { createSign } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { RETRYABLE_STATUS, withRetry } from "./http-retry.mjs";
 
 const BASE_URL = "https://androidpublisher.googleapis.com/androidpublisher/v3";
 const SCOPE = "https://www.googleapis.com/auth/androidpublisher";
@@ -122,26 +123,40 @@ export function createPlayClient({ serviceAccount, packageName }) {
 	 * @param {string} method
 	 * @param {string} path Caminho relativo a `/applications/{packageName}`.
 	 * @param {object} [body]
-	 * @throws {PlayApiError} Em qualquer resposta fora da faixa 2xx.
+	 * @throws {PlayApiError} Em qualquer resposta fora da faixa 2xx, após
+	 *   esgotar as tentativas em caso de 429/5xx.
 	 */
 	async function request(method, path, body) {
 		const url = `${BASE_URL}/applications/${packageName}${path}`;
-		const response = await fetch(url, {
-			method,
-			headers: {
-				Authorization: await authorization(),
-				...(body ? { "Content-Type": "application/json" } : {}),
+
+		return withRetry(
+			async () => {
+				const response = await fetch(url, {
+					method,
+					headers: {
+						Authorization: await authorization(),
+						...(body ? { "Content-Type": "application/json" } : {}),
+					},
+					body: body ? JSON.stringify(body) : undefined,
+				});
+
+				const text = await response.text();
+				const parsed = text ? JSON.parse(text) : null;
+
+				if (!response.ok) {
+					throw new PlayApiError(response.status, parsed, { method, path });
+				}
+				return parsed;
 			},
-			body: body ? JSON.stringify(body) : undefined,
-		});
-
-		const text = await response.text();
-		const parsed = text ? JSON.parse(text) : null;
-
-		if (!response.ok) {
-			throw new PlayApiError(response.status, parsed, { method, path });
-		}
-		return parsed;
+			{
+				isRetryable: error =>
+					error instanceof PlayApiError && RETRYABLE_STATUS.has(error.status),
+				onRetry: (_error, attemptNumber, delayMs) =>
+					console.warn(
+						`  ↻ ${method} ${path} falhou, tentando de novo em ${delayMs}ms (tentativa ${attemptNumber + 1})`,
+					),
+			},
+		);
 	}
 
 	return {

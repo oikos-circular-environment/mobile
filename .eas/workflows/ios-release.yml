@@ -1,0 +1,51 @@
+name: iOS release finalization
+
+# Requer a conexão com a App Store Connect configurada no dashboard da EAS
+# (Project Settings → App Store Connect) — é um setup único, fora do código.
+# Ver docs/publishing-path.md — "Publicação na App Store".
+on:
+  app_store_connect:
+    build_upload:
+      states:
+        - complete
+
+jobs:
+  # Job independente do attach — antes eram passos sequenciais, e uma falha
+  # ao anexar pulava a publicação das notas de versão (o que faltou na 1.0.2).
+  push_ios_metadata:
+    name: Push App Store metadata
+    type: custom
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - name: Push metadata
+        env:
+          EXPO_APPLE_TEAM_ID: "339A2VX3JG"
+          EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
+        run: node scripts/push-ios-metadata.mjs
+
+  # app_store_connect.build_upload.build.id vem pronto do trigger: dispensa o
+  # polling de até 45min que o job antigo fazia dentro de um push de produção.
+  attach_and_submit_ios:
+    name: Attach build and submit for review
+    type: custom
+    needs: [push_ios_metadata]
+    env:
+      IOS_ASC_BUILD_ID: ${{ app_store_connect.build_upload.build.id }}
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - name: Attach build and submit for review
+        run: node scripts/submit-ios-for-review.mjs
+
+  notify:
+    name: Notify release status
+    type: slack
+    after: [push_ios_metadata, attach_and_submit_ios]
+    params:
+      webhook_url: ${{ env.SLACK_WEBHOOK_URL }}
+      message: |
+        Finalização do release iOS — build ASC `${{ app_store_connect.build_upload.build.id }}`, versão ${{ app_store_connect.build_upload.cf_bundle_short_version_string }} (${{ app_store_connect.build_upload.cf_bundle_version }}).
+
+        - Ficha e notas de versão: ${{ after.push_ios_metadata.status }}
+        - Anexar build + enviar pra revisão: ${{ after.attach_and_submit_ios.status }}

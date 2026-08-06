@@ -22,7 +22,12 @@ import { colors } from "@/components/style/colors";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const BOOT_TIMEOUT_MS = 3000;
+// Orçamentos de tempo escalonados: o check precisa ser curto (não vale segurar
+// o boot por uma rede lenta só pra descobrir que não há update), mas o
+// download — só iniciado quando já sabemos que há um update — merece um
+// orçamento maior pra não cortar no meio.
+const CHECK_TIMEOUT_MS = 1200;
+const DOWNLOAD_TIMEOUT_MS = 8000;
 const INSTALL_BEAT_MS = 450;
 const READY_BEAT_MS = 350;
 const DEV_READY_HOLD_MS = 700;
@@ -42,6 +47,27 @@ const PHASE_CONTENT: Record<OtaPhase, { label: string; Icon: LucideIcon }> = {
 
 function wait(ms: number) {
 	return new Promise<void>(resolve => setTimeout(resolve, ms));
+}
+
+class TimeoutError extends Error {}
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+	return new Promise((resolve, reject) => {
+		const timeoutId = setTimeout(
+			() => reject(new TimeoutError(`timed out after ${ms}ms`)),
+			ms,
+		);
+		promise.then(
+			value => {
+				clearTimeout(timeoutId);
+				resolve(value);
+			},
+			error => {
+				clearTimeout(timeoutId);
+				reject(error);
+			},
+		);
+	});
 }
 
 type BootSplashScreenProps = {
@@ -181,15 +207,23 @@ export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 
 	useEffect(() => {
 		let cancelled = false;
-		const timeoutId = setTimeout(finish, BOOT_TIMEOUT_MS);
 
 		(async () => {
+			// true só quando o reload realmente começa; controla se o finally
+			// abaixo ainda deve chamar finish().
+			let reloading = false;
 			try {
-				const check = await Updates.checkForUpdateAsync();
+				const check = await withTimeout(
+					Updates.checkForUpdateAsync(),
+					CHECK_TIMEOUT_MS,
+				);
 				if (cancelled || !check.isAvailable) return;
 
 				setPhase("downloading");
-				await Updates.fetchUpdateAsync();
+				const fetched = await withTimeout(
+					Updates.fetchUpdateAsync(),
+					DOWNLOAD_TIMEOUT_MS,
+				);
 				if (cancelled) return;
 
 				setPhase("installing");
@@ -198,23 +232,34 @@ export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 
 				setPhase("ready");
 				await wait(READY_BEAT_MS);
+				if (cancelled || !fetched.isNew) return;
+
+				// Sem reload aqui o update baixado só valeria no próximo cold
+				// start. Seguro nesta tela: nenhum provider montou ainda, então
+				// não há promise nativa em voo pra colidir com o teardown do
+				// reload (expo/expo#47315).
+				reloading = true;
+				await Updates.reloadAsync();
 			} catch (err) {
 				// Falha silenciosa: mostra o mesmo "pronto" do caminho feliz e
-				// segue. Download parcial retoma no próximo boot.
-				console.warn("[boot-splash] checagem/download de OTA falhou", err);
+				// segue com o bundle atual. Download/reload parcial retoma no
+				// próximo boot.
+				reloading = false;
+				console.warn(
+					"[boot-splash] checagem/download/reload de OTA falhou",
+					err,
+				);
 				if (!cancelled) {
 					setPhase("ready");
 					await wait(READY_BEAT_MS);
 				}
 			} finally {
-				clearTimeout(timeoutId);
-				finish();
+				if (!reloading) finish();
 			}
 		})();
 
 		return () => {
 			cancelled = true;
-			clearTimeout(timeoutId);
 		};
 	}, [finish]);
 

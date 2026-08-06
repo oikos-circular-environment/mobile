@@ -2,8 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { format, parse, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Image } from "expo-image";
-import * as ImagePicker from "expo-image-picker";
+import type * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -30,6 +29,7 @@ import { useUploadCompanyAvatar } from "@/components/companies/hooks/use-upload-
 import { CompanyFormSkeleton } from "@/components/companies/skeletons";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -71,6 +71,7 @@ import {
 	companyTypeOptions,
 	identityTypeOptions,
 } from "@/libs/types/companies";
+import { usePickImage } from "@/libs/use-pick-image";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
@@ -220,16 +221,18 @@ export default function CompanyGeneralInfoScreen() {
 		},
 	});
 
+	const { pickImage, isPicking } = usePickImage();
+
 	const onPickAvatar = async () => {
-		const result = await ImagePicker.launchImageLibraryAsync({
+		const assets = await pickImage({
 			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [1, 1],
 			quality: 0.8,
 		});
-		if (!result.canceled && result.assets[0]) {
-			selectedAsset.current = result.assets[0];
-			setAvatarPreviewUri(result.assets[0].uri);
+		if (assets?.[0]) {
+			selectedAsset.current = assets[0];
+			setAvatarPreviewUri(assets[0].uri);
 		}
 	};
 
@@ -337,36 +340,34 @@ export default function CompanyGeneralInfoScreen() {
 								<TouchableOpacity
 									activeOpacity={0.7}
 									onPress={onPickAvatar}
+									disabled={isPicking}
 									className="rounded-md shadow-lg "
 								>
-									{(avatarPreviewUri ?? company?.avatar?.url) ? (
-										<Image
-											source={{
-												uri: avatarPreviewUri ?? company?.avatar?.url,
-												headers: getAuthenticatedImageHeaders(),
-											}}
-											style={{ width: 80, height: 80, borderRadius: 6 }}
-										/>
-									) : (
-										<View
-											style={{ width: 80, height: 80, borderRadius: 6 }}
-											className="bg-secondary items-center justify-center"
-										>
+									<Avatar size="lg">
+										{(avatarPreviewUri ?? company?.avatar?.url) ? (
+											<AvatarImage
+												source={{
+													uri: avatarPreviewUri ?? company?.avatar?.url,
+													headers: getAuthenticatedImageHeaders(),
+												}}
+											/>
+										) : (
 											<FactoryIcon
 												size={36}
 												color={colors.lime[800]}
 												strokeWidth={1.5}
 											/>
-										</View>
-									)}
+										)}
+									</Avatar>
 								</TouchableOpacity>
 								<Button
 									size="sm"
 									variant="secondary"
 									className="absolute bottom-0 right-0"
 									onPress={onPickAvatar}
+									isDisabled={isPicking}
 								>
-									<ButtonIcon as={PencilIcon} />
+									<ButtonIcon as={isPicking ? Spinner : PencilIcon} />
 								</Button>
 							</View>
 						</Animated.View>

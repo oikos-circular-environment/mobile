@@ -5,6 +5,7 @@
 
 import { createSign } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { RETRYABLE_STATUS, withRetry } from "./http-retry.mjs";
 
 const BASE_URL = "https://api.appstoreconnect.apple.com";
 const TOKEN_TTL_SECONDS = 19 * 60;
@@ -155,7 +156,8 @@ export function createAscClient({ keyId, issuerId, privateKeyPem }) {
 	 * @param {string} method
 	 * @param {string} path Caminho relativo à API ou URL absoluta.
 	 * @param {{ query?: Record<string, unknown>, body?: object }} [options]
-	 * @throws {AscApiError} Em qualquer resposta fora da faixa 2xx.
+	 * @throws {AscApiError} Em qualquer resposta fora da faixa 2xx, após
+	 *   esgotar as tentativas em caso de 429/5xx.
 	 */
 	async function request(method, path, { query, body } = {}) {
 		const url = new URL(path.startsWith("http") ? path : `${BASE_URL}${path}`);
@@ -165,28 +167,40 @@ export function createAscClient({ keyId, issuerId, privateKeyPem }) {
 			}
 		}
 
-		const response = await fetch(url, {
-			method,
-			headers: {
-				Authorization: authorization(),
-				...(body ? { "Content-Type": "application/json" } : {}),
+		return withRetry(
+			async () => {
+				const response = await fetch(url, {
+					method,
+					headers: {
+						Authorization: authorization(),
+						...(body ? { "Content-Type": "application/json" } : {}),
+					},
+					body: body ? JSON.stringify(body) : undefined,
+				});
+
+				if (response.status === 204) return null;
+
+				const text = await response.text();
+				const parsed = text ? JSON.parse(text) : null;
+
+				if (!response.ok) {
+					throw new AscApiError(response.status, parsed, {
+						method,
+						path: url.pathname,
+					});
+				}
+
+				return parsed;
 			},
-			body: body ? JSON.stringify(body) : undefined,
-		});
-
-		if (response.status === 204) return null;
-
-		const text = await response.text();
-		const parsed = text ? JSON.parse(text) : null;
-
-		if (!response.ok) {
-			throw new AscApiError(response.status, parsed, {
-				method,
-				path: url.pathname,
-			});
-		}
-
-		return parsed;
+			{
+				isRetryable: error =>
+					error instanceof AscApiError && RETRYABLE_STATUS.has(error.status),
+				onRetry: (_error, attemptNumber, delayMs) =>
+					console.warn(
+						`  ↻ ${method} ${url.pathname} falhou, tentando de novo em ${delayMs}ms (tentativa ${attemptNumber + 1})`,
+					),
+			},
+		);
 	}
 
 	return {

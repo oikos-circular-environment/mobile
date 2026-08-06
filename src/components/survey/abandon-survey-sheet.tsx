@@ -1,6 +1,7 @@
 import BottomSheet, {
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
+	BottomSheetTextInput,
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { eq } from "drizzle-orm";
@@ -13,9 +14,10 @@ import {
 	useState,
 } from "react";
 import { View } from "react-native";
+import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
-import { Input, InputField } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveySuiteRun, surveyTaskRun } from "@/libs/survey/db/schema";
 import {
@@ -31,6 +33,17 @@ export interface AbandonSurveySheetHandle {
 	open: () => void;
 	close: () => void;
 }
+
+// O sheet só reposiciona sobre o teclado se o campo for o BottomSheetTextInput
+// dele — um TextInput comum (o que o InputField do gluestack renderiza) não é
+// rastreado e acaba coberto. Por isso o campo vai estilizado via style, já que
+// o componente não passa pelo NativeWind.
+const textInputStyle = {
+	flex: 1,
+	fontSize: 16,
+	color: colors.gray[900],
+	textAlignVertical: "top",
+} as const;
 
 export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 	(_props, ref) => {
@@ -186,14 +199,15 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 						<Heading size="lg">Abandonar a pesquisa?</Heading>
 
 						<Input className="h-24 items-start px-3 py-2.5">
-							<InputField
+							<BottomSheetTextInput
 								placeholder="Opcional. O que impediu de continuar? Ajuda a melhorar a pesquisa."
+								placeholderTextColor={colors.gray[500]}
 								value={reason}
 								onChangeText={setReason}
 								multiline
 								numberOfLines={4}
-								textAlignVertical="top"
 								maxLength={500}
+								style={textInputStyle}
 							/>
 						</Input>
 

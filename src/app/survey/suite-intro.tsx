@@ -1,16 +1,23 @@
 import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+	AppButton as Button,
+	AppButtonText as ButtonText,
+} from "@/components/app-button";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
-import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveySuiteRun } from "@/libs/survey/db/schema";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
+
+/** Tempo mínimo antes de liberar "Começar" — força uma leitura do objetivo em vez de
+ *  deixar o participante pular direto pro toque de hábito. */
+const BEGIN_BUTTON_HOLD_MS = 3000;
 
 export default function SurveySuiteIntroScreen() {
 	const insets = useSafeAreaInsets();
@@ -23,6 +30,9 @@ export default function SurveySuiteIntroScreen() {
 	const suiteIndex = useSurveyExecutionStore(s => s.suiteIndex);
 	const suiteTitle = useSurveyExecutionStore(s => s.suiteTitle);
 	const suiteObjective = useSurveyExecutionStore(s => s.suiteObjective);
+	const suiteSpecificObjectives = useSurveyExecutionStore(
+		s => s.suiteSpecificObjectives,
+	);
 	const tasks = useSurveyExecutionStore(s => s.tasks);
 	const initRoteiro = useSurveyExecutionStore(s => s.initRoteiro);
 	const openSuiteIntro = useSurveyExecutionStore(s => s.openSuiteIntro);
@@ -37,22 +47,27 @@ export default function SurveySuiteIntroScreen() {
 
 	useEffect(() => {
 		if (suiteQueue.length === 0 && personaDefinition) {
-			initRoteiro(personaDefinition.suite_codes);
+			initRoteiro(personaDefinition.suites.map(s => s.suite_code));
 		}
 	}, [suiteQueue.length, personaDefinition, initRoteiro]);
 
 	const suiteCode = suiteQueue[suiteIndex];
 
 	useEffect(() => {
-		if (!protocol || !suiteCode) return;
+		if (!protocol || !suiteCode || !personaDefinition) return;
 
 		const suite = protocol.suites.find(s => s.code === suiteCode);
 		if (!suite) return;
+
+		const personaSuite = personaDefinition.suites.find(
+			s => s.suite_code === suiteCode,
+		);
 
 		openSuiteIntro({
 			code: suite.code,
 			title: suite.title,
 			objective: suite.objective,
+			specificObjectives: personaSuite?.specific_objectives ?? [],
 			tasks: suite.task_codes.map(taskCode => {
 				const task = protocol.tasks.find(t => t.code === taskCode);
 				return {
@@ -62,7 +77,25 @@ export default function SurveySuiteIntroScreen() {
 				};
 			}),
 		});
-	}, [protocol, suiteCode, openSuiteIntro]);
+	}, [protocol, suiteCode, personaDefinition, openSuiteIntro]);
+
+	const holdSeconds = BEGIN_BUTTON_HOLD_MS / 1000;
+	const [secondsLeft, setSecondsLeft] = useState(holdSeconds);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: suiteCode não é lido aqui, só reinicia a contagem quando a etapa muda
+	useEffect(() => {
+		setSecondsLeft(holdSeconds);
+		const interval = setInterval(() => {
+			setSecondsLeft(current => {
+				if (current <= 1) {
+					clearInterval(interval);
+					return 0;
+				}
+				return current - 1;
+			});
+		}, 1000);
+		return () => clearInterval(interval);
+	}, [suiteCode, holdSeconds]);
 
 	const handleBegin = async () => {
 		if (sessionId && suiteCode) {
@@ -98,10 +131,33 @@ export default function SurveySuiteIntroScreen() {
 				</Text>
 				<Heading size="2xl">{suiteTitle}</Heading>
 				<Text className="leading-6">{suiteObjective}</Text>
+
+				{suiteSpecificObjectives.length > 0 ? (
+					<View className="gap-2 pt-2">
+						<Text size="sm" bold>
+							Objetivos Específicos
+						</Text>
+						{suiteSpecificObjectives.map((item, index) => (
+							<View
+								key={item}
+								className="flex-row items-start gap-3 rounded-xl border border-gray-200 p-3"
+							>
+								<View className="h-6 w-6 items-center justify-center rounded-full bg-lime-800">
+									<Text size="xs" bold className="text-white">
+										{index + 1}
+									</Text>
+								</View>
+								<Text className="flex-1 leading-6">{item}</Text>
+							</View>
+						))}
+					</View>
+				) : null}
 			</View>
 
-			<Button onPress={handleBegin}>
-				<ButtonText>Começar</ButtonText>
+			<Button onPress={handleBegin} disabled={secondsLeft > 0}>
+				<ButtonText>
+					{secondsLeft > 0 ? `Começar (${secondsLeft})` : "Começar"}
+				</ButtonText>
 			</Button>
 		</View>
 	);

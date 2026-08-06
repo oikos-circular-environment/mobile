@@ -46,7 +46,7 @@ const protocolFixture = {
 	key: "oikos-walkthrough",
 	version: 1,
 	personas: [
-		{ key: "CITIZEN", label: "Cidadão", description: "d", suite_codes: [] },
+		{ key: "CITIZEN", label: "Cidadão", description: "d", suites: [] },
 	],
 	suites: [
 		{ code: "S1", title: "Exploração livre", objective: "o", task_codes: [] },
@@ -86,6 +86,7 @@ describe("SurveyResumeScreen", () => {
 			code: "S1",
 			title: "S1",
 			objective: "o",
+			specificObjectives: [],
 			tasks: [],
 		});
 		useSurveyExecutionStore.getState().beginSuite();
@@ -113,6 +114,7 @@ describe("SurveyResumeScreen", () => {
 			code: "S1",
 			title: "S1",
 			objective: "o",
+			specificObjectives: [],
 			tasks: [],
 		});
 		useSurveyExecutionStore.getState().beginSuite();
@@ -186,6 +188,7 @@ describe("SurveyResumeScreen", () => {
 			code: "S1",
 			title: "S1",
 			objective: "o",
+			specificObjectives: [],
 			tasks: [{ code: "T1", title: "a", instruction: "a" }],
 		});
 		useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");

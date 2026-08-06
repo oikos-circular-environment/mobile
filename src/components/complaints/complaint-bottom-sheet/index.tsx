@@ -365,7 +365,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 										</AlertText>
 									</Alert>
 
-									<View className="relative my-4">
+									<View className="relative my-4 gap-4">
 										{showResolutionsLocked ? (
 											Array.from({
 												length: Math.min(complaint.resolution_count, 3),

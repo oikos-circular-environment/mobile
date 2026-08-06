@@ -10,6 +10,7 @@ import {
 jest.mock("expo-updates", () => ({
 	checkForUpdateAsync: jest.fn(),
 	fetchUpdateAsync: jest.fn(),
+	reloadAsync: jest.fn(),
 	useUpdates: jest.fn(() => ({ downloadProgress: 0 })),
 	isEmbeddedLaunch: true,
 	channel: "production",
@@ -26,6 +27,7 @@ describe("boot-splash-screen", () => {
 		jest.useFakeTimers();
 		jest.mocked(Updates.checkForUpdateAsync).mockReset();
 		jest.mocked(Updates.fetchUpdateAsync).mockReset();
+		jest.mocked(Updates.reloadAsync).mockReset();
 	});
 
 	afterEach(() => {
@@ -45,7 +47,7 @@ describe("boot-splash-screen", () => {
 		expect(screen.queryByText("Baixando melhorias")).not.toBeOnTheScreen();
 	});
 
-	test("walks through downloading, installing and ready before calling onReady when an update is available", async () => {
+	test("walks through downloading, installing and ready, then reloads instead of calling onReady when the fetched update is new", async () => {
 		jest.mocked(Updates.checkForUpdateAsync).mockResolvedValue({
 			isAvailable: true,
 		} as Awaited<ReturnType<typeof Updates.checkForUpdateAsync>>);
@@ -53,10 +55,11 @@ describe("boot-splash-screen", () => {
 			.mocked(Updates.fetchUpdateAsync)
 			.mockImplementation(
 				() =>
-					new Promise(resolve => setTimeout(resolve, 200)) as ReturnType<
-						typeof Updates.fetchUpdateAsync
-					>,
+					new Promise(resolve =>
+						setTimeout(() => resolve({ isNew: true }), 200),
+					) as ReturnType<typeof Updates.fetchUpdateAsync>,
 			);
+		jest.mocked(Updates.reloadAsync).mockReturnValue(new Promise(() => {}));
 		const onReady = jest.fn();
 		await render(<OtaBootSplash onReady={onReady} />);
 
@@ -73,6 +76,25 @@ describe("boot-splash-screen", () => {
 
 		await jest.advanceTimersByTimeAsync(350);
 		await jest.advanceTimersByTimeAsync(0);
+		expect(Updates.reloadAsync).toHaveBeenCalledTimes(1);
+		expect(onReady).not.toHaveBeenCalled();
+	});
+
+	test("calls onReady without reloading when the fetched update isn't new", async () => {
+		jest.mocked(Updates.checkForUpdateAsync).mockResolvedValue({
+			isAvailable: true,
+		} as Awaited<ReturnType<typeof Updates.checkForUpdateAsync>>);
+		jest.mocked(Updates.fetchUpdateAsync).mockResolvedValue({
+			isNew: false,
+		} as Awaited<ReturnType<typeof Updates.fetchUpdateAsync>>);
+		const onReady = jest.fn();
+		await render(<OtaBootSplash onReady={onReady} />);
+
+		await jest.advanceTimersByTimeAsync(0);
+		await jest.advanceTimersByTimeAsync(450);
+		await jest.advanceTimersByTimeAsync(350);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(Updates.reloadAsync).not.toHaveBeenCalled();
 		expect(onReady).toHaveBeenCalledTimes(1);
 	});
 
@@ -88,7 +110,7 @@ describe("boot-splash-screen", () => {
 		expect(screen.queryByText("Baixando melhorias")).not.toBeOnTheScreen();
 	});
 
-	test("calls onReady after the timeout even if the check never resolves", async () => {
+	test("falls back to ready and calls onReady if checkForUpdateAsync never resolves", async () => {
 		jest
 			.mocked(Updates.checkForUpdateAsync)
 			.mockReturnValue(new Promise(() => {}));
@@ -96,7 +118,34 @@ describe("boot-splash-screen", () => {
 		await render(<OtaBootSplash onReady={onReady} />);
 
 		expect(onReady).not.toHaveBeenCalled();
-		await jest.advanceTimersByTimeAsync(3000);
+		await jest.advanceTimersByTimeAsync(1200);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Tudo pronto")).toBeOnTheScreen();
+		expect(onReady).not.toHaveBeenCalled();
+
+		await jest.advanceTimersByTimeAsync(350);
+		expect(onReady).toHaveBeenCalledTimes(1);
+	});
+
+	test("falls back to ready and calls onReady if fetchUpdateAsync never resolves", async () => {
+		jest.mocked(Updates.checkForUpdateAsync).mockResolvedValue({
+			isAvailable: true,
+		} as Awaited<ReturnType<typeof Updates.checkForUpdateAsync>>);
+		jest
+			.mocked(Updates.fetchUpdateAsync)
+			.mockReturnValue(new Promise(() => {}));
+		const onReady = jest.fn();
+		await render(<OtaBootSplash onReady={onReady} />);
+
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Baixando melhorias")).toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(8000);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Tudo pronto")).toBeOnTheScreen();
+		expect(onReady).not.toHaveBeenCalled();
+
+		await jest.advanceTimersByTimeAsync(350);
 		expect(onReady).toHaveBeenCalledTimes(1);
 	});
 

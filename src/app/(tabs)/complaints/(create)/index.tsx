@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Crypto from "expo-crypto";
-import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -86,6 +85,7 @@ import {
 } from "@/libs/media-validation";
 import type { Geospatial } from "@/libs/types/complaint";
 import { useCepLookup } from "@/libs/use-cep-lookup";
+import { usePickImage } from "@/libs/use-pick-image";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 const schema = z.object({
@@ -290,47 +290,40 @@ export default function ComplaintCreateScreen() {
 		[setValue, lookupCep],
 	);
 
+	const { pickImage, isPicking } = usePickImage();
+
 	const handlePickGallery = async () => {
-		const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-		if (!perm.granted) {
-			toast.error(
-				"Permissão negada",
-				"Permita o acesso à galeria nas configurações.",
-			);
-			return;
-		}
 		try {
-			const result = await ImagePicker.launchImageLibraryAsync({
+			const assets = await pickImage({
+				requestPermission: true,
 				mediaTypes: ["images", "videos"],
 				allowsMultipleSelection: true,
 				quality: 0.85,
 			});
-			if (!result.canceled) {
-				const existingUris = new Set(
-					attachments.map(a => a.uri).filter(Boolean),
+			if (!assets) return;
+
+			const existingUris = new Set(attachments.map(a => a.uri).filter(Boolean));
+			let skippedCount = 0;
+			for (const asset of assets) {
+				if (existingUris.has(asset.uri)) continue;
+				if (!isValidMimeType(asset.mimeType)) {
+					skippedCount++;
+					continue;
+				}
+				addAttachment({
+					id: asset.assetId ?? Crypto.randomUUID(),
+					source: "gallery",
+					mediaType: asset.type === "video" ? "video" : "photo",
+					uri: asset.uri,
+					fileSize: asset.fileSize,
+					mimeType: asset.mimeType,
+				});
+			}
+			if (skippedCount > 0) {
+				toast.warning(
+					"Arquivos ignorados",
+					`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
 				);
-				let skippedCount = 0;
-				for (const asset of result.assets) {
-					if (existingUris.has(asset.uri)) continue;
-					if (!isValidMimeType(asset.mimeType)) {
-						skippedCount++;
-						continue;
-					}
-					addAttachment({
-						id: asset.assetId ?? Crypto.randomUUID(),
-						source: "gallery",
-						mediaType: asset.type === "video" ? "video" : "photo",
-						uri: asset.uri,
-						fileSize: asset.fileSize,
-						mimeType: asset.mimeType,
-					});
-				}
-				if (skippedCount > 0) {
-					toast.warning(
-						"Arquivos ignorados",
-						`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
-					);
-				}
 			}
 		} catch {
 			toast.error(
@@ -780,9 +773,9 @@ export default function ComplaintCreateScreen() {
 							variant="outline"
 							className="flex-1"
 							onPress={handlePickGallery}
-							isDisabled={isPending}
+							isDisabled={isPending || isPicking}
 						>
-							<ButtonIcon as={ImageIcon} />
+							<ButtonIcon as={isPicking ? Spinner : ImageIcon} />
 							<ButtonText>Galeria</ButtonText>
 						</Button>
 					</View>

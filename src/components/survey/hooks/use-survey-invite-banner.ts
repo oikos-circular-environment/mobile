@@ -19,7 +19,7 @@ export function useSurveyInviteBanner() {
 
 	if (status === "IN_PROGRESS" || status === "ABANDONED") {
 		const personaDefinition = protocol?.personas.find(p => p.key === persona);
-		const suiteQueue = personaDefinition?.suite_codes ?? [];
+		const suiteQueue = personaDefinition?.suites.map(s => s.suite_code) ?? [];
 		const currentIndex = currentSuiteCode
 			? suiteQueue.indexOf(currentSuiteCode)
 			: -1;

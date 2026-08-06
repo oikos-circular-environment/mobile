@@ -3364,6 +3364,360 @@
                           "fontFamily": "$font-body",
                           "fontSize": "$text-body",
                           "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "U2b10",
+                          "name": "Objective Specific",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 8,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "OCqDb",
+                              "name": "Title",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "k67gxZ",
+                                  "name": "Title",
+                                  "fill": "$foreground",
+                                  "content": "Objetivos Especificos",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "GbmGi",
+                                  "x": 0,
+                                  "y": 19,
+                                  "name": "Desc",
+                                  "enabled": false,
+                                  "fill": "$muted-foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container(318)",
+                                  "lineHeight": 1.3,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "BoML1",
+                              "name": "Option — Discordo totalmente",
+                              "width": "fill_container",
+                              "fill": "#ffffff",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
+                              "strokeWidth": 1,
+                              "gap": 12,
+                              "padding": 16,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "mD6kc",
+                                  "x": 16,
+                                  "y": 16,
+                                  "name": "CheckIcon",
+                                  "enabled": false,
+                                  "width": 20,
+                                  "height": 20,
+                                  "icon": "circle",
+                                  "library": "lucide",
+                                  "fill": "$gray-300"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "f0vSM9",
+                                  "name": "TextCol",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$lime-600",
+                                  "cornerRadius": 4,
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Ba9yU",
+                                      "name": "Title",
+                                      "fill": "$9:--muted",
+                                      "content": "1",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Xkgdd",
+                                      "x": 0,
+                                      "y": 19,
+                                      "name": "Desc",
+                                      "enabled": false,
+                                      "fill": "$muted-foreground",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container(318)",
+                                      "lineHeight": 1.3,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "IKq9c",
+                                  "name": "TextCol",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Csji0",
+                                      "name": "Title",
+                                      "fill": "$foreground",
+                                      "content": "Objetivo Especifico",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "kVyqT",
+                                      "x": 0,
+                                      "y": 19,
+                                      "name": "Desc",
+                                      "enabled": false,
+                                      "fill": "$muted-foreground",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container(318)",
+                                      "lineHeight": 1.3,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "VauQB",
+                              "name": "Option — Discordo totalmente",
+                              "width": "fill_container",
+                              "fill": "#ffffff",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
+                              "strokeWidth": 1,
+                              "gap": 12,
+                              "padding": 16,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "S7QI5",
+                                  "x": 16,
+                                  "y": 16,
+                                  "name": "CheckIcon",
+                                  "enabled": false,
+                                  "width": 20,
+                                  "height": 20,
+                                  "icon": "circle",
+                                  "library": "lucide",
+                                  "fill": "$gray-300"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "UTIS7",
+                                  "name": "TextCol",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$lime-600",
+                                  "cornerRadius": 4,
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "xYpBl",
+                                      "name": "Title",
+                                      "fill": "$9:--muted",
+                                      "content": "2",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "KKkkj",
+                                      "x": 0,
+                                      "y": 19,
+                                      "name": "Desc",
+                                      "enabled": false,
+                                      "fill": "$muted-foreground",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container(318)",
+                                      "lineHeight": 1.3,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "l1QlS",
+                                  "name": "TextCol",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "jnSLU",
+                                      "name": "Title",
+                                      "fill": "$foreground",
+                                      "content": "Objetivo Especifico",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "ifw1S",
+                                      "x": 0,
+                                      "y": 19,
+                                      "name": "Desc",
+                                      "enabled": false,
+                                      "fill": "$muted-foreground",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container(318)",
+                                      "lineHeight": 1.3,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "cVA5n",
+                              "name": "Option — Discordo totalmente",
+                              "width": "fill_container",
+                              "fill": "#ffffff",
+                              "cornerRadius": "$radius-lg",
+                              "stroke": "$border",
+                              "strokeWidth": 1,
+                              "gap": 12,
+                              "padding": 16,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "e9wFs",
+                                  "x": 16,
+                                  "y": 16,
+                                  "name": "CheckIcon",
+                                  "enabled": false,
+                                  "width": 20,
+                                  "height": 20,
+                                  "icon": "circle",
+                                  "library": "lucide",
+                                  "fill": "$gray-300"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "yTfQh",
+                                  "name": "TextCol",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$lime-600",
+                                  "cornerRadius": 4,
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "F4Awb",
+                                      "name": "Title",
+                                      "fill": "$9:--muted",
+                                      "content": "3",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "ReQAK",
+                                      "x": 0,
+                                      "y": 19,
+                                      "name": "Desc",
+                                      "enabled": false,
+                                      "fill": "$muted-foreground",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container(318)",
+                                      "lineHeight": 1.3,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "ntObe",
+                                  "name": "TextCol",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "XonUh",
+                                      "name": "Title",
+                                      "fill": "$foreground",
+                                      "content": "Objetivo Especifico",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "hWu2M",
+                                      "x": 0,
+                                      "y": 19,
+                                      "name": "Desc",
+                                      "enabled": false,
+                                      "fill": "$muted-foreground",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container(318)",
+                                      "lineHeight": 1.3,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
                         }
                       ]
                     },
