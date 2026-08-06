@@ -33,7 +33,7 @@ import { surveySession } from "@/libs/survey/db/schema";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
-type StageStatus = "done" | "in_progress" | "pending";
+type StageStatus = "done" | "in_progress" | "pending" | "abandoned";
 
 const STATUS_META: Record<
 	StageStatus,
@@ -54,6 +54,11 @@ const STATUS_META: Record<
 		color: colors.yellow[600],
 		label: "Pendente",
 	},
+	abandoned: {
+		icon: CircleXIcon,
+		color: colors.red[600],
+		label: "Abandonada",
+	},
 };
 
 export default function SurveyResumeScreen() {
@@ -62,6 +67,8 @@ export default function SurveyResumeScreen() {
 	const { data: protocol } = useSurveyProtocol();
 	const persona = useSurveyStore(s => s.persona);
 	const sessionId = useSurveyStore(s => s.sessionId);
+	const status = useSurveyStore(s => s.status);
+	const isTerminal = status === "ABANDONED" || status === "COMPLETED";
 
 	const suiteQueue = useSurveyExecutionStore(s => s.suiteQueue);
 	const suiteIndex = useSurveyExecutionStore(s => s.suiteIndex);
@@ -84,6 +91,7 @@ export default function SurveyResumeScreen() {
 	const personaLabel = protocol?.personas.find(p => p.key === persona)?.label;
 
 	const handleContinue = () => {
+		if (isTerminal) return;
 		if (isActive) {
 			setPaused(false);
 			router.dismissTo("/(tabs)/(home)" as never);
@@ -91,6 +99,12 @@ export default function SurveyResumeScreen() {
 			router.replace("/survey/suite-intro");
 		}
 	};
+
+	const ctaLabel = isTerminal
+		? status === "ABANDONED"
+			? "Pesquisa abandonada"
+			: "Pesquisa concluída"
+		: "Continuar";
 
 	const cardStages: SurveyInviteStage[] = suiteQueue.map((code, index) => ({
 		code,
@@ -106,23 +120,25 @@ export default function SurveyResumeScreen() {
 	const stages = suiteQueue.map(suiteCode => {
 		const suite = protocol?.suites.find(s => s.code === suiteCode);
 		const index = suiteQueue.indexOf(suiteCode);
-		const status: StageStatus =
-			index < suiteIndex
-				? "done"
-				: index === suiteIndex && isActive
-					? "in_progress"
-					: "pending";
+		const stageStatus: StageStatus =
+			isTerminal && index >= suiteIndex
+				? "abandoned"
+				: index < suiteIndex
+					? "done"
+					: index === suiteIndex && isActive
+						? "in_progress"
+						: "pending";
 		return {
 			code: suiteCode,
 			title: suite ? `${suiteCode} · ${suite.title}` : suiteCode,
-			status,
+			status: stageStatus,
 		};
 	});
 
 	return (
 		<View
 			className="flex-1 bg-white px-6 pb-6 gap-5"
-			style={{ paddingTop: insets.top + 56 }}
+			style={{ paddingTop: insets.top + 16 }}
 		>
 			<View className="flex-row items-center gap-2.5">
 				<Pressable onPress={() => router.back()} hitSlop={8}>
@@ -142,7 +158,8 @@ export default function SurveyResumeScreen() {
 					personaLabel={personaLabel}
 					participantCode={participantCode ?? undefined}
 					stages={cardStages.length > 0 ? cardStages : undefined}
-					ctaLabel="Continuar"
+					ctaLabel={ctaLabel}
+					ctaDisabled={isTerminal}
 					onPressCta={handleContinue}
 				/>
 
@@ -227,13 +244,15 @@ export default function SurveyResumeScreen() {
 						tone="danger"
 						onPress={() => deleteSheetRef.current?.open()}
 					/>
-					<SettingOptionRow
-						icon={CircleXIcon}
-						title="Abandonar a pesquisa"
-						description="Você pode retomar depois de onde parou"
-						tone="danger"
-						onPress={() => abandonSheetRef.current?.open()}
-					/>
+					{!isTerminal ? (
+						<SettingOptionRow
+							icon={CircleXIcon}
+							title="Abandonar a pesquisa"
+							description="Você pode retomar depois de onde parou"
+							tone="danger"
+							onPress={() => abandonSheetRef.current?.open()}
+						/>
+					) : null}
 				</View>
 			</ScrollView>
 

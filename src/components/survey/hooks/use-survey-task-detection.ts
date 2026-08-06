@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
-import * as Crypto from "expo-crypto";
 import { usePathname } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveyTaskRun } from "@/libs/survey/db/schema";
 import { createTaskSignalWatcher } from "@/libs/survey/signal-matcher";
+import { getOrCreateOpenTaskRun } from "@/libs/survey/task-run";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 
 /**
@@ -36,35 +36,33 @@ export function useSurveyTaskDetection() {
 		watcherRef.current?.dispose();
 		watcherRef.current = null;
 
-		if (!currentTaskCode || !protocol || !suiteRunId) return;
+		if (!currentTaskCode || !protocol || !suiteRunId || !currentTask) return;
 
 		const taskDefinition = protocol.tasks.find(t => t.code === currentTaskCode);
 		if (!taskDefinition) return;
 
-		const taskRunId = Crypto.randomUUID();
-		const startedAt = new Date().toISOString();
-		const db = getSurveyDb();
-		db.insert(surveyTaskRun)
-			.values({
-				id: taskRunId,
-				suiteRunId,
-				taskCode: currentTaskCode,
-				position: currentTaskIndex,
-				startedAt,
-			})
-			.catch(() => {
-				// Modo de falha aceito: perde só o registro local desta tarefa.
-			});
+		// Disparada em paralelo à criação do observador — nunca bloqueia a detecção.
+		// Modo de falha aceito: se a gravação local falhar, a tarefa ainda avança; só o
+		// registro do outcome no SQLite é que se perde.
+		const taskRunPromise = getOrCreateOpenTaskRun(
+			suiteRunId,
+			currentTaskCode,
+			currentTask.position,
+		).catch(() => null);
 
 		watcherRef.current = createTaskSignalWatcher(taskDefinition.success, () => {
-			db.update(surveyTaskRun)
-				.set({
-					finishedAt: new Date().toISOString(),
-					outcome: "YES",
-					autoDetected: true,
-				})
-				.where(eq(surveyTaskRun.id, taskRunId))
-				.catch(() => {});
+			taskRunPromise.then(taskRun => {
+				if (!taskRun) return;
+				getSurveyDb()
+					.update(surveyTaskRun)
+					.set({
+						finishedAt: new Date().toISOString(),
+						outcome: "YES",
+						autoDetected: true,
+					})
+					.where(eq(surveyTaskRun.id, taskRun.id))
+					.catch(() => {});
+			});
 			completeCurrentTask();
 		});
 

@@ -59,6 +59,7 @@ describe("useSurveyTaskDetection", () => {
 			code: "S2",
 			title: "S2",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [{ code: "T1", title: "Criar uma conta", instruction: "x" }],
 		});
 		useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");
@@ -82,6 +83,7 @@ describe("useSurveyTaskDetection", () => {
 			code: "S2",
 			title: "S2",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [{ code: "T1", title: "Criar uma conta", instruction: "x" }],
 		});
 		useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");

@@ -1,13 +1,13 @@
-import { Image } from "expo-image";
 import { Link } from "expo-router";
 import {
 	ArrowRight,
 	SlidersHorizontalIcon,
+	UserIcon,
 	UserRoundPen,
 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
-import OikosLogo from "@/assets/icons/icon.png";
 import { colors } from "@/components/style/colors";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
@@ -43,17 +43,18 @@ export function HomeUserCard({ onOpenSettings }: HomeUserCardProps) {
 		<View className="flex-row items-center gap-3 rounded-2xl border border-white/40 bg-white/30 p-3 shadow-sm">
 			<Link href="/(tabs)/(home)/profile" asChild>
 				<Pressable className="flex flex-1 flex-row items-center gap-3">
-					<Image
-						source={
-							user.profile.profile_image
-								? {
-										uri: user.profile.profile_image.url,
-										headers: getAuthenticatedImageHeaders(),
-									}
-								: OikosLogo
-						}
-						style={{ width: 44, height: 44, borderRadius: 10 }}
-					/>
+					<Avatar size="sm" className="rounded-[10px]">
+						{user.profile.profile_image ? (
+							<AvatarImage
+								source={{
+									uri: user.profile.profile_image.url,
+									headers: getAuthenticatedImageHeaders(),
+								}}
+							/>
+						) : (
+							<UserIcon size={20} color={colors.lime[800]} />
+						)}
+					</Avatar>
 					<View className="flex flex-col flex-1">
 						<Heading size="sm" numberOfLines={1}>
 							{user.profile.display_name}

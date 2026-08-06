@@ -1,16 +1,23 @@
 import { useRouter } from "expo-router";
 import { SearchIcon } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, ScrollView, View } from "react-native";
+import { BackHandler, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+	AppButton as Button,
+	AppButtonSpinner as ButtonSpinner,
+	AppButtonText as ButtonText,
+} from "@/components/app-button";
 import {
 	useSurveyCities,
 	useSurveyStates,
 } from "@/components/survey/hooks/use-survey-location-catalog";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
-import { OptionRow } from "@/components/survey/option-row";
+import {
+	OptionRowList,
+	type OptionRowListItem,
+} from "@/components/survey/option-row-list";
 import { QHeader } from "@/components/survey/q-header";
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
@@ -29,14 +36,8 @@ const DRAFT_KEY_BY_QUESTION: Record<
 	chain_role: "chainRole",
 };
 
-function CatalogEmptyMessage() {
-	return (
-		<Text size="sm" className="text-muted-foreground">
-			Não foi possível carregar a lista agora. Verifique sua conexão e tente
-			novamente.
-		</Text>
-	);
-}
+const CATALOG_EMPTY_MESSAGE =
+	"Não foi possível carregar a lista agora. Verifique sua conexão e tente novamente.";
 
 export default function SurveyCharacterizationScreen() {
 	const insets = useSafeAreaInsets();
@@ -116,6 +117,65 @@ export default function SurveyCharacterizationScreen() {
 
 	const searchTerm = search.trim().toLowerCase();
 
+	let items: OptionRowListItem[];
+	let isListLoading = false;
+	let emptyMessage: string | undefined;
+
+	if (isStateQuestion) {
+		isListLoading = isLoadingStates;
+		emptyMessage = CATALOG_EMPTY_MESSAGE;
+		items = (states ?? [])
+			.filter(state => state.nome.toLowerCase().includes(searchTerm))
+			.map(state => ({
+				key: state.sigla,
+				title: state.nome,
+				selected: draft.stateUf === state.sigla,
+				onPress: () => {
+					useSurveyDraftStore
+						.getState()
+						.setScreenerAnswer("stateUf", state.sigla);
+					useSurveyDraftStore.getState().setScreenerAnswer("cityName", null);
+				},
+			}));
+	} else if (isCityQuestion) {
+		isListLoading = isLoadingCities;
+		emptyMessage = CATALOG_EMPTY_MESSAGE;
+		items = (cities ?? [])
+			.filter(city => city.nome.toLowerCase().includes(searchTerm))
+			.map(city => ({
+				key: String(city.codigo_ibge),
+				title: city.nome,
+				selected: draft.cityName === city.nome,
+				onPress: () =>
+					useSurveyDraftStore
+						.getState()
+						.setScreenerAnswer("cityName", city.nome),
+			}));
+	} else {
+		items = (question.options ?? []).map(option => ({
+			key: option.key,
+			title: option.label,
+			selected: isNumberQuestion
+				? currentNumberValue === option.value
+				: currentValue === option.key,
+			onPress: () => {
+				if (question.key === "waste_contact_frequency") {
+					useSurveyDraftStore
+						.getState()
+						.setScreenerAnswer("wasteContactFrequency", option.value);
+				} else if (question.key === "app_experience") {
+					useSurveyDraftStore
+						.getState()
+						.setScreenerAnswer("appExperience", option.value);
+				} else if (currentAnswerKey) {
+					useSurveyDraftStore
+						.getState()
+						.setScreenerAnswer(currentAnswerKey, option.key);
+				}
+			},
+		}));
+	}
+
 	const goToNextStep = async () => {
 		if (stepIndex < screenerQuestions.length - 1) {
 			setStepIndex(current => current + 1);
@@ -163,7 +223,7 @@ export default function SurveyCharacterizationScreen() {
 	return (
 		<View
 			className="flex-1 bg-white px-6 pb-6 gap-4"
-			style={{ paddingTop: insets.top + 56 }}
+			style={{ paddingTop: insets.top + 16 }}
 		>
 			<QHeader
 				categoryLabel="Caracterização"
@@ -193,77 +253,11 @@ export default function SurveyCharacterizationScreen() {
 				</Input>
 			) : null}
 
-			<ScrollView contentContainerClassName="gap-2.5" className="flex-1">
-				{isStateQuestion ? (
-					isLoadingStates ? null : !states || states.length === 0 ? (
-						<CatalogEmptyMessage />
-					) : (
-						states
-							.filter(state => state.nome.toLowerCase().includes(searchTerm))
-							.map(state => (
-								<OptionRow
-									key={state.sigla}
-									title={state.nome}
-									selected={draft.stateUf === state.sigla}
-									onPress={() => {
-										useSurveyDraftStore
-											.getState()
-											.setScreenerAnswer("stateUf", state.sigla);
-										useSurveyDraftStore
-											.getState()
-											.setScreenerAnswer("cityName", null);
-									}}
-								/>
-							))
-					)
-				) : isCityQuestion ? (
-					isLoadingCities ? null : !cities || cities.length === 0 ? (
-						<CatalogEmptyMessage />
-					) : (
-						cities
-							.filter(city => city.nome.toLowerCase().includes(searchTerm))
-							.map(city => (
-								<OptionRow
-									key={city.codigo_ibge}
-									title={city.nome}
-									selected={draft.cityName === city.nome}
-									onPress={() =>
-										useSurveyDraftStore
-											.getState()
-											.setScreenerAnswer("cityName", city.nome)
-									}
-								/>
-							))
-					)
-				) : (
-					question.options?.map(option => (
-						<OptionRow
-							key={option.key}
-							title={option.label}
-							selected={
-								isNumberQuestion
-									? currentNumberValue === option.value
-									: currentValue === option.key
-							}
-							onPress={() => {
-								if (question.key === "waste_contact_frequency") {
-									useSurveyDraftStore
-										.getState()
-										.setScreenerAnswer("wasteContactFrequency", option.value);
-								} else if (question.key === "app_experience") {
-									useSurveyDraftStore
-										.getState()
-										.setScreenerAnswer("appExperience", option.value);
-								} else if (currentAnswerKey) {
-									useSurveyDraftStore
-										.getState()
-										.setScreenerAnswer(currentAnswerKey, option.key);
-								}
-							}}
-						/>
-					))
-				)}
-			</ScrollView>
+			<OptionRowList
+				data={items}
+				isLoading={isListLoading}
+				emptyMessage={emptyMessage}
+			/>
 
 			<View className="flex-row gap-3">
 				<Button

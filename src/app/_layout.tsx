@@ -19,15 +19,13 @@ import { sessionBus } from "@/libs/session-bus";
 import "./global.css";
 import "@/libs/api/oikos-api";
 import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
+import { ReemKufi_700Bold } from "@expo-google-fonts/reem-kufi";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";
 import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import {
-	AppSplashScreen,
-	SplashBackdrop,
-} from "@/components/app-splash-screen";
+import { BootSplashScreen } from "@/components/boot-splash-screen";
 import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
 import { SurveyMigrationsRunner } from "@/components/survey/survey-migrations-runner";
 import { Toaster } from "@/components/toast";
@@ -46,14 +44,18 @@ Observe.configure({
 	integrations: { "expo-router": true },
 });
 
-const SPLASH_VIDEO_DURATION_MS = 10000;
-
-type SplashStage = "video" | "handoff" | "app";
+type SplashStage = "boot" | "app";
 
 const REVEAL_LINGER_MS = 120;
 const REVEAL_FADE_MS = 500;
+const FONTS_TIMEOUT_MS = 6000;
 
 const isDevelopmentMode = process.env.NODE_ENV === "development";
+
+// Mantém a splash nativa (imagem estática do app.config.ts) até as fontes
+// carregarem — sem isso, o primeiro render em branco do RootLayout já
+// dispara o auto-hide nativo e deixa uma tela em branco por um instante.
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 // @buoy-gg/core drags in shared-ui/floating-tools-core/license and is only
 // ever rendered in dev. A static import would evaluate all of that on every
@@ -67,32 +69,34 @@ const FloatingDevTools = __DEV__
 function RootLayout() {
 	const [loaded, error] = useFonts({
 		Oswald_700Bold,
+		ReemKufi_700Bold,
 		SpaceGrotesk_400Regular,
 	});
+	const fontsReady = loaded || error;
+	const [fontsTimedOut, setFontsTimedOut] = useState(false);
+	// Se useFonts nunca resolver, RootLayout ficaria preso em `return null`
+	// pra sempre. Depois desse teto, segue mesmo sem confirmação.
+	useEffect(() => {
+		if (fontsReady) return;
+		const timeoutId = setTimeout(
+			() => setFontsTimedOut(true),
+			FONTS_TIMEOUT_MS,
+		);
+		return () => clearTimeout(timeoutId);
+	}, [fontsReady]);
+	const canRenderBoot = fontsReady || fontsTimedOut;
 	const { markInteractive } = useObserve();
-	const [stage, setStage] = useState<SplashStage>(
-		isDevelopmentMode ? "handoff" : "video",
-	);
+	const [stage, setStage] = useState<SplashStage>("boot");
 	const revealBlurOpacity = useSharedValue(1);
 
 	useEffect(() => {
-		const timeout = setTimeout(
-			() => setStage("handoff"),
-			SPLASH_VIDEO_DURATION_MS,
-		);
-		return () => clearTimeout(timeout);
-	}, []);
-
-	useEffect(() => {
-		if (stage === "handoff" && (loaded || error)) {
-			const raf = requestAnimationFrame(() => setStage("app"));
-			return () => cancelAnimationFrame(raf);
+		if (canRenderBoot) {
+			SplashScreen.hideAsync().catch(() => {});
 		}
-	}, [stage, loaded, error]);
+	}, [canRenderBoot]);
 
 	useEffect(() => {
 		if (stage === "app") {
-			SplashScreen.hideAsync().catch(() => {});
 			markInteractive();
 			revealBlurOpacity.value = withDelay(
 				REVEAL_LINGER_MS,
@@ -105,12 +109,14 @@ function RootLayout() {
 		opacity: revealBlurOpacity.value,
 	}));
 
-	if (stage === "video") {
-		return <AppSplashScreen />;
+	if (!canRenderBoot) {
+		return null;
 	}
 
-	if (stage === "handoff") {
-		return <SplashBackdrop />;
+	if (stage === "boot") {
+		return (
+			<BootSplashScreen onReady={() => setStage("app")} fontsError={error} />
+		);
 	}
 
 	return (

@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Image } from "expo-image";
-import * as ImagePicker from "expo-image-picker";
+import type * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -9,6 +8,7 @@ import {
 	InfoIcon,
 	PencilIcon,
 	Search,
+	UserIcon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -22,9 +22,10 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
-import DefaultImage from "@/assets/icons/icon.png";
+import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
 	Button,
 	ButtonIcon,
@@ -64,6 +65,7 @@ import { compressImage } from "@/libs/media-compression";
 import { logProfileEvent } from "@/libs/observe-events";
 import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
 import { useCepLookup } from "@/libs/use-cep-lookup";
+import { usePickImage } from "@/libs/use-pick-image";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 
@@ -368,18 +370,18 @@ export default function ProfileScreen() {
 	const isLoading =
 		profileMutation.isPending || profileAvatarMutation.isPending;
 
+	const { pickImage: pickAvatarImage, isPicking } = usePickImage();
+
 	const pickImage = async (onChange: (value: string) => void) => {
-		const result = await ImagePicker.launchImageLibraryAsync({
+		const assets = await pickAvatarImage({
 			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [1, 1],
 			quality: 1,
 		});
-
-		if (!result.canceled) {
-			const asset = result.assets[0];
-			selectedAsset.current = asset;
-			onChange(asset.uri);
+		if (assets?.[0]) {
+			selectedAsset.current = assets[0];
+			onChange(assets[0].uri);
 		}
 	};
 
@@ -423,31 +425,34 @@ export default function ProfileScreen() {
 												testID="avatar-touchable"
 												activeOpacity={0.7}
 												onPress={() => pickImage(onChange)}
+												disabled={isPicking}
 												className="rounded-md shadow-lg shadow-black/40"
 											>
-												<Image
-													source={
-														value
-															? {
-																	uri: value,
-																	headers: getAuthenticatedImageHeaders(),
-																}
-															: DefaultImage
-													}
-													style={{
-														width: 80,
-														height: 80,
-														borderRadius: 6,
-													}}
-												/>
+												<Avatar size="lg">
+													{value ? (
+														<AvatarImage
+															source={{
+																uri: value,
+																headers: getAuthenticatedImageHeaders(),
+															}}
+														/>
+													) : (
+														<UserIcon
+															size={36}
+															color={colors.lime[800]}
+															strokeWidth={1.5}
+														/>
+													)}
+												</Avatar>
 											</TouchableOpacity>
 											<Button
 												size="sm"
 												variant="secondary"
 												className="absolute bottom-0 right-0"
 												onPress={() => pickImage(onChange)}
+												isDisabled={isPicking}
 											>
-												<ButtonIcon as={PencilIcon} />
+												<ButtonIcon as={isPicking ? Spinner : PencilIcon} />
 											</Button>
 										</View>
 									)}

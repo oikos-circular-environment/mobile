@@ -1,6 +1,7 @@
 import { AlertTriangleIcon, FactoryIcon } from "lucide-react-native";
-import { Image, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { colors } from "@/components/style/colors";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -18,21 +19,18 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 		<Pressable onPress={onPress}>
 			<Card className="shadow-none gap-3">
 				<View className="flex-row items-center gap-3">
-					{company.avatar ? (
-						<View className="border border-gray-200 rounded-lg items-center justify-center">
-							<Image
+					<Avatar size="md">
+						{company.avatar ? (
+							<AvatarImage
 								source={{
 									uri: company.avatar.url,
 									headers: getAuthenticatedImageHeaders(),
 								}}
-								style={{ width: 64, height: 64, borderRadius: 8 }}
 							/>
-						</View>
-					) : (
-						<View className="size-18 rounded-md bg-secondary items-center justify-center">
+						) : (
 							<FactoryIcon size={22} color={colors.gray[400]} />
-						</View>
-					)}
+						)}
+					</Avatar>
 
 					<View className="flex-1 justify-center">
 						<Heading size="lg" className="font-semibold" numberOfLines={1}>

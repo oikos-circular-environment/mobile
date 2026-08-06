@@ -42,7 +42,7 @@ export default function TabsNavigator() {
 			<Tabs.Screen
 				name="complaints"
 				options={{
-					title: "Denunciar",
+					title: "Denúncias",
 					tabBarIcon: ({ color, size }) => <Shield color={color} size={size} />,
 				}}
 			/>

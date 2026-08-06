@@ -98,7 +98,7 @@ export default function ComplaintsScreen() {
 				onEndReached={handleEndReached}
 				onEndReachedThreshold={0.3}
 			/>
-			<ComplaintBottomSheet />
+			<ComplaintBottomSheet source="list" />
 		</View>
 	);
 }

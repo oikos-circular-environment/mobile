@@ -7,8 +7,16 @@
  *
  * Idempotente: reexecutar sobre o mesmo release não duplica nada.
  *
- * Flags: `--dry-run`, `--skip-submit`,
- * `--build-number=<n>` (default: variável de ambiente `IOS_BUILD_NUMBER`).
+ * Duas formas de identificar o build a anexar:
+ * - `--build-id=<id>` (ou `IOS_ASC_BUILD_ID`): o id do build na App Store
+ *   Connect, já processado. É o caminho usado por `.eas/workflows/ios-release.yml`,
+ *   que recebe esse id pronto do trigger `app_store_connect.build_upload` — sem
+ *   polling.
+ * - `--build-number=<n>` (ou `IOS_BUILD_NUMBER`): o build number do EAS: aguarda
+ *   a Apple terminar de processar o upload (`eas submit` não espera por isso).
+ *   Caminho de fallback para execução manual.
+ *
+ * Flags: `--dry-run`, `--skip-submit`.
  *
  * @see docs/publishing-path.md — "Publicação na App Store"
  */
@@ -23,10 +31,15 @@ import {
 import { getExpoVersion } from "./lib/expo-config.mjs";
 
 const BUILD_POLL_INTERVAL_MS = 30_000;
+const BUILD_NUMBER_PATTERN = /^\d+$/;
 
 const flags = {
 	dryRun: process.argv.includes("--dry-run"),
 	skipSubmit: process.argv.includes("--skip-submit"),
+	buildId:
+		process.argv
+			.find(argument => argument.startsWith("--build-id="))
+			?.split("=")[1] ?? process.env.IOS_ASC_BUILD_ID,
 	buildNumber:
 		process.argv
 			.find(argument => argument.startsWith("--build-number="))
@@ -175,6 +188,46 @@ async function waitForBuild(
 }
 
 /**
+ * Confirma que um build já identificado por id chegou a `processingState:
+ * VALID`. Mais curto que `waitForBuild`: quando o id vem do trigger
+ * `app_store_connect.build_upload` (estado `complete`), a Apple já terminou —
+ * ou está prestes a terminar — de processar o upload.
+ *
+ * @param {ReturnType<createAscClient>} client
+ * @param {string} buildId
+ * @param {number} timeoutMinutes
+ * @throws {Error} Se o processamento falhar ou estourar o tempo.
+ */
+async function waitForBuildById(client, buildId, timeoutMinutes) {
+	const deadline = Date.now() + timeoutMinutes * 60_000;
+	let lastState = null;
+
+	while (Date.now() < deadline) {
+		const response = await client.get(`/v1/builds/${buildId}`, {
+			query: { "fields[builds]": "processingState" },
+		});
+		const state = response.data.attributes.processingState;
+
+		if (state !== lastState) {
+			info(`Build ${buildId}: ${state}`);
+			lastState = state;
+		}
+		if (state === "VALID") return;
+		if (state === "FAILED" || state === "INVALID") {
+			throw new Error(
+				`Build ${buildId} terminou o processamento como ${state} na Apple.`,
+			);
+		}
+
+		await sleep(BUILD_POLL_INTERVAL_MS);
+	}
+
+	throw new Error(
+		`Timeout de ${timeoutMinutes} min esperando o build ${buildId} ficar VALID.`,
+	);
+}
+
+/**
  * Envia a versão para o App Review, reutilizando uma review submission aberta
  * quando já houver uma.
  *
@@ -266,10 +319,21 @@ async function main() {
 
 	step(`Release iOS ${version}${flags.dryRun ? " (dry-run)" : ""}`);
 
-	if (!flags.buildNumber) {
+	if (!flags.buildId && !flags.buildNumber) {
 		throw new Error(
-			"Build a anexar não informado. Use --build-number=<n> ou a env IOS_BUILD_NUMBER " +
-				"(no workflow ela vem de needs.build_ios.outputs.app_build_version).",
+			"Build a anexar não informado. Use --build-id=<id> (preferível — vem de " +
+				"app_store_connect.build_upload.build.id) ou --build-number=<n>/IOS_BUILD_NUMBER.",
+		);
+	}
+	if (
+		flags.buildNumber &&
+		!BUILD_NUMBER_PATTERN.test(String(flags.buildNumber))
+	) {
+		throw new Error(
+			`--build-number recebeu "${flags.buildNumber}", que não é um número. ` +
+				"Isso normalmente indica uma expressão needs.*.outputs não interpolada — " +
+				"confira se o `env` que a define está no nível do job, não de um step " +
+				"individual (ver docs/publishing-path.md).",
 		);
 	}
 
@@ -280,7 +344,7 @@ async function main() {
 				? `Versão ${version}: ${existing.attributes.appVersionState}`
 				: `Versão ${version} ainda não existe.`,
 		);
-		info(`Build a anexar: ${flags.buildNumber}`);
+		info(`Build a anexar: ${flags.buildId ?? flags.buildNumber}`);
 		info("Nada foi escrito (--dry-run).");
 		return;
 	}
@@ -289,21 +353,32 @@ async function main() {
 	const appStoreVersionId = await ensureAppStoreVersion(client, appId, version);
 
 	step("Build");
-	const timeoutMinutes = Number(
-		process.env.ASC_BUILD_WAIT_TIMEOUT_MINUTES ?? 45,
-	);
-	const buildId = await waitForBuild(
-		client,
-		appId,
-		version,
-		flags.buildNumber,
-		timeoutMinutes,
-	);
+	let buildId;
+	if (flags.buildId) {
+		const timeoutMinutes = Number(
+			process.env.ASC_BUILD_WAIT_TIMEOUT_MINUTES ?? 10,
+		);
+		await waitForBuildById(client, flags.buildId, timeoutMinutes);
+		buildId = flags.buildId;
+	} else {
+		const timeoutMinutes = Number(
+			process.env.ASC_BUILD_WAIT_TIMEOUT_MINUTES ?? 45,
+		);
+		buildId = await waitForBuild(
+			client,
+			appId,
+			version,
+			flags.buildNumber,
+			timeoutMinutes,
+		);
+	}
 	await client.patch(
 		`/v1/appStoreVersions/${appStoreVersionId}/relationships/build`,
 		{ data: { type: "builds", id: buildId } },
 	);
-	info(`Build ${version} (${flags.buildNumber}) anexado à versão.`);
+	info(
+		`Build ${version} (${flags.buildId ?? flags.buildNumber}) anexado à versão.`,
+	);
 
 	step("App Review");
 	if (flags.skipSubmit) {

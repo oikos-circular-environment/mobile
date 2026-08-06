@@ -1,11 +1,14 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+	AppButton as Button,
+	AppButtonText as ButtonText,
+} from "@/components/app-button";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
-import { OptionRow } from "@/components/survey/option-row";
+import { OptionRowList } from "@/components/survey/option-row-list";
 import { QHeader } from "@/components/survey/q-header";
-import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useSurveyDraftStore } from "@/stores/survey-draft-store";
@@ -30,10 +33,18 @@ export default function SurveyPersonaScreen() {
 		router.push("/survey/characterization");
 	};
 
+	const items = (protocol?.personas ?? []).map(persona => ({
+		key: persona.key,
+		title: persona.label,
+		description: persona.description,
+		selected: selected === persona.key,
+		onPress: () => setSelected(persona.key),
+	}));
+
 	return (
 		<View
 			className="flex-1 bg-white px-6 pb-6 gap-4"
-			style={{ paddingTop: insets.top + 56 }}
+			style={{ paddingTop: insets.top + 16 }}
 		>
 			<QHeader
 				categoryLabel="Caracterização"
@@ -48,19 +59,7 @@ export default function SurveyPersonaScreen() {
 				</Text>
 			</View>
 
-			<ScrollView contentContainerClassName="gap-2.5" className="flex-1">
-				{isLoading || !protocol
-					? null
-					: protocol.personas.map(persona => (
-							<OptionRow
-								key={persona.key}
-								title={persona.label}
-								description={persona.description}
-								selected={selected === persona.key}
-								onPress={() => setSelected(persona.key)}
-							/>
-						))}
-			</ScrollView>
+			<OptionRowList data={items} isLoading={isLoading || !protocol} />
 
 			<Button disabled={!selected} onPress={handleContinue}>
 				<ButtonText>Continuar</ButtonText>

@@ -5,7 +5,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
-import { router } from "expo-router";
+import { router, useIsFocused } from "expo-router";
 import {
 	AlertTriangleIcon,
 	ArrowRightIcon,
@@ -46,6 +46,7 @@ import {
 	getV1ComplaintsByIdResolutions,
 } from "@/libs/oikos-sdk";
 import type { MapComplaintAttachment } from "@/libs/types/complaint";
+import { uiEventBus } from "@/libs/ui-event-bus";
 import { cn } from "@/libs/utils";
 import { useComplaintsStore } from "@/stores/complaints-store";
 import { ComplaintDetailsHeader } from "../complaint-details-header";
@@ -54,7 +55,11 @@ import { MapComplaintAttachmentPreview } from "./attachment-preview";
 import { ResolutionCard } from "./resolution-card";
 import { ResolutionCardSkeleton } from "./resolution-card-skeleton";
 
-export function ComplaintBottomSheet() {
+interface ComplaintBottomSheetProps {
+	source: "map" | "list";
+}
+
+export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 	const ref = useRef<BottomSheet>(null);
 	const [previewMapComplaintAttachment, setPreviewMapComplaintAttachment] =
 		useState<MapComplaintAttachment | null>(null);
@@ -77,6 +82,10 @@ export function ComplaintBottomSheet() {
 	const queryClient = useQueryClient();
 	const isOpen = !!complaint;
 
+	const isFocused = useIsFocused();
+	const isFocusedRef = useRef(isFocused);
+	isFocusedRef.current = isFocused;
+
 	const userLocation = location
 		? { lat: location.coords.latitude, lon: location.coords.longitude }
 		: null;
@@ -84,10 +93,13 @@ export function ComplaintBottomSheet() {
 	useEffect(() => {
 		if (isOpen) {
 			ref.current?.snapToIndex(0);
+			if (isFocusedRef.current) {
+				uiEventBus.emit({ name: "complaint.opened", payload: { source } });
+			}
 		} else {
 			ref.current?.close();
 		}
-	}, [isOpen]);
+	}, [isOpen, source]);
 
 	const handleSheetChange = useCallback(
 		(index: number) => {
@@ -353,7 +365,7 @@ export function ComplaintBottomSheet() {
 										</AlertText>
 									</Alert>
 
-									<View className="relative my-4">
+									<View className="relative my-4 gap-4">
 										{showResolutionsLocked ? (
 											Array.from({
 												length: Math.min(complaint.resolution_count, 3),

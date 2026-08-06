@@ -12,6 +12,7 @@ const mockReplace = jest.fn();
 const mockPush = jest.fn();
 const mockDb = createTestSurveyDb();
 const mockEnqueueAbandon = jest.fn().mockResolvedValue(undefined);
+const mockEnqueueCheckpoint = jest.fn().mockResolvedValue(undefined);
 const mockDrainOutbox = jest.fn().mockResolvedValue(undefined);
 const mockDeleteLocalSurveyData = jest.fn().mockResolvedValue(undefined);
 
@@ -30,6 +31,7 @@ jest.mock("@/libs/survey/db/client", () => ({
 
 jest.mock("@/libs/survey/queue/outbox", () => ({
 	enqueueAbandon: (...args: unknown[]) => mockEnqueueAbandon(...args),
+	enqueueCheckpoint: (...args: unknown[]) => mockEnqueueCheckpoint(...args),
 	drainOutbox: (...args: unknown[]) => mockDrainOutbox(...args),
 }));
 
@@ -44,7 +46,7 @@ const protocolFixture = {
 	key: "oikos-walkthrough",
 	version: 1,
 	personas: [
-		{ key: "CITIZEN", label: "Cidadão", description: "d", suite_codes: [] },
+		{ key: "CITIZEN", label: "Cidadão", description: "d", suites: [] },
 	],
 	suites: [
 		{ code: "S1", title: "Exploração livre", objective: "o", task_codes: [] },
@@ -62,6 +64,7 @@ describe("SurveyResumeScreen", () => {
 		mockReplace.mockClear();
 		mockPush.mockClear();
 		mockEnqueueAbandon.mockClear();
+		mockEnqueueCheckpoint.mockClear();
 		mockDrainOutbox.mockClear();
 		mockDeleteLocalSurveyData.mockClear();
 		mockDb.delete(surveySession).run();
@@ -83,6 +86,7 @@ describe("SurveyResumeScreen", () => {
 			code: "S1",
 			title: "S1",
 			objective: "o",
+			specificObjectives: [],
 			tasks: [],
 		});
 		useSurveyExecutionStore.getState().beginSuite();
@@ -110,6 +114,7 @@ describe("SurveyResumeScreen", () => {
 			code: "S1",
 			title: "S1",
 			objective: "o",
+			specificObjectives: [],
 			tasks: [],
 		});
 		useSurveyExecutionStore.getState().beginSuite();
@@ -151,7 +156,7 @@ describe("SurveyResumeScreen", () => {
 		).not.toBeOnTheScreen();
 	});
 
-	it("abre o sheet de abandonar e, ao confirmar, registra o abandono e volta para a home", async () => {
+	it("abre o sheet de abandonar e, ao confirmar, registra o abandono, marca as etapas ainda não iniciadas como NO, e volta para a home", async () => {
 		const user = userEvent.setup();
 		await render(<SurveyResumeScreen />);
 
@@ -160,11 +165,49 @@ describe("SurveyResumeScreen", () => {
 
 		await user.press(screen.getByText("Sim, abandonar"));
 
+		// Nenhuma suíte foi iniciada (suiteRunId nulo) — S1 e S2 recebem checkpoint
+		// sintético com outcome NO forçado, antes do E5.
+		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(2);
+		expect(mockEnqueueCheckpoint.mock.calls[0][1].suite).toEqual(
+			expect.objectContaining({ code: "S1", outcome: "NO" }),
+		);
+		expect(mockEnqueueCheckpoint.mock.calls[1][1].suite).toEqual(
+			expect.objectContaining({ code: "S2", outcome: "NO" }),
+		);
 		expect(mockEnqueueAbandon).toHaveBeenCalledWith(
 			"session-1",
 			expect.objectContaining({ session_id: "session-1" }),
 		);
 		expect(useSurveyStore.getState().status).toBe("ABANDONED");
 		expect(mockDismissTo).toHaveBeenCalledWith("/(tabs)/(home)");
+	});
+
+	it("suíte em andamento no momento do abandono usa a fórmula normal de contagem, não NO forçado", async () => {
+		const user = userEvent.setup();
+		useSurveyExecutionStore.getState().openSuiteIntro({
+			code: "S1",
+			title: "S1",
+			objective: "o",
+			specificObjectives: [],
+			tasks: [{ code: "T1", title: "a", instruction: "a" }],
+		});
+		useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");
+		useSurveyExecutionStore.getState().beginSuite();
+		useSurveyExecutionStore.getState().completeCurrentTask();
+
+		await render(<SurveyResumeScreen />);
+
+		await user.press(screen.getByText("Abandonar a pesquisa"));
+		await user.press(screen.getByText("Sim, abandonar"));
+
+		// Suíte S1 em andamento com 1/1 tarefa concluída -> YES pela fórmula normal.
+		// Só S2 (nunca iniciada) recebe NO forçado.
+		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(2);
+		expect(mockEnqueueCheckpoint.mock.calls[0][1].suite).toEqual(
+			expect.objectContaining({ code: "S1", outcome: "YES" }),
+		);
+		expect(mockEnqueueCheckpoint.mock.calls[1][1].suite).toEqual(
+			expect.objectContaining({ code: "S2", outcome: "NO" }),
+		);
 	});
 });

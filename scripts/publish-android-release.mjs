@@ -30,6 +30,8 @@ import {
 	whatsNewPath,
 } from "./lib/store-config.mjs";
 
+const VERSION_CODE_PATTERN = /^\d+$/;
+
 const flags = {
 	dryRun: process.argv.includes("--dry-run"),
 	versionCode:
@@ -37,6 +39,19 @@ const flags = {
 			.find(argument => argument.startsWith("--version-code="))
 			?.split("=")[1] ?? process.env.ANDROID_VERSION_CODE,
 };
+
+if (
+	flags.versionCode &&
+	!VERSION_CODE_PATTERN.test(String(flags.versionCode))
+) {
+	console.error(
+		`\n✖ --version-code recebeu "${flags.versionCode}", que não é um número. ` +
+			"Isso normalmente indica uma expressão needs.*.outputs não interpolada — " +
+			"confira se o `env` que a define está no nível do job, não de um step " +
+			"individual (ver docs/publishing-path.md).",
+	);
+	process.exit(1);
+}
 
 const step = message => console.log(`\n▸ ${message}`);
 const info = message => console.log(`  ${message}`);

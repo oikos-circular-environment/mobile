@@ -1,5 +1,6 @@
 import { networkTelemetryBus } from "@/libs/network-telemetry-bus";
 import { createTaskSignalWatcher } from "@/libs/survey/signal-matcher";
+import { uiEventBus } from "@/libs/ui-event-bus";
 
 describe("createTaskSignalWatcher", () => {
 	it("modo any conclui no primeiro sinal casado", () => {
@@ -228,6 +229,30 @@ describe("createTaskSignalWatcher", () => {
 		expect(onComplete).not.toHaveBeenCalled();
 
 		watcher.notifyScreen("/market/3fa85f64-5717-4562-b3fc-2c963f66afa6");
+		expect(onComplete).toHaveBeenCalledTimes(1);
+		watcher.dispose();
+	});
+
+	it("casa sinal de evento de UI (kind: event) por nome e payload", () => {
+		const onComplete = jest.fn();
+		const watcher = createTaskSignalWatcher(
+			{
+				mode: "any",
+				signals: [
+					{
+						kind: "event",
+						name: "complaint.opened",
+						payload: { source: "list" },
+					},
+				],
+			},
+			onComplete,
+		);
+
+		uiEventBus.emit({ name: "complaint.opened", payload: { source: "map" } });
+		expect(onComplete).not.toHaveBeenCalled();
+
+		uiEventBus.emit({ name: "complaint.opened", payload: { source: "list" } });
 		expect(onComplete).toHaveBeenCalledTimes(1);
 		watcher.dispose();
 	});
