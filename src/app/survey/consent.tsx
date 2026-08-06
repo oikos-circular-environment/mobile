@@ -100,10 +100,6 @@ export default function SurveyConsentScreen() {
 						label="Pesquisador responsável"
 						value={CONSENT_IDENTIFICATION.researcher}
 					/>
-					<IdentificationRow
-						label="Nº do parecer CEP"
-						value={CONSENT_IDENTIFICATION.cepStatus}
-					/>
 				</View>
 
 				{CONSENT_SECTIONS.map(section => (
