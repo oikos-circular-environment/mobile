@@ -6,6 +6,7 @@
 
 import {
 	APP_STORE_CONNECT_BASE_URL,
+	AppVersionState,
 	createAscClient,
 	readAscCredentialsFromEnv,
 } from "@oikos-circular-environment/apple-connect-api";
@@ -21,14 +22,13 @@ const DEFAULT_APP_ID = "6786017565";
  * @type {ReadonlySet<string>}
  */
 export const NON_EDITABLE_VERSION_STATES = new Set([
-	"READY_FOR_DISTRIBUTION",
-	"READY_FOR_SALE",
-	"PENDING_DEVELOPER_RELEASE",
-	"PENDING_APPLE_RELEASE",
-	"PROCESSING_FOR_APP_STORE",
-	"REPLACED_WITH_NEW_VERSION",
-	"WAITING_FOR_REVIEW",
-	"IN_REVIEW",
+	AppVersionState.READY_FOR_DISTRIBUTION,
+	AppVersionState.PENDING_DEVELOPER_RELEASE,
+	AppVersionState.PENDING_APPLE_RELEASE,
+	AppVersionState.PROCESSING_FOR_DISTRIBUTION,
+	AppVersionState.REPLACED_WITH_NEW_VERSION,
+	AppVersionState.WAITING_FOR_REVIEW,
+	AppVersionState.IN_REVIEW,
 ]);
 
 /**
