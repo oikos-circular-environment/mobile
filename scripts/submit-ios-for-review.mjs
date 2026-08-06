@@ -37,14 +37,21 @@ const BUILD_NUMBER_PATTERN = /^\d+$/;
 const flags = {
 	dryRun: process.argv.includes("--dry-run"),
 	skipSubmit: process.argv.includes("--skip-submit"),
+	// || '' no workflow_dispatch (fallback do contexto app_store_connect vazio
+	// em execução manual) vira string vazia, não undefined — normaliza aqui
+	// pra `??` continuar funcionando em todo o resto do arquivo.
 	buildId:
-		process.argv
+		(process.argv
 			.find(argument => argument.startsWith("--build-id="))
-			?.split("=")[1] ?? process.env.IOS_ASC_BUILD_ID,
+			?.split("=")[1] ??
+			process.env.IOS_ASC_BUILD_ID) ||
+		undefined,
 	buildNumber:
-		process.argv
+		(process.argv
 			.find(argument => argument.startsWith("--build-number="))
-			?.split("=")[1] ?? process.env.IOS_BUILD_NUMBER,
+			?.split("=")[1] ??
+			process.env.IOS_BUILD_NUMBER) ||
+		undefined,
 };
 
 const step = message => console.log(`\n▸ ${message}`);
