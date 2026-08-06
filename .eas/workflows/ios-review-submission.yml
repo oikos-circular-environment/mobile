@@ -1,4 +1,4 @@
-name: iOS release finalization
+name: iOS App Review submission
 
 # Requer a conexão com a App Store Connect configurada no dashboard da EAS
 # (Project Settings → App Store Connect) — é um setup único, fora do código.

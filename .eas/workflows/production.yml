@@ -102,7 +102,7 @@ jobs:
         run: node scripts/publish-android-release.mjs
 
   # Só sobe o binário — anexar, publicar ficha e enviar pra revisão dependem
-  # do processamento na Apple e vivem em ios-release.yml (trigger app_store_connect).
+  # do processamento na Apple e vivem em ios-review-submission.yml (trigger app_store_connect).
   submit_ios:
     name: Submit iOS
     type: submit
@@ -133,4 +133,4 @@ jobs:
         - iOS — upload do binário: ${{ after.submit_ios.status }}
         - OTA: ${{ after.publish_update.status }}
 
-        A finalização do release iOS (ficha + anexar build + enviar pra revisão) roda em outro workflow, disparado quando a Apple terminar de processar o upload. Acompanhe em `ios-release.yml`.
+        A finalização do release iOS (ficha + anexar build + enviar pra revisão) roda em outro workflow, disparado quando a Apple terminar de processar o upload. Acompanhe em `ios-review-submission.yml`.

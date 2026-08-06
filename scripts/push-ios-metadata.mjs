@@ -17,10 +17,15 @@ const FAILURE_PATTERNS = [/✖/, /failed to \w+/i, /error uploading/i];
  */
 function runMetadataPush() {
 	return new Promise((resolve, reject) => {
-		const child = spawn("npx", ["eas", "metadata:push", "--non-interactive"], {
-			stdio: ["ignore", "pipe", "pipe"],
-			env: process.env,
-		});
+		// `eas-cli` e não `eas`: o npx resolve pelo nome do pacote, não do binário.
+		const child = spawn(
+			"npx",
+			["--yes", "eas-cli", "metadata:push", "--non-interactive"],
+			{
+				stdio: ["ignore", "pipe", "pipe"],
+				env: process.env,
+			},
+		);
 
 		let combined = "";
 		const relay = (stream, target) => {

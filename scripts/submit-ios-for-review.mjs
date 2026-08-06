@@ -9,7 +9,7 @@
  *
  * Duas formas de identificar o build a anexar:
  * - `--build-id=<id>` (ou `IOS_ASC_BUILD_ID`): o id do build na App Store
- *   Connect, já processado. É o caminho usado por `.eas/workflows/ios-release.yml`,
+ *   Connect, já processado. É o caminho usado por `.eas/workflows/ios-review-submission.yml`,
  *   que recebe esse id pronto do trigger `app_store_connect.build_upload` — sem
  *   polling.
  * - `--build-number=<n>` (ou `IOS_BUILD_NUMBER`): o build number do EAS: aguarda
