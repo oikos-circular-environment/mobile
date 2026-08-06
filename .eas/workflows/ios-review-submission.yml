@@ -39,8 +39,8 @@ jobs:
     type: custom
     needs: [push_ios_metadata]
     env:
-      IOS_ASC_BUILD_ID: ${{ app_store_connect.build_upload.build.id }}
-      IOS_BUILD_NUMBER: ${{ inputs.build_number }}
+      IOS_ASC_BUILD_ID: ${{ app_store_connect.build_upload.build.id || '' }}
+      IOS_BUILD_NUMBER: ${{ inputs.build_number || '' }}
     steps:
       - uses: eas/checkout
       - run: npm ci

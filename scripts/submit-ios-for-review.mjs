@@ -27,6 +27,7 @@ import {
 	OPEN_REVIEW_SUBMISSION_STATES,
 	readAscCredentialsFromEnv,
 	sleep,
+	TRANSITIONING_REVIEW_SUBMISSION_STATES,
 } from "./lib/asc-api.mjs";
 import { getExpoVersion } from "./lib/expo-config.mjs";
 
@@ -145,7 +146,11 @@ async function waitForBuild(
 			query: {
 				"filter[app]": appId,
 				"filter[version]": buildNumber,
-				"fields[builds]": "version,processingState",
+				// preReleaseVersion precisa estar em fields[builds], não só em
+				// include — sparse fieldset também filtra relationships, e sem
+				// isso response.data[].relationships.preReleaseVersion vem
+				// undefined e o build nunca casa com o trem.
+				"fields[builds]": "version,processingState,preReleaseVersion",
 				include: "preReleaseVersion",
 				limit: 10,
 			},
@@ -253,7 +258,21 @@ async function submitForReview(
 
 	let submission = open.data[0] ?? null;
 
-	if (submission?.attributes.submitted) {
+	if (
+		submission &&
+		TRANSITIONING_REVIEW_SUBMISSION_STATES.includes(submission.attributes.state)
+	) {
+		throw new Error(
+			`Review submission em transição (estado: ${submission.attributes.state}) — ` +
+				"a Apple ainda está cancelando ou finalizando o envio anterior. Espere " +
+				"terminar e rode de novo.",
+		);
+	}
+
+	// `submitted` não é atributo de leitura do ReviewSubmission — só existe no
+	// corpo do PATCH. READY_FOR_REVIEW é o único estado aberto em que ainda não
+	// foi marcado; qualquer outro já passou por isso.
+	if (submission && submission.attributes.state !== "READY_FOR_REVIEW") {
 		info(
 			`Já existe um envio em andamento (estado: ${submission.attributes.state}) — nada a fazer.`,
 		);
