@@ -37,15 +37,3 @@ jobs:
       - run: npm ci
       - name: Attach build and submit for review
         run: node scripts/submit-ios-for-review.mjs
-
-  notify:
-    name: Notify release status
-    type: slack
-    after: [push_ios_metadata, attach_and_submit_ios]
-    params:
-      webhook_url: ${{ env.SLACK_WEBHOOK_URL }}
-      message: |
-        Finalização do release iOS — build ASC `${{ app_store_connect.build_upload.build.id }}`, versão ${{ app_store_connect.build_upload.cf_bundle_short_version_string }} (${{ app_store_connect.build_upload.cf_bundle_version }}).
-
-        - Ficha e notas de versão: ${{ after.push_ios_metadata.status }}
-        - Anexar build + enviar pra revisão: ${{ after.attach_and_submit_ios.status }}
