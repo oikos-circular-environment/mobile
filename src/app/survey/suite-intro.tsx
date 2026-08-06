@@ -1,7 +1,7 @@
 import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
 	AppButton as Button,
@@ -122,10 +122,16 @@ export default function SurveySuiteIntroScreen() {
 
 	return (
 		<View
-			className="flex-1 bg-white px-6 pb-8 justify-between"
+			className="flex-1 bg-white px-6 pb-8"
 			style={{ paddingTop: insets.top + 16 }}
 		>
-			<View className="gap-4">
+			{/* Os objetivos por persona chegam a 4 passos e não cabem em uma tela;
+			    sem o scroll, o texto do fim ficava inacessível. */}
+			<ScrollView
+				className="flex-1"
+				contentContainerClassName="gap-4 pb-6"
+				showsVerticalScrollIndicator={false}
+			>
 				<Text size="xs" bold className="uppercase tracking-wider text-lime-700">
 					{`Etapa ${suiteIndex + 1} de ${suiteQueue.length}`}
 				</Text>
@@ -152,7 +158,7 @@ export default function SurveySuiteIntroScreen() {
 						))}
 					</View>
 				) : null}
-			</View>
+			</ScrollView>
 
 			<Button onPress={handleBegin} disabled={secondsLeft > 0}>
 				<ButtonText>
