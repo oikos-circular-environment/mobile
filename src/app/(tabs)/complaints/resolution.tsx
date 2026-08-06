@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import * as ImagePicker from "expo-image-picker";
+import type * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -63,6 +63,7 @@ import {
 	postV1ComplaintsByIdResolutions,
 	postV1ComplaintsByIdResolutionsAttachments,
 } from "@/libs/oikos-sdk";
+import { usePickImage } from "@/libs/use-pick-image";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
@@ -166,45 +167,40 @@ export default function ComplaintResolutionScreen() {
 		};
 	}, [selectedMapComplaint, complaintsInList, id]);
 
+	const { pickImage, isPicking } = usePickImage();
+
 	const handlePickMedia = async () => {
-		const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-		if (!perm.granted) {
-			toast.error(
-				"Permissão negada",
-				"Permita o acesso à galeria nas configurações.",
-			);
-			return;
-		}
-		const result = await ImagePicker.launchImageLibraryAsync({
+		const assets = await pickImage({
+			requestPermission: true,
 			mediaTypes: ["images", "videos"],
 			allowsMultipleSelection: true,
 			quality: 0.85,
 			orderedSelection: true,
 		});
-		if (!result.canceled) {
-			const existingUris = new Set(selectedAssets.map(a => a.uri));
-			const validAssets: ImagePicker.ImagePickerAsset[] = [];
-			let skippedCount = 0;
+		if (!assets) return;
 
-			for (const asset of result.assets) {
-				if (existingUris.has(asset.uri)) continue;
-				if (!isValidMimeType(asset.mimeType)) {
-					skippedCount++;
-					continue;
-				}
-				validAssets.push(asset);
-			}
+		const existingUris = new Set(selectedAssets.map(a => a.uri));
+		const validAssets: ImagePicker.ImagePickerAsset[] = [];
+		let skippedCount = 0;
 
-			if (validAssets.length > 0) {
-				setSelectedAssets(prev => [...prev, ...validAssets]);
+		for (const asset of assets) {
+			if (existingUris.has(asset.uri)) continue;
+			if (!isValidMimeType(asset.mimeType)) {
+				skippedCount++;
+				continue;
 			}
+			validAssets.push(asset);
+		}
 
-			if (skippedCount > 0) {
-				toast.warning(
-					"Arquivos ignorados",
-					`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
-				);
-			}
+		if (validAssets.length > 0) {
+			setSelectedAssets(prev => [...prev, ...validAssets]);
+		}
+
+		if (skippedCount > 0) {
+			toast.warning(
+				"Arquivos ignorados",
+				`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
+			);
 		}
 	};
 
@@ -539,14 +535,19 @@ export default function ComplaintResolutionScreen() {
 						>
 							<Pressable
 								onPress={handlePickMedia}
+								disabled={isPicking}
 								className="items-center justify-center rounded-xl border border-gray-200 bg-gray-50"
 								style={{ width: 80, height: 80 }}
 							>
-								<ImageIcon
-									size={24}
-									color={colors.gray[400]}
-									strokeWidth={1.5}
-								/>
+								{isPicking ? (
+									<Spinner color={colors.gray[400]} />
+								) : (
+									<ImageIcon
+										size={24}
+										color={colors.gray[400]}
+										strokeWidth={1.5}
+									/>
+								)}
 							</Pressable>
 
 							{/* Anexos existentes do servidor */}

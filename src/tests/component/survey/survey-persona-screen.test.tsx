@@ -19,13 +19,21 @@ const protocolFixture = {
 			key: "COLLECTOR",
 			label: "Coletor(a)",
 			description: "Você coleta materiais recicláveis.",
-			suite_codes: ["S1", "S2", "S3", "S4"],
+			suites: [
+				{ suite_code: "S1", specific_objectives: [] },
+				{ suite_code: "S2", specific_objectives: [] },
+				{ suite_code: "S3", specific_objectives: [] },
+			],
 		},
 		{
 			key: "CITIZEN",
 			label: "Cidadão",
 			description: "Você mora na cidade.",
-			suite_codes: ["S1", "S2", "S6"],
+			suites: [
+				{ suite_code: "S1", specific_objectives: [] },
+				{ suite_code: "S2", specific_objectives: [] },
+				{ suite_code: "S6", specific_objectives: [] },
+			],
 		},
 	],
 	suites: [],

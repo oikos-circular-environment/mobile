@@ -85,6 +85,7 @@ function setupSuite() {
 		code: "S1",
 		title: "S1",
 		objective: "obj",
+		specificObjectives: [],
 		tasks: [{ code: "T8", title: "a", instruction: "a" }],
 	});
 	useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");

@@ -25,6 +25,7 @@ describe("survey-execution-store", () => {
 			code: "S1",
 			title: "Exploração livre",
 			objective: "Explore o app.",
+			specificObjectives: [],
 			tasks: [
 				{ code: "T8", title: "Buscar", instruction: "Busque algo." },
 				{ code: "T9", title: "Ver", instruction: "Veja algo." },
@@ -56,6 +57,7 @@ describe("survey-execution-store", () => {
 			code: "S1",
 			title: "S1",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [
 				{ code: "T8", title: "a", instruction: "a" },
 				{ code: "T9", title: "b", instruction: "b" },
@@ -100,6 +102,7 @@ describe("survey-execution-store", () => {
 				code: "S1",
 				title: "S1",
 				objective: "obj",
+				specificObjectives: [],
 				tasks: [
 					{ code: "T1", title: "a", instruction: "a" },
 					{ code: "T2", title: "b", instruction: "b" },
@@ -159,6 +162,7 @@ describe("survey-execution-store", () => {
 				code: "S1",
 				title: "S1",
 				objective: "obj",
+				specificObjectives: [],
 				tasks: [
 					{ code: "T1", title: "a", instruction: "a" },
 					{ code: "T2", title: "b", instruction: "b" },
@@ -180,6 +184,7 @@ describe("survey-execution-store", () => {
 				code: "S1",
 				title: "S1",
 				objective: "obj",
+				specificObjectives: [],
 				tasks: [
 					{ code: "T1", title: "a", instruction: "a" },
 					{ code: "T2", title: "b", instruction: "b" },
@@ -207,6 +212,7 @@ describe("survey-execution-store", () => {
 				code: "S1",
 				title: "S1",
 				objective: "obj",
+				specificObjectives: [],
 				tasks: [
 					{ code: "T1", title: "a", instruction: "a" },
 					{ code: "T2", title: "b", instruction: "b" },

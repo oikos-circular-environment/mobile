@@ -1,7 +1,7 @@
 import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { View } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { QHeader } from "@/components/survey/q-header";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
@@ -63,40 +63,52 @@ export default function SurveyClosingCommentScreen() {
 	};
 
 	return (
-		<View
-			className="flex-1 bg-white px-6 pb-6 gap-5"
-			style={{ paddingTop: insets.top + 16 }}
-		>
-			<QHeader categoryLabel="Encerramento" currentIndex={1} totalCount={1} />
+		<KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">
+			<Pressable
+				onPress={Keyboard.dismiss}
+				className="flex-1"
+				accessible={false}
+			>
+				<View
+					className="flex-1 px-6 pb-6 gap-5"
+					style={{ paddingTop: insets.top + 16 }}
+				>
+					<QHeader
+						categoryLabel="Encerramento"
+						currentIndex={1}
+						totalCount={1}
+					/>
 
-			<View className="gap-2">
-				<Heading size="xl">
-					Quer deixar algum comentário sobre a experiência?
-				</Heading>
-				<Text size="sm" className="text-muted-foreground">
-					Opcional. Fale do que quiser: o que você adicionaria, removeria ou
-					mudaria.
-				</Text>
-			</View>
+					<View className="gap-2">
+						<Heading size="xl">
+							Quer deixar algum comentário sobre a experiência?
+						</Heading>
+						<Text size="sm" className="text-muted-foreground">
+							Opcional. Fale do que quiser: o que você adicionaria, removeria ou
+							mudaria.
+						</Text>
+					</View>
 
-			<Input className="h-40 flex-1 items-start px-3.5 py-3.5">
-				<InputField
-					placeholder="Escreva aqui, se quiser…"
-					value={comment}
-					onChangeText={text => setComment(text.slice(0, MAX_LENGTH))}
-					multiline
-					textAlignVertical="top"
-					maxLength={MAX_LENGTH}
-				/>
-			</Input>
-			<Text size="xs" className="text-right text-muted-foreground">
-				{`${comment.length} / ${MAX_LENGTH}`}
-			</Text>
+					<Input className="h-40 flex-1 items-start px-3.5 py-3.5">
+						<InputField
+							placeholder="Escreva aqui, se quiser…"
+							value={comment}
+							onChangeText={text => setComment(text.slice(0, MAX_LENGTH))}
+							multiline
+							textAlignVertical="top"
+							maxLength={MAX_LENGTH}
+						/>
+					</Input>
+					<Text size="xs" className="text-right text-muted-foreground">
+						{`${comment.length} / ${MAX_LENGTH}`}
+					</Text>
 
-			<Button disabled={isSubmitting} onPress={handleSubmit}>
-				{isSubmitting ? <ButtonSpinner /> : null}
-				<ButtonText>Enviar e finalizar</ButtonText>
-			</Button>
-		</View>
+					<Button disabled={isSubmitting} onPress={handleSubmit}>
+						{isSubmitting ? <ButtonSpinner /> : null}
+						<ButtonText>Enviar e finalizar</ButtonText>
+					</Button>
+				</View>
+			</Pressable>
+		</KeyboardAvoidingView>
 	);
 }

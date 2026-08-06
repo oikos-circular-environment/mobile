@@ -27,7 +27,10 @@ const protocolFixture = {
 			key: "CITIZEN",
 			label: "Cidadão",
 			description: "desc",
-			suite_codes: ["S1", "S2"],
+			suites: [
+				{ suite_code: "S1", specific_objectives: ["Objetivo específico."] },
+				{ suite_code: "S2", specific_objectives: [] },
+			],
 		},
 	],
 	suites: [
@@ -105,11 +108,20 @@ describe("SurveySuiteIntroScreen", () => {
 		expect(screen.getByText("Etapa 1 de 2")).toBeOnTheScreen();
 		expect(screen.getByText("Exploração livre")).toBeOnTheScreen();
 		expect(screen.getByText("Explore o app livremente.")).toBeOnTheScreen();
+		expect(screen.getByText("Objetivo específico.")).toBeOnTheScreen();
 	});
 
-	it("Começar ativa a execução e fecha a tela de volta para o app real", async () => {
+	it("Começar fica desabilitado por 3s e só então ativa a execução", async () => {
 		const user = userEvent.setup();
 		await render(<SurveySuiteIntroScreen />);
+
+		expect(screen.getByText("Começar (3)")).toBeOnTheScreen();
+
+		await jest.advanceTimersByTimeAsync(1000);
+		await jest.advanceTimersByTimeAsync(1000);
+		await jest.advanceTimersByTimeAsync(1000);
+		await jest.advanceTimersByTimeAsync(0);
+		expect(screen.getByText("Começar")).toBeOnTheScreen();
 
 		await user.press(screen.getByText("Começar"));
 

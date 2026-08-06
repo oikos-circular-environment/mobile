@@ -3,14 +3,21 @@ import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import { CloudOffIcon, InfoIcon, PartyPopperIcon } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+	AppButton as Button,
+	AppButtonSpinner as ButtonSpinner,
+	AppButtonText as ButtonText,
+} from "@/components/app-button";
 import { colors } from "@/components/style/colors";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { InfoExpand } from "@/components/survey/info-expand";
-import { OptionRow } from "@/components/survey/option-row";
+import {
+	OptionRowList,
+	type OptionRowListItem,
+} from "@/components/survey/option-row-list";
 import { QHeader } from "@/components/survey/q-header";
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
@@ -178,6 +185,79 @@ export default function SurveyQuestionnaireScreen() {
 		}
 	};
 
+	const listHeader = (
+		<View className="gap-5">
+			<View className="flex-row items-start gap-2">
+				<Heading size="xl" className="flex-1">
+					{question.label}
+				</Heading>
+				{question.info_text ? (
+					<InfoIcon size={20} color={colors.gray[400]} />
+				) : null}
+			</View>
+
+			{question.info_text ? (
+				<InfoExpand label="O que isso quer dizer?">
+					<Text size="sm" className="leading-5">
+						{question.info_text}
+					</Text>
+				</InfoExpand>
+			) : null}
+
+			{isErrorGate ? (
+				<View className="gap-2.5">
+					<Button
+						variant={
+							answers.error_occurred?.valueText === "YES"
+								? "default"
+								: "outline"
+						}
+						onPress={() => setAnswer("error_occurred", { valueText: "YES" })}
+					>
+						<ButtonText>Sim</ButtonText>
+					</Button>
+					<Button
+						variant={
+							answers.error_occurred?.valueText === "NO" ? "default" : "outline"
+						}
+						onPress={() => {
+							setAnswer("error_occurred", { valueText: "NO" });
+							setAnswers(current => {
+								const { error_recovery, ...rest } = current;
+								return rest;
+							});
+						}}
+					>
+						<ButtonText>Não</ButtonText>
+					</Button>
+
+					{errorRevealed && errorRecoveryQuestion ? (
+						<Heading size="md" className="pt-4">
+							{errorRecoveryQuestion.label}
+						</Heading>
+					) : null}
+				</View>
+			) : null}
+		</View>
+	);
+
+	const items: OptionRowListItem[] = isErrorGate
+		? errorRevealed && errorRecoveryQuestion
+			? (errorRecoveryQuestion.options ?? []).map(option => ({
+					key: option.key,
+					title: option.label,
+					selected: answers.error_recovery?.valueNumber === option.value,
+					onPress: () =>
+						setAnswer("error_recovery", { valueNumber: option.value }),
+				}))
+			: []
+		: (question.options ?? []).map(option => ({
+				key: option.key,
+				title: option.label,
+				selected: answers[question.key]?.valueNumber === option.value,
+				onPress: () => setAnswer(question.key, { valueNumber: option.value }),
+			}));
+
 	const goToNextStep = () => {
 		if (stepIndex < steps.length - 1) {
 			setStepIndex(current => current + 1);
@@ -253,88 +333,7 @@ export default function SurveyQuestionnaireScreen() {
 				totalCount={totalCount}
 			/>
 
-			<ScrollView contentContainerClassName="gap-5" className="flex-1">
-				<View className="flex-row items-start gap-2">
-					<Heading size="xl" className="flex-1">
-						{question.label}
-					</Heading>
-					{question.info_text ? (
-						<InfoIcon size={20} color={colors.gray[400]} />
-					) : null}
-				</View>
-
-				{question.info_text ? (
-					<InfoExpand label="O que isso quer dizer?">
-						<Text size="sm" className="leading-5">
-							{question.info_text}
-						</Text>
-					</InfoExpand>
-				) : null}
-
-				{isErrorGate ? (
-					<View className="gap-2.5">
-						<Button
-							variant={
-								answers.error_occurred?.valueText === "YES"
-									? "default"
-									: "outline"
-							}
-							onPress={() => setAnswer("error_occurred", { valueText: "YES" })}
-						>
-							<ButtonText>Sim</ButtonText>
-						</Button>
-						<Button
-							variant={
-								answers.error_occurred?.valueText === "NO"
-									? "default"
-									: "outline"
-							}
-							onPress={() => {
-								setAnswer("error_occurred", { valueText: "NO" });
-								setAnswers(current => {
-									const { error_recovery, ...rest } = current;
-									return rest;
-								});
-							}}
-						>
-							<ButtonText>Não</ButtonText>
-						</Button>
-
-						{errorRevealed && errorRecoveryQuestion ? (
-							<View className="gap-2.5 pt-4">
-								<Heading size="md">{errorRecoveryQuestion.label}</Heading>
-								{errorRecoveryQuestion.options?.map(option => (
-									<OptionRow
-										key={option.key}
-										title={option.label}
-										selected={
-											answers.error_recovery?.valueNumber === option.value
-										}
-										onPress={() =>
-											setAnswer("error_recovery", {
-												valueNumber: option.value,
-											})
-										}
-									/>
-								))}
-							</View>
-						) : null}
-					</View>
-				) : (
-					<View className="gap-2.5">
-						{question.options?.map(option => (
-							<OptionRow
-								key={option.key}
-								title={option.label}
-								selected={answers[question.key]?.valueNumber === option.value}
-								onPress={() =>
-									setAnswer(question.key, { valueNumber: option.value })
-								}
-							/>
-						))}
-					</View>
-				)}
-			</ScrollView>
+			<OptionRowList data={items} ListHeaderComponent={listHeader} />
 
 			<Button disabled={!canContinue || isSubmitting} onPress={goToNextStep}>
 				{isSubmitting ? <ButtonSpinner /> : null}

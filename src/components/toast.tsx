@@ -90,30 +90,58 @@ interface ToastAPI {
 	closeAll: () => void;
 }
 
-let _toast: {
+type ToastBridge = {
 	show: (action: ToastAction, options: ToastOptions) => void;
 	close: (id: string) => void;
 	closeAll: () => void;
-} | null = null;
+};
+
+/** Pilha, não um único valor: uma `<Toaster />` aninhada (ex.: dentro de uma stack
+ *  apresentada como `fullScreenModal`, cuja própria `View` fica por cima da raiz)
+ *  empurra a sua ponte ao montar e desempilha ao desmontar, devolvendo o controle
+ *  pra `<Toaster />` externa em vez de deixar `_toast` apontando pra um bridge morto. */
+const toastBridgeStack: ToastBridge[] = [];
+
+const activeBridge = () => toastBridgeStack.at(-1) ?? null;
 
 export const toast: ToastAPI = {
 	success: (title, description, options) =>
-		_toast?.show("success", { title, description, duration: 3000, ...options }),
+		activeBridge()?.show("success", {
+			title,
+			description,
+			duration: 3000,
+			...options,
+		}),
 	error: (title, description, options) =>
-		_toast?.show("error", { title, description, duration: 4000, ...options }),
+		activeBridge()?.show("error", {
+			title,
+			description,
+			duration: 4000,
+			...options,
+		}),
 	info: (title, description, options) =>
-		_toast?.show("info", { title, description, duration: 3000, ...options }),
+		activeBridge()?.show("info", {
+			title,
+			description,
+			duration: 3000,
+			...options,
+		}),
 	warning: (title, description, options) =>
-		_toast?.show("warning", { title, description, duration: 3500, ...options }),
-	close: id => _toast?.close(id),
-	closeAll: () => _toast?.closeAll(),
+		activeBridge()?.show("warning", {
+			title,
+			description,
+			duration: 3500,
+			...options,
+		}),
+	close: id => activeBridge()?.close(id),
+	closeAll: () => activeBridge()?.closeAll(),
 };
 
 export function Toaster() {
 	const t = useToast();
 
 	useEffect(() => {
-		_toast = {
+		const bridge: ToastBridge = {
 			show: (
 				action,
 				{ title, description, duration = 3000, placement = "top" },
@@ -148,6 +176,12 @@ export function Toaster() {
 			},
 			close: id => t.close(id),
 			closeAll: () => t.closeAll(),
+		};
+
+		toastBridgeStack.push(bridge);
+		return () => {
+			const index = toastBridgeStack.indexOf(bridge);
+			if (index !== -1) toastBridgeStack.splice(index, 1);
 		};
 	}, [t]);
 

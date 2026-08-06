@@ -29,6 +29,7 @@ type SurveyExecutionState = {
 	suiteRunId: string | null;
 	suiteTitle: string | null;
 	suiteObjective: string | null;
+	suiteSpecificObjectives: string[];
 	tasks: ExecutionTask[];
 	currentTaskIndex: number;
 	/** `true` só depois de "Começar" em F4.10 — antes disso o indicador não aparece. */
@@ -48,6 +49,7 @@ type SurveyExecutionActions = {
 		code: string;
 		title: string;
 		objective: string;
+		specificObjectives: string[];
 		tasks: { code: string; title: string; instruction: string }[];
 	}) => void;
 	beginSuite: () => void;
@@ -74,6 +76,7 @@ const INITIAL_STATE: SurveyExecutionState = {
 	suiteRunId: null,
 	suiteTitle: null,
 	suiteObjective: null,
+	suiteSpecificObjectives: [],
 	tasks: [],
 	currentTaskIndex: 0,
 	isActive: false,
@@ -115,6 +118,7 @@ export const useSurveyExecutionStore = create<
 			suiteCode: suite.code,
 			suiteTitle: suite.title,
 			suiteObjective: suite.objective,
+			suiteSpecificObjectives: suite.specificObjectives,
 			tasks: suite.tasks.map((task, index) => ({
 				...task,
 				status: index === 0 ? "current" : "pending",
@@ -128,7 +132,9 @@ export const useSurveyExecutionStore = create<
 			isPaused: false,
 		}),
 
-	beginSuite: () => set({ isActive: true }),
+	/** O overlay já nasce aberto: o testador vê de cara o que precisa executar
+	 *  nesta etapa, em vez de precisar tocar no indicador recolhido primeiro. */
+	beginSuite: () => set({ isActive: true, isExpanded: true }),
 
 	setExpanded: isExpanded => set({ isExpanded }),
 

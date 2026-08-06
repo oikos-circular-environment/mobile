@@ -21,7 +21,12 @@ const protocolFixture = {
 			key: "COLLECTOR",
 			label: "Coletor(a)",
 			description: "d",
-			suite_codes: ["S1", "S2", "S3", "S4"],
+			suites: [
+				{ suite_code: "S1", specific_objectives: [] },
+				{ suite_code: "S2", specific_objectives: [] },
+				{ suite_code: "S3", specific_objectives: [] },
+				{ suite_code: "S4", specific_objectives: [] },
+			],
 		},
 	],
 	suites: [],

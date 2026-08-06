@@ -58,37 +58,42 @@ describe("SurveyExecutionOverlay", () => {
 		expect(screen.queryByText(/\d\/\d/)).not.toBeOnTheScreen();
 	});
 
-	it("mostra o indicador recolhido quando a etapa está ativa", async () => {
+	it("já mostra o cartão de tarefa aberto assim que a etapa começa, sem ação de autodeclarar sucesso", async () => {
 		useSurveyStore.getState().startSession("session-1", "CITIZEN");
 		useSurveyExecutionStore.getState().openSuiteIntro({
 			code: "S1",
 			title: "S1",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [{ code: "T8", title: "a", instruction: "Busque algo." }],
 		});
 		useSurveyExecutionStore.getState().beginSuite();
 
 		await render(<SurveyExecutionOverlay />);
 
-		expect(screen.getByText("0/1")).toBeOnTheScreen();
+		expect(screen.getByText("Busque algo.")).toBeOnTheScreen();
+		expect(screen.queryByText(/^consegui$/i)).not.toBeOnTheScreen();
 	});
 
-	it("expande o cartão da tarefa ao tocar no indicador, sem ação de autodeclarar sucesso", async () => {
+	it("recolhido manualmente, volta a expandir ao tocar no indicador", async () => {
 		const user = userEvent.setup();
 		useSurveyStore.getState().startSession("session-1", "CITIZEN");
 		useSurveyExecutionStore.getState().openSuiteIntro({
 			code: "S1",
 			title: "S1",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [{ code: "T8", title: "a", instruction: "Busque algo." }],
 		});
 		useSurveyExecutionStore.getState().beginSuite();
+		useSurveyExecutionStore.getState().setExpanded(false);
 
 		await render(<SurveyExecutionOverlay />);
+		expect(screen.getByText("0/1")).toBeOnTheScreen();
+
 		await user.press(screen.getByText("0/1"));
 
 		expect(screen.getByText("Busque algo.")).toBeOnTheScreen();
-		expect(screen.queryByText(/^consegui$/i)).not.toBeOnTheScreen();
 	});
 
 	it("pausar esconde o indicador", async () => {
@@ -98,12 +103,12 @@ describe("SurveyExecutionOverlay", () => {
 			code: "S1",
 			title: "S1",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [{ code: "T8", title: "a", instruction: "Busque algo." }],
 		});
 		useSurveyExecutionStore.getState().beginSuite();
 
 		await render(<SurveyExecutionOverlay />);
-		await user.press(screen.getByText("0/1"));
 		await user.press(screen.getByText("Pausar"));
 
 		expect(useSurveyExecutionStore.getState().isPaused).toBe(true);
@@ -117,6 +122,7 @@ describe("SurveyExecutionOverlay", () => {
 			code: "S1",
 			title: "S1",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [
 				{ code: "T1", title: "Primeira", instruction: "Faça a primeira." },
 				{ code: "T2", title: "Segunda", instruction: "Faça a segunda." },
@@ -125,7 +131,6 @@ describe("SurveyExecutionOverlay", () => {
 		useSurveyExecutionStore.getState().beginSuite();
 
 		await render(<SurveyExecutionOverlay />);
-		await user.press(screen.getByText("0/2"));
 		await user.press(screen.getByText("Pular"));
 
 		expect(screen.getByText("Faça a segunda.")).toBeOnTheScreen();
@@ -141,6 +146,7 @@ describe("SurveyExecutionOverlay", () => {
 			code: "S1",
 			title: "S1",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [
 				{ code: "T1", title: "Primeira", instruction: "Faça a primeira." },
 				{ code: "T2", title: "Segunda", instruction: "Faça a segunda." },
@@ -149,7 +155,6 @@ describe("SurveyExecutionOverlay", () => {
 		useSurveyExecutionStore.getState().beginSuite();
 
 		await render(<SurveyExecutionOverlay />);
-		await user.press(screen.getByText("0/2"));
 		// Dois botões "Abandonar" na tela: o inline (tarefa atual) e o de rodapé (etapa).
 		// O inline vem primeiro na árvore.
 		const abandonButtons = screen.getAllByText("Abandonar");
@@ -168,9 +173,13 @@ describe("SurveyExecutionOverlay", () => {
 			code: "S1",
 			title: "S1",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [{ code: "T1", title: "Única", instruction: "Faça." }],
 		});
 		useSurveyExecutionStore.getState().beginSuite();
+		// Simula o testador tendo recolhido o cartão manualmente antes de terminar,
+		// pra provar que a resolução da última tarefa reabre sozinha.
+		useSurveyExecutionStore.getState().setExpanded(false);
 
 		await render(<SurveyExecutionOverlay />);
 		await user.press(screen.getByText("0/1"));
@@ -190,6 +199,7 @@ describe("SurveyExecutionOverlay", () => {
 			code: "S1",
 			title: "S1",
 			objective: "obj",
+			specificObjectives: [],
 			tasks: [
 				{ code: "T1", title: "Primeira", instruction: "Faça a primeira." },
 				{ code: "T2", title: "Segunda", instruction: "Faça a segunda." },
@@ -198,7 +208,6 @@ describe("SurveyExecutionOverlay", () => {
 		useSurveyExecutionStore.getState().beginSuite();
 
 		await render(<SurveyExecutionOverlay />);
-		await user.press(screen.getByText("0/2"));
 		// Índice 1: o botão de rodapé, que troca de lugar com "Próximo".
 		const abandonButtons = screen.getAllByText("Abandonar");
 		await user.press(abandonButtons[abandonButtons.length - 1] as never);
