@@ -22,13 +22,25 @@
  */
 
 import {
-	createAscClient,
+	appStoreVersionsBuildUpdateToOneRelationship,
+	appStoreVersionsCreateInstance,
+	appsAppStoreVersionsGetToManyRelated,
+	buildsGetCollection,
+	buildsGetInstance,
+	reviewSubmissionItemsCreateInstance,
+	reviewSubmissionsCreateInstance,
+	reviewSubmissionsGetCollection,
+	reviewSubmissionsItemsGetToManyRelated,
+	reviewSubmissionsUpdateInstance,
+} from "@oikos-circular-environment/apple-connect-api";
+import {
+	ascCall,
+	createAsc,
 	NON_EDITABLE_VERSION_STATES,
 	OPEN_REVIEW_SUBMISSION_STATES,
-	readAscCredentialsFromEnv,
 	sleep,
 	TRANSITIONING_REVIEW_SUBMISSION_STATES,
-} from "./lib/asc-api.mjs";
+} from "./lib/asc.mjs";
 import { getExpoVersion } from "./lib/expo-config.mjs";
 
 const BUILD_POLL_INTERVAL_MS = 30_000;
@@ -64,17 +76,19 @@ const info = message => console.log(`  ${message}`);
 class AlreadySubmittedError extends Error {}
 
 /**
- * @param {ReturnType<createAscClient>} client
+ * @param {ReturnType<createAsc>["client"]} client
  * @param {string} appId
  * @param {string} versionString
  * @returns {Promise<object|null>} A App Store Version, ou `null` se não existir.
  */
 async function findAppStoreVersion(client, appId, versionString) {
-	const response = await client.get(`/v1/apps/${appId}/appStoreVersions`, {
+	const response = await ascCall(appsAppStoreVersionsGetToManyRelated, {
+		client,
+		path: { id: appId },
 		query: {
-			"filter[versionString]": versionString,
-			"filter[platform]": "IOS",
-			"fields[appStoreVersions]": "versionString,appVersionState",
+			"filter[versionString]": [versionString],
+			"filter[platform]": ["IOS"],
+			"fields[appStoreVersions]": ["versionString", "appVersionState"],
 			limit: 1,
 		},
 	});
@@ -85,7 +99,7 @@ async function findAppStoreVersion(client, appId, versionString) {
  * Cria a App Store Version ou reutiliza a existente, quando ainda editável. O
  * `eas metadata:push` preenche o conteúdo dela em seguida.
  *
- * @param {ReturnType<createAscClient>} client
+ * @param {ReturnType<createAsc>["client"]} client
  * @param {string} appId
  * @param {string} versionString
  * @returns {Promise<string>} O id da App Store Version.
@@ -114,11 +128,14 @@ async function ensureAppStoreVersion(client, appId, versionString) {
 		return existing.id;
 	}
 
-	const created = await client.post("/v1/appStoreVersions", {
-		data: {
-			type: "appStoreVersions",
-			attributes: { platform: "IOS", versionString },
-			relationships: { app: { data: { type: "apps", id: appId } } },
+	const created = await ascCall(appStoreVersionsCreateInstance, {
+		client,
+		body: {
+			data: {
+				type: "appStoreVersions",
+				attributes: { platform: "IOS", versionString },
+				relationships: { app: { data: { type: "apps", id: appId } } },
+			},
 		},
 	});
 	info(`Versão ${versionString} criada na App Store Connect.`);
@@ -130,7 +147,7 @@ async function ensureAppStoreVersion(client, appId, versionString) {
  * Apple permite anexá-lo a uma App Store Version. A espera é necessária porque
  * o `eas submit` faz o upload com `skip_waiting_for_build_processing`.
  *
- * @param {ReturnType<createAscClient>} client
+ * @param {ReturnType<createAsc>["client"]} client
  * @param {string} appId
  * @param {string} versionString Versão de marketing do trem de builds.
  * @param {string} buildNumber
@@ -149,16 +166,17 @@ async function waitForBuild(
 	let lastState = null;
 
 	while (Date.now() < deadline) {
-		const response = await client.get("/v1/builds", {
+		const response = await ascCall(buildsGetCollection, {
+			client,
 			query: {
-				"filter[app]": appId,
-				"filter[version]": buildNumber,
+				"filter[app]": [appId],
+				"filter[version]": [buildNumber],
 				// preReleaseVersion precisa estar em fields[builds], não só em
 				// include — sparse fieldset também filtra relationships, e sem
 				// isso response.data[].relationships.preReleaseVersion vem
 				// undefined e o build nunca casa com o trem.
-				"fields[builds]": "version,processingState,preReleaseVersion",
-				include: "preReleaseVersion",
+				"fields[builds]": ["version", "processingState", "preReleaseVersion"],
+				include: ["preReleaseVersion"],
 				limit: 10,
 			},
 		});
@@ -205,7 +223,7 @@ async function waitForBuild(
  * `app_store_connect.build_upload` (estado `complete`), a Apple já terminou —
  * ou está prestes a terminar — de processar o upload.
  *
- * @param {ReturnType<createAscClient>} client
+ * @param {ReturnType<createAsc>["client"]} client
  * @param {string} buildId
  * @param {number} timeoutMinutes
  * @throws {Error} Se o processamento falhar ou estourar o tempo.
@@ -215,8 +233,10 @@ async function waitForBuildById(client, buildId, timeoutMinutes) {
 	let lastState = null;
 
 	while (Date.now() < deadline) {
-		const response = await client.get(`/v1/builds/${buildId}`, {
-			query: { "fields[builds]": "processingState" },
+		const response = await ascCall(buildsGetInstance, {
+			client,
+			path: { id: buildId },
+			query: { "fields[builds]": ["processingState"] },
 		});
 		const state = response.data.attributes.processingState;
 
@@ -243,7 +263,7 @@ async function waitForBuildById(client, buildId, timeoutMinutes) {
  * Envia a versão para o App Review, reutilizando uma review submission aberta
  * quando já houver uma.
  *
- * @param {ReturnType<createAscClient>} client
+ * @param {ReturnType<createAsc>["client"]} client
  * @param {string} appId
  * @param {string} appStoreVersionId
  * @param {string} versionString
@@ -254,11 +274,12 @@ async function submitForReview(
 	appStoreVersionId,
 	versionString,
 ) {
-	const open = await client.get("/v1/reviewSubmissions", {
+	const open = await ascCall(reviewSubmissionsGetCollection, {
+		client,
 		query: {
-			"filter[app]": appId,
-			"filter[platform]": "IOS",
-			"filter[state]": OPEN_REVIEW_SUBMISSION_STATES.join(","),
+			"filter[app]": [appId],
+			"filter[platform]": ["IOS"],
+			"filter[state]": OPEN_REVIEW_SUBMISSION_STATES,
 			limit: 10,
 		},
 	});
@@ -291,35 +312,42 @@ async function submitForReview(
 			`Reutilizando review submission aberta (estado: ${submission.attributes.state}).`,
 		);
 	} else {
-		const created = await client.post("/v1/reviewSubmissions", {
-			data: {
-				type: "reviewSubmissions",
-				attributes: { platform: "IOS" },
-				relationships: { app: { data: { type: "apps", id: appId } } },
+		const created = await ascCall(reviewSubmissionsCreateInstance, {
+			client,
+			body: {
+				data: {
+					type: "reviewSubmissions",
+					attributes: { platform: "IOS" },
+					relationships: { app: { data: { type: "apps", id: appId } } },
+				},
 			},
 		});
 		submission = created.data;
 		info("Review submission criada.");
 	}
 
-	const items = await client.get(
-		`/v1/reviewSubmissions/${submission.id}/items`,
-		{ query: { limit: 50 } },
-	);
+	const items = await ascCall(reviewSubmissionsItemsGetToManyRelated, {
+		client,
+		path: { id: submission.id },
+		query: { limit: 50 },
+	});
 	const alreadyIncluded = items.data.some(
 		item => item.relationships?.appStoreVersion?.data?.id === appStoreVersionId,
 	);
 
 	if (!alreadyIncluded) {
-		await client.post("/v1/reviewSubmissionItems", {
-			data: {
-				type: "reviewSubmissionItems",
-				relationships: {
-					reviewSubmission: {
-						data: { type: "reviewSubmissions", id: submission.id },
-					},
-					appStoreVersion: {
-						data: { type: "appStoreVersions", id: appStoreVersionId },
+		await ascCall(reviewSubmissionItemsCreateInstance, {
+			client,
+			body: {
+				data: {
+					type: "reviewSubmissionItems",
+					relationships: {
+						reviewSubmission: {
+							data: { type: "reviewSubmissions", id: submission.id },
+						},
+						appStoreVersion: {
+							data: { type: "appStoreVersions", id: appStoreVersionId },
+						},
 					},
 				},
 			},
@@ -327,20 +355,22 @@ async function submitForReview(
 		info(`Versão ${versionString} adicionada ao envio.`);
 	}
 
-	await client.patch(`/v1/reviewSubmissions/${submission.id}`, {
-		data: {
-			type: "reviewSubmissions",
-			id: submission.id,
-			attributes: { submitted: true },
+	await ascCall(reviewSubmissionsUpdateInstance, {
+		client,
+		path: { id: submission.id },
+		body: {
+			data: {
+				type: "reviewSubmissions",
+				id: submission.id,
+				attributes: { submitted: true },
+			},
 		},
 	});
 	info(`Versão ${versionString} enviada para o App Review. 🚀`);
 }
 
 async function main() {
-	const credentials = readAscCredentialsFromEnv();
-	const client = createAscClient(credentials);
-	const { appId } = credentials;
+	const { appId, client } = createAsc();
 	const version = getExpoVersion();
 
 	step(`Release iOS ${version}${flags.dryRun ? " (dry-run)" : ""}`);
@@ -398,10 +428,11 @@ async function main() {
 			timeoutMinutes,
 		);
 	}
-	await client.patch(
-		`/v1/appStoreVersions/${appStoreVersionId}/relationships/build`,
-		{ data: { type: "builds", id: buildId } },
-	);
+	await ascCall(appStoreVersionsBuildUpdateToOneRelationship, {
+		client,
+		path: { id: appStoreVersionId },
+		body: { data: { type: "builds", id: buildId } },
+	});
 	info(
 		`Build ${version} (${flags.buildId ?? flags.buildNumber}) anexado à versão.`,
 	);
