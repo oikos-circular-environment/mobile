@@ -18,10 +18,11 @@ import {
 	getSubmitProfile,
 } from "./lib/expo-config.mjs";
 import {
-	createPlayClient,
+	createPlay,
+	playCall,
 	readServiceAccountFromEnv,
 	withEdit,
-} from "./lib/play-api.mjs";
+} from "./lib/play.mjs";
 import {
 	RELEASE_NOTES_MAX_LENGTH,
 	readContact,
@@ -111,15 +112,17 @@ function loadReleaseConfig(version) {
  * Descobre o versionCode a publicar quando ele não foi informado, usando o
  * maior bundle já enviado — que é o que o `eas submit` acabou de subir.
  *
- * @param {ReturnType<createPlayClient>} client
+ * @param {ReturnType<createPlay>} play
  * @param {string} editId
  * @returns {Promise<string>}
  * @throws {Error} Se nenhum bundle tiver sido enviado.
  */
-async function resolveVersionCode(client, editId) {
+async function resolveVersionCode({ api, packageName }, editId) {
 	if (flags.versionCode) return String(flags.versionCode);
 
-	const { bundles } = await client.get(`/edits/${editId}/bundles`);
+	const { bundles } = await playCall("edits.bundles.list", () =>
+		api.edits.bundles.list({ packageName, editId }),
+	);
 	const latest = (bundles ?? [])
 		.map(bundle => Number(bundle.versionCode))
 		.sort((a, b) => b - a)[0];
@@ -136,13 +139,15 @@ async function resolveVersionCode(client, editId) {
 /**
  * Sincroniza os dados de contato da ficha.
  *
- * @param {ReturnType<createPlayClient>} client
+ * @param {ReturnType<createPlay>} play
  * @param {string} editId
  * @param {object} details
  * @returns {Promise<boolean>} `true` se havia diferença a publicar.
  */
-async function syncDetails(client, editId, details) {
-	const current = await client.get(`/edits/${editId}/details`);
+async function syncDetails({ api, packageName }, editId, details) {
+	const current = await playCall("edits.details.get", () =>
+		api.edits.details.get({ packageName, editId }),
+	);
 	const changed = Object.entries(details).filter(
 		([key, value]) => current[key] !== value,
 	);
@@ -155,25 +160,31 @@ async function syncDetails(client, editId, details) {
 	for (const [key, value] of changed) {
 		info(`${key}: ${current[key] ?? "(vazio)"} → ${value}`);
 	}
-	await client.put(`/edits/${editId}/details`, { ...current, ...details });
+	await playCall("edits.details.update", () =>
+		api.edits.details.update({
+			packageName,
+			editId,
+			requestBody: { ...current, ...details },
+		}),
+	);
 	return true;
 }
 
 /**
  * Publica o versionCode e as notas da versão na trilha configurada.
  *
- * @param {ReturnType<createPlayClient>} client
+ * @param {ReturnType<createPlay>} play
  * @param {string} editId
  * @param {object} options
  * @returns {Promise<boolean>} `true` se havia diferença a publicar.
  */
 async function syncTrack(
-	client,
+	{ api, packageName },
 	editId,
 	{ release, version, versionCode, releaseNotes },
 ) {
-	const { releases = [] } = await client.get(
-		`/edits/${editId}/tracks/${release.track}`,
+	const { releases = [] } = await playCall("edits.tracks.get", () =>
+		api.edits.tracks.get({ packageName, editId, track: release.track }),
 	);
 
 	const target = {
@@ -206,10 +217,14 @@ async function syncTrack(
 	const others = releases.filter(
 		item => !(item.versionCodes ?? []).includes(versionCode),
 	);
-	await client.put(`/edits/${editId}/tracks/${release.track}`, {
-		track: release.track,
-		releases: [...others, target],
-	});
+	await playCall("edits.tracks.update", () =>
+		api.edits.tracks.update({
+			packageName,
+			editId,
+			track: release.track,
+			requestBody: { track: release.track, releases: [...others, target] },
+		}),
+	);
 
 	info(
 		`Trilha ${release.track}: ${version} (${versionCode}) como "${release.status}"` +
@@ -224,20 +239,20 @@ async function main() {
 	const serviceAccount = readServiceAccountFromEnv();
 	const packageName = getAndroidPackage();
 	const version = getExpoVersion();
-	const client = createPlayClient({ serviceAccount, packageName });
+	const play = createPlay({ serviceAccount, packageName });
 
 	step(`Release Android ${version}${flags.dryRun ? " (dry-run)" : ""}`);
 	const config = loadReleaseConfig(version);
 	info(`${packageName} → trilha ${config.release.track}`);
 
-	await withEdit(client, { dryRun: flags.dryRun, log: info }, async editId => {
-		const versionCode = await resolveVersionCode(client, editId);
+	await withEdit(play, { dryRun: flags.dryRun, log: info }, async editId => {
+		const versionCode = await resolveVersionCode(play, editId);
 
 		step("Dados de contato");
-		const detailsChanged = await syncDetails(client, editId, config.details);
+		const detailsChanged = await syncDetails(play, editId, config.details);
 
 		step("Trilha e notas da versão");
-		const trackChanged = await syncTrack(client, editId, {
+		const trackChanged = await syncTrack(play, editId, {
 			...config,
 			version,
 			versionCode,
