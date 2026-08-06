@@ -8,7 +8,11 @@
  * @see docs/publishing-path.md — "Envio para o App Review"
  */
 
-import { createAscClient, readAscCredentialsFromEnv } from "./lib/asc-api.mjs";
+import {
+	createAscClient,
+	OPEN_REVIEW_SUBMISSION_STATES,
+	readAscCredentialsFromEnv,
+} from "./lib/asc-api.mjs";
 import { getExpoVersion } from "./lib/expo-config.mjs";
 
 const heading = title =>
@@ -50,7 +54,10 @@ async function main() {
 	const builds = await client.get("/v1/builds", {
 		query: {
 			"filter[app]": appId,
-			"fields[builds]": "version,processingState,uploadedDate,expired",
+			// preReleaseVersion precisa estar em fields[builds], não só em
+			// include — sparse fieldset também filtra relationships.
+			"fields[builds]":
+				"version,processingState,uploadedDate,expired,preReleaseVersion",
 			include: "preReleaseVersion",
 			limit: 10,
 			sort: "-uploadedDate",
@@ -97,17 +104,19 @@ async function main() {
 	}
 
 	heading("Review submissions abertas");
+	// /v1/reviewSubmissions não aceita `sort` — confere a lista de parâmetros
+	// no OpenAPI da App Store Connect antes de reintroduzir.
 	const submissions = await client.get("/v1/reviewSubmissions", {
 		query: {
 			"filter[app]": appId,
 			"filter[platform]": "IOS",
+			"filter[state]": OPEN_REVIEW_SUBMISSION_STATES.join(","),
 			limit: 5,
-			sort: "-submittedDate",
 		},
 	});
 	for (const submission of submissions.data) {
 		console.log(
-			`  ${submission.attributes.state.padEnd(22)} submitted=${submission.attributes.submitted} ${submission.attributes.submittedDate ?? ""}`,
+			`  ${submission.attributes.state.padEnd(22)} ${submission.attributes.submittedDate ?? ""}`,
 		);
 	}
 	if (submissions.data.length === 0) console.log("  (nenhuma)");

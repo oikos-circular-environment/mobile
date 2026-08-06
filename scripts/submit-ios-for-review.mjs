@@ -9,7 +9,7 @@
  *
  * Duas formas de identificar o build a anexar:
  * - `--build-id=<id>` (ou `IOS_ASC_BUILD_ID`): o id do build na App Store
- *   Connect, já processado. É o caminho usado por `.eas/workflows/ios-release.yml`,
+ *   Connect, já processado. É o caminho usado por `.eas/workflows/ios-review-submission.yml`,
  *   que recebe esse id pronto do trigger `app_store_connect.build_upload` — sem
  *   polling.
  * - `--build-number=<n>` (ou `IOS_BUILD_NUMBER`): o build number do EAS: aguarda
@@ -27,6 +27,7 @@ import {
 	OPEN_REVIEW_SUBMISSION_STATES,
 	readAscCredentialsFromEnv,
 	sleep,
+	TRANSITIONING_REVIEW_SUBMISSION_STATES,
 } from "./lib/asc-api.mjs";
 import { getExpoVersion } from "./lib/expo-config.mjs";
 
@@ -36,14 +37,21 @@ const BUILD_NUMBER_PATTERN = /^\d+$/;
 const flags = {
 	dryRun: process.argv.includes("--dry-run"),
 	skipSubmit: process.argv.includes("--skip-submit"),
+	// || '' no workflow_dispatch (fallback do contexto app_store_connect vazio
+	// em execução manual) vira string vazia, não undefined — normaliza aqui
+	// pra `??` continuar funcionando em todo o resto do arquivo.
 	buildId:
-		process.argv
+		(process.argv
 			.find(argument => argument.startsWith("--build-id="))
-			?.split("=")[1] ?? process.env.IOS_ASC_BUILD_ID,
+			?.split("=")[1] ??
+			process.env.IOS_ASC_BUILD_ID) ||
+		undefined,
 	buildNumber:
-		process.argv
+		(process.argv
 			.find(argument => argument.startsWith("--build-number="))
-			?.split("=")[1] ?? process.env.IOS_BUILD_NUMBER,
+			?.split("=")[1] ??
+			process.env.IOS_BUILD_NUMBER) ||
+		undefined,
 };
 
 const step = message => console.log(`\n▸ ${message}`);
@@ -145,7 +153,11 @@ async function waitForBuild(
 			query: {
 				"filter[app]": appId,
 				"filter[version]": buildNumber,
-				"fields[builds]": "version,processingState",
+				// preReleaseVersion precisa estar em fields[builds], não só em
+				// include — sparse fieldset também filtra relationships, e sem
+				// isso response.data[].relationships.preReleaseVersion vem
+				// undefined e o build nunca casa com o trem.
+				"fields[builds]": "version,processingState,preReleaseVersion",
 				include: "preReleaseVersion",
 				limit: 10,
 			},
@@ -253,7 +265,21 @@ async function submitForReview(
 
 	let submission = open.data[0] ?? null;
 
-	if (submission?.attributes.submitted) {
+	if (
+		submission &&
+		TRANSITIONING_REVIEW_SUBMISSION_STATES.includes(submission.attributes.state)
+	) {
+		throw new Error(
+			`Review submission em transição (estado: ${submission.attributes.state}) — ` +
+				"a Apple ainda está cancelando ou finalizando o envio anterior. Espere " +
+				"terminar e rode de novo.",
+		);
+	}
+
+	// `submitted` não é atributo de leitura do ReviewSubmission — só existe no
+	// corpo do PATCH. READY_FOR_REVIEW é o único estado aberto em que ainda não
+	// foi marcado; qualquer outro já passou por isso.
+	if (submission && submission.attributes.state !== "READY_FOR_REVIEW") {
 		info(
 			`Já existe um envio em andamento (estado: ${submission.attributes.state}) — nada a fazer.`,
 		);

@@ -90,9 +90,6 @@ jobs:
     name: Publish Android release notes and track
     type: custom
     needs: [submit_android, build_android]
-    # needs.*.outputs só resolve em env no nível do job — em env de step
-    # individual a expressão ${{ }} chega como string literal (foi o que
-    # quebrou a submissão da 1.0.2).
     env:
       ANDROID_VERSION_CODE: ${{ needs.build_android.outputs.app_build_version }}
     steps:
@@ -102,7 +99,7 @@ jobs:
         run: node scripts/publish-android-release.mjs
 
   # Só sobe o binário — anexar, publicar ficha e enviar pra revisão dependem
-  # do processamento na Apple e vivem em ios-release.yml (trigger app_store_connect).
+  # do processamento na Apple e vivem em ios-review-submission.yml (trigger app_store_connect).
   submit_ios:
     name: Submit iOS
     type: submit
@@ -120,17 +117,3 @@ jobs:
     if: ${{ needs.get_build_android.outputs.build_id && needs.get_build_ios.outputs.build_id }}
     params:
       channel: production
-
-  notify:
-    name: Notify release status
-    type: github-comment
-    after: [publish_android, submit_ios, publish_update]
-    params:
-      message: |
-        **Release de produção** (fingerprint iOS `${{ needs.fingerprint.outputs.ios_fingerprint_hash }}`, Android `${{ needs.fingerprint.outputs.android_fingerprint_hash }}`)
-
-        - Android — trilha/notas: ${{ after.publish_android.status }}
-        - iOS — upload do binário: ${{ after.submit_ios.status }}
-        - OTA: ${{ after.publish_update.status }}
-
-        A finalização do release iOS (ficha + anexar build + enviar pra revisão) roda em outro workflow, disparado quando a Apple terminar de processar o upload. Acompanhe em `ios-release.yml`.

@@ -29,15 +29,34 @@ export const NON_EDITABLE_VERSION_STATES = new Set([
 ]);
 
 /**
- * Estados de Review Submission que ainda estão em andamento na Apple.
+ * Estados de Review Submission seguros para reaproveitar: dá pra adicionar item
+ * e marcar `submitted: true` sem conflitar com o que a Apple está fazendo.
  *
  * @type {ReadonlyArray<string>}
  */
-export const OPEN_REVIEW_SUBMISSION_STATES = [
+export const REUSABLE_REVIEW_SUBMISSION_STATES = [
 	"READY_FOR_REVIEW",
 	"WAITING_FOR_REVIEW",
 	"IN_REVIEW",
 	"UNRESOLVED_ISSUES",
+];
+
+/**
+ * Estados de transição: a submission está sendo cancelada ou finalizada pela
+ * Apple. Mexer nela agora — adicionar item, marcar `submitted: true` — é
+ * inseguro; a única opção é esperar terminar.
+ *
+ * @type {ReadonlyArray<string>}
+ */
+export const TRANSITIONING_REVIEW_SUBMISSION_STATES = [
+	"CANCELING",
+	"COMPLETING",
+];
+
+/** União das duas listas, para o filtro que busca qualquer submission em curso. */
+export const OPEN_REVIEW_SUBMISSION_STATES = [
+	...REUSABLE_REVIEW_SUBMISSION_STATES,
+	...TRANSITIONING_REVIEW_SUBMISSION_STATES,
 ];
 
 function base64url(input) {
