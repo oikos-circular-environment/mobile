@@ -46,6 +46,12 @@ function taskStatusFromDb(
 }
 
 export async function restoreSurveyExecution(input: RestoreExecutionInput) {
+	console.log("[survey] restoreSurveyExecution iniciado", {
+		sessionId: input.sessionId,
+		persona: input.persona,
+		protocolKey: input.protocol.key,
+	});
+
 	const db = getSurveyDb();
 
 	const suiteRuns = await db
@@ -53,6 +59,8 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 		.from(surveySuiteRun)
 		.where(eq(surveySuiteRun.sessionId, input.sessionId))
 		.orderBy(surveySuiteRun.position);
+
+	console.log("[survey] suiteRuns encontradas:", suiteRuns.length);
 
 	const personaSuiteCodes = input.personaDefinition.suites.map(
 		s => s.suite_code,
@@ -64,15 +72,29 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 	const currentSuiteRun =
 		suiteRuns.find(run => !run.finishedAt) ?? suiteRuns[suiteRuns.length - 1];
 
-	if (!currentSuiteRun) return;
+	if (!currentSuiteRun) {
+		console.log("[survey] nenhuma suiteRun para restaurar");
+		return;
+	}
+
+	console.log("[survey] suiteRun atual:", {
+		code: currentSuiteRun.suiteCode,
+		finishedAt: currentSuiteRun.finishedAt,
+	});
 
 	const suiteIndex = personaSuiteCodes.indexOf(currentSuiteRun.suiteCode);
-	if (suiteIndex === -1) return;
+	if (suiteIndex === -1) {
+		console.log("[survey] suiteCode não encontrado no roteiro da persona");
+		return;
+	}
 
 	const suite = input.protocol.suites.find(
 		s => s.code === currentSuiteRun.suiteCode,
 	);
-	if (!suite) return;
+	if (!suite) {
+		console.log("[survey] suite não encontrada no protocolo");
+		return;
+	}
 
 	const personaSuite = input.personaDefinition.suites.find(
 		s => s.suite_code === currentSuiteRun.suiteCode,
@@ -108,7 +130,7 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 					i === currentTaskIndex ? { ...t, status: "current" as const } : t,
 				);
 
-	useSurveyExecutionStore.setState({
+	const restoredState = {
 		suiteQueue: personaSuiteCodes,
 		suiteIndex,
 		suiteCode: suite.code,
@@ -124,5 +146,15 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 		suiteActiveMs: currentSuiteRun.activeMs,
 		currentTaskStartActiveMs: 0,
 		suiteOutcomeOverride: null,
+	};
+
+	console.log("[survey] execution store restaurado:", {
+		suiteCode: restoredState.suiteCode,
+		suiteIndex: restoredState.suiteIndex,
+		isActive: restoredState.isActive,
+		tasksCount: restoredState.tasks.length,
+		currentTaskIndex: restoredState.currentTaskIndex,
 	});
+
+	useSurveyExecutionStore.setState(restoredState);
 }

@@ -77,12 +77,17 @@ export async function restoreSurveySessionIfNeeded() {
 	let protocolKey = restored.protocolKey;
 
 	const cached = await getCachedProtocol(restored.protocolKey);
+	console.log("[survey] cache do protocolo:", {
+		key: restored.protocolKey,
+		hit: Boolean(cached),
+	});
 	if (cached) {
 		protocolPayload = cached.payload;
 		protocolKey = cached.key;
 	} else {
 		try {
 			const remote = await surveyClient.usability.protocol.query();
+			console.log("[survey] protocolo buscado do servidor:", Boolean(remote));
 			if (remote) {
 				await setCachedProtocol(remote.key, remote.version, remote);
 				protocolPayload = remote;
