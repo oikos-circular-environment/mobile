@@ -19,22 +19,21 @@ export interface RestoredSession {
 	protocolKey: string;
 }
 
-export async function restoreActiveSurveySession(): Promise<RestoredSession | null> {
+export async function restoreLatestSurveySession(): Promise<RestoredSession | null> {
 	const db = getSurveyDb();
 
-	const [activeSession] = await db
+	const [latestSession] = await db
 		.select()
 		.from(surveySession)
-		.where(eq(surveySession.status, "IN_PROGRESS"))
 		.orderBy(desc(surveySession.createdAt))
 		.limit(1);
 
-	if (!activeSession) return null;
+	if (!latestSession) return null;
 
 	const suites = await db
 		.select()
 		.from(surveySuiteRun)
-		.where(eq(surveySuiteRun.sessionId, activeSession.id))
+		.where(eq(surveySuiteRun.sessionId, latestSession.id))
 		.orderBy(surveySuiteRun.position);
 
 	const currentSuite =
@@ -55,22 +54,22 @@ export async function restoreActiveSurveySession(): Promise<RestoredSession | nu
 	}
 
 	return {
-		sessionId: activeSession.id,
-		persona: activeSession.persona,
-		participantCode: activeSession.participantCode,
-		status: activeSession.status,
+		sessionId: latestSession.id,
+		persona: latestSession.persona,
+		participantCode: latestSession.participantCode,
+		status: latestSession.status,
 		currentSuiteCode: currentSuite?.suiteCode ?? null,
 		currentTaskCode,
-		activeMs: activeSession.activeMs,
-		wallMs: activeSession.wallMs,
-		consentVersion: activeSession.consentVersion,
-		consentAt: activeSession.consentAt,
-		protocolKey: activeSession.protocolKey,
+		activeMs: latestSession.activeMs,
+		wallMs: latestSession.wallMs,
+		consentVersion: latestSession.consentVersion,
+		consentAt: latestSession.consentAt,
+		protocolKey: latestSession.protocolKey,
 	};
 }
 
 export async function restoreSurveySessionIfNeeded() {
-	const restored = await restoreActiveSurveySession();
+	const restored = await restoreLatestSurveySession();
 	if (!restored) return null;
 
 	let protocolPayload: unknown = null;

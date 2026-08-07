@@ -18,6 +18,7 @@ import {
 	type OptionRowListItem,
 } from "@/components/survey/option-row-list";
 import { QHeader } from "@/components/survey/q-header";
+import { toast } from "@/components/toast";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
@@ -194,6 +195,15 @@ export default function SurveyCharacterizationScreen() {
 			draft.wasteContactFrequency === null ||
 			draft.appExperience === null
 		) {
+			return;
+		}
+
+		if (useSurveyStore.getState().sessionId) {
+			toast.warning(
+				"Pesquisa já iniciada",
+				"Este dispositivo já possui uma participação. Acesse pelo resumo.",
+			);
+			router.replace("/survey/resume");
 			return;
 		}
 

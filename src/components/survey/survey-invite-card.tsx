@@ -192,11 +192,16 @@ export function SurveyInviteCard({
 						<View className="flex-row gap-2">
 							{detailsLabel ? (
 								<Button
-									variant="outline"
-									className="flex-1 h-12 border-white/30 bg-white/10"
+									variant={ctaLabel ? "outline" : "secondary"}
+									className={cn(
+										"flex-1 h-12",
+										ctaLabel && "border-white/30 bg-white/10",
+									)}
 									onPress={onPressDetails}
 								>
-									<ButtonText className="text-white">{detailsLabel}</ButtonText>
+									<ButtonText className={ctaLabel ? "text-white" : undefined}>
+										{detailsLabel}
+									</ButtonText>
 								</Button>
 							) : null}
 							{ctaLabel ? (
