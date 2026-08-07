@@ -1,7 +1,8 @@
 import { desc, eq } from "drizzle-orm";
+import { surveyClient } from "./api/client";
 import { getSurveyDb } from "./db/client";
 import { surveySession, surveySuiteRun, surveyTaskRun } from "./db/schema";
-import { getCachedProtocol } from "./protocol-cache";
+import { getCachedProtocol, setCachedProtocol } from "./protocol-cache";
 import { restoreSurveyExecution } from "./restore-execution";
 
 export interface RestoredSession {
@@ -15,6 +16,7 @@ export interface RestoredSession {
 	wallMs: number;
 	consentVersion: string;
 	consentAt: string;
+	protocolKey: string;
 }
 
 export async function restoreActiveSurveySession(): Promise<RestoredSession | null> {
@@ -63,6 +65,7 @@ export async function restoreActiveSurveySession(): Promise<RestoredSession | nu
 		wallMs: activeSession.wallMs,
 		consentVersion: activeSession.consentVersion,
 		consentAt: activeSession.consentAt,
+		protocolKey: activeSession.protocolKey,
 	};
 }
 
@@ -70,9 +73,39 @@ export async function restoreSurveySessionIfNeeded() {
 	const restored = await restoreActiveSurveySession();
 	if (!restored) return null;
 
-	const cached = await getCachedProtocol(activeSession.protocolKey);
-	if (cached && typeof cached.payload === "object" && cached.payload !== null) {
-		const payload = cached.payload as {
+	let protocolPayload: unknown = null;
+	let protocolKey = restored.protocolKey;
+
+	const cached = await getCachedProtocol(restored.protocolKey);
+	if (cached) {
+		protocolPayload = cached.payload;
+		protocolKey = cached.key;
+	} else {
+		try {
+			const remote = await surveyClient.usability.protocol.query();
+			if (remote) {
+				await setCachedProtocol(
+					remote.protocol_key,
+					remote.protocol_version,
+					remote,
+				);
+				protocolPayload = remote;
+				protocolKey = remote.protocol_key;
+			}
+		} catch (error) {
+			console.warn(
+				"[survey] não foi possível buscar o protocolo para restore",
+				error,
+			);
+		}
+	}
+
+	if (
+		protocolPayload &&
+		typeof protocolPayload === "object" &&
+		protocolPayload !== null
+	) {
+		const payload = protocolPayload as {
 			personas?: Array<{
 				key: string;
 				suites: Array<{
@@ -102,7 +135,7 @@ export async function restoreSurveySessionIfNeeded() {
 				sessionId: restored.sessionId,
 				persona: restored.persona,
 				protocol: {
-					key: cached.key,
+					key: protocolKey,
 					suites: payload.suites,
 					tasks: payload.tasks,
 				},
