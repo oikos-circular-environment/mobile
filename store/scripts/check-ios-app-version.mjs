@@ -7,35 +7,33 @@
  * @see docs/publishing-path.md — "Versionamento sincronizado entre iOS e Android"
  */
 
-import {
-	createAscClient,
-	NON_EDITABLE_VERSION_STATES,
-	readAscCredentialsFromEnv,
-} from "./lib/asc-api.mjs";
+import { appsAppStoreVersionsGetToManyRelated } from "@oikos-circular-environment/apple-connect-api";
+import { ascCall, createAsc, NON_EDITABLE_VERSION_STATES } from "./lib/asc.mjs";
 import { getExpoVersion } from "./lib/expo-config.mjs";
 
 /**
- * @param {ReturnType<import("./lib/asc-api.mjs").createAscClient>} client
+ * @param {ReturnType<import("./lib/asc.mjs").createAsc>["client"]} client
  * @param {string} appId
  * @param {string} versionString
  * @returns {Promise<string|null>} O `appVersionState`, ou `null` se a versão
  *   ainda não existir na App Store Connect.
  */
 async function fetchAppVersionState(client, appId, versionString) {
-	const response = await client.get(`/v1/apps/${appId}/appStoreVersions`, {
+	const response = await ascCall(appsAppStoreVersionsGetToManyRelated, {
+		client,
+		path: { id: appId },
 		query: {
-			"filter[versionString]": versionString,
-			"fields[appStoreVersions]": "versionString,appVersionState",
+			"filter[versionString]": [versionString],
+			"fields[appStoreVersions]": ["versionString", "appVersionState"],
 		},
 	});
 	return response.data[0]?.attributes?.appVersionState ?? null;
 }
 
 async function main() {
-	const credentials = readAscCredentialsFromEnv();
-	const client = createAscClient(credentials);
+	const { appId, client } = createAsc();
 	const version = getExpoVersion();
-	const state = await fetchAppVersionState(client, credentials.appId, version);
+	const state = await fetchAppVersionState(client, appId, version);
 
 	if (state && NON_EDITABLE_VERSION_STATES.has(state)) {
 		const inReview = state === "WAITING_FOR_REVIEW" || state === "IN_REVIEW";

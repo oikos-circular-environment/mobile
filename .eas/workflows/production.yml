@@ -56,7 +56,7 @@ jobs:
     steps:
       - uses: eas/checkout
       - run: npm ci
-      - run: node scripts/check-ios-app-version.mjs
+      - run: node store/scripts/check-ios-app-version.mjs
 
   build_android:
     name: Build Android app
@@ -96,7 +96,7 @@ jobs:
       - uses: eas/checkout
       - run: npm ci
       - name: Publish Android release
-        run: node scripts/publish-android-release.mjs
+        run: node store/scripts/publish-android-release.mjs
 
   # Só sobe o binário — anexar, publicar ficha e enviar pra revisão dependem
   # do processamento na Apple e vivem em ios-review-submission.yml (trigger app_store_connect).

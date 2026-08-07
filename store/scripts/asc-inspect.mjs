@@ -9,23 +9,31 @@
  */
 
 import {
-	createAscClient,
+	appStoreVersionLocalizationsAppScreenshotSetsGetToManyRelated,
+	appStoreVersionsAppStoreVersionLocalizationsGetToManyRelated,
+	appsAppStoreVersionsGetToManyRelated,
+	appsGetInstance,
+	buildsGetCollection,
+	reviewSubmissionsGetCollection,
+} from "@oikos-circular-environment/apple-connect-api";
+import {
+	ascCall,
+	createAsc,
 	OPEN_REVIEW_SUBMISSION_STATES,
-	readAscCredentialsFromEnv,
-} from "./lib/asc-api.mjs";
+} from "./lib/asc.mjs";
 import { getExpoVersion } from "./lib/expo-config.mjs";
 
 const heading = title =>
 	console.log(`\n── ${title} ${"─".repeat(Math.max(0, 56 - title.length))}`);
 
 async function main() {
-	const credentials = readAscCredentialsFromEnv();
-	const client = createAscClient(credentials);
-	const { appId } = credentials;
+	const { appId, client } = createAsc();
 	const version = getExpoVersion();
 
-	const app = await client.get(`/v1/apps/${appId}`, {
-		query: { "fields[apps]": "name,bundleId,sku" },
+	const app = await ascCall(appsGetInstance, {
+		client,
+		path: { id: appId },
+		query: { "fields[apps]": ["name", "bundleId", "sku"] },
 	});
 	heading("App");
 	console.log(
@@ -34,11 +42,17 @@ async function main() {
 	console.log(`  version em app.config.ts: ${version}`);
 
 	heading("App Store Versions");
-	const versions = await client.get(`/v1/apps/${appId}/appStoreVersions`, {
+	const versions = await ascCall(appsAppStoreVersionsGetToManyRelated, {
+		client,
+		path: { id: appId },
 		query: {
-			"filter[platform]": "IOS",
-			"fields[appStoreVersions]":
-				"versionString,appVersionState,createdDate,releaseType",
+			"filter[platform]": ["IOS"],
+			"fields[appStoreVersions]": [
+				"versionString",
+				"appVersionState",
+				"createdDate",
+				"releaseType",
+			],
 			limit: 10,
 		},
 	});
@@ -51,16 +65,22 @@ async function main() {
 	if (versions.data.length === 0) console.log("  (nenhuma)");
 
 	heading("Builds recentes");
-	const builds = await client.get("/v1/builds", {
+	const builds = await ascCall(buildsGetCollection, {
+		client,
 		query: {
-			"filter[app]": appId,
+			"filter[app]": [appId],
 			// preReleaseVersion precisa estar em fields[builds], não só em
 			// include — sparse fieldset também filtra relationships.
-			"fields[builds]":
-				"version,processingState,uploadedDate,expired,preReleaseVersion",
-			include: "preReleaseVersion",
+			"fields[builds]": [
+				"version",
+				"processingState",
+				"uploadedDate",
+				"expired",
+				"preReleaseVersion",
+			],
+			include: ["preReleaseVersion"],
 			limit: 10,
-			sort: "-uploadedDate",
+			sort: ["-uploadedDate"],
 		},
 	});
 	const trains = new Map(
@@ -84,15 +104,15 @@ async function main() {
 	if (!current) {
 		console.log("  (nenhuma versão para inspecionar)");
 	} else {
-		const localizations = await client.get(
-			`/v1/appStoreVersions/${current.id}/appStoreVersionLocalizations`,
-			{ query: { limit: 50 } },
+		const localizations = await ascCall(
+			appStoreVersionsAppStoreVersionLocalizationsGetToManyRelated,
+			{ client, path: { id: current.id }, query: { limit: 50 } },
 		);
 		console.log(`  versão inspecionada: ${current.attributes.versionString}`);
 		for (const localization of localizations.data) {
-			const sets = await client.get(
-				`/v1/appStoreVersionLocalizations/${localization.id}/appScreenshotSets`,
-				{ query: { limit: 50 } },
+			const sets = await ascCall(
+				appStoreVersionLocalizationsAppScreenshotSetsGetToManyRelated,
+				{ client, path: { id: localization.id }, query: { limit: 50 } },
 			);
 			const summary = sets.data
 				.map(set => set.attributes.screenshotDisplayType)
@@ -106,11 +126,12 @@ async function main() {
 	heading("Review submissions abertas");
 	// /v1/reviewSubmissions não aceita `sort` — confere a lista de parâmetros
 	// no OpenAPI da App Store Connect antes de reintroduzir.
-	const submissions = await client.get("/v1/reviewSubmissions", {
+	const submissions = await ascCall(reviewSubmissionsGetCollection, {
+		client,
 		query: {
-			"filter[app]": appId,
-			"filter[platform]": "IOS",
-			"filter[state]": OPEN_REVIEW_SUBMISSION_STATES.join(","),
+			"filter[app]": [appId],
+			"filter[platform]": ["IOS"],
+			"filter[state]": OPEN_REVIEW_SUBMISSION_STATES,
 			limit: 5,
 		},
 	});

@@ -3,14 +3,14 @@
  *   entre o que é configurado no EAS e o que os scripts próprios injetam.
  */
 
-import { getSubmitProfile } from "../../../scripts/lib/expo-config.mjs";
+import { getSubmitProfile } from "../../../store/scripts/lib/expo-config.mjs";
 import {
 	RELEASE_NOTES_MAX_LENGTH,
 	readContact,
 	readStoreJson,
 	readWhatsNew,
 	whatsNewPath,
-} from "../../../scripts/lib/store-config.mjs";
+} from "../../../store/scripts/lib/store-config.mjs";
 
 const VERSION = "1.0.3";
 

@@ -30,7 +30,7 @@ jobs:
         env:
           EXPO_APPLE_TEAM_ID: "339A2VX3JG"
           EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
-        run: node scripts/push-ios-metadata.mjs
+        run: node store/scripts/push-ios-metadata.mjs
 
   # O id vem pronto do trigger e dispensa o polling; na execução manual ele
   # fica vazio e o script cai no número do build.
@@ -45,4 +45,4 @@ jobs:
       - uses: eas/checkout
       - run: npm ci
       - name: Attach build and submit for review
-        run: node scripts/submit-ios-for-review.mjs
+        run: node store/scripts/submit-ios-for-review.mjs

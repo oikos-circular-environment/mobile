@@ -318,8 +318,8 @@ O release iOS é dividido entre o que o EAS já faz e o que precisamos injetar. 
 | Build | `eas build` |
 | Upload do binário para a App Store Connect | `eas submit` (`fastlane pilot`), em `production.yml` |
 | Ficha, screenshots, revisão, categorias, classificação etária | **`eas metadata:push`** (`store.config.js`), em `ios-review-submission.yml` |
-| Anexar o build à App Store Version | `scripts/submit-ios-for-review.mjs`, em `ios-review-submission.yml` |
-| Enviar para o App Review | `scripts/submit-ios-for-review.mjs`, em `ios-review-submission.yml` |
+| Anexar o build à App Store Version | `store/scripts/submit-ios-for-review.mjs`, em `ios-review-submission.yml` |
+| Enviar para o App Review | `store/scripts/submit-ios-for-review.mjs`, em `ios-review-submission.yml` |
 
 As três últimas linhas rodam num workflow separado, `.eas/workflows/ios-review-submission.yml`, disparado pelo trigger `on.app_store_connect.build_upload` quando a Apple termina de processar o upload — não como continuação síncrona de `production.yml`. Dois motivos:
 
@@ -328,11 +328,11 @@ As três últimas linhas rodam num workflow separado, `.eas/workflows/ios-review
 
 Requer a conexão com a App Store Connect configurada uma vez no dashboard da EAS (Project Settings → App Store Connect) para o trigger disparar.
 
-`scripts/submit-ios-for-review.mjs` aceita duas formas de identificar o build:
+`store/scripts/submit-ios-for-review.mjs` aceita duas formas de identificar o build:
 - `--build-id=<id>` (env `IOS_ASC_BUILD_ID`) — o caminho usado por `ios-review-submission.yml`, sem polling por versão.
 - `--build-number=<n>` (env `IOS_BUILD_NUMBER`) — fallback para execução manual; ainda espera o build chegar a `processingState: VALID` (timeout padrão 45 min, `ASC_BUILD_WAIT_TIMEOUT_MINUTES`).
 
-Se a versão já estiver em `WAITING_FOR_REVIEW` ou `IN_REVIEW`, o script encerra com sucesso e não mexe em nada — é o caso de um release enviado manualmente. `scripts/push-ios-metadata.mjs` envolve o `eas metadata:push` e falha explicitamente se a saída indicar upload/exclusão/reordenação de screenshot mal-sucedidos mesmo com exit code 0 (expo/eas-cli#3689, aberta e sem correção).
+Se a versão já estiver em `WAITING_FOR_REVIEW` ou `IN_REVIEW`, o script encerra com sucesso e não mexe em nada — é o caso de um release enviado manualmente. `store/scripts/push-ios-metadata.mjs` envolve o `eas metadata:push` e falha explicitamente se a saída indicar upload/exclusão/reordenação de screenshot mal-sucedidos mesmo com exit code 0 (expo/eas-cli#3689, aberta e sem correção).
 
 #### `store.config.js` — a ficha da App Store
 
@@ -410,7 +410,7 @@ O que **não** é compartilhado, e por quê: descrição, keywords e texto promo
 
 ### Publicação na Google Play
 
-O `submit_android` do workflow (que é `eas submit` por baixo) entrega o `.aab` na trilha configurada em `eas.json` — diferente do iOS, onde o binário só chega ao TestFlight — e já aplica `track`, `releaseStatus` e `rollout` daquele perfil. O que ele **não** faz é publicar as notas da versão nem sincronizar os dados de contato da ficha. Disso cuida o job **`publish_android`**, que roda `scripts/publish-android-release.mjs`.
+O `submit_android` do workflow (que é `eas submit` por baixo) entrega o `.aab` na trilha configurada em `eas.json` — diferente do iOS, onde o binário só chega ao TestFlight — e já aplica `track`, `releaseStatus` e `rollout` daquele perfil. O que ele **não** faz é publicar as notas da versão nem sincronizar os dados de contato da ficha. Disso cuida o job **`publish_android`**, que roda `store/scripts/publish-android-release.mjs`.
 
 > O EAS Metadata **não** cobre a Google Play — está explícito no FAQ da documentação do Expo. Por isso a ficha do Android depende de código nosso, enquanto a do iOS não.
 
@@ -495,7 +495,7 @@ A regra é: **tudo que o EAS cobre fica no EAS**; escrevemos código só para o 
 Duas descobertas mudaram esse desenho:
 
 - **O EAS Metadata publica screenshots.** A tabela "When to use EAS Metadata" da documentação do Expo ainda lista *Upload screenshots ✗*, mas `eas metadata:pull` baixa as imagens e o `push` as envia. A doc está atrasada em relação à CLI.
-- **O EAS Metadata não cobre a Google Play**, e isso está explícito no FAQ do Expo. Por isso a ficha do Android depende de código nosso, enquanto a do iOS não. Se o Expo fechar essa lacuna, `scripts/publish-android-release.mjs` deve ser aposentado do mesmo jeito que o código de metadata do iOS foi.
+- **O EAS Metadata não cobre a Google Play**, e isso está explícito no FAQ do Expo. Por isso a ficha do Android depende de código nosso, enquanto a do iOS não. Se o Expo fechar essa lacuna, `store/scripts/publish-android-release.mjs` deve ser aposentado do mesmo jeito que o código de metadata do iOS foi.
 
 ### Pendências
 
