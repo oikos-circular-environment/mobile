@@ -18,11 +18,7 @@ export function useSurveyProtocol() {
 		queryFn: async () => {
 			const remote = await surveyClient.usability.protocol.query();
 			if (remote) {
-				await setCachedProtocol(
-					remote.protocol_key,
-					remote.protocol_version,
-					remote,
-				);
+				await setCachedProtocol(remote.key, remote.version, remote);
 				return remote;
 			}
 

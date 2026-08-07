@@ -84,13 +84,9 @@ export async function restoreSurveySessionIfNeeded() {
 		try {
 			const remote = await surveyClient.usability.protocol.query();
 			if (remote) {
-				await setCachedProtocol(
-					remote.protocol_key,
-					remote.protocol_version,
-					remote,
-				);
+				await setCachedProtocol(remote.key, remote.version, remote);
 				protocolPayload = remote;
-				protocolKey = remote.protocol_key;
+				protocolKey = remote.key;
 			}
 		} catch (error) {
 			console.warn(

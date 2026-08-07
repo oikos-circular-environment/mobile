@@ -32,6 +32,11 @@ export async function setCachedProtocol(
 	protocolVersion: number,
 	payload: unknown,
 ) {
+	if (!protocolKey) {
+		console.warn("[survey] tentativa de cachear protocolo sem chave");
+		return;
+	}
+
 	const db = getSurveyDb();
 	const now = new Date().toISOString();
 
