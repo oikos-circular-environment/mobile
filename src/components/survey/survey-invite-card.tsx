@@ -32,6 +32,8 @@ interface SurveyInviteCardProps {
 	ctaLabel?: string;
 	ctaDisabled?: boolean;
 	onPressCta?: () => void;
+	detailsLabel?: string;
+	onPressDetails?: () => void;
 	className?: string;
 }
 
@@ -44,6 +46,8 @@ export function SurveyInviteCard({
 	ctaLabel,
 	ctaDisabled,
 	onPressCta,
+	detailsLabel,
+	onPressDetails,
 	className,
 }: SurveyInviteCardProps) {
 	const showPersonaBadge = Boolean(personaLabel);
@@ -184,16 +188,27 @@ export function SurveyInviteCard({
 						</View>
 					) : null}
 
-					{ctaLabel ? (
-						<View className="flex-row justify-end">
-							<Button
-								variant="secondary"
-								className="flex-1 h-12"
-								onPress={onPressCta}
-								disabled={ctaDisabled}
-							>
-								<ButtonText>{ctaLabel}</ButtonText>
-							</Button>
+					{ctaLabel || detailsLabel ? (
+						<View className="flex-row gap-2">
+							{detailsLabel ? (
+								<Button
+									variant="outline"
+									className="flex-1 h-12 border-white/30 bg-white/10"
+									onPress={onPressDetails}
+								>
+									<ButtonText className="text-white">{detailsLabel}</ButtonText>
+								</Button>
+							) : null}
+							{ctaLabel ? (
+								<Button
+									variant="secondary"
+									className="flex-1 h-12"
+									onPress={onPressCta}
+									disabled={ctaDisabled}
+								>
+									<ButtonText>{ctaLabel}</ButtonText>
+								</Button>
+							) : null}
 						</View>
 					) : null}
 				</View>

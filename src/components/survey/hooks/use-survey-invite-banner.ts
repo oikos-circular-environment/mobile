@@ -30,6 +30,8 @@ export function useSurveyInviteBanner() {
 			personaLabel: personaDefinition?.label,
 			participantCode: participantCode ?? undefined,
 			stages: stages.length > 0 ? stages : undefined,
+			detailsLabel: "Ver detalhes",
+			onPressDetails: () => router.push("/survey/resume"),
 		};
 	}
 
@@ -63,6 +65,8 @@ export function useSurveyInviteBanner() {
 			stages: stages.length > 0 ? stages : undefined,
 			ctaLabel: "Continuar",
 			onPressCta: () => router.push("/survey/resume"),
+			detailsLabel: "Ver detalhes",
+			onPressDetails: () => router.push("/survey/resume"),
 		};
 	}
 
