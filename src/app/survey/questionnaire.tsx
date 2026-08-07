@@ -108,12 +108,23 @@ export default function SurveyQuestionnaireScreen() {
 			const now = new Date().toISOString();
 			const db = getSurveyDb();
 
+			const suiteRunRow = await db
+				.select()
+				.from(surveySuiteRun)
+				.where(eq(surveySuiteRun.id, suiteRunId))
+				.then(rows => rows[0]);
+			const suiteStartedAt = suiteRunRow?.startedAt ?? now;
+			const suiteWallMs = Math.max(
+				0,
+				new Date(now).getTime() - new Date(suiteStartedAt).getTime(),
+			);
+
 			await db
 				.update(surveySuiteRun)
 				.set({
 					finishedAt: now,
 					activeMs: suiteActiveMs,
-					wallMs: suiteActiveMs,
+					wallMs: suiteWallMs,
 					outcome,
 					synced: false,
 				})
@@ -143,9 +154,9 @@ export default function SurveyQuestionnaireScreen() {
 				suite: {
 					code: suiteCode,
 					position: suiteIndex,
-					started_at: now,
+					started_at: suiteStartedAt,
 					active_ms: suiteActiveMs,
-					wall_ms: suiteActiveMs,
+					wall_ms: suiteWallMs,
 					finished_at: now,
 					outcome,
 				},
@@ -161,7 +172,8 @@ export default function SurveyQuestionnaireScreen() {
 				})),
 				answers: Object.entries(answers).map(([question_key, value]) => ({
 					question_key,
-					...value,
+					value_text: value.valueText,
+					value_number: value.valueNumber,
 				})),
 			});
 

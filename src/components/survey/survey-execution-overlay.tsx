@@ -16,6 +16,7 @@ import { toast } from "@/components/toast";
 import { resolveTaskRun } from "@/libs/survey/task-run";
 import {
 	selectAllTasksResolved,
+	selectCurrentTaskActiveMs,
 	selectResolvedTaskCount,
 	useSurveyExecutionStore,
 } from "@/stores/survey-execution-store";
@@ -130,6 +131,7 @@ export function SurveyExecutionOverlay() {
 				currentTask.code,
 				currentTask.position,
 				"NO",
+				selectCurrentTaskActiveMs(useSurveyExecutionStore.getState()),
 			).catch(() => {});
 		}
 		abandonCurrentTask();
@@ -141,9 +143,18 @@ export function SurveyExecutionOverlay() {
 			const toResolve = tasks.filter(
 				t => t.status !== "done" && t.status !== "abandoned",
 			);
+			const openTaskActiveMs = selectCurrentTaskActiveMs(
+				useSurveyExecutionStore.getState(),
+			);
 			await Promise.all(
 				toResolve.map(t =>
-					resolveTaskRun(suiteRunId, t.code, t.position, "NO").catch(() => {}),
+					resolveTaskRun(
+						suiteRunId,
+						t.code,
+						t.position,
+						"NO",
+						t.code === currentTask?.code ? openTaskActiveMs : 0,
+					).catch(() => {}),
 				),
 			);
 		}

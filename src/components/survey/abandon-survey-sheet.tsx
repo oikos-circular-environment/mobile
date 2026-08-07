@@ -25,6 +25,7 @@ import {
 	enqueueAbandon,
 	enqueueCheckpoint,
 } from "@/libs/survey/queue/outbox";
+import { sessionTotals } from "@/libs/survey/session-totals";
 import { useSurveyDraftStore } from "@/stores/survey-draft-store";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -98,12 +99,18 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 								? "NO"
 								: "PARTIAL";
 
+					const suiteStartedAt = suiteRunRow?.startedAt ?? now;
+					const suiteWallMs = Math.max(
+						0,
+						new Date(now).getTime() - new Date(suiteStartedAt).getTime(),
+					);
+
 					await db
 						.update(surveySuiteRun)
 						.set({
 							finishedAt: now,
 							activeMs,
-							wallMs: activeMs,
+							wallMs: suiteWallMs,
 							outcome: currentOutcome,
 							synced: false,
 						})
@@ -120,9 +127,9 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 						suite: {
 							code: suiteCode,
 							position: suiteIndex,
-							started_at: suiteRunRow?.startedAt ?? now,
+							started_at: suiteStartedAt,
 							active_ms: activeMs,
-							wall_ms: activeMs,
+							wall_ms: suiteWallMs,
 							finished_at: now,
 							outcome: currentOutcome,
 						},
@@ -161,10 +168,12 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 				}
 
 				// E5 por último — a fila do outbox respeita ordem de criação.
+				const totals = await sessionTotals(sessionId, now);
+
 				await enqueueAbandon(sessionId, {
 					session_id: sessionId,
-					active_ms: activeMs,
-					wall_ms: activeMs,
+					active_ms: totals.activeMs,
+					wall_ms: totals.wallMs,
 					finished_at: now,
 					reason: reason.trim() || undefined,
 					current_suite_code: suiteCode ?? undefined,

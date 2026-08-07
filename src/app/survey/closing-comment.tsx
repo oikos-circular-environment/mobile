@@ -11,7 +11,7 @@ import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveyAnswer } from "@/libs/survey/db/schema";
 import { drainOutbox, enqueueFinish } from "@/libs/survey/queue/outbox";
-import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
+import { sessionTotals } from "@/libs/survey/session-totals";
 import { useSurveyStore } from "@/stores/survey-store";
 
 const MAX_LENGTH = 4000;
@@ -21,7 +21,6 @@ export default function SurveyClosingCommentScreen() {
 	const router = useRouter();
 	const sessionId = useSurveyStore(s => s.sessionId);
 	const setStatus = useSurveyStore(s => s.setStatus);
-	const suiteActiveMs = useSurveyExecutionStore(s => s.suiteActiveMs);
 	const [comment, setComment] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,9 +31,10 @@ export default function SurveyClosingCommentScreen() {
 		try {
 			const now = new Date().toISOString();
 			const trimmed = comment.trim();
+			const db = getSurveyDb();
 
 			if (trimmed) {
-				await getSurveyDb().insert(surveyAnswer).values({
+				await db.insert(surveyAnswer).values({
 					id: Crypto.randomUUID(),
 					sessionId,
 					suiteRunId: null,
@@ -43,10 +43,12 @@ export default function SurveyClosingCommentScreen() {
 				});
 			}
 
+			const { activeMs, wallMs } = await sessionTotals(sessionId, now);
+
 			await enqueueFinish(sessionId, {
 				session_id: sessionId,
-				active_ms: suiteActiveMs,
-				wall_ms: suiteActiveMs,
+				active_ms: activeMs,
+				wall_ms: wallMs,
 				finished_at: now,
 				answers: trimmed
 					? [{ question_key: "free_comment", value_text: trimmed }]
