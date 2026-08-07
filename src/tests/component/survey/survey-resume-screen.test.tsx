@@ -1,7 +1,11 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
 import SurveyResumeScreen from "@/app/survey/resume";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
-import { surveySession } from "@/libs/survey/db/schema";
+import {
+	surveyAnswer,
+	surveySession,
+	surveySuiteRun,
+} from "@/libs/survey/db/schema";
 import { createTestSurveyDb } from "@/libs/survey/db/test-client";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -11,6 +15,37 @@ const mockDismissTo = jest.fn();
 const mockReplace = jest.fn();
 const mockPush = jest.fn();
 const mockDb = createTestSurveyDb();
+
+async function seedSession(
+	overrides: Partial<typeof surveySession.$inferInsert> = {},
+) {
+	const now = new Date().toISOString();
+	await mockDb.insert(surveySession).values({
+		id: "session-1",
+		protocolKey: "oikos-walkthrough",
+		protocolVersion: 1,
+		persona: "CITIZEN",
+		stateUf: "SP",
+		cityName: "São Paulo",
+		ageRange: "25-34",
+		educationLevel: "superior",
+		chainRole: "cidadao",
+		wasteContactFrequency: 3,
+		appExperience: 3,
+		consentVersion: "v1",
+		consentAt: now,
+		deviceOs: "android",
+		deviceOsVersion: "14",
+		appVersion: "1.0.0",
+		screenSize: "360x800",
+		status: "IN_PROGRESS",
+		startedAt: now,
+		createdAt: now,
+		updatedAt: now,
+		...overrides,
+	});
+}
+
 const mockEnqueueAbandon = jest.fn().mockResolvedValue(undefined);
 const mockEnqueueCheckpoint = jest.fn().mockResolvedValue(undefined);
 const mockDrainOutbox = jest.fn().mockResolvedValue(undefined);
@@ -57,7 +92,7 @@ const protocolFixture = {
 };
 
 describe("SurveyResumeScreen", () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		jest.useFakeTimers();
 		mockBack.mockClear();
 		mockDismissTo.mockClear();
@@ -67,7 +102,10 @@ describe("SurveyResumeScreen", () => {
 		mockEnqueueCheckpoint.mockClear();
 		mockDrainOutbox.mockClear();
 		mockDeleteLocalSurveyData.mockClear();
-		mockDb.delete(surveySession).run();
+		await mockDb.delete(surveyAnswer).run();
+		await mockDb.delete(surveySuiteRun).run();
+		await mockDb.delete(surveySession).run();
+		await seedSession();
 		useSurveyExecutionStore.getState().reset();
 		useSurveyStore.getState().reset();
 		useSurveyStore.getState().startSession("session-1", "CITIZEN");
@@ -97,6 +135,86 @@ describe("SurveyResumeScreen", () => {
 		expect(screen.getByText("Em andamento")).toBeOnTheScreen();
 		expect(screen.getByText("S2 · Registro e perfil")).toBeOnTheScreen();
 		expect(screen.getAllByText("Pendente").length).toBeGreaterThan(0);
+	});
+
+	it("mostra todas as suítes como concluídas quando a pesquisa está finalizada", async () => {
+		useSurveyStore.getState().setStatus("COMPLETED");
+		useSurveyExecutionStore.setState({
+			suiteQueue: ["S1", "S2"],
+			suiteIndex: 2,
+			isActive: false,
+		});
+
+		await mockDb.insert(surveySuiteRun).values([
+			{
+				id: "run-s1",
+				sessionId: "session-1",
+				suiteCode: "S1",
+				position: 0,
+				startedAt: new Date().toISOString(),
+				finishedAt: new Date().toISOString(),
+				activeMs: 0,
+				wallMs: 0,
+				outcome: "YES",
+			},
+			{
+				id: "run-s2",
+				sessionId: "session-1",
+				suiteCode: "S2",
+				position: 1,
+				startedAt: new Date().toISOString(),
+				finishedAt: new Date().toISOString(),
+				activeMs: 0,
+				wallMs: 0,
+				outcome: "YES",
+			},
+		]);
+
+		await render(<SurveyResumeScreen />);
+
+		expect(screen.getByText("S1 · Exploração livre")).toBeOnTheScreen();
+		expect(screen.getByText("S2 · Registro e perfil")).toBeOnTheScreen();
+		expect(
+			screen.getAllByText("Concluída · toque para ver respostas").length,
+		).toBeGreaterThanOrEqual(2);
+		expect(screen.queryByText("Abandonada")).not.toBeOnTheScreen();
+	});
+
+	it("mostra o comentário final como concluído quando houver resposta", async () => {
+		useSurveyStore.getState().setStatus("COMPLETED");
+		useSurveyExecutionStore.setState({
+			suiteQueue: ["S1", "S2"],
+			suiteIndex: 2,
+			isActive: false,
+		});
+
+		await mockDb.insert(surveyAnswer).values({
+			id: "answer-1",
+			sessionId: "session-1",
+			suiteRunId: null,
+			questionKey: "free_comment",
+			valueText: "Ótima experiência",
+		});
+
+		await render(<SurveyResumeScreen />);
+
+		expect(screen.getByText("Comentário final")).toBeOnTheScreen();
+		expect(screen.getByText("Concluído")).toBeOnTheScreen();
+	});
+
+	it("mostra a suíte atual como abandonada quando a pesquisa foi abandonada", async () => {
+		useSurveyStore.getState().setStatus("ABANDONED");
+		useSurveyExecutionStore.setState({
+			suiteQueue: ["S1", "S2"],
+			suiteIndex: 0,
+			isActive: false,
+		});
+
+		await render(<SurveyResumeScreen />);
+
+		expect(screen.getByText("S1 · Exploração livre")).toBeOnTheScreen();
+		expect(screen.getByText("S2 · Registro e perfil")).toBeOnTheScreen();
+		expect(screen.getAllByText("Abandonada").length).toBe(2);
 	});
 
 	it("toca em Caracterização e navega para a tela de respostas do rastreio", async () => {
@@ -168,10 +286,10 @@ describe("SurveyResumeScreen", () => {
 		// Nenhuma suíte foi iniciada (suiteRunId nulo) — S1 e S2 recebem checkpoint
 		// sintético com outcome NO forçado, antes do E5.
 		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(2);
-		expect(mockEnqueueCheckpoint.mock.calls[0][1].suite).toEqual(
+		expect(mockEnqueueCheckpoint.mock.calls[0][2].suite).toEqual(
 			expect.objectContaining({ code: "S1", outcome: "NO" }),
 		);
-		expect(mockEnqueueCheckpoint.mock.calls[1][1].suite).toEqual(
+		expect(mockEnqueueCheckpoint.mock.calls[1][2].suite).toEqual(
 			expect.objectContaining({ code: "S2", outcome: "NO" }),
 		);
 		expect(mockEnqueueAbandon).toHaveBeenCalledWith(
@@ -184,6 +302,7 @@ describe("SurveyResumeScreen", () => {
 
 	it("suíte em andamento no momento do abandono usa a fórmula normal de contagem, não NO forçado", async () => {
 		const user = userEvent.setup();
+		const now = new Date().toISOString();
 		useSurveyExecutionStore.getState().openSuiteIntro({
 			code: "S1",
 			title: "S1",
@@ -195,6 +314,16 @@ describe("SurveyResumeScreen", () => {
 		useSurveyExecutionStore.getState().beginSuite();
 		useSurveyExecutionStore.getState().completeCurrentTask();
 
+		await mockDb.insert(surveySuiteRun).values({
+			id: "suite-run-1",
+			sessionId: "session-1",
+			suiteCode: "S1",
+			position: 0,
+			startedAt: now,
+			activeMs: 0,
+			wallMs: 0,
+		});
+
 		await render(<SurveyResumeScreen />);
 
 		await user.press(screen.getByText("Abandonar a pesquisa"));
@@ -203,10 +332,10 @@ describe("SurveyResumeScreen", () => {
 		// Suíte S1 em andamento com 1/1 tarefa concluída -> YES pela fórmula normal.
 		// Só S2 (nunca iniciada) recebe NO forçado.
 		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(2);
-		expect(mockEnqueueCheckpoint.mock.calls[0][1].suite).toEqual(
+		expect(mockEnqueueCheckpoint.mock.calls[0][2].suite).toEqual(
 			expect.objectContaining({ code: "S1", outcome: "YES" }),
 		);
-		expect(mockEnqueueCheckpoint.mock.calls[1][1].suite).toEqual(
+		expect(mockEnqueueCheckpoint.mock.calls[1][2].suite).toEqual(
 			expect.objectContaining({ code: "S2", outcome: "NO" }),
 		);
 	});

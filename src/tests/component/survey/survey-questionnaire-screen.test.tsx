@@ -190,7 +190,7 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Próxima"));
 
 		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(1);
-		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
 		const errorAnswer = payload.answers.find(
 			(a: { question_key: string }) => a.question_key === "error_occurred",
 		);
@@ -249,7 +249,7 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Próxima"));
 
 		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(1);
-		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
 		expect(payload.tasks).toEqual([
 			expect.objectContaining({
 				code: "T8",
@@ -269,7 +269,7 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Não"));
 		await user.press(screen.getByText("Próxima"));
 
-		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
 		expect(payload.suite.started_at).toBe("2026-07-30T10:00:00.000Z");
 		expect(payload.suite.finished_at).not.toBe(payload.suite.started_at);
 		expect(payload.suite.wall_ms).toBeGreaterThan(0);
@@ -284,7 +284,7 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Não"));
 		await user.press(screen.getByText("Próxima"));
 
-		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
 		expect(payload.answers).toContainEqual(
 			expect.objectContaining({
 				question_key: "satisfaction",
@@ -311,7 +311,7 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Próxima"));
 
 		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(1);
-		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
 		expect(payload.suite.outcome).toBe("NO");
 	});
 });

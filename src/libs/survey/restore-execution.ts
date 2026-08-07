@@ -82,11 +82,19 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 		finishedAt: currentSuiteRun.finishedAt,
 	});
 
-	const suiteIndex = personaSuiteCodes.indexOf(currentSuiteRun.suiteCode);
-	if (suiteIndex === -1) {
+	const currentSuiteIndex = personaSuiteCodes.indexOf(
+		currentSuiteRun.suiteCode,
+	);
+	if (currentSuiteIndex === -1) {
 		console.log("[survey] suiteCode não encontrado no roteiro da persona");
 		return;
 	}
+
+	// Se a suíte atual já está finalizada, o índice deve apontar para depois dela,
+	// indicando que todas as suítes foram concluídas.
+	const suiteIndex = currentSuiteRun.finishedAt
+		? currentSuiteIndex + 1
+		: currentSuiteIndex;
 
 	const suite = input.protocol.suites.find(
 		s => s.code === currentSuiteRun.suiteCode,
