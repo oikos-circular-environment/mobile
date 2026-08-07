@@ -37,7 +37,7 @@ export const NON_EDITABLE_VERSION_STATES = new Set([
  *
  * @type {ReadonlyArray<string>}
  */
-export const REUSABLE_REVIEW_SUBMISSION_STATES = [
+const REUSABLE_REVIEW_SUBMISSION_STATES = [
 	"READY_FOR_REVIEW",
 	"WAITING_FOR_REVIEW",
 	"IN_REVIEW",

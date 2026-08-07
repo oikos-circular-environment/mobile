@@ -14,14 +14,6 @@ import { RETRYABLE_STATUS, withRetry } from "./http-retry.mjs";
 const SCOPE = "https://www.googleapis.com/auth/androidpublisher";
 
 /**
- * Status de release aceitos em `edits.tracks.update`. `inProgress` exige
- * `userFraction` entre 0 e 1; os demais o proíbem.
- *
- * @type {ReadonlyArray<string>}
- */
-export const RELEASE_STATUSES = ["completed", "inProgress", "draft", "halted"];
-
-/**
  * Erro de resposta da Play Developer API, com a mensagem da Google extraída do
  * envelope de erro.
  *
@@ -93,7 +85,9 @@ export function playCall(operation, call) {
 				const response = await call();
 				return response.data;
 			} catch (error) {
-				const status = error?.status ?? error?.response?.status ?? 0;
+				const status = error?.status ?? error?.response?.status;
+				if (status === undefined) throw error;
+
 				const detail =
 					error?.response?.data?.error?.message ?? error?.message ?? "";
 				throw new PlayApiError(status, detail, operation);
