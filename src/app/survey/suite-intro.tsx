@@ -12,6 +12,7 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveySuiteRun } from "@/libs/survey/db/schema";
+import { start as startEventRecorder } from "@/libs/survey/event-recorder";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
@@ -98,8 +99,9 @@ export default function SurveySuiteIntroScreen() {
 	}, [suiteCode, holdSeconds]);
 
 	const handleBegin = async () => {
+		let suiteRunId: string | null = null;
 		if (sessionId && suiteCode) {
-			const suiteRunId = Crypto.randomUUID();
+			suiteRunId = Crypto.randomUUID();
 			const now = new Date().toISOString();
 			await getSurveyDb().insert(surveySuiteRun).values({
 				id: suiteRunId,
@@ -112,6 +114,9 @@ export default function SurveySuiteIntroScreen() {
 		}
 
 		beginSuite();
+		if (sessionId && suiteRunId) {
+			startEventRecorder(sessionId, suiteRunId);
+		}
 		setProgress(suiteCode ?? null, tasks[0]?.code ?? null);
 		router.dismissTo("/(tabs)/(home)" as never);
 	};

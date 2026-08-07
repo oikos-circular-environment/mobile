@@ -8,6 +8,13 @@
 			"when": 1785370349203,
 			"tag": "0000_minor_pixie",
 			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "6",
+			"when": 1786124804553,
+			"tag": "0001_lowly_victor_mancha",
+			"breakpoints": true
 		}
 	]
 }

@@ -27,6 +27,7 @@ import {
 	surveySuiteRun,
 	surveyTaskRun,
 } from "@/libs/survey/db/schema";
+import { stop as stopEventRecorder } from "@/libs/survey/event-recorder";
 import { drainOutbox, enqueueCheckpoint } from "@/libs/survey/queue/outbox";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -190,6 +191,7 @@ export default function SurveyQuestionnaireScreen() {
 			setPendingSync(pending.length > 0);
 
 			setRemainingSuites(suiteQueue.length - (suiteIndex + 1));
+			stopEventRecorder();
 			finishSuite();
 			setShowConfirmation(true);
 		} finally {

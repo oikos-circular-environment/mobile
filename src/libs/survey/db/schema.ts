@@ -103,6 +103,7 @@ export const surveyEvent = sqliteTable(
 		taskCode: text("task_code"),
 		occurredAt: text("occurred_at").notNull(),
 		payload: text("payload", { mode: "json" }).notNull(),
+		sentAt: text("sent_at"),
 	},
 	t => [index("survey_event_session_seq").on(t.sessionId, t.seq)],
 );

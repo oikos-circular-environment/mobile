@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveyTaskRun } from "@/libs/survey/db/schema";
+import { screenRouteBus } from "@/libs/survey/screen-route-bus";
 import { createTaskSignalWatcher } from "@/libs/survey/signal-matcher";
 import { getOrCreateOpenTaskRun } from "@/libs/survey/task-run";
 import {
@@ -81,5 +82,6 @@ export function useSurveyTaskDetection() {
 
 	useEffect(() => {
 		watcherRef.current?.notifyScreen(pathname);
+		screenRouteBus.emit({ route: pathname });
 	}, [pathname]);
 }
