@@ -19,7 +19,7 @@ import { cn } from "@/libs/utils";
 
 export interface SurveyInviteStage {
 	code: string;
-	status: "done" | "current" | "upcoming";
+	status: "done" | "current" | "upcoming" | "completed";
 	currentLabel?: string;
 }
 
@@ -29,9 +29,9 @@ interface SurveyInviteCardProps {
 	personaLabel?: string;
 	participantCode?: string;
 	stages?: SurveyInviteStage[];
-	ctaLabel: string;
+	ctaLabel?: string;
 	ctaDisabled?: boolean;
-	onPressCta: () => void;
+	onPressCta?: () => void;
 	className?: string;
 }
 
@@ -168,10 +168,12 @@ export function SurveyInviteCard({
 										key={stage.code}
 										className={cn(
 											"size-9 items-center justify-center rounded-full",
-											stage.status === "done" && "bg-white/30",
+											(stage.status === "done" ||
+												stage.status === "completed") &&
+												"bg-white/30",
 										)}
 									>
-										{stage.status === "done" ? (
+										{stage.status === "done" || stage.status === "completed" ? (
 											<CircleCheckIcon size={16} color="#ffffff" />
 										) : (
 											<CircleDashedIcon size={16} color={colors.yellow[400]} />
@@ -182,16 +184,18 @@ export function SurveyInviteCard({
 						</View>
 					) : null}
 
-					<View className="flex-row justify-end">
-						<Button
-							variant="secondary"
-							className="flex-1 h-12"
-							onPress={onPressCta}
-							disabled={ctaDisabled}
-						>
-							<ButtonText>{ctaLabel}</ButtonText>
-						</Button>
-					</View>
+					{ctaLabel ? (
+						<View className="flex-row justify-end">
+							<Button
+								variant="secondary"
+								className="flex-1 h-12"
+								onPress={onPressCta}
+								disabled={ctaDisabled}
+							>
+								<ButtonText>{ctaLabel}</ButtonText>
+							</Button>
+						</View>
+					) : null}
 				</View>
 			</LinearGradient>
 		</View>

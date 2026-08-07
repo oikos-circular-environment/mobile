@@ -11,6 +11,7 @@ let db: ReturnType<typeof drizzle<typeof schema>> | undefined;
 export function getSurveyDb() {
 	if (!db) {
 		const sqlite = openDatabaseSync(DATABASE_NAME);
+		console.log("[survey] database path:", sqlite.databasePath);
 		sqlite.execSync("PRAGMA foreign_keys = ON;");
 		db = drizzle(sqlite, { schema });
 	}

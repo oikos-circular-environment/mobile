@@ -67,13 +67,16 @@ describe("useSurveyInviteBanner", () => {
 		expect(result.current).toMatchObject({ variant: "resume" });
 	});
 
-	it("retorna null quando a sessão está COMPLETED, para o banner sumir", async () => {
+	it("retorna variant completed quando a sessão está COMPLETED", async () => {
 		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 		useSurveyStore.getState().setStatus("COMPLETED");
 
 		const { result } = await renderHook(() => useSurveyInviteBanner());
 
-		expect(result.current).toBeNull();
+		expect(result.current).toMatchObject({
+			variant: "completed",
+			title: "Pesquisa finalizada",
+		});
 	});
 
 	it("onPress navega para /survey quando é convite", async () => {

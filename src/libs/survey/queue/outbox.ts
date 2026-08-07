@@ -1,6 +1,6 @@
 import type { AppRouter } from "@oikos-circular-environment/survey-api/routers/index";
 import type { inferRouterInputs } from "@trpc/server";
-import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { surveyClient } from "../api/client";
@@ -13,9 +13,41 @@ type UsabilityInputs = RouterInputs["usability"];
 type OutboxKind = "E2_SESSION" | "E3_CHECKPOINT" | "E4_FINISH" | "E5_ABANDON";
 
 const MAX_CHUNK_BYTES = 256_000;
+const STALE_SENDING_MS = 60_000;
+const BACKOFF_BASE_MS = 20_000;
+const BACKOFF_MAX_MS = 300_000;
+const BACKOFF_MAX_ATTEMPTS = 10;
 
 function nowIso() {
 	return new Date().toISOString();
+}
+
+function isBackoffExpired(item: typeof surveyOutbox.$inferSelect): boolean {
+	if (item.status !== "FAILED") return true;
+	if (item.attempts >= BACKOFF_MAX_ATTEMPTS) return false;
+	const backoffMs = Math.min(
+		BACKOFF_BASE_MS * 2 ** item.attempts,
+		BACKOFF_MAX_MS,
+	);
+	const updatedAt = new Date(item.updatedAt).getTime();
+	return Date.now() >= updatedAt + backoffMs;
+}
+
+async function reconcileStaleSendingItems(
+	db: ReturnType<typeof getSurveyDb>,
+	sessionId: string,
+) {
+	const threshold = new Date(Date.now() - STALE_SENDING_MS).toISOString();
+	await db
+		.update(surveyOutbox)
+		.set({ status: "PENDING", updatedAt: nowIso() })
+		.where(
+			and(
+				eq(surveyOutbox.sessionId, sessionId),
+				eq(surveyOutbox.status, "SENDING"),
+				lt(surveyOutbox.updatedAt, threshold),
+			),
+		);
 }
 
 async function enqueue(
@@ -283,6 +315,8 @@ async function sendOutboxItem(item: typeof surveyOutbox.$inferSelect) {
 
 export async function drainOutbox(sessionId: string): Promise<void> {
 	const db = getSurveyDb();
+	await reconcileStaleSendingItems(db, sessionId);
+
 	const pending = await db
 		.select()
 		.from(surveyOutbox)
@@ -298,7 +332,7 @@ export async function drainOutbox(sessionId: string): Promise<void> {
 	const otherItems = pending.filter(item => item.kind !== "E2_SESSION");
 
 	for (const item of [...sessionItems, ...otherItems]) {
-		const sent = await sendOutboxItem(item);
-		if (!sent) return;
+		if (!isBackoffExpired(item)) continue;
+		await sendOutboxItem(item);
 	}
 }

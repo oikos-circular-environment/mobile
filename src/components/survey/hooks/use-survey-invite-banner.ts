@@ -14,7 +14,23 @@ export function useSurveyInviteBanner() {
 	const participantCode = useSurveyParticipantCode(sessionId);
 
 	if (status === "COMPLETED") {
-		return null;
+		const personaDefinition = protocol?.personas.find(p => p.key === persona);
+		const suiteQueue = personaDefinition?.suites.map(s => s.suite_code) ?? [];
+
+		const stages: SurveyInviteStage[] = suiteQueue.map(code => ({
+			code,
+			status: "completed",
+			currentLabel: code,
+		}));
+
+		return {
+			variant: "completed" as const,
+			title: "Pesquisa finalizada",
+			description: "Sua participação foi concluída. Obrigado por contribuir!",
+			personaLabel: personaDefinition?.label,
+			participantCode: participantCode ?? undefined,
+			stages: stages.length > 0 ? stages : undefined,
+		};
 	}
 
 	if (status === "IN_PROGRESS" || status === "ABANDONED") {
