@@ -18,8 +18,9 @@ import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { buildCheckpoint } from "@/libs/survey/build-checkpoint";
 import { getSurveyDb } from "@/libs/survey/db/client";
-import { surveySuiteRun, surveyTaskRun } from "@/libs/survey/db/schema";
+import { surveySuiteRun } from "@/libs/survey/db/schema";
 import {
 	drainOutbox,
 	enqueueAbandon,
@@ -116,34 +117,12 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 						})
 						.where(eq(surveySuiteRun.id, suiteRunId));
 
-					const taskRuns = await db
-						.select()
-						.from(surveyTaskRun)
-						.where(eq(surveyTaskRun.suiteRunId, suiteRunId));
-
-					await enqueueCheckpoint(sessionId, suiteRunId, {
-						session_id: sessionId,
-						suite: {
-							code: suiteCode,
-							position: suiteIndex,
-							started_at: suiteStartedAt,
-							active_ms: activeMs,
-							wall_ms: suiteWallMs,
-							finished_at: now,
-							outcome: currentOutcome,
-						},
-						tasks: taskRuns.map(run => ({
-							code: run.taskCode,
-							position: run.position,
-							started_at: run.startedAt,
-							finished_at: run.finishedAt ?? undefined,
-							active_ms: run.activeMs ?? 0,
-							outcome:
-								(run.outcome as "YES" | "NO" | "PARTIAL" | null) ?? undefined,
-							auto_detected: run.autoDetected,
-						})),
-						answers: [],
-					});
+					const checkpointPayload = await buildCheckpoint(
+						sessionId,
+						suiteRunId,
+						true,
+					);
+					await enqueueCheckpoint(sessionId, suiteRunId, checkpointPayload);
 				}
 
 				// Suítes do roteiro ainda não iniciadas: outcome NO forçado, sem tarefas.

@@ -20,12 +20,12 @@ import {
 import { QHeader } from "@/components/survey/q-header";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { buildCheckpoint } from "@/libs/survey/build-checkpoint";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import {
 	surveyAnswer,
 	surveyOutbox,
 	surveySuiteRun,
-	surveyTaskRun,
 } from "@/libs/survey/db/schema";
 import { stop as stopEventRecorder } from "@/libs/survey/event-recorder";
 import { drainOutbox, enqueueCheckpoint } from "@/libs/survey/queue/outbox";
@@ -144,38 +144,12 @@ export default function SurveyQuestionnaireScreen() {
 				),
 			);
 
-			const taskRuns = await db
-				.select()
-				.from(surveyTaskRun)
-				.where(eq(surveyTaskRun.suiteRunId, suiteRunId));
-
-			await enqueueCheckpoint(sessionId, suiteRunId, {
-				session_id: sessionId,
-				suite: {
-					code: suiteCode,
-					position: suiteIndex,
-					started_at: suiteStartedAt,
-					active_ms: suiteActiveMs,
-					wall_ms: suiteWallMs,
-					finished_at: now,
-					outcome,
-				},
-				tasks: taskRuns.map(run => ({
-					code: run.taskCode,
-					position: run.position,
-					started_at: run.startedAt,
-					finished_at: run.finishedAt ?? undefined,
-					active_ms: run.activeMs ?? 0,
-					outcome:
-						(run.outcome as "YES" | "NO" | "PARTIAL" | null) ?? undefined,
-					auto_detected: run.autoDetected,
-				})),
-				answers: Object.entries(answers).map(([question_key, value]) => ({
-					question_key,
-					value_text: value.valueText,
-					value_number: value.valueNumber,
-				})),
-			});
+			const checkpointPayload = await buildCheckpoint(
+				sessionId,
+				suiteRunId,
+				true,
+			);
+			await enqueueCheckpoint(sessionId, suiteRunId, checkpointPayload);
 
 			await drainOutbox(sessionId);
 			const pending = await db
