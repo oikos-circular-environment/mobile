@@ -1,10 +1,11 @@
 import type { AppRouter } from "@oikos-circular-environment/survey-api/routers/index";
 import type { inferRouterInputs } from "@trpc/server";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
+import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { surveyClient } from "../api/client";
 import { getSurveyDb } from "../db/client";
-import { surveyOutbox, surveySession } from "../db/schema";
+import { surveyEvent, surveyOutbox, surveySession } from "../db/schema";
 
 type RouterInputs = inferRouterInputs<AppRouter>;
 type UsabilityInputs = RouterInputs["usability"];
@@ -65,6 +66,19 @@ type CheckpointEvent = NonNullable<
 	UsabilityInputs["checkpoint"]["send"]["events"]
 >[number];
 
+type CheckpointPayload = {
+	session_id: string;
+	suite: UsabilityInputs["checkpoint"]["send"]["suite"];
+	tasks?: UsabilityInputs["checkpoint"]["send"]["tasks"];
+	answers?: UsabilityInputs["checkpoint"]["send"]["answers"];
+};
+
+type CheckpointOutboxPayload = {
+	input: UsabilityInputs["checkpoint"]["send"];
+	eventIds: string[];
+	localSuiteRunId: string;
+};
+
 function chunkEvents(events: CheckpointEvent[]): CheckpointEvent[][] {
 	if (events.length === 0) return [[]];
 	const chunks: CheckpointEvent[][] = [];
@@ -85,24 +99,112 @@ function chunkEvents(events: CheckpointEvent[]): CheckpointEvent[][] {
 	return chunks;
 }
 
+async function loadPendingEvents(
+	sessionId: string,
+	suiteRunId: string,
+	suiteCode: string,
+): Promise<{ events: CheckpointEvent[]; eventIds: string[] }> {
+	const db = getSurveyDb();
+	const rows = await db
+		.select({
+			id: surveyEvent.id,
+			seq: surveyEvent.seq,
+			type: surveyEvent.type,
+			taskCode: surveyEvent.taskCode,
+			occurredAt: surveyEvent.occurredAt,
+			payload: surveyEvent.payload,
+		})
+		.from(surveyEvent)
+		.where(
+			and(
+				eq(surveyEvent.sessionId, sessionId),
+				eq(surveyEvent.suiteRunId, suiteRunId),
+				isNull(surveyEvent.sentAt),
+			),
+		)
+		.orderBy(asc(surveyEvent.seq))
+		.all();
+
+	const events = rows.map(row => ({
+		client_event_id: row.id,
+		seq: row.seq,
+		type: row.type,
+		suite_code: suiteCode,
+		task_code: row.taskCode ?? undefined,
+		occurred_at: row.occurredAt,
+		payload: (row.payload as Record<string, unknown>) ?? {},
+	}));
+
+	return { events, eventIds: rows.map(row => row.id) };
+}
+
 export async function enqueueCheckpoint(
 	sessionId: string,
-	input: UsabilityInputs["checkpoint"]["send"],
+	suiteRunId: string | undefined,
+	input: CheckpointPayload,
 ) {
-	const chunks = chunkEvents(input.events ?? []);
+	const { events, eventIds } = suiteRunId
+		? await loadPendingEvents(sessionId, suiteRunId, input.suite.code)
+		: { events: [] as CheckpointEvent[], eventIds: [] as string[] };
+	const chunks = chunkEvents(events);
 	const total = chunks.length;
 	for (let index = 0; index < total; index += 1) {
+		const chunkEvents = chunks[index];
+		const chunkEventIds = chunkEventIdsForChunk(eventIds, events, chunkEvents);
+		const fullInput: UsabilityInputs["checkpoint"]["send"] = {
+			...input,
+			...(suiteRunId ? { suite_run_id: suiteRunId } : {}),
+			chunk: { index, total },
+			events: chunkEvents,
+		};
 		await enqueue(
 			sessionId,
 			"E3_CHECKPOINT",
 			{
-				...input,
-				chunk: { index, total },
-				events: chunks[index],
-			},
+				input: fullInput,
+				eventIds: chunkEventIds,
+				localSuiteRunId: suiteRunId ?? "",
+			} satisfies CheckpointOutboxPayload,
 			{ suiteCode: input.suite.code, chunkIndex: index, chunkTotal: total },
 		);
 	}
+}
+
+function chunkEventIdsForChunk(
+	allEventIds: string[],
+	allEvents: CheckpointEvent[],
+	chunk: CheckpointEvent[],
+): string[] {
+	const ids: string[] = [];
+	for (let i = 0; i < allEvents.length; i += 1) {
+		if (chunk.includes(allEvents[i])) {
+			ids.push(allEventIds[i]);
+		}
+	}
+	return ids;
+}
+
+async function reconcileSuiteRunId(localId: string, effectiveId: string) {
+	if (localId === effectiveId) return;
+	const db = getSurveyDb();
+	await db.run(sql`PRAGMA foreign_keys = OFF`);
+	try {
+		await db.run(
+			sql`UPDATE survey_task_run SET suite_run_id = ${effectiveId} WHERE suite_run_id = ${localId}`,
+		);
+		await db.run(
+			sql`UPDATE survey_answer SET suite_run_id = ${effectiveId} WHERE suite_run_id = ${localId}`,
+		);
+		await db.run(
+			sql`UPDATE survey_event SET suite_run_id = ${effectiveId} WHERE suite_run_id = ${localId}`,
+		);
+		await db.run(
+			sql`UPDATE survey_suite_run SET id = ${effectiveId} WHERE id = ${localId}`,
+		);
+	} finally {
+		await db.run(sql`PRAGMA foreign_keys = ON`);
+	}
+	useSurveyExecutionStore.getState().setSuiteRunId(effectiveId);
 }
 
 async function sendOutboxItem(item: typeof surveyOutbox.$inferSelect) {
@@ -124,11 +226,23 @@ async function sendOutboxItem(item: typeof surveyOutbox.$inferSelect) {
 					.where(eq(surveySession.id, item.sessionId));
 				break;
 			}
-			case "E3_CHECKPOINT":
-				await surveyClient.usability.checkpoint.send.mutate(
-					item.payload as UsabilityInputs["checkpoint"]["send"],
-				);
+			case "E3_CHECKPOINT": {
+				const { input, eventIds, localSuiteRunId } =
+					item.payload as CheckpointOutboxPayload;
+				const result =
+					await surveyClient.usability.checkpoint.send.mutate(input);
+				if (result.suite_run_id && result.suite_run_id !== localSuiteRunId) {
+					await reconcileSuiteRunId(localSuiteRunId, result.suite_run_id);
+				}
+				const sentAt = nowIso();
+				for (const eventId of eventIds) {
+					await db
+						.update(surveyEvent)
+						.set({ sentAt })
+						.where(eq(surveyEvent.id, eventId));
+				}
 				break;
+			}
 			case "E4_FINISH": {
 				const result = await surveyClient.usability.finish.mutate(
 					item.payload as UsabilityInputs["finish"],

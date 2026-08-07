@@ -121,9 +121,8 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 						.from(surveyTaskRun)
 						.where(eq(surveyTaskRun.suiteRunId, suiteRunId));
 
-					await enqueueCheckpoint(sessionId, {
+					await enqueueCheckpoint(sessionId, suiteRunId, {
 						session_id: sessionId,
-						chunk: { index: 0, total: 1 },
 						suite: {
 							code: suiteCode,
 							position: suiteIndex,
@@ -150,9 +149,8 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 				// Suítes do roteiro ainda não iniciadas: outcome NO forçado, sem tarefas.
 				const startFrom = suiteRunId ? suiteIndex + 1 : suiteIndex;
 				for (let i = startFrom; i < suiteQueue.length; i += 1) {
-					await enqueueCheckpoint(sessionId, {
+					await enqueueCheckpoint(sessionId, undefined, {
 						session_id: sessionId,
-						chunk: { index: 0, total: 1 },
 						suite: {
 							code: suiteQueue[i],
 							position: i,

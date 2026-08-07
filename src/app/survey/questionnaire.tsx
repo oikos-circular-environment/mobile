@@ -149,9 +149,8 @@ export default function SurveyQuestionnaireScreen() {
 				.from(surveyTaskRun)
 				.where(eq(surveyTaskRun.suiteRunId, suiteRunId));
 
-			await enqueueCheckpoint(sessionId, {
+			await enqueueCheckpoint(sessionId, suiteRunId, {
 				session_id: sessionId,
-				chunk: { index: 0, total: 1 },
 				suite: {
 					code: suiteCode,
 					position: suiteIndex,
