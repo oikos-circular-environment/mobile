@@ -62,7 +62,7 @@ export function useSurveyInviteBanner() {
 			participantCode: participantCode ?? undefined,
 			stages: stages.length > 0 ? stages : undefined,
 			ctaLabel: "Continuar",
-			onPress: () => router.push("/survey/resume"),
+			onPressCta: () => router.push("/survey/resume"),
 		};
 	}
 
@@ -74,6 +74,6 @@ export function useSurveyInviteBanner() {
 		description:
 			"Participe de uma pesquisa rápida enquanto usa o aplicativo normalmente.",
 		ctaLabel: "Participar",
-		onPress: () => router.push("/survey"),
+		onPressCta: () => router.push("/survey"),
 	};
 }
