@@ -1,6 +1,6 @@
-import { BlurView } from "expo-blur";
+import { BlurTargetView, BlurView } from "expo-blur";
 import { CameraView } from "expo-camera";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Button, StyleSheet, View } from "react-native";
 import Animated, {
 	useAnimatedStyle,
@@ -29,6 +29,7 @@ export function CameraPreview() {
 	} = useCameraContext();
 
 	const blurOpacity = useSharedValue(0);
+	const blurTargetRef = useRef<View | null>(null);
 
 	useEffect(() => {
 		if (isModeTransitioning) {
@@ -62,23 +63,26 @@ export function CameraPreview() {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<CameraView
-				key={mode}
-				ref={cameraRef}
-				style={{ flex: 1 }}
-				mode={mode === "photo" ? "picture" : "video"}
-				flash={flash}
-				zoom={zoom}
-				onCameraReady={handleCameraReady}
-			/>
+			<BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
+				<CameraView
+					key={mode}
+					ref={cameraRef}
+					style={{ flex: 1 }}
+					mode={mode === "photo" ? "picture" : "video"}
+					flash={flash}
+					zoom={zoom}
+					onCameraReady={handleCameraReady}
+				/>
+			</BlurTargetView>
 			<Animated.View
 				style={[StyleSheet.absoluteFill, blurStyle]}
 				pointerEvents="none"
 			>
 				<BlurView
+					blurTarget={blurTargetRef}
 					intensity={70}
 					tint="dark"
-					experimentalBlurMethod="dimezisBlurView"
+					blurMethod="dimezisBlurView"
 					style={StyleSheet.absoluteFill}
 				/>
 			</Animated.View>
