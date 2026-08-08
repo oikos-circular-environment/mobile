@@ -18,10 +18,12 @@ import {
 	type OptionRowListItem,
 } from "@/components/survey/option-row-list";
 import { QHeader } from "@/components/survey/q-header";
+import { toast } from "@/components/toast";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { createSurveySession } from "@/libs/survey/create-session";
+import { setCachedProtocol } from "@/libs/survey/protocol-cache";
 import { useSurveyDraftStore } from "@/stores/survey-draft-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
@@ -196,6 +198,15 @@ export default function SurveyCharacterizationScreen() {
 			return;
 		}
 
+		if (useSurveyStore.getState().sessionId) {
+			toast.warning(
+				"Pesquisa já iniciada",
+				"Este dispositivo já possui uma participação. Acesse pelo resumo.",
+			);
+			router.replace("/survey/resume");
+			return;
+		}
+
 		setIsSubmitting(true);
 		try {
 			const sessionId = await createSurveySession({
@@ -212,6 +223,7 @@ export default function SurveyCharacterizationScreen() {
 				consentVersion: useSurveyStore.getState().consentVersion ?? "",
 				consentAt: useSurveyStore.getState().consentAt ?? "",
 			});
+			await setCachedProtocol(protocol.key, protocol.version, protocol);
 			startSession(sessionId, draft.persona);
 			useSurveyDraftStore.getState().reset();
 			router.replace("/survey/suite-intro");

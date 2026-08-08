@@ -130,7 +130,9 @@ export default function HomeScreen() {
 							title={surveyBanner.title}
 							description={surveyBanner.description}
 							ctaLabel={surveyBanner.ctaLabel}
-							onPressCta={surveyBanner.onPress}
+							onPressCta={surveyBanner.onPressCta}
+							detailsLabel={surveyBanner.detailsLabel}
+							onPressDetails={surveyBanner.onPressDetails}
 							personaLabel={surveyBanner.personaLabel}
 							participantCode={surveyBanner.participantCode}
 							stages={surveyBanner.stages}

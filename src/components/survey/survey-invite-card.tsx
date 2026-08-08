@@ -19,7 +19,7 @@ import { cn } from "@/libs/utils";
 
 export interface SurveyInviteStage {
 	code: string;
-	status: "done" | "current" | "upcoming";
+	status: "done" | "current" | "upcoming" | "completed";
 	currentLabel?: string;
 }
 
@@ -29,9 +29,11 @@ interface SurveyInviteCardProps {
 	personaLabel?: string;
 	participantCode?: string;
 	stages?: SurveyInviteStage[];
-	ctaLabel: string;
+	ctaLabel?: string;
 	ctaDisabled?: boolean;
-	onPressCta: () => void;
+	onPressCta?: () => void;
+	detailsLabel?: string;
+	onPressDetails?: () => void;
 	className?: string;
 }
 
@@ -44,6 +46,8 @@ export function SurveyInviteCard({
 	ctaLabel,
 	ctaDisabled,
 	onPressCta,
+	detailsLabel,
+	onPressDetails,
 	className,
 }: SurveyInviteCardProps) {
 	const showPersonaBadge = Boolean(personaLabel);
@@ -168,10 +172,12 @@ export function SurveyInviteCard({
 										key={stage.code}
 										className={cn(
 											"size-9 items-center justify-center rounded-full",
-											stage.status === "done" && "bg-white/30",
+											(stage.status === "done" ||
+												stage.status === "completed") &&
+												"bg-white/30",
 										)}
 									>
-										{stage.status === "done" ? (
+										{stage.status === "done" || stage.status === "completed" ? (
 											<CircleCheckIcon size={16} color="#ffffff" />
 										) : (
 											<CircleDashedIcon size={16} color={colors.yellow[400]} />
@@ -182,16 +188,34 @@ export function SurveyInviteCard({
 						</View>
 					) : null}
 
-					<View className="flex-row justify-end">
-						<Button
-							variant="secondary"
-							className="flex-1 h-12"
-							onPress={onPressCta}
-							disabled={ctaDisabled}
-						>
-							<ButtonText>{ctaLabel}</ButtonText>
-						</Button>
-					</View>
+					{ctaLabel || detailsLabel ? (
+						<View className="flex-row gap-2">
+							{detailsLabel ? (
+								<Button
+									variant={ctaLabel ? "outline" : "secondary"}
+									className={cn(
+										"flex-1 h-12",
+										ctaLabel && "border-white/30 bg-white/10",
+									)}
+									onPress={onPressDetails}
+								>
+									<ButtonText className={ctaLabel ? "text-white" : undefined}>
+										{detailsLabel}
+									</ButtonText>
+								</Button>
+							) : null}
+							{ctaLabel ? (
+								<Button
+									variant="secondary"
+									className="flex-1 h-12"
+									onPress={onPressCta}
+									disabled={ctaDisabled}
+								>
+									<ButtonText>{ctaLabel}</ButtonText>
+								</Button>
+							) : null}
+						</View>
+					) : null}
 				</View>
 			</LinearGradient>
 		</View>

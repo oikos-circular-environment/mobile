@@ -67,30 +67,56 @@ describe("useSurveyInviteBanner", () => {
 		expect(result.current).toMatchObject({ variant: "resume" });
 	});
 
-	it("retorna null quando a sessão está COMPLETED, para o banner sumir", async () => {
+	it("retorna variant completed quando a sessão está COMPLETED", async () => {
 		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 		useSurveyStore.getState().setStatus("COMPLETED");
 
 		const { result } = await renderHook(() => useSurveyInviteBanner());
 
-		expect(result.current).toBeNull();
+		expect(result.current).toMatchObject({
+			variant: "completed",
+			title: "Pesquisa finalizada",
+			detailsLabel: "Ver detalhes",
+		});
+		expect(result.current?.ctaLabel).toBeUndefined();
+	});
+
+	it("onPressDetails navega para /survey/resume quando a pesquisa foi finalizada", async () => {
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
+		useSurveyStore.getState().setStatus("COMPLETED");
+
+		const { result } = await renderHook(() => useSurveyInviteBanner());
+		result.current?.onPressDetails?.();
+
+		expect(mockPush).toHaveBeenCalledWith("/survey/resume");
 	});
 
 	it("onPress navega para /survey quando é convite", async () => {
 		const { result } = await renderHook(() => useSurveyInviteBanner());
-
-		result.current?.onPress();
+		result.current?.onPressCta();
 
 		expect(mockPush).toHaveBeenCalledWith("/survey");
 	});
 
-	it("onPress navega para /survey/resume quando é retomada", async () => {
+	it("onPressCta navega para /survey/resume quando é retomada", async () => {
 		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
 
 		const { result } = await renderHook(() => useSurveyInviteBanner());
-		result.current?.onPress();
+
+		result.current?.onPressCta();
 
 		expect(mockPush).toHaveBeenCalledWith("/survey/resume");
+	});
+
+	it("retomada também exibe botão Ver detalhes", async () => {
+		useSurveyStore.getState().startSession("session-1", "COLLECTOR");
+
+		const { result } = await renderHook(() => useSurveyInviteBanner());
+
+		expect(result.current).toMatchObject({
+			ctaLabel: "Continuar",
+			detailsLabel: "Ver detalhes",
+		});
 	});
 
 	it("na retomada, traz persona, código e etapas — igual ao CP49r", async () => {
@@ -112,7 +138,7 @@ describe("useSurveyInviteBanner", () => {
 			{ code: "S4", status: "upcoming", currentLabel: "S4" },
 		]);
 
-		result.current?.onPress?.();
+		result.current?.onPressCta?.();
 		expect(mockPush).toHaveBeenCalledWith("/survey/resume");
 	});
 

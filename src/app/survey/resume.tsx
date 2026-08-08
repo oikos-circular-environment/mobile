@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { useRouter } from "expo-router";
 import {
 	ArrowLeftIcon,
@@ -29,7 +29,7 @@ import {
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
-import { surveySession } from "@/libs/survey/db/schema";
+import { surveyAnswer, surveySession } from "@/libs/survey/db/schema";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
@@ -78,14 +78,26 @@ export default function SurveyResumeScreen() {
 	const deleteSheetRef = useRef<DeleteSurveyDataSheetHandle>(null);
 	const abandonSheetRef = useRef<AbandonSurveySheetHandle>(null);
 	const [participantCode, setParticipantCode] = useState<string | null>(null);
+	const [hasClosingComment, setHasClosingComment] = useState(false);
 
 	useEffect(() => {
 		if (!sessionId) return;
-		getSurveyDb()
-			.select()
+		const db = getSurveyDb();
+		db.select()
 			.from(surveySession)
 			.where(eq(surveySession.id, sessionId))
 			.then(rows => setParticipantCode(rows[0]?.participantCode ?? null));
+
+		db.select()
+			.from(surveyAnswer)
+			.where(
+				and(
+					eq(surveyAnswer.sessionId, sessionId),
+					eq(surveyAnswer.questionKey, "free_comment"),
+					isNull(surveyAnswer.suiteRunId),
+				),
+			)
+			.then(rows => setHasClosingComment(rows.length > 0));
 	}, [sessionId]);
 
 	const personaLabel = protocol?.personas.find(p => p.key === persona)?.label;
@@ -121,12 +133,16 @@ export default function SurveyResumeScreen() {
 		const suite = protocol?.suites.find(s => s.code === suiteCode);
 		const index = suiteQueue.indexOf(suiteCode);
 		const stageStatus: StageStatus =
-			isTerminal && index >= suiteIndex
-				? "abandoned"
-				: index < suiteIndex
-					? "done"
-					: index === suiteIndex && isActive
+			index < suiteIndex
+				? "done"
+				: index === suiteIndex
+					? isActive
 						? "in_progress"
+						: status === "ABANDONED"
+							? "abandoned"
+							: "pending"
+					: status === "ABANDONED"
+						? "abandoned"
 						: "pending";
 		return {
 			code: suiteCode,
@@ -214,13 +230,19 @@ export default function SurveyResumeScreen() {
 						})}
 
 						<View className="flex-row items-center gap-3 rounded-lg bg-gray-50 p-3.5">
-							<CircleDashedIcon size={22} color={colors.yellow[600]} />
+							{hasClosingComment ? (
+								<CircleCheckIcon size={22} color={colors.lime[800]} />
+							) : (
+								<CircleDashedIcon size={22} color={colors.yellow[600]} />
+							)}
 							<View className="flex-1 gap-0.5">
 								<Text size="sm" bold>
 									Comentário final
 								</Text>
 								<Text size="xs" className="text-muted-foreground">
-									Pendente · disponível ao concluir tudo
+									{hasClosingComment
+										? "Concluído"
+										: "Pendente · disponível ao concluir tudo"}
 								</Text>
 							</View>
 						</View>
