@@ -5,6 +5,7 @@ import BottomSheet, {
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { eq } from "drizzle-orm";
+import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import {
 	forwardRef,
@@ -128,7 +129,8 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 				// Suítes do roteiro ainda não iniciadas: outcome NO forçado, sem tarefas.
 				const startFrom = suiteRunId ? suiteIndex + 1 : suiteIndex;
 				for (let i = startFrom; i < suiteQueue.length; i += 1) {
-					await enqueueCheckpoint(sessionId, undefined, {
+					const forcedSuiteRunId = Crypto.randomUUID();
+					await enqueueCheckpoint(sessionId, forcedSuiteRunId, {
 						session_id: sessionId,
 						suite: {
 							code: suiteQueue[i],
