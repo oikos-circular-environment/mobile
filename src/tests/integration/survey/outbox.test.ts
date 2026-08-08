@@ -45,6 +45,7 @@ import {
 	enqueueCheckpoint,
 	enqueueSessionUpsert,
 } from "@/libs/survey/queue/outbox";
+import { useSurveyStore } from "@/stores/survey-store";
 
 const now = "2026-08-15T17:33:02.000Z";
 
@@ -126,8 +127,35 @@ function baseCheckpointInput() {
 	};
 }
 
+function sessionUpsertInput(): Parameters<typeof enqueueSessionUpsert>[1] {
+	return {
+		session_id: "session-1",
+		protocol_key: "oikos-walkthrough",
+		protocol_version: 1,
+		persona: "COLLECTOR",
+		screener: {
+			state_uf: "MT",
+			city_name: "Rondonópolis",
+			age_range: "AGE_35_44",
+			education_level: "HIGHSCHOOL_COMPLETE",
+			chain_role: "INDEPENDENT_COLLECTOR",
+			waste_contact_frequency: 5,
+			app_experience: 3,
+		},
+		consent: { version: "2026-08-01", accepted_at: now },
+		device: {
+			os: "android",
+			os_version: "14",
+			app_version: "1.0.1",
+			screen_size: "SMALL",
+		},
+		started_at: now,
+	};
+}
+
 describe("fila de envio do modo pesquisa", () => {
 	beforeEach(() => {
+		useSurveyStore.getState().reset();
 		mockDb.delete(surveyOutbox).run();
 		mockDb.delete(surveyEvent).run();
 		mockDb.delete(surveyAnswer).run();
@@ -169,29 +197,7 @@ describe("fila de envio do modo pesquisa", () => {
 		insertSession();
 
 		await enqueueCheckpoint("session-1", undefined, baseCheckpointInput());
-		await enqueueSessionUpsert("session-1", {
-			session_id: "session-1",
-			protocol_key: "oikos-walkthrough",
-			protocol_version: 1,
-			persona: "COLLECTOR",
-			screener: {
-				state_uf: "MT",
-				city_name: "Rondonópolis",
-				age_range: "AGE_35_44",
-				education_level: "HIGHSCHOOL_COMPLETE",
-				chain_role: "INDEPENDENT_COLLECTOR",
-				waste_contact_frequency: 5,
-				app_experience: 3,
-			},
-			consent: { version: "2026-08-01", accepted_at: now },
-			device: {
-				os: "android",
-				os_version: "14",
-				app_version: "1.0.1",
-				screen_size: "SMALL",
-			},
-			started_at: now,
-		});
+		await enqueueSessionUpsert("session-1", sessionUpsertInput());
 
 		const order: string[] = [];
 		mockUpsert.mockImplementationOnce(async () => {
@@ -220,29 +226,7 @@ describe("fila de envio do modo pesquisa", () => {
 
 	it("não reenvia um item já marcado como SENT", async () => {
 		insertSession();
-		await enqueueSessionUpsert("session-1", {
-			session_id: "session-1",
-			protocol_key: "oikos-walkthrough",
-			protocol_version: 1,
-			persona: "COLLECTOR",
-			screener: {
-				state_uf: "MT",
-				city_name: "Rondonópolis",
-				age_range: "AGE_35_44",
-				education_level: "HIGHSCHOOL_COMPLETE",
-				chain_role: "INDEPENDENT_COLLECTOR",
-				waste_contact_frequency: 5,
-				app_experience: 3,
-			},
-			consent: { version: "2026-08-01", accepted_at: now },
-			device: {
-				os: "android",
-				os_version: "14",
-				app_version: "1.0.1",
-				screen_size: "SMALL",
-			},
-			started_at: now,
-		});
+		await enqueueSessionUpsert("session-1", sessionUpsertInput());
 
 		await drainOutbox("session-1");
 		expect(mockUpsert).toHaveBeenCalledTimes(1);
@@ -253,29 +237,7 @@ describe("fila de envio do modo pesquisa", () => {
 
 	it("marca o item como FAILED e para de drenar quando o envio falha", async () => {
 		insertSession();
-		await enqueueSessionUpsert("session-1", {
-			session_id: "session-1",
-			protocol_key: "oikos-walkthrough",
-			protocol_version: 1,
-			persona: "COLLECTOR",
-			screener: {
-				state_uf: "MT",
-				city_name: "Rondonópolis",
-				age_range: "AGE_35_44",
-				education_level: "HIGHSCHOOL_COMPLETE",
-				chain_role: "INDEPENDENT_COLLECTOR",
-				waste_contact_frequency: 5,
-				app_experience: 3,
-			},
-			consent: { version: "2026-08-01", accepted_at: now },
-			device: {
-				os: "android",
-				os_version: "14",
-				app_version: "1.0.1",
-				screen_size: "SMALL",
-			},
-			started_at: now,
-		});
+		await enqueueSessionUpsert("session-1", sessionUpsertInput());
 
 		mockUpsert.mockRejectedValueOnce(new Error("network down"));
 		await drainOutbox("session-1");
@@ -528,29 +490,7 @@ describe("fila de envio do modo pesquisa", () => {
 
 	it("item envenenado não impede os demais de subirem", async () => {
 		insertSession();
-		await enqueueSessionUpsert("session-1", {
-			session_id: "session-1",
-			protocol_key: "oikos-walkthrough",
-			protocol_version: 1,
-			persona: "COLLECTOR",
-			screener: {
-				state_uf: "MT",
-				city_name: "Rondonópolis",
-				age_range: "AGE_35_44",
-				education_level: "HIGHSCHOOL_COMPLETE",
-				chain_role: "INDEPENDENT_COLLECTOR",
-				waste_contact_frequency: 5,
-				app_experience: 3,
-			},
-			consent: { version: "2026-08-01", accepted_at: now },
-			device: {
-				os: "android",
-				os_version: "14",
-				app_version: "1.0.1",
-				screen_size: "SMALL",
-			},
-			started_at: now,
-		});
+		await enqueueSessionUpsert("session-1", sessionUpsertInput());
 		await enqueueCheckpoint("session-1", undefined, baseCheckpointInput());
 
 		mockUpsert.mockRejectedValueOnce(new Error("poison"));
@@ -574,5 +514,26 @@ describe("fila de envio do modo pesquisa", () => {
 			.all();
 		expect(rows[0]?.status).toBe("FAILED");
 		expect(rows[1]?.status).toBe("SENT");
+	});
+
+	it("hasPendingSync fica falso após drenagem bem-sucedida", async () => {
+		insertSession();
+		await enqueueSessionUpsert("session-1", sessionUpsertInput());
+		useSurveyStore.getState().setPendingSync(true);
+
+		await drainOutbox("session-1");
+
+		expect(useSurveyStore.getState().hasPendingSync).toBe(false);
+	});
+
+	it("hasPendingSync continua verdadeiro quando sobra item a enviar", async () => {
+		insertSession();
+		await enqueueSessionUpsert("session-1", sessionUpsertInput());
+		mockUpsert.mockRejectedValueOnce(new Error("network down"));
+		useSurveyStore.getState().setPendingSync(true);
+
+		await drainOutbox("session-1");
+
+		expect(useSurveyStore.getState().hasPendingSync).toBe(true);
 	});
 });

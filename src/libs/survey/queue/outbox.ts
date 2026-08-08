@@ -3,6 +3,7 @@ import type { inferRouterInputs } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
+import { useSurveyStore } from "@/stores/survey-store";
 import { surveyClient } from "../api/client";
 import { getSurveyDb } from "../db/client";
 import { surveyEvent, surveyOutbox, surveySession } from "../db/schema";
@@ -335,4 +336,15 @@ export async function drainOutbox(sessionId: string): Promise<void> {
 		if (!isBackoffExpired(item)) continue;
 		await sendOutboxItem(item);
 	}
+
+	const remaining = await db
+		.select()
+		.from(surveyOutbox)
+		.where(
+			and(
+				eq(surveyOutbox.sessionId, sessionId),
+				inArray(surveyOutbox.status, ["PENDING", "FAILED"]),
+			),
+		);
+	useSurveyStore.getState().setPendingSync(remaining.length > 0);
 }
