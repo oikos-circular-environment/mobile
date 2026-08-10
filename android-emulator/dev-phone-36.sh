@@ -122,25 +122,29 @@ set_config hw.lcd.density          "$DENSITY"
 set_config hw.ramSize              "${RAM_MB}"
 set_config hw.cpu.ncore            "$CORES"
 set_config hw.gpu.enabled          yes
-set_config hw.gpu.mode             host
+# swiftshader_indirect (software): -gpu host trava intermitentemente nesta GPU
+# híbrida Intel+NVIDIA (erros "ColorBuffer"/"bad color buffer handle" no
+# gfxstream, mesmo com boot bem-sucedido). Fica gravado no config.ini para que
+# qualquer lançador (Android Studio, Expo, `emulator` direto) herde a mesma
+# config estável, não só este script.
+set_config hw.gpu.mode             swiftshader_indirect
 set_config hw.keyboard             yes
 set_config disk.dataPartition.size "${DATA_PARTITION_MB}M"
 
 # ---------------------------------------------------------------------------
 # 5. Iniciar o emulador
 # ---------------------------------------------------------------------------
-BOOT_FLAGS=(-no-boot-anim)
+BOOT_FLAGS=(-no-boot-anim -gpu swiftshader_indirect)
 if [[ "$MODE" == "headless" ]]; then
-  BOOT_FLAGS+=(-no-window -no-audio -no-snapshot -gpu swiftshader_indirect)
-else
-  # -feature -Vulkan: GPU do host via GLES (estável em GPUs híbridas Intel+NVIDIA)
-  BOOT_FLAGS+=(-gpu host -feature -Vulkan)
+  BOOT_FLAGS+=(-no-window -no-audio -no-snapshot)
 fi
 
 log "Iniciando emulador '$DEVICE' ($MODE)..."
-"$EMULATOR" -avd "$DEVICE" "${BOOT_FLAGS[@]}" -port "$PORT" &>"/tmp/${DEVICE}.log" &
+nohup "$EMULATOR" -avd "$DEVICE" "${BOOT_FLAGS[@]}" -port "$PORT" \
+  </dev/null &>"/tmp/${DEVICE}.log" &
 EMU_PID=$!
-trap 'kill "$EMU_PID" 2>/dev/null || true' EXIT
+disown
+echo "$EMU_PID" >"/tmp/${DEVICE}.pid"
 
 log "Aguardando boot completo..."
 for _ in $(seq 1 60); do
@@ -209,5 +213,5 @@ inject_assets() {
 }
 inject_assets
 
-log "$DEVICE pronto e enxuto. Log: /tmp/${DEVICE}.log"
-wait "$EMU_PID"
+log "$DEVICE pronto e enxuto (PID $EMU_PID, salvo em /tmp/${DEVICE}.pid). Log: /tmp/${DEVICE}.log"
+log "Para encerrar: adb -s $SERIAL emu kill   (ou: kill \$(cat /tmp/${DEVICE}.pid))"
