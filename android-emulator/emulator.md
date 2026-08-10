@@ -17,13 +17,44 @@ Cada script fixa sua porta (`-port`) e roda todos os comandos `adb` com
 `-s emulator-<porta>`, então vários emuladores podem ficar abertos ao mesmo
 tempo sem que os comandos caiam no dispositivo errado.
 
+O emulador é iniciado com `nohup`/`disown` (detached da sessão do terminal),
+então continua rodando mesmo depois que o terminal que rodou o script é
+fechado — o script termina assim que o boot + enxugamento + injeção de
+assets acabam, sem prender o terminal. O PID fica salvo em
+`/tmp/<device>.pid`. Para encerrar manualmente:
+
+```bash
+adb -s emulator-<porta> emu kill
+# ou
+kill $(cat /tmp/<device>.pid)
+```
+
+### GPU: por que `swiftshader_indirect` e não `-gpu host`
+
+`-gpu host` (passthrough de GPU real) trava o emulador de forma intermitente
+nesta máquina (GPU híbrida Intel iGPU + NVIDIA dGPU): o boot completa
+normalmente, mas o processo às vezes morre segundos depois com erros do
+gfxstream (`ColorBuffer`/`bad color buffer handle`). Isso derruba o
+emulador não só rodando pelos scripts, mas por **qualquer** lançador —
+Android Studio, `emulator -avd ...` direto, ou o auto-launch do Expo CLI —
+e explica erros como `CommandError: Failed to get properties for device` /
+`Error [ERR_STREAM_UNABLE_TO_PIPE]` ao rodar `npm start`/`npm run android`
+logo depois do emulador cair.
+
+Por isso os scripts gravam `hw.gpu.mode=swiftshader_indirect` direto no
+`config.ini` do AVD (passo 4), em vez de só passar `-gpu` na linha de
+comando: como fica persistido no AVD, qualquer lançador herda a config
+estável, não só quem passou a flag. É renderização por software — mais
+lenta que GPU real, mas sem os crashes aleatórios.
+
 ## Como funciona cada script
 
 1. **Imagem de sistema** — instala `system-images;android-<api>;google_apis;x86_64`
    somente se não estiver instalada no SDK.
 2. **AVD** — cria via `avdmanager` se não existir (`~/.android/avd/<device>.avd`).
 3. **Otimização** — grava no `config.ini`: resolução/densidade, 4 GB/6 GB RAM,
-   4 cores, GPU host, teclado físico, partição data 6 GB.
+   4 cores, GPU por software (`swiftshader_indirect`, ver seção abaixo),
+   teclado físico, partição data 6 GB.
 4. **Boot** — com `-no-boot-anim` (e KVM no Linux), aguarda `sys.boot_completed=1`.
 5. **Enxugamento** — remove apps não essenciais com
    `pm uninstall --user 0` (persiste entre reboots). **A galeria
@@ -67,16 +98,16 @@ Todos os scripts aceitam `--headless` no final. Sem ele, o modo é `windowed`.
 | `-no-window` | Roda sem janela (headless) | combo CI: `-no-window -no-audio -no-snapshot -gpu swiftshader_indirect` |
 | `-no-snapshot` | Ignora snapshots (boot frio determinístico) | `emulator -avd dev-phone-36 -no-snapshot` |
 | `-no-audio` | Sem áudio | `-no-audio` |
-| `-gpu host` | GPU do host (GLES) — recomendado em modo janela | `-gpu host` |
-| `-gpu swiftshader_indirect` | GPU por software (estável em headless) | `-gpu swiftshader_indirect` |
-| `-feature -Vulkan` | Desliga Vulkan (evita crash em GPU híbrida Intel+NVIDIA) | `-feature -Vulkan` |
+| `-gpu host` | GPU do host (GLES) — **evitar** nesta máquina, trava intermitente | `-gpu host` |
+| `-gpu swiftshader_indirect` | GPU por software — estável, usada por padrão nos scripts | `-gpu swiftshader_indirect` |
 | `-memory <MB>` | Sobrescreve RAM | `-memory 4096` |
 | `-cores <n>` | Sobrescreve número de cores | `-cores 4` |
 | `-wipe-data` | Formata os dados do AVD (útil se corromper) | `-avd dev-phone-36 -wipe-data` |
 
-> Os scripts já aplicam a combinação ideal (`-no-boot-anim`, GPU host, `-feature -Vulkan`
-> no windowed; `-no-window -no-audio -no-snapshot -gpu swiftshader_indirect` no headless).
-> Use o `emulator` direto só para casos pontuais.
+> Os scripts já aplicam a combinação ideal (`-no-boot-anim -gpu swiftshader_indirect`
+> no windowed; mais `-no-window -no-audio -no-snapshot` no headless) e persistem
+> `hw.gpu.mode=swiftshader_indirect` no `config.ini`. Use o `emulator` direto só
+> para casos pontuais.
 
 ### adb (Android Debug Bridge)
 

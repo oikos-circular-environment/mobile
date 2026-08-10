@@ -249,7 +249,7 @@ export default function ProfileScreen() {
 		},
 		onError: error => {
 			logProfileEvent("profile.updated", { success: false });
-			console.error(error);
+			console.error("profileMutation", JSON.stringify(error));
 			toast.error(
 				"Erro ao salvar",
 				"Ocorreu um problema ao atualizar seu perfil.",
@@ -293,7 +293,7 @@ export default function ProfileScreen() {
 		},
 		onError: error => {
 			logProfileEvent("profile.avatar_updated", { success: false });
-			console.error(error);
+			console.error("profileAvatarMutation", JSON.stringify(error));
 			toast.error(
 				"Erro ao salvar imagem",
 				"Ocorreu um problema ao atualizar sua foto.",

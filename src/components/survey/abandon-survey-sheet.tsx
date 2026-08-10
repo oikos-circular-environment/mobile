@@ -60,6 +60,7 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 		const tasks = useSurveyExecutionStore(s => s.tasks);
 		const [reason, setReason] = useState("");
 		const [isSubmitting, setIsSubmitting] = useState(false);
+		const [isOpen, setIsOpen] = useState(false);
 		const sheetRef = useRef<BottomSheet>(null);
 
 		useImperativeHandle(ref, () => ({
@@ -68,14 +69,15 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 		}));
 
 		const backdropComponent = useCallback(
-			(props: BottomSheetBackdropProps) => (
-				<BottomSheetBackdrop
-					{...props}
-					appearsOnIndex={0}
-					disappearsOnIndex={-1}
-				/>
-			),
-			[],
+			(props: BottomSheetBackdropProps) =>
+				isOpen ? (
+					<BottomSheetBackdrop
+						{...props}
+						appearsOnIndex={0}
+						disappearsOnIndex={-1}
+					/>
+				) : null,
+			[isOpen],
 		);
 
 		const handleAbandon = async () => {
@@ -181,6 +183,7 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 				keyboardBehavior="interactive"
 				android_keyboardInputMode="adjustResize"
 				backdropComponent={backdropComponent}
+				onChange={index => setIsOpen(index >= 0)}
 			>
 				<BottomSheetView>
 					<View className="gap-4 p-4 pb-8">

@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { ClipboardListIcon, TriangleAlertIcon } from "lucide-react-native";
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
@@ -16,11 +16,13 @@ export default function SurveyPresentationScreen() {
 	const { permissionDenied } = useGeospatial();
 	const sessionId = useSurveyStore(s => s.sessionId);
 
-	useEffect(() => {
-		if (sessionId) {
-			router.replace("/survey/resume");
-		}
-	}, [sessionId, router]);
+	useFocusEffect(
+		useCallback(() => {
+			if (sessionId) {
+				router.replace("/survey/resume");
+			}
+		}, [sessionId, router]),
+	);
 
 	const handleContinue = () => {
 		if (permissionDenied) {

@@ -14,7 +14,6 @@ import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveySession } from "@/libs/survey/db/schema";
 import { useSurveyDraftStore } from "@/stores/survey-draft-store";
-import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
 export default function SurveyThanksScreen() {
@@ -39,7 +38,6 @@ export default function SurveyThanksScreen() {
 	};
 
 	const handleBackToAccount = () => {
-		useSurveyExecutionStore.getState().reset();
 		useSurveyDraftStore.getState().reset();
 		router.dismissTo("/(tabs)/(home)" as never);
 	};

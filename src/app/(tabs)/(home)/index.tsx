@@ -14,8 +14,7 @@ import {
 } from "@/components/home/services-carousel";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
-import { useSurveyInviteBanner } from "@/components/survey/hooks/use-survey-invite-banner";
-import { SurveyInviteCard } from "@/components/survey/survey-invite-card";
+import { SurveyInviteBanner } from "@/components/survey/survey-invite-banner";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import {
@@ -35,7 +34,6 @@ export default function HomeScreen() {
 	const { isAuthenticated, needsProfileCompletion, isLoading, signOut } =
 		useAuthContext();
 	const { permissionDenied } = useGeospatial();
-	const surveyBanner = useSurveyInviteBanner();
 	const router = useRouter();
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [showAuthModal, setShowAuthModal] = useState(false);
@@ -125,19 +123,7 @@ export default function HomeScreen() {
 					)}
 
 					{/* Convite da pesquisa de usabilidade */}
-					{surveyBanner ? (
-						<SurveyInviteCard
-							title={surveyBanner.title}
-							description={surveyBanner.description}
-							ctaLabel={surveyBanner.ctaLabel}
-							onPressCta={surveyBanner.onPressCta}
-							detailsLabel={surveyBanner.detailsLabel}
-							onPressDetails={surveyBanner.onPressDetails}
-							personaLabel={surveyBanner.personaLabel}
-							participantCode={surveyBanner.participantCode}
-							stages={surveyBanner.stages}
-						/>
-					) : null}
+					<SurveyInviteBanner />
 
 					{/* Serviços */}
 					<View className="gap-3">
