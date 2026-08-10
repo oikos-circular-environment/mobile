@@ -7,6 +7,7 @@ const mockBack = jest.fn();
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({ push: mockPush, back: mockBack }),
+	useFocusEffect: (effect: () => void) => effect(),
 }));
 
 jest.mock("@/contexts/geospatial-context");

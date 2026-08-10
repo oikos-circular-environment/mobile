@@ -37,6 +37,7 @@ export const DeleteSurveyDataSheet = forwardRef<
 	const sessionId = useSurveyStore(s => s.sessionId);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const sheetRef = useRef<BottomSheet>(null);
+	const [isOpen, setIsOpen] = useState(false);
 
 	useImperativeHandle(ref, () => ({
 		open: () => sheetRef.current?.snapToIndex(0),
@@ -44,14 +45,15 @@ export const DeleteSurveyDataSheet = forwardRef<
 	}));
 
 	const backdropComponent = useCallback(
-		(props: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop
-				{...props}
-				appearsOnIndex={0}
-				disappearsOnIndex={-1}
-			/>
-		),
-		[],
+		(props: BottomSheetBackdropProps) =>
+			isOpen ? (
+				<BottomSheetBackdrop
+					{...props}
+					appearsOnIndex={0}
+					disappearsOnIndex={-1}
+				/>
+			) : null,
+		[isOpen],
 	);
 
 	const handleDelete = async () => {
@@ -76,6 +78,7 @@ export const DeleteSurveyDataSheet = forwardRef<
 			enableDynamicSizing
 			enablePanDownToClose
 			backdropComponent={backdropComponent}
+			onChange={index => setIsOpen(index >= 0)}
 		>
 			<BottomSheetView>
 				<View className="gap-4 p-4 pb-8">

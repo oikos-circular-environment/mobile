@@ -13,6 +13,7 @@ const mockNotificationAsync = jest.fn();
 jest.mock("expo-router", () => ({
 	useRouter: () => ({ push: mockPush }),
 	usePathname: () => "/",
+	useSegments: () => ["(tabs)", "(home)"],
 }));
 
 jest.mock("@/libs/survey/db/client", () => ({
