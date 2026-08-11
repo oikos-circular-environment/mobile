@@ -131,3 +131,13 @@ The design source of truth is `pencil/oikos-pencil.pen` — read/edit it only th
 2. Any UI that appears 2+ times (cards, chips, list rows) must first be created as a master component in the Design System, then instanced in screens.
 3. Variants (active/inactive, open/closed, collector/company) are instance overrides via `descendants` — not new components.
 4. Use the document variables (`$lime-*`, `$gray-*`, `$spacing-*`, `$radius-*`) instead of hardcoded values.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
