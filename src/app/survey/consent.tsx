@@ -1,16 +1,24 @@
+import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
+import { CopyIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors } from "@/components/style/colors";
+import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import {
+	CONSENT_ETHICS_NOTE,
 	CONSENT_IDENTIFICATION,
 	CONSENT_SECTIONS,
 	CONSENT_TERM_VERSION,
+	type ConsentPerson,
+	type ConsentReference,
 } from "@/libs/survey/consent-content";
 import { useSurveyStore } from "@/stores/survey-store";
 
@@ -30,6 +38,56 @@ function IdentificationRow({ label, value }: { label: string; value: string }) {
 				{value}
 			</Text>
 		</View>
+	);
+}
+
+function PersonRow({ role, name, email }: ConsentPerson) {
+	const handleCopy = async () => {
+		await Clipboard.setStringAsync(email);
+		toast.success("E-mail copiado!");
+	};
+
+	return (
+		<View className="gap-0.5">
+			<Text
+				size="xs"
+				bold
+				className="uppercase tracking-wide text-muted-foreground"
+			>
+				{role}
+			</Text>
+			<Pressable onPress={handleCopy} className="flex-row items-center gap-2">
+				<Text size="sm" bold className="flex-1">
+					{name} — <Text size="sm">{email}</Text>
+				</Text>
+				<CopyIcon size={16} color={colors.gray[500]} />
+			</Pressable>
+		</View>
+	);
+}
+
+function CopyableReferenceRow({ label, value }: ConsentReference) {
+	const handleCopy = async () => {
+		await Clipboard.setStringAsync(value);
+		toast.success("Link copiado!");
+	};
+
+	return (
+		<Pressable onPress={handleCopy} className="gap-0.5">
+			<Text
+				size="xs"
+				bold
+				className="uppercase tracking-wide text-muted-foreground"
+			>
+				{label}
+			</Text>
+			<View className="flex-row items-center gap-2">
+				<Text size="sm" className="flex-1 text-lime-800" numberOfLines={1}>
+					{value}
+				</Text>
+				<CopyIcon size={16} color={colors.gray[500]} />
+			</View>
+		</Pressable>
 	);
 }
 
@@ -96,10 +154,19 @@ export default function SurveyConsentScreen() {
 						label="Instituição / Programa"
 						value={CONSENT_IDENTIFICATION.institution}
 					/>
-					<IdentificationRow
-						label="Pesquisador responsável"
-						value={CONSENT_IDENTIFICATION.researcher}
-					/>
+					{CONSENT_IDENTIFICATION.people.map(person => (
+						<PersonRow key={person.email} {...person} />
+					))}
+				</View>
+
+				<View className="gap-3 rounded-lg bg-gray-50 p-4">
+					<Text bold>{CONSENT_ETHICS_NOTE.heading}</Text>
+					<Text size="sm" className="leading-5">
+						{CONSENT_ETHICS_NOTE.paragraph}
+					</Text>
+					{CONSENT_ETHICS_NOTE.references.map(reference => (
+						<CopyableReferenceRow key={reference.label} {...reference} />
+					))}
 				</View>
 
 				{CONSENT_SECTIONS.map(section => (
