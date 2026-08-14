@@ -8,8 +8,6 @@ on:
     build_upload:
       states:
         - complete
-  # Caminho de recuperação: o contexto app_store_connect só existe no trigger
-  # por evento, então na execução manual o build vem pelo número.
   workflow_dispatch:
     inputs:
       build_number:
@@ -18,8 +16,7 @@ on:
         description: 'Build number na App Store Connect (ex.: 22)'
 
 jobs:
-  # Job independente do attach — antes eram passos sequenciais, e uma falha
-  # ao anexar pulava a publicação das notas de versão (o que faltou na 1.0.2).
+  # Publica a ficha da App Store (metadados, informações de revisão, screenshots).
   push_ios_metadata:
     name: Push App Store metadata
     type: custom
@@ -32,10 +29,7 @@ jobs:
           EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
         run: node store/scripts/push-ios-metadata.mjs
 
-  # build_upload.build é preenchido de forma assíncrona pela Apple e pode
-  # ainda não existir no evento `complete` — ler .id direto derrubava o
-  # workflow inteiro antes deste job ser criado. Guard com && evita o crash;
-  # cf_bundle_version (já presente no complete) cobre a lacuna do build number.
+  # Anexa o build processado à App Store Version e envia para o App Review.
   attach_and_submit_ios:
     name: Attach build and submit for review
     type: custom
