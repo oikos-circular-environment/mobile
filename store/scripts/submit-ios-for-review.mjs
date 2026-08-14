@@ -7,14 +7,9 @@
  *
  * Idempotente: reexecutar sobre o mesmo release não duplica nada.
  *
- * Duas formas de identificar o build a anexar:
- * - `--build-id=<id>` (ou `IOS_ASC_BUILD_ID`): o id do build na App Store
- *   Connect, já processado. É o caminho usado por `.eas/workflows/ios-review-submission.yml`,
- *   que recebe esse id pronto do trigger `app_store_connect.build_upload` — sem
- *   polling.
- * - `--build-number=<n>` (ou `IOS_BUILD_NUMBER`): o build number do EAS: aguarda
- *   a Apple terminar de processar o upload (`eas submit` não espera por isso).
- *   Caminho de fallback para execução manual.
+ * Identifica o build a anexar por `--build-id`/`IOS_ASC_BUILD_ID`,
+ * `--build-number`/`IOS_BUILD_NUMBER`, ou nenhum dos dois — ver JSDoc de
+ * `waitForBuild()` para a ordem de preferência e o fallback.
  *
  * Flags: `--dry-run`, `--skip-submit`.
  *
@@ -147,10 +142,14 @@ async function ensureAppStoreVersion(client, appId, versionString) {
  * Apple permite anexá-lo a uma App Store Version. A espera é necessária porque
  * o `eas submit` faz o upload com `skip_waiting_for_build_processing`.
  *
+ * `buildNumber` é opcional: sem ele, o filtro cai só em `filter[app]`,
+ * ordenado por `-uploadedDate`, e casa pelo trem — pega o build mais
+ * recente da versão em vez de um só já identificado.
+ *
  * @param {ReturnType<createAsc>["client"]} client
  * @param {string} appId
  * @param {string} versionString Versão de marketing do trem de builds.
- * @param {string} buildNumber
+ * @param {string|undefined} buildNumber
  * @param {number} timeoutMinutes
  * @returns {Promise<string>} O id do build.
  * @throws {Error} Se o processamento falhar ou estourar o tempo.
@@ -164,13 +163,16 @@ async function waitForBuild(
 ) {
 	const deadline = Date.now() + timeoutMinutes * 60_000;
 	let lastState = null;
+	const label = buildNumber
+		? `${versionString} (${buildNumber})`
+		: versionString;
 
 	while (Date.now() < deadline) {
 		const response = await ascCall(buildsGetCollection, {
 			client,
 			query: {
 				"filter[app]": [appId],
-				"filter[version]": [buildNumber],
+				...(buildNumber ? { "filter[version]": [buildNumber] } : {}),
 				// preReleaseVersion precisa estar em fields[builds], não só em
 				// include — sparse fieldset também filtra relationships, e sem
 				// isso response.data[].relationships.preReleaseVersion vem
@@ -178,6 +180,7 @@ async function waitForBuild(
 				"fields[builds]": ["version", "processingState", "preReleaseVersion"],
 				include: ["preReleaseVersion"],
 				limit: 10,
+				sort: ["-uploadedDate"],
 			},
 		});
 
@@ -193,19 +196,17 @@ async function waitForBuild(
 		if (build) {
 			const state = build.attributes.processingState;
 			if (state !== lastState) {
-				info(`Build ${versionString} (${buildNumber}): ${state}`);
+				info(`Build ${label}: ${state}`);
 				lastState = state;
 			}
 			if (state === "VALID") return build.id;
 			if (state === "FAILED" || state === "INVALID") {
 				throw new Error(
-					`Build ${versionString} (${buildNumber}) terminou o processamento como ${state} na Apple.`,
+					`Build ${label} terminou o processamento como ${state} na Apple.`,
 				);
 			}
 		} else if (lastState === null) {
-			info(
-				`Build ${versionString} (${buildNumber}) ainda não apareceu na App Store Connect…`,
-			);
+			info(`Build ${label} ainda não apareceu na App Store Connect…`);
 			lastState = "PENDING";
 		}
 
@@ -213,7 +214,7 @@ async function waitForBuild(
 	}
 
 	throw new Error(
-		`Timeout de ${timeoutMinutes} min esperando o build ${versionString} (${buildNumber}) ficar VALID.`,
+		`Timeout de ${timeoutMinutes} min esperando o build ${label} ficar VALID.`,
 	);
 }
 
@@ -375,12 +376,6 @@ async function main() {
 
 	step(`Release iOS ${version}${flags.dryRun ? " (dry-run)" : ""}`);
 
-	if (!flags.buildId && !flags.buildNumber) {
-		throw new Error(
-			"Build a anexar não informado. Use --build-id=<id> (preferível — vem de " +
-				"app_store_connect.build_upload.build.id) ou --build-number=<n>/IOS_BUILD_NUMBER.",
-		);
-	}
 	if (
 		flags.buildNumber &&
 		!BUILD_NUMBER_PATTERN.test(String(flags.buildNumber))
@@ -400,7 +395,9 @@ async function main() {
 				? `Versão ${version}: ${existing.attributes.appVersionState}`
 				: `Versão ${version} ainda não existe.`,
 		);
-		info(`Build a anexar: ${flags.buildId ?? flags.buildNumber}`);
+		info(
+			`Build a anexar: ${flags.buildId ?? flags.buildNumber ?? `(a localizar por ${version})`}`,
+		);
 		info("Nada foi escrito (--dry-run).");
 		return;
 	}
@@ -434,7 +431,7 @@ async function main() {
 		body: { data: { type: "builds", id: buildId } },
 	});
 	info(
-		`Build ${version} (${flags.buildId ?? flags.buildNumber}) anexado à versão.`,
+		`Build ${version} (${flags.buildId ?? flags.buildNumber ?? buildId}) anexado à versão.`,
 	);
 
 	step("App Review");

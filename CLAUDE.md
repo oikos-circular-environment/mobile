@@ -15,6 +15,10 @@ npm test               # Run Jest tests
 npm run test:coverage  # Run Jest with coverage report
 ```
 
+## Release notes (store/)
+
+Ao redigir `store/shared/whats-new/<version>.md`: limite de **500 caracteres** (Google Play; a Apple aceita até 4.000). Confira com `wc -m` antes de commitar — o script de publicação só valida isso tarde, depois que o binário já foi publicado na loja. Ver `docs/publishing-path.md`.
+
 ## Expo MCP
 
 An `expo` MCP server is configured (`https://mcp.expo.dev/mcp`, project-scoped).
