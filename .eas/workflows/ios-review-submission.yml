@@ -12,8 +12,8 @@ on:
     inputs:
       build_number:
         type: string
-        required: true
-        description: 'Build number na App Store Connect (ex.: 22)'
+        required: false
+        description: 'Build number na App Store Connect (opcional — vazio usa o build mais recente da versão atual)'
 
 jobs:
   # Publica a ficha da App Store (metadados, informações de revisão, screenshots).

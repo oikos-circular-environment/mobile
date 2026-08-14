@@ -142,10 +142,9 @@ async function ensureAppStoreVersion(client, appId, versionString) {
  * Apple permite anexá-lo a uma App Store Version. A espera é necessária porque
  * o `eas submit` faz o upload com `skip_waiting_for_build_processing`.
  *
- * `buildNumber` é opcional: sem ele, o filtro cai só em `filter[app]` e casa
- * pelo trem — mais lento, mas appId e versionString vêm de config estática
- * do repo, nunca do payload do evento, então esse caminho nunca fica sem
- * como localizar o build.
+ * `buildNumber` é opcional: sem ele, o filtro cai só em `filter[app]`,
+ * ordenado por `-uploadedDate`, e casa pelo trem — pega o build mais
+ * recente da versão em vez de um só já identificado.
  *
  * @param {ReturnType<createAsc>["client"]} client
  * @param {string} appId
@@ -181,6 +180,7 @@ async function waitForBuild(
 				"fields[builds]": ["version", "processingState", "preReleaseVersion"],
 				include: ["preReleaseVersion"],
 				limit: 10,
+				sort: ["-uploadedDate"],
 			},
 		});
 
