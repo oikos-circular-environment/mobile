@@ -32,13 +32,10 @@ jobs:
           EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
         run: node store/scripts/push-ios-metadata.mjs
 
-  # `build_upload.build` só existe depois que a Apple termina de linkar o
-  # recurso Build ao upload — no evento `complete` isso pode ainda não ter
-  # acontecido, e ler `.id` de um `build` inexistente derruba o workflow
-  # inteiro antes mesmo deste job ser criado (era o caso da 1.0.4). Guard
-  # com `&&` evita o crash; e cf_bundle_version (esse sim presente desde o
-  # `complete`) cobre a lacuna caindo no polling de waitForBuild() em vez de
-  # falhar com build vazio. Na execução manual, inputs.build_number.
+  # build_upload.build é preenchido de forma assíncrona pela Apple e pode
+  # ainda não existir no evento `complete` — ler .id direto derrubava o
+  # workflow inteiro antes deste job ser criado. Guard com && evita o crash;
+  # cf_bundle_version (já presente no complete) cobre a lacuna do build number.
   attach_and_submit_ios:
     name: Attach build and submit for review
     type: custom

@@ -7,20 +7,9 @@
  *
  * Idempotente: reexecutar sobre o mesmo release não duplica nada.
  *
- * Três formas de identificar o build a anexar, da mais rápida à mais lenta —
- * nenhuma delas pode faltar ao mesmo tempo, sempre há uma com que continuar:
- * - `--build-id=<id>` (ou `IOS_ASC_BUILD_ID`): o id do build na App Store
- *   Connect, já processado. Vem de `app_store_connect.build_upload.build.id`
- *   no trigger — sem polling — mas esse link é preenchido pela Apple de
- *   forma assíncrona e pode ainda não existir no momento do evento `complete`.
- * - `--build-number=<n>` (ou `IOS_BUILD_NUMBER`): build number do EAS. Vem de
- *   `app_store_connect.build_upload.cf_bundle_version` (presente desde o
- *   `complete`, ao contrário de `.build.id`) ou de `inputs.build_number` na
- *   execução manual. Aguarda a Apple terminar de processar o upload.
- * - Nenhum dos dois: último recurso, quando por algum motivo nem o id nem o
- *   build number vieram do trigger. `waitForBuild()` varre os builds do app
- *   e casa pelo trem (versão de marketing) — appId e versionString são
- *   sempre conhecidos localmente, nunca dependem do payload do evento.
+ * Identifica o build a anexar por `--build-id`/`IOS_ASC_BUILD_ID`,
+ * `--build-number`/`IOS_BUILD_NUMBER`, ou nenhum dos dois — ver JSDoc de
+ * `waitForBuild()` para a ordem de preferência e o fallback.
  *
  * Flags: `--dry-run`, `--skip-submit`.
  *
@@ -153,12 +142,10 @@ async function ensureAppStoreVersion(client, appId, versionString) {
  * Apple permite anexá-lo a uma App Store Version. A espera é necessária porque
  * o `eas submit` faz o upload com `skip_waiting_for_build_processing`.
  *
- * `buildNumber` é opcional: sem ele (fallback de último recurso, quando nem
- * `app_store_connect.build_upload.build.id` nem `.cf_bundle_version` vieram
- * do trigger), o filtro cai só em `filter[app]` e casa pelo trem — mais lento
- * (varre os builds mais recentes em vez de um só), mas nunca fica sem como
- * localizar o build: appId e versionString vêm de config estática do repo,
- * nunca do payload do evento, então nunca ficam vazios.
+ * `buildNumber` é opcional: sem ele, o filtro cai só em `filter[app]` e casa
+ * pelo trem — mais lento, mas appId e versionString vêm de config estática
+ * do repo, nunca do payload do evento, então esse caminho nunca fica sem
+ * como localizar o build.
  *
  * @param {ReturnType<createAsc>["client"]} client
  * @param {string} appId
@@ -389,10 +376,6 @@ async function main() {
 
 	step(`Release iOS ${version}${flags.dryRun ? " (dry-run)" : ""}`);
 
-	// Nem --build-id nem --build-number informados (nem app_store_connect.build_upload.build.id
-	// nem .cf_bundle_version vieram do trigger, ou o dispatch manual não passou
-	// build_number): não é motivo pra falhar — waitForBuild() acha o build
-	// varrendo por app + versão de marketing, sem precisar de nenhum dos dois.
 	if (
 		flags.buildNumber &&
 		!BUILD_NUMBER_PATTERN.test(String(flags.buildNumber))
