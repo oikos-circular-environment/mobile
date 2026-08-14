@@ -6,10 +6,13 @@ import {
 	useSurveyStates,
 } from "@/components/survey/hooks/use-survey-location-catalog";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
+import { surveyProtocolCache } from "@/libs/survey/db/schema";
+import { createTestSurveyDb } from "@/libs/survey/db/test-client";
 import { useSurveyDraftStore } from "@/stores/survey-draft-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
 const mockReplace = jest.fn();
+const mockDb = createTestSurveyDb();
 const mockBack = jest.fn();
 const mockCreateSurveySession = jest.fn().mockResolvedValue("session-1");
 
@@ -21,6 +24,10 @@ jest.mock("@/components/survey/hooks/use-survey-protocol");
 jest.mock("@/components/survey/hooks/use-survey-location-catalog");
 jest.mock("@/libs/survey/create-session", () => ({
 	createSurveySession: (...args: unknown[]) => mockCreateSurveySession(...args),
+}));
+
+jest.mock("@/libs/survey/db/client", () => ({
+	getSurveyDb: () => mockDb,
 }));
 
 const protocolFixture = {
@@ -64,13 +71,14 @@ function setDraft(
 }
 
 describe("SurveyCharacterizationScreen", () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		jest.useFakeTimers();
 		mockReplace.mockClear();
 		mockBack.mockClear();
 		mockCreateSurveySession.mockClear();
 		useSurveyDraftStore.getState().reset();
 		useSurveyStore.getState().reset();
+		await mockDb.delete(surveyProtocolCache).run();
 		jest.mocked(useSurveyProtocol).mockReturnValue({
 			data: protocolFixture,
 		} as never);

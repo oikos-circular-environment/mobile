@@ -190,11 +190,11 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Próxima"));
 
 		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(1);
-		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
 		const errorAnswer = payload.answers.find(
 			(a: { question_key: string }) => a.question_key === "error_occurred",
 		);
-		expect(errorAnswer.valueText).toBe("NO");
+		expect(errorAnswer.value_text).toBe("NO");
 		expect(
 			payload.answers.some(
 				(a: { question_key: string }) => a.question_key === "error_recovery",
@@ -249,7 +249,7 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Próxima"));
 
 		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(1);
-		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
 		expect(payload.tasks).toEqual([
 			expect.objectContaining({
 				code: "T8",
@@ -258,6 +258,45 @@ describe("SurveyQuestionnaireScreen", () => {
 				auto_detected: true,
 			}),
 		]);
+	});
+
+	it("envia o início real da suíte e um tempo total que cobre a janela até o envio", async () => {
+		const user = userEvent.setup();
+		await render(<SurveyQuestionnaireScreen />);
+
+		await user.press(screen.getByText("Ótimo"));
+		await user.press(screen.getByText("Próxima"));
+		await user.press(screen.getByText("Não"));
+		await user.press(screen.getByText("Próxima"));
+
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
+		expect(payload.suite.started_at).toBe("2026-07-30T10:00:00.000Z");
+		expect(payload.suite.finished_at).not.toBe(payload.suite.started_at);
+		expect(payload.suite.wall_ms).toBeGreaterThan(0);
+	});
+
+	it("envia as respostas em snake_case, como o schema do endpoint espera", async () => {
+		const user = userEvent.setup();
+		await render(<SurveyQuestionnaireScreen />);
+
+		await user.press(screen.getByText("Ótimo"));
+		await user.press(screen.getByText("Próxima"));
+		await user.press(screen.getByText("Não"));
+		await user.press(screen.getByText("Próxima"));
+
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
+		expect(payload.answers).toContainEqual(
+			expect.objectContaining({
+				question_key: "satisfaction",
+				value_number: 5,
+			}),
+		);
+		expect(
+			payload.answers.every(
+				(answer: Record<string, unknown>) =>
+					!("valueText" in answer) && !("valueNumber" in answer),
+			),
+		).toBe(true);
 	});
 
 	it("outcome da suíte respeita suiteOutcomeOverride (abandonar etapa) independente da contagem de done", async () => {
@@ -272,7 +311,7 @@ describe("SurveyQuestionnaireScreen", () => {
 		await user.press(screen.getByText("Próxima"));
 
 		expect(mockEnqueueCheckpoint).toHaveBeenCalledTimes(1);
-		const payload = mockEnqueueCheckpoint.mock.calls[0][1];
+		const payload = mockEnqueueCheckpoint.mock.calls[0][2];
 		expect(payload.suite.outcome).toBe("NO");
 	});
 });

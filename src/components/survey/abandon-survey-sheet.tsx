@@ -5,6 +5,7 @@ import BottomSheet, {
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { eq } from "drizzle-orm";
+import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import {
 	forwardRef,
@@ -18,13 +19,15 @@ import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { buildCheckpoint } from "@/libs/survey/build-checkpoint";
 import { getSurveyDb } from "@/libs/survey/db/client";
-import { surveySuiteRun, surveyTaskRun } from "@/libs/survey/db/schema";
+import { surveySuiteRun } from "@/libs/survey/db/schema";
 import {
 	drainOutbox,
 	enqueueAbandon,
 	enqueueCheckpoint,
 } from "@/libs/survey/queue/outbox";
+import { sessionTotals } from "@/libs/survey/session-totals";
 import { useSurveyDraftStore } from "@/stores/survey-draft-store";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
@@ -57,6 +60,7 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 		const tasks = useSurveyExecutionStore(s => s.tasks);
 		const [reason, setReason] = useState("");
 		const [isSubmitting, setIsSubmitting] = useState(false);
+		const [isOpen, setIsOpen] = useState(false);
 		const sheetRef = useRef<BottomSheet>(null);
 
 		useImperativeHandle(ref, () => ({
@@ -65,14 +69,15 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 		}));
 
 		const backdropComponent = useCallback(
-			(props: BottomSheetBackdropProps) => (
-				<BottomSheetBackdrop
-					{...props}
-					appearsOnIndex={0}
-					disappearsOnIndex={-1}
-				/>
-			),
-			[],
+			(props: BottomSheetBackdropProps) =>
+				isOpen ? (
+					<BottomSheetBackdrop
+						{...props}
+						appearsOnIndex={0}
+						disappearsOnIndex={-1}
+					/>
+				) : null,
+			[isOpen],
 		);
 
 		const handleAbandon = async () => {
@@ -98,54 +103,37 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 								? "NO"
 								: "PARTIAL";
 
+					const suiteStartedAt = suiteRunRow?.startedAt ?? now;
+					const suiteWallMs = Math.max(
+						0,
+						new Date(now).getTime() - new Date(suiteStartedAt).getTime(),
+					);
+
 					await db
 						.update(surveySuiteRun)
 						.set({
 							finishedAt: now,
 							activeMs,
-							wallMs: activeMs,
+							wallMs: suiteWallMs,
 							outcome: currentOutcome,
 							synced: false,
 						})
 						.where(eq(surveySuiteRun.id, suiteRunId));
 
-					const taskRuns = await db
-						.select()
-						.from(surveyTaskRun)
-						.where(eq(surveyTaskRun.suiteRunId, suiteRunId));
-
-					await enqueueCheckpoint(sessionId, {
-						session_id: sessionId,
-						chunk: { index: 0, total: 1 },
-						suite: {
-							code: suiteCode,
-							position: suiteIndex,
-							started_at: suiteRunRow?.startedAt ?? now,
-							active_ms: activeMs,
-							wall_ms: activeMs,
-							finished_at: now,
-							outcome: currentOutcome,
-						},
-						tasks: taskRuns.map(run => ({
-							code: run.taskCode,
-							position: run.position,
-							started_at: run.startedAt,
-							finished_at: run.finishedAt ?? undefined,
-							active_ms: run.activeMs ?? 0,
-							outcome:
-								(run.outcome as "YES" | "NO" | "PARTIAL" | null) ?? undefined,
-							auto_detected: run.autoDetected,
-						})),
-						answers: [],
-					});
+					const checkpointPayload = await buildCheckpoint(
+						sessionId,
+						suiteRunId,
+						true,
+					);
+					await enqueueCheckpoint(sessionId, suiteRunId, checkpointPayload);
 				}
 
 				// Suítes do roteiro ainda não iniciadas: outcome NO forçado, sem tarefas.
 				const startFrom = suiteRunId ? suiteIndex + 1 : suiteIndex;
 				for (let i = startFrom; i < suiteQueue.length; i += 1) {
-					await enqueueCheckpoint(sessionId, {
+					const forcedSuiteRunId = Crypto.randomUUID();
+					await enqueueCheckpoint(sessionId, forcedSuiteRunId, {
 						session_id: sessionId,
-						chunk: { index: 0, total: 1 },
 						suite: {
 							code: suiteQueue[i],
 							position: i,
@@ -161,10 +149,12 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 				}
 
 				// E5 por último — a fila do outbox respeita ordem de criação.
+				const totals = await sessionTotals(sessionId, now);
+
 				await enqueueAbandon(sessionId, {
 					session_id: sessionId,
-					active_ms: activeMs,
-					wall_ms: activeMs,
+					active_ms: totals.activeMs,
+					wall_ms: totals.wallMs,
 					finished_at: now,
 					reason: reason.trim() || undefined,
 					current_suite_code: suiteCode ?? undefined,
@@ -193,6 +183,7 @@ export const AbandonSurveySheet = forwardRef<AbandonSurveySheetHandle>(
 				keyboardBehavior="interactive"
 				android_keyboardInputMode="adjustResize"
 				backdropComponent={backdropComponent}
+				onChange={index => setIsOpen(index >= 0)}
 			>
 				<BottomSheetView>
 					<View className="gap-4 p-4 pb-8">

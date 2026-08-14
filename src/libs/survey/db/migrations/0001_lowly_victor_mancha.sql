@@ -1,0 +1,1 @@
+ALTER TABLE `survey_event` ADD `sent_at` text;

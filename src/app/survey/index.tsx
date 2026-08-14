@@ -1,5 +1,6 @@
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { ClipboardListIcon, TriangleAlertIcon } from "lucide-react-native";
+import { useCallback } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
@@ -7,11 +8,21 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useSurveyStore } from "@/stores/survey-store";
 
 export default function SurveyPresentationScreen() {
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { permissionDenied } = useGeospatial();
+	const sessionId = useSurveyStore(s => s.sessionId);
+
+	useFocusEffect(
+		useCallback(() => {
+			if (sessionId) {
+				router.replace("/survey/resume");
+			}
+		}, [sessionId, router]),
+	);
 
 	const handleContinue = () => {
 		if (permissionDenied) {

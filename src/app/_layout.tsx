@@ -30,6 +30,7 @@ import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-ove
 import { SurveyMigrationsRunner } from "@/components/survey/survey-migrations-runner";
 import { Toaster } from "@/components/toast";
 import { initSurveyQueue } from "@/libs/survey/queue/network-status";
+import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
 export const unstable_settings = {
@@ -38,7 +39,18 @@ export const unstable_settings = {
 
 const queryClient = new QueryClient();
 sessionBus.subscribe(() => queryClient.resetQueries());
-initSurveyQueue(() => useSurveyStore.getState().sessionId);
+initSurveyQueue(
+	() => useSurveyStore.getState().sessionId,
+	() => {
+		const state = useSurveyExecutionStore.getState();
+		return {
+			isActive: state.isActive,
+			tasksSignature: state.tasks
+				.map(task => `${task.code}:${task.status}`)
+				.join(","),
+		};
+	},
+);
 
 Observe.configure({
 	integrations: { "expo-router": true },

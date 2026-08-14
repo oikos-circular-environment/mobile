@@ -4,7 +4,7 @@ import BottomSheet, {
 	BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BlurView } from "expo-blur";
+import { BlurTargetView, BlurView } from "expo-blur";
 import { router, useIsFocused } from "expo-router";
 import {
 	AlertTriangleIcon,
@@ -70,6 +70,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [showVoteGuide, setShowVoteGuide] = useState(false);
+	const resolutionBlurTargetRef = useRef<View | null>(null);
 	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
 	const { location } = useGeospatial();
 
@@ -367,9 +368,16 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 
 									<View className="relative my-4 gap-4">
 										{showResolutionsLocked ? (
-											Array.from({
-												length: Math.min(complaint.resolution_count, 3),
-											}).map((_, i) => <ResolutionCardSkeleton key={i} />)
+											<BlurTargetView
+												ref={resolutionBlurTargetRef}
+												className="gap-4"
+											>
+												{Array.from({
+													length: Math.min(complaint.resolution_count, 3),
+												}).map((_, i) => (
+													<ResolutionCardSkeleton key={i} />
+												))}
+											</BlurTargetView>
 										) : isLoadingResolutions ? (
 											<>
 												<ResolutionCardSkeleton />
@@ -395,9 +403,10 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 
 										{showResolutionsLocked && (
 											<BlurView
+												blurTarget={resolutionBlurTargetRef}
 												intensity={15}
 												tint="light"
-												experimentalBlurMethod="dimezisBlurView"
+												blurMethod="dimezisBlurView"
 												style={{
 													position: "absolute",
 													top: 0,
@@ -408,6 +417,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 													justifyContent: "center",
 													gap: 12,
 													borderRadius: 8,
+													overflow: "hidden",
 												}}
 											>
 												<LockKeyholeIcon size={16} color={colors.gray[600]} />

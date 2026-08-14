@@ -5,7 +5,7 @@ const googleMapsApiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 const config: ExpoConfig = {
 	name: "oikos",
 	slug: "oikos",
-	version: "1.0.3",
+	version: "1.0.4",
 	orientation: "default",
 	icon: "./src/assets/icons/icon.png",
 	scheme: "oikos",
@@ -47,7 +47,7 @@ const config: ExpoConfig = {
 				image: "./src/assets/icons/splash-icon.png",
 				imageWidth: 200,
 				resizeMode: "contain",
-				backgroundColor: "#3f6212",
+				backgroundColor: "#274E2D",
 			},
 		],
 		[

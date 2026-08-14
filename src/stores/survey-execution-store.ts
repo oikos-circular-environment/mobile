@@ -37,6 +37,7 @@ type SurveyExecutionState = {
 	isExpanded: boolean;
 	isPaused: boolean;
 	suiteActiveMs: number;
+	currentTaskStartActiveMs: number;
 	/** Setado só pelo botão "Abandonar etapa" — força o outcome da suíte a NO
 	 *  independente da contagem de tarefas concluídas. */
 	suiteOutcomeOverride: "NO" | null;
@@ -83,6 +84,7 @@ const INITIAL_STATE: SurveyExecutionState = {
 	isExpanded: false,
 	isPaused: false,
 	suiteActiveMs: 0,
+	currentTaskStartActiveMs: 0,
 	suiteOutcomeOverride: null,
 };
 
@@ -126,6 +128,7 @@ export const useSurveyExecutionStore = create<
 			})),
 			currentTaskIndex: 0,
 			suiteActiveMs: 0,
+			currentTaskStartActiveMs: 0,
 			suiteOutcomeOverride: null,
 			isActive: false,
 			isExpanded: false,
@@ -153,7 +156,11 @@ export const useSurveyExecutionStore = create<
 				: t,
 		);
 		const { tasks, currentTaskIndex } = activateNextTask(marked, idx + 1);
-		set({ tasks, currentTaskIndex });
+		set({
+			tasks,
+			currentTaskIndex,
+			currentTaskStartActiveMs: state.suiteActiveMs,
+		});
 	},
 
 	skipCurrentTask: () => {
@@ -165,7 +172,11 @@ export const useSurveyExecutionStore = create<
 		if (!skipped) return;
 		rest.push({ ...skipped, status: "skipped" as const });
 		const { tasks, currentTaskIndex } = activateNextTask(rest, idx);
-		set({ tasks, currentTaskIndex });
+		set({
+			tasks,
+			currentTaskIndex,
+			currentTaskStartActiveMs: state.suiteActiveMs,
+		});
 	},
 
 	abandonCurrentTask: () => {
@@ -178,7 +189,11 @@ export const useSurveyExecutionStore = create<
 				: t,
 		);
 		const { tasks, currentTaskIndex } = activateNextTask(marked, idx + 1);
-		set({ tasks, currentTaskIndex });
+		set({
+			tasks,
+			currentTaskIndex,
+			currentTaskStartActiveMs: state.suiteActiveMs,
+		});
 	},
 
 	abandonSuite: () =>
@@ -212,3 +227,6 @@ export const selectAllTasksResolved = (state: SurveyExecutionState) =>
 export const selectResolvedTaskCount = (state: SurveyExecutionState) =>
 	state.tasks.filter(t => t.status === "done" || t.status === "abandoned")
 		.length;
+
+export const selectCurrentTaskActiveMs = (state: SurveyExecutionState) =>
+	Math.max(0, state.suiteActiveMs - state.currentTaskStartActiveMs);

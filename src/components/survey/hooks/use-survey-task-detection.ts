@@ -4,9 +4,13 @@ import { useEffect, useRef } from "react";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveyTaskRun } from "@/libs/survey/db/schema";
+import { screenRouteBus } from "@/libs/survey/screen-route-bus";
 import { createTaskSignalWatcher } from "@/libs/survey/signal-matcher";
 import { getOrCreateOpenTaskRun } from "@/libs/survey/task-run";
-import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
+import {
+	selectCurrentTaskActiveMs,
+	useSurveyExecutionStore,
+} from "@/stores/survey-execution-store";
 
 /**
  * Liga o casador de sinais (M06) à tarefa atual: cria um observador para a regra de
@@ -51,12 +55,16 @@ export function useSurveyTaskDetection() {
 		).catch(() => null);
 
 		watcherRef.current = createTaskSignalWatcher(taskDefinition.success, () => {
+			const activeMsDelta = selectCurrentTaskActiveMs(
+				useSurveyExecutionStore.getState(),
+			);
 			taskRunPromise.then(taskRun => {
 				if (!taskRun) return;
 				getSurveyDb()
 					.update(surveyTaskRun)
 					.set({
 						finishedAt: new Date().toISOString(),
+						activeMs: taskRun.activeMs + activeMsDelta,
 						outcome: "YES",
 						autoDetected: true,
 					})
@@ -74,5 +82,6 @@ export function useSurveyTaskDetection() {
 
 	useEffect(() => {
 		watcherRef.current?.notifyScreen(pathname);
+		screenRouteBus.emit({ route: pathname });
 	}, [pathname]);
 }

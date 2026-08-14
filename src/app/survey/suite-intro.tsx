@@ -1,3 +1,4 @@
+import { and, eq } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -12,6 +13,7 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveySuiteRun } from "@/libs/survey/db/schema";
+import { start as startEventRecorder } from "@/libs/survey/event-recorder";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
@@ -98,20 +100,40 @@ export default function SurveySuiteIntroScreen() {
 	}, [suiteCode, holdSeconds]);
 
 	const handleBegin = async () => {
+		let suiteRunId: string | null = null;
 		if (sessionId && suiteCode) {
-			const suiteRunId = Crypto.randomUUID();
-			const now = new Date().toISOString();
-			await getSurveyDb().insert(surveySuiteRun).values({
-				id: suiteRunId,
-				sessionId,
-				suiteCode,
-				position: suiteIndex,
-				startedAt: now,
-			});
+			const db = getSurveyDb();
+			const [existing] = await db
+				.select({ id: surveySuiteRun.id })
+				.from(surveySuiteRun)
+				.where(
+					and(
+						eq(surveySuiteRun.sessionId, sessionId),
+						eq(surveySuiteRun.suiteCode, suiteCode),
+					),
+				)
+				.limit(1);
+
+			if (existing) {
+				suiteRunId = existing.id;
+			} else {
+				suiteRunId = Crypto.randomUUID();
+				const now = new Date().toISOString();
+				await db.insert(surveySuiteRun).values({
+					id: suiteRunId,
+					sessionId,
+					suiteCode,
+					position: suiteIndex,
+					startedAt: now,
+				});
+			}
 			setSuiteRunId(suiteRunId);
 		}
 
 		beginSuite();
+		if (sessionId && suiteRunId) {
+			startEventRecorder(sessionId, suiteRunId);
+		}
 		setProgress(suiteCode ?? null, tasks[0]?.code ?? null);
 		router.dismissTo("/(tabs)/(home)" as never);
 	};

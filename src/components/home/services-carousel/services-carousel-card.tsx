@@ -1,11 +1,13 @@
-import { BlurView } from "expo-blur";
+import { BlurTargetView, BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import { ArrowUpRightIcon } from "lucide-react-native";
+import { useCallback, useRef } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/libs/utils";
 import { useServicesCarouselContext } from "./context";
 import { ServicesCarouselDebugOverlay } from "./services-carousel-debug-overlay";
 import type { ServiceCarouselItem } from "./types";
@@ -20,6 +22,10 @@ const FOOTER_LABELS = ["REDUZA", "REUTILIZE", "RECICLE"];
 /** Liga o overlay de debug de temporização/pausa — só pra depuração manual, não é UI final. */
 const SHOW_DEBUG_OVERLAY = true;
 
+/** Toques mais longos que isso contam como "segurar" (já pausa o autoplay via handleTouchStart
+ * no track) e não navegam ao soltar — só um tap rápido dispara a ação do card. */
+const TAP_MAX_HOLD_MS = 300;
+
 export function ServicesCarouselCard({
 	item,
 	index,
@@ -27,6 +33,26 @@ export function ServicesCarouselCard({
 	const { cardWidth, cardHeight, scale, activeIndex } =
 		useServicesCarouselContext();
 	const isActive = index === activeIndex;
+	const blurTargetRef = useRef<View | null>(null);
+	const router = useRouter();
+	const pressStartRef = useRef<number | null>(null);
+
+	const handlePressIn = useCallback(() => {
+		pressStartRef.current = Date.now();
+	}, []);
+
+	const handlePress = useCallback(() => {
+		const heldMs =
+			pressStartRef.current === null ? 0 : Date.now() - pressStartRef.current;
+		pressStartRef.current = null;
+		if (heldMs >= TAP_MAX_HOLD_MS) return;
+
+		if (item.onPress) {
+			item.onPress();
+		} else {
+			router.push(item.href);
+		}
+	}, [item, router]);
 
 	const cta = (
 		<View
@@ -41,6 +67,7 @@ export function ServicesCarouselCard({
 				intensity={24}
 				tint="dark"
 				style={StyleSheet.absoluteFill}
+				blurTarget={blurTargetRef}
 				blurMethod="dimezisBlurView"
 			/>
 			<Text style={{ fontSize: 13 * scale }} className="font-medium text-white">
@@ -51,29 +78,38 @@ export function ServicesCarouselCard({
 	);
 
 	return (
-		<View
+		<Pressable
+			onPressIn={handlePressIn}
+			onPress={handlePress}
+			accessibilityRole="button"
+			accessibilityLabel={`${item.ctaLabel}: ${item.title}`}
 			style={{ width: cardWidth, height: cardHeight }}
-			className="overflow-hidden rounded-lg"
+			className={cn("overflow-hidden rounded-lg", "active:opacity-90")}
 		>
-			<Image
-				source={item.image}
-				style={StyleSheet.absoluteFill}
-				contentFit="cover"
-			/>
-			<LinearGradient
-				colors={["transparent", item.gradientColors[0]]}
-				locations={[0, 1]}
-				style={{
-					position: "absolute",
-					bottom: 0,
-					left: 0,
-					right: 0,
-					height: cardHeight * 0.6,
-				}}
-			/>
+			<BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
+				<Image
+					source={item.image}
+					style={StyleSheet.absoluteFill}
+					contentFit="cover"
+				/>
+				<LinearGradient
+					colors={["transparent", item.gradientColors[0]]}
+					locations={[0, 1]}
+					style={{
+						position: "absolute",
+						bottom: 0,
+						left: 0,
+						right: 0,
+						height: cardHeight * 0.6,
+					}}
+				/>
+			</BlurTargetView>
 
 			{isActive ? (
-				<ServicesCarouselDebugOverlay isVisible={SHOW_DEBUG_OVERLAY} />
+				<ServicesCarouselDebugOverlay
+					isVisible={SHOW_DEBUG_OVERLAY}
+					blurTarget={blurTargetRef}
+				/>
 			) : null}
 
 			<View
@@ -98,13 +134,7 @@ export function ServicesCarouselCard({
 
 				<View style={{ gap: 20 * scale }}>
 					<View style={{ gap: 8 * scale }}>
-						{item.onPress ? (
-							<Pressable onPress={item.onPress}>{cta}</Pressable>
-						) : (
-							<Link href={item.href} asChild>
-								<Pressable>{cta}</Pressable>
-							</Link>
-						)}
+						{cta}
 
 						<View
 							className="overflow-hidden rounded-lg border border-white/30 flex-row items-start justify-start"
@@ -114,6 +144,7 @@ export function ServicesCarouselCard({
 								intensity={30}
 								tint="dark"
 								style={StyleSheet.absoluteFill}
+								blurTarget={blurTargetRef}
 								blurMethod="dimezisBlurView"
 							/>
 							<Text
@@ -150,6 +181,6 @@ export function ServicesCarouselCard({
 					</View>
 				</View>
 			</View>
-		</View>
+		</Pressable>
 	);
 }

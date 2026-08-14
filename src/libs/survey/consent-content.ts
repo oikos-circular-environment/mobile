@@ -3,16 +3,59 @@
  * mestrado/plans/tcle-walkthrough-oikos.md. Atualizar os dois juntos.
  */
 
-export const CONSENT_TERM_VERSION = "2026-07-30";
+export const CONSENT_TERM_VERSION = "2026-08-13";
+
+export interface ConsentPerson {
+	role: string;
+	name: string;
+	email: string;
+}
 
 export const CONSENT_IDENTIFICATION = {
 	researchTitle:
 		"Aspectos sociotécnicos de sistemas de informação para a economia circular de resíduos sólidos no Brasil",
 	institution:
 		"UNIPAMPA — Programa de Pós-Graduação em Engenharia de Software (PPGES), Mestrado",
-	researcher: "Christian Cesar Rodrigues Santos",
-	advisor: "Fábio Basso e Maicon Bernardino",
-	contact: "christiansantos.aluno@unipampa.edu.br",
+	people: [
+		{
+			role: "Pesquisador responsável",
+			name: "Christian Cesar Rodrigues Santos",
+			email: "christiansantos.aluno@unipampa.edu.br",
+		},
+		{
+			role: "Orientador",
+			name: "Fábio Basso",
+			email: "fabiobasso@unipampa.edu.br",
+		},
+		{
+			role: "Orientador",
+			name: "Maicon Bernardino",
+			email: "maiconbernardino@unipampa.edu.br",
+		},
+	] satisfies ConsentPerson[],
+};
+
+export interface ConsentReference {
+	label: string;
+	value: string;
+}
+
+export const CONSENT_ETHICS_NOTE = {
+	heading: "Aspectos éticos e Comitê de Ética em Pesquisa (CEP)",
+	paragraph:
+		"Esta avaliação não foi submetida ao Comitê de Ética em Pesquisa (CEP) por atender às condições de isenção previstas na Resolução nº 674/2022 do Conselho Nacional de Saúde (CNS) (Capítulo IX, Artigo 26, Inciso VII) e na Circular nº 17/2022/CONEP/SECNS/MS (Artigo 1º, Inciso VII). Os documentos completos podem ser consultados nos endereços abaixo — toque para copiar e cole no navegador do seu dispositivo:",
+	references: [
+		{
+			label: "Resolução CNS nº 674/2022",
+			value:
+				"https://www.gov.br/conselho-nacional-de-saude/pt-br/atos-normativos/resolucoes/2022/resolucao-no-674.pdf/view",
+		},
+		{
+			label: "Ofício Circular nº 17/2022/CONEP/SECNS/MS",
+			value:
+				"https://www.gov.br/conselho-nacional-de-saude/pt-br/camaras-tecnicas-e-comissoes/conep/legislacao/oficios-circulares/oficio-circular-no-17-de-5-de-julho-de-2022.pdf/view",
+		},
+	] satisfies ConsentReference[],
 };
 
 export interface ConsentSection {

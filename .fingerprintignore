@@ -1,0 +1,16 @@
+android/**/*
+ios/**/*
+
+# Tooling, docs and agent config unrelated to native runtime
+.agents/**/*
+.claude/**/*
+.github/**/*
+.vscode/**/*
+.opencode/**/*
+.eas/**/*
+docs/**/*
+graphify-out/**/*
+pencil/**/*
+plans/**/*
+android-emulator/**/*
+android-studio/**/*

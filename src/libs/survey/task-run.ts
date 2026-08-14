@@ -25,9 +25,9 @@ export async function getOrCreateOpenTaskRun(
 	suiteRunId: string,
 	taskCode: string,
 	position: number,
-): Promise<{ id: string }> {
+): Promise<{ id: string; activeMs: number }> {
 	const existing = await findTaskRun(suiteRunId, taskCode);
-	if (existing) return { id: existing.id };
+	if (existing) return { id: existing.id, activeMs: existing.activeMs };
 
 	const id = Crypto.randomUUID();
 	await getSurveyDb().insert(surveyTaskRun).values({
@@ -37,7 +37,7 @@ export async function getOrCreateOpenTaskRun(
 		position,
 		startedAt: new Date().toISOString(),
 	});
-	return { id };
+	return { id, activeMs: 0 };
 }
 
 /**
@@ -52,6 +52,7 @@ export async function resolveTaskRun(
 	taskCode: string,
 	position: number,
 	outcome: "YES" | "NO",
+	activeMsDelta = 0,
 ): Promise<void> {
 	const now = new Date().toISOString();
 	const db = getSurveyDb();
@@ -62,6 +63,7 @@ export async function resolveTaskRun(
 			.update(surveyTaskRun)
 			.set({
 				finishedAt: existing.finishedAt ?? now,
+				activeMs: existing.activeMs + activeMsDelta,
 				outcome,
 				autoDetected: false,
 			})
@@ -76,6 +78,7 @@ export async function resolveTaskRun(
 		position,
 		startedAt: now,
 		finishedAt: now,
+		activeMs: activeMsDelta,
 		outcome,
 		autoDetected: false,
 	});

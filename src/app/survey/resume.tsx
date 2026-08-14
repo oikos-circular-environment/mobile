@@ -1,4 +1,5 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
+import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import {
 	ArrowLeftIcon,
@@ -6,7 +7,9 @@ import {
 	CircleDashedIcon,
 	CircleDotDashedIcon,
 	CircleXIcon,
+	CopyIcon,
 	Trash2Icon,
+	UserRoundIcon,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
@@ -21,15 +24,30 @@ import {
 	DeleteSurveyDataSheet,
 	type DeleteSurveyDataSheetHandle,
 } from "@/components/survey/delete-survey-data-sheet";
+import { useSurveyContinue } from "@/components/survey/hooks/use-survey-continue";
+import { useSurveyPersonaLabel } from "@/components/survey/hooks/use-survey-persona-label";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import {
 	SurveyInviteCard,
+	SurveyInviteCardActions,
+	SurveyInviteCardDescription,
+	SurveyInviteCardHeader,
+	SurveyInviteCardInfo,
+	SurveyInviteCardInfoItem,
+	SurveyInviteCardInfoItemContent,
+	SurveyInviteCardInfoItemLabel,
+	SurveyInviteCardInfoItemValue,
+	SurveyInviteCardPersonaBadge,
+	SurveyInviteCardStages,
+	SurveyInviteCardTitle,
 	type SurveyInviteStage,
 } from "@/components/survey/survey-invite-card";
+import { toast } from "@/components/toast";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getSurveyDb } from "@/libs/survey/db/client";
-import { surveySession } from "@/libs/survey/db/schema";
+import { surveyAnswer, surveySession } from "@/libs/survey/db/schema";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 
@@ -65,7 +83,6 @@ export default function SurveyResumeScreen() {
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { data: protocol } = useSurveyProtocol();
-	const persona = useSurveyStore(s => s.persona);
 	const sessionId = useSurveyStore(s => s.sessionId);
 	const status = useSurveyStore(s => s.status);
 	const isTerminal = status === "ABANDONED" || status === "COMPLETED";
@@ -73,31 +90,39 @@ export default function SurveyResumeScreen() {
 	const suiteQueue = useSurveyExecutionStore(s => s.suiteQueue);
 	const suiteIndex = useSurveyExecutionStore(s => s.suiteIndex);
 	const isActive = useSurveyExecutionStore(s => s.isActive);
-	const setPaused = useSurveyExecutionStore(s => s.setPaused);
+	const handleContinue = useSurveyContinue();
 
 	const deleteSheetRef = useRef<DeleteSurveyDataSheetHandle>(null);
 	const abandonSheetRef = useRef<AbandonSurveySheetHandle>(null);
 	const [participantCode, setParticipantCode] = useState<string | null>(null);
+	const [hasClosingComment, setHasClosingComment] = useState(false);
 
 	useEffect(() => {
 		if (!sessionId) return;
-		getSurveyDb()
-			.select()
+		const db = getSurveyDb();
+		db.select()
 			.from(surveySession)
 			.where(eq(surveySession.id, sessionId))
 			.then(rows => setParticipantCode(rows[0]?.participantCode ?? null));
+
+		db.select()
+			.from(surveyAnswer)
+			.where(
+				and(
+					eq(surveyAnswer.sessionId, sessionId),
+					eq(surveyAnswer.questionKey, "free_comment"),
+					isNull(surveyAnswer.suiteRunId),
+				),
+			)
+			.then(rows => setHasClosingComment(rows.length > 0));
 	}, [sessionId]);
 
-	const personaLabel = protocol?.personas.find(p => p.key === persona)?.label;
+	const personaLabel = useSurveyPersonaLabel();
 
-	const handleContinue = () => {
-		if (isTerminal) return;
-		if (isActive) {
-			setPaused(false);
-			router.dismissTo("/(tabs)/(home)" as never);
-		} else {
-			router.replace("/survey/suite-intro");
-		}
+	const handleCopyCode = async () => {
+		if (!participantCode) return;
+		await Clipboard.setStringAsync(participantCode);
+		toast.success("Código copiado!");
 	};
 
 	const ctaLabel = isTerminal
@@ -121,12 +146,16 @@ export default function SurveyResumeScreen() {
 		const suite = protocol?.suites.find(s => s.code === suiteCode);
 		const index = suiteQueue.indexOf(suiteCode);
 		const stageStatus: StageStatus =
-			isTerminal && index >= suiteIndex
-				? "abandoned"
-				: index < suiteIndex
-					? "done"
-					: index === suiteIndex && isActive
+			index < suiteIndex
+				? "done"
+				: index === suiteIndex
+					? isActive
 						? "in_progress"
+						: status === "ABANDONED"
+							? "abandoned"
+							: "pending"
+					: status === "ABANDONED"
+						? "abandoned"
 						: "pending";
 		return {
 			code: suiteCode,
@@ -148,20 +177,60 @@ export default function SurveyResumeScreen() {
 			</View>
 
 			<ScrollView contentContainerClassName="gap-6" className="flex-1">
-				<SurveyInviteCard
-					title="Continue de onde parou"
-					description={
-						suiteQueue.length > 0
+				<SurveyInviteCard>
+					<SurveyInviteCardHeader>
+						{personaLabel ? (
+							<SurveyInviteCardPersonaBadge>
+								{personaLabel}
+							</SurveyInviteCardPersonaBadge>
+						) : null}
+					</SurveyInviteCardHeader>
+					<SurveyInviteCardTitle>Continue de onde parou</SurveyInviteCardTitle>
+					<SurveyInviteCardDescription>
+						{suiteQueue.length > 0
 							? `Você está na Etapa ${suiteIndex + 1} de ${suiteQueue.length}.`
-							: "Continue sua participação."
-					}
-					personaLabel={personaLabel}
-					participantCode={participantCode ?? undefined}
-					stages={cardStages.length > 0 ? cardStages : undefined}
-					ctaLabel={ctaLabel}
-					ctaDisabled={isTerminal}
-					onPressCta={handleContinue}
-				/>
+							: "Continue sua participação."}
+					</SurveyInviteCardDescription>
+					<SurveyInviteCardInfo>
+						{personaLabel ? (
+							<SurveyInviteCardInfoItem>
+								<SurveyInviteCardInfoItemContent>
+									<SurveyInviteCardInfoItemLabel>
+										Seu perfil
+									</SurveyInviteCardInfoItemLabel>
+									<SurveyInviteCardInfoItemValue>
+										{personaLabel}
+									</SurveyInviteCardInfoItemValue>
+								</SurveyInviteCardInfoItemContent>
+								<UserRoundIcon size={18} color="#ffffffcc" />
+							</SurveyInviteCardInfoItem>
+						) : null}
+						{participantCode ? (
+							<SurveyInviteCardInfoItem onPress={handleCopyCode}>
+								<SurveyInviteCardInfoItemContent>
+									<SurveyInviteCardInfoItemLabel>
+										Seu código
+									</SurveyInviteCardInfoItemLabel>
+									<SurveyInviteCardInfoItemValue>
+										{participantCode}
+									</SurveyInviteCardInfoItemValue>
+								</SurveyInviteCardInfoItemContent>
+								<CopyIcon size={16} color="#ffffffcc" />
+							</SurveyInviteCardInfoItem>
+						) : null}
+					</SurveyInviteCardInfo>
+					<SurveyInviteCardStages items={cardStages} />
+					<SurveyInviteCardActions>
+						<Button
+							variant="secondary"
+							className="flex-1 h-12"
+							onPress={handleContinue}
+							disabled={isTerminal}
+						>
+							<ButtonText>{ctaLabel}</ButtonText>
+						</Button>
+					</SurveyInviteCardActions>
+				</SurveyInviteCard>
 
 				<View className="gap-2.5">
 					<Heading size="md">Etapas</Heading>
@@ -214,13 +283,19 @@ export default function SurveyResumeScreen() {
 						})}
 
 						<View className="flex-row items-center gap-3 rounded-lg bg-gray-50 p-3.5">
-							<CircleDashedIcon size={22} color={colors.yellow[600]} />
+							{hasClosingComment ? (
+								<CircleCheckIcon size={22} color={colors.lime[800]} />
+							) : (
+								<CircleDashedIcon size={22} color={colors.yellow[600]} />
+							)}
 							<View className="flex-1 gap-0.5">
 								<Text size="sm" bold>
 									Comentário final
 								</Text>
 								<Text size="xs" className="text-muted-foreground">
-									Pendente · disponível ao concluir tudo
+									{hasClosingComment
+										? "Concluído"
+										: "Pendente · disponível ao concluir tudo"}
 								</Text>
 							</View>
 						</View>

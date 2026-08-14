@@ -317,22 +317,22 @@ O release iOS é dividido entre o que o EAS já faz e o que precisamos injetar. 
 |---|---|
 | Build | `eas build` |
 | Upload do binário para a App Store Connect | `eas submit` (`fastlane pilot`), em `production.yml` |
-| Ficha, screenshots, revisão, categorias, classificação etária | **`eas metadata:push`** (`store.config.js`), em `ios-release.yml` |
-| Anexar o build à App Store Version | `scripts/submit-ios-for-review.mjs`, em `ios-release.yml` |
-| Enviar para o App Review | `scripts/submit-ios-for-review.mjs`, em `ios-release.yml` |
+| Ficha, screenshots, revisão, categorias, classificação etária | **`eas metadata:push`** (`store.config.js`), em `ios-review-submission.yml` |
+| Anexar o build à App Store Version | `store/scripts/submit-ios-for-review.mjs`, em `ios-review-submission.yml` |
+| Enviar para o App Review | `store/scripts/submit-ios-for-review.mjs`, em `ios-review-submission.yml` |
 
-As três últimas linhas rodam num workflow separado, `.eas/workflows/ios-release.yml`, disparado pelo trigger `on.app_store_connect.build_upload` quando a Apple termina de processar o upload — não como continuação síncrona de `production.yml`. Dois motivos:
+As três últimas linhas rodam num workflow separado, `.eas/workflows/ios-review-submission.yml`, disparado pelo trigger `on.app_store_connect.build_upload` quando a Apple termina de processar o upload — não como continuação síncrona de `production.yml`. Dois motivos:
 
 - **Esperar o processamento (minutos) dentro do job que fez o upload deixava o release inteiro vulnerável** a timeout e a 500 intermitente da ASC — foi o que quebrou a submissão da 1.0.2. O trigger `app_store_connect` entrega `app_store_connect.build_upload.build.id` já processado, então não há mais polling síncrono nesse ponto.
 - **Anexar o build e publicar a ficha viraram dois jobs independentes** (`push_ios_metadata` e `attach_and_submit_ios`), em vez de dois passos do mesmo job. Antes, uma falha ao anexar pulava a publicação das notas de versão — exatamente o que faltou na 1.0.2.
 
 Requer a conexão com a App Store Connect configurada uma vez no dashboard da EAS (Project Settings → App Store Connect) para o trigger disparar.
 
-`scripts/submit-ios-for-review.mjs` aceita duas formas de identificar o build:
-- `--build-id=<id>` (env `IOS_ASC_BUILD_ID`) — o caminho usado por `ios-release.yml`, sem polling por versão.
+`store/scripts/submit-ios-for-review.mjs` aceita duas formas de identificar o build:
+- `--build-id=<id>` (env `IOS_ASC_BUILD_ID`) — o caminho usado por `ios-review-submission.yml`, sem polling por versão.
 - `--build-number=<n>` (env `IOS_BUILD_NUMBER`) — fallback para execução manual; ainda espera o build chegar a `processingState: VALID` (timeout padrão 45 min, `ASC_BUILD_WAIT_TIMEOUT_MINUTES`).
 
-Se a versão já estiver em `WAITING_FOR_REVIEW` ou `IN_REVIEW`, o script encerra com sucesso e não mexe em nada — é o caso de um release enviado manualmente. `scripts/push-ios-metadata.mjs` envolve o `eas metadata:push` e falha explicitamente se a saída indicar upload/exclusão/reordenação de screenshot mal-sucedidos mesmo com exit code 0 (expo/eas-cli#3689, aberta e sem correção).
+Se a versão já estiver em `WAITING_FOR_REVIEW` ou `IN_REVIEW`, o script encerra com sucesso e não mexe em nada — é o caso de um release enviado manualmente. `store/scripts/push-ios-metadata.mjs` envolve o `eas metadata:push` e falha explicitamente se a saída indicar upload/exclusão/reordenação de screenshot mal-sucedidos mesmo com exit code 0 (expo/eas-cli#3689, aberta e sem correção).
 
 #### `store.config.js` — a ficha da App Store
 
@@ -410,7 +410,7 @@ O que **não** é compartilhado, e por quê: descrição, keywords e texto promo
 
 ### Publicação na Google Play
 
-O `submit_android` do workflow (que é `eas submit` por baixo) entrega o `.aab` na trilha configurada em `eas.json` — diferente do iOS, onde o binário só chega ao TestFlight — e já aplica `track`, `releaseStatus` e `rollout` daquele perfil. O que ele **não** faz é publicar as notas da versão nem sincronizar os dados de contato da ficha. Disso cuida o job **`publish_android`**, que roda `scripts/publish-android-release.mjs`.
+O `submit_android` do workflow (que é `eas submit` por baixo) entrega o `.aab` na trilha configurada em `eas.json` — diferente do iOS, onde o binário só chega ao TestFlight — e já aplica `track`, `releaseStatus` e `rollout` daquele perfil. O que ele **não** faz é publicar as notas da versão nem sincronizar os dados de contato da ficha. Disso cuida o job **`publish_android`**, que roda `store/scripts/publish-android-release.mjs`.
 
 > O EAS Metadata **não** cobre a Google Play — está explícito no FAQ da documentação do Expo. Por isso a ficha do Android depende de código nosso, enquanto a do iOS não.
 
@@ -461,7 +461,7 @@ npm run play:publish               # abre o edit e faz o commit
 
 `.eas/workflows/production.yml` dispara em push pra `production` (e também por `workflow_dispatch`, pra reexecutar só a publicação sem novo push — `get_build_*` reusa o build já feito pelo fingerprint). Cobre quality checks → fingerprint → decidir build-vs-OTA → upload dos binários → OTA.
 
-`.eas/workflows/ios-release.yml` dispara pelo trigger `on.app_store_connect.build_upload` — quando a Apple termina de processar um upload — e fecha o release iOS (ficha, anexar build, enviar pra revisão). Ver [Publicação na App Store](#publicação-na-app-store) para o porquê da separação.
+`.eas/workflows/ios-review-submission.yml` dispara pelo trigger `on.app_store_connect.build_upload`, quando a Apple termina de processar um upload, e coloca a versão na fila do App Review: publica a ficha, anexa o build à App Store Version e cria a review submission. Ele não publica na loja — a publicação acontece depois da aprovação da Apple, automaticamente, por causa do `release.automaticRelease` no `store.config.js`. Ver [Publicação na App Store](#publicação-na-app-store) para o porquê da separação.
 
 Pra uma ação manual e pontual como "builda o dev client agora", um workflow seria só uma casca em volta do próprio `eas build`, sem ganho nenhum — por isso não tem workflow dedicado.
 
@@ -495,15 +495,14 @@ A regra é: **tudo que o EAS cobre fica no EAS**; escrevemos código só para o 
 Duas descobertas mudaram esse desenho:
 
 - **O EAS Metadata publica screenshots.** A tabela "When to use EAS Metadata" da documentação do Expo ainda lista *Upload screenshots ✗*, mas `eas metadata:pull` baixa as imagens e o `push` as envia. A doc está atrasada em relação à CLI.
-- **O EAS Metadata não cobre a Google Play**, e isso está explícito no FAQ do Expo. Por isso a ficha do Android depende de código nosso, enquanto a do iOS não. Se o Expo fechar essa lacuna, `scripts/publish-android-release.mjs` deve ser aposentado do mesmo jeito que o código de metadata do iOS foi.
+- **O EAS Metadata não cobre a Google Play**, e isso está explícito no FAQ do Expo. Por isso a ficha do Android depende de código nosso, enquanto a do iOS não. Se o Expo fechar essa lacuna, `store/scripts/publish-android-release.mjs` deve ser aposentado do mesmo jeito que o código de metadata do iOS foi.
 
 ### Pendências
 
-**A submissão da 1.0.2 (build 21) rodou ponta a ponta e falhou em `submit_for_review` e `publish_android`** — a causa raiz era a mesma nos dois: `env` de step individual não interpola `${{ needs.*.outputs.* }}` (a expressão chegava como string literal, causando 400 na Google Play e 500 na App Store Connect). Corrigido movendo `env` pro nível do job. A reestruturação em dois workflows (`production.yml` + `ios-release.yml`, ago/2026) endureceu o resto: validação de formato dos identificadores de build, retry com backoff em 5xx/429, e a finalização do iOS decoupled do polling síncrono.
+**A submissão da 1.0.2 (build 21) rodou ponta a ponta e falhou em `submit_for_review` e `publish_android`** — a causa raiz era a mesma nos dois: `env` de step individual não interpola `${{ needs.*.outputs.* }}` (a expressão chegava como string literal, causando 400 na Google Play e 500 na App Store Connect). Corrigido movendo `env` pro nível do job. A reestruturação em dois workflows (`production.yml` + `ios-review-submission.yml`, ago/2026) endureceu o resto: validação de formato dos identificadores de build, retry com backoff em 5xx/429, e a finalização do iOS decoupled do polling síncrono.
 
 **Setup único pendente, fora do código:**
-- Conectar a App Store Connect no dashboard da EAS (Project Settings → App Store Connect), exigido pelo trigger `on.app_store_connect` em `ios-release.yml`.
-- Opcional: `SLACK_WEBHOOK_URL` como env var da EAS, pra o job `notify` de `ios-release.yml` (o de `production.yml` usa `github-comment`, que não precisa de setup extra).
+- Conectar a App Store Connect no dashboard da EAS (Project Settings → App Store Connect), exigido pelo trigger `on.app_store_connect` em `ios-review-submission.yml`. Confirmado funcionando no release 1.0.3.
 
 **App Store**
 

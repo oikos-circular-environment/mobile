@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Dimensions, Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -16,6 +16,7 @@ import { toast } from "@/components/toast";
 import { resolveTaskRun } from "@/libs/survey/task-run";
 import {
 	selectAllTasksResolved,
+	selectCurrentTaskActiveMs,
 	selectResolvedTaskCount,
 	useSurveyExecutionStore,
 } from "@/stores/survey-execution-store";
@@ -34,6 +35,7 @@ function formatElapsed(ms: number) {
 
 export function SurveyExecutionOverlay() {
 	const router = useRouter();
+	const segments = useSegments();
 	const surveyStatus = useSurveyStore(s => s.status);
 	const isActive = useSurveyExecutionStore(s => s.isActive);
 	const isPaused = useSurveyExecutionStore(s => s.isPaused);
@@ -100,7 +102,12 @@ export function SurveyExecutionOverlay() {
 		],
 	}));
 
-	if (surveyStatus !== "IN_PROGRESS" || !isActive || isPaused) {
+	if (
+		surveyStatus !== "IN_PROGRESS" ||
+		!isActive ||
+		isPaused ||
+		segments[0] === "survey"
+	) {
 		return null;
 	}
 
@@ -130,6 +137,7 @@ export function SurveyExecutionOverlay() {
 				currentTask.code,
 				currentTask.position,
 				"NO",
+				selectCurrentTaskActiveMs(useSurveyExecutionStore.getState()),
 			).catch(() => {});
 		}
 		abandonCurrentTask();
@@ -141,9 +149,18 @@ export function SurveyExecutionOverlay() {
 			const toResolve = tasks.filter(
 				t => t.status !== "done" && t.status !== "abandoned",
 			);
+			const openTaskActiveMs = selectCurrentTaskActiveMs(
+				useSurveyExecutionStore.getState(),
+			);
 			await Promise.all(
 				toResolve.map(t =>
-					resolveTaskRun(suiteRunId, t.code, t.position, "NO").catch(() => {}),
+					resolveTaskRun(
+						suiteRunId,
+						t.code,
+						t.position,
+						"NO",
+						t.code === currentTask?.code ? openTaskActiveMs : 0,
+					).catch(() => {}),
 				),
 			);
 		}

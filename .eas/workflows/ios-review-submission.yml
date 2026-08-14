@@ -1,0 +1,48 @@
+name: iOS App Review submission
+
+# Requer a conexão com a App Store Connect configurada no dashboard da EAS
+# (Project Settings → App Store Connect) — é um setup único, fora do código.
+# Ver docs/publishing-path.md — "Publicação na App Store".
+on:
+  app_store_connect:
+    build_upload:
+      states:
+        - complete
+  # Caminho de recuperação: o contexto app_store_connect só existe no trigger
+  # por evento, então na execução manual o build vem pelo número.
+  workflow_dispatch:
+    inputs:
+      build_number:
+        type: string
+        required: true
+        description: 'Build number na App Store Connect (ex.: 22)'
+
+jobs:
+  # Job independente do attach — antes eram passos sequenciais, e uma falha
+  # ao anexar pulava a publicação das notas de versão (o que faltou na 1.0.2).
+  push_ios_metadata:
+    name: Push App Store metadata
+    type: custom
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - name: Push metadata
+        env:
+          EXPO_APPLE_TEAM_ID: "339A2VX3JG"
+          EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
+        run: node store/scripts/push-ios-metadata.mjs
+
+  # O id vem pronto do trigger e dispensa o polling; na execução manual ele
+  # fica vazio e o script cai no número do build.
+  attach_and_submit_ios:
+    name: Attach build and submit for review
+    type: custom
+    needs: [push_ios_metadata]
+    env:
+      IOS_ASC_BUILD_ID: ${{ app_store_connect.build_upload.build.id || '' }}
+      IOS_BUILD_NUMBER: ${{ inputs.build_number || '' }}
+    steps:
+      - uses: eas/checkout
+      - run: npm ci
+      - name: Attach build and submit for review
+        run: node store/scripts/submit-ios-for-review.mjs

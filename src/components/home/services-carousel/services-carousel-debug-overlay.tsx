@@ -1,6 +1,6 @@
 import { BlurView } from "expo-blur";
 import { PauseIcon, PlayIcon } from "lucide-react-native";
-import { useState } from "react";
+import { type RefObject, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useAnimatedReaction } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -11,10 +11,13 @@ import { useServicesCarouselContext } from "./context";
 interface ServicesCarouselDebugOverlayProps {
 	/** Liga/desliga o overlay manualmente — pensado só pra depuração da temporização. */
 	isVisible: boolean;
+	/** Ref do BlurTargetView do card, usado como fonte do blur do overlay. */
+	blurTarget: RefObject<View | null>;
 }
 
 export function ServicesCarouselDebugOverlay({
 	isVisible,
+	blurTarget,
 }: ServicesCarouselDebugOverlayProps) {
 	const { progress, isPaused, autoPlayIntervalMs, scale } =
 		useServicesCarouselContext();
@@ -50,6 +53,7 @@ export function ServicesCarouselDebugOverlay({
 				intensity={30}
 				tint="dark"
 				style={StyleSheet.absoluteFill}
+				blurTarget={blurTarget}
 				blurMethod="dimezisBlurView"
 			/>
 			<StateIcon size={12 * scale} color={colors.white} />

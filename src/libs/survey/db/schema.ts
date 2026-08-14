@@ -103,6 +103,7 @@ export const surveyEvent = sqliteTable(
 		taskCode: text("task_code"),
 		occurredAt: text("occurred_at").notNull(),
 		payload: text("payload", { mode: "json" }).notNull(),
+		sentAt: text("sent_at"),
 	},
 	t => [index("survey_event_session_seq").on(t.sessionId, t.seq)],
 );
@@ -147,3 +148,12 @@ export const surveyOutbox = sqliteTable(
 	},
 	t => [index("survey_outbox_session_status").on(t.sessionId, t.status)],
 );
+
+/** Cache local do protocolo vigente (E1). Uma única linha, chaveada por `protocolKey`. */
+export const surveyProtocolCache = sqliteTable("survey_protocol_cache", {
+	protocolKey: text("protocol_key").primaryKey(),
+	protocolVersion: integer("protocol_version").notNull(),
+	payload: text("payload", { mode: "json" }).notNull(),
+	createdAt: text("created_at").notNull(),
+	updatedAt: text("updated_at").notNull(),
+});
