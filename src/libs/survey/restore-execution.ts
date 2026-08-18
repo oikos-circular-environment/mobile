@@ -148,8 +148,10 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 		tasks: normalizedTasks,
 		currentTaskIndex: currentTaskIndex === -1 ? tasks.length : currentTaskIndex,
 		suiteRunId: currentSuiteRun.id,
-		isActive: !currentSuiteRun.finishedAt,
-		isExpanded: !currentSuiteRun.finishedAt,
+		// Dados vêm sempre — a contagem (isActive) só liga no toque manual em
+		// "Continuar" (`useSurveyContinue`), nunca sozinha na restauração.
+		isActive: false,
+		isExpanded: false,
 		isPaused: false,
 		suiteActiveMs: currentSuiteRun.activeMs,
 		currentTaskStartActiveMs: 0,
