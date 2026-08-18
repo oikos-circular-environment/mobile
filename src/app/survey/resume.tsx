@@ -89,8 +89,11 @@ export default function SurveyResumeScreen() {
 
 	const suiteQueue = useSurveyExecutionStore(s => s.suiteQueue);
 	const suiteIndex = useSurveyExecutionStore(s => s.suiteIndex);
-	const isActive = useSurveyExecutionStore(s => s.isActive);
+	const suiteRunId = useSurveyExecutionStore(s => s.suiteRunId);
+	const currentSuiteCode = useSurveyExecutionStore(s => s.suiteCode);
 	const handleContinue = useSurveyContinue();
+	const hasResumableSuite =
+		Boolean(suiteRunId) && suiteQueue[suiteIndex] === currentSuiteCode;
 
 	const deleteSheetRef = useRef<DeleteSurveyDataSheetHandle>(null);
 	const abandonSheetRef = useRef<AbandonSurveySheetHandle>(null);
@@ -149,7 +152,7 @@ export default function SurveyResumeScreen() {
 			index < suiteIndex
 				? "done"
 				: index === suiteIndex
-					? isActive
+					? hasResumableSuite
 						? "in_progress"
 						: status === "ABANDONED"
 							? "abandoned"

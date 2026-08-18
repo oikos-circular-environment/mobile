@@ -52,6 +52,7 @@ describe("useSurveyContinue", () => {
 			specificObjectives: [],
 			tasks: [],
 		});
+		useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");
 		useSurveyExecutionStore.getState().beginSuite();
 		useSurveyExecutionStore.getState().setPaused(true);
 
