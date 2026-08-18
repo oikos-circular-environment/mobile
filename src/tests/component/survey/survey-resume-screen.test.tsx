@@ -50,6 +50,10 @@ const mockEnqueueAbandon = jest.fn().mockResolvedValue(undefined);
 const mockEnqueueCheckpoint = jest.fn().mockResolvedValue(undefined);
 const mockDrainOutbox = jest.fn().mockResolvedValue(undefined);
 const mockDeleteLocalSurveyData = jest.fn().mockResolvedValue(undefined);
+const mockSessionDelete = jest.fn().mockResolvedValue({
+	participant_code: "PSQ-TEST",
+	deleted: true,
+});
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({
@@ -73,6 +77,16 @@ jest.mock("@/libs/survey/queue/outbox", () => ({
 jest.mock("@/libs/survey/delete-local-data", () => ({
 	deleteLocalSurveyData: (...args: unknown[]) =>
 		mockDeleteLocalSurveyData(...args),
+}));
+
+jest.mock("@/libs/survey/api/client", () => ({
+	surveyClient: {
+		usability: {
+			session: {
+				delete: { mutate: (...args: unknown[]) => mockSessionDelete(...args) },
+			},
+		},
+	},
 }));
 
 jest.mock("@/components/survey/hooks/use-survey-protocol");
@@ -102,6 +116,7 @@ describe("SurveyResumeScreen", () => {
 		mockEnqueueCheckpoint.mockClear();
 		mockDrainOutbox.mockClear();
 		mockDeleteLocalSurveyData.mockClear();
+		mockSessionDelete.mockClear();
 		await mockDb.delete(surveyAnswer).run();
 		await mockDb.delete(surveySuiteRun).run();
 		await mockDb.delete(surveySession).run();
@@ -258,6 +273,7 @@ describe("SurveyResumeScreen", () => {
 
 		await user.press(screen.getByText("Excluir meus dados"));
 
+		expect(mockSessionDelete).toHaveBeenCalledWith({ session_id: "session-1" });
 		expect(mockDeleteLocalSurveyData).toHaveBeenCalledWith("session-1");
 		expect(useSurveyStore.getState().sessionId).toBeNull();
 		expect(mockDismissTo).toHaveBeenCalledWith("/(tabs)/(home)");
