@@ -111,12 +111,13 @@ describe("SurveyInviteBanner", () => {
 		useSurveyStore.getState().startSession("session-1", "CITIZEN");
 		useSurveyExecutionStore.getState().initRoteiro(["S1", "S2"]);
 		useSurveyExecutionStore.getState().openSuiteIntro({
-			code: "S2",
+			code: "S1",
 			title: "Etapa 2",
 			objective: "Objetivo",
 			specificObjectives: [],
 			tasks: [],
 		});
+		useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");
 		useSurveyExecutionStore.getState().beginSuite();
 		useSurveyExecutionStore.getState().setPaused(true);
 

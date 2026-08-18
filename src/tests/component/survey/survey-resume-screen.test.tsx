@@ -127,6 +127,7 @@ describe("SurveyResumeScreen", () => {
 			specificObjectives: [],
 			tasks: [],
 		});
+		useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");
 		useSurveyExecutionStore.getState().beginSuite();
 
 		await render(<SurveyResumeScreen />);
@@ -235,6 +236,7 @@ describe("SurveyResumeScreen", () => {
 			specificObjectives: [],
 			tasks: [],
 		});
+		useSurveyExecutionStore.getState().setSuiteRunId("suite-run-1");
 		useSurveyExecutionStore.getState().beginSuite();
 		useSurveyExecutionStore.getState().setPaused(true);
 
