@@ -3,6 +3,7 @@ import BottomSheet, {
 	type BottomSheetBackdropProps,
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { TRPCClientError } from "@trpc/client";
 import { useRouter } from "expo-router";
 import {
 	forwardRef,
@@ -12,9 +13,11 @@ import {
 	useState,
 } from "react";
 import { View } from "react-native";
+import { toast } from "@/components/toast";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { surveyClient } from "@/libs/survey/api/client";
 import { deleteLocalSurveyData } from "@/libs/survey/delete-local-data";
 import { useSurveyDraftStore } from "@/stores/survey-draft-store";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
@@ -59,6 +62,24 @@ export const DeleteSurveyDataSheet = forwardRef<
 	const handleDelete = async () => {
 		if (!sessionId) return;
 		setIsDeleting(true);
+
+		try {
+			await surveyClient.usability.session.delete.mutate({
+				session_id: sessionId,
+			});
+		} catch (error) {
+			const alreadyGone =
+				error instanceof TRPCClientError && error.data?.code === "NOT_FOUND";
+			if (!alreadyGone) {
+				setIsDeleting(false);
+				toast.error(
+					"Não foi possível excluir do servidor",
+					"Seus dados locais continuam salvos. Tente novamente com internet.",
+				);
+				return;
+			}
+		}
+
 		try {
 			await deleteLocalSurveyData(sessionId);
 			useSurveyStore.getState().reset();
@@ -85,10 +106,9 @@ export const DeleteSurveyDataSheet = forwardRef<
 					<Heading size="lg">Excluir meus dados da pesquisa?</Heading>
 
 					<Text size="sm" className="leading-5">
-						Todas as respostas e o progresso guardados neste aparelho para o
-						código abaixo serão apagados agora. Para excluir também o que já foi
-						enviado ao servidor, entre em contato com o pesquisador informando
-						este código — é assim que o pedido de exclusão é processado.
+						Todas as respostas e o progresso guardados neste aparelho e no
+						servidor para o código abaixo serão apagados agora. Essa ação não
+						pode ser desfeita.
 					</Text>
 
 					<View className="items-center rounded-lg bg-gray-50 p-4">
