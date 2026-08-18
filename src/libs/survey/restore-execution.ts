@@ -66,7 +66,6 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 		s => s.suite_code,
 	);
 
-	// Garante que o roteiro da persona esteja no store.
 	useSurveyExecutionStore.setState({ suiteQueue: personaSuiteCodes });
 
 	const currentSuiteRun =
@@ -90,8 +89,6 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 		return;
 	}
 
-	// Se a suíte atual já está finalizada, o índice deve apontar para depois dela,
-	// indicando que todas as suítes foram concluídas.
 	const suiteIndex = currentSuiteRun.finishedAt
 		? currentSuiteIndex + 1
 		: currentSuiteIndex;
@@ -148,8 +145,6 @@ export async function restoreSurveyExecution(input: RestoreExecutionInput) {
 		tasks: normalizedTasks,
 		currentTaskIndex: currentTaskIndex === -1 ? tasks.length : currentTaskIndex,
 		suiteRunId: currentSuiteRun.id,
-		// Dados vêm sempre — a contagem (isActive) só liga no toque manual em
-		// "Continuar" (`useSurveyContinue`), nunca sozinha na restauração.
 		isActive: false,
 		isExpanded: false,
 		isPaused: false,

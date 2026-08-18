@@ -12,10 +12,6 @@ export function useSurveyContinue() {
 	const setPaused = useSurveyExecutionStore(s => s.setPaused);
 	const beginSuite = useSurveyExecutionStore(s => s.beginSuite);
 
-	// `suiteRunId`/`suiteCode` já vêm restaurados (dados sempre montados); a suíte
-	// corrente só passa a contar (isActive) neste toque explícito, nunca sozinha no
-	// boot. A comparação com `suiteQueue[suiteIndex]` evita reativar um `suiteRunId`
-	// de uma suíte já concluída, deixado no store por uma suíte anterior.
 	const hasResumableSuite =
 		Boolean(suiteRunId) && suiteQueue[suiteIndex] === suiteCode;
 
