@@ -41,6 +41,7 @@ import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { MapSkeleton } from "@/components/ui/map-skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
@@ -389,6 +390,7 @@ export default function ComplaintsMapScreen() {
 					);
 				})}
 			</MapView>
+			{!isMapReady && <MapSkeleton />}
 
 			{/* Filter row */}
 			<View
