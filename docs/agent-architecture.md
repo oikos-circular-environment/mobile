@@ -1,12 +1,13 @@
 # Arquitetura de Agents Especializados — Oikos Mobile
 
-> **Status: experimental.** Este documento define a *especificação* de um conjunto de subagents
-> especializados para trabalhar neste repositório. Hoje (2026-08-26) já existem as **skills** que
-> esses agents vão consumir (`.agents/skills/`, ver seção 6), mas os arquivos `.claude/agents/*.md`
-> em si ainda não foram criados — implementá-los é o próximo passo, não coberto por este documento.
-> Ver seção 8.
+> **Status: implementado, em teste prático.** Os 13 agents descritos aqui existem de fato em
+> `.claude/agents/*.md`, consumindo as skills de `.agents/skills/` (seção 6). `observability-executor`
+> é a única peça da spec original que ficou só no papel — por decisão explícita, sem instrumentar
+> ferramenta nova enquanto `plans/epic-3-observability` não decidir o vendor. Ver seção 8 pro que
+> falta validar na prática.
 >
-> Público-alvo: qualquer pessoa (ou agente) que vá rodar este projeto e programar usando Claude Code.
+> Público-alvo: qualquer pessoa (ou agente) que vá rodar este projeto e programar usando Claude Code
+> e/ou OpenCode — ver seção 9 pra como os dois se encaixam.
 
 ## 1. Problema que isso resolve
 
@@ -151,7 +152,7 @@ tools (qa-runner):            Read, Grep, Glob, Bash, Skill  (sem Edit/Write —
 | `data-executor` | Hooks de dados, formulários, consumo do `oikos-sdk`, mutations/queries, estado global | `expo-data-fetching`, `native-data-fetching`, `dinero-*` (valores monetários do Market), `react-state-management`, `zustand` | React Query para todo estado de servidor, `react-hook-form`+`zod`, nunca editar `src/libs/oikos-sdk/` à mão (regenerar via `npm run generate:api`); Zustand está instalado mas sem uso real hoje — só introduzir se Context API deixar de bastar para um caso concreto, não preventivamente |
 | `native-executor` | Módulos nativos, permissões, config plugins (`plugins/`, `app.config.ts`, `expo-camera`/`expo-location`) | `expo-module`, `expo-native-ui`, `eas-workflows` | Preferir config plugin a edição manual de `android/`/`ios/` (que são gerados e gitignored — ver `plugins/withAndroidSplashWindowBackground.js` como referência real deste repo) |
 | `release-executor` | Publicação, EAS, release notes, ASC/Play (`store/`, `.eas/`, `eas.json`) | `eas-app-stores`, `eas-workflows`, `eas-update-insights`, `copywriting`/`copy-editing` | Release notes ≤500 caracteres (`wc -m` antes de commitar, ver `docs/publishing-path.md`), nunca pular validação de char limit |
-| `observability-executor` | Instrumentação de erro/performance (SDK setup, releases, alertas) | `sentry-get-started`, `sentry-react-native-sdk`, `sentry-instrument`, `sentry-setup-releases`, `posthog-instrumentation`, `eas-observe` | Implementa o que o `observability-analyst` apontar como faltando — hoje isso é literalmente o escopo do `plans/epic-3-observability` (decisão de ferramenta ainda em aberto: Sentry/BugSnag para crash, PostHog/Amplitude/Firebase para analytics) |
+| `observability-executor` **(não implementado)** | Instrumentação de erro/performance (SDK setup, releases, alertas) | `sentry-get-started`, `sentry-react-native-sdk`, `sentry-instrument`, `sentry-setup-releases`, `posthog-instrumentation`, `eas-observe` | Ficaria pronto pra implementar o que `observability-analyst` apontar como faltando, mas por decisão explícita não construímos esse arquivo agora — sem instrumentar ferramenta nova antes do `plans/epic-3-observability` decidir o vendor |
 | `performance-executor` | Qualquer camada, quando o pedido é otimização (não feature nova) | `argent-react-native-optimization`, `expo-react-native-performance`, `react-native-architecture`, `react-state-management`, `typescript-refactor` | Ver nota abaixo — é a exceção deliberada ao padrão Analista/Executor |
 | `qa-runner` | **Não escreve código.** Roda o app, verifica, coleta evidência | `agent-device`, `android-emulator`, `ios-simulator`, `dogfood`, `expo-dev-client` | Fluxo `open → snapshot -i → act → re-snapshot → verify → close`; app já precisa estar rodando (`npm run android`/`ios`); reporta pass/fail + screenshots/logs ao orquestrador — não corrige o que encontrar, devolve para o executor certo |
 
@@ -219,7 +220,12 @@ Rode `npm run lint` e, se o ticket tiver testes associados, `npm test`. Não mar
 concluído — isso é decisão do orquestrador após o `qa-runner` validar.
 ```
 
-### Exemplo completo — `observability-executor`
+### Exemplo (não implementado) — `observability-executor`
+
+> Este arquivo `.claude/agents/observability-executor.md` **não existe no repo** — o resto dos
+> 13 agents desta spec já foi implementado, esse ficou de fora por decisão explícita (ver
+> status no topo do documento). O exemplo abaixo continua valendo como template pra quando
+> `plans/epic-3-observability` decidir a ferramenta.
 
 ```markdown
 ---
@@ -368,36 +374,94 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 - **Escrita:** `copywriting`/`copy-editing` (instaladas nesta sessão) cobrem tanto texto de produto
   (UI, `ui-executor`) quanto texto de release (`release-executor`, release notes com limite de 500
   caracteres).
-- **Observabilidade:** `observability-analyst`/`observability-executor` são a materialização do
-  `plans/epic-3-observability`, hoje travado em "aguarda decisão de ferramenta" — esses agents
-  não destravam a decisão sozinhos, mas ficam prontos pra executar qualquer um dos dois caminhos
-  (Sentry ou PostHog) assim que alguém decidir.
+- **Observabilidade:** `observability-analyst` materializa a metade "entender o que já existe e
+  o que falta" do `plans/epic-3-observability`, lendo o EAS Observe (epic-2, já implementado) —
+  sem instrumentar nada novo. A metade "implementar" (`observability-executor`) fica só como
+  template até alguém decidir Sentry vs. PostHog (ou outro).
 - **Performance:** `performance-executor` não nasce de um epic específico — é acionado ad-hoc
   quando o pedido é "isso está lento"/"otimiza isso", não uma feature planejada.
 
 ## 8. Status atual e próximos passos
 
 O que já existe:
-- [x] Skills de automação de app (`agent-device` + 3 companheiras) instaladas e documentadas em
-      `CLAUDE.md`.
-- [x] Skills de copywriting instaladas.
-- [x] Skills de performance/TypeScript moderno e de observabilidade (Sentry + PostHog)
-      instaladas.
-- [x] Este documento — a especificação da arquitetura de agents (6 Analistas, 6 Executores,
-      contando `performance-executor` e `observability-executor`).
+- [x] Skills de automação de app (`agent-device` + 3 companheiras), copywriting,
+      performance/TypeScript moderno, observabilidade (Sentry + PostHog) e arquitetura
+      (SOLID/DDD/clean-architecture/clean-code, zustand, react-composition-2026) instaladas.
+- [x] Os 13 arquivos `.claude/agents/*.md` (7 Analistas + 6 Executores/QA) implementados.
+- [x] Integração com o pipeline OpenCode do repo `api` (`.opencode/prompt/*.md` desta mobile) —
+      ver seção 9.
+- [x] Este documento.
 
-O que **não** existe ainda (próximo passo natural, fora do escopo deste documento):
-- [ ] Os arquivos `.claude/agents/*.md` de fato (os 6 Analistas + 6 Executores/QA descritos
-      aqui).
+O que **não** existe ainda:
+- [ ] `observability-executor` (decisão explícita — ver seção 7).
 - [ ] Uma skill de projeto (não global) para gerar `epic-brief.md`/`tech-plan.md`/`tickets.md` no
       formato deste repo — hoje esse fluxo depende de skills globais de uma máquina específica.
 - [ ] A decisão de ferramenta do `plans/epic-3-observability` em si (Sentry vs. BugSnag,
-      PostHog vs. Amplitude/Firebase) — este documento arma o `observability-executor` pra
-      qualquer um dos caminhos, mas não escolhe por ninguém.
-- [ ] Validação prática: rodar esse pipeline em uma tarefa real e medir se de fato reduz consumo de
-      contexto/token frente ao agent generalista atual — é isso que o pedido original chamou de
-      "testar essa prática".
+      PostHog vs. Amplitude/Firebase) — não é algo que este documento resolve.
+- [ ] Validação prática: rodar esse pipeline numa tarefa real e medir se de fato reduz consumo de
+      contexto/token frente ao agent generalista — é isso que o pedido original chamou de "testar
+      essa prática", e é o próximo passo real agora que os agents existem de verdade.
 
-Quando for a hora de implementar os arquivos `.claude/agents/*.md`, os exemplos completos das
-seções 3 e 4 já são o template — os demais agents da tabela seguem a mesma forma, trocando domínio,
-skills e regras específicas.
+## 9. Modelo híbrido: Claude Code + OpenCode
+
+Dois motores diferentes, cada um no papel que faz sentido pro custo dele — não dois jeitos
+concorrentes de fazer a mesma coisa.
+
+### Claude Code — julgamento (todos os 13 agents desta spec)
+
+Todo Analista e todo Executor roda em **`model: sonnet`** por padrão — é o modelo com reasoning
+suficiente pra aplicar convenção de framework corretamente e pra julgar escopo, sem o custo do
+Opus. A única exceção é `qa-runner`, em **`model: haiku`**: ele segue um protocolo fixo (abrir
+app → interagir → verificar → fechar) com pouca ambiguidade de julgamento — o ganho está em
+executar o roteiro certo, não em decidir arquitetura. Se um caso concreto mostrar Haiku errando
+a leitura de um snapshot ou travando numa decisão de navegação, isso é sinal pra promover **esse
+agent específico** pra `sonnet` — não todos preventivamente, o que anularia a economia.
+
+Não usamos Opus em nenhum agent desta spec por padrão. Se um domínio específico (ex.:
+`data-layer-analyst` numa decisão arquitetural grande) mostrar que Sonnet não dá conta, isso
+também é uma promoção pontual, não uma mudança de baseline.
+
+### OpenCode — execução mecânica em lote (tier gratuito primeiro)
+
+Este repo **reaproveita** o pipeline que já existe pro `api` (`~/.config/opencode/opencode.json`,
+escopo de máquina, não deste repo) em vez de inventar um novo:
+
+| Tier | Agent OpenCode | Modelo | Uso |
+|---|---|---|---|
+| T0 | `oikos-text` | `ollama/qwen2.5-coder:3b` (local) | Só texto curto (mensagem de commit, changelog) — nunca código. Modelo local não é forte o bastante pra mais que isso. |
+| T1 | `oikos-exec` | `opencode/big-pickle` | Executor principal, gratuito e generoso — primeira tentativa pra trabalho mecânico já 100% especificado. |
+| T1 alt | `oikos-exec-gemini` | `google/gemini-3.6-flash` | Quando a task tem muito contexto de leitura. |
+| T1 fallback | `oikos-exec-alt` | `opencode/deepseek-v4-flash-free` | Segunda tentativa gratuita antes de escalar pra tier pago. |
+| T2 | `oikos-exec-go` | `opencode-go/kimi-k2.7-code` | Pago (assinatura OpenCode Go) — crédito curto hoje, então é escalonamento consciente, não default. |
+| Review | `oikos-review` | `opencode/ling-3.0-tiny-free` | Só lê e reporta, nunca edita — barato o bastante pra rodar sempre antes de um `worker_done` de sucesso. |
+
+`.opencode/prompt/{oikos-exec,oikos-review,oikos-text}.md` **neste repo** dão a cada tier as
+convenções da mobile (gluestack-ui/NativeWind, `android/`/`ios/` gerados, `oikos-sdk` gerado) —
+os agents em si (modelo, permissão, fallback) continuam definidos globalmente, então o mesmo
+pipeline atende `api`, `mobile`, e qualquer outro repo do org que ganhar seu próprio
+`.opencode/prompt/`.
+
+**Como um Executor Claude despacha pro OpenCode:** via Bash, não via tool `Agent` (são processos
+completamente separados) —
+
+```
+opencode run --agent oikos-exec --format json "<task totalmente especificada>"
+```
+
+A task só deve ser despachada quando **não sobra nenhuma decisão de design** pro worker —
+arquivos exatos, padrão exato, exemplo já escrito pelo Executor Claude. O worker executa, não
+julga escopo; quem garante que ele não passou dos limites do ticket é o Executor Claude, revisando
+o diff antes de reportar ao orquestrador. `ui-executor` e `data-executor` documentam isso
+explicitamente; `native-executor` e `release-executor` optam por **não delegar** — baixa margem
+de erro (mudança nativa só valida depois de build real) ou trabalho com credencial/char-limit
+exato demais pra confiar num worker sem julgamento.
+
+### Por que não mais provedores gratuitos, nem modelo local mais pesado
+
+Documentado aqui porque foi decisão explícita, não omissão: servidores/modelos gratuitos fora do
+que já está configurado (`big-pickle`, `deepseek-v4-flash-free`, `gemini-3.6-flash`) estão cada
+vez mais raros e não valem o custo de descoberta/manutenção; modelos locais (`qwen2.5-coder:3b`
+via Ollama) não têm reasoning suficiente pra código real neste projeto — por isso ficam
+restritos a T0 (texto puro). Se isso mudar (hardware melhor, modelo local mais forte), revisar
+essa restrição é razoável — não é um limite permanente, é o estado real de hoje
+(2026-08-26).
