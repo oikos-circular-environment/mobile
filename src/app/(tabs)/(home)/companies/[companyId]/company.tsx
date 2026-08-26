@@ -344,18 +344,17 @@ export default function CompanyGeneralInfoScreen() {
 									className="rounded-md shadow-lg "
 								>
 									<Avatar size="lg">
-										{(avatarPreviewUri ?? company?.avatar?.url) ? (
+										<FactoryIcon
+											size={36}
+											color={colors.lime[800]}
+											strokeWidth={1.5}
+										/>
+										{(avatarPreviewUri ?? company?.avatar?.url) && (
 											<AvatarImage
 												source={{
 													uri: avatarPreviewUri ?? company?.avatar?.url,
 													headers: getAuthenticatedImageHeaders(),
 												}}
-											/>
-										) : (
-											<FactoryIcon
-												size={36}
-												color={colors.lime[800]}
-												strokeWidth={1.5}
 											/>
 										)}
 									</Avatar>
