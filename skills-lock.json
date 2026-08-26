@@ -1,6 +1,18 @@
 {
 	"version": 1,
 	"skills": {
+		"agent-device": {
+			"source": "callstack/agent-device",
+			"sourceType": "github",
+			"skillPath": "skills/agent-device/SKILL.md",
+			"computedHash": "0a673fe5ec24469f6ad35596cdf40f9d33076b78d0a929742d9e1de83f97d231"
+		},
+		"android-emulator": {
+			"source": "callstack/agent-device",
+			"sourceType": "github",
+			"skillPath": "skills/android-emulator/SKILL.md",
+			"computedHash": "20b3ca719cceeb25a7442f167f5ae60a816e03cd2b05dc3574cdd9d9056e8dac"
+		},
 		"building-native-ui": {
 			"source": "expo/skills",
 			"sourceType": "github",
@@ -24,6 +36,12 @@
 			"skillPath": "skills/dinero-formatting/SKILL.md",
 			"computedHash": "8f176bd8c9cc2a9b0d587fbbed1f3adf2fb9a66597c75a0bed9721dcaf763594"
 		},
+		"dogfood": {
+			"source": "callstack/agent-device",
+			"sourceType": "github",
+			"skillPath": "skills/dogfood/SKILL.md",
+			"computedHash": "8e6dfbff0633e355210ce7ae109cb39a3e1347946b6e92aaa607271154526b6b"
+		},
 		"expo-tailwind-setup": {
 			"source": "expo/skills",
 			"sourceType": "github",
@@ -33,6 +51,12 @@
 			"source": "gluestack/agent-skills",
 			"sourceType": "github",
 			"computedHash": "5f00d8934fef415e31bbae36b1cb8bfe59452eeff0e48dea27172d620a00c612"
+		},
+		"ios-simulator": {
+			"source": "callstack/agent-device",
+			"sourceType": "github",
+			"skillPath": "skills/ios-simulator/SKILL.md",
+			"computedHash": "a0196ca78c5af1e2f25f4d534b3971fe8d9e5e6aa02a2d0f35a53b222bca57da"
 		},
 		"native-data-fetching": {
 			"source": "expo/skills",
