@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { BuildingIcon, CheckIcon, SearchIcon } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Image, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { colors } from "@/components/style/colors";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
 	BottomSheet,
 	BottomSheetBackdrop,
@@ -134,32 +135,29 @@ export function CompanyPickerBottomSheet({
 								}}
 								activeOpacity={0.7}
 							>
-								{item.avatar?.url ? (
-									<Image
-										source={{
-											uri: item.avatar.url,
-											headers: getAuthenticatedImageHeaders(),
-										}}
-										style={{ width: 40, height: 40, borderRadius: 20 }}
+								<Avatar
+									size="sm"
+									style={{
+										width: 40,
+										height: 40,
+										borderRadius: 20,
+										backgroundColor: colors.gray[100],
+									}}
+								>
+									<BuildingIcon
+										size={16}
+										color={colors.gray[500]}
+										strokeWidth={2}
 									/>
-								) : (
-									<View
-										style={{
-											width: 40,
-											height: 40,
-											borderRadius: 20,
-											backgroundColor: colors.gray[100],
-											alignItems: "center",
-											justifyContent: "center",
-										}}
-									>
-										<BuildingIcon
-											size={16}
-											color={colors.gray[500]}
-											strokeWidth={2}
+									{item.avatar?.url && (
+										<AvatarImage
+											source={{
+												uri: item.avatar.url,
+												headers: getAuthenticatedImageHeaders(),
+											}}
 										/>
-									</View>
-								)}
+									)}
+								</Avatar>
 								<View style={{ flex: 1 }}>
 									<Text
 										style={{

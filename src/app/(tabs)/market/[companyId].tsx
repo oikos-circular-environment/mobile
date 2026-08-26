@@ -4,7 +4,6 @@ import { SproutIcon } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
 	ActivityIndicator,
-	Image,
 	KeyboardAvoidingView,
 	type NativeScrollEvent,
 	type NativeSyntheticEvent,
@@ -14,6 +13,7 @@ import {
 import { CompanyDetailGeneralTab } from "@/components/market/company-detail-general-tab";
 import { CompanyDetailSimulationTab } from "@/components/market/company-detail-simulation-tab";
 import { colors } from "@/components/style/colors";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -180,28 +180,23 @@ export default function MarketCompanyDetailScreen() {
 								setHeaderCardHeight(event.nativeEvent.layout.height)
 							}
 						>
-							{company.avatar ? (
-								<View className="w-16 h-16 rounded-lg overflow-hidden">
-									<Image
+							<Avatar size="md" className="w-16 h-16 rounded-lg bg-primary">
+								{company.company_type === "COLLECTOR" ? (
+									<SproutIcon size={20} color={colors.white} />
+								) : (
+									<Text className="text-primary-foreground text-sm font-bold">
+										{initials}
+									</Text>
+								)}
+								{company.avatar && (
+									<AvatarImage
 										source={{
 											uri: company.avatar,
 											headers: getAuthenticatedImageHeaders(),
 										}}
-										className="w-full h-full"
-										resizeMode="cover"
 									/>
-								</View>
-							) : (
-								<View className="w-16 h-16 rounded-lg bg-primary items-center justify-center">
-									{company.company_type === "COLLECTOR" ? (
-										<SproutIcon size={20} color={colors.white} />
-									) : (
-										<Text className="text-primary-foreground text-sm font-bold">
-											{initials}
-										</Text>
-									)}
-								</View>
-							)}
+								)}
+							</Avatar>
 
 							<View className="min-w-0 flex-1 justify-center gap-0.5">
 								<Heading className="uppercase">{company.business_name}</Heading>
