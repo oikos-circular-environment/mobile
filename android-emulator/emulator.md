@@ -12,6 +12,7 @@ zero (imagem de sistema → AVD → otimização → boot → enxugamento → as
 | `dev-phone-35.sh` | `dev-phone-35` | Phone (pixel_2) | 1080x1920 @ 420dpi | 4 GB | `emulator-5554` |
 | `dev-phone-36.sh` | `dev-phone-36` | Phone (pixel_2) | 1080x1920 @ 420dpi | 4 GB | `emulator-5556` |
 | `dev-tablet-36.sh` | `dev-tablet-36` | Tablet (pixel_tablet) | 2560x1600 @ 320dpi | 6 GB | `emulator-5558` |
+| `galaxy-a30.sh` | `galaxy-a30` | Repro Galaxy A30 (pixel_5) | 1080x2340 @ 420dpi, 3 botões | 3.75 GB | `emulator-5560` |
 
 Cada script fixa sua porta (`-port`) e roda todos os comandos `adb` com
 `-s emulator-<porta>`, então vários emuladores podem ficar abertos ao mesmo
@@ -28,6 +29,21 @@ adb -s emulator-<porta> emu kill
 # ou
 kill $(cat /tmp/<device>.pid)
 ```
+
+### `galaxy-a30`: reprodução de um dispositivo físico
+
+Diferente dos `dev-phone-*`/`dev-tablet-*` (perfis genéricos de desenvolvimento),
+o `galaxy-a30` existe para **reproduzir a geometria de tela de um aparelho real**
+usado em teste (Samsung Galaxy A30 / SM-A305GT — ver
+`docs/device-analysis-samsung-sm-a305gt.md` na raiz do projeto): mesma resolução
+(1080x2340), densidade (420dpi) e navegação por **3 botões on-screen** (não
+gestos). Serve para investigar bugs de layout que só aparecem nessa combinação
+específica (texto do splash cortado, botões colados na barra de navegação em
+telas de survey/câmera).
+
+A navegação por 3 botões não é um `hw.*` do `config.ini` — é uma preferência de
+sistema (RRO overlay) que reseta para gestos a cada boot. Por isso o script força
+via `cmd overlay enable-exclusive` logo após o boot (passo 6), toda vez que sobe.
 
 ### GPU: por que `swiftshader_indirect` e não `-gpu host`
 
