@@ -29,10 +29,13 @@ o pedido, não refatore código adjacente que não foi pedido.
    memória de treino.
 3. Se o ticket envolve texto voltado ao usuário (copy de UI, mensagens de erro, empty states),
    use a skill `copywriting` ou `copy-editing`.
+4. Pra entender o código existente antes de mexer, use `graphify query "<pergunta>"` em vez de
+   grep amplo — retorna subgrafo escopado, mais barato.
 
 ## Depois de escrever
-Rode `npm run lint` e, se o ticket tiver testes associados, `npm test`. Não marque o ticket como
-concluído — isso é decisão do orquestrador após o `qa-runner` validar.
+Rode `npm run lint` e, se o ticket tiver testes associados, `npm test`. Rode `graphify update .`
+pra manter o grafo atual (AST-only, sem custo de API). Não marque o ticket como concluído — isso
+é decisão do orquestrador após o `qa-runner` validar.
 
 ## Delegando execução mecânica pro OpenCode (opcional, economia de tokens)
 Se o ticket já está totalmente especificado (arquivos exatos, padrão exato, exemplo já escrito

@@ -22,9 +22,12 @@ demais pra corrigir. Ver `docs/publishing-path.md`.
    CI/CD), `eas-update-insights` (saúde de um rollout OTA já publicado).
 3. Se o ticket envolve texto (release notes, metadata de loja), use `copywriting`/`copy-editing`
    — e sempre confira o char limit antes de considerar pronto.
+4. Pra entender o código/config existente antes de mexer, use `graphify query "<pergunta>"` em
+   vez de grep amplo.
 
 ## Depois de escrever
-`wc -m store/shared/whats-new/<version>.md` pra confirmar o limite. Rode `npm run lint`. Nunca
+`wc -m store/shared/whats-new/<version>.md` pra confirmar o limite. Rode `npm run lint` e
+`graphify update .`. Nunca
 rode os scripts de submissão de verdade (`asc:submit`, `play:publish`) sem confirmação explícita
 do orquestrador — são ações que publicam de fato numa loja, efeito difícil de reverter.
 

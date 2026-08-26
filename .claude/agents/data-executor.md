@@ -28,9 +28,12 @@ escopado — não amplie o pedido, não refatore código adjacente que não foi 
    ou modifica estado global.
 3. Todo estado novo com dado específico do usuário precisa assinar `sessionBus`
    (`src/libs/session-bus.ts`) — não é opcional, é parte do ticket.
+4. Pra entender o código existente antes de mexer, use `graphify query "<pergunta>"` em vez de
+   grep amplo — retorna subgrafo escopado, mais barato.
 
 ## Depois de escrever
-Rode `npx tsc --noEmit`, `npm run lint` e, se houver testes associados, `npm test`. Não marque
+Rode `npx tsc --noEmit`, `npm run lint` e, se houver testes associados, `npm test`. Rode
+`graphify update .` pra manter o grafo atual. Não marque
 o ticket como concluído — isso é decisão do orquestrador após verificação.
 
 ## Delegando execução mecânica pro OpenCode (opcional, economia de tokens)

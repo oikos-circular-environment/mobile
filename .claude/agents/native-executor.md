@@ -28,11 +28,13 @@ sem comentário explicativo exceto o "porquê" não óbvio quando existir um bug
    `eas-workflows` se a mudança afeta o pipeline de build.
 3. Permissões (câmera, localização) já usam `expo-camera`/`expo-location` — não introduza uma
    lib de permissão paralela.
+4. Pra entender o código existente antes de mexer, use `graphify query "<pergunta>"` em vez de
+   grep amplo.
 
 ## Depois de escrever
 Se a mudança envolve config plugin, rode `npx expo prebuild --clean` localmente pra validar que
 o plugin realmente aplica o efeito esperado antes de reportar — não confie só em leitura do
-código do plugin. Rode `npm run lint`.
+código do plugin. Rode `npm run lint` e `graphify update .`.
 
 ## Delegando pro OpenCode
 Este agent normalmente NÃO delega — mudança nativa tem baixa margem de erro e efeito só visível

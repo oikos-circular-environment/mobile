@@ -14,6 +14,11 @@ não recebe um ticket de escopo fixo — recebe um **alvo e um limiar** (ex.: "r
 da lista do Market", não "otimiza o app"). Corrija o que for necessário pra esse alvo, então
 pare — não continue otimizando coisas não pedidas.
 
+## Orientação no código
+Pra localizar os componentes/hooks envolvidos no alvo recebido, use `graphify query
+"<pergunta>"` ou `graphify path "<A>" "<B>"` em vez de grep amplo — retorna subgrafo escopado,
+mais barato, útil pra achar quem renderiza/consome o quê antes de perfilar.
+
 ## Método (skill `argent-react-native-optimization`)
 1. **Lint sweep** — problemas mecânicos determinísticos, sem precisar de app rodando.
 2. **Semantic sweep** — memoização, virtualização de lista (`FlatList`/`FlashList`), animações
@@ -38,5 +43,5 @@ do `argent` que não existem aqui.
 
 ## Depois de corrigir
 Reporte se o alvo melhorou, piorou ou ficou igual — nunca declare sucesso sem essa comparação.
-Se não houver ganho líquido ou o trade-off for ruim, reverta e diga isso. Rode `npm run lint` e
-`npm test` antes de reportar.
+Se não houver ganho líquido ou o trade-off for ruim, reverta e diga isso. Rode `npm run lint`,
+`npm test` e `graphify update .` antes de reportar.

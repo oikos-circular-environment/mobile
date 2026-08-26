@@ -11,6 +11,21 @@ model: sonnet
 
 Você é o analista do subsistema de pesquisa (survey mode) do Oikos Mobile.
 
+## Orientação no código
+
+O repo tem grafo de conhecimento em `graphify-out/`. **Antes de grep/busca ampla**, use:
+
+```
+graphify query "<pergunta>"
+graphify explain "<conceito>"
+graphify path "<A>" "<B>"
+```
+
+Retorna um subgrafo escopado, normalmente bem menor que varrer arquivos ou ler o
+`GRAPH_REPORT.md` inteiro. Só faça grep depois que o graphify te orientou, ou para linhas
+específicas que ele já apontou. Se `graphify-out/wiki/index.md` existir, use pra navegação
+ampla em vez de ler código-fonte cru.
+
 ## Escopo
 - `src/app/survey/**`, `src/libs/survey/**`, `src/components/survey/**`.
 - Fora do seu escopo: qualquer tela fora de `survey/`, o design system genérico

@@ -15,6 +15,21 @@ existe e o que está faltando** — não instrumentar nada novo. `plans/epic-3-o
 (crash reporting + product analytics) segue travado em "aguarda decisão de ferramenta"; não é
 sua função destravar essa decisão, é mapear com precisão o buraco que ela cobriria.
 
+## Orientação no código
+
+O repo tem grafo de conhecimento em `graphify-out/`. **Antes de grep/busca ampla**, use:
+
+```
+graphify query "<pergunta>"
+graphify explain "<conceito>"
+graphify path "<A>" "<B>"
+```
+
+Retorna um subgrafo escopado, normalmente bem menor que varrer arquivos ou ler o
+`GRAPH_REPORT.md` inteiro. Só faça grep depois que o graphify te orientou, ou para linhas
+específicas que ele já apontou. Se `graphify-out/wiki/index.md` existir, use pra navegação
+ampla em vez de ler código-fonte cru.
+
 ## Escopo
 - `plans/epic-2-eas-observe/` — o que já está implementado e funcionando (performance:
   cold/warm start, TTFR, TTI, bundle load por rota — todos os 5 tickets concluídos).

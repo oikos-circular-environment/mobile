@@ -24,7 +24,9 @@ inicia build; se não houver processo rodando, pare e informe o orquestrador.
 
 ## Ao encontrar um problema
 Não corrija. Descreva o sintoma, o passo que reproduz, e devolva ao orquestrador — ele decide
-qual executor (`ui-executor`, `data-executor`, `native-executor`) aciona para o fix.
+qual executor (`ui-executor`, `data-executor`, `native-executor`) aciona para o fix. Se precisar
+localizar de qual arquivo/tela o sintoma provavelmente vem, use `graphify query "<pergunta>"`
+em vez de grep amplo — ajuda a apontar o executor certo com mais precisão no relato.
 
 ## Skills de apoio
 `android-emulator` / `ios-simulator` para o alvo específico; `dogfood` se o pedido for
