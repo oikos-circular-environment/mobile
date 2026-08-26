@@ -147,8 +147,8 @@ tools (qa-runner):            Read, Grep, Glob, Bash, Skill  (sem Edit/Write —
 
 | Agent | Escopo de escrita | Skills principais | Boas práticas que aplica |
 |---|---|---|---|
-| `ui-executor` | Telas, componentes, layouts (`src/app/**`, `src/components/**` exceto `camera/` nativo) | `expo-router`, `expo-native-ui`, `expo-design-system`, `gluestack-ui-v4`, `expo-tailwind-setup`, `expo-animation`, `copywriting`/`copy-editing` | `cn()` para className condicional, formulários em `KeyboardAvoidingView`+`ScrollView`, ícones só `lucide-react-native`, cor primária `lime-800`, gluestack-ui v5 antes de RN cru |
-| `data-executor` | Hooks de dados, formulários, consumo do `oikos-sdk`, mutations/queries | `expo-data-fetching`, `native-data-fetching`, `dinero-*` (valores monetários do Market) | React Query para todo estado de servidor, `react-hook-form`+`zod`, nunca editar `src/libs/oikos-sdk/` à mão (regenerar via `npm run generate:api`) |
+| `ui-executor` | Telas, componentes, layouts (`src/app/**`, `src/components/**` exceto `camera/` nativo) | `expo-router`, `expo-native-ui`, `expo-design-system`, `gluestack-ui-v4`, `expo-tailwind-setup`, `expo-animation`, `react-composition-2026`, `copywriting`/`copy-editing` | `cn()` para className condicional, formulários em `KeyboardAvoidingView`+`ScrollView`, ícones só `lucide-react-native`, cor primária `lime-800`, gluestack-ui v5 antes de RN cru, composição em vez de prop-drilling excessivo |
+| `data-executor` | Hooks de dados, formulários, consumo do `oikos-sdk`, mutations/queries, estado global | `expo-data-fetching`, `native-data-fetching`, `dinero-*` (valores monetários do Market), `react-state-management`, `zustand` | React Query para todo estado de servidor, `react-hook-form`+`zod`, nunca editar `src/libs/oikos-sdk/` à mão (regenerar via `npm run generate:api`); Zustand está instalado mas sem uso real hoje — só introduzir se Context API deixar de bastar para um caso concreto, não preventivamente |
 | `native-executor` | Módulos nativos, permissões, config plugins (`plugins/`, `app.config.ts`, `expo-camera`/`expo-location`) | `expo-module`, `expo-native-ui`, `eas-workflows` | Preferir config plugin a edição manual de `android/`/`ios/` (que são gerados e gitignored — ver `plugins/withAndroidSplashWindowBackground.js` como referência real deste repo) |
 | `release-executor` | Publicação, EAS, release notes, ASC/Play (`store/`, `.eas/`, `eas.json`) | `eas-app-stores`, `eas-workflows`, `eas-update-insights`, `copywriting`/`copy-editing` | Release notes ≤500 caracteres (`wc -m` antes de commitar, ver `docs/publishing-path.md`), nunca pular validação de char limit |
 | `observability-executor` | Instrumentação de erro/performance (SDK setup, releases, alertas) | `sentry-get-started`, `sentry-react-native-sdk`, `sentry-instrument`, `sentry-setup-releases`, `posthog-instrumentation`, `eas-observe` | Implementa o que o `observability-analyst` apontar como faltando — hoje isso é literalmente o escopo do `plans/epic-3-observability` (decisão de ferramenta ainda em aberto: Sentry/BugSnag para crash, PostHog/Amplitude/Firebase para analytics) |
@@ -333,6 +333,8 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 | Dados/dinheiro | `native-data-fetching`, `dinero-best-practices`, `dinero-currency-patterns`, `dinero-formatting` | `data-layer-analyst`, `data-executor` |
 | Escrita | `copywriting`, `copy-editing` | `ui-executor`, `release-executor` (e qualquer um escrevendo texto pro usuário) |
 | Performance/otimização | `argent-react-native-optimization`, `expo-react-native-performance`, `react-native-architecture`, `react-state-management`, `typescript-refactor`, `typescript-advanced-patterns` | `performance-executor` |
+| Arquitetura e princípios de design | `solid`, `domain-driven-design`, `clean-architecture`, `clean-code` | Julgamento de qualquer Analista ao propor um plano; `data-layer-analyst` em especial (DDD mapeia direto pros `src/contexts/*` do app — cada context já é, na prática, um bounded context informal) |
+| Estado/componentes React | `react-state-management`, `zustand`, `react-composition-2026` | `data-layer-analyst`/`data-executor` (estado), `design-system-analyst`/`ui-executor` (composição de componente) |
 | Observabilidade (erro/crash/analytics) | `sentry-get-started`, `sentry-react-native-sdk`, `sentry-instrument`, `sentry-debug-issue`, `sentry-fix-stack-traces`, `sentry-setup-releases`, `posthog-instrumentation` | `observability-analyst` (as de `sentry-debug-issue`/`sentry-fix-stack-traces`), `observability-executor` (as demais) |
 | Meta | `expo-skill-feedback` | Qualquer agent, para reportar falha/lacuna de uma skill |
 
@@ -340,6 +342,12 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 > para crash, PostHog para product analytics) — instalar as skills não decide a ferramenta, só
 > arma quem for executar o epic com conhecimento atualizado dos dois caminhos possíveis. A decisão
 > em si continua em aberto e cabe a uma pessoa, não ao `observability-executor`.
+
+> **MVVM não tem skill instalada de propósito.** As opções disponíveis no catálogo são todas de
+> Kotlin/Android, SwiftUI ou WPF/MAUI — plataformas erradas pra este stack. MVVM não é como React
+> pensa (não existe um "ViewModel" observável separado do componente — o hook já cumpre esse
+> papel). `clean-architecture` cobre o problema real por trás do pedido (separar regra de negócio
+> de apresentação) de um jeito que faz sentido aqui.
 
 > **Gap conhecido:** as 23 skills `expo-*`/`eas-*` foram instaladas copiando o conteúdo do plugin
 > oficial (`expo@claude-plugins-official`) manualmente, não via `npx skills add expo/skills`. Por
