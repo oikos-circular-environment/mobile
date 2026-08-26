@@ -44,11 +44,17 @@ CORES=4
 DATA_PARTITION_MB=6144
 PORT=5560
 
+# Skin visual oficial da Samsung (Galaxy A31 — não existe skin do A30; corte de
+# tela do skin é 1080x2400 contra os 1080x2340 reais, ~2,5% de diferença de
+# altura, esticamento imperceptível). É só a moldura: não muda resolução/
+# densidade nem adiciona recursos de One UI (ver 00_README.txt da skin).
+
 MODE="windowed"
 [[ "${1:-}" == "--headless" ]] && MODE="headless"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ASSETS_DIR="$SCRIPT_DIR/assets"
+SKIN_DIR="$SCRIPT_DIR/galaxy-a-31-skin"
 AVD_DIR="$HOME/.android/avd/$DEVICE.avd"
 CONFIG="$AVD_DIR/config.ini"
 
@@ -141,6 +147,15 @@ set_config disk.dataPartition.size "${DATA_PARTITION_MB}M"
 # mainKeys=no => sem teclas fisicas, o Android desenha a barra de navegacao
 # on-screen (que forcamos para 3 botoes no passo 6, igual ao A30 real).
 set_config hw.mainKeys              no
+
+if [[ -f "$SKIN_DIR/layout" ]]; then
+  set_config skin.path  "$SKIN_DIR"
+  set_config skin.name  "galaxy-a-31-skin"
+  set_config skin.dynamic yes
+  set_config showDeviceFrame yes
+else
+  log "Skin não encontrado em '$SKIN_DIR' — seguindo sem moldura."
+fi
 
 # ---------------------------------------------------------------------------
 # 5. Iniciar o emulador
