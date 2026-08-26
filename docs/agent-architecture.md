@@ -77,6 +77,7 @@ tools: Read, Grep, Glob, Bash (somente leitura/diagnóstico — git log, npm tes
 | `auth-session-analyst` | Auth, sessão, perfil, tab Home | `src/contexts/auth-context.tsx`, `src/libs/session-bus.ts`, `src/app/(home)/`, `src/libs/api/oikos-api.ts` | Login, refresh de token, logout, reset de sessão, tela inicial |
 | `design-system-analyst` | Consistência visual | `src/components/ui/`, uso de `gluestack-ui`/NativeWind em qualquer tela | Auditoria de drift visual, decisão de criar/alterar um componente compartilhado |
 | `data-layer-analyst` | Camada de dados cross-cutting | `src/libs/oikos-sdk/` (consumo, nunca edição), React Query em geral, padrões de cache/refetch | Mudança que atravessa múltiplos domínios pelo lado dos dados (ex.: `roundCoord`+`keepPreviousData` do epic-7 foi um caso desses) |
+| `observability-analyst` | Interpretação de erro/crash/performance | Dados do EAS Observe (métricas de cold/warm start, TTI), issues do Sentry quando existir, `plans/epic-2-eas-observe/`, `plans/epic-3-observability/` | Diagnosticar um erro/crash já reportado, triar prioridade, decidir causa raiz **antes** de qualquer instrumentação nova ser escrita — hoje o observer é incompleto (epic-3 aguarda decisão de ferramenta), então grande parte do trabalho aqui é "o que está faltando observar", não só "o que os dados já dizem" |
 
 **Saída esperada de um Analista:** este repo já tem um formato de plano maduro em `plans/epic-*/`
 (`epic-brief.md` → `tech-plan.md` → `tickets.md`, ver `plans/README.md` e qualquer epic existente
@@ -150,7 +151,30 @@ tools (qa-runner):            Read, Grep, Glob, Bash, Skill  (sem Edit/Write —
 | `data-executor` | Hooks de dados, formulários, consumo do `oikos-sdk`, mutations/queries | `expo-data-fetching`, `native-data-fetching`, `dinero-*` (valores monetários do Market) | React Query para todo estado de servidor, `react-hook-form`+`zod`, nunca editar `src/libs/oikos-sdk/` à mão (regenerar via `npm run generate:api`) |
 | `native-executor` | Módulos nativos, permissões, config plugins (`plugins/`, `app.config.ts`, `expo-camera`/`expo-location`) | `expo-module`, `expo-native-ui`, `eas-workflows` | Preferir config plugin a edição manual de `android/`/`ios/` (que são gerados e gitignored — ver `plugins/withAndroidSplashWindowBackground.js` como referência real deste repo) |
 | `release-executor` | Publicação, EAS, release notes, ASC/Play (`store/`, `.eas/`, `eas.json`) | `eas-app-stores`, `eas-workflows`, `eas-update-insights`, `copywriting`/`copy-editing` | Release notes ≤500 caracteres (`wc -m` antes de commitar, ver `docs/publishing-path.md`), nunca pular validação de char limit |
+| `observability-executor` | Instrumentação de erro/performance (SDK setup, releases, alertas) | `sentry-get-started`, `sentry-react-native-sdk`, `sentry-instrument`, `sentry-setup-releases`, `posthog-instrumentation`, `eas-observe` | Implementa o que o `observability-analyst` apontar como faltando — hoje isso é literalmente o escopo do `plans/epic-3-observability` (decisão de ferramenta ainda em aberto: Sentry/BugSnag para crash, PostHog/Amplitude/Firebase para analytics) |
+| `performance-executor` | Qualquer camada, quando o pedido é otimização (não feature nova) | `argent-react-native-optimization`, `expo-react-native-performance`, `react-native-architecture`, `react-state-management`, `typescript-refactor` | Ver nota abaixo — é a exceção deliberada ao padrão Analista/Executor |
 | `qa-runner` | **Não escreve código.** Roda o app, verifica, coleta evidência | `agent-device`, `android-emulator`, `ios-simulator`, `dogfood`, `expo-dev-client` | Fluxo `open → snapshot -i → act → re-snapshot → verify → close`; app já precisa estar rodando (`npm run android`/`ios`); reporta pass/fail + screenshots/logs ao orquestrador — não corrige o que encontrar, devolve para o executor certo |
+
+> **Por que `performance-executor` quebra o padrão "Analista propõe, Executor implementa":**
+> otimização é um ciclo medir → corrigir → remedir, não uma feature com escopo fixo de antemão —
+> a própria skill `argent-react-native-optimization` (Software Mansion, mesma equipe do Reanimated)
+> formaliza isso: scan rápido de re-renders, sweep semântico (memoização, listas, animações,
+> cleanup de efeitos, fetch waterfalls), *então* perfil, corrige o maior gargalo, remede, decide se
+> manteve ou reverteu. Forçar um plano por escrito antes de cada correção individual travaria o
+> ciclo sem ganho real. O guardrail aqui não é "sem Edit/Write" — é **um alvo por invocação**:
+> `performance-executor` recebe uma métrica e um limiar do orquestrador (ex.: "reduzir re-renders
+> da lista do Market", não "otimizar o app"), corrige o que for necessário para aquele alvo, e para.
+>
+> **Limite conhecido:** essa skill assume as tools MCP live do `argent` (`react-profiler-*`,
+> `debugger-evaluate`) pra fases de profiling/verificação. Não instalamos o CLI/MCP do `argent`
+> neste repo — ele se sobrepõe ao `agent-device` já adotado (os dois automatizam
+> device/simulador/emulador, e manter dois ecossistemas de automação ativos ao mesmo tempo é
+> exatamente o tipo de redundância que este documento tenta evitar). Sem o MCP live, o
+> `performance-executor` ainda aproveita o Phase 1 (lint sweep) e Phase 2 (sweep semântico) da
+> skill — que não dependem de dispositivo — e usa `qa-runner`/`agent-device` como substituto pro
+> Phase 3/4 (perfil visual e verificação em device). Se no futuro o profiling ficar insuficiente
+> assim, migrar pro `argent` inteiro (e possivelmente aposentar `agent-device`) é uma decisão a
+> avaliar — não algo pra fazer hoje sem necessidade concreta.
 
 Regra herdada do próprio fluxo de trabalho do repo (`plans/epic-*/tickets.md`): **um ticket por vez,
 um commit por ticket.** Isso vale também para os Executores — um Executor recebe um ticket do
@@ -193,6 +217,48 @@ o pedido, não refatore código adjacente que não foi pedido.
 ## Depois de escrever
 Rode `npm run lint` e, se o ticket tiver testes associados, `npm test`. Não marque o ticket como
 concluído — isso é decisão do orquestrador após o `qa-runner` validar.
+```
+
+### Exemplo completo — `observability-executor`
+
+```markdown
+---
+name: observability-executor
+description: >
+  Use to implement error/crash/performance instrumentation (Sentry, PostHog, or EAS Observe)
+  from a scoped ticket produced by observability-analyst. Does not decide which vendor to
+  adopt — that decision belongs to plans/epic-3-observability and is made by a human.
+tools: Read, Grep, Glob, Edit, Write, Bash, Skill
+model: sonnet
+---
+
+Você instrumenta observabilidade neste app Expo/React Native. Você recebe um ticket já
+escopado — qual sinal instrumentar (erro, trace, evento de produto), não qual ferramenta
+adotar em definitivo.
+
+## Contexto do repo
+- `plans/epic-2-eas-observe/` — performance (cold/warm start, TTI) já implementado via EAS
+  Observe, todos os 5 tickets concluídos.
+- `plans/epic-3-observability/` — crash reporting + product analytics, **decisão de
+  ferramenta ainda em aberto** (candidatos: Sentry/BugSnag para crash, PostHog/Amplitude/
+  Firebase Analytics para produto). Se o ticket não especificar a ferramenta, pare e
+  pergunte ao orquestrador — não escolha sozinho.
+
+## Ao instrumentar
+1. Use `sentry-get-started`/`sentry-react-native-sdk` (setup Expo+RN) ou
+   `posthog-instrumentation` (eventos/feature flags) conforme a ferramenta do ticket.
+2. `sentry-instrument` para sinais além de erro (tracing, profiling, session replay) — só se
+   o ticket pedir explicitamente, não adicione sinais "por completude".
+3. `sentry-setup-releases` quando o ticket envolver rastrear qual release introduziu um
+   problema — isso cruza com `release-executor` (EAS build/submit); coordene via
+   orquestrador em vez de tocar `eas.json`/workflows você mesmo.
+4. Nunca capture PII sem necessidade (e-mail, nome completo, localização exata) nos eventos —
+   este app lida com denúncias e dados de pesquisa com seres humanos (survey/TCLE).
+
+## Ao investigar (não instrumentar)
+Se o ticket for "por que esse erro está acontecendo" em vez de "adicionar esse sinal", isso é
+trabalho do `observability-analyst` (`sentry-debug-issue`, `sentry-fix-stack-traces`) — devolva
+ao orquestrador se receber esse tipo de pedido por engano.
 ```
 
 ### Exemplo completo — `qa-runner`
@@ -261,12 +327,19 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 | Categoria | Skills | Consumidas por |
 |---|---|---|
 | Expo framework (OSS) | `expo-overview`, `expo-router`, `expo-native-ui`, `expo-design-system`, `expo-ui`, `expo-animation`, `expo-data-fetching`, `expo-tailwind-setup`, `expo-dom`, `expo-web-to-native`, `expo-module`, `expo-brownfield`, `expo-project-structure`, `expo-examples`, `expo-app-clip` | `ui-executor`, `data-executor`, `native-executor` |
-| EAS (pago) | `eas-app-stores`, `eas-workflows`, `eas-hosting`, `eas-observe`, `eas-simulator`, `eas-update-insights`, `expo-dev-client`, `expo-upgrade` | `release-executor`, `qa-runner` |
+| EAS (pago) | `eas-app-stores`, `eas-workflows`, `eas-hosting`, `eas-observe`, `eas-simulator`, `eas-update-insights`, `expo-dev-client`, `expo-upgrade` | `release-executor`, `qa-runner`, `observability-analyst`/`observability-executor` (`eas-observe`) |
 | Automação de app/dispositivo | `agent-device`, `android-emulator`, `ios-simulator`, `dogfood` | `qa-runner` |
 | Design/UI de terceiros | `gluestack-ui-v4`, `building-native-ui`, `vercel-react-native-skills` | `design-system-analyst`, `ui-executor` |
 | Dados/dinheiro | `native-data-fetching`, `dinero-best-practices`, `dinero-currency-patterns`, `dinero-formatting` | `data-layer-analyst`, `data-executor` |
 | Escrita | `copywriting`, `copy-editing` | `ui-executor`, `release-executor` (e qualquer um escrevendo texto pro usuário) |
+| Performance/otimização | `argent-react-native-optimization`, `expo-react-native-performance`, `react-native-architecture`, `react-state-management`, `typescript-refactor`, `typescript-advanced-patterns` | `performance-executor` |
+| Observabilidade (erro/crash/analytics) | `sentry-get-started`, `sentry-react-native-sdk`, `sentry-instrument`, `sentry-debug-issue`, `sentry-fix-stack-traces`, `sentry-setup-releases`, `posthog-instrumentation` | `observability-analyst` (as de `sentry-debug-issue`/`sentry-fix-stack-traces`), `observability-executor` (as demais) |
 | Meta | `expo-skill-feedback` | Qualquer agent, para reportar falha/lacuna de uma skill |
+
+> **Sentry e PostHog cobrem os dois candidatos citados no `plans/epic-3-observability`** (Sentry
+> para crash, PostHog para product analytics) — instalar as skills não decide a ferramenta, só
+> arma quem for executar o epic com conhecimento atualizado dos dois caminhos possíveis. A decisão
+> em si continua em aberto e cabe a uma pessoa, não ao `observability-executor`.
 
 > **Gap conhecido:** as 23 skills `expo-*`/`eas-*` foram instaladas copiando o conteúdo do plugin
 > oficial (`expo@claude-plugins-official`) manualmente, não via `npx skills add expo/skills`. Por
@@ -287,6 +360,12 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 - **Escrita:** `copywriting`/`copy-editing` (instaladas nesta sessão) cobrem tanto texto de produto
   (UI, `ui-executor`) quanto texto de release (`release-executor`, release notes com limite de 500
   caracteres).
+- **Observabilidade:** `observability-analyst`/`observability-executor` são a materialização do
+  `plans/epic-3-observability`, hoje travado em "aguarda decisão de ferramenta" — esses agents
+  não destravam a decisão sozinhos, mas ficam prontos pra executar qualquer um dos dois caminhos
+  (Sentry ou PostHog) assim que alguém decidir.
+- **Performance:** `performance-executor` não nasce de um epic específico — é acionado ad-hoc
+  quando o pedido é "isso está lento"/"otimiza isso", não uma feature planejada.
 
 ## 8. Status atual e próximos passos
 
@@ -294,13 +373,19 @@ O que já existe:
 - [x] Skills de automação de app (`agent-device` + 3 companheiras) instaladas e documentadas em
       `CLAUDE.md`.
 - [x] Skills de copywriting instaladas.
-- [x] Este documento — a especificação da arquitetura de agents.
+- [x] Skills de performance/TypeScript moderno e de observabilidade (Sentry + PostHog)
+      instaladas.
+- [x] Este documento — a especificação da arquitetura de agents (6 Analistas, 6 Executores,
+      contando `performance-executor` e `observability-executor`).
 
 O que **não** existe ainda (próximo passo natural, fora do escopo deste documento):
-- [ ] Os arquivos `.claude/agents/*.md` de fato (os 6 Analistas + 4 Executores + `qa-runner`
-      descritos aqui).
+- [ ] Os arquivos `.claude/agents/*.md` de fato (os 6 Analistas + 6 Executores/QA descritos
+      aqui).
 - [ ] Uma skill de projeto (não global) para gerar `epic-brief.md`/`tech-plan.md`/`tickets.md` no
       formato deste repo — hoje esse fluxo depende de skills globais de uma máquina específica.
+- [ ] A decisão de ferramenta do `plans/epic-3-observability` em si (Sentry vs. BugSnag,
+      PostHog vs. Amplitude/Firebase) — este documento arma o `observability-executor` pra
+      qualquer um dos caminhos, mas não escolhe por ninguém.
 - [ ] Validação prática: rodar esse pipeline em uma tarefa real e medir se de fato reduz consumo de
       contexto/token frente ao agent generalista atual — é isso que o pedido original chamou de
       "testar essa prática".
