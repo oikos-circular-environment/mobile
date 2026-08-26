@@ -13,8 +13,8 @@ export default function SurveyLocationDeniedScreen() {
 
 	return (
 		<View
-			className="flex-1 bg-white px-6 justify-between pb-8"
-			style={{ paddingTop: insets.top + 16 }}
+			className="flex-1 bg-white px-6 justify-between"
+			style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 }}
 		>
 			<View className="flex-1 items-center justify-center gap-4">
 				<View className="size-16 items-center justify-center rounded-full bg-red-50">

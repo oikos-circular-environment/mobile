@@ -144,8 +144,8 @@ export default function SurveySuiteIntroScreen() {
 
 	return (
 		<View
-			className="flex-1 bg-white px-6 pb-8"
-			style={{ paddingTop: insets.top + 16 }}
+			className="flex-1 bg-white px-6"
+			style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 }}
 		>
 			{/* Os objetivos por persona chegam a 4 passos e não cabem em uma tela;
 			    sem o scroll, o texto do fim ficava inacessível. */}

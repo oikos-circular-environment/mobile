@@ -44,8 +44,8 @@ export default function SurveyThanksScreen() {
 
 	return (
 		<View
-			className="flex-1 bg-white px-6 pb-8 gap-5"
-			style={{ paddingTop: insets.top + 16 }}
+			className="flex-1 bg-white px-6 gap-5"
+			style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 }}
 		>
 			<View className="flex-1 items-center justify-center gap-5">
 				<PartyPopperIcon size={52} color={colors.lime[700]} />

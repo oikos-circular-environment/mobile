@@ -140,7 +140,7 @@ export default function SurveyConsentScreen() {
 					paddingTop: insets.top + 16,
 					gap: 16,
 					paddingHorizontal: 24,
-					paddingBottom: 32,
+					paddingBottom: insets.bottom + 32,
 				}}
 			>
 				<Heading size="xl">Termo de consentimento</Heading>

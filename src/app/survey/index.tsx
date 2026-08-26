@@ -35,8 +35,8 @@ export default function SurveyPresentationScreen() {
 
 	return (
 		<View
-			className="flex-1 bg-white px-6 pb-8 justify-between"
-			style={{ paddingTop: insets.top + 16 }}
+			className="flex-1 bg-white px-6 justify-between"
+			style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 }}
 		>
 			<View className="flex-1 items-center justify-center gap-4">
 				<ClipboardListIcon size={48} color={colors.lime[700]} />

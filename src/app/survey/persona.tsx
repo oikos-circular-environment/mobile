@@ -43,8 +43,8 @@ export default function SurveyPersonaScreen() {
 
 	return (
 		<View
-			className="flex-1 bg-white px-6 pb-6 gap-4"
-			style={{ paddingTop: insets.top + 16 }}
+			className="flex-1 bg-white px-6 gap-4"
+			style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }}
 		>
 			<QHeader
 				categoryLabel="Caracterização"

@@ -72,8 +72,11 @@ export default function SurveyClosingCommentScreen() {
 				accessible={false}
 			>
 				<View
-					className="flex-1 px-6 pb-6 gap-5"
-					style={{ paddingTop: insets.top + 16 }}
+					className="flex-1 px-6 gap-5"
+					style={{
+						paddingTop: insets.top + 16,
+						paddingBottom: insets.bottom + 24,
+					}}
 				>
 					<QHeader
 						categoryLabel="Encerramento"
