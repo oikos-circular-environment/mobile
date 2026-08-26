@@ -7,9 +7,6 @@ import { scheduleOnRN } from "react-native-worklets";
 import { useServicesCarouselContext } from "./context";
 import { ServicesCarouselCard } from "./services-carousel-card";
 
-/** Distância (px) que o gesto precisa se mover na horizontal antes de "vencer" a arena de gestos.
- * Abaixo disso (ou se o movimento vertical superar isso primeiro), o gesto falha e o toque
- * cai naturalmente para o ScrollView pai, permitindo rolar a página tocando sobre o card. */
 const PAN_GESTURE_THRESHOLD = 10;
 
 export function ServicesCarouselTrack() {
@@ -25,10 +22,6 @@ export function ServicesCarouselTrack() {
 		setIsPaused,
 	} = useServicesCarouselContext();
 
-	// O auto-advance da própria lib reinicia do zero (5s inteiros) toda vez que o
-	// usuário solta o toque, em vez de continuar do tempo restante — por isso o
-	// avanço do card comanda por conta própria via `progress`: quando a barra
-	// (que pausa/retoma corretamente) termina, nós mesmos chamamos next().
 	const advanceToNext = useCallback(() => {
 		carouselRef.current?.next({ animated: true });
 	}, [carouselRef]);
