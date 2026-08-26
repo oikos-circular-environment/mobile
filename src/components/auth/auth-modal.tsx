@@ -45,10 +45,12 @@ export function AuthModal({
 						className="flex-1 border-gray-200"
 						onPress={handleRegister}
 					>
-						<ButtonText className="text-gray-700">Registrar-se</ButtonText>
+						<ButtonText className="text-sm text-gray-700">
+							Registrar-se
+						</ButtonText>
 					</Button>
 					<Button className="flex-1 bg-lime-800" onPress={handleLogin}>
-						<ButtonText>Login</ButtonText>
+						<ButtonText className="text-sm">Login</ButtonText>
 					</Button>
 				</ModalFooter>
 			</ModalContent>

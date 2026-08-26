@@ -59,8 +59,8 @@ export function HomeHero({
 						numberOfLines={1}
 						style={{
 							fontFamily: "Oswald_700Bold",
-							fontSize: 156,
-							lineHeight: 180,
+							fontSize: wordmarkSize,
+							lineHeight: wordmarkLineHeight,
 							letterSpacing: 4,
 						}}
 						className="text-white"
