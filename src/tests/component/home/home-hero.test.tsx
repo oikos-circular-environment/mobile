@@ -9,7 +9,6 @@ jest.mock("expo-image", () => ({
 }));
 
 jest.mock("expo-router", () => ({
-	useFocusEffect: (effect: () => void) => effect(),
 	Link: ({
 		children,
 		asChild,

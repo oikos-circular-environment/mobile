@@ -10,7 +10,7 @@ import {
 } from "@/components/home/floating-glass-badge";
 import { HomeHeaderSkeleton } from "@/components/home/home-header-skeleton";
 import { HomeUserCard } from "@/components/home/home-user-card";
-import { SlideToLoginButton } from "@/components/home/slide-to-login-button";
+import { LoginButton } from "@/components/home/login-button";
 import { Text } from "@/components/ui/text";
 
 interface HomeHeroProps {
@@ -98,7 +98,7 @@ export function HomeHero({
 				</View>
 
 				{!isLoading && !isAuthenticated ? (
-					<SlideToLoginButton onComplete={onPressLogin} />
+					<LoginButton onPress={onPressLogin} />
 				) : null}
 			</View>
 		</View>
