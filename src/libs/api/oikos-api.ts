@@ -39,12 +39,12 @@ getStoredRefreshToken().then(token => {
 	if (token) refreshToken = token;
 });
 
-export function setAuthToken(token: string | null) {
+export async function setAuthToken(token: string | null) {
 	authToken = token;
 	if (token) {
-		saveAuthToken(token);
+		await saveAuthToken(token);
 	} else {
-		removeAuthToken();
+		await removeAuthToken();
 	}
 }
 
@@ -52,12 +52,12 @@ export function getAuthToken(): string | null {
 	return authToken;
 }
 
-export function setRefreshToken(token: string | null) {
+export async function setRefreshToken(token: string | null) {
 	refreshToken = token;
 	if (token) {
-		saveRefreshToken(token);
+		await saveRefreshToken(token);
 	} else {
-		removeRefreshToken();
+		await removeRefreshToken();
 	}
 }
 
@@ -161,7 +161,8 @@ client.instance.interceptors.response.use(
 		isRefreshing = true;
 
 		try {
-			const storedRefreshToken = await getStoredRefreshToken();
+			const storedRefreshToken =
+				refreshToken ?? (await getStoredRefreshToken());
 			if (!storedRefreshToken) throw new Error("No refresh token");
 
 			const response = await client.instance.patch(
@@ -173,11 +174,9 @@ client.instance.interceptors.response.use(
 			const { token: newToken, refreshToken: newRefreshToken } =
 				response.data as { token: string; refreshToken: string };
 
-			authToken = newToken;
-			refreshToken = newRefreshToken;
 			await Promise.all([
-				saveAuthToken(newToken),
-				saveRefreshToken(newRefreshToken),
+				setAuthToken(newToken),
+				setRefreshToken(newRefreshToken),
 			]);
 
 			processQueue(null, newToken);

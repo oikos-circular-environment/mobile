@@ -45,7 +45,7 @@ type AuthContextValue = {
 	deletionScheduledAt: Date | null;
 	signIn: (data: { email: string; password: string }) => void;
 	signUp: (data: { email: string; password: string }) => void;
-	signOut: () => void;
+	signOut: () => Promise<void>;
 	requestDeletion: () => void;
 	cancelDeletion: () => void;
 	changePassword: (
@@ -123,8 +123,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			const { token, refreshToken } = authResponse.data ?? {};
 			if (!token || !refreshToken) throw new Error("Token não recebido");
 
-			setAuthToken(token);
-			setRefreshToken(refreshToken);
+			await Promise.all([setAuthToken(token), setRefreshToken(refreshToken)]);
 
 			const [profileResponse, userResponse] = await Promise.all([
 				getV1Profiles(),
@@ -259,12 +258,14 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			});
 			return response.data;
 		},
-		onSuccess: data => {
+		onSuccess: async data => {
 			// A troca de senha derruba as outras sessões; o par novo mantém este
 			// dispositivo logado.
 			if (data?.token && data?.refreshToken) {
-				setAuthToken(data.token);
-				setRefreshToken(data.refreshToken);
+				await Promise.all([
+					setAuthToken(data.token),
+					setRefreshToken(data.refreshToken),
+				]);
 			}
 			toast.success(
 				"Senha alterada",
@@ -292,7 +293,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		},
 	});
 
-	const signOut = useCallback(() => {
+	const signOut = useCallback(async () => {
 		// Best-effort: revoga o refresh token no servidor. O header vai explícito
 		// porque a sessão local é limpa logo abaixo, antes do interceptor rodar.
 		const currentAuthToken = getAuthToken();
@@ -309,8 +310,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			});
 		}
 
-		setAuthToken(null);
-		setRefreshToken(null);
+		await Promise.all([setAuthToken(null), setRefreshToken(null)]);
 		setUser(null);
 		setAccount(null);
 		setIsAuthenticated(false);

@@ -14,6 +14,7 @@ não crash/analytics/replay.
 | [epic-6-address-form-ux](./epic-6-address-form-ux/) | UX de formulários de endereço — Enter confirma CEP/CNPJ, lat/long via Google Geocoding, hook `useCepLookup` compartilhado (profile, company, complaints) | **PR aberta (#63)**, empilhada sobre a #62 (diff encolhe quando a #62 mergear) — typecheck/lint/suíte de testes (201/201) OK. Falta só validação manual do mapa em complaints (sem device/simulador neste ambiente) |
 | [epic-7-map-geo-stability](./epic-7-map-geo-stability/) | Estabilidade de mapa/geolocalização — ícone do norte não escapa do botão (Complaints), fim do refetch por drift de GPS em Complaints e Market (`roundCoord` + `keepPreviousData`), remoção do overlay morto da câmera e do ticker de 1s do `GeospatialContext`, cores explícitas em ícones lucide | **PR #80 mergeada em `development`** — typecheck/lint/testes (198/198) OK. Falta validação manual em device/simulador (sem device neste ambiente). Independente da cadeia de observabilidade |
 | [epic-8-gluestack-v5-upgrade](./epic-8-gluestack-v5-upgrade/) | Upgrade do gluestack-ui (alpha → v5 estável) em 2 fases — bump de `@gluestack-ui/core`/`utils`, remoção de componentes vendorizados sem uso (`avatar`, `date-time-picker`, `tabs`), depois atualização dos componentes vendorizados com uso real | **Em andamento** na branch `chore/gluestack-ui-v5-stable` (de `development`). Independente da cadeia de observabilidade |
+| [epic-9-market-complaints-hardware-performance](./epic-9-market-complaints-hardware-performance/) | Performance/UX em Market e Denúncias — race condition de refresh token (toast preso na tab bar), dois `MapView` nativos sem skeleton (NPE + jank), race condition no bottom sheet de denúncias, imagens sem fallback visual (avatar do usuário incluso) | **Em andamento** na branch `fix/market-complaints-hardware-performance` (de `origin/development`). Achados confirmados ao vivo em emulador e no Samsung SM-A305GT físico. Independente da cadeia de observabilidade |
 
 ## Ordem de dependência
 
@@ -24,6 +25,7 @@ Epic 4 é independente, mas não está sendo trabalhado agora.
 Epic 6 é independente (não faz parte da cadeia de observabilidade).
 Epic 7 é independente (bugfix de mapa/geolocalização, fora da cadeia de observabilidade).
 Epic 8 é independente (upgrade de dependência de UI, fora da cadeia de observabilidade).
+Epic 9 é independente (bugfix de performance/UX em Market/Denúncias, fora da cadeia de observabilidade).
 ```
 
 Epic 5 furou a fila: o app está rejeitado na App Store e não pode ser lançado
