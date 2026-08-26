@@ -13,6 +13,12 @@
 			"skillPath": "skills/android-emulator/SKILL.md",
 			"computedHash": "20b3ca719cceeb25a7442f167f5ae60a816e03cd2b05dc3574cdd9d9056e8dac"
 		},
+		"argent-react-native-optimization": {
+			"source": "software-mansion/argent",
+			"sourceType": "github",
+			"skillPath": "packages/skills/skills/argent-react-native-optimization/SKILL.md",
+			"computedHash": "d318479816075aaa88c6f5aab9b7d920684f387c659d8deec32564fb9bc56ee3"
+		},
 		"building-native-ui": {
 			"source": "expo/skills",
 			"sourceType": "github",
@@ -54,6 +60,12 @@
 			"skillPath": "skills/dogfood/SKILL.md",
 			"computedHash": "8e6dfbff0633e355210ce7ae109cb39a3e1347946b6e92aaa607271154526b6b"
 		},
+		"expo-react-native-performance": {
+			"source": "pproenca/dot-skills",
+			"sourceType": "github",
+			"skillPath": "skills/.experimental/expo-react-native-performance/SKILL.md",
+			"computedHash": "da6e70dd6c48bd87388d966d8789063041a70928fa824841a3e097e59e924a54"
+		},
 		"expo-tailwind-setup": {
 			"source": "expo/skills",
 			"sourceType": "github",
@@ -75,10 +87,76 @@
 			"sourceType": "github",
 			"computedHash": "6c14e4efb34a9c4759e8b959f82dec328f87dd89a022957c6737086984b9b106"
 		},
+		"posthog-instrumentation": {
+			"source": "posthog/posthog-for-claude",
+			"sourceType": "github",
+			"skillPath": "skills/posthog-instrumentation/SKILL.md",
+			"computedHash": "a9a30a63accd756ef41009f987ac75812ab1e855b30ea5d6153e0fed16ebf22d"
+		},
+		"react-native-architecture": {
+			"source": "wshobson/agents",
+			"sourceType": "github",
+			"skillPath": "plugins/frontend-mobile-development/skills/react-native-architecture/SKILL.md",
+			"computedHash": "a83762db6ab371eb25e1b33e49d7895bb73df9d3952e26a3bdca90903d6ac91a"
+		},
+		"react-state-management": {
+			"source": "wshobson/agents",
+			"sourceType": "github",
+			"skillPath": "plugins/frontend-mobile-development/skills/react-state-management/SKILL.md",
+			"computedHash": "eadfba2e4198625858b67c8e105fb8252448524920344bd037c202bd372aa00d"
+		},
+		"sentry-debug-issue": {
+			"source": "getsentry/sentry-for-ai",
+			"sourceType": "github",
+			"skillPath": "src/skills/sentry-debug-issue/SKILL.md",
+			"computedHash": "448787a0630fc135bfa0888116a1ac27d14e64d67f5f2e9da2016ab39d529b35"
+		},
+		"sentry-fix-stack-traces": {
+			"source": "getsentry/sentry-for-ai",
+			"sourceType": "github",
+			"skillPath": "src/skills/sentry-fix-stack-traces/SKILL.md",
+			"computedHash": "a74e5a7f57b6b56c1349ed75d5afb9fe586e512a1f6134a7040443a41e93d16e"
+		},
+		"sentry-get-started": {
+			"source": "getsentry/sentry-for-ai",
+			"sourceType": "github",
+			"skillPath": "src/skills/sentry-get-started/SKILL.md",
+			"computedHash": "5f6057ca2ceff60c2d99ec740d872a0d311436424975ff42dd2b4eda6d6b9c66"
+		},
+		"sentry-instrument": {
+			"source": "getsentry/sentry-for-ai",
+			"sourceType": "github",
+			"skillPath": "src/skills/sentry-instrument/SKILL.md",
+			"computedHash": "da7c916895d081746619a13ec7d47d105fce07a8704e20b6b3b5ca5e2c16cf1e"
+		},
+		"sentry-react-native-sdk": {
+			"source": "getsentry/sentry-for-ai",
+			"sourceType": "github",
+			"skillPath": "skills-legacy/sentry-react-native-sdk/SKILL.md",
+			"computedHash": "3db668fa292af75af4b2894509f49900794b32609db17cd4c6b62de333cb91b6"
+		},
+		"sentry-setup-releases": {
+			"source": "getsentry/sentry-for-ai",
+			"sourceType": "github",
+			"skillPath": "src/skills/sentry-setup-releases/SKILL.md",
+			"computedHash": "6e0f3d08baec1642429aa6625480b57575036ba05d6bd875ccd2a42058e751ef"
+		},
 		"tailwind-design-system": {
 			"source": "wshobson/agents",
 			"sourceType": "github",
 			"computedHash": "7ff2f4650597e98ca4cd8f01231fb432ab4d187d6b12e641485aa871a04448cc"
+		},
+		"typescript-advanced-patterns": {
+			"source": "pproenca/dot-skills",
+			"sourceType": "github",
+			"skillPath": "skills/.experimental/typescript-advanced-patterns/SKILL.md",
+			"computedHash": "0895e4f188def93f05a1708f621c94cd97a1ccdaaf4cbcff628c04d3b363e9aa"
+		},
+		"typescript-refactor": {
+			"source": "pproenca/dot-skills",
+			"sourceType": "github",
+			"skillPath": "skills/.experimental/typescript-refactor/SKILL.md",
+			"computedHash": "8ea8df719cd12f7f3c7502341c75379ef19b27a5c011e34c27081545c23a094f"
 		},
 		"vercel-react-native-skills": {
 			"source": "vercel-labs/agent-skills",
