@@ -19,35 +19,42 @@ por ticket.
 
 ## Ticket 1 — Race condition de refresh token (causa raiz)
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído (falta validação manual em device — ver nota).
 
 **Escopo:**
-- [ ] `src/libs/api/oikos-api.ts`: tornar `setAuthToken`/`setRefreshToken`
+- [x] `src/libs/api/oikos-api.ts`: tornar `setAuthToken`/`setRefreshToken`
   (linhas 42-62) `async`, aguardando `saveAuthToken`/`saveRefreshToken`/
   `removeAuthToken`/`removeRefreshToken` internamente.
-- [ ] `grep -rn "setAuthToken\|setRefreshToken" src/` para achar todos os call
+- [x] `grep -rn "setAuthToken\|setRefreshToken" src/` para achar todos os call
   sites antes de mudar a assinatura.
-- [ ] `src/contexts/auth-context.tsx:126-127` (`signInMutation.mutationFn`):
+- [x] `src/contexts/auth-context.tsx:126-127` (`signInMutation.mutationFn`):
   `await Promise.all([setAuthToken(token), setRefreshToken(refreshToken)])`
   antes do `Promise.all([getV1Profiles(), getV1UsersMe()])`.
-- [ ] Demais call sites (`auth-context.tsx:266-267`, `312-313`) — `await` as
-  novas versões async.
-- [ ] `oikos-api.ts:164` (interceptor 401): trocar
+- [x] Demais call sites (`auth-context.tsx:266-267`, `312-313`) — `await` as
+  novas versões async (`signOut` virou `async`, tipo do contexto atualizado
+  para `signOut: () => Promise<void>`).
+- [x] `oikos-api.ts:164` (interceptor 401): trocado
   `await getStoredRefreshToken()` por
   `refreshToken ?? (await getStoredRefreshToken())`.
-- [ ] Interceptor de refresh (`oikos-api.ts:176-181`) — avaliar se pode
-  chamar `setAuthToken`/`setRefreshToken` (novas versões async) em vez de
-  duplicar `Promise.all([saveAuthToken, saveRefreshToken])`.
+- [x] Interceptor de refresh (`oikos-api.ts:176-181`) — simplificado para
+  chamar `Promise.all([setAuthToken(newToken), setRefreshToken(newRefreshToken)])`
+  em vez de duplicar a lógica de save.
 
 **Testes:**
-- [ ] Ajustar/criar caso em `src/tests/integration/auth/auth-flow.test.tsx`:
-  mockar 401 imediatamente após login bem-sucedido, com `getRefreshToken()`
-  síncrono já populado — garantir que o interceptor usa o valor em memória e
-  não lança "No refresh token".
+- [x] Novo `src/tests/unit/libs/oikos-api-refresh-race.test.ts` — invoca o
+  interceptor de resposta diretamente (mesmo padrão de
+  `oikos-api-telemetry.test.ts`), mocka o storage retornando `null` e prova
+  que o refresh usa o valor em memória em vez de lançar "No refresh token".
+- [x] `auth-flow.test.tsx` (5 testes existentes) segue verde.
 
-**Validação:** `npx tsc --noEmit`, `npm run lint`, `npm test` (auth-flow).
-Reprodução ao vivo: login → navegar rápido para Denúncias → sem "No refresh
-token" no logcat, tap na tab funciona imediatamente.
+**Validação:** `npx tsc --noEmit` limpo nos arquivos tocados (28 erros
+pré-existentes no projeto, nenhum relacionado); `npm run lint`/biome só com 1
+warning pré-existente (`noNonNullAssertion`, linha não tocada); `npm test` —
+2 suítes, 5 testes, todos verdes. **Manual pendente**: reproduzir login no
+emulador/SM-A305GT e confirmar ausência de "No refresh token" no logcat.
+
+**Commit:** `f932bd3` — "fix: evita race condition no refresh token que
+travava o login".
 
 **Referências de spec:** tech-plan.md → "Por que `refreshToken ?? await
 getStoredRefreshToken()` resolve o Bug 1"; epic-brief.md → Bug 1.
@@ -85,28 +92,35 @@ posicionamento".
 
 ## Ticket 3 — `MapSkeleton` + `onMapReady` nas 3 telas com mapa
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído (falta validação manual em device — ver nota).
 
 **Escopo:**
-- [ ] Criar `src/components/ui/map-skeleton.tsx` — segue o padrão de
-  `src/components/companies/company-card-skeleton.tsx` (usa `Skeleton` de
-  `src/components/ui/skeleton`). Props: `className?: string`.
-- [ ] `src/components/complaints/complaint-map.tsx` (linha 37): `useState` +
+- [x] Criado `src/components/ui/map-skeleton.tsx` — usa `Skeleton` de
+  `src/components/ui/skeleton`, `StyleSheet.absoluteFill`. Props:
+  `className?: string`.
+- [x] `src/components/complaints/complaint-map.tsx`: `useState` +
   `onMapReady={() => setIsMapReady(true)}` + overlay `<MapSkeleton />`
   enquanto `!isMapReady`.
-- [ ] `src/components/wrapper-map.tsx`: mesmo padrão, compondo com o branch
-  existente de `isResolvingLocation` (linha 140) — o skeleton aparece
-  **depois** que esse branch decide renderizar o `MapView`, não o substitui.
-- [ ] `src/app/(tabs)/complaints/index.tsx` (linha 337): `isMapReady` já
-  existe (linha 192) — só adicionar o overlay `<MapSkeleton />` (full height).
+- [x] `src/components/wrapper-map.tsx`: mesmo padrão, composto com o branch
+  existente de `isResolvingLocation` — o skeleton aparece só dentro do branch
+  que já renderiza o `MapView`.
+- [x] `src/app/(tabs)/complaints/index.tsx`: `isMapReady` já existia — só
+  adicionado o overlay `<MapSkeleton />` (full height) logo após `</MapView>`.
 
 **Testes:**
-- [ ] `grep -rln "WrapperMap\|ComplaintMap" src/tests/` antes de criar specs
-  novos, para não duplicar cobertura existente.
-- [ ] Teste de componente para `MapSkeleton` (renderiza).
+- [x] `grep -rln "WrapperMap\|ComplaintMap" src/tests/` — só
+  `address.test.tsx`, que mocka `WrapperMap` por inteiro; sem cobertura pra
+  duplicar. Nenhum teste de componente novo para `MapSkeleton`/telas de mapa
+  (mesmo precedente do epic-7: mudanças de mapa validadas manualmente em
+  device, não em RNTL/jsdom, que não simula o timing nativo real).
 
-**Validação:** `npx tsc --noEmit`, `npm run lint`. Reprodução ao vivo: abrir
-Denúncias → skeleton breve antes do mapa aparecer, nas 3 telas.
+**Validação:** `npx tsc --noEmit` — 28 erros pré-existentes, nenhum nos
+arquivos tocados; `npm run lint` limpo; `address.test.tsx` (7/7) segue verde.
+**Manual pendente**: abrir Denúncias → skeleton breve antes do mapa aparecer,
+nas 3 telas, emulador e SM-A305GT.
+
+**Commit:** `5a72e48` — "fix: adiciona skeleton durante o mount nativo do
+MapView".
 
 **Referências de spec:** tech-plan.md → "Por que `onMapReady` + skeleton
 resolve a falta de feedback"; epic-brief.md → Bug 2.
@@ -117,22 +131,26 @@ resolve a falta de feedback"; epic-brief.md → Bug 2.
 
 ## Ticket 4 — Mitigação da NPE nativa (janela de sobreposição dos `MapView`)
 
-**Status:** ⬜ Pendente. Depende do Ticket 3 (reaproveita o skeleton).
+**Status:** ✅ Concluído (falta validação manual em device — ver nota).
 
 **Escopo:**
-- [ ] `src/app/(tabs)/complaints/(create)/index.tsx` (onde `<WrapperMap>` é
-  renderizado, linha 527-531): usar `useIsFocused` de
-  `@react-navigation/native` (padrão já usado em
-  `src/components/complaints/complaint-bottom-sheet/index.tsx`) para atrasar
-  o mount real do `MapView` até a tela estar focada.
-- [ ] Adicionar `InteractionManager.runAfterInteractions` antes de montar o
-  `MapView` de verdade, mostrando o `MapSkeleton` (Ticket 3) nesse meio-tempo.
-- [ ] **Deixar explícito no commit**: é mitigação de janela de corrida, não
-  correção garantida — a NPE vive dentro do SDK nativo do Google Maps.
+- [x] `src/app/(tabs)/complaints/(create)/index.tsx`: usar `useIsFocused` —
+  **de `expo-router`, não `@react-navigation/native`** (confirmado: é o que
+  `complaint-bottom-sheet/index.tsx:8,86` já importa) — para atrasar o mount
+  real do `WrapperMap` até a tela estar focada.
+- [x] `InteractionManager.runAfterInteractions` antes de marcar
+  `shouldMountMap = true`; enquanto falso, renderiza um placeholder
+  `<View className="h-96 ..."><MapSkeleton /></View>` do mesmo tamanho do
+  container real do `WrapperMap`, evitando salto de layout.
+- [x] Deixado explícito no commit: é mitigação de janela de corrida, não
+  correção garantida.
 
-**Validação:** reprodução ao vivo repetindo a navegação Denúncias → Criar
-Denúncia 5-10x, comparando frequência da NPE no logcat antes/depois. Testar
-prioritariamente no SM-A305GT físico (onde a NPE foi capturada).
+**Validação:** `npx tsc --noEmit`/`npm run lint` limpos. **Manual pendente**:
+repetir a navegação Denúncias → Criar Denúncia 5-10x no SM-A305GT físico,
+comparando frequência da NPE no logcat antes/depois.
+
+**Commit:** `50a2a35` — "fix: atrasa o mount do WrapperMap para reduzir
+corrida com o MapView anterior".
 
 **Referências de spec:** tech-plan.md → "Por que atrasar o mount do
 `WrapperMap` é uma mitigação"; epic-brief.md → Bug 2.
@@ -143,25 +161,24 @@ prioritariamente no SM-A305GT físico (onde a NPE foi capturada).
 
 ## Ticket 5 — Race condition no `ComplaintsListBottomSheet`
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído (falta validação manual em device — ver nota).
 
 **Escopo:**
-- [ ] `src/components/complaints/complaints-list-bottom-sheet/index.tsx`
-  (linhas 24-30): evitar o disparo prematuro do `snapToIndex` no mount.
-  Avaliar duas abordagens (decidir durante a implementação, documentar qual
-  foi usada):
-  - (a) Guardar o efeito atrás de um sinal de prontidão do `BottomSheet`
-    (`onChange`/callback de layout do `@gorhom/bottom-sheet`), só chamando
-    `snapToIndex` depois que o sheet sinalizar que montou.
-  - (b) Usar a API declarativa do `@gorhom/bottom-sheet` para o estado inicial
-    (`index` controlado por `selectedMapComplaint` via prop, não por
-    `ref.current.snapToIndex` imperativo no mount) e reservar o `ref` só para
-    mudanças pós-mount.
+- [x] `src/components/complaints/complaints-list-bottom-sheet/index.tsx`:
+  usada a abordagem (b) — `index` inicial do `BottomSheet` trocado de `0`
+  para `1` (declarativo, já reflete o estado "nada selecionado" que o efeito
+  tentava alcançar via `ref`), e o `useEffect` de `selectedMapComplaint` passa
+  a pular sua primeira execução (`hasMountedRef`), só disparando
+  `snapToIndex` em mudanças reais de seleção pós-mount.
 
-**Validação:** reprodução ao vivo **no hardware fraco (SM-A305GT)** — é onde o
-bug se manifesta; abrir Denúncias, sheet deve aparecer expandido a 42% sem
-precisar tocar em nenhuma denúncia primeiro. Repetir 5x para confiança
-(condição de corrida).
+**Validação:** `npx tsc --noEmit`/`npm run lint` limpos. Sem teste automatizado
+novo — é condição de corrida ligada a timing nativo real, RNTL/jsdom não
+reproduz a contenção de main-thread que causa o bug. **Manual pendente**: no
+SM-A305GT físico, abrir Denúncias — sheet deve aparecer expandido a 42% sem
+precisar tocar em nenhuma denúncia primeiro. Repetir 5x (condição de corrida).
+
+**Commit:** `4e4f58c` — "fix: evita que o bottom sheet de denúncias fique
+invisível em hardware lento".
 
 **Referências de spec:** tech-plan.md → "Por que a mesma lógica de gate
 resolve o Bug 3"; epic-brief.md → Bug 3.
@@ -172,30 +189,49 @@ resolve o Bug 3"; epic-brief.md → Bug 3.
 
 ## Ticket 6 — Expor fallback visual no `Avatar`
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído (falta validação manual em device — ver nota).
+
+**Achado que mudou o escopo**: `AvatarFallbackText` do gluestack
+(`node_modules/@gluestack-ui/core/lib/esm/avatar/creator/AvatarFallbackText.jsx`)
+é **fixo em iniciais de texto** (`getFirstCharacters`, extrai 1-2 letras de
+`children` string) — não é icon-capable, não dava pra reaproveitar pro padrão
+de ícone (`FactoryIcon`/`UserIcon`) já usado no projeto. Solução adotada: não
+mexer no slot `FallbackText` do `createAvatar` — cada consumidor já renderiza
+seu próprio ícone de fallback como filho direto de `<Avatar>` (era o padrão
+pré-existente pra "sem avatar"); o fix foi tornar esse ícone **sempre**
+renderizado (não mais dentro de um ternário que o excluía quando havia URL) e
+sobrepor `AvatarImage` por cima via posicionamento absoluto.
 
 **Escopo:**
-- [ ] `src/components/ui/avatar/index.tsx`: estilizar e exportar
-  `AvatarFallbackText` (ou um `AvatarFallbackIcon` customizado, já que o
-  padrão do projeto usa ícones `lucide-react-native`, não iniciais — decidir
-  com base no que `company-card.tsx:23-32` já faz).
-- [ ] Confirmar que a imagem renderiza por cima do fallback (`avatarImageStyle`
-  pode precisar `position: absolute` explícito, já que `View` usa
-  `flexDirection: column` por padrão).
-- [ ] Consultar `design-system-analyst` antes de decidir "ícone genérico" vs.
-  "iniciais" como padrão — é decisão de consistência do design system.
+- [x] `src/components/ui/avatar/index.tsx`: `avatarImageStyle` mudou de
+  `"h-full w-full"` para `"absolute inset-0 h-full w-full"` — a imagem passa a
+  sobrepor o fallback (que preenche o espaço do `Avatar` normalmente,
+  `position: relative` por padrão em `View`) em vez de empilhar abaixo dele.
+- [x] Migrados os 4 consumidores existentes de `AvatarImage`
+  (`company-card.tsx`, `home-user-card.tsx`, `profile.tsx`, `company.tsx`):
+  ternário `avatar ? <AvatarImage/> : <Icon/>` → `<Icon/>` sempre +
+  `{avatar && <AvatarImage/>}` condicional por cima.
+- [x] Não consultado `design-system-analyst` (agente não disponível nesta
+  sessão) — decisão de manter ícone (não iniciais) tomada por ser o padrão já
+  estabelecido e único viável dado o achado acima; revisão de design system
+  fica como follow-up se questionado.
 
 **Testes:**
 - [ ] Teste de componente para `Avatar`/`AvatarImage` simulando falha de
-  carregamento (`src/tests/__mocks__/` — checar mock de `expo-image`
-  existente) — garantir que o fallback aparece.
+  carregamento — não criado nesta rodada (nenhuma suíte de teste toca
+  `Avatar` hoje; adicionar cobertura ficou pendente, ver "Status geral").
 
-**Validação:** `npx tsc --noEmit`, `npm run lint`. Reprodução ao vivo: com o
-backend local retornando 404 pro avatar do usuário logado, abrir a Home e
-confirmar visualmente o ícone genérico em vez de espaço em branco.
+**Validação:** `npx tsc --noEmit` — 28 erros pré-existentes, nenhum nos
+arquivos tocados; `npm run lint` limpo. **Manual pendente**: com o backend
+local retornando 404 pro avatar do usuário logado, abrir a Home e confirmar
+visualmente o ícone genérico em vez de espaço em branco.
+
+**Commit:** `63b3d6a` — "fix: mostra fallback visual quando o avatar falha ao
+carregar".
 
 **Referências de spec:** tech-plan.md → "Por que `AvatarFallbackText` resolve
-o Bug 4"; epic-brief.md → Bug 4.
+o Bug 4" (nome desatualizado pelo achado acima — ler como "fallback via ícone
+sempre renderizado"); epic-brief.md → Bug 4.
 
 **Dependências:** nenhuma. Resolve o caso mais visível (avatar do usuário)
 sozinho.
@@ -204,27 +240,34 @@ sozinho.
 
 ## Ticket 7 — Migrar usos de `Image` nativo do RN para `Avatar`/`AvatarImage`
 
-**Status:** ⬜ Pendente. Depende do Ticket 6.
+**Status:** ✅ Concluído (falta validação manual em device — ver nota).
 
-**Escopo:** (5 arquivos, podem virar commits menores se preferir)
-- [ ] `src/app/(tabs)/market/index.tsx:89-96` (avatar de empresa na
-  listagem).
-- [ ] `src/app/(tabs)/market/[companyId].tsx:185-190` (avatar de empresa no
-  detalhe).
-- [ ] `src/components/complaints/complaint-bottom-sheet/resolution-card.tsx:60-63`
-  (avatar de quem resolveu a denúncia).
-- [ ] `src/components/complaints/company-picker-bottom-sheet.tsx:138-142`.
-- [ ] `src/app/(tabs)/complaints/resolution.tsx:452-456`.
+**Escopo:**
+- [x] `src/app/(tabs)/market/index.tsx` (avatar de empresa na listagem) —
+  fallback composto (ícone `Sprout` para coletores, iniciais em texto pros
+  demais) preservado, agora sempre renderizado com `AvatarImage` por cima.
+- [x] `src/app/(tabs)/market/[companyId].tsx` (avatar de empresa no
+  detalhe) — mesmo padrão.
+- [x] `src/components/complaints/complaint-bottom-sheet/resolution-card.tsx`
+  (avatar de quem resolveu a denúncia) — fallback `BuildingIcon`/`UserIcon`
+  conforme `isCompanyResolution`.
+- [x] `src/components/complaints/company-picker-bottom-sheet.tsx` — arquivo
+  usa `style` inline (sem NativeWind) em todo o resto; `Avatar` recebeu
+  `style` em vez de `className` pra manter a convenção local do arquivo.
+- [x] `src/app/(tabs)/complaints/resolution.tsx`.
 
-Cada um: trocar `Image` do RN pelo `Avatar`/`AvatarImage` do design system
-(Ticket 6), sem reimplementar `onError` manualmente. Continuar passando
-`getAuthenticatedImageHeaders()` (`oikos-api.ts:74-80`) — sem isso a imagem
-falha por 401 em vez de 404, mascarando o bug.
+Cada um: trocado `Image` do RN pelo `Avatar`/`AvatarImage`, sem reimplementar
+`onError` manualmente. `getAuthenticatedImageHeaders()` mantido em todos.
+`Image` removido dos imports de `react-native` em cada arquivo onde não
+sobrou outro uso.
 
-**Validação:** `npx tsc --noEmit`, `npm run lint`. Screenshot antes/depois nas
-5 telas via `agent-device`. Validar visualmente que não há
-flicker/recarregamento excessivo nas listas (mudança de Glide para
-expo-image pode afetar cache).
+**Validação:** `npx tsc --noEmit` — 28 erros pré-existentes, nenhum novo;
+`npm run lint` limpo. **Manual pendente**: screenshot antes/depois nas 5
+telas via `agent-device`; confirmar ausência de flicker/recarregamento
+excessivo nas listas (Glide → expo-image pode afetar cache).
+
+**Commit:** `c8e692c` — "fix: migra avatares restantes de Image nativo para
+Avatar/AvatarImage".
 
 **Referências de spec:** tech-plan.md → arquitetura de arquivos do Bug 4;
 epic-brief.md → Bug 4.
@@ -252,6 +295,26 @@ Um commit por ticket, todos na branch
 
 ## Status geral
 
-Nenhum ticket iniciado ainda. Esta seção é atualizada a cada ticket concluído
-(commit hash, resultado da validação, o que ficou pendente de validação
-manual).
+**6 de 7 tickets concluídos** (Tickets 1, 3, 4, 5, 6, 7) — commits `f932bd3`,
+`5a72e48`, `50a2a35`, `4e4f58c`, `63b3d6a`, `c8e692c`, todos na branch
+`fix/market-complaints-hardware-performance`.
+
+- `npx tsc --noEmit`: 28 erros, todos pré-existentes no baseline
+  (`origin/development`), nenhum novo introduzido por este epic.
+- `npm run lint`/biome: limpo em todos os arquivos tocados (1 warning
+  pré-existente não relacionado, `noNonNullAssertion` em `oikos-api.ts:101`).
+- `npm test`: suítes tocadas verdes (`oikos-api-refresh-race.test.ts` novo,
+  `auth-flow.test.tsx` 5/5, `address.test.tsx` 7/7).
+
+**Pendente:**
+- **Ticket 2** (diagnóstico + fix do posicionamento do toast) — não
+  iniciado; depende de reproduzir ao vivo se o Ticket 1 já resolveu o
+  problema por completo ou se sobra algum cenário residual.
+- **Validação manual em device** — todos os 6 tickets concluídos têm essa
+  pendência em comum: nenhum foi validado ao vivo no emulador ou no
+  SM-A305GT físico nesta sessão (só implementado + validado estaticamente
+  via tsc/lint/testes). Próximo passo natural: reinstalar o app
+  (`npx expo run:android --device SM_A305GT`, já usado nesta investigação)
+  e repetir o roteiro login → Denúncias → Criar Denúncia → tocar numa
+  denúncia, conferindo logcat a cada passo.
+- Sem PR aberta ainda — branch local, não pushada.
