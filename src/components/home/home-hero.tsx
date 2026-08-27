@@ -36,7 +36,7 @@ export function HomeHero({
 	const { width } = useWindowDimensions();
 
 	const wordmarkSize = Math.round(width * 0.235);
-	const wordmarkLineHeight = Math.round(wordmarkSize * 0.92);
+	const wordmarkLineHeight = Math.round(wordmarkSize * 1.15);
 	const treeSize = Math.round(wordmarkSize * 2.6);
 	const wordmarkRowHeight = Math.round(wordmarkLineHeight + treeSize * 0.7);
 
