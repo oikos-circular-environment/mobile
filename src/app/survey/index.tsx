@@ -54,8 +54,8 @@ export default function SurveyPresentationScreen() {
 				<View className="w-full flex-row items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
 					<TriangleAlertIcon size={18} color={colors.yellow[800]} />
 					<Text size="sm" className="flex-1 leading-5 text-yellow-800">
-						Participar encerra a sessão da conta atual. A pesquisa começa como
-						visitante.
+						Participar encerra a sessão da conta atual. O app faz login
+						automático em uma conta de teste para a pesquisa.
 					</Text>
 				</View>
 			</View>
