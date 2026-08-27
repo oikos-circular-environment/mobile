@@ -1,9 +1,16 @@
 import { AxiosError } from "axios";
+import { Asset } from "expo-asset";
 import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
+import {
+	getCepV2,
+	listIbgeMunicipios,
+	listIbgeUfs,
+} from "@/libs/brasil-api-sdk";
 import {
 	postV1AuthLogin,
 	postV1UsersRegister,
 	putV1Profiles,
+	putV1ProfilesAvatar,
 } from "@/libs/oikos-sdk";
 import { provisionSyntheticParticipant } from "@/libs/survey/synthetic-participant";
 
@@ -11,11 +18,22 @@ jest.mock("@/libs/oikos-sdk", () => ({
 	postV1AuthLogin: jest.fn(),
 	postV1UsersRegister: jest.fn(),
 	putV1Profiles: jest.fn(),
+	putV1ProfilesAvatar: jest.fn(),
 }));
 
 jest.mock("@/libs/api/oikos-api", () => ({
 	setAuthToken: jest.fn().mockResolvedValue(undefined),
 	setRefreshToken: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock("@/libs/brasil-api-sdk", () => ({
+	getCepV2: jest.fn(),
+	listIbgeUfs: jest.fn(),
+	listIbgeMunicipios: jest.fn(),
+}));
+
+jest.mock("expo-asset", () => ({
+	Asset: { fromModule: jest.fn() },
 }));
 
 function conflictError() {
@@ -40,6 +58,34 @@ describe("provisionSyntheticParticipant", () => {
 			.mockResolvedValue(
 				{} as unknown as Awaited<ReturnType<typeof putV1Profiles>>,
 			);
+		jest
+			.mocked(putV1ProfilesAvatar)
+			.mockResolvedValue(
+				{} as unknown as Awaited<ReturnType<typeof putV1ProfilesAvatar>>,
+			);
+		jest.mocked(Asset.fromModule).mockReturnValue({
+			downloadAsync: jest.fn().mockResolvedValue(undefined),
+			localUri: "file:///mock/icon.png",
+		} as never);
+	});
+
+	it("faz upload do ícone do app como avatar do participante sintético", async () => {
+		await provisionSyntheticParticipant();
+
+		expect(putV1ProfilesAvatar).toHaveBeenCalledTimes(1);
+		const avatarBody = jest.mocked(putV1ProfilesAvatar).mock.calls[0][0]
+			?.body as unknown as FormData;
+		expect(avatarBody).toBeInstanceOf(FormData);
+	});
+
+	it("não bloqueia o provisionamento se o upload do avatar falhar", async () => {
+		jest
+			.mocked(putV1ProfilesAvatar)
+			.mockRejectedValueOnce(new Error("upload failed"));
+
+		await provisionSyntheticParticipant();
+
+		expect(putV1Profiles).toHaveBeenCalledTimes(1);
 	});
 
 	it("registra, loga e preenche o perfil de um participante sintético", async () => {
@@ -65,8 +111,8 @@ describe("provisionSyntheticParticipant", () => {
 			phone: string;
 			address?: unknown;
 		};
-		expect(profileBody.full_name).toEqual(expect.any(String));
-		expect(profileBody.display_name).toEqual(expect.any(String));
+		expect(profileBody.full_name).toMatch(/^usuario-[A-Z0-9]{6}$/);
+		expect(profileBody.display_name).toEqual(profileBody.full_name);
 		expect(profileBody.phone).toMatch(/^\d+$/);
 		expect(profileBody.address).toBeUndefined();
 	});
@@ -113,5 +159,113 @@ describe("provisionSyntheticParticipant", () => {
 			"Token não recebido",
 		);
 		expect(putV1Profiles).not.toHaveBeenCalled();
+	});
+
+	describe("endereço a partir da localização atual", () => {
+		const location = {
+			latitude: -23.55,
+			longitude: -46.63,
+			postalCode: "01310-100",
+			streetNumber: "1000",
+		};
+
+		beforeEach(() => {
+			jest.mocked(getCepV2).mockResolvedValue({
+				data: {
+					cep: "01310100",
+					state: "SP",
+					city: "São Paulo",
+					neighborhood: "Bela Vista",
+					street: "Avenida Paulista",
+				},
+			} as unknown as Awaited<ReturnType<typeof getCepV2>>);
+			jest.mocked(listIbgeUfs).mockResolvedValue({
+				data: [{ id: 35, sigla: "SP", nome: "São Paulo" }],
+			} as unknown as Awaited<ReturnType<typeof listIbgeUfs>>);
+			jest.mocked(listIbgeMunicipios).mockResolvedValue({
+				data: [{ nome: "São Paulo", codigo_ibge: "3550308" }],
+			} as unknown as Awaited<ReturnType<typeof listIbgeMunicipios>>);
+		});
+
+		it("resolve e envia o endereço quando a localização tem CEP", async () => {
+			await provisionSyntheticParticipant(location);
+
+			expect(getCepV2).toHaveBeenCalledWith({ path: { cep: "01310100" } });
+			expect(listIbgeMunicipios).toHaveBeenCalledWith({
+				path: { siglaUF: "SP" },
+			});
+
+			const profileBody = jest.mocked(putV1Profiles).mock.calls[0][0]?.body as {
+				address?: Record<string, unknown>;
+			};
+			expect(profileBody.address).toEqual({
+				zip_code: "01310100",
+				street: "Avenida Paulista",
+				number: "1000",
+				district: "Bela Vista",
+				city: "São Paulo",
+				city_ibge_id: 3550308,
+				state: "São Paulo",
+				state_code: "SP",
+				state_ibge_id: 35,
+				latitude: -23.55,
+				longitude: -46.63,
+			});
+		});
+
+		it("cria a conta sem endereço quando a localização não tem CEP", async () => {
+			await provisionSyntheticParticipant({ ...location, postalCode: null });
+
+			expect(getCepV2).not.toHaveBeenCalled();
+			const profileBody = jest.mocked(putV1Profiles).mock.calls[0][0]?.body as {
+				address?: unknown;
+			};
+			expect(profileBody.address).toBeUndefined();
+		});
+
+		it("cria a conta sem endereço quando a resolução falha (erro de rede)", async () => {
+			jest.mocked(getCepV2).mockRejectedValueOnce(new Error("network down"));
+
+			await provisionSyntheticParticipant(location);
+
+			expect(putV1Profiles).toHaveBeenCalledTimes(1);
+			const profileBody = jest.mocked(putV1Profiles).mock.calls[0][0]?.body as {
+				address?: unknown;
+			};
+			expect(profileBody.address).toBeUndefined();
+		});
+
+		it("cria a conta sem endereço quando UF ou município não são encontrados", async () => {
+			jest.mocked(listIbgeUfs).mockResolvedValueOnce({
+				data: [],
+			} as unknown as Awaited<ReturnType<typeof listIbgeUfs>>);
+
+			await provisionSyntheticParticipant(location);
+
+			const profileBody = jest.mocked(putV1Profiles).mock.calls[0][0]?.body as {
+				address?: unknown;
+			};
+			expect(profileBody.address).toBeUndefined();
+		});
+
+		it("cria a conta sem endereço quando o CEP não tem rua ou bairro detalhados", async () => {
+			jest.mocked(getCepV2).mockResolvedValueOnce({
+				data: {
+					cep: "01310100",
+					state: "SP",
+					city: "São Paulo",
+					neighborhood: null,
+					street: null,
+				},
+			} as unknown as Awaited<ReturnType<typeof getCepV2>>);
+
+			await provisionSyntheticParticipant(location);
+
+			expect(putV1Profiles).toHaveBeenCalledTimes(1);
+			const profileBody = jest.mocked(putV1Profiles).mock.calls[0][0]?.body as {
+				address?: unknown;
+			};
+			expect(profileBody.address).toBeUndefined();
+		});
 	});
 });

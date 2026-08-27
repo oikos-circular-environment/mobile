@@ -12,6 +12,7 @@ import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 import {
 	CONSENT_ETHICS_NOTE,
 	CONSENT_IDENTIFICATION,
@@ -96,6 +97,7 @@ export default function SurveyConsentScreen() {
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { isAuthenticated, signOut, refreshSession } = useAuthContext();
+	const { location, addresses } = useGeospatial();
 	const setConsent = useSurveyStore(s => s.setConsent);
 	const [reachedEnd, setReachedEnd] = useState(false);
 	const [isProvisioning, setIsProvisioning] = useState(false);
@@ -126,7 +128,16 @@ export default function SurveyConsentScreen() {
 			if (wasAuthenticated) {
 				await signOut({ silent: true });
 			}
-			await provisionSyntheticParticipant();
+			await provisionSyntheticParticipant(
+				location
+					? {
+							latitude: location.coords.latitude,
+							longitude: location.coords.longitude,
+							postalCode: addresses[0]?.postalCode ?? null,
+							streetNumber: addresses[0]?.streetNumber ?? null,
+						}
+					: null,
+			);
 			await refreshSession();
 
 			router.replace(

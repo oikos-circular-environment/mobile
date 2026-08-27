@@ -7,6 +7,7 @@ import {
 import SurveyConsentScreen from "@/app/survey/consent";
 import { toast } from "@/components/toast";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useGeospatial } from "@/contexts/geospatial-context";
 import { provisionSyntheticParticipant } from "@/libs/survey/synthetic-participant";
 import { useSurveyStore } from "@/stores/survey-store";
 
@@ -19,6 +20,7 @@ jest.mock("expo-router", () => ({
 }));
 
 jest.mock("@/contexts/auth-context");
+jest.mock("@/contexts/geospatial-context");
 
 jest.mock("@/libs/survey/synthetic-participant", () => ({
 	provisionSyntheticParticipant: jest.fn(),
@@ -60,6 +62,10 @@ describe("SurveyConsentScreen", () => {
 			isAuthenticated: false,
 			signOut: mockSignOut,
 			refreshSession: mockRefreshSession,
+		} as never);
+		jest.mocked(useGeospatial).mockReturnValue({
+			location: null,
+			addresses: [],
 		} as never);
 	});
 
@@ -111,6 +117,27 @@ describe("SurveyConsentScreen", () => {
 		expect(provisionSyntheticParticipant).toHaveBeenCalledTimes(1);
 		expect(mockRefreshSession).toHaveBeenCalledTimes(1);
 		expect(useSurveyStore.getState().consentVersion).not.toBeNull();
+	});
+
+	it("passa a localização atual pro provisionamento sintético quando disponível", async () => {
+		jest.mocked(useGeospatial).mockReturnValue({
+			location: { coords: { latitude: -23.55, longitude: -46.63 } },
+			addresses: [{ postalCode: "01310-100", streetNumber: "1000" }],
+		} as never);
+		const user = userEvent.setup();
+		await render(<SurveyConsentScreen />);
+
+		await scrollToEnd(user);
+		await user.press(screen.getByText("Li e aceito"));
+
+		await waitFor(() => {
+			expect(provisionSyntheticParticipant).toHaveBeenCalledWith({
+				latitude: -23.55,
+				longitude: -46.63,
+				postalCode: "01310-100",
+				streetNumber: "1000",
+			});
+		});
 	});
 
 	it("erro ao provisionar o participante sintético mostra toast e mantém o participante na tela", async () => {
