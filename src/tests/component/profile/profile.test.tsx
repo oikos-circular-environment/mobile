@@ -100,6 +100,7 @@ function setupAuthMock(
 		signIn: jest.fn(),
 		signUp: jest.fn(),
 		signOut: jest.fn(),
+		refreshSession: jest.fn(),
 		requestDeletion: jest.fn(),
 		cancelDeletion: jest.fn(),
 		isRequestingDeletion: false,

@@ -45,7 +45,8 @@ type AuthContextValue = {
 	deletionScheduledAt: Date | null;
 	signIn: (data: { email: string; password: string }) => void;
 	signUp: (data: { email: string; password: string }) => void;
-	signOut: () => Promise<void>;
+	signOut: (options?: { silent?: boolean }) => Promise<void>;
+	refreshSession: () => Promise<void>;
 	requestDeletion: () => void;
 	cancelDeletion: () => void;
 	changePassword: (
@@ -293,31 +294,41 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		},
 	});
 
-	const signOut = useCallback(async () => {
-		// Best-effort: revoga o refresh token no servidor. O header vai explícito
-		// porque a sessão local é limpa logo abaixo, antes do interceptor rodar.
-		const currentAuthToken = getAuthToken();
-		const currentRefreshToken = getRefreshToken();
+	const signOut = useCallback(
+		async (options?: { silent?: boolean }) => {
+			// Best-effort: revoga o refresh token no servidor. O header vai explícito
+			// porque a sessão local é limpa logo abaixo, antes do interceptor rodar.
+			const currentAuthToken = getAuthToken();
+			const currentRefreshToken = getRefreshToken();
 
-		if (currentRefreshToken) {
-			postV1AuthLogout({
-				body: { refreshToken: currentRefreshToken },
-				headers: currentAuthToken
-					? { Authorization: `Bearer ${currentAuthToken}` }
-					: undefined,
-			}).catch(() => {
-				// Falha ao revogar não pode impedir o logout local.
-			});
-		}
+			if (currentRefreshToken) {
+				postV1AuthLogout({
+					body: { refreshToken: currentRefreshToken },
+					headers: currentAuthToken
+						? { Authorization: `Bearer ${currentAuthToken}` }
+						: undefined,
+				}).catch(() => {
+					// Falha ao revogar não pode impedir o logout local.
+				});
+			}
 
-		await Promise.all([setAuthToken(null), setRefreshToken(null)]);
-		setUser(null);
-		setAccount(null);
-		setIsAuthenticated(false);
-		sessionBus.emit();
-		router.navigate("/(tabs)/(home)");
-		toast.success("Você foi deslogado com sucesso!");
-	}, [router]);
+			await Promise.all([setAuthToken(null), setRefreshToken(null)]);
+			setUser(null);
+			setAccount(null);
+			setIsAuthenticated(false);
+			sessionBus.emit();
+
+			if (!options?.silent) {
+				router.navigate("/(tabs)/(home)");
+				toast.success("Você foi deslogado com sucesso!");
+			}
+		},
+		[router],
+	);
+
+	const refreshSession = useCallback(async () => {
+		await refetch({ throwOnError: true });
+	}, [refetch]);
 
 	useEffect(() => {
 		setOnUnauthenticated(() => {
@@ -365,6 +376,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 				signUpMutation.mutate(data);
 			},
 			signOut,
+			refreshSession,
 			requestDeletion: () => requestDeletionMutation.mutate(),
 			cancelDeletion: () => cancelDeletionMutation.mutate(),
 			changePassword: (
@@ -389,6 +401,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			signInMutation,
 			signUpMutation,
 			signOut,
+			refreshSession,
 			requestDeletionMutation,
 			cancelDeletionMutation,
 			changePasswordMutation,

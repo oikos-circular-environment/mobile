@@ -7,7 +7,7 @@ import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -20,6 +20,7 @@ import {
 	type ConsentPerson,
 	type ConsentReference,
 } from "@/libs/survey/consent-content";
+import { provisionSyntheticParticipant } from "@/libs/survey/synthetic-participant";
 import { useSurveyStore } from "@/stores/survey-store";
 
 const SCROLL_END_THRESHOLD_PX = 24;
@@ -94,9 +95,10 @@ function CopyableReferenceRow({ label, value }: ConsentReference) {
 export default function SurveyConsentScreen() {
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
-	const { isAuthenticated, signOut } = useAuthContext();
+	const { isAuthenticated, signOut, refreshSession } = useAuthContext();
 	const setConsent = useSurveyStore(s => s.setConsent);
 	const [reachedEnd, setReachedEnd] = useState(false);
+	const [isProvisioning, setIsProvisioning] = useState(false);
 
 	const handleScroll = useCallback(
 		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -114,14 +116,30 @@ export default function SurveyConsentScreen() {
 		[reachedEnd],
 	);
 
-	const handleAccept = () => {
-		setConsent(CONSENT_TERM_VERSION, new Date().toISOString());
+	const handleAccept = async () => {
+		const wasAuthenticated = isAuthenticated;
 
-		if (isAuthenticated) {
-			signOut();
-			router.replace("/survey/consent-ended");
-		} else {
-			router.replace("/survey/persona");
+		setIsProvisioning(true);
+		try {
+			setConsent(CONSENT_TERM_VERSION, new Date().toISOString());
+
+			if (wasAuthenticated) {
+				await signOut({ silent: true });
+			}
+			await provisionSyntheticParticipant();
+			await refreshSession();
+
+			router.replace(
+				wasAuthenticated ? "/survey/consent-ended" : "/survey/persona",
+			);
+		} catch (error) {
+			console.error("Falha ao provisionar participante sintético:", error);
+			toast.error(
+				"Não foi possível iniciar a pesquisa",
+				"Tente novamente em instantes.",
+			);
+		} finally {
+			setIsProvisioning(false);
 		}
 	};
 
@@ -181,8 +199,12 @@ export default function SurveyConsentScreen() {
 				))}
 
 				<View className="gap-2 pt-2">
-					<Button disabled={!reachedEnd} onPress={handleAccept}>
+					<Button
+						disabled={!reachedEnd || isProvisioning}
+						onPress={handleAccept}
+					>
 						<ButtonText>Li e aceito</ButtonText>
+						{isProvisioning ? <ButtonSpinner /> : null}
 					</Button>
 					{!reachedEnd ? (
 						<Text size="xs" className="text-center text-muted-foreground">
