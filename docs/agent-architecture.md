@@ -91,10 +91,17 @@ como referência de forma). Um Analista deve:
 Nos dois casos, o plano deve declarar explicitamente o que fica **fora** do escopo — esse "Fora:" é o
 principal mecanismo anti scope-creep na saída do Analista.
 
-> Nota: as skills globais `brief`/`tech-plan`/`tickets` (workflow `agile`, ver
-> `~/.claude/CLAUDE.md`) já automatizam esse formato, mas hoje são globais da máquina — não
-> reproduzíveis por qualquer pessoa que clone o repo. Formalizar esse fluxo em nível de projeto
-> (skill própria, ou pelo menos um template em `plans/`) é um gap em aberto (seção 8).
+> Nota: as skills globais `brief`/`tech-plan`/`tickets` (workflow `agile`, hoje em
+> `/media/ccrs/development/software-engineer/workflows/`) automatizam esse formato, mas são
+> globais da máquina — não reproduzíveis por quem clona só este repo. **Resolvido em
+> 2026-08-27:** `.agents/skills/{brief,tech-plan,tickets}/SKILL.md` (symlinked em
+> `.claude/skills/`) reproduzem o mesmo fluxo (mesma filosofia de alinhamento por entrevista,
+> mesma disciplina de "artefato só depois de entendimento compartilhado"), mas com o
+> **template real já praticado nos 9 epics deste repo** (que expande um pouco o esqueleto
+> genérico — ex.: "Riscos/atenção" e "Validação" no tech-plan, "Status geral" no tickets) em vez
+> do esqueleto mínimo das skills globais. Por terem o mesmo nome (`brief`/`tech-plan`/`tickets`),
+> a resolução de skill deste harness já prioriza a versão local quando você está neste repo —
+> não precisa desinstalar nem desativar as globais.
 
 ### Exemplo completo — `survey-analyst`
 
@@ -338,6 +345,7 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 | Design/UI de terceiros | `gluestack-ui-v4`, `building-native-ui`, `vercel-react-native-skills` | `design-system-analyst`, `ui-executor` |
 | Dados/dinheiro | `native-data-fetching`, `dinero-best-practices`, `dinero-currency-patterns`, `dinero-formatting` | `data-layer-analyst`, `data-executor` |
 | Escrita | `copywriting`, `copy-editing` | `ui-executor`, `release-executor` (e qualquer um escrevendo texto pro usuário) |
+| Planejamento (autoral, não copiada de fonte externa) | `brief`, `tech-plan`, `tickets` | Orquestrador e qualquer Analista, ao levantar/planejar um epic novo em `plans/epic-*/` — ver nota da seção 3 |
 | Performance/otimização | `argent-react-native-optimization`, `expo-react-native-performance`, `react-native-architecture`, `react-state-management`, `typescript-refactor`, `typescript-advanced-patterns` | `performance-executor` |
 | Arquitetura e princípios de design | `solid`, `domain-driven-design`, `clean-architecture`, `clean-code` | Julgamento de qualquer Analista ao propor um plano; `data-layer-analyst` em especial (DDD mapeia direto pros `src/contexts/*` do app — cada context já é, na prática, um bounded context informal) |
 | Estado/componentes React | `react-state-management`, `zustand`, `react-composition-2026` | `data-layer-analyst`/`data-executor` (estado), `design-system-analyst`/`ui-executor` (composição de componente) |
@@ -361,10 +369,18 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 > esse caminho, está lá). Reinstalar via `skills add` no futuro destravaria `skills update`
 > automático para elas.
 
+> **`brief`/`tech-plan`/`tickets` também não aparecem em `skills-lock.json`, mas por motivo
+> diferente**: não vieram de `skills add` de fonte alguma — foram escritas do zero pra este repo
+> em 2026-08-27, adaptando a filosofia dos workflows globais do usuário
+> (`/media/ccrs/development/software-engineer/workflows/agile/`) ao formato real já praticado
+> aqui. Não há "fonte" externa a rastrear; `skills-lock.json` não se aplica.
+
 ## 7. Como isso se conecta ao fluxo de trabalho existente
 
 - **Planejamento:** saída dos Analistas alimenta `plans/epic-*/` (`epic-brief.md` → `tech-plan.md`
-  → `tickets.md`), o mesmo formato já usado nos 8 epics existentes.
+  → `tickets.md`), o mesmo formato já usado nos 9 epics existentes — agora com skills de projeto
+  próprias (`brief`/`tech-plan`/`tickets`, seção 6) em vez de depender só do julgamento do
+  Analista ou de skills globais da máquina.
 - **Branch/commit:** segue as regras já em vigor neste repo — nunca commit direto em
   `development`/`production`, uma branch por tarefa (não fragmentar), um commit por ticket, PR sem
   checklist de pendências (pendência vira ticket, não texto de PR).
@@ -391,11 +407,12 @@ O que já existe:
 - [x] Integração com o pipeline OpenCode do repo `api` (`.opencode/prompt/*.md` desta mobile) —
       ver seção 9.
 - [x] Este documento.
+- [x] Skill de projeto (não global) pra gerar `epic-brief.md`/`tech-plan.md`/`tickets.md` no
+      formato deste repo — `.agents/skills/{brief,tech-plan,tickets}/SKILL.md` (2026-08-27),
+      reproduz o fluxo sem depender de skills globais da máquina. Ver seção 6/7.
 
 O que **não** existe ainda:
 - [ ] `observability-executor` (decisão explícita — ver seção 7).
-- [ ] Uma skill de projeto (não global) para gerar `epic-brief.md`/`tech-plan.md`/`tickets.md` no
-      formato deste repo — hoje esse fluxo depende de skills globais de uma máquina específica.
 - [ ] A decisão de ferramenta do `plans/epic-3-observability` em si (Sentry vs. BugSnag,
       PostHog vs. Amplitude/Firebase) — não é algo que este documento resolve.
 - [ ] Validação prática: rodar esse pipeline numa tarefa real e medir se de fato reduz consumo de
@@ -428,22 +445,45 @@ vem de sempre revisar antes de aceitar, delegado ou não.
 | # | Tier | Agent OpenCode | Modelo | Custo | Quando passa pro próximo |
 |---|---|---|---|---|---|
 | 1 | T1 free | `oikos-exec` | `opencode/big-pickle` | grátis | erro de cota/rate-limit |
-| 2 | T1 free | `oikos-exec-alt` | `opencode/deepseek-v4-flash-free` | grátis | erro de cota **idêntico** ao do passo 1 → pula os dois provedores da OpenCode Zen no resto da sessão (ver nota de cota abaixo); erro diferente → tenta mesmo assim |
-| 3 | T1 free | `oikos-exec-omni` | `omniroute/omini-free-tier` | grátis | falha de conexão ou timeout — ver nota sobre o combo custom abaixo |
-| 4 | T2 pago | `oikos-exec-go` | `opencode-go/kimi-k2.7-code` | pago (crédito curto — escalonamento consciente) | falha ou diff ruim na revisão |
-| 5 | Claude | Executor Claude, `model: haiku` (override do orquestrador na chamada `Agent`) | `claude-haiku-4-5` | pago (Anthropic) | diff ruim na revisão |
-| 6 | Claude | Executor Claude, `model: sonnet` (default do agent, sem override) | `claude-sonnet-5` | pago (Anthropic) | — é o último tier, sempre funciona |
+| 2 | T1 free | `oikos-exec-alt` | `opencode/muse-spark-1.2-contributor-free` | grátis | erro de cota/rate-limit |
+| 3 | T1 free | `oikos-exec-alt2` | `opencode/mimo-v2.5-free` | grátis | erro de cota/rate-limit |
+| 4 | T1 free | `oikos-exec-alt3` | `opencode/hy3-free` | grátis | erro de cota/rate-limit |
+| 5 | T1 free | `oikos-exec-omni` | `omniroute/omini-free-tier` | grátis | falha de conexão ou timeout — ver nota sobre o combo custom abaixo |
+| 6 | T2 pago | `oikos-exec-go` | `opencode-go/kimi-k2.7-code` | pago (crédito curto — **já bateu o limite em 2026-08-27, pular por ora**) | falha ou diff ruim na revisão |
+| 7 | Claude | Executor Claude, `model: haiku` (override do orquestrador na chamada `Agent`) | `claude-haiku-4-5` | pago (Anthropic) | diff ruim na revisão |
+| 8 | Claude | Executor Claude, `model: sonnet` (default do agent, sem override) | `claude-sonnet-5` | pago (Anthropic) | — é o último tier, sempre funciona |
 
 `oikos-exec-gemini` (`google/gemini-3.6-flash`) continua fora dessa cadeia linear — é uma escolha
 por **formato da task** (muito contexto de leitura), não um degrau de fallback por custo; o
 Executor Claude escolhe ele diretamente quando a task pedir isso, em vez de entrar na sequência
 acima.
 
-**Nota sobre cota compartilhada (não confirmada por documentação):** não há doc pública da
-OpenCode Zen que diga se `big-pickle` e `deepseek-v4-flash-free` compartilham cota por conta ou
-têm cota independente por modelo. Em vez de assumir, o passo 2 da cadeia funciona como teste
-empírico por sessão: se o erro vier no mesmo formato do passo 1, trata como confirmado *para essa
-sessão* e pula direto pro passo 3 nas próximas tentativas — não reabre a pergunta a cada ticket.
+**Passos 1-4 expandidos em 2026-08-27: `oikos-exec-alt` trocou de modelo, dois agents novos.**
+`opencode/deepseek-v4-flash-free` (modelo original do passo 2) apareceu **vermelho/quebrado** no
+dashboard do OmniRoute (`OpenCode Free` → Available Models) nesta sessão — substituído por
+`muse-spark-1.2-contributor-free` (confirmado funcionando, 4s de latência). Dos 64 modelos listados
+pro provider `opencode` (no-auth, ver nota abaixo), só 4 passam no teste hoje:
+`big-pickle`, `muse-spark-1.2-contributor-free`, `mimo-v2.5-free`, `hy3-free` — os 4 agora têm um
+agent dedicado cada (`oikos-exec` → `oikos-exec-alt3`), todos testados individualmente com sucesso
+antes de entrar na config.
+
+**Nota sobre cota compartilhada — resolvida, é "no-auth" (não é conta com login).** Pesquisei no
+repo `diegosouzapw/OmniRoute` ([#7622](https://github.com/diegosouzapw/OmniRoute/issues/7622)): o
+provider `opencode` (Zen) é classificado explicitamente como **no-auth** — não existe
+login/API-key, o acesso é anônimo. Confirmado batendo os dois lados: `~/.local/share/opencode/auth.json`
+(CLI local) não tem entrada `opencode` nenhuma, e a conexão do OmniRoute pro `opencode`
+(`connectionId 04f022d4...`) tem `authType: "apikey"` mas sem chave real — só um campo
+`providerSpecificData.fingerprints`, um identificador sintético que o OmniRoute gera pra se
+apresentar como um cliente diferente da CLI local. Como a conexão do OmniRoute também tem
+`proxyEnabled: true`, o tráfego dela provavelmente sai por um IP diferente do da CLI local também.
+**Conclusão prática (inferência forte, não confirmada por doc do Zen):** os dois caminhos
+(CLI local vs. OmniRoute) provavelmente não competem pela mesma cota, já que nenhum dos dois usa
+conta de verdade e ambos têm fingerprint+IP distintos — mas como o algoritmo de rate-limit do Zen é
+fechado, não dá pra garantir 100%. **Se e como o rate-limit do Zen é por modelo ou por
+sessão/dispositivo dentro de um mesmo caminho (ex.: usar `big-pickle` afeta `hy3-free` na mesma
+CLI?) continua em aberto** — decidimos testar isso via uso real (dogfooding a cadeia acima numa
+task de verdade) em vez de um teste sintético de stress, porque um teste sintético leve (1 chamada
+por modelo) não teria revelado nada mesmo.
 
 **OmniRoute** (`http://127.0.0.1:20128`, container Docker local, ver `docker ps` → `omniroute`)
 agrega dezenas de provedores gratuitos por trás de um único endpoint compatível com OpenAI (GitHub
@@ -482,26 +522,121 @@ em si e a chave Bearer continuam sendo setup humano inicial.
    não-zero (~$0.012 numa chamada de 24k tokens), mas isso é o OmniRoute reportando o valor de
    mercado do que foi consumido dentro da cota mensal grátis do plano Kiro/AWS — não uma cobrança
    real. Confirmado pelo usuário. **Mantido no combo.**
-4. **`opencode/mimo-v2.5-free` (candidato free real, teste inconcluso).** Adicionado ao combo — mesma
-   conta OpenCode Zen já usada por `oikos-exec`/`oikos-exec-alt`, mas roteada pelo omniroute
-   (contexto de 1M tokens, sem custo). Primeiro teste real (24k tokens) bateu em
-   `[429] Rate limit exceeded` — pode ser limite real do free tier desse modelo ou só as várias
-   chamadas de teste anteriores nesta sessão saturando a mesma conta. **Não teve tempo de reteste.**
+4. **`opencode/mimo-v2.5-free` — 429 confirmado persistente, não transitório.** Reteste em
+   2026-08-27 ~12:08 UTC (horas depois da sessão anterior, sem chamadas de teste no meio) bateu de
+   novo em `[429] Error from provider (Console): Rate limit exceeded`. `check_quota` da conta
+   OpenCode no mesmo instante mostrou `quotaUsed: 0`, `percentRemaining: 100`, `tokenStatus: valid`
+   — ou seja, não é cota da conta esgotada, é rate-limit estrutural do backend "Console" desse
+   modelo específico no tier free, igual em espécie ao TPM de 8k do Groq (achado 2). **Descartado
+   como candidato — não vale reteste futuro sem mudança de tier/conta.**
+5. **Groq com erro novo, não visto na sessão anterior.** No mesmo teste de 2026-08-27, o
+   `groq/qwen/qwen3.6-27b` (que antes batia em TPM 8k) passou a falhar antes de processar:
+   `[400]: property 'x-provider' is unsupported`. Parece o OmniRoute mandando um campo `x-provider`
+   que a API do Groq passou a rejeitar — regressão de infra do combo/OmniRoute, não do free tier em
+   si. Não investigado a fundo ainda.
 
-**Estado do combo `omini-free-tier` ao pausar (2026-08-27, ~01:35 UTC):**
-`groq/qwen/qwen3.6-27b` + `opencode/mimo-v2.5-free` + `kiro/claude-haiku-4.5`. O Kiro é o candidato
-mais forte até agora (único que aguentou 24k tokens sem erro de TPM/rate-limit); o `mimo-v2.5-free`
-ainda precisa de reteste pra confirmar se o 429 foi transitório.
+6. **GitHub Copilot — causa raiz achada e corrigida.** Conta reconectada duas vezes sem efeito
+   (100% dos modelos batendo `[400] The requested model is not supported`, inclusive fallback de
+   alias) — não era problema de token/plano (Copilot Student ativo, 200 créditos, confirmado por
+   screenshot). Causa real, confirmada via `gh issue`/`gh pr` no repo `diegosouzapw/OmniRoute`:
+   [#8926](https://github.com/diegosouzapw/OmniRoute/issues/8926) — catálogo estático compilado
+   (`model-metadata-v1:static`) desatualizado em relação à lista live real do Copilot; o router
+   confiava no estático. Fix da camada de reconciliação **existe** na v3.8.50 (container estava em
+   3.8.49) mas vem **desligada por padrão** — precisa habilitar **"Auto-fetch upstream models"** na
+   conexão (não só "Auto-Sync", que é outro toggle). Depois de atualizar o container
+   (`docker pull` + recriar preservando o volume `omniroute-data`) e ligar o toggle certo, catálogo
+   passou a vir `source: "api"` (live). Da lista live (~48 modelos), só 3 funcionam de fato no plano
+   Student (testado manualmente pelo usuário via "Test all models"): `gpt-4o-2024-11-20`,
+   `gpt-4o-mini`, `gpt-5.4-nano` — resto (Claude/Gemini/Kimi/GPT-5.x maiores) aparece "available" no
+   catálogo mas não é servido pro plano (gap de entitlement conhecido, não coberto pelo #8926).
+7. **Antigravity — não estava "sem funcionar", o slug é `agy`, não `antigravity`.** `check_quota`/
+   `list_models_catalog` pra `antigravity` sempre voltavam vazio; a conexão real está registrada sob
+   o provider id `agy` (login via conta Google, `christiancnp@gmail.com`). Com isso resolvido,
+   catálogo já vem live (`source: "api"`) com 14 modelos — Gemini 3.1/3.6/3.7 (várias variantes),
+   Claude Opus 4-6/Sonnet 4-6, GPT-OSS-120b. Testado `agy/gemini-3-flash` com sucesso (1.8s, custo 0).
+8. **`qwen-web` — beco sem saída confirmado, não vale reteste.** `list_models_catalog` só expõe
+   `qwen3.7-plus`; testar retorna `Provider returned empty content`. Reproduz exatamente
+   [#9991](https://github.com/diegosouzapw/OmniRoute/issues/9991) (fechado como *invalid*/limitação
+   upstream, não bug do OmniRoute): `chat.qwen.ai` está atrás de CAPTCHA anti-bot da Alibaba
+   (`x5sec`/`RGV587`/`FAIL_SYS_USER_VALIDATE`), que a conexão por cookie não consegue resolver — os
+   mantenedores decidiram explicitamente não contornar isso (contornar = derrubar proteção anti-bot,
+   fora de escopo do projeto). `test_status` mostra `active` de forma enganosa; completions nunca
+   funcionam. **Não usar, não vale retestar sem uma mudança de arquitetura no OmniRoute.**
+9. **OpenRouter conectado, 20 modelos free no catálogo.** Pra código, testados dois candidatos:
+   `z-ai/glm-5.2:free` bateu timeout e depois `429 model_cooldown` (pool free do OpenRouter pra esse
+   modelo está saturado — comum em modelo free popular, não confiável pra fallback);
+   `cohere/north-mini-code:free` respondeu limpo (6s, código Python correto e bem estruturado) —
+   candidato viável.
+
+10. **Groq não estava morto — só `qwen/qwen3.6-27b` (o do achado 5) que ficou com o bug do
+    `x-provider`.** Dashboard mostrou `groq/openai/gpt-oss-120b` e `groq/openai/gpt-oss-20b` com
+    status verde; os demais (`llama-4-scout`, `llama-3.3-70b`, `qwen3-32b`, `gpt-oss-safeguard-20b`)
+    seguem com erro. Testado `groq/openai/gpt-oss-120b` com prompt de código real: **553ms–1.7s**,
+    de longe o mais rápido do combo (infra LPU do Groq), código correto e bem estruturado. **Voltou
+    pro combo**, só que como `openai/gpt-oss-120b` em vez do `qwen` quebrado.
+11. **Ollama Cloud conectado, mas só 2/12 modelos passam no teste do dashboard** (`gemma4:31b` e
+    `nemotron-3-super`, resto vermelho). Testado `ollama-cloud/nemotron-3-super` com o mesmo prompt
+    de código: funcionou, mas em **41 segundos** — outlier de latência muito acima do resto do combo
+    (o próximo mais lento, Cohere, ficou em 6-7s). Tarefas reais têm bem mais contexto que o teste,
+    tende a piorar. **Não entrou no combo** por esse motivo, mas fica confirmado como candidato de
+    último recurso se algum dia faltar opção.
+
+12. **`opencode/mimo-v2.5-free` reteste — o 429 do achado 4 era mesmo transitório.** Retestado
+    ~50min depois (chat simples e prompt de código real): os dois passaram limpo (2.7s e 14.1s,
+    resposta de qualidade — três abordagens + tabela de complexidade). Contradiz o achado 4
+    ("não vale reteste"); a causa mais provável é saturação temporária da conta durante os testes
+    intensos daquela sessão, não um limite estrutural do modelo (diferente do TPM 8k do Groq ou do
+    CAPTCHA do qwen-web, que são estruturais). **Voltou pro combo**, priorizado (ver nota de cota
+    no achado dos agents locais, acima).
+13. **NVIDIA NIM — todos os modelos travando, causa identificada mas não é bug corrigível daqui.**
+    Toda chamada trava até o teto de 600s do OmniRoute. Não é o bug clássico de socket morto
+    (#3884, já corrigido na v3.8.50) nem hang de proxy SOCKS5 (#8575 — testei desligando o proxy da
+    conexão, mesmo resultado). O log mostra a real causa: a segunda tentativa (retry automático)
+    chega a *streamar de verdade* por 12-30s antes de ser abortada — ou seja, o NVIDIA está
+    genuinamente lento agora (faixa do Ollama lento, achado 11), e um deadline interno do OmniRoute
+    (`resilienceSettings.requestQueue.maxWaitMs=15000ms`, rotulado "legacy" no próprio código) mata
+    a primeira tentativa aos 15s com erro sintético antes de sequer saber se o NVIDIA ia responder,
+    piorando o tempo total. **Não é candidato hoje** — nem por bug (não é), nem por velocidade
+    (não está rápido o suficiente).
+
+**Estado do combo `omini-free-tier` (2026-08-27, ~13:12 UTC) — 11 membros, todos testados com
+sucesso, modelos do OpenCode Zen priorizados primeiro:**
+
+| # | Modelo | Provider | Latência (teste) | Papel |
+|---|---|---|---|---|
+| 1 | `opencode/mimo-v2.5-free` | OpenCode Zen | 2.7-14s | priorizado a pedido — mesmo caminho de fallback que os agents locais (achado acima) |
+| 2 | `opencode/muse-spark-1.2-contributor-free` | OpenCode Zen | 4s | idem |
+| 3 | `opencode/hy3-free` | OpenCode Zen | 2.8s | idem |
+| 4 | `kiro/claude-haiku-4.5` | Kiro (AWS) | 1.2s | já provado com carga real (24k tokens) |
+| 5 | `agy/claude-sonnet-4-6` | Antigravity | 1.9s | melhor modelo de código do lote — Sonnet sem o peso do Opus-thinking |
+| 6 | `github/gpt-4o-2024-11-20` | GitHub Copilot | 1.6s | GPT-4o completo, o mais forte dos 3 que funcionam no plano Student |
+| 7 | `github/gpt-4o-mini` | GitHub Copilot | 1.2s | backup leve/rápido do Copilot |
+| 8 | `openrouter/cohere/north-mini-code:free` | OpenRouter | 747ms | modelo dedicado a código |
+| 9 | `groq/openai/gpt-oss-120b` | Groq | 553ms | mais rápido de longe (LPU) |
+| 10 | `ollama-cloud/gemma4:31b` | Ollama Cloud | — | por último a pedido do usuário (só os 2/12 que passam no teste do dashboard) |
+| 11 | `ollama-cloud/nemotron-3-super` | Ollama Cloud | 41s | idem — mais lento do combo, propositalmente por último |
+
+Removidos permanentemente: `groq/qwen/qwen3.6-27b` (`400 x-provider unsupported`, achado 5 — o
+Groq em si funciona, substituído por `openai/gpt-oss-120b` no achado 10), `nvidia` (achado 13, lento
+demais + trava). Deliberadamente fora: `claude-opus-4-6-thinking` (mais pesado, sem ganho real sobre
+o Sonnet pra esse tier), `gpt-5.4-nano` (tier fraco demais pra código real), `z-ai/glm-5.2:free`
+(rate-limit não confiável), `qwen-web` (achado 8, beco sem saída), demais modelos do Copilot fora do
+plano Student, e os modelos do OpenRouter/Antigravity/OpenCode Zen fora do foco de código.
+
+**Config local espelhada (2026-08-27, ~13:12 UTC):** `~/.config/opencode/opencode.json` recebeu os
+mesmos 3 modelos novos do OpenCode Zen como agents dedicados (`oikos-exec-alt2` = `mimo-v2.5-free`,
+`oikos-exec-alt3` = `hy3-free`), e `oikos-exec-alt` trocou de `deepseek-v4-flash-free` (quebrado) pra
+`muse-spark-1.2-contributor-free`. Isso expande a cadeia de execução da seção anterior de 6 pra 8
+degraus — ver tabela atualizada lá. `oikos-exec-go` (T2 pago) já bateu o limite de crédito nesta
+sessão — pular ele até renovar, não insistir.
 
 **Próximos passos (retomar em sessão futura):**
-- Retestar `opencode/mimo-v2.5-free` isolado (fora do horário de pico de uso da conta) pra separar
-  rate-limit real de saturação temporária da sessão de testes.
-- Se confirmar 429 persistente, tentar outro candidato genuinamente free: `nvidia` (NVIDIA NIM,
-  `tokenStatus: valid` no quota check) ou `github` (Copilot, mesma ressalva).
-- Só depois de achar 1-2 providers realmente free e estáveis sob carga real, rodar de novo o
-  dispatch completo do `oikos-exec-omni` fazendo um commit de verdade (teste ponta-a-ponta que
-  ainda não foi concluído com sucesso).
-- Até lá, uma falha nesse tier deve escalar pro passo 4 (`oikos-exec-go`) sem insistir.
+- Rodar uma task real de programação usando a cadeia expandida (`oikos-exec` → `oikos-exec-alt3` →
+  `oikos-exec-omni`) — é o teste ponta-a-ponta que estava pendente, e de quebra observa na prática
+  se o rate-limit do OpenCode Zen é por modelo ou por sessão/dispositivo dentro do mesmo caminho
+  (pergunta que ficou em aberto na nota de cota da seção anterior).
+- Reavaliar `nvidia` se um dia o time do OmniRoute destravar o timeout de 15s (achado 13) ou a
+  latência deles melhorar — hoje não vale.
 
 `.opencode/prompt/{oikos-exec,oikos-review,oikos-text}.md` **neste repo** dão a cada tier as
 convenções da mobile (gluestack-ui/NativeWind, `android/`/`ios/` gerados, `oikos-sdk` gerado) —
