@@ -1,10 +1,24 @@
 # Arquitetura de Agents Especializados — Oikos Mobile
 
-> **Status: implementado, em teste prático.** Os 13 agents descritos aqui existem de fato em
+> **Status: implementado, em teste prático.** Os 6 agents descritos aqui existem de fato em
 > `.claude/agents/*.md`, consumindo as skills de `.agents/skills/` (seção 6). `observability-executor`
 > é a única peça da spec original que ficou só no papel — por decisão explícita, sem instrumentar
 > ferramenta nova enquanto `plans/epic-3-observability` não decidir o vendor. Ver seção 8 pro que
 > falta validar na prática.
+>
+> **Revisão de 2026-08-27:** a versão original desta arquitetura tinha 13 agents — 7 Analistas
+> segregados por domínio de produto (market, complaints, survey, auth-session, design-system,
+> data-layer, observability) e 6 Executores/QA. Na prática, manter um arquivo de Analista por
+> domínio não escala: cada módulo novo do app exigiria criar mais um agent. Os 6 analistas de
+> domínio foram removidos — essa análise agora é trabalho direto do orquestrador (que já lê o
+> código via `Explore`/`graphify`), sem precisar de um agent fixo por módulo. `observability-analyst`
+> é a exceção: não é conhecimento de domínio de produto que cresce com o app, é leitura de uma
+> fonte de dados técnica fixa (EAS Observe). Do mesmo modo, `ui-executor`/`data-executor`/
+> `native-executor` (segregados por camada técnica) viraram um único `executor` — as regras de
+> cada camada não mudam por domínio, então três arquivos quase idênticos não se justificavam. Um
+> agent novo, `code-review`, formaliza o gate que antes era só a skill `/code-review` chamada por
+> convenção. Ver seção 9 pro estado atual da nomenclatura da cadeia OpenCode (agora
+> `provedor-modelo`, ex. `opencode-big-pickle`, em vez dos aliases `oikos-exec*`).
 >
 > Público-alvo: qualquer pessoa (ou agente) que vá rodar este projeto e programar usando Claude Code
 > e/ou OpenCode — ver seção 9 pra como os dois se encaixam.
@@ -31,10 +45,13 @@ estreito", cada um carregando só o contexto (skills, arquivos, convenções) da
 graph TD
     U[Pedido do usuário] --> O{Orquestrador}
     O -->|trivial: 1 arquivo, causa óbvia| D[Resolve direto, sem delegar]
-    O -->|não-trivial| A[Camada 1 — Analista de domínio]
-    A -->|plano escopado em plans/epic-*/| O
-    O --> E[Camada 2 — Executor de camada técnica]
-    E -->|1 ticket por vez, 1 commit por ticket| O
+    O -->|análise de domínio: lê o código direto| O
+    O -->|diagnóstico de observabilidade| OA[observability-analyst]
+    OA -->|gap report| O
+    O --> E[executor / performance-executor / release-executor]
+    E -->|diff| CR[code-review]
+    CR -->|aprovado| O
+    CR -->|reprovado: tenta o próximo tier| E
     O --> Q[qa-runner via agent-device]
     Q -->|passou| O
     Q -->|falhou| O
@@ -44,13 +61,15 @@ graph TD
 **O orquestrador não é um agent novo.** É a própria sessão principal do Claude Code — quem já tem a
 tool `Agent`/Task e decide quando delegar. Não faz sentido criar um "agent orquestrador" separado:
 isso só adicionaria uma chamada de LLM redundante em cima de uma decisão que a sessão principal já
-toma de graça.
+toma de graça. **O orquestrador é sempre o modelo Claude selecionado na sessão atual** — não um
+modelo fixo — e é quem faz a análise de domínio (Camada 1) diretamente, sem precisar de um Analista
+dedicado por módulo (ver revisão de 2026-08-27 no topo do documento).
 
 Regras do protocolo:
 
-- **Só o orquestrador aciona agents.** Nenhum Analista ou Executor tem a tool `Agent` no seu
+- **Só o orquestrador aciona agents.** Nenhum agent desta lista tem a tool `Agent` no seu
   `tools:` — evita árvores de subagents descontroladas (elas mesmas um vetor de scope creep).
-- **Agents frescos, não fork.** Analistas e Executores devem ser instâncias novas (`Agent` sem
+- **Agents frescos, não fork.** Executores e QA devem ser instâncias novas (`Agent` sem
   `subagent_type: "fork"`), não forks da sessão principal. O ganho de isolamento de contexto —
   o motivo de existir essa arquitetura — some se o agent herda todo o histórico da sessão que o
   chamou.
@@ -58,12 +77,22 @@ Regras do protocolo:
   factual sobre o código: a sessão principal resolve direto. O pipeline existe para reduzir o custo
   de tarefas não-triviais, não para burocratizar tudo — isso ecoa a regra geral do Claude Code de
   não invocar subagent sem necessidade real.
+- **O orquestrador nunca escreve o diff de um ticket ele mesmo, exceto como último recurso.**
+  Ticket de verdade sempre passa por `executor` (ou `performance-executor`/`release-executor`,
+  conforme o caso) — que já tenta a cadeia de modelos gratuitos antes de cair em Sonnet (seção 9).
+  O orquestrador só implementa direto se a tool `Agent` ou o dispatch pro OpenCode estiverem
+  quebrados, nunca por preferir pular a delegação.
 
-## 3. Camada 1 — Analistas (leitura, análise, proposta)
+## 3. Camada 1 — Análise de domínio (orquestrador direto) + observability-analyst
 
-Analistas **não escrevem código**. Consomem o estado atual do domínio, analisam o pedido, e produzem
-um plano escopado — sem abrir o leque para além do problema determinado. O contrato de tools espelha
-os agents builtin `Explore`/`Plan` deste harness (mesmo padrão, não uma invenção nova):
+**Análise de domínio deixou de ser um agent fixo por módulo (revisão de 2026-08-27).** O
+orquestrador já é quem lê o código — via `Explore` (busca read-only) e `graphify query`/`explain`/
+`path` (subgrafo escopado, mais barato que grep amplo) — e produz o plano diretamente, sem precisar
+criar um novo arquivo de agent a cada módulo que o app ganha (Market, Complaints, Survey, Auth,
+design system, camada de dados já cobertos hoje; qualquer módulo futuro não exige um agent novo).
+
+A única exceção continua sendo `observability-analyst` — não é conhecimento de domínio de produto
+que cresce com o app, é leitura de uma fonte de dados técnica fixa:
 
 ```
 tools: Read, Grep, Glob, Bash (somente leitura/diagnóstico — git log, npm test --listTests, graphify query), Skill
@@ -72,24 +101,19 @@ tools: Read, Grep, Glob, Bash (somente leitura/diagnóstico — git log, npm tes
 
 | Agent | Domínio | Arquivos-chave | Aciona quando |
 |---|---|---|---|
-| `market-analyst` | Marketplace de resíduos/serviços | `src/app/(tabs)/market/`, `src/contexts/market-context.tsx`, `src/components/market/` | Mudança de comportamento/feature no Market |
-| `complaints-analyst` | Denúncia + câmera | `src/app/(tabs)/complaints/`, `src/contexts/complaint-creation-context.tsx`, `src/contexts/complaints-context.tsx`, `src/components/camera/` | Fluxo de denúncia, captura de foto, geolocalização anexada à denúncia |
-| `survey-analyst` | Modo pesquisa (TCLE, SQLite, outbox) | `src/app/survey/`, `src/libs/survey/`, `src/components/survey/` | Qualquer mudança no subsistema de pesquisa — é o mais isolado e complexo do repo (persistência local, consentimento, outbox de sincronização) |
-| `auth-session-analyst` | Auth, sessão, perfil, tab Home | `src/contexts/auth-context.tsx`, `src/libs/session-bus.ts`, `src/app/(home)/`, `src/libs/api/oikos-api.ts` | Login, refresh de token, logout, reset de sessão, tela inicial |
-| `design-system-analyst` | Consistência visual | `src/components/ui/`, uso de `gluestack-ui`/NativeWind em qualquer tela | Auditoria de drift visual, decisão de criar/alterar um componente compartilhado |
-| `data-layer-analyst` | Camada de dados cross-cutting | `src/libs/oikos-sdk/` (consumo, nunca edição), React Query em geral, padrões de cache/refetch | Mudança que atravessa múltiplos domínios pelo lado dos dados (ex.: `roundCoord`+`keepPreviousData` do epic-7 foi um caso desses) |
 | `observability-analyst` | Interpretação de erro/crash/performance | Dados do EAS Observe (métricas de cold/warm start, TTI), issues do Sentry quando existir, `plans/epic-2-eas-observe/`, `plans/epic-3-observability/` | Diagnosticar um erro/crash já reportado, triar prioridade, decidir causa raiz **antes** de qualquer instrumentação nova ser escrita — hoje o observer é incompleto (epic-3 aguarda decisão de ferramenta), então grande parte do trabalho aqui é "o que está faltando observar", não só "o que os dados já dizem" |
 
-**Saída esperada de um Analista:** este repo já tem um formato de plano maduro em `plans/epic-*/`
-(`epic-brief.md` → `tech-plan.md` → `tickets.md`, ver `plans/README.md` e qualquer epic existente
-como referência de forma). Um Analista deve:
+**Saída esperada da análise de domínio:** este repo já tem um formato de plano maduro em
+`plans/epic-*/` (`epic-brief.md` → `tech-plan.md` → `tickets.md`, ver `plans/README.md` e qualquer
+epic existente como referência de forma). O orquestrador (ou `observability-analyst`, no seu
+diagnóstico) deve:
 
 - Para algo do tamanho de um epic: criar/atualizar essa estrutura de 3 arquivos.
-- Para algo menor (um ticket avulso): devolver ao orquestrador um plano inline no mesmo formato de
-  `tickets.md` (checkboxes `[ ]`, escopo explícito, "Fora:" listando o que **não** é para tocar).
+- Para algo menor (um ticket avulso): produzir um plano inline no mesmo formato de `tickets.md`
+  (checkboxes `[ ]`, escopo explícito, "Fora:" listando o que **não** é para tocar).
 
-Nos dois casos, o plano deve declarar explicitamente o que fica **fora** do escopo — esse "Fora:" é o
-principal mecanismo anti scope-creep na saída do Analista.
+Nos dois casos, o plano deve declarar explicitamente o que fica **fora** do escopo — esse "Fora:" é
+o principal mecanismo anti scope-creep antes de acionar um Executor.
 
 > Nota: as skills globais `brief`/`tech-plan`/`tickets` (workflow `agile`, hoje em
 > `/media/ccrs/development/software-engineer/workflows/`) automatizam esse formato, mas são
@@ -103,67 +127,31 @@ principal mecanismo anti scope-creep na saída do Analista.
 > a resolução de skill deste harness já prioriza a versão local quando você está neste repo —
 > não precisa desinstalar nem desativar as globais.
 
-### Exemplo completo — `survey-analyst`
-
-```markdown
----
-name: survey-analyst
-description: >
-  Use when the request touches the survey mode subsystem: TCLE consent, SQLite persistence,
-  outbox sync, task/suite flow, or anything under src/app/survey/, src/libs/survey/,
-  src/components/survey/. Analyzes the current state and proposes a scoped plan; does not
-  write code.
-tools: Read, Grep, Glob, Bash, Skill
-model: sonnet
----
-
-Você é o analista do subsistema de pesquisa (survey mode) do Oikos Mobile.
-
-## Escopo
-- `src/app/survey/**`, `src/libs/survey/**`, `src/components/survey/**`.
-- Fora do seu escopo: qualquer tela fora de `survey/`, o design system genérico
-  (`src/components/ui/`) — para essas, o orquestrador aciona outro analista.
-
-## O que você faz
-1. Lê o código relevante e o(s) ticket(s)/epic(s) já existentes em `plans/` que tocam survey.
-2. Entende exatamente o problema pedido — não amplie para "enquanto isso, também poderíamos...".
-3. Produz um plano no formato `tickets.md` deste repo: checkboxes de escopo, seção "Fora:"
-   explícita, e uma nota se o ticket depende de outro domínio (ex.: geolocalização vem de
-   `geospatial-context`, não é survey).
-4. Nunca edita código. Devolve o plano para o orquestrador decidir qual executor aciona.
-
-## Convenções do domínio a respeitar na análise
-- Persistência é SQLite isolada do resto do app (ver M01 em `plans/`), com outbox de sync.
-- Fluxo de consentimento (TCLE) tem exigências éticas de pesquisa com seres humanos — qualquer
-  mudança de texto ou fluxo de consentimento deve ser sinalizada como sensível no plano.
-- Estado de sessão de pesquisa é resetado via `sessionBus` no logout, como qualquer outro
-  contexto — verifique se o ticket proposto preserva isso.
-```
-
 ## 4. Camada 2 — Executores e QA (escrevem código, rodam o app)
 
-Diferente dos Analistas (organizados por domínio de produto), os Executores são organizados por
-**camada técnica** — porque é aí que "boas práticas de Expo/TypeScript/React Native" realmente
-diferem. Um ticket de UI do Market e um ticket de UI de Complaints usam exatamente as mesmas regras
-de `gluestack-ui`/NativeWind; não faz sentido duplicar esse conhecimento por domínio.
+**Revisão de 2026-08-27: `ui-executor`/`data-executor`/`native-executor` viraram um único
+`executor`.** A justificativa original de segregar por camada técnica (não por domínio de produto)
+continua válida — um ticket de UI do Market e um ticket de UI de Complaints usam exatamente as
+mesmas regras de `gluestack-ui`/NativeWind — mas manter três arquivos quase idênticos (mesmo
+`tools:`, mesma cadeia de fallback, só a seção de regras mudando) não se pagava: um único agent que
+conhece as três camadas cobre o mesmo terreno com menos manutenção.
 
 ```
-tools (executores de código): Read, Grep, Glob, Edit, Write, Bash, Skill
-tools (qa-runner):            Read, Grep, Glob, Bash, Skill  (sem Edit/Write — é verificador, não escritor)
+tools (executor / performance-executor / release-executor): Read, Grep, Glob, Edit, Write, Bash, Skill
+tools (code-review / qa-runner):                             Read, Grep, Glob, Bash, Skill  (sem Edit/Write — leem e reportam, não escrevem)
 # Excluído de todos: Agent (só o orquestrador encadeia agents)
 ```
 
 | Agent | Escopo de escrita | Skills principais | Boas práticas que aplica |
 |---|---|---|---|
-| `ui-executor` | Telas, componentes, layouts (`src/app/**`, `src/components/**` exceto `camera/` nativo) | `expo-router`, `expo-native-ui`, `expo-design-system`, `gluestack-ui-v4`, `expo-tailwind-setup`, `expo-animation`, `react-composition-2026`, `copywriting`/`copy-editing` | `cn()` para className condicional, formulários em `KeyboardAvoidingView`+`ScrollView`, ícones só `lucide-react-native`, cor primária `lime-800`, gluestack-ui v5 antes de RN cru, composição em vez de prop-drilling excessivo |
-| `data-executor` | Hooks de dados, formulários, consumo do `oikos-sdk`, mutations/queries, estado global | `expo-data-fetching`, `native-data-fetching`, `dinero-*` (valores monetários do Market), `react-state-management`, `zustand` | React Query para todo estado de servidor, `react-hook-form`+`zod`, nunca editar `src/libs/oikos-sdk/` à mão (regenerar via `npm run generate:api`); Zustand está instalado mas sem uso real hoje — só introduzir se Context API deixar de bastar para um caso concreto, não preventivamente |
-| `native-executor` | Módulos nativos, permissões, config plugins (`plugins/`, `app.config.ts`, `expo-camera`/`expo-location`) | `expo-module`, `expo-native-ui`, `eas-workflows` | Preferir config plugin a edição manual de `android/`/`ios/` (que são gerados e gitignored — ver `plugins/withAndroidSplashWindowBackground.js` como referência real deste repo) |
+| `executor` | UI (telas/componentes/layouts), dados (hooks, formulários, `oikos-sdk`, estado) e nativo (módulos, permissões, config plugins) — todas as camadas, um ticket por vez | `expo-router`, `expo-native-ui`, `expo-design-system`, `gluestack-ui-v4`, `expo-tailwind-setup`, `expo-animation`, `react-composition-2026`, `expo-data-fetching`, `native-data-fetching`, `dinero-*`, `react-state-management`, `zustand`, `expo-module`, `eas-workflows`, `copywriting`/`copy-editing` | `cn()` para className condicional, formulários em `KeyboardAvoidingView`+`ScrollView`, ícones só `lucide-react-native`, cor primária `lime-800`, gluestack-ui v5 antes de RN cru; React Query pra todo estado de servidor, `react-hook-form`+`zod`, nunca editar `src/libs/oikos-sdk/` à mão; config plugin em vez de editar `android/`/`ios/` direto (gerados/gitignored — ver `plugins/withAndroidSplashWindowBackground.js`); Zustand instalado mas sem uso real hoje — só introduzir se Context API deixar de bastar, não preventivamente |
+| `code-review` | **Não escreve código.** Lê o diff de qualquer tier da cadeia (seção 9) e reporta achados | — (checklist próprio, ver `.claude/agents/code-review.md`) | Gate obrigatório antes de qualquer ticket ser aceito, independente de qual tier produziu o diff |
 | `release-executor` | Publicação, EAS, release notes, ASC/Play (`store/`, `.eas/`, `eas.json`) | `eas-app-stores`, `eas-workflows`, `eas-update-insights`, `copywriting`/`copy-editing` | Release notes ≤500 caracteres (`wc -m` antes de commitar, ver `docs/publishing-path.md`), nunca pular validação de char limit |
 | `observability-executor` **(não implementado)** | Instrumentação de erro/performance (SDK setup, releases, alertas) | `sentry-get-started`, `sentry-react-native-sdk`, `sentry-instrument`, `sentry-setup-releases`, `posthog-instrumentation`, `eas-observe` | Ficaria pronto pra implementar o que `observability-analyst` apontar como faltando, mas por decisão explícita não construímos esse arquivo agora — sem instrumentar ferramenta nova antes do `plans/epic-3-observability` decidir o vendor |
-| `performance-executor` | Qualquer camada, quando o pedido é otimização (não feature nova) | `argent-react-native-optimization`, `expo-react-native-performance`, `react-native-architecture`, `react-state-management`, `typescript-refactor` | Ver nota abaixo — é a exceção deliberada ao padrão Analista/Executor |
-| `qa-runner` | **Não escreve código.** Roda o app, verifica, coleta evidência | `agent-device`, `android-emulator`, `ios-simulator`, `dogfood`, `expo-dev-client` | Fluxo `open → snapshot -i → act → re-snapshot → verify → close`; app já precisa estar rodando (`npm run android`/`ios`); reporta pass/fail + screenshots/logs ao orquestrador — não corrige o que encontrar, devolve para o executor certo |
+| `performance-executor` | Qualquer camada, quando o pedido é otimização (não feature nova) | `argent-react-native-optimization`, `expo-react-native-performance`, `react-native-architecture`, `react-state-management`, `typescript-refactor` | Ver nota abaixo — é a exceção deliberada ao padrão de ticket com escopo fixo |
+| `qa-runner` | **Não escreve código.** Roda o app, verifica, coleta evidência | `agent-device`, `android-emulator`, `ios-simulator`, `dogfood`, `expo-dev-client` | Fluxo `open → snapshot -i → act → re-snapshot → verify → close`; app já precisa estar rodando (`npm run android`/`ios`); reporta pass/fail + screenshots/logs ao orquestrador — não corrige o que encontrar, devolve pro `executor` |
 
-> **Por que `performance-executor` quebra o padrão "Analista propõe, Executor implementa":**
+> **Por que `performance-executor` quebra o padrão "orquestrador analisa, Executor implementa":**
 > otimização é um ciclo medir → corrigir → remedir, não uma feature com escopo fixo de antemão —
 > a própria skill `argent-react-native-optimization` (Software Mansion, mesma equipe do Reanimated)
 > formaliza isso: scan rápido de re-renders, sweep semântico (memoização, listas, animações,
@@ -186,46 +174,17 @@ tools (qa-runner):            Read, Grep, Glob, Bash, Skill  (sem Edit/Write —
 
 Regra herdada do próprio fluxo de trabalho do repo (`plans/epic-*/tickets.md`): **um ticket por vez,
 um commit por ticket.** Isso vale também para os Executores — um Executor recebe um ticket do
-Analista/orquestrador, não o epic inteiro. Limita o raio de ação de cada invocação individual.
+orquestrador, não o epic inteiro. Limita o raio de ação de cada invocação individual.
 
-### Exemplo completo — `ui-executor`
+### Exemplo completo — `executor` e `code-review`
 
-```markdown
----
-name: ui-executor
-description: >
-  Use to implement a single, already-scoped UI ticket (screen, component, layout) in
-  React Native + Expo Router + gluestack-ui v5 + NativeWind. Does not decide product scope —
-  expects a ticket with explicit boundaries from an Analyst or the orchestrator.
-tools: Read, Grep, Glob, Edit, Write, Bash, Skill
-model: sonnet
----
-
-Você implementa UI neste app Expo/React Native. Você recebe UM ticket já escopado — não amplie
-o pedido, não refatore código adjacente que não foi pedido.
-
-## Regras obrigatórias (não são sugestões)
-- Componentes: `gluestack-ui v5` antes de primitivos RN crus. Wrappers vivem em `src/components/ui/`.
-- Estilo: `NativeWind` (`className`). `className` com lógica condicional SEMPRE via `cn()` de
-  `@/libs/utils` — nunca template literal.
-- Cor primária: `lime-800`. Não introduza paleta concorrente.
-- Ícones: só `lucide-react-native`.
-- Formulários: sempre `KeyboardAvoidingView behavior="padding"` + `ScrollView` com
-  `contentContainerClassName` para padding.
-- Zero comentários explicativos por padrão no código.
-
-## Antes de escrever
-1. Confirme os limites do ticket (arquivos que pode tocar). Se o ticket exigir tocar fora
-   desses limites, pare e devolva ao orquestrador em vez de expandir sozinho.
-2. Use as skills `expo-router`, `expo-native-ui`, `expo-design-system`, `gluestack-ui-v4`,
-   `expo-tailwind-setup` para padrões atualizados — não confie só em memória de treino.
-3. Se o ticket envolve texto voltado ao usuário (copy de UI, mensagens de erro, empty states),
-   use a skill `copywriting` ou `copy-editing`.
-
-## Depois de escrever
-Rode `npm run lint` e, se o ticket tiver testes associados, `npm test`. Não marque o ticket como
-concluído — isso é decisão do orquestrador após o `qa-runner` validar.
-```
+Conteúdo real em `.claude/agents/executor.md` e `.claude/agents/code-review.md` — não duplicado
+aqui para não manter dois lugares em sincronia toda vez que uma regra de camada mudar. Resumo do
+`executor`: recebe UM ticket já escopado (UI, dados ou nativo), aplica as regras obrigatórias de
+cada camada (seção 4, tabela acima), roda lint/`tsc`/testes/`graphify update .`, e tenta a cadeia
+de execução gratuita (seção 9) antes de escrever ele mesmo. Resumo do `code-review`: só leitura,
+roda depois de qualquer diff de `executor`/`performance-executor`/`release-executor` — de qualquer
+tier da cadeia —, reporta achados de correção/simplificação/eficiência/convenção, nunca edita.
 
 ### Exemplo (não implementado) — `observability-executor`
 
@@ -303,7 +262,7 @@ inicia build; se não houver processo rodando, pare e informe o orquestrador.
 
 ## Ao encontrar um problema
 Não corrija. Descreva o sintoma, o passo que reproduz, e devolva ao orquestrador — ele decide
-qual executor (`ui-executor`, `data-executor`, `native-executor`) aciona para o fix.
+se aciona o `executor` (ou `performance-executor`/`release-executor`) para o fix.
 
 ## Skills de apoio
 `android-emulator` / `ios-simulator` para o alvo específico; `dogfood` se o pedido for
@@ -315,11 +274,13 @@ ticket específico.
 
 Mecanismos concretos, não só disciplina de prompt:
 
-1. **Estrutural — Analistas não têm `Edit`/`Write`.** Código só nasce depois de passar por um
-   plano revisável. Isso é reforçado pelo `tools:` do agent, não só pedido no texto.
+1. **Estrutural — `observability-analyst` e `code-review` não têm `Edit`/`Write`.** Código só
+   nasce depois de passar por um plano revisável (análise de domínio, hoje feita pelo orquestrador
+   antes de acionar um Executor) e todo diff passa por revisão antes de aceito. Isso é reforçado
+   pelo `tools:` do agent, não só pedido no texto.
 2. **Um ticket por invocação de Executor**, nunca o epic inteiro — limita o raio de ação de cada
    chamada individual (convenção já usada em `plans/epic-*/tickets.md`).
-3. **Seção "Fora:" obrigatória** em todo plano de Analista — declara o que não deve ser tocado.
+3. **Seção "Fora:" obrigatória** em todo plano (orquestrador ou `observability-analyst`) — declara o que não deve ser tocado.
 4. **Nenhum agent encadeia outro agent.** Só o orquestrador usa `Agent`. Evita árvores de
    delegação descontroladas, que são elas mesmas um jeito de o escopo crescer sem supervisão.
 5. **Sem refatoração de carona.** Herda a regra geral do projeto: bug fix não leva refactor
@@ -339,16 +300,16 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 
 | Categoria | Skills | Consumidas por |
 |---|---|---|
-| Expo framework (OSS) | `expo-overview`, `expo-router`, `expo-native-ui`, `expo-design-system`, `expo-ui`, `expo-animation`, `expo-data-fetching`, `expo-tailwind-setup`, `expo-dom`, `expo-web-to-native`, `expo-module`, `expo-brownfield`, `expo-project-structure`, `expo-examples`, `expo-app-clip` | `ui-executor`, `data-executor`, `native-executor` |
+| Expo framework (OSS) | `expo-overview`, `expo-router`, `expo-native-ui`, `expo-design-system`, `expo-ui`, `expo-animation`, `expo-data-fetching`, `expo-tailwind-setup`, `expo-dom`, `expo-web-to-native`, `expo-module`, `expo-brownfield`, `expo-project-structure`, `expo-examples`, `expo-app-clip` | `executor` |
 | EAS (pago) | `eas-app-stores`, `eas-workflows`, `eas-hosting`, `eas-observe`, `eas-simulator`, `eas-update-insights`, `expo-dev-client`, `expo-upgrade` | `release-executor`, `qa-runner`, `observability-analyst`/`observability-executor` (`eas-observe`) |
 | Automação de app/dispositivo | `agent-device`, `android-emulator`, `ios-simulator`, `dogfood` | `qa-runner` |
-| Design/UI de terceiros | `gluestack-ui-v4`, `building-native-ui`, `vercel-react-native-skills` | `design-system-analyst`, `ui-executor` |
-| Dados/dinheiro | `native-data-fetching`, `dinero-best-practices`, `dinero-currency-patterns`, `dinero-formatting` | `data-layer-analyst`, `data-executor` |
-| Escrita | `copywriting`, `copy-editing` | `ui-executor`, `release-executor` (e qualquer um escrevendo texto pro usuário) |
-| Planejamento (autoral, não copiada de fonte externa) | `brief`, `tech-plan`, `tickets` | Orquestrador e qualquer Analista, ao levantar/planejar um epic novo em `plans/epic-*/` — ver nota da seção 3 |
+| Design/UI de terceiros | `gluestack-ui-v4`, `building-native-ui`, `vercel-react-native-skills` | Orquestrador (auditoria de consistência visual), `executor` |
+| Dados/dinheiro | `native-data-fetching`, `dinero-best-practices`, `dinero-currency-patterns`, `dinero-formatting` | Orquestrador (decisão de camada de dados), `executor` |
+| Escrita | `copywriting`, `copy-editing` | `executor`, `release-executor` (e qualquer um escrevendo texto pro usuário) |
+| Planejamento (autoral, não copiada de fonte externa) | `brief`, `tech-plan`, `tickets` | Orquestrador, ao levantar/planejar um epic novo em `plans/epic-*/` — ver nota da seção 3 |
 | Performance/otimização | `argent-react-native-optimization`, `expo-react-native-performance`, `react-native-architecture`, `react-state-management`, `typescript-refactor`, `typescript-advanced-patterns` | `performance-executor` |
-| Arquitetura e princípios de design | `solid`, `domain-driven-design`, `clean-architecture`, `clean-code` | Julgamento de qualquer Analista ao propor um plano; `data-layer-analyst` em especial (DDD mapeia direto pros `src/contexts/*` do app — cada context já é, na prática, um bounded context informal) |
-| Estado/componentes React | `react-state-management`, `zustand`, `react-composition-2026` | `data-layer-analyst`/`data-executor` (estado), `design-system-analyst`/`ui-executor` (composição de componente) |
+| Arquitetura e princípios de design | `solid`, `domain-driven-design`, `clean-architecture`, `clean-code` | Julgamento do orquestrador ao propor um plano de qualquer domínio — DDD mapeia direto pros `src/contexts/*` do app (cada context já é, na prática, um bounded context informal) |
+| Estado/componentes React | `react-state-management`, `zustand`, `react-composition-2026` | Orquestrador (decisão de estado/composição), `executor` (implementação) |
 | Observabilidade (erro/crash/analytics) | `sentry-get-started`, `sentry-react-native-sdk`, `sentry-instrument`, `sentry-debug-issue`, `sentry-fix-stack-traces`, `sentry-setup-releases`, `posthog-instrumentation` | `observability-analyst` (as de `sentry-debug-issue`/`sentry-fix-stack-traces`), `observability-executor` (as demais) |
 | Meta | `expo-skill-feedback` | Qualquer agent, para reportar falha/lacuna de uma skill |
 
@@ -377,10 +338,10 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
 
 ## 7. Como isso se conecta ao fluxo de trabalho existente
 
-- **Planejamento:** saída dos Analistas alimenta `plans/epic-*/` (`epic-brief.md` → `tech-plan.md`
-  → `tickets.md`), o mesmo formato já usado nos 9 epics existentes — agora com skills de projeto
-  próprias (`brief`/`tech-plan`/`tickets`, seção 6) em vez de depender só do julgamento do
-  Analista ou de skills globais da máquina.
+- **Planejamento:** a análise de domínio do orquestrador alimenta `plans/epic-*/` (`epic-brief.md`
+  → `tech-plan.md` → `tickets.md`), o mesmo formato já usado nos 9 epics existentes — agora com
+  skills de projeto próprias (`brief`/`tech-plan`/`tickets`, seção 6) em vez de depender só do
+  julgamento ad-hoc ou de skills globais da máquina.
 - **Branch/commit:** segue as regras já em vigor neste repo — nunca commit direto em
   `development`/`production`, uma branch por tarefa (não fragmentar), um commit por ticket, PR sem
   checklist de pendências (pendência vira ticket, não texto de PR).
@@ -388,7 +349,7 @@ Todas em `.agents/skills/`, com symlink em `.claude/skills/` — ver `skills-loc
   o ciclo "escreveu código → rodou de verdade no emulador/simulador" sem depender de validação manual
   humana para todo ticket.
 - **Escrita:** `copywriting`/`copy-editing` (instaladas nesta sessão) cobrem tanto texto de produto
-  (UI, `ui-executor`) quanto texto de release (`release-executor`, release notes com limite de 500
+  (UI, `executor`) quanto texto de release (`release-executor`, release notes com limite de 500
   caracteres).
 - **Observabilidade:** `observability-analyst` materializa a metade "entender o que já existe e
   o que falta" do `plans/epic-3-observability`, lendo o EAS Observe (epic-2, já implementado) —
@@ -403,7 +364,9 @@ O que já existe:
 - [x] Skills de automação de app (`agent-device` + 3 companheiras), copywriting,
       performance/TypeScript moderno, observabilidade (Sentry + PostHog) e arquitetura
       (SOLID/DDD/clean-architecture/clean-code, zustand, react-composition-2026) instaladas.
-- [x] Os 13 arquivos `.claude/agents/*.md` (7 Analistas + 6 Executores/QA) implementados.
+- [x] Os 6 arquivos `.claude/agents/*.md` (`observability-analyst`, `executor`,
+      `performance-executor`, `release-executor`, `qa-runner`, `code-review`) implementados —
+      reduzido de 13 em 2026-08-27 (ver revisão no topo do documento).
 - [x] Integração com o pipeline OpenCode do repo `api` (`.opencode/prompt/*.md` desta mobile) —
       ver seção 9.
 - [x] Este documento.
@@ -426,13 +389,14 @@ concorrentes de fazer a mesma coisa.
 
 ### Claude Code — orquestração, julgamento e revisão (nunca a primeira tentativa de execução)
 
-O **Orquestrador**, todo **Analista** e o **`qa-runner`** sempre rodam em Claude — são papéis de
-julgamento (escopo, arquitetura, verificação), não de escrever o diff em si. Analistas seguem em
-`model: sonnet`; `qa-runner` segue em `model: haiku` (protocolo fixo, pouca ambiguidade — só
-promover pra `sonnet` se um caso concreto mostrar Haiku errando leitura de snapshot).
+O **Orquestrador**, o **`observability-analyst`**, o **`code-review`** e o **`qa-runner`** sempre
+rodam em Claude — são papéis de julgamento (escopo, arquitetura, verificação, revisão), não de
+escrever o diff em si. `observability-analyst` e `code-review` seguem em `model: sonnet`;
+`qa-runner` segue em `model: haiku` (protocolo fixo, pouca ambiguidade — só promover pra `sonnet`
+se um caso concreto mostrar Haiku errando leitura de snapshot).
 
-**Os 5 Executores (`ui-executor`, `data-executor`, `native-executor`, `release-executor`,
-`performance-executor`) não são mais "Claude por padrão, OpenCode como economia opcional".**
+**Os 3 Executores (`executor`, `release-executor`, `performance-executor`) não são mais
+"Claude por padrão, OpenCode como economia opcional".**
 Desde 2026-08-26, todo Executor tenta a cadeia de modelos gratuitos primeiro — sem exceção pra
 native/release — e só escreve o código ele mesmo (em Claude) se a cadeia inteira falhar. A revisão
 obrigatória (ver "Rede de segurança" abaixo) é o que torna isso seguro mesmo pra native/release,
@@ -442,21 +406,24 @@ vem de sempre revisar antes de aceitar, delegado ou não.
 
 ### Cadeia de execução (por ticket, nesta ordem)
 
+> **Nomenclatura revisada em 2026-08-27:** os agents OpenCode trocaram os aliases genéricos
+> `oikos-exec`/`oikos-exec-alt*`/`oikos-exec-omni`/`oikos-exec-go` por nomes `provedor-modelo`
+> (ex. `opencode-big-pickle`), tanto neste documento quanto no `~/.config/opencode/opencode.json`
+> global. O restante desta seção (achados empíricos, changelog) mantém os nomes antigos nas
+> entradas datadas anteriores a essa revisão — são registro histórico do que era verdade quando
+> escritas, não a nomenclatura atual. `oikos-exec-gemini` (`google/gemini-3.6-flash`) foi removido
+> por completo — não faz mais parte da cadeia nem do config global.
+
 | # | Tier | Agent OpenCode | Modelo | Custo | Quando passa pro próximo |
 |---|---|---|---|---|---|
-| 1 | T1 free | `oikos-exec` | `opencode/big-pickle` | grátis | erro de cota/rate-limit |
-| 2 | T1 free | `oikos-exec-alt` | `opencode/muse-spark-1.2-contributor-free` | grátis | erro de cota/rate-limit |
-| 3 | T1 free | `oikos-exec-alt2` | `opencode/mimo-v2.5-free` | grátis | erro de cota/rate-limit |
-| 4 | T1 free | `oikos-exec-alt3` | `opencode/hy3-free` | grátis | erro de cota/rate-limit |
-| 5 | T1 free | `oikos-exec-omni` | `omniroute/omini-free-tier` | grátis | falha de conexão ou timeout — ver nota sobre o combo custom abaixo |
-| 6 | T2 pago | `oikos-exec-go` | `opencode-go/kimi-k2.7-code` | pago (crédito curto — **já bateu o limite em 2026-08-27, pular por ora**) | falha ou diff ruim na revisão |
+| 1 | T1 free | `opencode-big-pickle` | `opencode/big-pickle` | grátis | erro de cota/rate-limit |
+| 2 | T1 free | `opencode-muse-spark-1.2` | `opencode/muse-spark-1.2-contributor-free` | grátis | erro de cota/rate-limit |
+| 3 | T1 free | `opencode-mimo-v2.5` | `opencode/mimo-v2.5-free` | grátis | erro de cota/rate-limit |
+| 4 | T1 free | `opencode-hy3` | `opencode/hy3-free` | grátis | erro de cota/rate-limit |
+| 5 | T1 free | `omniroute-omini-free-tier` | `omniroute/omini-free-tier` | grátis | falha de conexão ou timeout — ver nota sobre o combo custom abaixo |
+| 6 | T2 pago | `opencode-go-kimi-k2.7` | `opencode-go/kimi-k2.7-code` | pago (crédito curto — **já bateu o limite em 2026-08-27, pular por ora**) | falha ou diff ruim na revisão |
 | 7 | Claude | Executor Claude, `model: haiku` (override do orquestrador na chamada `Agent`) | `claude-haiku-4-5` | pago (Anthropic) | diff ruim na revisão |
 | 8 | Claude | Executor Claude, `model: sonnet` (default do agent, sem override) | `claude-sonnet-5` | pago (Anthropic) | — é o último tier, sempre funciona |
-
-`oikos-exec-gemini` (`google/gemini-3.6-flash`) continua fora dessa cadeia linear — é uma escolha
-por **formato da task** (muito contexto de leitura), não um degrau de fallback por custo; o
-Executor Claude escolhe ele diretamente quando a task pedir isso, em vez de entrar na sequência
-acima.
 
 **Passos 1-4 expandidos em 2026-08-27: `oikos-exec-alt` trocou de modelo, dois agents novos.**
 `opencode/deepseek-v4-flash-free` (modelo original do passo 2) apareceu **vermelho/quebrado** no
@@ -648,7 +615,7 @@ qualquer outro repo do org que ganhar seu próprio `.opencode/prompt/`.
 completamente separados) —
 
 ```
-opencode run --agent oikos-exec --format json "<task totalmente especificada>"
+opencode run --agent opencode-big-pickle --format json "<task totalmente especificada>"
 ```
 
 A task só deve ser despachada quando **não sobra nenhuma decisão de design** pro worker —
@@ -658,8 +625,8 @@ julga escopo.
 ### Rede de segurança: code review obrigatório em toda saída, de qualquer tier
 
 Isso é o que viabiliza usar gratuito por padrão até em native/release: **nenhuma saída de
-Executor — de qualquer um dos 6 tiers acima, inclusive quando o próprio Sonnet escreveu — é
-aceita sem passar pelo `/code-review` do orquestrador antes do ticket ser marcado concluído.**
+Executor — de qualquer um dos 8 tiers acima, inclusive quando o próprio Sonnet escreveu — é
+aceita sem passar pelo agente `code-review` antes do ticket ser marcado concluído.**
 Não é uma sugestão do Executor "reviso se achar necessário" — é um portão que o orquestrador
 sempre aciona. Erro de um tier barato custa uma rodada de revisão + nova tentativa no próximo
 tier; sem essa rede, custaria descobrir o erro em produção (native) ou numa loja (release), que é
@@ -668,8 +635,9 @@ exatamente o motivo que antes justificava excluir esses dois da delegação.
 ### Por que não mais provedores gratuitos, nem modelo local mais pesado
 
 Documentado aqui porque foi decisão explícita, não omissão: fora do que já está configurado
-(`big-pickle`, `deepseek-v4-flash-free`, `gemini-3.6-flash`, e agora o combo do OmniRoute, que por
-si só cobre a maior parte do espaço de "mais um provedor gratuito"), modelos locais
+(`opencode-big-pickle`, `opencode-muse-spark-1.2`, `opencode-mimo-v2.5`, `opencode-hy3`, e agora o
+combo do OmniRoute `omniroute-omini-free-tier`, que por si só cobre a maior parte do espaço de
+"mais um provedor gratuito"), modelos locais
 (`qwen2.5-coder:3b` via Ollama) não têm reasoning suficiente pra código real neste projeto — por
 isso ficam restritos a T0 (texto puro). Se isso mudar (hardware melhor, modelo local mais forte),
 revisar essa restrição é razoável — não é um limite permanente, é o estado real de hoje

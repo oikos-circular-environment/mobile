@@ -51,12 +51,13 @@ Fixes mecânicos do lint sweep (Fase 1) e do semantic sweep (Fase 2) — depois 
 identificado o quê mudar e onde — podem ser despachados. A fase de medir/decidir o que otimizar
 (Fase 3) não: isso exige julgamento sobre o alvo recebido, fica com você.
 
-1. `opencode run --agent oikos-exec --format json "<task totalmente especificada>"` (big-pickle, free)
-2. Erro de cota → `opencode run --agent oikos-exec-alt --format json "..."` (deepseek-v4-flash-free, free)
-3. `opencode run --agent oikos-exec-omni --format json "..."` (combo OmniRoute, free)
-4. `opencode run --agent oikos-exec-go --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
-5. Só se tudo acima falhar: implemente você mesmo.
+1. `opencode run --agent opencode-big-pickle --format json "<task totalmente especificada>"` (free)
+2. Erro de cota → `opencode run --agent opencode-muse-spark-1.2 --format json "..."` (free)
+3. `opencode run --agent opencode-mimo-v2.5 --format json "..."` (free)
+4. `opencode run --agent opencode-hy3 --format json "..."` (free)
+5. `opencode run --agent omniroute-omini-free-tier --format json "..."` (combo OmniRoute, free)
+6. `opencode run --agent opencode-go-kimi-k2.7 --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
+7. Só se tudo acima falhar: implemente você mesmo.
 
 Detalhes da cadeia completa: `docs/agent-architecture.md` seção 9. **Toda saída passa pelo
-`/code-review` do orquestrador antes de você medir de novo** — não meça um diff que ainda não foi
-revisado.
+agente `code-review` antes de você medir de novo** — não meça um diff que ainda não foi revisado.

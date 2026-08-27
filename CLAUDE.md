@@ -15,6 +15,18 @@ npm test               # Run Jest tests
 npm run test:coverage  # Run Jest with coverage report
 ```
 
+## Orquestração de agentes
+
+Fonte de verdade: `docs/agent-architecture.md`. Regra objetiva: **nunca abra o agente genérico
+(`claude`/`general-purpose`) pra executar um ticket.** Análise de domínio é trabalho direto do
+orquestrador (você, o modelo desta sessão — leia o código via `Explore`/`graphify` em vez de
+delegar pra um analista fixo por módulo); execução de ticket vai pro agente `executor` (ou
+`performance-executor`/`release-executor`, conforme o caso), que tenta a cadeia de modelos
+gratuitos (omniroute → opencode free → opencode-go) antes de cair em Sonnet; todo diff passa pelo
+agente `code-review` antes de aceito; `qa-runner` verifica rodando o app de verdade. Você (o
+orquestrador) só escreve o diff de um ticket diretamente, sem passar por agent nenhum, se a tool
+`Agent` ou o dispatch pro OpenCode estiverem indisponíveis — nunca por preferência.
+
 ## agent-device (execução, testes e depuração)
 
 CLI + MCP da Callstack (instalado como devDependency, `node_modules/.bin/agent-device`, registrado em `.mcp.json` como `agent-device`) para agentes controlarem o app rodando em emulador/simulador: inspecionar UI, gestos, deep links, logs, rede, React DevTools, perfil de performance e scripts `.ad` de replay. Skills correspondentes: `agent-device` (router), `android-emulator`, `ios-simulator`, `dogfood`.
