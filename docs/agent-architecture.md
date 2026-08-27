@@ -476,30 +476,24 @@ em si e a chave Bearer continuam sendo setup humano inicial.
    `[413] tokens per minute (TPM): Limit 8000` — estrutural do tier gratuito daquele
    provider/modelo, não contornável via config. Só serve pra prompts pequenos (testado: chat
    simples de 16 tokens respondeu em 1.4s).
-3. **Kiro — status de custo incerto, não confirmado.** Testei adicionar `kiro/claude-haiku-4.5` ao
-   combo — funcionou tecnicamente (roteou certo, aguentou 24k tokens sem erro de TPM, 3.5s de
-   latência), mas o header `x-omniroute-response-cost` veio com valor não-zero (~$0.012 numa
-   chamada de 24k tokens; bate com `cost: 0.002362` já visto no `omniroute_cost_report` pra esse
-   modelo). A conexão (`GET /api/providers`) mostra `authType: oauth`, importada via GitHub, ligada
-   a um `profileArn` da AWS CodeWhisperer — é o Kiro da AWS, que tem plano com cota **mensal de
-   créditos gratuitos**. Não achei nenhum campo que confirme se esse `response-cost` é cobrança real
-   ou só uma estimativa interna do OmniRoute consumindo a cota grátis mensal (hipótese do usuário,
-   plausível, não verificada). **Removido do combo por precaução** até confirmar — sem certeza não
-   vale arriscar consumo de cota/crédito real do usuário só pra um teste de infraestrutura.
-4. **`opencode/mimo-v2.5-free` (candidato free real, teste inconcluso).** Adicionado ao combo no
-   lugar do Kiro — mesma conta OpenCode Zen já usada por `oikos-exec`/`oikos-exec-alt`, mas roteada
-   pelo omniroute (contexto de 1M tokens, sem custo). Primeiro teste real (24k tokens) bateu em
+3. **Kiro — confirmado como cota de créditos grátis (usuário confirmou), não cobrança real.** Testei
+   adicionar `kiro/claude-haiku-4.5` ao combo — funcionou tecnicamente (roteou certo, aguentou 24k
+   tokens sem erro de TPM, 3.5s de latência); o header `x-omniroute-response-cost` mostra um valor
+   não-zero (~$0.012 numa chamada de 24k tokens), mas isso é o OmniRoute reportando o valor de
+   mercado do que foi consumido dentro da cota mensal grátis do plano Kiro/AWS — não uma cobrança
+   real. Confirmado pelo usuário. **Mantido no combo.**
+4. **`opencode/mimo-v2.5-free` (candidato free real, teste inconcluso).** Adicionado ao combo — mesma
+   conta OpenCode Zen já usada por `oikos-exec`/`oikos-exec-alt`, mas roteada pelo omniroute
+   (contexto de 1M tokens, sem custo). Primeiro teste real (24k tokens) bateu em
    `[429] Rate limit exceeded` — pode ser limite real do free tier desse modelo ou só as várias
    chamadas de teste anteriores nesta sessão saturando a mesma conta. **Não teve tempo de reteste.**
 
-**Estado do combo `omini-free-tier` ao pausar (2026-08-27, ~01:30 UTC):**
-`groq/qwen/qwen3.6-27b` + `opencode/mimo-v2.5-free`. Não confiar nesse tier em produção até o
-próximo teste confirmar se o 429 foi transitório.
+**Estado do combo `omini-free-tier` ao pausar (2026-08-27, ~01:35 UTC):**
+`groq/qwen/qwen3.6-27b` + `opencode/mimo-v2.5-free` + `kiro/claude-haiku-4.5`. O Kiro é o candidato
+mais forte até agora (único que aguentou 24k tokens sem erro de TPM/rate-limit); o `mimo-v2.5-free`
+ainda precisa de reteste pra confirmar se o 429 foi transitório.
 
 **Próximos passos (retomar em sessão futura):**
-- Confirmar se o Kiro (AWS) cobra de verdade ou só consome cota mensal grátis — se for cota grátis,
-  ele volta a ser candidato válido pro combo (teve 100% de sucesso e sem cap de TPM/tools nos
-  testes).
 - Retestar `opencode/mimo-v2.5-free` isolado (fora do horário de pico de uso da conta) pra separar
   rate-limit real de saturação temporária da sessão de testes.
 - Se confirmar 429 persistente, tentar outro candidato genuinamente free: `nvidia` (NVIDIA NIM,
