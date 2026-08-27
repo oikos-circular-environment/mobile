@@ -1,10 +1,11 @@
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { BuildingIcon, UserIcon } from "lucide-react-native";
-import { Image, View } from "react-native";
+import { View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { ResolutionAttachmentsStack } from "@/components/complaints/resolution-attachments-stack";
 import { colors } from "@/components/style/colors";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Text } from "@/components/ui/text";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
@@ -56,24 +57,21 @@ export function ResolutionCard({
 			)}
 
 			<View className="flex-row items-center gap-2">
-				{avatarUrl ? (
-					<Image
-						source={{ uri: avatarUrl, headers: getAuthenticatedImageHeaders() }}
-						style={{ width: 32, height: 32, borderRadius: 16 }}
-					/>
-				) : (
-					<View className="h-8 w-8 items-center justify-center rounded-full bg-gray-100">
-						{isCompanyResolution ? (
-							<BuildingIcon
-								size={14}
-								color={colors.gray[500]}
-								strokeWidth={2}
-							/>
-						) : (
-							<UserIcon size={14} color={colors.gray[500]} strokeWidth={2} />
-						)}
-					</View>
-				)}
+				<Avatar size="sm" className="h-8 w-8 rounded-full bg-gray-100">
+					{isCompanyResolution ? (
+						<BuildingIcon size={14} color={colors.gray[500]} strokeWidth={2} />
+					) : (
+						<UserIcon size={14} color={colors.gray[500]} strokeWidth={2} />
+					)}
+					{avatarUrl && (
+						<AvatarImage
+							source={{
+								uri: avatarUrl,
+								headers: getAuthenticatedImageHeaders(),
+							}}
+						/>
+					)}
+				</Avatar>
 
 				<View className="flex-1">
 					<Text className="text-sm font-semibold text-gray-800">

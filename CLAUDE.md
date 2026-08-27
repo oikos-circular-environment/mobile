@@ -15,6 +15,14 @@ npm test               # Run Jest tests
 npm run test:coverage  # Run Jest with coverage report
 ```
 
+## agent-device (execução, testes e depuração)
+
+CLI + MCP da Callstack (instalado como devDependency, `node_modules/.bin/agent-device`, registrado em `.mcp.json` como `agent-device`) para agentes controlarem o app rodando em emulador/simulador: inspecionar UI, gestos, deep links, logs, rede, React DevTools, perfil de performance e scripts `.ad` de replay. Skills correspondentes: `agent-device` (router), `android-emulator`, `ios-simulator`, `dogfood`.
+
+Regra de uso: use `agent-device` só para tarefas de automação de app/dispositivo. Para uma tarefa normal de dirigir o app, comece direto — não sonde antes com `--help`, `--version`, `devices`, `appstate` ou `snapshot`; abra o app pedido em foreground e continue a partir do snapshot interativo inicial. Fluxo padrão: `open -> snapshot -i -> act -> re-snapshot -> verify -> close`. Para logs/rede/perf/falhas em runtime, use `agent-device help debugging`. Para árvore de componentes React Native, props/state/hooks ou re-renders, use `agent-device help react-devtools`. Mantenha comandos que alteram estado seriais numa única sessão.
+
+O app precisa estar rodando antes (`npm run android` / `npm run ios` / `npm start`); a ferramenta não roda build, só controla o processo já ativo.
+
 ## Release notes (store/)
 
 Ao redigir `store/shared/whats-new/<version>.md`: limite de **500 caracteres** (Google Play; a Apple aceita até 4.000). Confira com `wc -m` antes de commitar — o script de publicação só valida isso tarde, depois que o binário já foi publicado na loja. Ver `docs/publishing-path.md`.

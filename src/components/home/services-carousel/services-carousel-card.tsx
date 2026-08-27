@@ -20,7 +20,7 @@ interface ServicesCarouselCardProps {
 const FOOTER_LABELS = ["REDUZA", "REUTILIZE", "RECICLE"];
 
 /** Liga o overlay de debug de temporização/pausa — só pra depuração manual, não é UI final. */
-const SHOW_DEBUG_OVERLAY = true;
+const SHOW_DEBUG_OVERLAY = false;
 
 /** Toques mais longos que isso contam como "segurar" (já pausa o autoplay via handleTouchStart
  * no track) e não navegam ao soltar — só um tap rápido dispara a ação do card. */

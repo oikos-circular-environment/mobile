@@ -20,15 +20,14 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 			<Card className="shadow-none gap-3">
 				<View className="flex-row items-center gap-3">
 					<Avatar size="md">
-						{company.avatar ? (
+						<FactoryIcon size={22} color={colors.gray[400]} />
+						{company.avatar && (
 							<AvatarImage
 								source={{
 									uri: company.avatar.url,
 									headers: getAuthenticatedImageHeaders(),
 								}}
 							/>
-						) : (
-							<FactoryIcon size={22} color={colors.gray[400]} />
 						)}
 					</Avatar>
 

@@ -18,6 +18,7 @@ import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { MapSkeleton } from "@/components/ui/map-skeleton";
 import { Text } from "@/components/ui/text";
 
 type LocationPoint = {
@@ -50,6 +51,7 @@ export default function WrapperMap({
 	);
 	const [isResolvingLocation, setIsResolvingLocation] = useState(false);
 	const [permissionDenied, setPermissionDenied] = useState(false);
+	const [isMapReady, setIsMapReady] = useState(false);
 
 	useEffect(() => {
 		if (latitude != null && longitude != null) {
@@ -151,6 +153,7 @@ export default function WrapperMap({
 							provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
 							region={region}
 							onPress={handleMapSelection}
+							onMapReady={() => setIsMapReady(true)}
 							showsCompass
 							loadingEnabled
 						>
@@ -163,6 +166,7 @@ export default function WrapperMap({
 								description="Ponto selecionado"
 							/>
 						</MapView>
+						{!isMapReady && <MapSkeleton />}
 
 						<View className="absolute inset-x-0 bottom-0 flex-row items-center justify-between gap-2 bg-background/95 px-3 py-2">
 							<Badge variant="secondary">

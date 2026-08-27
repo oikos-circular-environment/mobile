@@ -30,7 +30,7 @@ const avatarStyle = tva({
 });
 
 const avatarImageStyle = tva({
-	base: "h-full w-full",
+	base: "absolute inset-0 h-full w-full",
 });
 
 type IAvatarProps = React.ComponentPropsWithoutRef<typeof UIAvatar> &

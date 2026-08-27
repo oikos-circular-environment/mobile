@@ -18,10 +18,15 @@ export function ComplaintsListBottomSheet({
 	onSelectComplaint,
 }: Props) {
 	const ref = useRef<BottomSheet>(null);
+	const hasMountedRef = useRef(false);
 	const snapPoints = useMemo(() => ["15%", "42%"], []);
 	const selectedMapComplaint = useComplaintsStore(s => s.selectedMapComplaint);
 
 	useEffect(() => {
+		if (!hasMountedRef.current) {
+			hasMountedRef.current = true;
+			return;
+		}
 		if (selectedMapComplaint) {
 			ref.current?.snapToIndex(0);
 		} else {
@@ -76,7 +81,7 @@ export function ComplaintsListBottomSheet({
 	return (
 		<BottomSheet
 			ref={ref}
-			index={0}
+			index={1}
 			snapPoints={snapPoints}
 			enablePanDownToClose={false}
 			handleIndicatorStyle={{ backgroundColor: "#d1d5db", width: 40 }}
