@@ -455,31 +455,59 @@ ef4ee986-7b43-4f2f-a387-47a8ae9360f7`, strategy `round-robin`) — em vez do com
 os providers que o usuário escolheu manualmente adicionar (controle explícito sobre quais
 provedores participam), enquanto `auto/coding:free` tenta todos os providers gratuitos conectados
 sem curadoria. Sem autenticação necessária pro endpoint de chat (o container só escuta em
-`127.0.0.1`); o management API (`/api/combos`, CRUD completo — GET/POST/PUT/DELETE/PATCH) e o
-dashboard exigem a chave Bearer ou login que só o usuário tem — criar/editar/popular combos é
-tarefa humana; o agente só consome os combos já existentes via `/v1/chat/completions`.
+`127.0.0.1`); o management API (`/api/combos`, CRUD completo — GET/POST/PUT/DELETE/PATCH) aceita a
+mesma chave Bearer usada no MCP — **confirmado na prática**: a IA consegue listar, adicionar,
+remover e testar providers dentro de um combo diretamente via `PUT /api/combos/{id}` (mandando o
+objeto completo com o array `models` atualizado), sem precisar do dashboard. Só a criação do combo
+em si e a chave Bearer continuam sendo setup humano inicial.
 
-**Duas causas reais de falha encontradas testando esse tier, nessa ordem:**
+**Achados reais testando esse tier (sessão de 2026-08-26/27, incompleta — retomar):**
 
 1. **Cap de 128 tools do Groq.** OpenCode manda no `tools` da request toda capacidade de todo MCP
    habilitado globalmente pro agent — não só os builtins. Neste repo isso somava ~137 tools
    (`metro-mcp`: 88, `chrome-devtools-mcp`: 29, builtins do OpenCode: 12, `pencil`: 4, `context7`:
-   2), e o Groq rejeita requests com mais de 128. Corrigido restringindo por agent via
+   2), e o Groq rejeita requests com mais de 128. **Corrigido**: restrição por agent via
    `permission` com wildcard (`"chrome-devtools_*": "deny"`, `"metro-mcp_*": "deny"` em cada agent
    `oikos-*` no `opencode.json` global) — a doc oficial do OpenCode confirma que `deny` remove a
    tool da descrição mandada pro modelo, não só bloqueia a execução. `Framelink_Figma_MCP` foi
    removido do config global por não ser mais necessário.
-2. **TPM (tokens/minuto) do tier free do Groq.** Depois de corrigir o cap de tools, uma task real
-   (dispatch de commit via `oikos-exec-omni`, ~17-44k tokens de contexto por causa do diff de 6
-   arquivos) bateu em `[413] tokens per minute (TPM): Limit 8000` no `groq/qwen/qwen3.6-27b` —
-   único provider hoje cadastrado no combo. Esse limite é estrutural do tier gratuito daquele
-   provider/modelo especificamente, não algo que dê pra contornar via config.
+2. **TPM (tokens/minuto) do tier free do Groq.** Com só `groq/qwen/qwen3.6-27b` no combo, uma task
+   real (dispatch de commit via `oikos-exec-omni`, ~17-44k tokens de contexto) bateu em
+   `[413] tokens per minute (TPM): Limit 8000` — estrutural do tier gratuito daquele
+   provider/modelo, não contornável via config. Só serve pra prompts pequenos (testado: chat
+   simples de 16 tokens respondeu em 1.4s).
+3. **Kiro — status de custo incerto, não confirmado.** Testei adicionar `kiro/claude-haiku-4.5` ao
+   combo — funcionou tecnicamente (roteou certo, aguentou 24k tokens sem erro de TPM, 3.5s de
+   latência), mas o header `x-omniroute-response-cost` veio com valor não-zero (~$0.012 numa
+   chamada de 24k tokens; bate com `cost: 0.002362` já visto no `omniroute_cost_report` pra esse
+   modelo). A conexão (`GET /api/providers`) mostra `authType: oauth`, importada via GitHub, ligada
+   a um `profileArn` da AWS CodeWhisperer — é o Kiro da AWS, que tem plano com cota **mensal de
+   créditos gratuitos**. Não achei nenhum campo que confirme se esse `response-cost` é cobrança real
+   ou só uma estimativa interna do OmniRoute consumindo a cota grátis mensal (hipótese do usuário,
+   plausível, não verificada). **Removido do combo por precaução** até confirmar — sem certeza não
+   vale arriscar consumo de cota/crédito real do usuário só pra um teste de infraestrutura.
+4. **`opencode/mimo-v2.5-free` (candidato free real, teste inconcluso).** Adicionado ao combo no
+   lugar do Kiro — mesma conta OpenCode Zen já usada por `oikos-exec`/`oikos-exec-alt`, mas roteada
+   pelo omniroute (contexto de 1M tokens, sem custo). Primeiro teste real (24k tokens) bateu em
+   `[429] Rate limit exceeded` — pode ser limite real do free tier desse modelo ou só as várias
+   chamadas de teste anteriores nesta sessão saturando a mesma conta. **Não teve tempo de reteste.**
 
-**Conclusão:** `omini-free-tier` com um único provider Groq de baixo TPM só serve pra prompts
-pequenos (testado: chat simples de 16 tokens respondeu em 1.4s). Pra virar viável como Tier 3 da
-cadeia em tasks agênticas reais, precisa de mais providers cadastrados no combo (idealmente um com
-TPM/context maior que os 8k do Groq free). Até isso acontecer, uma falha nesse tier deve escalar
-pro passo 4 (`oikos-exec-go`) sem insistir.
+**Estado do combo `omini-free-tier` ao pausar (2026-08-27, ~01:30 UTC):**
+`groq/qwen/qwen3.6-27b` + `opencode/mimo-v2.5-free`. Não confiar nesse tier em produção até o
+próximo teste confirmar se o 429 foi transitório.
+
+**Próximos passos (retomar em sessão futura):**
+- Confirmar se o Kiro (AWS) cobra de verdade ou só consome cota mensal grátis — se for cota grátis,
+  ele volta a ser candidato válido pro combo (teve 100% de sucesso e sem cap de TPM/tools nos
+  testes).
+- Retestar `opencode/mimo-v2.5-free` isolado (fora do horário de pico de uso da conta) pra separar
+  rate-limit real de saturação temporária da sessão de testes.
+- Se confirmar 429 persistente, tentar outro candidato genuinamente free: `nvidia` (NVIDIA NIM,
+  `tokenStatus: valid` no quota check) ou `github` (Copilot, mesma ressalva).
+- Só depois de achar 1-2 providers realmente free e estáveis sob carga real, rodar de novo o
+  dispatch completo do `oikos-exec-omni` fazendo um commit de verdade (teste ponta-a-ponta que
+  ainda não foi concluído com sucesso).
+- Até lá, uma falha nesse tier deve escalar pro passo 4 (`oikos-exec-go`) sem insistir.
 
 `.opencode/prompt/{oikos-exec,oikos-review,oikos-text}.md` **neste repo** dão a cada tier as
 convenções da mobile (gluestack-ui/NativeWind, `android/`/`ios/` gerados, `oikos-sdk` gerado) —
