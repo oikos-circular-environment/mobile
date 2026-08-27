@@ -1,7 +1,7 @@
 import type BottomSheetType from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import { BuildingIcon, RecycleIcon, ShieldIcon } from "lucide-react-native";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
@@ -42,6 +42,21 @@ export default function HomeScreen() {
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showSignOutModal, setShowSignOutModal] = useState(false);
 	const settingsSheetRef = useRef<BottomSheetType>(null);
+	const isFirstDimensionChange = useRef(true);
+	const hasAppliedMitigation = useRef(false);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: width só dispara o efeito na mudança de largura, não é lido no corpo
+	useEffect(() => {
+		if (isFirstDimensionChange.current) {
+			isFirstDimensionChange.current = false;
+			return;
+		}
+		if (hasAppliedMitigation.current) {
+			return;
+		}
+		hasAppliedMitigation.current = true;
+		settingsSheetRef.current?.close();
+	}, [width]);
 
 	const handleOpenSettings = useCallback(() => {
 		settingsSheetRef.current?.snapToIndex(0);
