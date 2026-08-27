@@ -8,13 +8,16 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/libs/utils";
-import { useServicesCarouselContext } from "./context";
 import { ServicesCarouselDebugOverlay } from "./services-carousel-debug-overlay";
 import type { ServiceCarouselItem } from "./types";
 
 interface ServicesCarouselCardProps {
 	item: ServiceCarouselItem;
 	index: number;
+	cardWidth: number;
+	cardHeight: number;
+	scale: number;
+	isActive: boolean;
 }
 
 const FOOTER_LABELS = ["REDUZA", "REUTILIZE", "RECICLE"];
@@ -28,11 +31,11 @@ const TAP_MAX_HOLD_MS = 300;
 
 export function ServicesCarouselCard({
 	item,
-	index,
+	cardWidth,
+	cardHeight,
+	scale,
+	isActive,
 }: ServicesCarouselCardProps) {
-	const { cardWidth, cardHeight, scale, activeIndex } =
-		useServicesCarouselContext();
-	const isActive = index === activeIndex;
 	const blurTargetRef = useRef<View | null>(null);
 	const router = useRouter();
 	const pressStartRef = useRef<number | null>(null);

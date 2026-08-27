@@ -236,7 +236,7 @@ export function HomeHero({
 			<View style={{ paddingTop: insets.top + 16 }} className="gap-5 px-6 pb-6">
 				{header}
 
-				<View style={{ height: wordmarkRowHeight - 92 || undefined }}>
+				<View style={{ height: wordmarkRowHeight - 76 || undefined }}>
 					{portrait.fontSize ? (
 						<Wordmark fontSize={portrait.fontSize} />
 					) : (
