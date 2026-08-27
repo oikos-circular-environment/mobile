@@ -31,6 +31,24 @@ demais pra corrigir. Ver `docs/publishing-path.md`.
 rode os scripts de submissão de verdade (`asc:submit`, `play:publish`) sem confirmação explícita
 do orquestrador — são ações que publicam de fato numa loja, efeito difícil de reverter.
 
-## Delegando pro OpenCode
-Não delega. Esse escopo lida com credenciais/scripts de publicação e texto com limite de
-caractere que precisa de conferência exata — mantenha em Sonnet, sem intermediário.
+## Cadeia de execução: gratuito primeiro, você (Sonnet) por último
+Antes de implementar você mesmo, tente nesta ordem — pare no primeiro que produzir um diff
+aceitável na revisão:
+
+1. `opencode run --agent oikos-exec --format json "<task totalmente especificada>"` (big-pickle, free)
+2. Erro de cota → `opencode run --agent oikos-exec-alt --format json "..."` (deepseek-v4-flash-free, free)
+3. `opencode run --agent oikos-exec-omni --format json "..."` (combo OmniRoute, free)
+4. `opencode run --agent oikos-exec-go --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
+5. Só se tudo acima falhar: implemente você mesmo.
+
+Detalhes da cadeia completa: `docs/agent-architecture.md` seção 9. **Nunca inclua uma credencial
+real na task despachada** — se o ticket exige tocar em segredo/token, isso não é mecânico o
+suficiente pra delegar, pule direto pro passo 5.
+
+**Isso já era o escopo mais sensível a erro tardio (só aparece depois de submeter pra loja de
+verdade) — por isso aqui a revisão não é só ler o diff.** Depois de qualquer tier produzir a
+mudança, rode `wc -m` no release notes e confira o limite você mesmo antes de mandar pro
+`/code-review` do orquestrador. Diff que passa no code review mas estoura o limite de caractere
+não conta como sucesso — tente o próximo tier. Independente de quem escreveu, a regra de nunca
+rodar os scripts de submissão de verdade (`asc:submit`, `play:publish`) sem confirmação explícita
+do orquestrador continua valendo.

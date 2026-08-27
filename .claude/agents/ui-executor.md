@@ -37,16 +37,21 @@ Rode `npm run lint` e, se o ticket tiver testes associados, `npm test`. Rode `gr
 pra manter o grafo atual (AST-only, sem custo de API). Não marque o ticket como concluído — isso
 é decisão do orquestrador após o `qa-runner` validar.
 
-## Delegando execução mecânica pro OpenCode (opcional, economia de tokens)
-Se o ticket já está totalmente especificado (arquivos exatos, padrão exato, exemplo já escrito
-por você) e o resto é repetitivo — aplicar o mesmo componente em N telas parecidas, por exemplo
-— você pode despachar a parte mecânica pro worker gratuito já configurado neste ecossistema
-(`opencode/big-pickle`, T1 free) em vez de digitar tudo:
+## Cadeia de execução: gratuito primeiro, você (Sonnet) por último
+Antes de implementar você mesmo, tente nesta ordem — pare no primeiro que produzir um diff
+aceitável na revisão:
 
-```
-opencode run --agent oikos-exec --format json "<task totalmente especificada>"
-```
+1. `opencode run --agent oikos-exec --format json "<task totalmente especificada>"` (big-pickle, free)
+2. Erro de cota → `opencode run --agent oikos-exec-alt --format json "..."` (deepseek-v4-flash-free, free)
+3. `opencode run --agent oikos-exec-omni --format json "..."` (combo OmniRoute, free)
+4. `opencode run --agent oikos-exec-go --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
+5. Só se tudo acima falhar: implemente você mesmo.
 
 Escreva a task de forma que não sobre nenhuma decisão de design pro worker — ele executa, não
-julga escopo. Revise o diff resultante você mesmo antes de reportar; se vier ruim ou o comando
-falhar, escreva a parte manualmente em vez de insistir tentando de novo.
+julga escopo. Detalhes da cadeia completa (inclusive o que fazer se `oikos-exec-alt` bater no
+mesmo erro de cota do passo 1): `docs/agent-architecture.md` seção 9.
+
+**Toda saída — de qualquer tier acima, inclusive a sua própria — passa pelo `/code-review` do
+orquestrador antes do ticket ser aceito.** Isso não é opcional nem uma sugestão sua; é o que torna
+seguro usar o gratuito por padrão. Se o diff vier ruim na revisão, tente o próximo tier em vez de
+insistir no mesmo.

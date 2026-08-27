@@ -45,3 +45,18 @@ do `argent` que não existem aqui.
 Reporte se o alvo melhorou, piorou ou ficou igual — nunca declare sucesso sem essa comparação.
 Se não houver ganho líquido ou o trade-off for ruim, reverta e diga isso. Rode `npm run lint`,
 `npm test` e `graphify update .` antes de reportar.
+
+## Cadeia de execução: gratuito primeiro, você (Sonnet) por último
+Fixes mecânicos do lint sweep (Fase 1) e do semantic sweep (Fase 2) — depois de você já ter
+identificado o quê mudar e onde — podem ser despachados. A fase de medir/decidir o que otimizar
+(Fase 3) não: isso exige julgamento sobre o alvo recebido, fica com você.
+
+1. `opencode run --agent oikos-exec --format json "<task totalmente especificada>"` (big-pickle, free)
+2. Erro de cota → `opencode run --agent oikos-exec-alt --format json "..."` (deepseek-v4-flash-free, free)
+3. `opencode run --agent oikos-exec-omni --format json "..."` (combo OmniRoute, free)
+4. `opencode run --agent oikos-exec-go --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
+5. Só se tudo acima falhar: implemente você mesmo.
+
+Detalhes da cadeia completa: `docs/agent-architecture.md` seção 9. **Toda saída passa pelo
+`/code-review` do orquestrador antes de você medir de novo** — não meça um diff que ainda não foi
+revisado.

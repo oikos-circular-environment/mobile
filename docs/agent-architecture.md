@@ -407,39 +407,85 @@ O que **não** existe ainda:
 Dois motores diferentes, cada um no papel que faz sentido pro custo dele — não dois jeitos
 concorrentes de fazer a mesma coisa.
 
-### Claude Code — julgamento (todos os 13 agents desta spec)
+### Claude Code — orquestração, julgamento e revisão (nunca a primeira tentativa de execução)
 
-Todo Analista e todo Executor roda em **`model: sonnet`** por padrão — é o modelo com reasoning
-suficiente pra aplicar convenção de framework corretamente e pra julgar escopo, sem o custo do
-Opus. A única exceção é `qa-runner`, em **`model: haiku`**: ele segue um protocolo fixo (abrir
-app → interagir → verificar → fechar) com pouca ambiguidade de julgamento — o ganho está em
-executar o roteiro certo, não em decidir arquitetura. Se um caso concreto mostrar Haiku errando
-a leitura de um snapshot ou travando numa decisão de navegação, isso é sinal pra promover **esse
-agent específico** pra `sonnet` — não todos preventivamente, o que anularia a economia.
+O **Orquestrador**, todo **Analista** e o **`qa-runner`** sempre rodam em Claude — são papéis de
+julgamento (escopo, arquitetura, verificação), não de escrever o diff em si. Analistas seguem em
+`model: sonnet`; `qa-runner` segue em `model: haiku` (protocolo fixo, pouca ambiguidade — só
+promover pra `sonnet` se um caso concreto mostrar Haiku errando leitura de snapshot).
 
-Não usamos Opus em nenhum agent desta spec por padrão. Se um domínio específico (ex.:
-`data-layer-analyst` numa decisão arquitetural grande) mostrar que Sonnet não dá conta, isso
-também é uma promoção pontual, não uma mudança de baseline.
+**Os 5 Executores (`ui-executor`, `data-executor`, `native-executor`, `release-executor`,
+`performance-executor`) não são mais "Claude por padrão, OpenCode como economia opcional".**
+Desde 2026-08-26, todo Executor tenta a cadeia de modelos gratuitos primeiro — sem exceção pra
+native/release — e só escreve o código ele mesmo (em Claude) se a cadeia inteira falhar. A revisão
+obrigatória (ver "Rede de segurança" abaixo) é o que torna isso seguro mesmo pra native/release,
+que antes eram exceção por causa de blast radius alto (native só valida depois de build real,
+release lida com credencial/char-limit exato) — antes essa cautela vinha de nunca delegar; agora
+vem de sempre revisar antes de aceitar, delegado ou não.
 
-### OpenCode — execução mecânica em lote (tier gratuito primeiro)
+### Cadeia de execução (por ticket, nesta ordem)
 
-Este repo **reaproveita** o pipeline que já existe pro `api` (`~/.config/opencode/opencode.json`,
-escopo de máquina, não deste repo) em vez de inventar um novo:
+| # | Tier | Agent OpenCode | Modelo | Custo | Quando passa pro próximo |
+|---|---|---|---|---|---|
+| 1 | T1 free | `oikos-exec` | `opencode/big-pickle` | grátis | erro de cota/rate-limit |
+| 2 | T1 free | `oikos-exec-alt` | `opencode/deepseek-v4-flash-free` | grátis | erro de cota **idêntico** ao do passo 1 → pula os dois provedores da OpenCode Zen no resto da sessão (ver nota de cota abaixo); erro diferente → tenta mesmo assim |
+| 3 | T1 free | `oikos-exec-omni` | `omniroute/omini-free-tier` | grátis | falha de conexão ou timeout — ver nota sobre o combo custom abaixo |
+| 4 | T2 pago | `oikos-exec-go` | `opencode-go/kimi-k2.7-code` | pago (crédito curto — escalonamento consciente) | falha ou diff ruim na revisão |
+| 5 | Claude | Executor Claude, `model: haiku` (override do orquestrador na chamada `Agent`) | `claude-haiku-4-5` | pago (Anthropic) | diff ruim na revisão |
+| 6 | Claude | Executor Claude, `model: sonnet` (default do agent, sem override) | `claude-sonnet-5` | pago (Anthropic) | — é o último tier, sempre funciona |
 
-| Tier | Agent OpenCode | Modelo | Uso |
-|---|---|---|---|
-| T0 | `oikos-text` | `ollama/qwen2.5-coder:3b` (local) | Só texto curto (mensagem de commit, changelog) — nunca código. Modelo local não é forte o bastante pra mais que isso. |
-| T1 | `oikos-exec` | `opencode/big-pickle` | Executor principal, gratuito e generoso — primeira tentativa pra trabalho mecânico já 100% especificado. |
-| T1 alt | `oikos-exec-gemini` | `google/gemini-3.6-flash` | Quando a task tem muito contexto de leitura. |
-| T1 fallback | `oikos-exec-alt` | `opencode/deepseek-v4-flash-free` | Segunda tentativa gratuita antes de escalar pra tier pago. |
-| T2 | `oikos-exec-go` | `opencode-go/kimi-k2.7-code` | Pago (assinatura OpenCode Go) — crédito curto hoje, então é escalonamento consciente, não default. |
-| Review | `oikos-review` | `opencode/ling-3.0-tiny-free` | Só lê e reporta, nunca edita — barato o bastante pra rodar sempre antes de um `worker_done` de sucesso. |
+`oikos-exec-gemini` (`google/gemini-3.6-flash`) continua fora dessa cadeia linear — é uma escolha
+por **formato da task** (muito contexto de leitura), não um degrau de fallback por custo; o
+Executor Claude escolhe ele diretamente quando a task pedir isso, em vez de entrar na sequência
+acima.
+
+**Nota sobre cota compartilhada (não confirmada por documentação):** não há doc pública da
+OpenCode Zen que diga se `big-pickle` e `deepseek-v4-flash-free` compartilham cota por conta ou
+têm cota independente por modelo. Em vez de assumir, o passo 2 da cadeia funciona como teste
+empírico por sessão: se o erro vier no mesmo formato do passo 1, trata como confirmado *para essa
+sessão* e pula direto pro passo 3 nas próximas tentativas — não reabre a pergunta a cada ticket.
+
+**OmniRoute** (`http://127.0.0.1:20128`, container Docker local, ver `docker ps` → `omniroute`)
+agrega dezenas de provedores gratuitos por trás de um único endpoint compatível com OpenAI (GitHub
+Copilot, Groq, NVIDIA NIM, Ollama Cloud, Kiro, OpenRouter free tier, e mais). Em vez de cadastrar
+provedor por provedor no `opencode.json` (frágil — cada provedor tem limites próprios), usamos um
+**combo custom criado no dashboard do OmniRoute**, `omini-free-tier` (`/api/combos`, `id
+ef4ee986-7b43-4f2f-a387-47a8ae9360f7`, strategy `round-robin`) — em vez do combo genérico
+`auto/coding:free` que o OmniRoute já expõe por padrão. A diferença: o combo custom só roteia entre
+os providers que o usuário escolheu manualmente adicionar (controle explícito sobre quais
+provedores participam), enquanto `auto/coding:free` tenta todos os providers gratuitos conectados
+sem curadoria. Sem autenticação necessária pro endpoint de chat (o container só escuta em
+`127.0.0.1`); o management API (`/api/combos`, CRUD completo — GET/POST/PUT/DELETE/PATCH) e o
+dashboard exigem a chave Bearer ou login que só o usuário tem — criar/editar/popular combos é
+tarefa humana; o agente só consome os combos já existentes via `/v1/chat/completions`.
+
+**Duas causas reais de falha encontradas testando esse tier, nessa ordem:**
+
+1. **Cap de 128 tools do Groq.** OpenCode manda no `tools` da request toda capacidade de todo MCP
+   habilitado globalmente pro agent — não só os builtins. Neste repo isso somava ~137 tools
+   (`metro-mcp`: 88, `chrome-devtools-mcp`: 29, builtins do OpenCode: 12, `pencil`: 4, `context7`:
+   2), e o Groq rejeita requests com mais de 128. Corrigido restringindo por agent via
+   `permission` com wildcard (`"chrome-devtools_*": "deny"`, `"metro-mcp_*": "deny"` em cada agent
+   `oikos-*` no `opencode.json` global) — a doc oficial do OpenCode confirma que `deny` remove a
+   tool da descrição mandada pro modelo, não só bloqueia a execução. `Framelink_Figma_MCP` foi
+   removido do config global por não ser mais necessário.
+2. **TPM (tokens/minuto) do tier free do Groq.** Depois de corrigir o cap de tools, uma task real
+   (dispatch de commit via `oikos-exec-omni`, ~17-44k tokens de contexto por causa do diff de 6
+   arquivos) bateu em `[413] tokens per minute (TPM): Limit 8000` no `groq/qwen/qwen3.6-27b` —
+   único provider hoje cadastrado no combo. Esse limite é estrutural do tier gratuito daquele
+   provider/modelo especificamente, não algo que dê pra contornar via config.
+
+**Conclusão:** `omini-free-tier` com um único provider Groq de baixo TPM só serve pra prompts
+pequenos (testado: chat simples de 16 tokens respondeu em 1.4s). Pra virar viável como Tier 3 da
+cadeia em tasks agênticas reais, precisa de mais providers cadastrados no combo (idealmente um com
+TPM/context maior que os 8k do Groq free). Até isso acontecer, uma falha nesse tier deve escalar
+pro passo 4 (`oikos-exec-go`) sem insistir.
 
 `.opencode/prompt/{oikos-exec,oikos-review,oikos-text}.md` **neste repo** dão a cada tier as
 convenções da mobile (gluestack-ui/NativeWind, `android/`/`ios/` gerados, `oikos-sdk` gerado) —
-os agents em si (modelo, permissão, fallback) continuam definidos globalmente, então o mesmo
-pipeline atende `api`, `mobile`, e qualquer outro repo do org que ganhar seu próprio
-`.opencode/prompt/`.
+os agents em si (modelo, permissão, fallback, provider `omniroute`) continuam definidos
+globalmente (`~/.config/opencode/opencode.json`), então o mesmo pipeline atende `api`, `mobile`, e
+qualquer outro repo do org que ganhar seu próprio `.opencode/prompt/`.
 
 **Como um Executor Claude despacha pro OpenCode:** via Bash, não via tool `Agent` (são processos
 completamente separados) —
@@ -450,18 +496,24 @@ opencode run --agent oikos-exec --format json "<task totalmente especificada>"
 
 A task só deve ser despachada quando **não sobra nenhuma decisão de design** pro worker —
 arquivos exatos, padrão exato, exemplo já escrito pelo Executor Claude. O worker executa, não
-julga escopo; quem garante que ele não passou dos limites do ticket é o Executor Claude, revisando
-o diff antes de reportar ao orquestrador. `ui-executor` e `data-executor` documentam isso
-explicitamente; `native-executor` e `release-executor` optam por **não delegar** — baixa margem
-de erro (mudança nativa só valida depois de build real) ou trabalho com credencial/char-limit
-exato demais pra confiar num worker sem julgamento.
+julga escopo.
+
+### Rede de segurança: code review obrigatório em toda saída, de qualquer tier
+
+Isso é o que viabiliza usar gratuito por padrão até em native/release: **nenhuma saída de
+Executor — de qualquer um dos 6 tiers acima, inclusive quando o próprio Sonnet escreveu — é
+aceita sem passar pelo `/code-review` do orquestrador antes do ticket ser marcado concluído.**
+Não é uma sugestão do Executor "reviso se achar necessário" — é um portão que o orquestrador
+sempre aciona. Erro de um tier barato custa uma rodada de revisão + nova tentativa no próximo
+tier; sem essa rede, custaria descobrir o erro em produção (native) ou numa loja (release), que é
+exatamente o motivo que antes justificava excluir esses dois da delegação.
 
 ### Por que não mais provedores gratuitos, nem modelo local mais pesado
 
-Documentado aqui porque foi decisão explícita, não omissão: servidores/modelos gratuitos fora do
-que já está configurado (`big-pickle`, `deepseek-v4-flash-free`, `gemini-3.6-flash`) estão cada
-vez mais raros e não valem o custo de descoberta/manutenção; modelos locais (`qwen2.5-coder:3b`
-via Ollama) não têm reasoning suficiente pra código real neste projeto — por isso ficam
-restritos a T0 (texto puro). Se isso mudar (hardware melhor, modelo local mais forte), revisar
-essa restrição é razoável — não é um limite permanente, é o estado real de hoje
+Documentado aqui porque foi decisão explícita, não omissão: fora do que já está configurado
+(`big-pickle`, `deepseek-v4-flash-free`, `gemini-3.6-flash`, e agora o combo do OmniRoute, que por
+si só cobre a maior parte do espaço de "mais um provedor gratuito"), modelos locais
+(`qwen2.5-coder:3b` via Ollama) não têm reasoning suficiente pra código real neste projeto — por
+isso ficam restritos a T0 (texto puro). Se isso mudar (hardware melhor, modelo local mais forte),
+revisar essa restrição é razoável — não é um limite permanente, é o estado real de hoje
 (2026-08-26).

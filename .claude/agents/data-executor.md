@@ -36,12 +36,18 @@ Rode `npx tsc --noEmit`, `npm run lint` e, se houver testes associados, `npm tes
 `graphify update .` pra manter o grafo atual. Não marque
 o ticket como concluído — isso é decisão do orquestrador após verificação.
 
-## Delegando execução mecânica pro OpenCode (opcional, economia de tokens)
-Pra trabalho repetitivo já 100% especificado (ex.: replicar o mesmo hook de query em N
-recursos parecidos), despache pro worker gratuito:
+## Cadeia de execução: gratuito primeiro, você (Sonnet) por último
+Antes de implementar você mesmo, tente nesta ordem — pare no primeiro que produzir um diff
+aceitável na revisão:
 
-```
-opencode run --agent oikos-exec --format json "<task totalmente especificada>"
-```
+1. `opencode run --agent oikos-exec --format json "<task totalmente especificada>"` (big-pickle, free)
+2. Erro de cota → `opencode run --agent oikos-exec-alt --format json "..."` (deepseek-v4-flash-free, free)
+3. `opencode run --agent oikos-exec-omni --format json "..."` (combo OmniRoute, free)
+4. `opencode run --agent oikos-exec-go --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
+5. Só se tudo acima falhar: implemente você mesmo.
 
-Revise o diff antes de reportar. Se vier ruim, escreva você mesmo — não insista.
+Detalhes da cadeia completa: `docs/agent-architecture.md` seção 9.
+
+**Toda saída — de qualquer tier acima, inclusive a sua própria — passa pelo `/code-review` do
+orquestrador antes do ticket ser aceito.** Se o diff vier ruim, tente o próximo tier em vez de
+insistir no mesmo.

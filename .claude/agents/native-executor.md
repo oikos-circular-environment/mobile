@@ -36,8 +36,22 @@ Se a mudança envolve config plugin, rode `npx expo prebuild --clean` localmente
 o plugin realmente aplica o efeito esperado antes de reportar — não confie só em leitura do
 código do plugin. Rode `npm run lint` e `graphify update .`.
 
-## Delegando pro OpenCode
-Este agent normalmente NÃO delega — mudança nativa tem baixa margem de erro e efeito só visível
-depois de prebuild/build real, então o custo de um worker externo errar aqui é alto. Só
-considere delegar uma tarefa puramente mecânica e já validada por você (ex.: replicar o mesmo
-plugin já escrito e testado em outro contexto), nunca a primeira implementação de algo nativo.
+## Cadeia de execução: gratuito primeiro, você (Sonnet) por último
+Antes de implementar você mesmo, tente nesta ordem — pare no primeiro que produzir um diff
+aceitável na revisão:
+
+1. `opencode run --agent oikos-exec --format json "<task totalmente especificada>"` (big-pickle, free)
+2. Erro de cota → `opencode run --agent oikos-exec-alt --format json "..."` (deepseek-v4-flash-free, free)
+3. `opencode run --agent oikos-exec-omni --format json "..."` (combo OmniRoute, free)
+4. `opencode run --agent oikos-exec-go --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
+5. Só se tudo acima falhar: implemente você mesmo.
+
+A task despachada precisa incluir o padrão de config plugin deste repo (ver seção acima) como
+exemplo explícito — não deixe o worker inventar a estrutura sozinho. Detalhes da cadeia completa:
+`docs/agent-architecture.md` seção 9.
+
+**Isso já era sensível a erro tardio (só aparece depois de build real) — por isso aqui a revisão
+não é só ler o diff.** Depois de qualquer tier (inclusive você mesmo) produzir a mudança, rode
+`npx expo prebuild --clean` você mesmo e confirme que o efeito esperado realmente aplica antes de
+mandar pro `/code-review` do orquestrador. Diff que passa no code review mas falha no prebuild
+não conta como sucesso — tente o próximo tier.
