@@ -1,6 +1,5 @@
 import { fakerPT_BR as faker } from "@faker-js/faker";
 import { AxiosError } from "axios";
-import { Asset } from "expo-asset";
 import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
 import {
 	getCepV2,
@@ -11,30 +10,7 @@ import {
 	postV1AuthLogin,
 	postV1UsersRegister,
 	putV1Profiles,
-	putV1ProfilesAvatar,
 } from "@/libs/oikos-sdk";
-
-async function uploadSyntheticAvatar(): Promise<void> {
-	try {
-		const icon = Asset.fromModule(require("@/assets/icons/icon.png"));
-		await icon.downloadAsync();
-		if (!icon.localUri) return;
-
-		const formData = new FormData();
-		formData.append("file", {
-			uri: icon.localUri,
-			name: "icon.png",
-			type: "image/png",
-		} as unknown as Blob);
-
-		await putV1ProfilesAvatar({ body: formData as unknown as undefined });
-	} catch (error) {
-		console.warn(
-			"[survey] não foi possível definir o avatar do participante sintético",
-			error,
-		);
-	}
-}
 
 type SyntheticCredentials = { email: string; password: string };
 
@@ -142,15 +118,12 @@ export async function provisionSyntheticParticipant(
 	const address = location ? await resolveSyntheticAddress(location) : null;
 	const syntheticName = generateSyntheticName();
 
-	await Promise.all([
-		putV1Profiles({
-			body: {
-				full_name: syntheticName,
-				display_name: syntheticName,
-				phone: faker.phone.number({ style: "national" }).replace(/\D/g, ""),
-				...(address ? { address } : {}),
-			},
-		}),
-		uploadSyntheticAvatar(),
-	]);
+	await putV1Profiles({
+		body: {
+			full_name: syntheticName,
+			display_name: syntheticName,
+			phone: faker.phone.number({ style: "national" }).replace(/\D/g, ""),
+			...(address ? { address } : {}),
+		},
+	});
 }

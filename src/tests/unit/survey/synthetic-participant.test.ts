@@ -1,5 +1,4 @@
 import { AxiosError } from "axios";
-import { Asset } from "expo-asset";
 import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
 import {
 	getCepV2,
@@ -10,7 +9,6 @@ import {
 	postV1AuthLogin,
 	postV1UsersRegister,
 	putV1Profiles,
-	putV1ProfilesAvatar,
 } from "@/libs/oikos-sdk";
 import { provisionSyntheticParticipant } from "@/libs/survey/synthetic-participant";
 
@@ -18,7 +16,6 @@ jest.mock("@/libs/oikos-sdk", () => ({
 	postV1AuthLogin: jest.fn(),
 	postV1UsersRegister: jest.fn(),
 	putV1Profiles: jest.fn(),
-	putV1ProfilesAvatar: jest.fn(),
 }));
 
 jest.mock("@/libs/api/oikos-api", () => ({
@@ -30,10 +27,6 @@ jest.mock("@/libs/brasil-api-sdk", () => ({
 	getCepV2: jest.fn(),
 	listIbgeUfs: jest.fn(),
 	listIbgeMunicipios: jest.fn(),
-}));
-
-jest.mock("expo-asset", () => ({
-	Asset: { fromModule: jest.fn() },
 }));
 
 function conflictError() {
@@ -58,34 +51,6 @@ describe("provisionSyntheticParticipant", () => {
 			.mockResolvedValue(
 				{} as unknown as Awaited<ReturnType<typeof putV1Profiles>>,
 			);
-		jest
-			.mocked(putV1ProfilesAvatar)
-			.mockResolvedValue(
-				{} as unknown as Awaited<ReturnType<typeof putV1ProfilesAvatar>>,
-			);
-		jest.mocked(Asset.fromModule).mockReturnValue({
-			downloadAsync: jest.fn().mockResolvedValue(undefined),
-			localUri: "file:///mock/icon.png",
-		} as never);
-	});
-
-	it("faz upload do ícone do app como avatar do participante sintético", async () => {
-		await provisionSyntheticParticipant();
-
-		expect(putV1ProfilesAvatar).toHaveBeenCalledTimes(1);
-		const avatarBody = jest.mocked(putV1ProfilesAvatar).mock.calls[0][0]
-			?.body as unknown as FormData;
-		expect(avatarBody).toBeInstanceOf(FormData);
-	});
-
-	it("não bloqueia o provisionamento se o upload do avatar falhar", async () => {
-		jest
-			.mocked(putV1ProfilesAvatar)
-			.mockRejectedValueOnce(new Error("upload failed"));
-
-		await provisionSyntheticParticipant();
-
-		expect(putV1Profiles).toHaveBeenCalledTimes(1);
 	});
 
 	it("registra, loga e preenche o perfil de um participante sintético", async () => {
