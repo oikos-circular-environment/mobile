@@ -219,24 +219,37 @@ mismatch; o código em si não depende do conteúdo do Ticket 3).
 
 ## Ticket 5 — Copy (repo `mobile`)
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído (código escrito por agente `executor`, revisado via
+`code-review`, commitado). Falta só a verificação manual via `agent-device`.
 
 **Escopo:**
-- [ ] `src/app/survey/index.tsx` (aviso amarelo): trocar "a pesquisa começa como
-  visitante" por texto refletindo o login automático de conta de teste.
-- [ ] `src/app/survey/consent-ended.tsx`: mesmo ajuste.
-- [ ] `src/app/survey/persona.tsx` (subtítulo "Isso define quais etapas você vai
-  realizar"): trocar por texto que reflita persona como caracterização, não seleção
-  de conteúdo.
+- [x] `src/app/survey/index.tsx` (aviso amarelo): "A pesquisa começa como
+  visitante" → "O app faz login automático em uma conta de teste para a pesquisa."
+- [x] `src/app/survey/consent-ended.tsx`: mesmo ajuste ("A pesquisa começa do zero,
+  como visitante" → "O app faz login automático em uma conta de teste").
+- [x] `src/app/survey/persona.tsx` (subtítulo): "Isso define quais etapas você vai
+  realizar" → "Isso ajuda a caracterizar sua participação na pesquisa" (persona não
+  seleciona etapas no protocolo v10 — suíte única pra todas as personas).
 
 **Testes:**
-- [ ] Ajustar snapshots/queries de texto nos testes que dependem da copy antiga
-  dessas 3 telas, se houver.
+- [x] Nenhum ajuste necessário — os testes diretos das 3 telas
+  (`survey-presentation-screen.test.tsx`, `survey-consent-ended-screen.test.tsx`,
+  `survey-persona-screen.test.tsx`) não faziam assert na parte trocada do texto.
 
-**Validação:** `npm run lint` e `npm test` limpos; conferência visual via
-`agent-device`.
+**Nota de execução:** o `executor` rodou em worktree isolado criado a partir de
+`origin/development` (comportamento padrão da ferramenta), não da branch
+`feat/survey-suite-consolidation` — divergiam (development já tinha PRs #171/#172
+mergeados que não fazem parte deste epic). O diff foi extraído e reaplicado
+manualmente na branch correta em vez de mesclar aquele worktree, pra não trazer
+histórico não relacionado. Worktree descartado depois.
 
-**Commit:** _(preencher após feito)_
+**Validação:** `npx tsc --noEmit` idêntico ao baseline do projeto (28 erros
+pré-existentes, zero novos); `npx biome lint` limpo nos 3 arquivos; testes das 3
+telas — 3 suites/8 testes verdes. `code-review` sem achados. Verificação manual via
+`agent-device` **pendente** — fica com o usuário (ver Status geral).
+
+**Commit:** `ddfd62b` — "fix(survey): atualiza copy de visitante para conta
+sintética de teste".
 
 **Referências de spec:** tech-plan.md → "4. Copy (repo `mobile`)".
 
@@ -257,15 +270,15 @@ implementa).
 
 ## Status geral
 
-Tickets 1-4 concluídos. Tickets 1 e 2 (repo `survey`) — protocolo v10 publicado e
-ativo em produção (`survey-db`/`survey-api` em `0.1.24`). Tickets 3 e 4 (repo
-`mobile`) implementados em worktrees isolados por agente `general-purpose` (o
-`docs/agent-architecture.md` mudou depois disso — hoje o agente correto seria
-`executor` — mas o trabalho já estava feito, então não foi refeito), validados
-(`tsc`/lint/testes), revisados via agente `code-review` (achado real corrigido em
-cada um: `refreshSession` engolindo erro no Ticket 3, `deleteLocalSurveyData` sem
-tratamento de erro no Ticket 4) e commitados diretamente na branch
-`feat/survey-suite-consolidation` do repo mobile (commits `067f8ff` e `c5812e7`,
-worktrees ainda não removidos). Falta: Ticket 5 (copy, depende do Ticket 3 — pronto
-pra começar) e a verificação manual via `agent-device` de ambos, adiada pra rodar
-junto com a do Ticket 5.
+**Todos os 5 tickets implementados, revisados e commitados.** Tickets 1 e 2 (repo
+`survey`) — protocolo v10 publicado e ativo em produção (`survey-db`/`survey-api`
+em `0.1.24`). Tickets 3, 4 e 5 (repo `mobile`) commitados na branch
+`feat/survey-suite-consolidation` (commits `067f8ff`, `c5812e7`, `ddfd62b`),
+todos validados (`tsc`/lint/testes) e revisados via agente `code-review` — achado
+real corrigido em cada um dos tickets 3 e 4 antes do commit (`refreshSession`
+engolindo erro silenciosamente, `deleteLocalSurveyData` sem tratamento de erro);
+Ticket 5 sem achados. Worktrees isolados removidos após os commits.
+
+**Falta:** verificação manual via `agent-device` do fluxo feliz completo
+(consentimento → provisionamento sintético → persona → execução das tasks da
+suíte única) — fica por conta do usuário, fora do escopo desta sessão.
