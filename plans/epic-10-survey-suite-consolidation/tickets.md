@@ -29,7 +29,7 @@ pedem confirmação explícita do usuário no momento de executar.
 
 ## Ticket 1 — Protocolo v10 (repo `survey`)
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído.
 
 **Escopo:**
 - [ ] `packages/db/src/protocol/data.ts`: remover tasks `T1`-`T7`, `T20`.
@@ -59,11 +59,16 @@ pedem confirmação explícita do usuário no momento de executar.
   `send-usability-checkpoint.test.ts`, `finish-and-abandon-usability-session.test.ts`,
   `usability-test-helpers.ts` (helper CITIZEN "S1,S2,S6" → "S1").
 
-**Validação:** `bun test` em `packages/db` limpo; `db:generate` sem migration nova;
-`bun run db:seed` local, conferir no dashboard/DB que v9 vira `isActive: false` e v10
-`isActive: true`, sessão antiga (v9) ainda navegável em `get-tester-detail`.
+**Validação:** `bun test` em `packages/db` (99 pass) e `packages/api` (101 pass) limpos;
+`tsc --noEmit` limpo; `db:generate` confirmou "No schema changes, nothing to
+migrate"; `bun run db:seed` local, conferido no DB que v9 virou `isActive: false` e
+v10 `isActive: true`, sessão antiga (v9) `COMPLETED` ainda navegável em
+`get-tester-detail` com seu roteiro original (S1/S2/S3, T8-T15/T1-T3/T4-T7+T20)
+intacto.
 
-**Commit:** _(preencher após feito)_
+**Commit:** `58f7846` — "feat(protocol): consolida protocolo de usabilidade em suíte
+única (v10)"; `5622bda` — fix de copy na persona GOVERNMENT (menção a "sem login"
+ficaria incorreta com a conta sintética do Ticket 3).
 
 **Referências de spec:** tech-plan.md → "1. Protocolo v10"; epic-brief.md → "Estrutura
 atual", "Bug de sinal em T12", "Micro-tarefas de filtro".
@@ -74,27 +79,28 @@ atual", "Bug de sinal em T12", "Micro-tarefas de filtro".
 
 ## Ticket 2 — Publish: PR até `production` + seed (repo `survey`)
 
-**Status:** ⬜ Pendente.
+**Status:** ✅ Concluído.
 
 **Escopo:**
-- [ ] Commit do Ticket 1 na branch `feat/survey-suite-consolidation`.
-- [ ] ⚠️ **Confirmar com o usuário antes de**: abrir PR para `development`, mergear;
-  abrir PR de `development` para `production`, mergear. Ações em branch
-  compartilhada — não autônomas.
-- [ ] Confirmar no GitHub Actions que `publish-packages.yml` rodou e publicou
-  `@oikos-circular-environment/survey-db` e `survey-api` (versão nova, formato
-  `major.minor.<run_number>`).
-- [ ] ⚠️ **Confirmar com o usuário antes de**: rodar `bun run db:seed` contra o banco
-  do ambiente alvo (staging/produção) — ativa o protocolo v10 de verdade, afeta
-  participantes reais a partir desse momento.
+- [x] Commit do Ticket 1 na branch `feat/survey-suite-consolidation`.
+- [x] PR #65 (`feat/survey-suite-consolidation` → `development`) aberto e mergeado.
+- [x] PR #66 (`development` → `production`) aberto e mergeado, com confirmação
+  explícita do usuário antes de cada merge.
+- [x] Confirmado no GitHub Actions que `publish-packages.yml` rodou (run
+  `33086054110`) e publicou `@oikos-circular-environment/survey-db` e `survey-api`
+  na versão `0.1.24`.
+- [x] `bun run db:seed` rodado contra o banco de produção (TiDB Cloud, credenciais
+  de `apps/web/.env.prod`, via `bun run --env-file=...` para evitar mangling de
+  aspas do shell na string de conexão SSL) — autorizado explicitamente pelo
+  usuário. Versão 10 publicada (UUID `8866360b-a9a1-4989-ac3b-4f92c38e0511`).
 
 **Testes:** nenhum novo — cobertos no Ticket 1.
 
-**Validação:** Action verde; versão nova visível em
-`https://github.com/orgs/oikos-circular-environment/packages`; protocolo v10
-`isActive: true` no ambiente alvo após o seed.
+**Validação:** Action verde (35s); pacotes em `0.1.24` no GitHub Packages;
+confirmado direto no banco de produção via query `SELECT` na tabela
+`protocol_versions`: v10 `isActive: true`, v9 `isActive: false`.
 
-**Commit:** _(preencher após feito — PRs, não commit direto)_
+**Commit:** PRs #65 e #66 (sem commit direto — merge via GitHub).
 
 **Referências de spec:** tech-plan.md → "Ordem de execução (obrigatória)".
 
@@ -104,7 +110,7 @@ atual", "Bug de sinal em T12", "Micro-tarefas de filtro".
 
 ## Ticket 3 — Conta sintética automática (repo `mobile`)
 
-**Status:** ⬜ Pendente.
+**Status:** 🔶 Em andamento (agente `general-purpose` em worktree isolado).
 
 **Escopo:**
 - [ ] `package.json`: atualizar `"@oikos-circular-environment/survey-api"` para a
@@ -143,7 +149,7 @@ verificação manual via `agent-device` (ver Ticket 4/5, fluxo feliz completo).
 
 ## Ticket 4 — Sessão em andamento presa a versão antiga (repo `mobile`)
 
-**Status:** ⬜ Pendente.
+**Status:** 🔶 Em andamento (agente `general-purpose` em worktree isolado).
 
 **Escopo:**
 - [ ] `src/libs/survey/restore-session.ts`: `RestoredSession` ganha
@@ -215,4 +221,9 @@ implementa).
 
 ## Status geral
 
-Nenhum ticket iniciado. Próximo passo: Ticket 1, repo `survey`.
+Tickets 1 e 2 (repo `survey`) concluídos — protocolo v10 publicado e ativo em
+produção (`survey-db`/`survey-api` em `0.1.24`). Tickets 3 e 4 (repo `mobile`) em
+andamento em paralelo, cada um em worktree isolado. Ticket 5 (copy) ainda não
+iniciado — depende do Ticket 3. Branch do mobile: `feat/survey-suite-consolidation`
+(criada a partir da `development` já atualizada com o merge de
+`chore/atualizacoes-gerais`, PR #175).
