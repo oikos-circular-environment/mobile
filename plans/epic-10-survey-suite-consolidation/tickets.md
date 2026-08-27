@@ -19,8 +19,11 @@ trabalho, este arquivo é a fonte de verdade de onde paramos.
 
 **Agentes**: Ticket 1 não tem Executor especializado pro repo `survey` (os Executors
 listados em `docs/agent-architecture.md` são todos escopados ao `mobile`) — roda via
-agente `general-purpose` isolado no repo `survey`, ou o orquestrador direto. Tickets 3
-e 4 → `data-executor` (SDK, Context, SQLite). Ticket 5 → `ui-executor` (copy de tela).
+agente `general-purpose` isolado no repo `survey`, ou o orquestrador direto. Tickets
+3 e 4 foram implementados via `general-purpose` (arquitetura de agentes antiga,
+vigente quando esses tickets começaram); `data-executor`/`ui-executor` foram
+descontinuados desde então em favor de um único agente `executor` genérico (ver
+`docs/agent-architecture.md`) — Ticket 5, ainda não iniciado, deve usar `executor`.
 Ticket 2 tem passos que **não devem ser delegados a um agente autônomo** — merge até
 `production` e rodar `db:seed` contra o ambiente alvo são ações de blast radius alto,
 pedem confirmação explícita do usuário no momento de executar.
@@ -110,35 +113,53 @@ confirmado direto no banco de produção via query `SELECT` na tabela
 
 ## Ticket 3 — Conta sintética automática (repo `mobile`)
 
-**Status:** 🔶 Em andamento (agente `general-purpose` em worktree isolado).
+**Status:** ✅ Concluído (código escrito por agente `general-purpose` em worktree
+isolado numa sessão anterior; validado, revisado via `code-review` e commitado
+nesta sessão).
 
 **Escopo:**
-- [ ] `package.json`: atualizar `"@oikos-circular-environment/survey-api"` para a
-  versão publicada no Ticket 2; mover `@faker-js/faker` de `devDependencies` para
-  `dependencies`.
-- [ ] Novo `src/libs/survey/synthetic-participant.ts`:
+- [x] `package.json`: atualizar `"@oikos-circular-environment/survey-api"` para a
+  versão publicada no Ticket 2 (`^0.1.24`); mover `@faker-js/faker` de
+  `devDependencies` para `dependencies`. `package-lock.json` regenerado
+  (`npm install --package-lock-only`, exigiu `GH_TOKEN_PERSONAL_TOKEN` do
+  `.env.eas` — não estava disponível no shell por padrão).
+- [x] Novo `src/libs/survey/synthetic-participant.ts`:
   `provisionSyntheticParticipant()` — email `oikos-survey-<uuid>@participant.invalid`
   + senha via `fakerPT_BR`, `postV1UsersRegister` → `postV1AuthLogin` (tokens via
   `setAuthToken`/`setRefreshToken`) → `putV1Profiles({ full_name, display_name,
   phone })` (sem endereço, sem avatar).
-- [ ] `src/contexts/auth-context.tsx`: expor `refreshSession` (wrapper do `refetch`
-  interno); `signOut(options?: { silent?: boolean })` — `silent` pula toast +
-  `router.navigate`, mantém revogação de token e limpeza de estado.
-- [ ] `src/app/survey/consent.tsx` (`handleAccept`): vira `async`; se autenticado,
+- [x] `src/contexts/auth-context.tsx`: expõe `refreshSession` (wrapper do `refetch`
+  interno, com `throwOnError: true` — fix pós-review, ver abaixo); `signOut(options?:
+  { silent?: boolean })` — `silent` pula toast + `router.navigate`, mantém revogação
+  de token e limpeza de estado.
+- [x] `src/app/survey/consent.tsx` (`handleAccept`): vira `async`; se autenticado,
   `await signOut({ silent: true })`; `await provisionSyntheticParticipant()`;
   `await refreshSession()`; só então navega. Estado `isProvisioning` desabilita botão
   + spinner (`ButtonSpinner`, padrão de `profile.tsx`). Erro: toast, mantém na tela.
 
 **Testes:**
-- [ ] Cobertura para `provisionSyntheticParticipant` (mock das chamadas SDK, feliz +
-  409 duplicate email).
-- [ ] Ajustar/mockar `signOut`/`refreshSession` nos testes existentes de
-  `consent.tsx` que dependem do fluxo atual (visitante).
+- [x] Cobertura para `provisionSyntheticParticipant` (mock das chamadas SDK, feliz +
+  409 duplicate email) — `src/tests/unit/survey/synthetic-participant.test.ts`.
+- [x] Ajustado/mockado `signOut`/`refreshSession` nos testes existentes de
+  `consent.tsx` e nos demais que consomem `auth-context` (auth, home, market,
+  profile — 17 suites/132 testes verdes no total).
 
-**Validação:** `npx tsc --noEmit` e `npm run lint` limpos; `npm test` verde;
-verificação manual via `agent-device` (ver Ticket 4/5, fluxo feliz completo).
+**Achados do `code-review` corrigidos antes do commit:**
+- `refreshSession()` chamava `refetch()` sem `throwOnError: true` — React Query só
+  rejeita a promise com essa opção explícita, então uma falha no fetch de perfil
+  pós-provisionamento não acionava o `catch` de `handleAccept`: nenhum toast de erro,
+  navegação seguia com `isAuthenticated`/`user` desincronizados do token sintético já
+  salvo. Corrigido: `refetch({ throwOnError: true })`.
+- `package-lock.json` não tinha sido regenerado após o bump do `package.json` (bloquearia
+  `npm ci` em CI/EAS build). Corrigido via `npm install --package-lock-only`.
 
-**Commit:** _(preencher após feito)_
+**Validação:** `npx tsc --noEmit` limpo (mesma baseline de erros pré-existentes do
+projeto, nenhum novo); `npx biome lint` limpo nos arquivos do ticket; `npm test`
+(suítes tocadas) 17 suites / 132 testes, todos verdes. Verificação manual via
+`agent-device` ainda pendente — planejada junto do Ticket 5 (fluxo feliz completo).
+
+**Commit:** `067f8ff` — "feat(survey): provisiona participante sintético no
+consentimento".
 
 **Referências de spec:** tech-plan.md → "2. Conta sintética automática (repo
 `mobile`)"; epic-brief.md → "Restrição inegociável".
@@ -149,29 +170,44 @@ verificação manual via `agent-device` (ver Ticket 4/5, fluxo feliz completo).
 
 ## Ticket 4 — Sessão em andamento presa a versão antiga (repo `mobile`)
 
-**Status:** 🔶 Em andamento (agente `general-purpose` em worktree isolado).
+**Status:** ✅ Concluído (código escrito por agente `general-purpose` em worktree
+isolado numa sessão anterior; validado, revisado via `code-review` e commitado
+nesta sessão).
 
 **Escopo:**
-- [ ] `src/libs/survey/restore-session.ts`: `RestoredSession` ganha
-  `protocolVersion: number` (coluna já existe em `survey_session`).
-- [ ] `restoreSurveySessionIfNeeded()`: se `status === "IN_PROGRESS"`, buscar
+- [x] `src/libs/survey/restore-session.ts`: `RestoredSession` ganha
+  `protocolVersion: number` (coluna já existe em `survey_session`). Como efeito
+  colateral, corrigiu um erro de tipo pré-existente na baseline do projeto
+  (`protocolVersion` não cobria `"COMPLETED"`).
+- [x] `restoreSurveySessionIfNeeded()`: se `status === "IN_PROGRESS"`, buscar
   protocolo preferindo rede (grava no cache em caso de sucesso, cache só como
-  fallback offline); se `status !== "IN_PROGRESS"`, manter cache-primeiro atual.
-- [ ] Se versão buscada ≠ `protocolVersion` da sessão **e** `IN_PROGRESS`:
-  `deleteLocalSurveyData(sessionId)` (já existe) e retornar `null` em vez de
+  fallback offline); se `status !== "IN_PROGRESS"`, mantém cache-primeiro atual.
+- [x] Se versão buscada ≠ `protocolVersion` da sessão **e** `IN_PROGRESS`:
+  `deleteLocalSurveyData(sessionId)` (já existia) e retorna `null` em vez de
   `restoreSurveyExecution`.
 
 **Testes:**
-- [ ] Sessão `IN_PROGRESS` com versão desatualizada → dados locais apagados, `null`
+- [x] Sessão `IN_PROGRESS` com versão desatualizada → dados locais apagados, `null`
   retornado.
-- [ ] Sessão `IN_PROGRESS` com versão atual → resume normalmente (regressão).
-- [ ] Sessão `COMPLETED`/`ABANDONED` → não dispara fetch de rede extra, não é tocada.
+- [x] Sessão `IN_PROGRESS` com versão atual → resume normalmente (regressão).
+- [x] Sessão `COMPLETED`/`ABANDONED` → não dispara fetch de rede extra, não é tocada.
+- [x] Sessão `IN_PROGRESS` offline (rede falha) → cai pro cache e resume se a versão
+  bater.
 
-**Validação:** `npx tsc --noEmit`, `npm run lint`, `npm test` limpos; manual: iniciar
-sessão, não terminar, forçar versão nova (mudar cache local ou usar o protocolo v10
-já publicado), reabrir o app e confirmar que a sessão some sem crash/tela travada.
+**Achado do `code-review` corrigido antes do commit:** `deleteLocalSurveyData` era
+chamado sem `try/catch`; uma falha nele (I/O do SQLite, por exemplo) rejeitava a
+promise de `restoreSurveySessionIfNeeded()`, e o único call site
+(`survey-migrations-runner.tsx`) não tem `.catch()` — vira unhandled rejection no
+boot do app em vez do fallback gracioso que o resto da função pratica. Corrigido com
+`try/catch` ao redor do delete, seguido de `console.warn` e `return null` de
+qualquer forma.
 
-**Commit:** _(preencher após feito)_
+**Validação:** `npx tsc --noEmit` limpo (mesma baseline do projeto, nenhum erro
+novo); `npx biome lint` limpo; `npm test` (suíte tocada) 6/6 testes verdes. Manual
+via `agent-device` ainda pendente — planejada junto do Ticket 5.
+
+**Commit:** `c5812e7` — "fix(survey): descarta sessão local presa a versão antiga do
+protocolo".
 
 **Referências de spec:** tech-plan.md → "3. Sessão em andamento presa a versão antiga
 (repo `mobile`)".
@@ -221,9 +257,15 @@ implementa).
 
 ## Status geral
 
-Tickets 1 e 2 (repo `survey`) concluídos — protocolo v10 publicado e ativo em
-produção (`survey-db`/`survey-api` em `0.1.24`). Tickets 3 e 4 (repo `mobile`) em
-andamento em paralelo, cada um em worktree isolado. Ticket 5 (copy) ainda não
-iniciado — depende do Ticket 3. Branch do mobile: `feat/survey-suite-consolidation`
-(criada a partir da `development` já atualizada com o merge de
-`chore/atualizacoes-gerais`, PR #175).
+Tickets 1-4 concluídos. Tickets 1 e 2 (repo `survey`) — protocolo v10 publicado e
+ativo em produção (`survey-db`/`survey-api` em `0.1.24`). Tickets 3 e 4 (repo
+`mobile`) implementados em worktrees isolados por agente `general-purpose` (o
+`docs/agent-architecture.md` mudou depois disso — hoje o agente correto seria
+`executor` — mas o trabalho já estava feito, então não foi refeito), validados
+(`tsc`/lint/testes), revisados via agente `code-review` (achado real corrigido em
+cada um: `refreshSession` engolindo erro no Ticket 3, `deleteLocalSurveyData` sem
+tratamento de erro no Ticket 4) e commitados diretamente na branch
+`feat/survey-suite-consolidation` do repo mobile (commits `067f8ff` e `c5812e7`,
+worktrees ainda não removidos). Falta: Ticket 5 (copy, depende do Ticket 3 — pronto
+pra começar) e a verificação manual via `agent-device` de ambos, adiada pra rodar
+junto com a do Ticket 5.
