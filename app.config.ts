@@ -1,11 +1,14 @@
 import type { ExpoConfig } from "expo/config";
 
+// biome-ignore lint/suspicious/noExplicitAny: require-based Expo config plugin, sem tipos próprios
+const withAndroidSplashWindowBackground: any = require("./plugins/withAndroidSplashWindowBackground");
+
 const googleMapsApiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 
 const config: ExpoConfig = {
 	name: "oikos",
 	slug: "oikos",
-	version: "1.0.4",
+	version: "1.0.5",
 	orientation: "default",
 	icon: "./src/assets/icons/icon.png",
 	scheme: "oikos",
@@ -40,6 +43,7 @@ const config: ExpoConfig = {
 		],
 	},
 	plugins: [
+		withAndroidSplashWindowBackground,
 		"expo-router",
 		[
 			"expo-splash-screen",

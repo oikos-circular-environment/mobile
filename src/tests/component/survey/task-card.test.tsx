@@ -32,6 +32,8 @@ describe("TaskCard — componente", () => {
 				onAbandonSuite={jest.fn()}
 				onSkipTask={jest.fn()}
 				onAbandonTask={jest.fn()}
+				onRepeatTour={jest.fn()}
+				onMinimize={jest.fn()}
 			/>,
 		);
 
@@ -56,6 +58,8 @@ describe("TaskCard — componente", () => {
 				onAbandonSuite={jest.fn()}
 				onSkipTask={jest.fn()}
 				onAbandonTask={jest.fn()}
+				onRepeatTour={jest.fn()}
+				onMinimize={jest.fn()}
 			/>,
 		);
 
@@ -78,6 +82,8 @@ describe("TaskCard — componente", () => {
 				onAbandonSuite={onAbandonSuite}
 				onSkipTask={jest.fn()}
 				onAbandonTask={jest.fn()}
+				onRepeatTour={jest.fn()}
+				onMinimize={jest.fn()}
 			/>,
 		);
 
@@ -104,6 +110,8 @@ describe("TaskCard — componente", () => {
 				onAbandonSuite={jest.fn()}
 				onSkipTask={onSkipTask}
 				onAbandonTask={jest.fn()}
+				onRepeatTour={jest.fn()}
+				onMinimize={jest.fn()}
 			/>,
 		);
 
@@ -126,6 +134,8 @@ describe("TaskCard — componente", () => {
 				onAbandonSuite={jest.fn()}
 				onSkipTask={jest.fn()}
 				onAbandonTask={onAbandonTask}
+				onRepeatTour={jest.fn()}
+				onMinimize={jest.fn()}
 			/>,
 		);
 
@@ -134,6 +144,53 @@ describe("TaskCard — componente", () => {
 		await user.press(abandonButtons[0] as never);
 
 		expect(onAbandonTask).toHaveBeenCalledTimes(1);
+	});
+
+	it("chama onRepeatTour ao pressionar Repetir tutorial", async () => {
+		const user = userEvent.setup();
+		const onRepeatTour = jest.fn();
+		await render(
+			<TaskCard
+				currentTask={3}
+				totalTasks={7}
+				elapsedLabel="02:41"
+				instruction="Instrução"
+				checklist={checklist}
+				onPause={jest.fn()}
+				onAbandonSuite={jest.fn()}
+				onSkipTask={jest.fn()}
+				onAbandonTask={jest.fn()}
+				onRepeatTour={onRepeatTour}
+			/>,
+		);
+
+		await user.press(screen.getByText("Repetir tutorial"));
+
+		expect(onRepeatTour).toHaveBeenCalledTimes(1);
+	});
+
+	it("chama onMinimize ao pressionar Minimizar", async () => {
+		const user = userEvent.setup();
+		const onMinimize = jest.fn();
+		await render(
+			<TaskCard
+				currentTask={3}
+				totalTasks={7}
+				elapsedLabel="02:41"
+				instruction="Instrução"
+				checklist={checklist}
+				onPause={jest.fn()}
+				onAbandonSuite={jest.fn()}
+				onSkipTask={jest.fn()}
+				onAbandonTask={jest.fn()}
+				onRepeatTour={jest.fn()}
+				onMinimize={onMinimize}
+			/>,
+		);
+
+		await user.press(screen.getByText("Minimizar"));
+
+		expect(onMinimize).toHaveBeenCalledTimes(1);
 	});
 
 	it("não exibe nenhum botão de autodeclaração de sucesso — só desistência (pular/abandonar)", async () => {
@@ -148,13 +205,15 @@ describe("TaskCard — componente", () => {
 				onAbandonSuite={jest.fn()}
 				onSkipTask={jest.fn()}
 				onAbandonTask={jest.fn()}
+				onRepeatTour={jest.fn()}
+				onMinimize={jest.fn()}
 			/>,
 		);
 
 		expect(screen.queryByText(/^consegui$/i)).not.toBeOnTheScreen();
 		expect(screen.queryByText(/^não consegui$/i)).not.toBeOnTheScreen();
-		// Pular + Abandonar (tarefa) + Pausar + Abandonar (etapa)
-		expect(screen.getAllByRole("button")).toHaveLength(4);
+		// Minimizar + Repetir tutorial + Pular + Abandonar (tarefa) + Pausar + Abandonar (etapa)
+		expect(screen.getAllByRole("button")).toHaveLength(6);
 	});
 
 	it("esconde os botões inline de Pular/Abandonar quando não há tarefa atual (tudo resolvido)", async () => {
@@ -171,6 +230,8 @@ describe("TaskCard — componente", () => {
 				onAbandonSuite={jest.fn()}
 				onSkipTask={jest.fn()}
 				onAbandonTask={jest.fn()}
+				onRepeatTour={jest.fn()}
+				onMinimize={jest.fn()}
 			/>,
 		);
 
@@ -193,6 +254,8 @@ describe("TaskCard — componente", () => {
 				onPause={jest.fn()}
 				onNext={onNext}
 				onAbandonSuite={jest.fn()}
+				onRepeatTour={jest.fn()}
+				onMinimize={jest.fn()}
 			/>,
 		);
 

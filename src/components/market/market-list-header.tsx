@@ -70,7 +70,7 @@ export function MarketListHeader() {
 		formState: { errors },
 	} = useForm<MarketFilterValues>({
 		resolver: zodResolver(marketFilterSchema),
-		defaultValues: { query: "", radius: "2000", category: undefined },
+		defaultValues: { query: "", radius: "10000", category: undefined },
 	});
 
 	const categoryValue = watch("category");
@@ -134,7 +134,7 @@ export function MarketListHeader() {
 			<View className="flex-row gap-2">
 				<Pressable
 					className={cn(
-						"flex-1 flex-row gap-2 itens-center justify-center rounded-md p-4",
+						"flex-1 flex-row gap-2 items-center justify-center rounded-md p-4",
 						categoryValue === "waste" ? "bg-primary" : "border border-border",
 					)}
 					onPress={() => {
@@ -157,7 +157,7 @@ export function MarketListHeader() {
 				</Pressable>
 				<Pressable
 					className={cn(
-						"flex-1 flex-row gap-2 itens-center justify-center rounded-md p-4",
+						"flex-1 flex-row gap-2 items-center justify-center rounded-md p-4",
 						categoryValue === "services"
 							? "bg-primary"
 							: "border border-border",
@@ -181,7 +181,7 @@ export function MarketListHeader() {
 					</Text>
 				</Pressable>
 				<Pressable
-					className="flex-1 flex-row gap-2 itens-center justify-center rounded-md p-4 border border-border"
+					className="flex-1 flex-row gap-2 items-center justify-center rounded-md p-4 border border-border"
 					onPress={openRadiusSheet}
 				>
 					<NavigationIcon size={14} color={colors.gray[950]} />

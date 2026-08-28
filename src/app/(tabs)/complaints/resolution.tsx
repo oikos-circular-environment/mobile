@@ -15,7 +15,6 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-	Image,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
@@ -33,6 +32,7 @@ import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
 	FormControl,
 	FormControlError,
@@ -448,23 +448,21 @@ export default function ComplaintResolutionScreen() {
 
 						{selectedCompany ? (
 							<View className="flex-row items-center gap-3 rounded-xl border border-lime-700 bg-lime-50 p-3">
-								{selectedCompany.avatar?.url ? (
-									<Image
-										source={{
-											uri: selectedCompany.avatar.url,
-											headers: getAuthenticatedImageHeaders(),
-										}}
-										style={{ width: 36, height: 36, borderRadius: 18 }}
+								<Avatar size="sm" className="h-9 w-9 rounded-full bg-lime-100">
+									<BuildingIcon
+										size={16}
+										color={colors.lime[800]}
+										strokeWidth={2}
 									/>
-								) : (
-									<View className="h-9 w-9 items-center justify-center rounded-full bg-lime-100">
-										<BuildingIcon
-											size={16}
-											color={colors.lime[800]}
-											strokeWidth={2}
+									{selectedCompany.avatar?.url && (
+										<AvatarImage
+											source={{
+												uri: selectedCompany.avatar.url,
+												headers: getAuthenticatedImageHeaders(),
+											}}
 										/>
-									</View>
-								)}
+									)}
+								</Avatar>
 								<View className="flex-1">
 									<Text className="font-semibold text-lime-900">
 										{selectedCompany.business_name ??

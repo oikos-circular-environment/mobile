@@ -44,15 +44,14 @@ export function HomeUserCard({ onOpenSettings }: HomeUserCardProps) {
 			<Link href="/(tabs)/(home)/profile" asChild>
 				<Pressable className="flex flex-1 flex-row items-center gap-3">
 					<Avatar size="sm" className="rounded-[10px]">
-						{user.profile.profile_image ? (
+						<UserIcon size={20} color={colors.lime[800]} />
+						{user.profile.profile_image && (
 							<AvatarImage
 								source={{
 									uri: user.profile.profile_image.url,
 									headers: getAuthenticatedImageHeaders(),
 								}}
 							/>
-						) : (
-							<UserIcon size={20} color={colors.lime[800]} />
 						)}
 					</Avatar>
 					<View className="flex flex-col flex-1">

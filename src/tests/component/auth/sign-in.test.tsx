@@ -22,6 +22,7 @@ function setupAuthMock(overrides: Record<string, unknown> = {}) {
 		signIn: mockSignIn,
 		signUp: jest.fn(),
 		signOut: jest.fn(),
+		refreshSession: jest.fn(),
 		isLoading: false,
 		isAuthenticated: false,
 		user: null,

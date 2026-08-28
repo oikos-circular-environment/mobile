@@ -3,7 +3,6 @@ import { HammerIcon, RecycleIcon, Sprout } from "lucide-react-native";
 import { useMemo } from "react";
 import {
 	FlatList,
-	Image,
 	KeyboardAvoidingView,
 	Pressable,
 	ScrollView,
@@ -15,6 +14,7 @@ import { LocationSourceBottomSheet } from "@/components/market/location-source-b
 import { MarketListHeader } from "@/components/market/market-list-header";
 import { RadiusBottomSheet } from "@/components/market/radius-bottom-sheet";
 import { colors } from "@/components/style/colors";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -84,28 +84,23 @@ function CompanyCardItem({
 				>
 					<Pressable>
 						<HStack space="md" className="items-center">
-							{company.avatar ? (
-								<View className="w-16 h-16 rounded-lg overflow-hidden">
-									<Image
+							<Avatar size="md" className="w-16 h-16 rounded-lg bg-primary">
+								{company.company_type === "COLLECTOR" ? (
+									<Sprout size={20} color={colors.white} />
+								) : (
+									<Text className="text-primary-foreground text-sm font-bold">
+										{initials}
+									</Text>
+								)}
+								{company.avatar && (
+									<AvatarImage
 										source={{
 											uri: company.avatar,
 											headers: getAuthenticatedImageHeaders(),
 										}}
-										className="w-full h-full"
-										resizeMode="cover"
 									/>
-								</View>
-							) : (
-								<View className="w-16 h-16 rounded-lg bg-primary items-center justify-center">
-									{company.company_type === "COLLECTOR" ? (
-										<Sprout size={20} color={colors.white} />
-									) : (
-										<Text className="text-primary-foreground text-sm font-bold">
-											{initials}
-										</Text>
-									)}
-								</View>
-							)}
+								)}
+							</Avatar>
 
 							<View className="flex-1 gap-1">
 								<Text className="font-bold uppercase" numberOfLines={1}>

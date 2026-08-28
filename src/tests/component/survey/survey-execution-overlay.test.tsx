@@ -1,5 +1,7 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
+import { useSurveyParticipantCode } from "@/components/survey/hooks/use-survey-participant-code";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
+import { useSurveyTourSeen } from "@/components/survey/hooks/use-survey-tour-seen";
 import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
 import { toast } from "@/components/toast";
 import { createTestSurveyDb } from "@/libs/survey/db/test-client";
@@ -21,6 +23,12 @@ jest.mock("@/libs/survey/db/client", () => ({
 }));
 
 jest.mock("@/components/survey/hooks/use-survey-protocol");
+
+jest.mock("@/components/survey/hooks/use-survey-participant-code");
+
+jest.mock("@/components/survey/hooks/use-survey-tour-seen", () => ({
+	useSurveyTourSeen: jest.fn(),
+}));
 
 jest.mock("expo-haptics", () => ({
 	notificationAsync: (...args: unknown[]) => mockNotificationAsync(...args),
@@ -47,6 +55,12 @@ describe("SurveyExecutionOverlay", () => {
 		jest.mocked(useSurveyProtocol).mockReturnValue({
 			data: { tasks: [] },
 		} as never);
+		jest.mocked(useSurveyParticipantCode).mockReturnValue("PSQ-7X29-QK41");
+		jest.mocked(useSurveyTourSeen).mockReturnValue({
+			loaded: true,
+			seen: true,
+			markSeen: jest.fn(),
+		});
 	});
 
 	afterEach(() => {

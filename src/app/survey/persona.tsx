@@ -43,8 +43,8 @@ export default function SurveyPersonaScreen() {
 
 	return (
 		<View
-			className="flex-1 bg-white px-6 pb-6 gap-4"
-			style={{ paddingTop: insets.top + 16 }}
+			className="flex-1 bg-white px-6 gap-4"
+			style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }}
 		>
 			<QHeader
 				categoryLabel="Caracterização"
@@ -55,7 +55,7 @@ export default function SurveyPersonaScreen() {
 			<View className="gap-1">
 				<Heading size="xl">Com qual persona você mais se identifica?</Heading>
 				<Text size="sm" className="text-muted-foreground">
-					Isso define quais etapas você vai realizar.
+					Isso ajuda a caracterizar sua participação na pesquisa.
 				</Text>
 			</View>
 

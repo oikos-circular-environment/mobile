@@ -194,6 +194,10 @@ function BootProgressStatus({
 
 // Só roda fora do __DEV__: checkForUpdateAsync/fetchUpdateAsync lançam
 // ERR_UPDATES_DISABLED em desenvolvimento.
+function BootProgressGroup({ children }: PropsWithChildren) {
+	return <View style={styles.progressGroup}>{children}</View>;
+}
+
 export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 	const { downloadProgress } = useUpdates();
 	const [phase, setPhase] = useState<OtaPhase>("checking");
@@ -271,7 +275,9 @@ export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 			<View style={styles.center}>
 				<View style={styles.content}>
 					<BootWordmark fontSize={96} />
-					<BootProgressStatus phase={phase} progress={progressValue} />
+					<BootProgressGroup>
+						<BootProgressStatus phase={phase} progress={progressValue} />
+					</BootProgressGroup>
 				</View>
 			</View>
 		</View>
@@ -331,10 +337,12 @@ export function DevBootDiagnostics({
 				<View style={styles.devGroup}>
 					<View style={styles.content}>
 						<BootWordmark fontSize={96} />
-						<BootProgressStatus
-							phase={current.phase}
-							progress={current.progress}
-						/>
+						<BootProgressGroup>
+							<BootProgressStatus
+								phase={current.phase}
+								progress={current.progress}
+							/>
+						</BootProgressGroup>
 					</View>
 					<View style={styles.debugPanel}>
 						{rows.map(([label, value]) => (
@@ -368,6 +376,10 @@ const styles = StyleSheet.create({
 		gap: 40,
 	},
 	content: {
+		alignItems: "center",
+		gap: 8,
+	},
+	progressGroup: {
 		width: CONTENT_WIDTH,
 		alignItems: "center",
 		gap: 8,

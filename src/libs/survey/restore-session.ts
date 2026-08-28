@@ -2,6 +2,7 @@ import { desc, eq } from "drizzle-orm";
 import { surveyClient } from "./api/client";
 import { getSurveyDb } from "./db/client";
 import { surveySession, surveySuiteRun, surveyTaskRun } from "./db/schema";
+import { deleteLocalSurveyData } from "./delete-local-data";
 import { getCachedProtocol, setCachedProtocol } from "./protocol-cache";
 import { restoreSurveyExecution } from "./restore-execution";
 
@@ -9,7 +10,7 @@ export interface RestoredSession {
 	sessionId: string;
 	persona: string;
 	participantCode: string | null;
-	status: "IN_PROGRESS" | "ABANDONED";
+	status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
 	currentSuiteCode: string | null;
 	currentTaskCode: string | null;
 	activeMs: number;
@@ -17,6 +18,7 @@ export interface RestoredSession {
 	consentVersion: string;
 	consentAt: string;
 	protocolKey: string;
+	protocolVersion: number;
 }
 
 export async function restoreLatestSurveySession(): Promise<RestoredSession | null> {
@@ -65,6 +67,7 @@ export async function restoreLatestSurveySession(): Promise<RestoredSession | nu
 		consentVersion: latestSession.consentVersion,
 		consentAt: latestSession.consentAt,
 		protocolKey: latestSession.protocolKey,
+		protocolVersion: latestSession.protocolVersion,
 	};
 }
 
@@ -74,30 +77,86 @@ export async function restoreSurveySessionIfNeeded() {
 
 	let protocolPayload: unknown = null;
 	let protocolKey = restored.protocolKey;
+	let protocolVersion: number | undefined;
 
-	const cached = await getCachedProtocol(restored.protocolKey);
-	console.log("[survey] cache do protocolo:", {
-		key: restored.protocolKey,
-		hit: Boolean(cached),
-	});
-	if (cached) {
-		protocolPayload = cached.payload;
-		protocolKey = cached.key;
-	} else {
+	if (restored.status === "IN_PROGRESS") {
 		try {
 			const remote = await surveyClient.usability.protocol.query();
-			console.log("[survey] protocolo buscado do servidor:", Boolean(remote));
+			console.log(
+				"[survey] protocolo buscado do servidor (sessão em andamento):",
+				Boolean(remote),
+			);
 			if (remote) {
 				await setCachedProtocol(remote.key, remote.version, remote);
 				protocolPayload = remote;
 				protocolKey = remote.key;
+				protocolVersion = remote.version;
 			}
 		} catch (error) {
 			console.warn(
-				"[survey] não foi possível buscar o protocolo para restore",
+				"[survey] não foi possível buscar o protocolo na rede para restore de sessão em andamento — usando cache",
+				error,
+			);
+			const cached = await getCachedProtocol(restored.protocolKey);
+			console.log("[survey] cache do protocolo (fallback offline):", {
+				key: restored.protocolKey,
+				hit: Boolean(cached),
+			});
+			if (cached) {
+				protocolPayload = cached.payload;
+				protocolKey = cached.key;
+				protocolVersion = cached.version;
+			}
+		}
+	} else {
+		const cached = await getCachedProtocol(restored.protocolKey);
+		console.log("[survey] cache do protocolo:", {
+			key: restored.protocolKey,
+			hit: Boolean(cached),
+		});
+		if (cached) {
+			protocolPayload = cached.payload;
+			protocolKey = cached.key;
+		} else {
+			try {
+				const remote = await surveyClient.usability.protocol.query();
+				console.log("[survey] protocolo buscado do servidor:", Boolean(remote));
+				if (remote) {
+					await setCachedProtocol(remote.key, remote.version, remote);
+					protocolPayload = remote;
+					protocolKey = remote.key;
+				}
+			} catch (error) {
+				console.warn(
+					"[survey] não foi possível buscar o protocolo para restore",
+					error,
+				);
+			}
+		}
+	}
+
+	if (
+		restored.status === "IN_PROGRESS" &&
+		protocolVersion !== undefined &&
+		protocolVersion !== restored.protocolVersion
+	) {
+		console.warn(
+			"[survey] sessão em andamento presa a versão antiga do protocolo — descartando dados locais",
+			{
+				sessionId: restored.sessionId,
+				sessionProtocolVersion: restored.protocolVersion,
+				fetchedProtocolVersion: protocolVersion,
+			},
+		);
+		try {
+			await deleteLocalSurveyData(restored.sessionId);
+		} catch (error) {
+			console.warn(
+				"[survey] falha ao apagar dados locais de sessão com protocolo desatualizado",
 				error,
 			);
 		}
+		return null;
 	}
 
 	if (

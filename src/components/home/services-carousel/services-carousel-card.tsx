@@ -8,19 +8,22 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/libs/utils";
-import { useServicesCarouselContext } from "./context";
 import { ServicesCarouselDebugOverlay } from "./services-carousel-debug-overlay";
 import type { ServiceCarouselItem } from "./types";
 
 interface ServicesCarouselCardProps {
 	item: ServiceCarouselItem;
 	index: number;
+	cardWidth: number;
+	cardHeight: number;
+	scale: number;
+	isActive: boolean;
 }
 
 const FOOTER_LABELS = ["REDUZA", "REUTILIZE", "RECICLE"];
 
 /** Liga o overlay de debug de temporização/pausa — só pra depuração manual, não é UI final. */
-const SHOW_DEBUG_OVERLAY = true;
+const SHOW_DEBUG_OVERLAY = false;
 
 /** Toques mais longos que isso contam como "segurar" (já pausa o autoplay via handleTouchStart
  * no track) e não navegam ao soltar — só um tap rápido dispara a ação do card. */
@@ -28,11 +31,11 @@ const TAP_MAX_HOLD_MS = 300;
 
 export function ServicesCarouselCard({
 	item,
-	index,
+	cardWidth,
+	cardHeight,
+	scale,
+	isActive,
 }: ServicesCarouselCardProps) {
-	const { cardWidth, cardHeight, scale, activeIndex } =
-		useServicesCarouselContext();
-	const isActive = index === activeIndex;
 	const blurTargetRef = useRef<View | null>(null);
 	const router = useRouter();
 	const pressStartRef = useRef<number | null>(null);

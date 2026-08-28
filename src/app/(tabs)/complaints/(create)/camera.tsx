@@ -61,7 +61,7 @@ export default function ComplaintCameraScreen() {
 
 			<View
 				className="absolute left-0 right-0 flex-row px-5"
-				style={{ top: 16 }}
+				style={{ paddingTop: insets.top + 16 }}
 			>
 				<TouchableOpacity
 					className="rounded-xl p-3"
@@ -70,8 +70,8 @@ export default function ComplaintCameraScreen() {
 					<ArrowLeft size={20} color={colors.white} strokeWidth={2.2} />
 				</TouchableOpacity>
 			</View>
-			<CameraRecordingTimer style={{ top: 16 }} />
-			<CameraFlashControl style={{ top: 16 }} />
+			<CameraRecordingTimer style={{ paddingTop: insets.top + 16 }} />
+			<CameraFlashControl style={{ paddingTop: insets.top + 16 }} />
 			<CameraZoomControls style={{ bottom: insets.bottom + 180 }} />
 			<CameraModeSelector style={{ bottom: insets.bottom + 120 }} />
 
@@ -94,7 +94,7 @@ export default function ComplaintCameraScreen() {
 						onPress={handleAdvance}
 						disabled={cameraAttachments.length === 0}
 					>
-						<ArrowRight size={34} color={colors.lime[800]} strokeWidth={2.2} />
+						<ArrowRight size={34} color={colors.black} strokeWidth={2.2} />
 					</TouchableOpacity>
 				</View>
 			</View>

@@ -1,3 +1,8 @@
+import GorhomBottomSheet, {
+	BottomSheetBackdrop,
+	type BottomSheetBackdropProps,
+	BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import {
 	ListIcon,
@@ -9,9 +14,10 @@ import {
 	MoonIcon,
 	Navigation2Icon,
 	PlusIcon,
+	SlidersHorizontalIcon,
 	SunIcon,
 } from "lucide-react-native";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	Platform,
 	TouchableOpacity,
@@ -41,6 +47,7 @@ import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { MapSkeleton } from "@/components/ui/map-skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
@@ -53,6 +60,14 @@ const controlShadow = {
 	shadowOpacity: 0.15,
 	shadowRadius: 3,
 	elevation: 3,
+};
+
+const fabShadow = {
+	shadowColor: colors.black,
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.18,
+	shadowRadius: 4,
+	elevation: 4,
 };
 
 const NIGHT_MAP_STYLE = [
@@ -147,6 +162,8 @@ const NIGHT_MAP_STYLE = [
 ];
 
 const LIST_SHEET_MIN_SNAP_RATIO = 0.15;
+const FAB_SIZE = 50;
+const FAB_GROUP_GAP = 12;
 
 const MARKER_PIN_PATH =
 	"M4.74,21.5 A13,13 0 1 1 27.26,21.5 L18.6,36.5 A3,3 0 0 1 13.4,36.5 Z";
@@ -187,6 +204,7 @@ export default function ComplaintsMapScreen() {
 	const { location, permissionDenied } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
 	const filterSheetRef = useRef<BottomSheetRef>(null);
+	const mapControlsSheetRef = useRef<GorhomBottomSheet>(null);
 	const hasAnimatedRef = useRef(false);
 	const suppressMapPressRef = useRef(false);
 	const [isMapReady, setIsMapReady] = useState(false);
@@ -333,6 +351,21 @@ export default function ComplaintsMapScreen() {
 		}
 	};
 
+	const handleOpenMapControlsSheet = () => {
+		mapControlsSheetRef.current?.snapToIndex(0);
+	};
+
+	const mapControlsBackdropComponent = useCallback(
+		(props: BottomSheetBackdropProps) => (
+			<BottomSheetBackdrop
+				{...props}
+				appearsOnIndex={0}
+				disappearsOnIndex={-1}
+			/>
+		),
+		[],
+	);
+
 	return (
 		<View className="flex-1">
 			<MapView
@@ -389,11 +422,12 @@ export default function ComplaintsMapScreen() {
 					);
 				})}
 			</MapView>
+			{!isMapReady && <MapSkeleton />}
 
 			{/* Filter row */}
 			<View
 				className="absolute left-0 right-0 gap-2 px-4"
-				style={{ top: insets.top }}
+				style={{ top: insets.top + 16 }}
 				pointerEvents="box-none"
 			>
 				<ComplaintFilterRow
@@ -427,100 +461,39 @@ export default function ComplaintsMapScreen() {
 				</View>
 			)}
 
-			{/* Map controls — right side, vertically centered */}
+			{/* Map controls trigger */}
 			<View
-				className="absolute right-4 gap-2 justify-center"
+				className="absolute"
 				style={{
-					top: insets.top,
-					bottom: windowHeight * LIST_SHEET_MIN_SNAP_RATIO + insets.bottom,
+					right: 16 + insets.right,
+					bottom:
+						windowHeight * LIST_SHEET_MIN_SNAP_RATIO +
+						FAB_GROUP_GAP +
+						FAB_SIZE +
+						FAB_GROUP_GAP,
 				}}
 				pointerEvents="box-none"
 			>
 				<TouchableOpacity
-					activeOpacity={0.85}
-					onPress={handleZoomIn}
-					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
-					style={controlShadow}
+					activeOpacity={0.9}
+					onPress={handleOpenMapControlsSheet}
+					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
+					style={fabShadow}
 				>
-					<PlusIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					activeOpacity={0.85}
-					onPress={handleZoomOut}
-					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
-					style={controlShadow}
-				>
-					<MinusIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					activeOpacity={0.85}
-					onPress={() => setShowUserLocation(v => !v)}
-					className={cn(
-						"h-11 w-11 items-center justify-center rounded-xl",
-						showUserLocation ? "bg-lime-800" : "bg-white",
-					)}
-					style={controlShadow}
-				>
-					{showUserLocation ? (
-						<MapPinnedIcon size={18} color={colors.white} strokeWidth={2.2} />
-					) : (
-						<MapIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
-					)}
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					activeOpacity={0.85}
-					onPress={() => setIsDarkMap(v => !v)}
-					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
-					style={controlShadow}
-				>
-					{isDarkMap ? (
-						<SunIcon size={18} color={colors.amber[500]} strokeWidth={2.2} />
-					) : (
-						<MoonIcon size={18} color={colors.gray[700]} strokeWidth={2.2} />
-					)}
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					activeOpacity={0.85}
-					onPress={handleResetNorth}
-					className="h-11 w-11 items-center justify-center rounded-xl bg-primary"
-					style={controlShadow}
-				>
-					<View style={{ transform: [{ rotate: `${-mapHeading}deg` }] }}>
-						<Navigation2Icon size={20} color={colors.white} strokeWidth={2.2} />
-					</View>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					activeOpacity={0.85}
-					onPress={handleGoToLocation}
-					className="h-11 w-11 items-center justify-center rounded-xl bg-white"
-					style={controlShadow}
-				>
-					{permissionDenied ? (
-						<LocateOffIcon
-							size={18}
-							color={colors.red[500]}
-							strokeWidth={2.2}
-						/>
-					) : (
-						<LocateFixedIcon
-							size={18}
-							color={colors.gray[700]}
-							strokeWidth={2.2}
-						/>
-					)}
+					<SlidersHorizontalIcon
+						size={20}
+						color={colors.gray[700]}
+						strokeWidth={2}
+					/>
 				</TouchableOpacity>
 			</View>
 
 			{/* FABs */}
 			<View
-				className="absolute right-4 flex-row gap-2 items-center"
+				className="absolute flex-row gap-2 items-center"
 				style={{
-					bottom: windowHeight * LIST_SHEET_MIN_SNAP_RATIO + 12,
+					right: 16 + insets.right,
+					bottom: windowHeight * LIST_SHEET_MIN_SNAP_RATIO + FAB_GROUP_GAP,
 				}}
 				pointerEvents="box-none"
 			>
@@ -538,13 +511,7 @@ export default function ComplaintsMapScreen() {
 						router.push("/(tabs)/complaints/list");
 					}}
 					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
-					style={{
-						shadowColor: colors.black,
-						shadowOffset: { width: 0, height: 2 },
-						shadowOpacity: 0.18,
-						shadowRadius: 4,
-						elevation: 4,
-					}}
+					style={fabShadow}
 				>
 					<ListIcon size={20} color={colors.gray[700]} strokeWidth={2} />
 				</TouchableOpacity>
@@ -601,6 +568,138 @@ export default function ComplaintsMapScreen() {
 				onApply={handleApplyFilters}
 				onClear={handleClearFilters}
 			/>
+
+			<GorhomBottomSheet
+				ref={mapControlsSheetRef}
+				index={-1}
+				enableDynamicSizing
+				enablePanDownToClose
+				backdropComponent={mapControlsBackdropComponent}
+				handleIndicatorStyle={{ backgroundColor: "#d1d5db", width: 40 }}
+			>
+				<BottomSheetView>
+					<View
+						className="gap-4 pb-8 pt-2"
+						style={{
+							paddingLeft: 16 + insets.left,
+							paddingRight: 16 + insets.right,
+						}}
+					>
+						<Heading size="md" className="text-gray-900">
+							Controles do mapa
+						</Heading>
+
+						<View className="flex-row flex-wrap justify-center gap-3">
+							<TouchableOpacity
+								activeOpacity={0.85}
+								onPress={handleZoomIn}
+								className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+								style={controlShadow}
+							>
+								<PlusIcon
+									size={18}
+									color={colors.gray[700]}
+									strokeWidth={2.2}
+								/>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								activeOpacity={0.85}
+								onPress={handleZoomOut}
+								className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+								style={controlShadow}
+							>
+								<MinusIcon
+									size={18}
+									color={colors.gray[700]}
+									strokeWidth={2.2}
+								/>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								activeOpacity={0.85}
+								onPress={() => setShowUserLocation(v => !v)}
+								className={cn(
+									"h-11 w-11 items-center justify-center rounded-xl",
+									showUserLocation ? "bg-lime-800" : "bg-white",
+								)}
+								style={controlShadow}
+							>
+								{showUserLocation ? (
+									<MapPinnedIcon
+										size={18}
+										color={colors.white}
+										strokeWidth={2.2}
+									/>
+								) : (
+									<MapIcon
+										size={18}
+										color={colors.gray[700]}
+										strokeWidth={2.2}
+									/>
+								)}
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								activeOpacity={0.85}
+								onPress={() => setIsDarkMap(v => !v)}
+								className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+								style={controlShadow}
+							>
+								{isDarkMap ? (
+									<SunIcon
+										size={18}
+										color={colors.amber[500]}
+										strokeWidth={2.2}
+									/>
+								) : (
+									<MoonIcon
+										size={18}
+										color={colors.gray[700]}
+										strokeWidth={2.2}
+									/>
+								)}
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								activeOpacity={0.85}
+								onPress={handleResetNorth}
+								className="h-11 w-11 items-center justify-center rounded-xl bg-primary"
+								style={controlShadow}
+							>
+								<View style={{ transform: [{ rotate: `${-mapHeading}deg` }] }}>
+									<Navigation2Icon
+										size={20}
+										color={colors.white}
+										strokeWidth={2.2}
+									/>
+								</View>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								activeOpacity={0.85}
+								onPress={handleGoToLocation}
+								className="h-11 w-11 items-center justify-center rounded-xl bg-white"
+								style={controlShadow}
+							>
+								{permissionDenied ? (
+									<LocateOffIcon
+										size={18}
+										color={colors.red[500]}
+										strokeWidth={2.2}
+									/>
+								) : (
+									<LocateFixedIcon
+										size={18}
+										color={colors.gray[700]}
+										strokeWidth={2.2}
+									/>
+								)}
+							</TouchableOpacity>
+						</View>
+					</View>
+				</BottomSheetView>
+			</GorhomBottomSheet>
 		</View>
 	);
 }

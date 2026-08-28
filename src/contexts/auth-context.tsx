@@ -45,7 +45,8 @@ type AuthContextValue = {
 	deletionScheduledAt: Date | null;
 	signIn: (data: { email: string; password: string }) => void;
 	signUp: (data: { email: string; password: string }) => void;
-	signOut: () => void;
+	signOut: (options?: { silent?: boolean }) => Promise<void>;
+	refreshSession: () => Promise<void>;
 	requestDeletion: () => void;
 	cancelDeletion: () => void;
 	changePassword: (
@@ -123,8 +124,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			const { token, refreshToken } = authResponse.data ?? {};
 			if (!token || !refreshToken) throw new Error("Token não recebido");
 
-			setAuthToken(token);
-			setRefreshToken(refreshToken);
+			await Promise.all([setAuthToken(token), setRefreshToken(refreshToken)]);
 
 			const [profileResponse, userResponse] = await Promise.all([
 				getV1Profiles(),
@@ -259,12 +259,14 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			});
 			return response.data;
 		},
-		onSuccess: data => {
+		onSuccess: async data => {
 			// A troca de senha derruba as outras sessões; o par novo mantém este
 			// dispositivo logado.
 			if (data?.token && data?.refreshToken) {
-				setAuthToken(data.token);
-				setRefreshToken(data.refreshToken);
+				await Promise.all([
+					setAuthToken(data.token),
+					setRefreshToken(data.refreshToken),
+				]);
 			}
 			toast.success(
 				"Senha alterada",
@@ -292,32 +294,41 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 		},
 	});
 
-	const signOut = useCallback(() => {
-		// Best-effort: revoga o refresh token no servidor. O header vai explícito
-		// porque a sessão local é limpa logo abaixo, antes do interceptor rodar.
-		const currentAuthToken = getAuthToken();
-		const currentRefreshToken = getRefreshToken();
+	const signOut = useCallback(
+		async (options?: { silent?: boolean }) => {
+			// Best-effort: revoga o refresh token no servidor. O header vai explícito
+			// porque a sessão local é limpa logo abaixo, antes do interceptor rodar.
+			const currentAuthToken = getAuthToken();
+			const currentRefreshToken = getRefreshToken();
 
-		if (currentRefreshToken) {
-			postV1AuthLogout({
-				body: { refreshToken: currentRefreshToken },
-				headers: currentAuthToken
-					? { Authorization: `Bearer ${currentAuthToken}` }
-					: undefined,
-			}).catch(() => {
-				// Falha ao revogar não pode impedir o logout local.
-			});
-		}
+			if (currentRefreshToken) {
+				postV1AuthLogout({
+					body: { refreshToken: currentRefreshToken },
+					headers: currentAuthToken
+						? { Authorization: `Bearer ${currentAuthToken}` }
+						: undefined,
+				}).catch(() => {
+					// Falha ao revogar não pode impedir o logout local.
+				});
+			}
 
-		setAuthToken(null);
-		setRefreshToken(null);
-		setUser(null);
-		setAccount(null);
-		setIsAuthenticated(false);
-		sessionBus.emit();
-		router.navigate("/(tabs)/(home)");
-		toast.success("Você foi deslogado com sucesso!");
-	}, [router]);
+			await Promise.all([setAuthToken(null), setRefreshToken(null)]);
+			setUser(null);
+			setAccount(null);
+			setIsAuthenticated(false);
+			sessionBus.emit();
+
+			if (!options?.silent) {
+				router.navigate("/(tabs)/(home)");
+				toast.success("Você foi deslogado com sucesso!");
+			}
+		},
+		[router],
+	);
+
+	const refreshSession = useCallback(async () => {
+		await refetch({ throwOnError: true });
+	}, [refetch]);
 
 	useEffect(() => {
 		setOnUnauthenticated(() => {
@@ -365,6 +376,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 				signUpMutation.mutate(data);
 			},
 			signOut,
+			refreshSession,
 			requestDeletion: () => requestDeletionMutation.mutate(),
 			cancelDeletion: () => cancelDeletionMutation.mutate(),
 			changePassword: (
@@ -389,6 +401,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			signInMutation,
 			signUpMutation,
 			signOut,
+			refreshSession,
 			requestDeletionMutation,
 			cancelDeletionMutation,
 			changePasswordMutation,

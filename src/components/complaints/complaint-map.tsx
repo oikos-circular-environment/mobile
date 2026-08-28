@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Platform, View } from "react-native";
 import MapView, {
 	Marker,
@@ -7,6 +8,7 @@ import MapView, {
 	type Region,
 } from "react-native-maps";
 import { Heading } from "@/components/ui/heading";
+import { MapSkeleton } from "@/components/ui/map-skeleton";
 import { Text } from "@/components/ui/text";
 
 type ComplaintMapProps = {
@@ -15,6 +17,7 @@ type ComplaintMapProps = {
 };
 
 export function ComplaintMap({ latitude, longitude }: ComplaintMapProps) {
+	const [isMapReady, setIsMapReady] = useState(false);
 	const region: Region = {
 		latitude,
 		longitude,
@@ -43,12 +46,14 @@ export function ComplaintMap({ latitude, longitude }: ComplaintMapProps) {
 				zoomEnabled={true}
 				rotateEnabled={false}
 				pitchEnabled={false}
+				onMapReady={() => setIsMapReady(true)}
 			>
 				<Marker
 					coordinate={{ latitude, longitude }}
 					title="Local da denúncia"
 				/>
 			</MapView>
+			{!isMapReady && <MapSkeleton />}
 		</View>
 	);
 }

@@ -431,18 +431,17 @@ export default function ProfileScreen() {
 												className="rounded-md shadow-lg shadow-black/40"
 											>
 												<Avatar size="lg">
-													{value ? (
+													<UserIcon
+														size={36}
+														color={colors.lime[800]}
+														strokeWidth={1.5}
+													/>
+													{value && (
 														<AvatarImage
 															source={{
 																uri: value,
 																headers: getAuthenticatedImageHeaders(),
 															}}
-														/>
-													) : (
-														<UserIcon
-															size={36}
-															color={colors.lime[800]}
-															strokeWidth={1.5}
 														/>
 													)}
 												</Avatar>

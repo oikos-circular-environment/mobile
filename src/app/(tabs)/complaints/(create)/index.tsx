@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Crypto from "expo-crypto";
-import { router } from "expo-router";
+import { router, useIsFocused } from "expo-router";
 import {
 	AlertCircleIcon,
 	CameraIcon,
@@ -12,6 +12,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+	InteractionManager,
 	KeyboardAvoidingView,
 	ScrollView,
 	TouchableOpacity,
@@ -57,6 +58,7 @@ import {
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { MapSkeleton } from "@/components/ui/map-skeleton";
 import {
 	Modal,
 	ModalBackdrop,
@@ -111,6 +113,8 @@ type FormValues = z.infer<typeof schema>;
 export default function ComplaintCreateScreen() {
 	useRouteInteractive();
 	const insets = useSafeAreaInsets();
+	const isFocused = useIsFocused();
+	const [shouldMountMap, setShouldMountMap] = useState(false);
 	const { location, heading, addresses } = useGeospatial();
 	const {
 		attachments,
@@ -214,6 +218,14 @@ export default function ComplaintCreateScreen() {
 	useEffect(() => {
 		return () => exitEditMode();
 	}, [exitEditMode]);
+
+	useEffect(() => {
+		if (!isFocused) return;
+		const task = InteractionManager.runAfterInteractions(() => {
+			setShouldMountMap(true);
+		});
+		return () => task.cancel();
+	}, [isFocused]);
 
 	const handleAddressSelect = useCallback(
 		(fields: GoogleAddressFields) => {
@@ -524,11 +536,17 @@ export default function ComplaintCreateScreen() {
 
 				<GooglePlacesInput onSelect={handleAddressSelect} />
 
-				<WrapperMap
-					latitude={latValue ? parseFloat(latValue) : null}
-					longitude={lonValue ? parseFloat(lonValue) : null}
-					onChange={handleMapChange}
-				/>
+				{shouldMountMap ? (
+					<WrapperMap
+						latitude={latValue ? parseFloat(latValue) : null}
+						longitude={lonValue ? parseFloat(lonValue) : null}
+						onChange={handleMapChange}
+					/>
+				) : (
+					<View className="h-96 overflow-hidden rounded-lg border border-border">
+						<MapSkeleton />
+					</View>
+				)}
 				{isReverseGeocoding && (
 					<View className="flex-row items-center gap-2">
 						<Spinner size="small" />
