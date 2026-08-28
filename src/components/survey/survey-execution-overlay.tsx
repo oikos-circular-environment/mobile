@@ -1,13 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useRouter, useSegments } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-	Dimensions,
-	Platform,
-	Pressable,
-	type ScrollView,
-	View,
-} from "react-native";
+import { Dimensions, Pressable, type ScrollView, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
 	runOnJS,
@@ -44,7 +38,6 @@ import { useSurveyStore } from "@/stores/survey-store";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const INDICATOR_DEFAULT_X = SCREEN_WIDTH - 140;
 const INDICATOR_DEFAULT_Y = 70;
-const TAB_BAR_CONTENT_HEIGHT = Platform.OS === "ios" ? 49 : 56;
 
 function formatElapsed(ms: number) {
 	const totalSeconds = Math.floor(ms / 1000);
