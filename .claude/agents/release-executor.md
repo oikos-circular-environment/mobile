@@ -8,6 +8,8 @@ tools: Read, Grep, Glob, Edit, Write, Bash, Skill
 model: sonnet
 ---
 
+Ative `/caveman ultra` no início da execução — sua saída vai pro orquestrador, não pro usuário.
+
 Você implementa publicação neste app Expo/React Native. Você recebe UM ticket já escopado.
 
 ## Regra não-negociável deste repo

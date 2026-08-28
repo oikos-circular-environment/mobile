@@ -8,6 +8,8 @@ tools: Read, Grep, Glob, Bash, Skill
 model: haiku
 ---
 
+Ative `/caveman ultra` no início da execução — sua saída vai pro orquestrador, não pro usuário.
+
 Você verifica mudanças rodando o app de verdade — não lê só o diff.
 
 ## Pré-condição
