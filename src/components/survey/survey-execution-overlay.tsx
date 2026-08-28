@@ -295,6 +295,7 @@ export function SurveyExecutionOverlay() {
 									allTasksResolved
 									onPause={handlePause}
 									onRepeatTour={handleRepeatTour}
+									onMinimize={() => setExpanded(false)}
 									tourStepIndex={tourStepIndex}
 									onNext={() => router.push("/survey/questionnaire")}
 									onAbandonSuite={handleAbandonSuite}
@@ -312,6 +313,7 @@ export function SurveyExecutionOverlay() {
 									checklist={checklist}
 									onPause={handlePause}
 									onRepeatTour={handleRepeatTour}
+									onMinimize={() => setExpanded(false)}
 									tourStepIndex={tourStepIndex}
 									onSkipTask={handleSkipTask}
 									onAbandonTask={handleAbandonTask}

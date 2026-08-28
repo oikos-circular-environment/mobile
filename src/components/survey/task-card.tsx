@@ -5,6 +5,7 @@ import {
 	CircleSlashIcon,
 	CircleXIcon,
 	HelpCircleIcon,
+	MinimizeIcon,
 } from "lucide-react-native";
 import type { RefObject } from "react";
 import { Fragment } from "react";
@@ -42,6 +43,7 @@ interface TaskCardProps {
 	onSkipTask?: () => void;
 	onAbandonTask?: () => void;
 	onRepeatTour: () => void;
+	onMinimize: () => void;
 	tourStepIndex?: SurveyTourStepIndex;
 	className?: string;
 	checklistScrollRef?: RefObject<ScrollView | null>;
@@ -63,6 +65,7 @@ export function TaskCard({
 	onSkipTask,
 	onAbandonTask,
 	onRepeatTour,
+	onMinimize,
 	tourStepIndex = DEFAULT_TOUR_STEP_INDEX,
 	className,
 	checklistScrollRef,
@@ -91,14 +94,26 @@ export function TaskCard({
 						</AttachStep>
 					</View>
 
-					<Button
-						variant="secondary"
-						onPress={onRepeatTour}
-						className="flex-row items-center justify-between"
-					>
-						<ButtonText>Repetir tutorial</ButtonText>
-						<ButtonIcon as={HelpCircleIcon} />
-					</Button>
+					<AttachStep index={tourStepIndex.MINIMIZE}>
+						<View className="flex-row gap-3">
+							<Button
+								variant="outline"
+								onPress={onMinimize}
+								className="flex-1 flex-row items-center justify-center"
+							>
+								<ButtonText>Minimizar</ButtonText>
+								<ButtonIcon as={MinimizeIcon} />
+							</Button>
+							<Button
+								variant="secondary"
+								onPress={onRepeatTour}
+								className="flex-1 flex-row items-center justify-center"
+							>
+								<ButtonText>Repetir tutorial</ButtonText>
+								<ButtonIcon as={HelpCircleIcon} />
+							</Button>
+						</View>
+					</AttachStep>
 
 					<Text size="md" className="font-medium leading-5">
 						{instruction}

@@ -138,7 +138,8 @@ describe("SurveyExecutionOverlay - tour guiado", () => {
 			"Precisa parar? Toque em Pausar para continuar depois.",
 			"Não consegue fazer esta tarefa agora? Pule para a próxima ou abandone-a.",
 			"Se precisar desistir de toda a etapa, use este botão.",
-			"Toque fora do cartão a qualquer momento para minimizá-lo assim. Toque no indicador para reabrir, ou arraste-o para outro lugar da tela enquanto faz a tarefa.",
+			"Para liberar a tela enquanto faz a tarefa, minimize este cartão tocando fora dele ou pelo botão Minimizar.",
+			"Pronto! O cartão virou um indicador. Toque nele para reabrir a qualquer momento, ou arraste-o para outro lugar da tela.",
 		];
 		expect(stepTexts).toHaveLength(TOUR_STEP_COUNT - 1);
 
@@ -186,12 +187,13 @@ describe("SurveyExecutionOverlay - tour guiado", () => {
 				"Aqui estão as tarefas desta etapa. Acompanhe o progresso de cada uma.",
 			),
 		).toBeOnTheScreen();
-		expect(screen.getByText("1/4")).toBeOnTheScreen();
+		expect(screen.getByText("1/5")).toBeOnTheScreen();
 
 		const stepTexts = [
 			"Este é o tempo que você está gastando nesta etapa.",
 			"Precisa parar? Toque em Pausar para continuar depois.",
-			"Toque fora do cartão a qualquer momento para minimizá-lo assim. Toque no indicador para reabrir, ou arraste-o para outro lugar da tela enquanto faz a tarefa.",
+			"Para liberar a tela enquanto faz a tarefa, minimize este cartão tocando fora dele ou pelo botão Minimizar.",
+			"Pronto! O cartão virou um indicador. Toque nele para reabrir a qualquer momento, ou arraste-o para outro lugar da tela.",
 		];
 
 		// TaskCard resolvida também mostra um botão "Próximo" no rodapé — o do

@@ -8,6 +8,7 @@ export interface SurveyTourStepIndex {
 	PAUSE: number;
 	SKIP_OR_ABANDON_TASK?: number;
 	ABANDON_SUITE?: number;
+	MINIMIZE: number;
 	FLOATING_PILL: number;
 }
 
@@ -21,7 +22,7 @@ export function getSurveyTourStepIndex(
 	allTasksResolved: boolean,
 ): SurveyTourStepIndex {
 	if (allTasksResolved) {
-		return { CHECKLIST: 0, TIMER: 1, PAUSE: 2, FLOATING_PILL: 3 };
+		return { CHECKLIST: 0, TIMER: 1, PAUSE: 2, MINIMIZE: 3, FLOATING_PILL: 4 };
 	}
 	return {
 		CHECKLIST: 0,
@@ -29,12 +30,13 @@ export function getSurveyTourStepIndex(
 		PAUSE: 2,
 		SKIP_OR_ABANDON_TASK: 3,
 		ABANDON_SUITE: 4,
-		FLOATING_PILL: 5,
+		MINIMIZE: 5,
+		FLOATING_PILL: 6,
 	};
 }
 
 /** Contagem de passos do tour padrão (sem todas as tarefas resolvidas). */
-export const TOUR_STEP_COUNT = 6;
+export const TOUR_STEP_COUNT = 7;
 
 const TOUR_STEP_TEXT: Record<keyof SurveyTourStepIndex, string> = {
 	CHECKLIST:
@@ -44,8 +46,10 @@ const TOUR_STEP_TEXT: Record<keyof SurveyTourStepIndex, string> = {
 	SKIP_OR_ABANDON_TASK:
 		"Não consegue fazer esta tarefa agora? Pule para a próxima ou abandone-a.",
 	ABANDON_SUITE: "Se precisar desistir de toda a etapa, use este botão.",
+	MINIMIZE:
+		"Para liberar a tela enquanto faz a tarefa, minimize este cartão tocando fora dele ou pelo botão Minimizar.",
 	FLOATING_PILL:
-		"Toque fora do cartão a qualquer momento para minimizá-lo assim. Toque no indicador para reabrir, ou arraste-o para outro lugar da tela enquanto faz a tarefa.",
+		"Pronto! O cartão virou um indicador. Toque nele para reabrir a qualquer momento, ou arraste-o para outro lugar da tela.",
 };
 
 export interface BuildSurveyTourStepsDeps {
@@ -81,6 +85,15 @@ export function buildSurveyTourSteps(
 				...buildStep(key),
 				before: () => {
 					deps.setExpanded(false);
+					return new Promise<void>(resolve => setTimeout(resolve, 50));
+				},
+			};
+		}
+		if (key === "MINIMIZE") {
+			return {
+				...buildStep(key),
+				before: () => {
+					deps.setExpanded(true);
 					return new Promise<void>(resolve => setTimeout(resolve, 50));
 				},
 			};
