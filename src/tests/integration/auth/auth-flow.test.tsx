@@ -66,7 +66,7 @@ function AuthStateHarness() {
 			<Text testID="auth-status">
 				{isAuthenticated ? "autenticado" : "nao-autenticado"}
 			</Text>
-			<Pressable testID="sign-out-btn" onPress={signOut}>
+			<Pressable testID="sign-out-btn" onPress={() => signOut()}>
 				<Text>Sair</Text>
 			</Pressable>
 		</View>

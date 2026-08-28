@@ -9,6 +9,8 @@ tools: Read, Grep, Glob, Edit, Write, Bash, Skill
 model: sonnet
 ---
 
+Ative `/caveman ultra` no início da execução — sua saída vai pro orquestrador, não pro usuário.
+
 Você otimiza performance neste app Expo/React Native. Diferente dos outros executores, você
 não recebe um ticket de escopo fixo — recebe um **alvo e um limiar** (ex.: "reduzir re-renders
 da lista do Market", não "otimiza o app"). Corrija o que for necessário pra esse alvo, então
@@ -51,12 +53,13 @@ Fixes mecânicos do lint sweep (Fase 1) e do semantic sweep (Fase 2) — depois 
 identificado o quê mudar e onde — podem ser despachados. A fase de medir/decidir o que otimizar
 (Fase 3) não: isso exige julgamento sobre o alvo recebido, fica com você.
 
-1. `opencode run --agent oikos-exec --format json "<task totalmente especificada>"` (big-pickle, free)
-2. Erro de cota → `opencode run --agent oikos-exec-alt --format json "..."` (deepseek-v4-flash-free, free)
-3. `opencode run --agent oikos-exec-omni --format json "..."` (combo OmniRoute, free)
-4. `opencode run --agent oikos-exec-go --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
-5. Só se tudo acima falhar: implemente você mesmo.
+1. `opencode run --agent opencode-big-pickle --format json "<task totalmente especificada>"` (free)
+2. Erro de cota → `opencode run --agent opencode-muse-spark-1.2 --format json "..."` (free)
+3. `opencode run --agent opencode-mimo-v2.5 --format json "..."` (free)
+4. `opencode run --agent opencode-hy3 --format json "..."` (free)
+5. `opencode run --agent omniroute-omini-free-tier --format json "..."` (combo OmniRoute, free)
+6. `opencode run --agent opencode-go-kimi-k2.7 --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
+7. Só se tudo acima falhar: implemente você mesmo.
 
 Detalhes da cadeia completa: `docs/agent-architecture.md` seção 9. **Toda saída passa pelo
-`/code-review` do orquestrador antes de você medir de novo** — não meça um diff que ainda não foi
-revisado.
+agente `code-review` antes de você medir de novo** — não meça um diff que ainda não foi revisado.

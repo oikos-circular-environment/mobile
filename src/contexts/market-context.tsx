@@ -33,7 +33,7 @@ export type LocationSource = "current" | "profile";
 
 const defaultFilters: MarketFilterValues = {
 	query: "",
-	radius: "2000",
+	radius: "10000",
 	category: undefined,
 };
 

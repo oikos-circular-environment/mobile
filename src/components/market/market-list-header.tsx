@@ -70,7 +70,7 @@ export function MarketListHeader() {
 		formState: { errors },
 	} = useForm<MarketFilterValues>({
 		resolver: zodResolver(marketFilterSchema),
-		defaultValues: { query: "", radius: "2000", category: undefined },
+		defaultValues: { query: "", radius: "10000", category: undefined },
 	});
 
 	const categoryValue = watch("category");

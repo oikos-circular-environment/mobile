@@ -24,9 +24,9 @@ export default function SurveyConsentEndedScreen() {
 				</Heading>
 
 				<Text className="text-center leading-6">
-					Para participar, desconectamos a conta atual. A pesquisa começa do
-					zero, como visitante. Você poderá voltar à sua conta normalmente ao
-					final.
+					Para participar, desconectamos a conta atual. O app faz login
+					automático em uma conta de teste. Você poderá voltar à sua conta
+					normalmente ao final.
 				</Text>
 			</View>
 

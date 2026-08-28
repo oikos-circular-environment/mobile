@@ -15,6 +15,8 @@ export function ServicesCarouselTrack() {
 		carouselRef,
 		cardWidth,
 		cardHeight,
+		scale,
+		activeIndex,
 		progress,
 		setActiveIndex,
 		autoPlayIntervalMs,
@@ -100,7 +102,14 @@ export function ServicesCarouselTrack() {
 				onSnapToItem={handleSnapToItem}
 				onConfigurePanGesture={handleConfigurePanGesture}
 				renderItem={({ item, index }) => (
-					<ServicesCarouselCard item={item} index={index} />
+					<ServicesCarouselCard
+						item={item}
+						index={index}
+						cardWidth={cardWidth}
+						cardHeight={cardHeight}
+						scale={scale}
+						isActive={index === activeIndex}
+					/>
 				)}
 			/>
 		</View>

@@ -1,8 +1,8 @@
 import type BottomSheetType from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import { BuildingIcon, RecycleIcon, ShieldIcon } from "lucide-react-native";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { HomeHero } from "@/components/home/home-hero";
@@ -11,6 +11,7 @@ import {
 	ServicesCarousel,
 	ServicesCarouselSteps,
 	ServicesCarouselTrack,
+	ServicesRow,
 } from "@/components/home/services-carousel";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
@@ -35,10 +36,27 @@ export default function HomeScreen() {
 		useAuthContext();
 	const { permissionDenied } = useGeospatial();
 	const router = useRouter();
+	const { width, height } = useWindowDimensions();
+	const isLandscape = width > height;
 	const [showProfileModal, setShowProfileModal] = useState(false);
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showSignOutModal, setShowSignOutModal] = useState(false);
 	const settingsSheetRef = useRef<BottomSheetType>(null);
+	const isFirstDimensionChange = useRef(true);
+	const hasAppliedMitigation = useRef(false);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: width só dispara o efeito na mudança de largura, não é lido no corpo
+	useEffect(() => {
+		if (isFirstDimensionChange.current) {
+			isFirstDimensionChange.current = false;
+			return;
+		}
+		if (hasAppliedMitigation.current) {
+			return;
+		}
+		hasAppliedMitigation.current = true;
+		settingsSheetRef.current?.close();
+	}, [width]);
 
 	const handleOpenSettings = useCallback(() => {
 		settingsSheetRef.current?.snapToIndex(0);
@@ -128,10 +146,16 @@ export default function HomeScreen() {
 					{/* Serviços */}
 					<View className="gap-3">
 						<Heading>Serviços</Heading>
-						<ServicesCarousel items={services} autoPlayIntervalMs={5000}>
-							<ServicesCarouselSteps />
-							<ServicesCarouselTrack />
-						</ServicesCarousel>
+						{isLandscape ? (
+							<View style={{ height: 340 }}>
+								<ServicesRow items={services} />
+							</View>
+						) : (
+							<ServicesCarousel items={services} autoPlayIntervalMs={5000}>
+								<ServicesCarouselSteps />
+								<ServicesCarouselTrack />
+							</ServicesCarousel>
+						)}
 					</View>
 				</View>
 			</ScrollView>
