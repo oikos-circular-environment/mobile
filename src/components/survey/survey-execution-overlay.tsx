@@ -1,16 +1,35 @@
 import * as Haptics from "expo-haptics";
 import { useRouter, useSegments } from "expo-router";
-import { useEffect, useRef, useState } from "react";
-import { Dimensions, Pressable, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	Dimensions,
+	Platform,
+	Pressable,
+	type ScrollView,
+	View,
+} from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
 	runOnJS,
 	useAnimatedStyle,
 	useSharedValue,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+	AttachStep,
+	type SpotlightTour,
+	SpotlightTourProvider,
+	type TourState,
+} from "react-native-spotlight-tour";
 import { FloatingIndicator } from "@/components/survey/floating-indicator";
 import { useSurveyActiveTimer } from "@/components/survey/hooks/use-survey-active-timer";
+import { useSurveyParticipantCode } from "@/components/survey/hooks/use-survey-participant-code";
 import { useSurveyTaskDetection } from "@/components/survey/hooks/use-survey-task-detection";
+import { useSurveyTourSeen } from "@/components/survey/hooks/use-survey-tour-seen";
+import {
+	buildSurveyTourSteps,
+	getSurveyTourStepIndex,
+} from "@/components/survey/survey-execution-tour-steps";
 import { TaskCard } from "@/components/survey/task-card";
 import { toast } from "@/components/toast";
 import { resolveTaskRun } from "@/libs/survey/task-run";
@@ -25,6 +44,7 @@ import { useSurveyStore } from "@/stores/survey-store";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const INDICATOR_DEFAULT_X = SCREEN_WIDTH - 140;
 const INDICATOR_DEFAULT_Y = 70;
+const TAB_BAR_CONTENT_HEIGHT = Platform.OS === "ios" ? 49 : 56;
 
 function formatElapsed(ms: number) {
 	const totalSeconds = Math.floor(ms / 1000);
@@ -36,6 +56,7 @@ function formatElapsed(ms: number) {
 export function SurveyExecutionOverlay() {
 	const router = useRouter();
 	const segments = useSegments();
+	const insets = useSafeAreaInsets();
 	const surveyStatus = useSurveyStore(s => s.status);
 	const isActive = useSurveyExecutionStore(s => s.isActive);
 	const isPaused = useSurveyExecutionStore(s => s.isPaused);
@@ -62,6 +83,74 @@ export function SurveyExecutionOverlay() {
 
 	const prevResolvedRef = useRef(false);
 	const skipNextCelebrationRef = useRef(false);
+
+	const sessionId = useSurveyStore(s => s.sessionId);
+	const participantCode = useSurveyParticipantCode(sessionId);
+	const tourRef = useRef<SpotlightTour>(null);
+	const {
+		loaded: tourSeenLoaded,
+		seen: hasSeenTour,
+		markSeen,
+	} = useSurveyTourSeen(participantCode);
+	const [tourActive, setTourActive] = useState(false);
+	const frozenAllTasksResolvedRef = useRef(allTasksResolved);
+	if (!tourActive) {
+		frozenAllTasksResolvedRef.current = allTasksResolved;
+	}
+	const effectiveAllTasksResolved = tourActive
+		? frozenAllTasksResolvedRef.current
+		: allTasksResolved;
+	const checklistScrollRef = useRef<ScrollView>(null);
+	const currentItemYRef = useRef(0);
+	const scrollChecklistTo = useCallback(async (mode: "top" | "current") => {
+		checklistScrollRef.current?.scrollTo({
+			y: mode === "top" ? 0 : currentItemYRef.current,
+			animated: false,
+		});
+		await new Promise<void>(resolve => setTimeout(resolve, 50));
+	}, []);
+	const tourSteps = useMemo(
+		() =>
+			buildSurveyTourSteps(
+				{ setExpanded, scrollChecklistTo },
+				effectiveAllTasksResolved,
+			),
+		[setExpanded, effectiveAllTasksResolved, scrollChecklistTo],
+	);
+	const tourStepIndex = useMemo(
+		() => getSurveyTourStepIndex(effectiveAllTasksResolved),
+		[effectiveAllTasksResolved],
+	);
+	const overlayEligible =
+		surveyStatus === "IN_PROGRESS" &&
+		isActive &&
+		!isPaused &&
+		segments[0] !== "survey";
+
+	useEffect(() => {
+		if (
+			overlayEligible &&
+			isExpanded &&
+			tourSeenLoaded &&
+			!hasSeenTour &&
+			participantCode
+		) {
+			markSeen();
+			setTourActive(true);
+			tourRef.current?.start();
+		}
+	}, [
+		overlayEligible,
+		isExpanded,
+		tourSeenLoaded,
+		hasSeenTour,
+		participantCode,
+		markSeen,
+	]);
+
+	const handleTourStop = (_values: TourState) => {
+		setTourActive(false);
+	};
 
 	useEffect(() => {
 		if (allTasksResolved && !prevResolvedRef.current) {
@@ -102,12 +191,7 @@ export function SurveyExecutionOverlay() {
 		],
 	}));
 
-	if (
-		surveyStatus !== "IN_PROGRESS" ||
-		!isActive ||
-		isPaused ||
-		segments[0] === "survey"
-	) {
+	if (!overlayEligible) {
 		return null;
 	}
 
@@ -121,6 +205,11 @@ export function SurveyExecutionOverlay() {
 	const handlePause = () => {
 		setPaused(true);
 		setExpanded(false);
+	};
+
+	const handleRepeatTour = () => {
+		setTourActive(true);
+		tourRef.current?.start();
 	};
 
 	const handleSkipTask = () => {
@@ -169,65 +258,96 @@ export function SurveyExecutionOverlay() {
 	};
 
 	return (
-		<View
-			pointerEvents="box-none"
-			style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+		<SpotlightTourProvider
+			ref={tourRef}
+			steps={tourSteps}
+			shape="rectangle"
+			onBackdropPress="continue"
+			shift={{ padding: 16 }}
+			onStop={handleTourStop}
 		>
-			{isExpanded ? (
-				<Pressable
-					onPress={() => setExpanded(false)}
-					style={{
-						position: "absolute",
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						backgroundColor: "#00000055",
-					}}
-				>
+			<View
+				pointerEvents="box-none"
+				style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+			>
+				{isExpanded ? (
 					<Pressable
-						onPress={event => event.stopPropagation()}
-						style={{ position: "absolute", left: 20, right: 20, top: 180 }}
+						onPress={() => setExpanded(false)}
+						style={{
+							position: "absolute",
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							backgroundColor: "#00000055",
+						}}
 					>
-						{allTasksResolved ? (
-							<TaskCard
-								currentTask={resolvedCount}
-								totalTasks={tasks.length}
-								elapsedLabel={formatElapsed(suiteActiveMs)}
-								instruction="Você chegou ao fim das tarefas desta etapa. Toque em Próximo para responder o questionário rápido sobre ela."
-								checklist={checklist}
-								allTasksResolved
-								onPause={handlePause}
-								onNext={() => router.push("/survey/questionnaire")}
-								onAbandonSuite={handleAbandonSuite}
-							/>
-						) : currentTask ? (
-							<TaskCard
-								currentTask={resolvedCount + 1}
-								totalTasks={tasks.length}
-								elapsedLabel={formatElapsed(suiteActiveMs)}
-								instruction={currentTask.instruction}
-								checklist={checklist}
-								onPause={handlePause}
-								onSkipTask={handleSkipTask}
-								onAbandonTask={handleAbandonTask}
-								onAbandonSuite={handleAbandonSuite}
-							/>
-						) : null}
+						<Pressable
+							onPress={event => event.stopPropagation()}
+							style={{
+								position: "absolute",
+								left: 20,
+								right: 20,
+								top: insets.top + 32,
+								// bottom: insets.bottom + 32,
+							}}
+						>
+							{allTasksResolved ? (
+								<TaskCard
+									currentTask={resolvedCount}
+									totalTasks={tasks.length}
+									elapsedLabel={formatElapsed(suiteActiveMs)}
+									instruction="Você chegou ao fim das tarefas desta etapa. Toque em Próximo para responder o questionário rápido sobre ela."
+									checklist={checklist}
+									allTasksResolved
+									onPause={handlePause}
+									onRepeatTour={handleRepeatTour}
+									tourStepIndex={tourStepIndex}
+									onNext={() => router.push("/survey/questionnaire")}
+									onAbandonSuite={handleAbandonSuite}
+									checklistScrollRef={checklistScrollRef}
+									onCurrentItemLayoutY={y => {
+										currentItemYRef.current = y;
+									}}
+								/>
+							) : currentTask ? (
+								<TaskCard
+									currentTask={resolvedCount + 1}
+									totalTasks={tasks.length}
+									elapsedLabel={formatElapsed(suiteActiveMs)}
+									instruction={currentTask.instruction}
+									checklist={checklist}
+									onPause={handlePause}
+									onRepeatTour={handleRepeatTour}
+									tourStepIndex={tourStepIndex}
+									onSkipTask={handleSkipTask}
+									onAbandonTask={handleAbandonTask}
+									onAbandonSuite={handleAbandonSuite}
+									checklistScrollRef={checklistScrollRef}
+									onCurrentItemLayoutY={y => {
+										currentItemYRef.current = y;
+									}}
+								/>
+							) : null}
+						</Pressable>
 					</Pressable>
-				</Pressable>
-			) : (
-				<GestureDetector gesture={panGesture}>
-					<Animated.View style={[{ position: "absolute" }, animatedStyle]}>
-						<FloatingIndicator
-							completedCount={resolvedCount}
-							totalCount={tasks.length}
-							elapsedLabel={formatElapsed(suiteActiveMs)}
-							onPress={() => setExpanded(true)}
-						/>
-					</Animated.View>
-				</GestureDetector>
-			)}
-		</View>
+				) : (
+					<GestureDetector gesture={panGesture}>
+						<Animated.View style={[{ position: "absolute" }, animatedStyle]}>
+							<AttachStep index={tourStepIndex.FLOATING_PILL}>
+								<View>
+									<FloatingIndicator
+										completedCount={resolvedCount}
+										totalCount={tasks.length}
+										elapsedLabel={formatElapsed(suiteActiveMs)}
+										onPress={() => setExpanded(true)}
+									/>
+								</View>
+							</AttachStep>
+						</Animated.View>
+					</GestureDetector>
+				)}
+			</View>
+		</SpotlightTourProvider>
 	);
 }
