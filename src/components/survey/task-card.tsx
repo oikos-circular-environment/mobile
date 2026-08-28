@@ -4,8 +4,8 @@ import {
 	CircleIcon,
 	CircleSlashIcon,
 	CircleXIcon,
-	HelpCircleIcon,
 	MinimizeIcon,
+	RotateCcwIcon,
 } from "lucide-react-native";
 import type { RefObject } from "react";
 import { Fragment } from "react";
@@ -94,28 +94,28 @@ export function TaskCard({
 						</AttachStep>
 					</View>
 
-					<AttachStep index={tourStepIndex.MINIMIZE}>
-						<View className="flex-row gap-3">
+					<View className="flex-row gap-2">
+						<Button
+							variant="secondary"
+							onPress={onRepeatTour}
+							className="flex-1"
+						>
+							<ButtonText>Repetir tutorial</ButtonText>
+							<ButtonIcon as={RotateCcwIcon} />
+						</Button>
+						<AttachStep index={tourStepIndex.MINIMIZE} fill>
 							<Button
-								variant="outline"
+								variant="secondary"
 								onPress={onMinimize}
-								className="flex-1 flex-row items-center justify-center"
+								className="flex-1"
 							>
 								<ButtonText>Minimizar</ButtonText>
 								<ButtonIcon as={MinimizeIcon} />
 							</Button>
-							<Button
-								variant="secondary"
-								onPress={onRepeatTour}
-								className="flex-1 flex-row items-center justify-center"
-							>
-								<ButtonText>Repetir tutorial</ButtonText>
-								<ButtonIcon as={HelpCircleIcon} />
-							</Button>
-						</View>
-					</AttachStep>
+						</AttachStep>
+					</View>
 
-					<Text size="md" className="font-medium leading-5">
+					<Text size="md" className="font-medium leading-5 text-justify">
 						{instruction}
 					</Text>
 				</View>
@@ -123,7 +123,6 @@ export function TaskCard({
 				<ScrollView
 					ref={checklistScrollRef}
 					style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minHeight: 0 }}
-					// contentContainerClassName="pb-1"
 				>
 					<AttachStep index={tourStepIndex.CHECKLIST} fill>
 						<View className="gap-0.5">
