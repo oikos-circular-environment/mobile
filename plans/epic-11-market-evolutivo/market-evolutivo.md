@@ -136,7 +136,6 @@ A comunidade interage com as fichas em três eixos distintos, cada um com impact
 O cidadão indica se o ponto **é útil** ou **não é útil** para quem busca reciclagem. É uma avaliação subjetiva de qualidade: funcionando bem, atende bem, vale a pena ir.
 
 - Cooldown: um voto por ficha por usuário (pode alterar depois).
-- Acumula pontuação no sistema de gamificação (fase posterior).
 - **Não** remove ficha do catálogo — é sinal de qualidade, não de existência.
 
 ### 2. Validação de existência (pode arquivar ficha)
@@ -159,26 +158,11 @@ A questão "este ponto é de reciclagem?" **não é uma avaliação de lugar** �
 
 ### Resumo dos eixos
 
-| Eixo | Tipo | Impacto | Alimenta |
-|---|---|---|---|
-| Utilidade | Subjetivo | Score/gamificação | Ranking secundário |
-| Existência | Objetivo | Arquivamento da ficha | Higiene do catálogo |
-| Categorização | Objetivo | Reclassifica o ramo | Taxonomia (não é remoção) |
-
-## Gamificação (fase posterior)
-
-Não entra no primeiro corte. Princípio: interação que **melhora o catálogo** pontua; vanity não.
-
-Candidatos a score (decidir antes de desenhar medalha):
-
-- Sugerir dado que depois é aceito (voto ou dono).
-- Votar em sugestão que vira consenso.
-- Avaliar ponto (com cooldown / um voto por ficha).
-- Apontar ponto novo que passa em filtro anti-spam.
-- Claim aprovado (evento raro, peso alto).
-- **Não** pontuar: abrir detalhe, filtrar, só cadastrar empresa (já tem o selo).
-
-Medalha/score é consequência; o catálogo comunitário precisa existir sem ela.
+| Eixo | Tipo | Impacto |
+|---|---|---|
+| Utilidade | Subjetivo | Score (epic posterior) |
+| Existência | Objetivo | Arquivamento da ficha |
+| Categorização | Objetivo | Reclassifica o ramo |
 
 ## Vocabulário sugerido (UI)
 
@@ -194,7 +178,6 @@ Medalha/score é consequência; o catálogo comunitário precisa existir sem ela
 - Implementação, tickets, OpenAPI.
 - Preço na ficha comunitária como verdade (só sugestão votada, com disclaimer).
 - Moderação automática de texto (necessário depois; v1 pode ser denúncia + fila).
-- Gamificação e medalhas.
 - Expansão para ramos além de reciclagem (fornecedores, catadores, cooperativas de outros segmentos).
 
 ## Riscos / decisões em aberto
@@ -216,6 +199,5 @@ Medalha/score é consequência; o catálogo comunitário precisa existir sem ela
 2. **Sugestão + voto** nos campos públicos, autor visível.
 3. **Reivindicar propriedade do negócio**: dossiê completo (CPF + RG/CNH + comprovante de residência + CNPJ + contrato social + comprovante de vínculo + conta de serviço) + fila BullMQ (`ownership-claim-review`) + auditoria no Postgres (tabela `ownership_claims` com log de estados) + promoção da ficha.
 4. **Avaliação do lugar + validação de existência**: utilidade (score), votação de existência (arquivamento), categorização comunitária (reciclagem vs. fornecedor de resíduo).
-5. **Score/medalhas**, depois de listar o que pontua.
 
 Cross-repo obrigatório: mobile só consome; a verdade mora na API.
