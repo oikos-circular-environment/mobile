@@ -14,3 +14,5 @@ pencil/**/*
 plans/**/*
 android-emulator/**/*
 android-studio/**/*
+patches/**/*
+store/**/*
