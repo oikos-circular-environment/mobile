@@ -332,9 +332,21 @@ export async function drainOutbox(sessionId: string): Promise<void> {
 	const sessionItems = pending.filter(item => item.kind === "E2_SESSION");
 	const otherItems = pending.filter(item => item.kind !== "E2_SESSION");
 
-	for (const item of [...sessionItems, ...otherItems]) {
-		if (!isBackoffExpired(item)) continue;
-		await sendOutboxItem(item);
+	let sessionUnresolved = false;
+	for (const item of sessionItems) {
+		if (!isBackoffExpired(item)) {
+			sessionUnresolved = true;
+			continue;
+		}
+		const sent = await sendOutboxItem(item);
+		if (!sent) sessionUnresolved = true;
+	}
+
+	if (!sessionUnresolved) {
+		for (const item of otherItems) {
+			if (!isBackoffExpired(item)) continue;
+			await sendOutboxItem(item);
+		}
 	}
 
 	const remaining = await db
