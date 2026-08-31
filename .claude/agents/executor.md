@@ -64,7 +64,7 @@ plugin realmente aplica o efeito esperado antes de reportar — não confie só 
 do plugin. Rode `graphify update .` ao final. Não marque o ticket como concluído — isso é decisão
 do orquestrador após o agente `code-review` e (quando aplicável) o `qa-runner` validarem.
 
-## Cadeia de execução: gratuito primeiro, você (Sonnet) por último
+## Cadeia de execução: gratuito primeiro, pago só com permissão explícita
 Antes de implementar você mesmo, tente nesta ordem — pare no primeiro que produzir um diff
 aceitável na revisão:
 
@@ -73,11 +73,21 @@ aceitável na revisão:
 3. `opencode run --agent opencode-mimo-v2.5 --format json "..."` (free)
 4. `opencode run --agent opencode-hy3 --format json "..."` (free)
 5. `opencode run --agent omniroute-omini-free-tier --format json "..."` (combo OmniRoute, free)
-6. `opencode run --agent opencode-go-kimi-k2.7 --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
-7. Só se tudo acima falhar: implemente você mesmo (Sonnet).
+
+**Gate obrigatório antes de qualquer tier pago abaixo:** se os 5 tiers grátis falharem ou vierem
+ruins na revisão, NÃO avance sozinho. Pare e devolva ao orquestrador pedindo permissão explícita,
+informando o que cada tier grátis retornou e por que falhou (erro de cota, diff ruim, timeout).
+Só prossiga pro tier 6 (ou implemente você mesmo) depois que o orquestrador confirmar autorização.
+
+6. `opencode run --agent opencode-go-kimi-k2.7 --format json "..."` (OpenCode Go, pago — crédito curto)
+7. Só com autorização confirmada e se tudo acima falhar: implemente você mesmo (Sonnet, pago).
 
 Escreva a task de forma que não sobre nenhuma decisão de design pro worker — ele executa, não
 julga escopo. Detalhes da cadeia completa: `docs/agent-architecture.md` seção 9.
+
+**Ao reportar ao orquestrador, sempre identifique explicitamente qual tier/modelo resolveu o
+ticket**, citando o número e nome desta lista (ex.: "tier 3 — `opencode-mimo-v2.5`
+(`opencode/mimo-v2.5-free`)"). Nunca deixe implícito que foi você (Sonnet) por padrão.
 
 **Toda saída — de qualquer tier acima, inclusive a sua própria — passa pelo agente `code-review`
 antes do ticket ser aceito.** Isso não é opcional; é o que torna seguro usar o gratuito por padrão,

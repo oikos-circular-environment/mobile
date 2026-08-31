@@ -1,0 +1,1 @@
+ALTER TABLE `survey_session` ADD `tour_seen_at` text;

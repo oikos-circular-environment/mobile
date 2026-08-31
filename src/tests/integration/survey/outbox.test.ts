@@ -488,7 +488,7 @@ describe("fila de envio do modo pesquisa", () => {
 		expect(row?.status).toBe("SENT");
 	});
 
-	it("item envenenado não impede os demais de subirem", async () => {
+	it("item envenenado de E2_SESSION bloqueia os dependentes na mesma passada, sem gastar retry deles", async () => {
 		insertSession();
 		await enqueueSessionUpsert("session-1", sessionUpsertInput());
 		await enqueueCheckpoint("session-1", undefined, baseCheckpointInput());
@@ -505,7 +505,7 @@ describe("fila de envio do modo pesquisa", () => {
 		await drainOutbox("session-1");
 
 		expect(mockUpsert).toHaveBeenCalledTimes(1);
-		expect(mockCheckpoint).toHaveBeenCalledTimes(1);
+		expect(mockCheckpoint).not.toHaveBeenCalled();
 
 		const rows = mockDb
 			.select()
@@ -513,7 +513,40 @@ describe("fila de envio do modo pesquisa", () => {
 			.orderBy(asc(surveyOutbox.createdAt))
 			.all();
 		expect(rows[0]?.status).toBe("FAILED");
-		expect(rows[1]?.status).toBe("SENT");
+		expect(rows[1]?.status).toBe("PENDING");
+		expect(rows[1]?.attempts).toBe(0);
+	});
+
+	it("E2_SESSION em backoff impede itens dependentes de gastarem tentativa própria", async () => {
+		insertSession();
+		const staleUpdatedAt = new Date(Date.now() - 25_000).toISOString();
+		mockDb
+			.insert(surveyOutbox)
+			.values({
+				id: "failed-session-item",
+				sessionId: "session-1",
+				kind: "E2_SESSION",
+				payload: sessionUpsertInput(),
+				status: "FAILED",
+				attempts: 1,
+				createdAt: staleUpdatedAt,
+				updatedAt: staleUpdatedAt,
+			})
+			.run();
+		await enqueueCheckpoint("session-1", undefined, baseCheckpointInput());
+
+		await drainOutbox("session-1");
+
+		expect(mockUpsert).not.toHaveBeenCalled();
+		expect(mockCheckpoint).not.toHaveBeenCalled();
+
+		const [checkpointRow] = mockDb
+			.select()
+			.from(surveyOutbox)
+			.where(eq(surveyOutbox.kind, "E3_CHECKPOINT"))
+			.all();
+		expect(checkpointRow?.status).toBe("PENDING");
+		expect(checkpointRow?.attempts).toBe(0);
 	});
 
 	it("hasPendingSync fica falso após drenagem bem-sucedida", async () => {
