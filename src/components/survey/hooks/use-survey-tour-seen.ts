@@ -1,7 +1,7 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { eq } from "drizzle-orm";
 import { useCallback, useEffect, useState } from "react";
-
-const STORAGE_KEY_PREFIX = "@oikos:survey-execution-tour-seen";
+import { getSurveyDb } from "@/libs/survey/db/client";
+import { surveySession } from "@/libs/survey/db/schema";
 
 export interface UseSurveyTourSeenResult {
 	loaded: boolean;
@@ -14,38 +14,46 @@ export interface UseSurveyTourSeenResult {
  * rodar), não na conclusão — proposital, para não precisar lidar com o estado de
  * "abandonou o tour no meio".
  *
- * A chave é escopada por `participantCode` porque cada participação de pesquisa
- * cria uma conta sintética nova — sem isso, o tour nunca reapareceria após a
- * primeira execução no device.
+ * O controle é persistido na coluna `tourSeenAt` de `surveySession`, chaveada por
+ * `sessionId`. Cada participação de pesquisa cria uma sessão local nova — sem
+ * isso, o tour nunca reapareceria após a primeira execução no device.
+ * `sessionId` fica disponível assim que a sessão é criada localmente, sem
+ * depender de round-trip com o servidor.
  */
 export function useSurveyTourSeen(
-	participantCode: string | null | undefined,
+	sessionId: string | null | undefined,
 ): UseSurveyTourSeenResult {
 	const [loaded, setLoaded] = useState(false);
 	const [seen, setSeen] = useState(false);
 
 	useEffect(() => {
-		if (!participantCode) {
+		if (!sessionId) {
 			setSeen(false);
 			setLoaded(true);
 			return;
 		}
 
 		setLoaded(false);
-		AsyncStorage.getItem(`${STORAGE_KEY_PREFIX}:${participantCode}`).then(
-			value => {
-				setSeen(value === "1");
+		getSurveyDb()
+			.select({ tourSeenAt: surveySession.tourSeenAt })
+			.from(surveySession)
+			.where(eq(surveySession.id, sessionId))
+			.then(rows => {
+				setSeen(Boolean(rows[0]?.tourSeenAt));
 				setLoaded(true);
-			},
-		);
-	}, [participantCode]);
+			});
+	}, [sessionId]);
 
 	const markSeen = useCallback(() => {
-		if (!participantCode) return;
+		if (!sessionId) return;
 
 		setSeen(true);
-		AsyncStorage.setItem(`${STORAGE_KEY_PREFIX}:${participantCode}`, "1");
-	}, [participantCode]);
+		getSurveyDb()
+			.update(surveySession)
+			.set({ tourSeenAt: new Date().toISOString() })
+			.where(eq(surveySession.id, sessionId))
+			.catch(() => {});
+	}, [sessionId]);
 
 	return { loaded, seen, markSeen };
 }

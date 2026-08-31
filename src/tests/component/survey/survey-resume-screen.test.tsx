@@ -218,6 +218,20 @@ describe("SurveyResumeScreen", () => {
 		expect(screen.getByText("Concluído")).toBeOnTheScreen();
 	});
 
+	it("mostra o comentário final como concluído quando a pesquisa está finalizada mesmo sem resposta", async () => {
+		useSurveyStore.getState().setStatus("COMPLETED");
+		useSurveyExecutionStore.setState({
+			suiteQueue: ["S1", "S2"],
+			suiteIndex: 2,
+			isActive: false,
+		});
+
+		await render(<SurveyResumeScreen />);
+
+		expect(screen.getByText("Comentário final")).toBeOnTheScreen();
+		expect(screen.getByText("Concluído")).toBeOnTheScreen();
+	});
+
 	it("mostra a suíte atual como abandonada quando a pesquisa foi abandonada", async () => {
 		useSurveyStore.getState().setStatus("ABANDONED");
 		useSurveyExecutionStore.setState({
