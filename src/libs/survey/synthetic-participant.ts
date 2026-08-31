@@ -82,7 +82,7 @@ function generateCredentials(): SyntheticCredentials {
  */
 function generateSyntheticName(): string {
 	const suffix = faker.string.alphanumeric({ length: 6 }).toUpperCase();
-	return `usuario-${suffix}`;
+	return `USUARIO-${suffix}`;
 }
 
 async function registerParticipant(): Promise<SyntheticCredentials> {

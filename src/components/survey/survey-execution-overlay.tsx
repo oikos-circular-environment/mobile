@@ -17,7 +17,6 @@ import {
 } from "react-native-spotlight-tour";
 import { FloatingIndicator } from "@/components/survey/floating-indicator";
 import { useSurveyActiveTimer } from "@/components/survey/hooks/use-survey-active-timer";
-import { useSurveyParticipantCode } from "@/components/survey/hooks/use-survey-participant-code";
 import { useSurveyTaskDetection } from "@/components/survey/hooks/use-survey-task-detection";
 import { useSurveyTourSeen } from "@/components/survey/hooks/use-survey-tour-seen";
 import {
@@ -75,16 +74,16 @@ export function SurveyExecutionOverlay() {
 	const [baseY, setBaseY] = useState(INDICATOR_DEFAULT_Y);
 
 	const prevResolvedRef = useRef(false);
+	const prevResolvedCountRef = useRef(resolvedCount);
 	const skipNextCelebrationRef = useRef(false);
 
 	const sessionId = useSurveyStore(s => s.sessionId);
-	const participantCode = useSurveyParticipantCode(sessionId);
 	const tourRef = useRef<SpotlightTour>(null);
 	const {
 		loaded: tourSeenLoaded,
 		seen: hasSeenTour,
 		markSeen,
-	} = useSurveyTourSeen(participantCode);
+	} = useSurveyTourSeen(sessionId);
 	const [tourActive, setTourActive] = useState(false);
 	const frozenAllTasksResolvedRef = useRef(allTasksResolved);
 	if (!tourActive) {
@@ -121,29 +120,23 @@ export function SurveyExecutionOverlay() {
 		segments[0] !== "survey";
 
 	useEffect(() => {
-		if (
-			overlayEligible &&
-			isExpanded &&
-			tourSeenLoaded &&
-			!hasSeenTour &&
-			participantCode
-		) {
+		if (overlayEligible && isExpanded && tourSeenLoaded && !hasSeenTour) {
 			markSeen();
 			setTourActive(true);
 			tourRef.current?.start();
 		}
-	}, [
-		overlayEligible,
-		isExpanded,
-		tourSeenLoaded,
-		hasSeenTour,
-		participantCode,
-		markSeen,
-	]);
+	}, [overlayEligible, isExpanded, tourSeenLoaded, hasSeenTour, markSeen]);
 
 	const handleTourStop = (_values: TourState) => {
 		setTourActive(false);
 	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reseta o estado do tour só quando a sessão muda
+	useEffect(() => {
+		setTourActive(false);
+		frozenAllTasksResolvedRef.current = allTasksResolved;
+		prevResolvedCountRef.current = resolvedCount;
+	}, [sessionId]);
 
 	useEffect(() => {
 		if (allTasksResolved && !prevResolvedRef.current) {
@@ -156,6 +149,14 @@ export function SurveyExecutionOverlay() {
 		}
 		prevResolvedRef.current = allTasksResolved;
 	}, [allTasksResolved, setExpanded]);
+
+	useEffect(() => {
+		if (resolvedCount > prevResolvedCountRef.current && !allTasksResolved) {
+			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+			setExpanded(true);
+		}
+		prevResolvedCountRef.current = resolvedCount;
+	}, [resolvedCount, allTasksResolved, setExpanded]);
 
 	const panGesture = Gesture.Pan()
 		.onUpdate(e => {

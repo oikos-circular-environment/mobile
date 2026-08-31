@@ -163,7 +163,12 @@ export function CompanyDetailSimulationTab({
 	const parsedQuantity = parseNumber(watchedQuantity ?? "");
 	const unitPrice = selectedCatalogItem?.price ?? 0;
 	const total = parsedQuantity * unitPrice;
-	const orderTotal = checkoutItems.reduce((acc, item) => acc + item.total, 0);
+	const wasteTotal = checkoutItems
+		.filter(item => item.itemType === "waste")
+		.reduce((acc, item) => acc + item.total, 0);
+	const serviceTotal = checkoutItems
+		.filter(item => item.itemType === "service")
+		.reduce((acc, item) => acc + item.total, 0);
 
 	const onSubmit = (data: SimulationFormValues) => {
 		if (!selectedCatalogItem) return;
@@ -409,17 +414,33 @@ export function CompanyDetailSimulationTab({
 					</Card>
 				)}
 
-				<Card className="border-0 bg-lime-800/10 p-3 shadow-none">
-					<View className="flex-row items-center justify-between">
-						<View className="flex-row items-center gap-2">
-							<Calculator size={16} color={colors.lime[800]} />
-							<Text className="text-sm text-lime-800">Total geral</Text>
+				{wasteTotal > 0 && (
+					<Card className="border-0 bg-lime-800/10 p-3 shadow-none">
+						<View className="flex-row items-center justify-between">
+							<View className="flex-row items-center gap-2">
+								<Calculator size={16} color={colors.lime[800]} />
+								<Text className="text-sm text-lime-800">Você recebe</Text>
+							</View>
+							<Text className="text-base font-bold text-lime-800">
+								{formatCurrency(wasteTotal)}
+							</Text>
 						</View>
-						<Text className="text-base font-bold text-lime-800">
-							{formatCurrency(orderTotal)}
-						</Text>
-					</View>
-				</Card>
+					</Card>
+				)}
+
+				{serviceTotal > 0 && (
+					<Card className="border-0 bg-amber-100 p-3 shadow-none">
+						<View className="flex-row items-center justify-between">
+							<View className="flex-row items-center gap-2">
+								<Calculator size={16} color={colors.amber[700]} />
+								<Text className="text-sm text-amber-700">Você paga</Text>
+							</View>
+							<Text className="text-base font-bold text-amber-700">
+								{formatCurrency(serviceTotal)}
+							</Text>
+						</View>
+					</Card>
+				)}
 			</VStack>
 		</View>
 	);

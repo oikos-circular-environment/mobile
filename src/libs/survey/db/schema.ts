@@ -13,6 +13,7 @@ export const surveySession = sqliteTable("survey_session", {
 	protocolVersion: integer("protocol_version").notNull(),
 	persona: text("persona").notNull(),
 	participantCode: text("participant_code"),
+	tourSeenAt: text("tour_seen_at"),
 
 	stateUf: text("state_uf").notNull(),
 	cityName: text("city_name").notNull(),

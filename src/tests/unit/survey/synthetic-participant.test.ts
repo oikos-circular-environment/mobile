@@ -76,7 +76,7 @@ describe("provisionSyntheticParticipant", () => {
 			phone: string;
 			address?: unknown;
 		};
-		expect(profileBody.full_name).toMatch(/^usuario-[A-Z0-9]{6}$/);
+		expect(profileBody.full_name).toMatch(/^USUARIO-[A-Z0-9]{6}$/);
 		expect(profileBody.display_name).toEqual(profileBody.full_name);
 		expect(profileBody.phone).toMatch(/^\d+$/);
 		expect(profileBody.address).toBeUndefined();

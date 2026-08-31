@@ -7,6 +7,7 @@ import { useSurveyStore } from "@/stores/survey-store";
 import { surveyClient } from "../api/client";
 import { getSurveyDb } from "../db/client";
 import { surveyEvent, surveyOutbox, surveySession } from "../db/schema";
+import { emitParticipantSync } from "../survey-participant-sync-bus";
 
 type RouterInputs = inferRouterInputs<AppRouter>;
 type UsabilityInputs = RouterInputs["usability"];
@@ -257,6 +258,7 @@ async function sendOutboxItem(item: typeof surveyOutbox.$inferSelect) {
 					.update(surveySession)
 					.set({ participantCode: result.participant_code })
 					.where(eq(surveySession.id, item.sessionId));
+				emitParticipantSync(item.sessionId);
 				break;
 			}
 			case "E3_CHECKPOINT": {
@@ -287,6 +289,7 @@ async function sendOutboxItem(item: typeof surveyOutbox.$inferSelect) {
 						status: "COMPLETED",
 					})
 					.where(eq(surveySession.id, item.sessionId));
+				emitParticipantSync(item.sessionId);
 				break;
 			}
 			case "E5_ABANDON":
@@ -332,9 +335,21 @@ export async function drainOutbox(sessionId: string): Promise<void> {
 	const sessionItems = pending.filter(item => item.kind === "E2_SESSION");
 	const otherItems = pending.filter(item => item.kind !== "E2_SESSION");
 
-	for (const item of [...sessionItems, ...otherItems]) {
-		if (!isBackoffExpired(item)) continue;
-		await sendOutboxItem(item);
+	let sessionUnresolved = false;
+	for (const item of sessionItems) {
+		if (!isBackoffExpired(item)) {
+			sessionUnresolved = true;
+			continue;
+		}
+		const sent = await sendOutboxItem(item);
+		if (!sent) sessionUnresolved = true;
+	}
+
+	if (!sessionUnresolved) {
+		for (const item of otherItems) {
+			if (!isBackoffExpired(item)) continue;
+			await sendOutboxItem(item);
+		}
 	}
 
 	const remaining = await db
