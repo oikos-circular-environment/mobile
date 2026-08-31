@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { eq } from "drizzle-orm";
+import { useEffect } from "react";
 import { getSurveyDb } from "@/libs/survey/db/client";
 import { surveySession } from "@/libs/survey/db/schema";
+import { subscribeParticipantSync } from "@/libs/survey/survey-participant-sync-bus";
 
 /**
  * Lê o participant_code da sessão local — só existe depois que E2 (ou E4) sincroniza
@@ -19,8 +21,18 @@ export function useSurveyParticipantCode(sessionId: string | null) {
 			return rows[0]?.participantCode ?? null;
 		},
 		enabled: Boolean(sessionId),
-		refetchInterval: query => (query.state.data ? false : 3000),
+		refetchInterval: query => (query.state.data ? false : 750),
 	});
+
+	const { refetch } = query;
+	useEffect(() => {
+		if (!sessionId) return;
+		return subscribeParticipantSync(syncedSessionId => {
+			if (syncedSessionId === sessionId) {
+				refetch();
+			}
+		});
+	}, [sessionId, refetch]);
 
 	return query.data ?? null;
 }
