@@ -74,6 +74,7 @@ export function SurveyExecutionOverlay() {
 	const [baseY, setBaseY] = useState(INDICATOR_DEFAULT_Y);
 
 	const prevResolvedRef = useRef(false);
+	const prevResolvedCountRef = useRef(resolvedCount);
 	const skipNextCelebrationRef = useRef(false);
 
 	const sessionId = useSurveyStore(s => s.sessionId);
@@ -134,6 +135,7 @@ export function SurveyExecutionOverlay() {
 	useEffect(() => {
 		setTourActive(false);
 		frozenAllTasksResolvedRef.current = allTasksResolved;
+		prevResolvedCountRef.current = resolvedCount;
 	}, [sessionId]);
 
 	useEffect(() => {
@@ -147,6 +149,14 @@ export function SurveyExecutionOverlay() {
 		}
 		prevResolvedRef.current = allTasksResolved;
 	}, [allTasksResolved, setExpanded]);
+
+	useEffect(() => {
+		if (resolvedCount > prevResolvedCountRef.current && !allTasksResolved) {
+			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+			setExpanded(true);
+		}
+		prevResolvedCountRef.current = resolvedCount;
+	}, [resolvedCount, allTasksResolved, setExpanded]);
 
 	const panGesture = Gesture.Pan()
 		.onUpdate(e => {
