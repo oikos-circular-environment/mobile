@@ -1,0 +1,17 @@
+diff --git a/node_modules/react-native-spotlight-tour/dist/helpers/responsive.js b/node_modules/react-native-spotlight-tour/dist/helpers/responsive.js
+index 2a25b3c..b841c01 100644
+--- a/node_modules/react-native-spotlight-tour/dist/helpers/responsive.js
++++ b/node_modules/react-native-spotlight-tour/dist/helpers/responsive.js
+@@ -1,8 +1,8 @@
+-import { responsiveScreenHeight, responsiveScreenWidth } from "react-native-responsive-dimensions";
++import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
+ export function vw(percentage) {
+-    return responsiveScreenWidth(percentage);
++    return responsiveWidth(percentage);
+ }
+ export function vh(percentage) {
+-    return responsiveScreenHeight(percentage);
++    return responsiveHeight(percentage);
+ }
+ //# sourceMappingURL=responsive.js.map
+\ No newline at end of file

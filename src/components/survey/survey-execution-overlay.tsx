@@ -130,6 +130,12 @@ export function SurveyExecutionOverlay() {
 		setTourActive(false);
 	};
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reseta o estado do tour só quando a sessão muda
+	useEffect(() => {
+		setTourActive(false);
+		frozenAllTasksResolvedRef.current = allTasksResolved;
+	}, [sessionId]);
+
 	useEffect(() => {
 		if (allTasksResolved && !prevResolvedRef.current) {
 			if (!skipNextCelebrationRef.current) {

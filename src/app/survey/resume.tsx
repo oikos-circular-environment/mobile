@@ -120,6 +120,8 @@ export default function SurveyResumeScreen() {
 			.then(rows => setHasClosingComment(rows.length > 0));
 	}, [sessionId]);
 
+	const closingCommentCompleted = isTerminal || hasClosingComment;
+
 	const personaLabel = useSurveyPersonaLabel();
 
 	const handleCopyCode = async () => {
@@ -286,7 +288,7 @@ export default function SurveyResumeScreen() {
 						})}
 
 						<View className="flex-row items-center gap-3 rounded-lg bg-gray-50 p-3.5">
-							{hasClosingComment ? (
+							{closingCommentCompleted ? (
 								<CircleCheckIcon size={22} color={colors.lime[800]} />
 							) : (
 								<CircleDashedIcon size={22} color={colors.yellow[600]} />
@@ -296,7 +298,7 @@ export default function SurveyResumeScreen() {
 									Comentário final
 								</Text>
 								<Text size="xs" className="text-muted-foreground">
-									{hasClosingComment
+									{closingCommentCompleted
 										? "Concluído"
 										: "Pendente · disponível ao concluir tudo"}
 								</Text>
