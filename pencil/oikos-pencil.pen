@@ -20,7 +20,10 @@
             {
               "type": "frame",
               "id": "Sye51",
+              "x": 0,
+              "y": 0,
               "name": "splash",
+              "enabled": false,
               "clip": true,
               "width": 390,
               "height": 844,
