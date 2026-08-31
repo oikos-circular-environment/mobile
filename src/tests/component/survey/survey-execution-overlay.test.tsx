@@ -1,4 +1,4 @@
-import { render, screen, userEvent } from "@testing-library/react-native";
+import { act, render, screen, userEvent } from "@testing-library/react-native";
 import { useSurveyProtocol } from "@/components/survey/hooks/use-survey-protocol";
 import { useSurveyTourSeen } from "@/components/survey/hooks/use-survey-tour-seen";
 import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
@@ -10,6 +10,7 @@ import { useSurveyStore } from "@/stores/survey-store";
 const mockPush = jest.fn();
 const mockDb = createTestSurveyDb();
 const mockNotificationAsync = jest.fn();
+const mockImpactAsync = jest.fn();
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({ push: mockPush }),
@@ -29,7 +30,9 @@ jest.mock("@/components/survey/hooks/use-survey-tour-seen", () => ({
 
 jest.mock("expo-haptics", () => ({
 	notificationAsync: (...args: unknown[]) => mockNotificationAsync(...args),
+	impactAsync: (...args: unknown[]) => mockImpactAsync(...args),
 	NotificationFeedbackType: { Success: "success" },
+	ImpactFeedbackStyle: { Light: "light" },
 }));
 
 jest.mock("@/components/toast", () => ({
@@ -46,6 +49,7 @@ describe("SurveyExecutionOverlay", () => {
 		jest.useFakeTimers();
 		mockPush.mockClear();
 		mockNotificationAsync.mockClear();
+		mockImpactAsync.mockClear();
 		jest.mocked(toast.success).mockClear();
 		useSurveyExecutionStore.getState().reset();
 		useSurveyStore.getState().reset();
@@ -229,5 +233,57 @@ describe("SurveyExecutionOverlay", () => {
 		expect(mockPush).toHaveBeenCalledWith("/survey/questionnaire");
 		expect(mockNotificationAsync).not.toHaveBeenCalled();
 		expect(toast.success).not.toHaveBeenCalled();
+	});
+
+	it("ao resolver uma tarefa individual (ainda restando outras), vibra leve e expande o overlay sozinho", async () => {
+		useSurveyStore.getState().startSession("session-1", "CITIZEN");
+		useSurveyExecutionStore.getState().openSuiteIntro({
+			code: "S1",
+			title: "S1",
+			objective: "obj",
+			specificObjectives: [],
+			tasks: [
+				{ code: "T1", title: "Primeira", instruction: "Faça a primeira." },
+				{ code: "T2", title: "Segunda", instruction: "Faça a segunda." },
+			],
+		});
+		useSurveyExecutionStore.getState().beginSuite();
+		useSurveyExecutionStore.getState().setExpanded(false);
+
+		await render(<SurveyExecutionOverlay />);
+		expect(screen.getByText("0/2")).toBeOnTheScreen();
+
+		await act(async () => {
+			useSurveyExecutionStore.getState().completeCurrentTask();
+		});
+
+		expect(mockImpactAsync).toHaveBeenCalledTimes(1);
+		expect(mockImpactAsync).toHaveBeenCalledWith("light");
+		expect(mockNotificationAsync).not.toHaveBeenCalled();
+		expect(useSurveyExecutionStore.getState().isExpanded).toBe(true);
+		expect(screen.getByText("Faça a segunda.")).toBeOnTheScreen();
+	});
+
+	it("ao resolver a última tarefa, não dispara a vibração leve de tarefa individual (só a celebração de fim de etapa)", async () => {
+		useSurveyStore.getState().startSession("session-1", "CITIZEN");
+		useSurveyExecutionStore.getState().openSuiteIntro({
+			code: "S1",
+			title: "S1",
+			objective: "obj",
+			specificObjectives: [],
+			tasks: [{ code: "T1", title: "Única", instruction: "Faça." }],
+		});
+		useSurveyExecutionStore.getState().beginSuite();
+		useSurveyExecutionStore.getState().setExpanded(false);
+
+		await render(<SurveyExecutionOverlay />);
+
+		await act(async () => {
+			useSurveyExecutionStore.getState().completeCurrentTask();
+		});
+
+		expect(mockNotificationAsync).toHaveBeenCalledTimes(1);
+		expect(mockImpactAsync).not.toHaveBeenCalled();
+		expect(useSurveyExecutionStore.getState().isExpanded).toBe(true);
 	});
 });
