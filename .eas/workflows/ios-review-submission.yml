@@ -60,4 +60,4 @@ jobs:
       - uses: eas/checkout
       - run: npm ci
       - name: Attach build and submit for review
-        run: node store/scripts/submit-ios-for-review.mjs --skip-submit
+        run: node store/scripts/submit-ios-for-review.mjs
