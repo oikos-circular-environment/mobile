@@ -58,8 +58,17 @@ identificado o quê mudar e onde — podem ser despachados. A fase de medir/deci
 3. `opencode run --agent opencode-mimo-v2.5 --format json "..."` (free)
 4. `opencode run --agent opencode-hy3 --format json "..."` (free)
 5. `opencode run --agent omniroute-omini-free-tier --format json "..."` (combo OmniRoute, free)
-6. `opencode run --agent opencode-go-kimi-k2.7 --format json "..."` (OpenCode Go, pago — crédito curto, use com moderação)
-7. Só se tudo acima falhar: implemente você mesmo.
+
+**Gate obrigatório antes de qualquer tier pago abaixo:** se os 5 tiers grátis falharem ou vierem
+ruins na revisão, NÃO avance sozinho. Pare e devolva ao orquestrador pedindo permissão explícita,
+informando o que cada tier grátis retornou e por que falhou. Só prossiga pro tier 6 (ou implemente
+você mesmo) depois que o orquestrador confirmar autorização.
+
+6. `opencode run --agent opencode-go-kimi-k2.7 --format json "..."` (OpenCode Go, pago — crédito curto)
+7. Só com autorização confirmada e se tudo acima falhar: implemente você mesmo (pago).
 
 Detalhes da cadeia completa: `docs/agent-architecture.md` seção 9. **Toda saída passa pelo
 agente `code-review` antes de você medir de novo** — não meça um diff que ainda não foi revisado.
+
+**Ao reportar ao orquestrador, sempre identifique explicitamente qual tier/modelo resolveu o
+alvo**, citando o número e nome desta lista. Nunca deixe implícito que foi você (Sonnet) por padrão.
