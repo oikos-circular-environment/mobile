@@ -26612,7 +26612,7 @@
               "context": "Formulário de criação/edição de denúncia: localização, endereço, mídias, categorias e observações. src/app/(tabs)/complaints/(create)/index.tsx",
               "clip": true,
               "width": 430,
-              "height": 1671,
+              "height": 932,
               "fill": "$background",
               "layout": "vertical",
               "children": [
@@ -27519,6 +27519,7 @@
           "id": "KXfuR",
           "name": "Market Flow",
           "context": "Tab market — src/app/(tabs)/market/. Listagem de empresas (index) e detalhe ([companyId]).",
+          "height": 930,
           "gap": 96,
           "children": [
             {
@@ -54872,6 +54873,2054 @@
               ]
             }
           ]
+        },
+        {
+          "type": "frame",
+          "id": "i4bvY",
+          "name": "Device.svg",
+          "clip": true,
+          "width": 475,
+          "height": 962,
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "X0bpsh",
+              "x": 22.5,
+              "y": 15,
+              "name": "market/[companyId] — simulação",
+              "context": "Detalhe da empresa, aba Simulação — company-detail-simulation-tab.tsx. Catálogo selecionável, formulário de quantidade, lista com swipe-delete e totais.",
+              "clip": true,
+              "width": 430,
+              "height": 932,
+              "fill": "$background",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "eIuK1",
+                  "name": "Status Bar",
+                  "context": "Status bar iOS para mockups. Fonte Inter proposital (simula SF Pro do sistema) — não usar tokens do DS aqui.",
+                  "width": "fill_container",
+                  "height": 62,
+                  "fill": "#ffffff",
+                  "padding": [
+                    0,
+                    20
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "P2WrR",
+                      "fill": "$foreground",
+                      "content": "9:41",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "cW1WR",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "wqIkv",
+                          "name": "Cellular-Connection.svg",
+                          "clip": true,
+                          "width": 19,
+                          "height": 12,
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "path",
+                              "id": "i6Rcoq",
+                              "x": -0.000011205673217773438,
+                              "y": 0,
+                              "geometry": "M1.11801 7.5l1.117 0c0.618 0 1.118 0.504 1.118 1.125l0 2.25c0 0.621-0.5 1.125-1.118 1.125l-1.117 0c-0.29756-0.00053-0.58269-0.11945-0.79244-0.33051-0.20975-0.21106-0.32689-0.49692-0.32556-0.79449l0-2.25c0-0.621 0.5-1.125 1.118-1.125m5.215-2.25l1.118 0c0.617 0 1.118 0.504 1.118 1.125l0 4.5c0 0.621-0.5 1.125-1.118 1.125l-1.118 0c-0.29739-0.00079-0.58226-0.11983-0.79179-0.33087-0.20954-0.21104-0.32654-0.49674-0.32521-0.79413l0-4.5c0-0.621 0.5-1.125 1.117-1.125m5.216-2.625l1.118 0c0.617 0 1.117 0.504 1.117 1.125l0 7.125c0 0.621-0.5 1.125-1.117 1.125l-1.118 0c-0.29756-0.00053-0.58269-0.11945-0.79244-0.33051-0.20975-0.21106-0.32689-0.49692-0.32556-0.79449l0-7.125c0-0.621 0.5-1.125 1.118-1.125m5.216-2.625l1.117 0c0.618 0 1.118 0.504 1.118 1.125l0 9.75c0 0.621-0.5 1.125-1.118 1.125l-1.117 0c-0.29756-0.00053-0.58269-0.11945-0.79244-0.33051-0.20975-0.21106-0.32689-0.49692-0.32556-0.79449l0-9.75c0-0.621 0.5-1.125 1.118-1.125",
+                              "fill": "$9:--black",
+                              "width": 19.000011205673218,
+                              "height": 12
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "O4Qo7",
+                          "name": "Wifi.svg",
+                          "clip": true,
+                          "width": 17,
+                          "height": 12,
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "path",
+                              "id": "BZrJV",
+                              "x": 0.00043996336171403527,
+                              "y": 0,
+                              "geometry": "M8.49956 2.492c2.467 0 4.84 0.932 6.627 2.603 0.134 0.129 0.35 0.127 0.482-0.004l1.287-1.277c0.06649-0.0662 0.10361-0.15631 0.10304-0.25013-0.00057-0.09382-0.03877-0.18348-0.10604-0.24887-4.692-4.42-12.094-4.42-16.786 0-0.06759 0.06543-0.10599 0.1553-0.10655 0.24937-0.00056 0.09406 0.03676 0.1844 0.10355 0.25063l1.286 1.275c0.13337 0.13091 0.34647 0.13268 0.482 0.004 1.7996-1.67619 4.1687-2.60625 6.628-2.602m0 4.154c1.356 0 2.662 0.495 3.667 1.39 0.13693 0.12631 0.3488 0.12323 0.482-0.007l1.286-1.277c0.06716-0.06658 0.10452-0.15749 0.10358-0.25206-0.00094-0.09456-0.04011-0.18472-0.10858-0.24994-3.06-2.797-7.797-2.797-10.856 0-0.06847 0.06522-0.10764 0.15538-0.10858 0.24994-0.00094 0.09456 0.03642 0.18548 0.10358 0.25206l1.285 1.278c0.13347 0.12995 0.34534 0.13259 0.482 0.006 1.01008-0.89622 2.31364-1.39111 3.664-1.391m2.47 3.047c0.06857-0.06576 0.1065-0.15721 0.1046-0.25219-0.0019-0.09498-0.04345-0.18484-0.1146-0.24781-1.42753-1.18059-3.49247-1.18059-4.92 0-0.07114 0.06296-0.1127 0.15282-0.1146 0.24781-0.0019 0.09499 0.03603 0.18643 0.1046 0.25219l2.224 2.206c0.13645 0.13537 0.35655 0.13537 0.493 0l2.223-2.206z",
+                              "fill": "$9:--black",
+                              "width": 16.998610177019145,
+                              "height": 11.999528884887695
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "laLma",
+                          "name": "Battery.svg",
+                          "clip": true,
+                          "width": 29,
+                          "height": 13,
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "path",
+                              "id": "M2SoWd",
+                              "x": 0.5,
+                              "y": 0.5,
+                              "opacity": 0.35,
+                              "geometry": "M20.998 0c1.216 0 1.665 0.106 2.112 0.345 0.402 0.215 0.717 0.53 0.932 0.932 0.239 0.447 0.345 0.896 0.345 2.112l0 5.222c0 1.216-0.106 1.665-0.345 2.112-0.215 0.401-0.53 0.717-0.932 0.932-0.447 0.239-0.896 0.345-2.112 0.345l-17.609 0c-1.216 0-1.665-0.106-2.112-0.345-0.39711-0.21017-0.72183-0.53489-0.932-0.932-0.239-0.447-0.345-0.896-0.345-2.113l0-5.221c0-1.216 0.106-1.665 0.345-2.112 0.21017-0.39711 0.53489-0.72183 0.932-0.932 0.447-0.239 0.896-0.345 2.113-0.345l17.608 0z",
+                              "fill": "$9:--black",
+                              "width": 24.38699722290039,
+                              "height": 12
+                            },
+                            {
+                              "type": "path",
+                              "id": "FUy36",
+                              "x": 26.6299991607666,
+                              "y": 4.177000045776367,
+                              "opacity": 0.4,
+                              "geometry": "M0 0l0 4.646c0.93506-0.39317 1.54324-1.30865 1.54324-2.323 0-1.01435-0.60818-1.92983-1.54324-2.323",
+                              "fill": "$9:--black",
+                              "width": 1.5432357788085938,
+                              "height": 4.645999908447266
+                            },
+                            {
+                              "type": "path",
+                              "id": "rWRaq",
+                              "x": 2.241999864578247,
+                              "y": 2.242000102996826,
+                              "geometry": "M1.985 0l16.933 0c0.69 0 0.94 0.072 1.193 0.207 0.252 0.135 0.45 0.333 0.585 0.585 0.135 0.252 0.207 0.503 0.207 1.193l0 4.546c0 0.69-0.072 0.94-0.207 1.193-0.135 0.252-0.333 0.45-0.585 0.585-0.252 0.135-0.503 0.207-1.193 0.207l-16.933 0c-0.69 0-0.94-0.072-1.193-0.207-0.24948-0.13161-0.45339-0.33552-0.585-0.585-0.135-0.252-0.207-0.503-0.207-1.193l0-4.546c0-0.69 0.072-0.94 0.207-1.193 0.135-0.252 0.333-0.45 0.585-0.585 0.252-0.135 0.503-0.207 1.193-0.207",
+                              "fill": "$9:--black",
+                              "width": 20.903000593185425,
+                              "height": 8.516000270843506
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "vfO1t",
+                  "name": "Content",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": [
+                    8,
+                    16,
+                    0,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "qPTQk",
+                      "name": "Company Header",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "zxVAk",
+                          "name": "Company Avatar",
+                          "width": 72,
+                          "height": "fill_container",
+                          "fill": "$primary",
+                          "cornerRadius": "$radius-md",
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "qOuKr",
+                              "name": "Avatar Initials",
+                              "fill": "#ffffff",
+                              "content": "ER",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-h3",
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "R8kv6Y",
+                          "name": "Header Col",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "c3WZv2",
+                              "name": "Company Name",
+                              "fill": "$foreground",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "ECOPONTO II RONDONOPOLIS",
+                              "lineHeight": 1.2,
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h2",
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "pZS5i",
+                              "name": "Company CNPJ",
+                              "fill": "$muted-foreground",
+                              "content": "43.354.377/0001-51",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body-sm",
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "tLOaq",
+                              "name": "Header Badges",
+                              "width": "fill_container",
+                              "gap": 6,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "RFra1",
+                                  "name": "Badge Aberto",
+                                  "context": "Badge/tag — src/components/ui/badge. Variantes: secondary, success, destructive, outline. Texto Caption 11/600.",
+                                  "fill": "$gray-2",
+                                  "cornerRadius": "$radius-sm",
+                                  "gap": 4,
+                                  "padding": [
+                                    3,
+                                    10
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "vBIpE",
+                                      "width": 12,
+                                      "height": 12,
+                                      "icon": "radar",
+                                      "library": "lucide",
+                                      "fill": "$9:--foreground"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "w4lSCL",
+                                      "name": "BadgeLabel",
+                                      "fill": "$gray-3",
+                                      "content": "1,0 KM",
+                                      "lineHeight": 1.4,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "qgzPd",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "Badge Distancia",
+                                  "context": "Badge/tag — src/components/ui/badge. Variantes: secondary, success, destructive, outline. Texto Caption 11/600.",
+                                  "enabled": false,
+                                  "fill": "$destructive",
+                                  "cornerRadius": "$radius-sm",
+                                  "gap": 4,
+                                  "padding": [
+                                    3,
+                                    10
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "kLyD8",
+                                      "width": 12,
+                                      "height": 12,
+                                      "icon": "door-closed-locked",
+                                      "library": "lucide",
+                                      "fill": "$primary-foreground"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "eiKSG",
+                                      "name": "BadgeLabel",
+                                      "fill": "#ffffff",
+                                      "content": "FECHADO",
+                                      "lineHeight": 1.4,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "BrcVF",
+                                  "name": "Badge Distancia",
+                                  "context": "Badge/tag — src/components/ui/badge. Variantes: secondary, success, destructive, outline. Texto Caption 11/600.",
+                                  "fill": "$lime-2",
+                                  "cornerRadius": "$radius-sm",
+                                  "gap": 4,
+                                  "padding": [
+                                    3,
+                                    10
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "XCTUZ",
+                                      "width": 12,
+                                      "height": 12,
+                                      "icon": "handshake",
+                                      "library": "lucide",
+                                      "fill": "$primary-foreground"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "i0utqc",
+                                      "name": "BadgeLabel",
+                                      "fill": "#ffffff",
+                                      "content": "ABERTO",
+                                      "lineHeight": 1.4,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "cgkvo",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "Badge Distancia",
+                                  "context": "Badge/tag — src/components/ui/badge. Variantes: secondary, success, destructive, outline. Texto Caption 11/600.",
+                                  "enabled": false,
+                                  "fill": "$yellow",
+                                  "cornerRadius": "$radius-sm",
+                                  "gap": 4,
+                                  "padding": [
+                                    3,
+                                    10
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "hzRwa",
+                                      "width": 12,
+                                      "height": 12,
+                                      "icon": "sprout",
+                                      "library": "lucide",
+                                      "fill": "$primary-foreground"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "FJYsk",
+                                      "name": "BadgeLabel",
+                                      "fill": "#ffffff",
+                                      "content": "COLETOR",
+                                      "lineHeight": 1.4,
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Ftzy4",
+                      "name": "SegmentedControl",
+                      "context": "Controle segmentado — tabs selecionáveis. Active = fill $primary; Inactive = bg transparente. Pattern: refs alteram visibilidade de IconLeft / Label / IconRight por tab.",
+                      "width": "fill_container",
+                      "height": 40,
+                      "fill": "$gray-2",
+                      "cornerRadius": "$radius-md",
+                      "gap": 4,
+                      "padding": 3,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "oqHCV",
+                          "name": "TabActive",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "cornerRadius": 6,
+                          "gap": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "lbUHX",
+                              "x": 0,
+                              "y": 0,
+                              "name": "IconLeft",
+                              "enabled": false,
+                              "width": 16,
+                              "height": 16,
+                              "icon": "hash",
+                              "library": "lucide",
+                              "fill": "#ffffff"
+                            },
+                            {
+                              "type": "text",
+                              "id": "M967uu",
+                              "name": "Label",
+                              "fill": "$gray-4",
+                              "content": "Geral",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "v7297m",
+                              "x": 0,
+                              "y": 0,
+                              "name": "IconRight",
+                              "enabled": false,
+                              "width": 16,
+                              "height": 16,
+                              "icon": "hash",
+                              "library": "lucide",
+                              "fill": "#ffffff"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "OEVEK",
+                          "name": "TabInactive",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "$primary",
+                          "cornerRadius": 6,
+                          "gap": 4,
+                          "padding": [
+                            0,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "GFkbq",
+                              "x": 0,
+                              "y": 0,
+                              "name": "IconLeft",
+                              "enabled": false,
+                              "width": 16,
+                              "height": 16,
+                              "icon": "hash",
+                              "library": "lucide",
+                              "fill": "$gray-4"
+                            },
+                            {
+                              "type": "text",
+                              "id": "W4UtC",
+                              "name": "Label",
+                              "fill": "#ffffff",
+                              "content": "Simulação",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-label",
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "A6GUYU",
+                              "x": 0,
+                              "y": 0,
+                              "name": "IconRight",
+                              "enabled": false,
+                              "width": 16,
+                              "height": 16,
+                              "icon": "hash",
+                              "library": "lucide",
+                              "fill": "$gray-4"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DVP8B",
+                      "name": "Catalog Card",
+                      "width": "fill_container",
+                      "cornerRadius": "$radius-lg",
+                      "stroke": {
+                        "type": "color",
+                        "color": "$border",
+                        "enabled": false
+                      },
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
+                      "layout": "vertical",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "CnTBL",
+                          "name": "Catalog Title",
+                          "fill": "$foreground",
+                          "content": "Simulação",
+                          "lineHeight": 1.25,
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-h3",
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "M3N2E",
+                          "name": "Catalog Sub",
+                          "fill": "$muted-foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Selecione os itens e quantidades para montar sua simulação.",
+                          "lineHeight": 1.45,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-body-sm",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "sLkLh",
+                          "name": "SegmentedControl",
+                          "context": "Controle segmentado — tabs selecionáveis. Active = fill $primary; Inactive = bg transparente. Pattern: refs alteram visibilidade de IconLeft / Label / IconRight por tab.",
+                          "width": "fill_container",
+                          "height": 40,
+                          "fill": "$gray-2",
+                          "cornerRadius": "$radius-md",
+                          "gap": 4,
+                          "padding": 3,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "msQJh",
+                              "name": "TabActive",
+                              "width": "fill_container",
+                              "height": "fill_container",
+                              "fill": "$primary",
+                              "cornerRadius": 6,
+                              "gap": 4,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "m74Ed",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "IconLeft",
+                                  "enabled": false,
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "hash",
+                                  "library": "lucide",
+                                  "fill": "#ffffff"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "saC62",
+                                  "name": "Label",
+                                  "fill": "#ffffff",
+                                  "content": "Resíduos",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-label",
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "btUYD",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "IconRight",
+                                  "enabled": false,
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "hash",
+                                  "library": "lucide",
+                                  "fill": "#ffffff"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "SyLF2",
+                              "name": "TabInactive",
+                              "width": "fill_container",
+                              "height": "fill_container",
+                              "cornerRadius": 6,
+                              "gap": 4,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "zLguJ",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "IconLeft",
+                                  "enabled": false,
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "hash",
+                                  "library": "lucide",
+                                  "fill": "$gray-4"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "GAYqP",
+                                  "name": "Label",
+                                  "fill": "$gray-4",
+                                  "content": "Serviços",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-label",
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "a6zjCV",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "IconRight",
+                                  "enabled": false,
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "hash",
+                                  "library": "lucide",
+                                  "fill": "$gray-4"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "YMO1y",
+                          "name": "MarketItemCard ListView",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 8,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "csmEc",
+                              "name": "Row Têxtil selecionado",
+                              "width": "fill_container",
+                              "fill": "$lime-3",
+                              "cornerRadius": "$radius-md",
+                              "stroke": "$primary",
+                              "strokeWidth": 1,
+                              "strokeAlignment": "inner",
+                              "gap": "$spacing",
+                              "padding": [
+                                8,
+                                12
+                              ],
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "LHaIS",
+                                  "name": "TextCol",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "apMbW",
+                                      "name": "Name",
+                                      "fill": "$gray-3",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "Têxtil / Roupas / Tecidos",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "za1ov",
+                                      "name": "Description",
+                                      "fill": "$gray-5",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "Coleta de resíduos: Têxtil / Roupas / Tecidos",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "JZE5L",
+                                  "name": "Price",
+                                  "fill": "$gray-6",
+                                  "content": "R$ 2,32 / kg",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "nTK0a",
+                              "name": "Row Óleo Vegetal",
+                              "width": "fill_container",
+                              "fill": "#ffffff",
+                              "cornerRadius": "$radius-md",
+                              "stroke": "$gray-7",
+                              "strokeWidth": 1,
+                              "strokeAlignment": "inner",
+                              "gap": "$spacing",
+                              "padding": [
+                                8,
+                                12
+                              ],
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "w7Fsn",
+                                  "name": "TextCol",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "aH9my",
+                                      "name": "Name",
+                                      "fill": "$gray-3",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "Óleo Vegetal Usado (de cozinha)",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body-sm",
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "UyMF2",
+                                      "name": "Description",
+                                      "fill": "$gray-5",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "Coleta de resíduos: Óleo Vegetal Usado (de cozinha)",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-caption",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "M93HXW",
+                                  "name": "Price",
+                                  "fill": "$gray-6",
+                                  "content": "R$ 4,88 / kg",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-caption",
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "E5sofM",
+                      "name": "Form Card",
+                      "width": "fill_container",
+                      "fill": "#ffffff",
+                      "cornerRadius": "$radius-lg",
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "zwvUL",
+                          "name": "Form Row",
+                          "width": "fill_container",
+                          "gap": 12,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "lsZM4",
+                              "name": "Qty Col",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 6,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "AfbFm",
+                                  "name": "Qty Label",
+                                  "fill": "$muted-foreground",
+                                  "content": "QUANTIDADE",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 1
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "dJSGY",
+                                  "name": "Qty Field",
+                                  "width": "fill_container",
+                                  "height": 44,
+                                  "fill": "#ffffff",
+                                  "cornerRadius": "$radius-md",
+                                  "stroke": "$border",
+                                  "strokeWidth": 1,
+                                  "strokeAlignment": "inner",
+                                  "padding": [
+                                    0,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "C5JOq9",
+                                      "name": "Qty Value",
+                                      "fill": "$foreground",
+                                      "content": "1,00",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "CK8n8",
+                              "name": "Unit Col",
+                              "width": 72,
+                              "layout": "vertical",
+                              "gap": 6,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "N7CAi2",
+                                  "name": "Unit Label",
+                                  "fill": "$muted-foreground",
+                                  "content": "UNIDADE",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": "$text-overline",
+                                  "fontWeight": "600",
+                                  "letterSpacing": 1
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "BHkUG",
+                                  "name": "Unit Field",
+                                  "width": "fill_container",
+                                  "height": 44,
+                                  "fill": "$gray-8",
+                                  "cornerRadius": "$radius-md",
+                                  "stroke": "$border",
+                                  "strokeWidth": 1,
+                                  "strokeAlignment": "inner",
+                                  "padding": [
+                                    0,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "U3JL2z",
+                                      "name": "Unit Value",
+                                      "fill": "$gray-5",
+                                      "content": "kg",
+                                      "fontFamily": "$font-body",
+                                      "fontSize": "$text-body",
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "XCwGl",
+                          "name": "Total Item Card",
+                          "width": "fill_container",
+                          "fill": "$lime-4",
+                          "cornerRadius": "$radius-md",
+                          "padding": 12,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "bzY4b",
+                              "name": "Total Item Left",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "RDP0Y",
+                                  "name": "Calc Icon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "calculator",
+                                  "library": "lucide",
+                                  "fill": "$primary"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "Q29FW",
+                                  "name": "Total Item Label",
+                                  "fill": "$primary",
+                                  "content": "Total do item",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "JZOOC",
+                              "name": "Total Item Value",
+                              "fill": "$primary",
+                              "content": "R$ 2,32",
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h4",
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "BNUeA",
+                          "name": "Botao Adicionar",
+                          "context": "Botão primário — src/components/ui/button. Variantes no showcase: secondary, outline, ghost, destructive, disabled.",
+                          "width": "fill_container",
+                          "height": 48,
+                          "fill": "$primary",
+                          "cornerRadius": "$radius-md",
+                          "gap": "$spacing",
+                          "padding": [
+                            0,
+                            "$spacing-6"
+                          ],
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "nLsDV",
+                              "x": 0,
+                              "y": 0,
+                              "name": "BtnIconLeft",
+                              "enabled": false,
+                              "width": 18,
+                              "height": 18,
+                              "icon": "arrow-left",
+                              "library": "lucide",
+                              "fill": "$primary-foreground"
+                            },
+                            {
+                              "type": "text",
+                              "id": "P2hiDD",
+                              "fill": "$primary-foreground",
+                              "content": "Adicionar a simulação",
+                              "lineHeight": 1,
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-button",
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "CcVAX",
+                              "x": 0,
+                              "y": 0,
+                              "name": "BtnIconRight",
+                              "enabled": false,
+                              "width": 18,
+                              "height": 18,
+                              "icon": "arrow-right",
+                              "library": "lucide",
+                              "fill": "$primary-foreground"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "r7WBA",
+                      "name": "List Section",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ge99R",
+                          "name": "List Title",
+                          "fill": "$foreground",
+                          "content": "Lista",
+                          "lineHeight": 1.25,
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-h3",
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "i1qlfw",
+                          "name": "List Sub",
+                          "fill": "$muted-foreground",
+                          "content": "Deslize o card para a esquerda para deletar um item da lista.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "y54Bq",
+                          "name": "Empty State",
+                          "width": "fill_container",
+                          "fill": "$gray-8",
+                          "cornerRadius": "$radius-lg",
+                          "stroke": "$border",
+                          "strokeWidth": 1,
+                          "strokeAlignment": "inner",
+                          "padding": "$spacing-4",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "R0cJU",
+                              "name": "Empty Text",
+                              "fill": "$muted-foreground",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Nenhum item adicionado a simulação.",
+                              "fontFamily": "$font-body",
+                              "fontSize": "$text-body",
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "cdm2d",
+                          "name": "Total Geral Card",
+                          "width": "fill_container",
+                          "fill": "$lime-4",
+                          "cornerRadius": "$radius-md",
+                          "padding": 12,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "YLEHR",
+                              "name": "Total Geral Left",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "sGjCU",
+                                  "name": "Calc Icon 2",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "calculator",
+                                  "library": "lucide",
+                                  "fill": "$primary"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "Z3wWEv",
+                                  "name": "Total Geral Label",
+                                  "fill": "$primary",
+                                  "content": "Total geral",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": "$text-body-sm",
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "dyPlU",
+                              "name": "Total Geral Value",
+                              "fill": "$primary",
+                              "content": "R$ 0,00",
+                              "fontFamily": "$font-heading",
+                              "fontSize": "$text-h4",
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "oTBDd",
+                  "x": 0,
+                  "y": 832,
+                  "name": "TabBar",
+                  "context": "Bottom tab bar — src/app/(tabs)/_layout.tsx. Tabs: Pontos de coleta (market), Home ((home)), Denunciar (complaints). tabBarStyle.backgroundColor = $lime-800. Ativa: tabBarActiveTintColor $gray-100, peso padrão. Inativa: tabBarInactiveTintColor branco 50% opacidade.",
+                  "enabled": false,
+                  "width": "fill_container(430)",
+                  "height": 100,
+                  "fill": "$lime",
+                  "padding": [
+                    0,
+                    8,
+                    16,
+                    8
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "n5fUb",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "PeFu4",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "recycle",
+                          "library": "lucide",
+                          "fill": "$background"
+                        },
+                        {
+                          "type": "text",
+                          "id": "xtkdW",
+                          "fill": "$background",
+                          "content": "Pontos de coleta",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "TbZnS",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "Nw4Y0",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "leaf",
+                          "library": "lucide",
+                          "fill": "#f2f3f580"
+                        },
+                        {
+                          "type": "text",
+                          "id": "c3c67T",
+                          "fill": "#f2f3f580",
+                          "content": "Home",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "l5ctq",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "ka0jY",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "shield",
+                          "library": "lucide",
+                          "fill": "#ffffff80"
+                        },
+                        {
+                          "type": "text",
+                          "id": "x97n37",
+                          "fill": "#ffffff80",
+                          "content": "Denunciar",
+                          "fontFamily": "$font-body",
+                          "fontSize": "$text-caption",
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "CCgWB",
+              "x": 0.2999999999992724,
+              "y": 0,
+              "children": [
+                {
+                  "type": "group",
+                  "id": "weTOV",
+                  "x": 170.07012020606817,
+                  "y": 36.64503386004526,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 14.4,
+                      "id": "b0CODD",
+                      "x": 0,
+                      "y": 0,
+                      "fill": "#000",
+                      "width": 134.85975958786494,
+                      "height": 39.08803611738149
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "BP4H3",
+                      "x": 103.04808242701984,
+                      "y": 10.85778781038357,
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 41.803051865590895,
+                        "size": {
+                          "height": 0.9846317435519522
+                        },
+                        "colors": [
+                          {
+                            "color": "#1D1E20",
+                            "position": 0
+                          },
+                          {
+                            "color": "#08090A",
+                            "position": 1
+                          }
+                        ],
+                        "center": {
+                          "x": 0.8835546875000011,
+                          "y": 0.1529296875000001
+                        }
+                      },
+                      "width": 17.40125930165999,
+                      "height": 17.372460496613996
+                    },
+                    {
+                      "type": "group",
+                      "id": "xBBDN",
+                      "x": -171.02175157412603,
+                      "y": -32.57336343115139,
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "Cgp1I",
+                          "x": 277.87635947338276,
+                          "y": 47.23137697516927,
+                          "fill": {
+                            "type": "gradient",
+                            "gradientType": "radial",
+                            "enabled": true,
+                            "rotation": -90,
+                            "size": {
+                              "width": 1,
+                              "height": 1
+                            },
+                            "colors": [
+                              {
+                                "color": "#0A1629",
+                                "position": 0
+                              },
+                              {
+                                "color": "#0A1629",
+                                "position": 0.442
+                              },
+                              {
+                                "color": "#000000",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": 0.4999999999999992,
+                              "y": 0.5000000000000002
+                            }
+                          },
+                          "width": 9.788208357183745,
+                          "height": 9.772009029345373
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "e0t3Bc",
+                          "x": 277.87635947338276,
+                          "y": 47.23137697516927,
+                          "fill": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -90,
+                            "size": {
+                              "height": 0.3966666666666659
+                            },
+                            "colors": [
+                              {
+                                "color": "#377AB7",
+                                "position": 0
+                              },
+                              {
+                                "color": "#377ab703",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": 0.19833333333333295,
+                              "y": 0.6983333333333341
+                            }
+                          },
+                          "width": 9.788208357183745,
+                          "height": 9.772009029345373
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "CywXC",
+                          "x": 277.87635947338276,
+                          "y": 47.23137697516927,
+                          "fill": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": 90,
+                            "size": {
+                              "height": 0.34430555555555364
+                            },
+                            "colors": [
+                              {
+                                "color": "#173481d5",
+                                "position": 0
+                              },
+                              {
+                                "color": "#377ab703",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": 0.8278472222222217,
+                              "y": 0.32791666666666724
+                            }
+                          },
+                          "width": 9.788208357183745,
+                          "height": 9.772009029345373
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "id": "I85MI",
+                      "x": -171.02175157412603,
+                      "y": -32.57336343115139,
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "E1F5Tw",
+                          "x": 277.87635947338276,
+                          "y": 47.23137697516927,
+                          "fill": "#00000003",
+                          "width": 9.788208357183745,
+                          "height": 9.772009029345373
+                        }
+                      ]
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "Pqsip",
+                      "x": 109.25000000000182,
+                      "y": 17.58825902934541,
+                      "fill": "#493B7A",
+                      "width": 2.175157412707499,
+                      "height": 2.1715575620767495
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "v2RbP0",
+                      "x": 112.46515455065855,
+                      "y": 19.989187358916524,
+                      "fill": "#3C657F",
+                      "width": 2.175157412707499,
+                      "height": 2.1715575620767495
+                    }
+                  ]
+                },
+                {
+                  "type": "group",
+                  "id": "mFJRa",
+                  "x": -0.40784201488168037,
+                  "y": 0,
+                  "children": [
+                    {
+                      "type": "group",
+                      "id": "grKCJ",
+                      "x": 0.40784201488168037,
+                      "y": 0,
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "AVENS",
+                          "x": 0,
+                          "y": 153.50197516930007,
+                          "fill": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 0.9418000000000001
+                            },
+                            "colors": [
+                              {
+                                "color": "#DDE5EC",
+                                "position": 0
+                              },
+                              {
+                                "color": "#1F2630",
+                                "position": 0.077
+                              },
+                              {
+                                "color": "#D0DFF6",
+                                "position": 0.191
+                              },
+                              {
+                                "color": "#C4D4EE",
+                                "position": 0.803
+                              },
+                              {
+                                "color": "#162637",
+                                "position": 0.919
+                              },
+                              {
+                                "color": "#C5CEDB",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.04088235294117647,
+                              "y": 0.4929400000000001
+                            }
+                          },
+                          "width": 4.622209502003435,
+                          "height": 33.93058690744921
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "SXuNk",
+                          "x": 0,
+                          "y": 153.50197516930007,
+                          "width": 4.622209502003435,
+                          "height": 33.93058690744921,
+                          "stroke": "#B6D0E4",
+                          "strokeWidth": 0.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "nguxd",
+                          "x": 0,
+                          "y": 153.50197516930007,
+                          "width": 4.622209502003435,
+                          "height": 33.93058690744921,
+                          "stroke": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 1.0205599999999997
+                            },
+                            "colors": [
+                              {
+                                "color": "#111213",
+                                "position": 0
+                              },
+                              {
+                                "color": "#474B51",
+                                "position": 0.196
+                              },
+                              {
+                                "color": "#474B51",
+                                "position": 0.814
+                              },
+                              {
+                                "color": "#1A282F",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.08617647058823528,
+                              "y": 0.49828
+                            }
+                          },
+                          "strokeWidth": 0.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "KfAXu",
+                          "x": 0.5437893531779991,
+                          "y": 221.9060383747178,
+                          "fill": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 0.9570689655172413
+                            },
+                            "colors": [
+                              {
+                                "color": "#DDE5EC",
+                                "position": 0
+                              },
+                              {
+                                "color": "#1F2630",
+                                "position": 0.029
+                              },
+                              {
+                                "color": "#D0DFF6",
+                                "position": 0.129
+                              },
+                              {
+                                "color": "#C4D4EE",
+                                "position": 0.863
+                              },
+                              {
+                                "color": "#162637",
+                                "position": 0.971
+                              },
+                              {
+                                "color": "#C5CEDB",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.056470588235294106,
+                              "y": 0.5011015325670498
+                            }
+                          },
+                          "width": 4.622209502003435,
+                          "height": 70.84706546275396
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "a1ECjw",
+                          "x": 0.5437893531779991,
+                          "y": 221.9060383747178,
+                          "width": 4.622209502003435,
+                          "height": 70.84706546275396,
+                          "stroke": "#B6D0E4",
+                          "strokeWidth": 0.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "d3CQl",
+                          "x": 0.5437893531779991,
+                          "y": 221.9060383747178,
+                          "width": 4.622209502003435,
+                          "height": 70.84706546275396,
+                          "stroke": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 1.0080842911877397
+                            },
+                            "colors": [
+                              {
+                                "color": "#111213",
+                                "position": 0
+                              },
+                              {
+                                "color": "#474B51",
+                                "position": 0.196
+                              },
+                              {
+                                "color": "#474B51",
+                                "position": 0.814
+                              },
+                              {
+                                "color": "#1A282F",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.08617647058823528,
+                              "y": 0.49829501915708796
+                            }
+                          },
+                          "strokeWidth": 0.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "CUdEB",
+                          "x": 0.5437893531779991,
+                          "y": 314.19723476297963,
+                          "fill": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 0.9570689655172413
+                            },
+                            "colors": [
+                              {
+                                "color": "#DDE5EC",
+                                "position": 0
+                              },
+                              {
+                                "color": "#1F2630",
+                                "position": 0.029
+                              },
+                              {
+                                "color": "#D0DFF6",
+                                "position": 0.129
+                              },
+                              {
+                                "color": "#C4D4EE",
+                                "position": 0.863
+                              },
+                              {
+                                "color": "#162637",
+                                "position": 0.971
+                              },
+                              {
+                                "color": "#C5CEDB",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.056470588235294106,
+                              "y": 0.5011015325670498
+                            }
+                          },
+                          "width": 4.622209502003435,
+                          "height": 70.84706546275396
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "Vx6Q6",
+                          "x": 0.5437893531779991,
+                          "y": 314.19723476297963,
+                          "width": 4.622209502003435,
+                          "height": 70.84706546275396,
+                          "stroke": "#B6D0E4",
+                          "strokeWidth": 0.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "fbrfn",
+                          "x": 0.5437893531779991,
+                          "y": 314.19723476297963,
+                          "width": 4.622209502003435,
+                          "height": 70.84706546275396,
+                          "stroke": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 1.0080842911877397
+                            },
+                            "colors": [
+                              {
+                                "color": "#111213",
+                                "position": 0
+                              },
+                              {
+                                "color": "#474B51",
+                                "position": 0.196
+                              },
+                              {
+                                "color": "#474B51",
+                                "position": 0.814
+                              },
+                              {
+                                "color": "#1A282F",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.08617647058823528,
+                              "y": 0.49829501915708796
+                            }
+                          },
+                          "strokeWidth": 0.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "u9WiKy",
+                          "x": 470.3777904979961,
+                          "y": 246.8789503386006,
+                          "fill": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 0.9688377723970942
+                            },
+                            "colors": [
+                              {
+                                "color": "#DDE5EC",
+                                "position": 0
+                              },
+                              {
+                                "color": "#1F2630",
+                                "position": 0.015
+                              },
+                              {
+                                "color": "#D0DFF6",
+                                "position": 0.057
+                              },
+                              {
+                                "color": "#C4D4EE",
+                                "position": 0.923
+                              },
+                              {
+                                "color": "#162637",
+                                "position": 0.987
+                              },
+                              {
+                                "color": "#C5CEDB",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.0658823529411734,
+                              "y": 0.49868038740920084
+                            }
+                          },
+                          "width": 4.622209502003435,
+                          "height": 112.1066591422122
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "cydoV",
+                          "x": 470.3777904979961,
+                          "y": 246.8789503386006,
+                          "width": 4.622209502003435,
+                          "height": 112.1066591422122,
+                          "stroke": "#B6D0E4",
+                          "strokeWidth": 0.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 0.5,
+                          "id": "zS6ZL",
+                          "x": 470.3777904979961,
+                          "y": 246.8789503386006,
+                          "width": 4.622209502003435,
+                          "height": 112.1066591422122,
+                          "stroke": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 1.003861985472155
+                            },
+                            "colors": [
+                              {
+                                "color": "#111213",
+                                "position": 0
+                              },
+                              {
+                                "color": "#474B51",
+                                "position": 0.196
+                              },
+                              {
+                                "color": "#474B51",
+                                "position": 0.814
+                              },
+                              {
+                                "color": "#1A282F",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.08617647058823717,
+                              "y": 0.4982990314769975
+                            }
+                          },
+                          "strokeWidth": 0.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 51.6,
+                          "id": "oeVoe",
+                          "x": 6.661419576419576,
+                          "y": 3.8002257336343064,
+                          "width": 462.2209502003435,
+                          "height": 954.3995485327315,
+                          "stroke": "#000000ff",
+                          "strokeWidth": 16,
+                          "strokeAlignment": "inner"
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 51.6,
+                          "id": "iT5mR",
+                          "x": 6.661419576419576,
+                          "y": 3.8002257336343064,
+                          "width": 462.2209502003435,
+                          "height": 954.3995485327315,
+                          "stroke": "#5A697C",
+                          "strokeWidth": 5.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 51.6,
+                          "id": "Rsb8E",
+                          "x": 6.661419576419576,
+                          "y": 3.8002257336343064,
+                          "width": 462.2209502003435,
+                          "height": 954.3995485327315,
+                          "stroke": {
+                            "type": "gradient",
+                            "gradientType": "linear",
+                            "enabled": true,
+                            "rotation": -180,
+                            "size": {
+                              "height": 1.0079635949943118
+                            },
+                            "colors": [
+                              {
+                                "color": "#637185",
+                                "position": 0
+                              },
+                              {
+                                "color": "#475668",
+                                "position": 1
+                              }
+                            ],
+                            "center": {
+                              "x": -0.00823529411764706
+                            }
+                          },
+                          "strokeWidth": 5.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 51.6,
+                          "id": "f484d",
+                          "x": 6.661419576419576,
+                          "y": 3.8002257336343064,
+                          "width": 462.2209502003435,
+                          "height": 954.3995485327315,
+                          "stroke": "#fff",
+                          "strokeWidth": 5.6
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 51.6,
+                          "id": "J3LShA",
+                          "x": 6.661419576419576,
+                          "y": 3.8002257336343064,
+                          "width": 462.2209502003435,
+                          "height": 954.3995485327315,
+                          "stroke": "#3B4C64",
+                          "strokeWidth": 5.6
+                        },
+                        {
+                          "type": "group",
+                          "id": "m1hCwR",
+                          "x": -0.40784201488168037,
+                          "y": 0,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 52.8,
+                              "id": "E2UlwH",
+                              "x": 5.4378935317690775,
+                              "y": 2.171557562076714,
+                              "fill": "#00000003",
+                              "width": 465.48368631940474,
+                              "height": 957.6568848758466
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "g01j8p",
+                          "x": 2.8548941041790385,
+                          "y": 97.72009029345372,
+                          "fill": "#838eaccc",
+                          "width": 6.5254722381224965,
+                          "height": 6.514672686230249
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "pRntZ",
+                          "x": 466.1634230108775,
+                          "y": 97.72009029345372,
+                          "fill": "#838eaccc",
+                          "width": 6.5254722381224965,
+                          "height": 6.514672686230249
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "ipqyE",
+                          "x": 371.5440755581003,
+                          "y": 0,
+                          "fill": "#838eaccc",
+                          "width": 6.5254722381224965,
+                          "height": 6.514672686230249
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "s2V2P",
+                          "x": 97.47424155695626,
+                          "y": 955.4853273137699,
+                          "fill": "#838eaccc",
+                          "width": 6.5254722381224965,
+                          "height": 6.514672686230249
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "kq4Le",
+                          "x": 2.8548941041790385,
+                          "y": 857.7652370203159,
+                          "fill": "#838eaccc",
+                          "width": 6.5254722381224965,
+                          "height": 6.514672686230249
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "Y5gLj",
+                          "x": 466.1634230108775,
+                          "y": 857.7652370203159,
+                          "fill": "#838eaccc",
+                          "width": 6.5254722381224965,
+                          "height": 6.514672686230249
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "id": "w1fY5B",
+                      "x": 9.516313680594976,
+                      "y": 0,
+                      "opacity": 0.4,
+                      "children": [
+                        {
+                          "type": "path",
+                          "id": "c6UuB",
+                          "x": 191.41385646704293,
+                          "y": 8.686230377741822,
+                          "geometry": "M0 2c0-1.10457 0.89543-2 2-2l50.40001 0c1.10455 0 1.99999 0.89543 1.99998 2 0 1.10457-0.89543 2-2 2l-50.40001 0c-1.10455 0-1.99998-0.89543-1.99998-2",
+                          "fillRule": "evenodd",
+                          "fill": "#1A1A1A",
+                          "width": 73.95534373448793,
+                          "height": 5.428893258017288
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
@@ -55247,6 +57296,46 @@
     "spacing": {
       "type": "number",
       "value": 8
+    },
+    "gray-2": {
+      "type": "color",
+      "value": "#f3f4f6"
+    },
+    "gray-3": {
+      "type": "color",
+      "value": "#111827"
+    },
+    "yellow": {
+      "type": "color",
+      "value": "#b8b128"
+    },
+    "gray-4": {
+      "type": "color",
+      "value": "#4b5563"
+    },
+    "lime-3": {
+      "type": "color",
+      "value": "#f7fee7"
+    },
+    "gray-5": {
+      "type": "color",
+      "value": "#6b7280"
+    },
+    "gray-6": {
+      "type": "color",
+      "value": "#1f2937"
+    },
+    "gray-7": {
+      "type": "color",
+      "value": "#e5e7eb"
+    },
+    "gray-8": {
+      "type": "color",
+      "value": "#f9fafb"
+    },
+    "lime-4": {
+      "type": "color",
+      "value": "#ecfccb"
     }
   },
   "imports": {
