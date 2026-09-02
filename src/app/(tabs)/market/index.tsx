@@ -14,6 +14,7 @@ import { LocationSourceBottomSheet } from "@/components/market/location-source-b
 import { MarketListHeader } from "@/components/market/market-list-header";
 import { RadiusBottomSheet } from "@/components/market/radius-bottom-sheet";
 import { colors } from "@/components/style/colors";
+import { TestingWarningAlert } from "@/components/testing-warning-alert";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -209,6 +210,9 @@ export default function MarketScreen() {
 			behavior={process.env.EXPO_OS === "ios" ? "padding" : "height"}
 			className="flex-1 bg-background"
 		>
+			<View className="px-4" style={{ paddingTop: insets.top + 16 }}>
+				<TestingWarningAlert />
+			</View>
 			<FlatList
 				data={companies}
 				keyExtractor={company => company.id}
