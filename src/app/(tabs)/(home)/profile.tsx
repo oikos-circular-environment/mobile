@@ -1,4 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	putV1Profiles,
+	putV1ProfilesAvatar,
+} from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
@@ -63,7 +67,6 @@ import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
 import { compressImage } from "@/libs/media-compression";
 import { logProfileEvent } from "@/libs/observe-events";
-import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
 import { useCepLookup } from "@/libs/use-cep-lookup";
 import { usePickImage } from "@/libs/use-pick-image";
 import { useRouteInteractive } from "@/libs/use-route-interactive";

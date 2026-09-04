@@ -1,6 +1,6 @@
+import { getV1Companies } from "@oikos-circular-environment/oikos-sdk";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { getV1Companies } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 export function useLoadCompanies() {

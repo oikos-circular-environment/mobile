@@ -1,4 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
+	patchV1ComplaintsByIdResolutionsByResolutionId,
+	postV1ComplaintsByIdResolutions,
+	postV1ComplaintsByIdResolutionsAttachments,
+} from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
@@ -57,12 +63,6 @@ import {
 	MAX_FILE_SIZE_BYTES,
 } from "@/libs/media-validation";
 import { logComplaintEvent } from "@/libs/observe-events";
-import {
-	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
-	patchV1ComplaintsByIdResolutionsByResolutionId,
-	postV1ComplaintsByIdResolutions,
-	postV1ComplaintsByIdResolutionsAttachments,
-} from "@/libs/oikos-sdk";
 import { usePickImage } from "@/libs/use-pick-image";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useComplaintsStore } from "@/stores/complaints-store";

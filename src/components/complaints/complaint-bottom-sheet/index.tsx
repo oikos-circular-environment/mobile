@@ -3,6 +3,10 @@ import BottomSheet, {
 	type BottomSheetBackdropProps,
 	BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
+import {
+	deleteV1ComplaintsByIdResolutions,
+	getV1ComplaintsByIdResolutions,
+} from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BlurTargetView, BlurView } from "expo-blur";
 import { router, useIsFocused } from "expo-router";
@@ -41,10 +45,6 @@ import { VStack } from "@/components/ui/vstack";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { logComplaintEvent } from "@/libs/observe-events";
-import {
-	deleteV1ComplaintsByIdResolutions,
-	getV1ComplaintsByIdResolutions,
-} from "@/libs/oikos-sdk";
 import type { MapComplaintAttachment } from "@/libs/types/complaint";
 import { uiEventBus } from "@/libs/ui-event-bus";
 import { cn } from "@/libs/utils";

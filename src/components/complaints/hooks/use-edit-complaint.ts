@@ -1,11 +1,11 @@
+import {
+	patchV1ComplaintsById,
+	postV1ComplaintsByIdAttachments,
+} from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { logComplaintEvent } from "@/libs/observe-events";
-import {
-	patchV1ComplaintsById,
-	postV1ComplaintsByIdAttachments,
-} from "@/libs/oikos-sdk";
 import type { Geospatial } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 import type { OnUploadProgress } from "./upload-progress";

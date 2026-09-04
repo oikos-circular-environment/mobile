@@ -1,4 +1,9 @@
 import { fakerPT_BR as faker } from "@faker-js/faker";
+import {
+	postV1AuthLogin,
+	postV1UsersRegister,
+	putV1Profiles,
+} from "@oikos-circular-environment/oikos-sdk";
 import { AxiosError } from "axios";
 import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
 import {
@@ -6,11 +11,6 @@ import {
 	listIbgeMunicipios,
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
-import {
-	postV1AuthLogin,
-	postV1UsersRegister,
-	putV1Profiles,
-} from "@/libs/oikos-sdk";
 
 type SyntheticCredentials = { email: string; password: string };
 

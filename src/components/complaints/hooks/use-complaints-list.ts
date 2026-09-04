@@ -1,6 +1,9 @@
+import {
+	getV1Complaints,
+	getV1ComplaintsDashboard,
+} from "@oikos-circular-environment/oikos-sdk";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { getV1Complaints, getV1ComplaintsDashboard } from "@/libs/oikos-sdk";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 export const COMPLAINTS_QUERY_KEY = ["complaints"] as const;

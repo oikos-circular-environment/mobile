@@ -1,7 +1,7 @@
 import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import "@/libs/api/oikos-api";
+import { client } from "@oikos-circular-environment/oikos-sdk/client.gen";
 import { setRefreshToken } from "@/libs/api/oikos-api";
-import { client } from "@/libs/oikos-sdk/client.gen";
 
 jest.mock("@/libs/storage", () => ({
 	getAuthToken: jest.fn().mockResolvedValue(null),
