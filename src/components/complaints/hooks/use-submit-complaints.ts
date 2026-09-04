@@ -1,10 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/components/toast";
-import { logComplaintEvent } from "@/libs/observe-events";
 import {
 	postV1Complaints,
 	postV1ComplaintsByIdAttachments,
-} from "@/libs/oikos-sdk";
+} from "@oikos-circular-environment/oikos-sdk";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/components/toast";
+import { logComplaintEvent } from "@/libs/observe-events";
 import type { Geospatial } from "@/libs/types/complaint";
 import type { OnUploadProgress } from "./upload-progress";
 import {

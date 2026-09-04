@@ -1,8 +1,8 @@
+import { client } from "@oikos-circular-environment/oikos-sdk/client.gen";
 import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { AxiosError } from "axios";
 import Constants from "expo-constants";
 import { networkTelemetryBus } from "../network-telemetry-bus";
-import { client } from "../oikos-sdk/client.gen";
 import {
 	clearTokens,
 	getRefreshToken as getStoredRefreshToken,

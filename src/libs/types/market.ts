@@ -1,4 +1,4 @@
-import type { GetV1MarketResponses } from "@/libs/oikos-sdk";
+import type { GetV1MarketResponses } from "@oikos-circular-environment/oikos-sdk";
 
 export type MarketCompany = GetV1MarketResponses[200]["companies"][number];
 export type MarketBusinessHour = MarketCompany["business_hours"][number];

@@ -1,3 +1,8 @@
+import type {
+	GetV1ComplaintsDashboardResponses,
+	GetV1ComplaintsMapResponses,
+	GetV1ComplaintsResponses,
+} from "@oikos-circular-environment/oikos-sdk";
 import type { CameraCapturedPicture } from "expo-camera";
 import {
 	FlameIcon,
@@ -8,11 +13,6 @@ import {
 	TractorIcon,
 	Trash2Icon,
 } from "lucide-react-native";
-import type {
-	GetV1ComplaintsDashboardResponses,
-	GetV1ComplaintsMapResponses,
-	GetV1ComplaintsResponses,
-} from "@/libs/oikos-sdk";
 import type { ValueMapping } from "./value-mapping";
 
 // SDK-derived types

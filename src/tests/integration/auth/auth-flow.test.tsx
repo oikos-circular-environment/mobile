@@ -1,3 +1,9 @@
+import {
+	getV1Profiles,
+	getV1UsersMe,
+	postV1AuthLogin,
+	postV1AuthLogout,
+} from "@oikos-circular-environment/oikos-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
 	fireEvent,
@@ -14,19 +20,13 @@ import SignInScreen from "@/app/(tabs)/(home)/sign-in";
 import { toast } from "@/components/toast";
 import { AuthContextProvider, useAuthContext } from "@/contexts/auth-context";
 import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
-import {
-	getV1Profiles,
-	getV1UsersMe,
-	postV1AuthLogin,
-	postV1AuthLogout,
-} from "@/libs/oikos-sdk";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
 	Link: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock("@/libs/oikos-sdk", () => ({
+jest.mock("@oikos-circular-environment/oikos-sdk", () => ({
 	postV1AuthLogin: jest.fn(),
 	getV1Profiles: jest.fn(),
 	getV1UsersMe: jest.fn(),

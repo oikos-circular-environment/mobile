@@ -1,3 +1,7 @@
+import {
+	putV1Profiles,
+	putV1ProfilesAvatar,
+} from "@oikos-circular-environment/oikos-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
 	cleanup,
@@ -17,7 +21,6 @@ import {
 	listIbgeMunicipios,
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
-import { putV1Profiles, putV1ProfilesAvatar } from "@/libs/oikos-sdk";
 import { makeAddress, makeProfile, makeUser } from "@/tests/factories";
 
 jest.mock("expo-router", () => ({
@@ -64,7 +67,7 @@ jest.mock("@/components/toast", () => {
 
 jest.mock("@/contexts/auth-context");
 
-jest.mock("@/libs/oikos-sdk", () => ({
+jest.mock("@oikos-circular-environment/oikos-sdk", () => ({
 	putV1Profiles: jest.fn(),
 	putV1ProfilesAvatar: jest.fn(),
 }));

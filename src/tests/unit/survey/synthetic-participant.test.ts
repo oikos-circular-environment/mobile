@@ -1,3 +1,8 @@
+import {
+	postV1AuthLogin,
+	postV1UsersRegister,
+	putV1Profiles,
+} from "@oikos-circular-environment/oikos-sdk";
 import { AxiosError } from "axios";
 import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
 import {
@@ -5,14 +10,9 @@ import {
 	listIbgeMunicipios,
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
-import {
-	postV1AuthLogin,
-	postV1UsersRegister,
-	putV1Profiles,
-} from "@/libs/oikos-sdk";
 import { provisionSyntheticParticipant } from "@/libs/survey/synthetic-participant";
 
-jest.mock("@/libs/oikos-sdk", () => ({
+jest.mock("@oikos-circular-environment/oikos-sdk", () => ({
 	postV1AuthLogin: jest.fn(),
 	postV1UsersRegister: jest.fn(),
 	putV1Profiles: jest.fn(),

@@ -1,4 +1,4 @@
-import type { GetV1CompaniesResponses } from "@/libs/oikos-sdk";
+import type { GetV1CompaniesResponses } from "@oikos-circular-environment/oikos-sdk";
 import type { ValueMapping } from "./value-mapping";
 
 export type Company = GetV1CompaniesResponses[200]["companies"][number];

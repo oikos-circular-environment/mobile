@@ -1,3 +1,5 @@
+import type { GetV1CompaniesResponse } from "@oikos-circular-environment/oikos-sdk";
+import { getV1Companies } from "@oikos-circular-environment/oikos-sdk";
 import { useQuery } from "@tanstack/react-query";
 import { BuildingIcon, CheckIcon, SearchIcon } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
@@ -15,8 +17,6 @@ import {
 } from "@/components/ui/bottomsheet";
 import { Text } from "@/components/ui/text";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
-import type { GetV1CompaniesResponse } from "@/libs/oikos-sdk";
-import { getV1Companies } from "@/libs/oikos-sdk";
 
 export type Company = GetV1CompaniesResponse["companies"][number];
 

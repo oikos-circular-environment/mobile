@@ -1,10 +1,10 @@
+import { patchV1ComplaintsByIdCanceled } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Alert } from "react-native";
 import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { logComplaintEvent } from "@/libs/observe-events";
-import { patchV1ComplaintsByIdCanceled } from "@/libs/oikos-sdk";
 import { openAppleMaps, openGoogleMaps } from "@/libs/open-in-maps";
 import type { Complaint, MapComplaint } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";

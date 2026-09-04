@@ -1,6 +1,6 @@
+import { patchV1CompaniesByIdStatus } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
-import { patchV1CompaniesByIdStatus } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 export function useToggleCompanyStatus(companyId: string) {
