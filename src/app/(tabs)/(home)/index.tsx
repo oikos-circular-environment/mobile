@@ -73,6 +73,11 @@ export default function HomeScreen() {
 		router.push("/(tabs)/(home)/support");
 	}, [router]);
 
+	const handleOpenDenunciation = useCallback(() => {
+		settingsSheetRef.current?.close();
+		router.push("/(tabs)/(home)/denunciation");
+	}, [router]);
+
 	const handleSignOut = useCallback(() => {
 		settingsSheetRef.current?.close();
 		setShowSignOutModal(true);
@@ -184,6 +189,7 @@ export default function HomeScreen() {
 						ref={settingsSheetRef}
 						onOpenAccount={handleOpenAccount}
 						onOpenSupport={handleOpenSupport}
+						onOpenDenunciation={handleOpenDenunciation}
 						onSignOut={handleSignOut}
 					/>
 

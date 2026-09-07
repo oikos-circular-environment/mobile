@@ -20,6 +20,7 @@ export default function HomeStackLayout() {
 				/>
 				<Stack.Screen name="account" options={{ title: "Conta" }} />
 				<Stack.Screen name="support" options={{ headerShown: false }} />
+				<Stack.Screen name="denunciation" options={{ headerShown: false }} />
 			</Stack.Protected>
 			<Stack.Screen
 				name="companies"
