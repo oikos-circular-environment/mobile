@@ -29,6 +29,25 @@ jobs:
           EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
         run: node store/scripts/push-ios-metadata.mjs
 
+  # Diagnóstico temporário — isola se o erro de orquestração vem da expressão
+  # app_store_connect.* em si ou da combinação needs+env do job attach_and_submit_ios.
+  # Remover depois que o run 01a058dc (ou o próximo com o mesmo sintoma) for entendido.
+  debug_asc_context:
+    name: Debug ASC trigger context
+    type: custom
+    env:
+      IOS_ASC_BUILD_ID: ${{ (app_store_connect.build_upload.build && app_store_connect.build_upload.build.id) || '' }}
+      IOS_BUILD_NUMBER: ${{ app_store_connect.build_upload.cf_bundle_version || inputs.build_number || '' }}
+      ASC_BUILD_UPLOAD_STATE: ${{ app_store_connect.build_upload.state || '' }}
+      ASC_BUILD_UPLOAD_ID: ${{ app_store_connect.build_upload.id || '' }}
+    steps:
+      - name: Dump ASC trigger context
+        run: |
+          echo "IOS_ASC_BUILD_ID=$IOS_ASC_BUILD_ID"
+          echo "IOS_BUILD_NUMBER=$IOS_BUILD_NUMBER"
+          echo "ASC_BUILD_UPLOAD_STATE=$ASC_BUILD_UPLOAD_STATE"
+          echo "ASC_BUILD_UPLOAD_ID=$ASC_BUILD_UPLOAD_ID"
+
   # Anexa o build processado à App Store Version e envia para o App Review.
   attach_and_submit_ios:
     name: Attach build and submit for review
@@ -41,4 +60,4 @@ jobs:
       - uses: eas/checkout
       - run: npm ci
       - name: Attach build and submit for review
-        run: node store/scripts/submit-ios-for-review.mjs --skip-submit
+        run: node store/scripts/submit-ios-for-review.mjs

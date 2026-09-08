@@ -1,8 +1,8 @@
+import { deleteV1ComplaintsByIdAttachmentsByAttachmentId } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "@/components/toast";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
-import { deleteV1ComplaintsByIdAttachmentsByAttachmentId } from "@/libs/oikos-sdk";
 import type { DraftAttachment } from "@/libs/types/complaint";
 
 export function useAttachmentRemove(complaintId: string | undefined) {

@@ -44,6 +44,7 @@ import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { colors } from "@/components/style/colors";
+import { TestingWarningAlert } from "@/components/testing-warning-alert";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
@@ -440,6 +441,7 @@ export default function ComplaintsMapScreen() {
 					}
 					onPress={handleOpenFilterSheet}
 				/>
+				<TestingWarningAlert />
 				{permissionDenied && (
 					<LocationPermissionAlert message="Habilite a localização para ver sua posição e denúncias por perto no mapa." />
 				)}

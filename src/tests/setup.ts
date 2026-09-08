@@ -1,6 +1,10 @@
 import { notifyManager } from "@tanstack/query-core";
 import { configure } from "@testing-library/react-native";
 
+// createAuthClient (better-auth) valida a baseURL de forma síncrona no boot do
+// módulo — diferente do axios, que só falha ao disparar uma request de verdade.
+process.env.EXPO_PUBLIC_BASE_URL ??= "https://test.oikos.invalid";
+
 jest.mock("react-native-worklets", () =>
 	require("react-native-worklets/src/mock"),
 );

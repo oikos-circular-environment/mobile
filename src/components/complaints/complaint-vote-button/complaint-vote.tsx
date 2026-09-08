@@ -1,3 +1,8 @@
+import {
+	deleteV1ComplaintsByIdVotes,
+	getV1ComplaintsByIdVotes,
+	postV1ComplaintsByIdVotes,
+} from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	type PropsWithChildren,
@@ -11,11 +16,6 @@ import { ProfileCompletionModal } from "@/components/auth/profile-completion-mod
 import { toast } from "@/components/toast";
 import { useAuthContext } from "@/contexts/auth-context";
 import { logComplaintEvent } from "@/libs/observe-events";
-import {
-	deleteV1ComplaintsByIdVotes,
-	getV1ComplaintsByIdVotes,
-	postV1ComplaintsByIdVotes,
-} from "@/libs/oikos-sdk";
 import { useComplaintsStore } from "@/stores/complaints-store";
 import { ComplaintVoteButtonContext } from "./context";
 

@@ -3,20 +3,27 @@ import BottomSheet, {
 	type BottomSheetBackdropProps,
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { LogOutIcon, UserRoundIcon } from "lucide-react-native";
+import {
+	LifeBuoyIcon,
+	LogOutIcon,
+	ShieldIcon,
+	UserRoundIcon,
+} from "lucide-react-native";
 import { forwardRef, useCallback } from "react";
 import { View } from "react-native";
 import { SettingOptionRow } from "@/components/settings/setting-option-row";
 
 type SettingsBottomSheetProps = {
 	onOpenAccount: () => void;
+	onOpenSupport: () => void;
+	onOpenDenunciation: () => void;
 	onSignOut: () => void;
 };
 
 export const SettingsBottomSheet = forwardRef<
 	BottomSheet,
 	SettingsBottomSheetProps
->(({ onOpenAccount, onSignOut }, ref) => {
+>(({ onOpenAccount, onOpenSupport, onOpenDenunciation, onSignOut }, ref) => {
 	const backdropComponent = useCallback(
 		(props: BottomSheetBackdropProps) => (
 			<BottomSheetBackdrop
@@ -45,6 +52,23 @@ export const SettingsBottomSheet = forwardRef<
 						showChevron
 						onPress={onOpenAccount}
 					/>
+
+					<SettingOptionRow
+						icon={LifeBuoyIcon}
+						title="Suporte"
+						description="Acompanhe seus chamados de suporte"
+						showChevron
+						onPress={onOpenSupport}
+					/>
+
+					<SettingOptionRow
+						icon={ShieldIcon}
+						title="Denúncia"
+						description="Acompanhe suas denúncias"
+						showChevron
+						onPress={onOpenDenunciation}
+					/>
+
 					<SettingOptionRow
 						icon={LogOutIcon}
 						title="Sair da conta"

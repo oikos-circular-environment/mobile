@@ -1,3 +1,7 @@
+import {
+	getV1Profiles,
+	getV1UsersMe,
+} from "@oikos-circular-environment/oikos-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
 	fireEvent,
@@ -6,44 +10,40 @@ import {
 	userEvent,
 	waitFor,
 } from "@testing-library/react-native";
-import { AxiosError } from "axios";
 import { useRouter } from "expo-router";
 import type React from "react";
 import { Pressable, Text, View } from "react-native";
 import SignInScreen from "@/app/(tabs)/(home)/sign-in";
 import { toast } from "@/components/toast";
 import { AuthContextProvider, useAuthContext } from "@/contexts/auth-context";
-import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
-import {
-	getV1Profiles,
-	getV1UsersMe,
-	postV1AuthLogin,
-	postV1AuthLogout,
-} from "@/libs/oikos-sdk";
+import { setAuthToken } from "@/libs/api/oikos-api";
+import { authClient } from "@/libs/auth/auth-client";
 
 jest.mock("expo-router", () => ({
 	useRouter: jest.fn(),
 	Link: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock("@/libs/oikos-sdk", () => ({
-	postV1AuthLogin: jest.fn(),
+jest.mock("@oikos-circular-environment/oikos-sdk", () => ({
 	getV1Profiles: jest.fn(),
 	getV1UsersMe: jest.fn(),
-	postV1UsersRegister: jest.fn(),
-	postV1AuthLogout: jest.fn().mockResolvedValue({ data: { message: "ok" } }),
 	deleteV1UsersMe: jest.fn(),
 	patchV1UsersMeCancelDeletion: jest.fn(),
-	patchV1UsersMeChangePassword: jest.fn(),
+}));
+
+jest.mock("@/libs/auth/auth-client", () => ({
+	authClient: {
+		signIn: { email: jest.fn() },
+		signUp: { email: jest.fn() },
+		signOut: jest.fn().mockResolvedValue({ data: {}, error: null }),
+		changePassword: jest.fn(),
+	},
 }));
 
 jest.mock("@/libs/storage", () => ({
 	getAuthToken: jest.fn().mockResolvedValue(null),
 	saveAuthToken: jest.fn().mockResolvedValue(undefined),
 	removeAuthToken: jest.fn().mockResolvedValue(undefined),
-	getRefreshToken: jest.fn().mockResolvedValue(null),
-	saveRefreshToken: jest.fn().mockResolvedValue(undefined),
-	removeRefreshToken: jest.fn().mockResolvedValue(undefined),
 	clearTokens: jest.fn().mockResolvedValue(undefined),
 }));
 
@@ -58,6 +58,17 @@ jest.mock("@/components/toast", () => ({
 	},
 	Toaster: () => null,
 }));
+
+function mockEmailSignIn(token = "access-token") {
+	jest
+		.mocked(authClient.signIn.email)
+		.mockImplementation(async (_body, options) => {
+			await options?.onSuccess?.({
+				response: { headers: new Headers({ "set-auth-token": token }) },
+			} as never);
+			return { data: {}, error: null } as never;
+		});
+}
 
 function AuthStateHarness() {
 	const { signOut, isAuthenticated } = useAuthContext();
@@ -111,9 +122,7 @@ describe("Fluxo de autenticação — integração", () => {
 
 	describe("SignIn", () => {
 		it("chama a API com as credenciais e navega para home quando o perfil existe", async () => {
-			jest.mocked(postV1AuthLogin).mockResolvedValue({
-				data: { token: "access-token", refreshToken: "refresh-token" },
-			} as unknown as Awaited<ReturnType<typeof postV1AuthLogin>>);
+			mockEmailSignIn();
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: { profile: { id: "user-1", name: "Test User" } },
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
@@ -139,17 +148,16 @@ describe("Fluxo de autenticação — integração", () => {
 			await user.press(screen.getByRole("button", { name: "Entrar" }));
 
 			await waitFor(() => {
-				expect(postV1AuthLogin).toHaveBeenCalledWith({
-					body: { email: "user@example.com", password: "senha1234" },
-				});
+				expect(authClient.signIn.email).toHaveBeenCalledWith(
+					{ email: "user@example.com", password: "senha1234" },
+					expect.objectContaining({ onSuccess: expect.any(Function) }),
+				);
 				expect(mockRouter.push).toHaveBeenCalledWith("/(tabs)/(home)");
 			});
 		});
 
 		it("navega para completar perfil quando o usuário não possui perfil cadastrado", async () => {
-			jest.mocked(postV1AuthLogin).mockResolvedValue({
-				data: { token: "access-token", refreshToken: "refresh-token" },
-			} as unknown as Awaited<ReturnType<typeof postV1AuthLogin>>);
+			mockEmailSignIn();
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: {},
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
@@ -180,10 +188,10 @@ describe("Fluxo de autenticação — integração", () => {
 		});
 
 		it("exibe toast de erro e não navega quando as credenciais são inválidas", async () => {
-			const error = Object.assign(new AxiosError("Unauthorized"), {
-				response: { data: { code: "INVALID_CREDENTIALS" }, status: 401 },
-			});
-			jest.mocked(postV1AuthLogin).mockRejectedValue(error);
+			jest.mocked(authClient.signIn.email).mockResolvedValue({
+				data: null,
+				error: { code: "INVALID_EMAIL_OR_PASSWORD" },
+			} as never);
 
 			const user = userEvent.setup();
 			await renderWithAuth(<SignInScreen />);
@@ -208,7 +216,6 @@ describe("Fluxo de autenticação — integração", () => {
 	describe("SignOut", () => {
 		it("reseta o estado de autenticação, navega para home e exibe toast", async () => {
 			setAuthToken("existing-access-token");
-			setRefreshToken("existing-refresh-token");
 			jest.mocked(getV1Profiles).mockResolvedValue({
 				data: { profile: { id: "user-1", name: "Test User" } },
 			} as unknown as Awaited<ReturnType<typeof getV1Profiles>>);
@@ -243,11 +250,7 @@ describe("Fluxo de autenticação — integração", () => {
 			expect(jest.mocked(toast.success)).toHaveBeenCalledWith(
 				"Você foi deslogado com sucesso!",
 			);
-			expect(jest.mocked(postV1AuthLogout)).toHaveBeenCalledWith(
-				expect.objectContaining({
-					body: { refreshToken: "existing-refresh-token" },
-				}),
-			);
+			expect(jest.mocked(authClient.signOut)).toHaveBeenCalledTimes(1);
 		});
 	});
 });

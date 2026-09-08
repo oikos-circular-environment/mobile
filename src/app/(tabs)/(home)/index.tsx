@@ -16,6 +16,7 @@ import {
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { SettingsBottomSheet } from "@/components/settings/settings-bottom-sheet";
 import { SurveyInviteBanner } from "@/components/survey/survey-invite-banner";
+import { TestingWarningAlert } from "@/components/testing-warning-alert";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import {
@@ -65,6 +66,16 @@ export default function HomeScreen() {
 	const handleOpenAccount = useCallback(() => {
 		settingsSheetRef.current?.close();
 		router.push("/(tabs)/(home)/account");
+	}, [router]);
+
+	const handleOpenSupport = useCallback(() => {
+		settingsSheetRef.current?.close();
+		router.push("/(tabs)/(home)/support");
+	}, [router]);
+
+	const handleOpenDenunciation = useCallback(() => {
+		settingsSheetRef.current?.close();
+		router.push("/(tabs)/(home)/denunciation");
 	}, [router]);
 
 	const handleSignOut = useCallback(() => {
@@ -135,6 +146,8 @@ export default function HomeScreen() {
 				/>
 
 				<View className="gap-6 px-4 pt-6">
+					<TestingWarningAlert />
+
 					{/* Aviso de localização indisponível */}
 					{permissionDenied && (
 						<LocationPermissionAlert message="Habilite a localização para ver conteúdo e recomendações mais próximos de você." />
@@ -175,6 +188,8 @@ export default function HomeScreen() {
 					<SettingsBottomSheet
 						ref={settingsSheetRef}
 						onOpenAccount={handleOpenAccount}
+						onOpenSupport={handleOpenSupport}
+						onOpenDenunciation={handleOpenDenunciation}
 						onSignOut={handleSignOut}
 					/>
 

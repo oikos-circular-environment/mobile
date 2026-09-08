@@ -1,4 +1,4 @@
-import type { GetV1WasteCategoriesResponses } from "@/libs/oikos-sdk";
+import type { GetV1WasteCategoriesResponses } from "@oikos-circular-environment/oikos-sdk";
 
 export type WasteCategory =
 	GetV1WasteCategoriesResponses[200]["categories"][number];

@@ -1,16 +1,12 @@
-import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { AxiosError } from "axios";
+import { client } from "@oikos-circular-environment/oikos-sdk/client.gen";
+import type { AxiosError, AxiosResponse } from "axios";
 import Constants from "expo-constants";
 import { networkTelemetryBus } from "../network-telemetry-bus";
-import { client } from "../oikos-sdk/client.gen";
 import {
 	clearTokens,
-	getRefreshToken as getStoredRefreshToken,
 	getAuthToken as getStoredToken,
 	removeAuthToken,
-	removeRefreshToken,
 	saveAuthToken,
-	saveRefreshToken,
 } from "../storage";
 
 // Development
@@ -28,15 +24,11 @@ const appVersion = Constants.expoConfig?.version;
 client.setConfig({ baseURL, throwOnError: true });
 
 let authToken: string | null = null;
-let refreshToken: string | null = null;
 let onUnauthenticated: (() => void) | null = null;
 
-// Initialize tokens from storage
+// Initialize token from storage
 getStoredToken().then(token => {
 	if (token) authToken = token;
-});
-getStoredRefreshToken().then(token => {
-	if (token) refreshToken = token;
 });
 
 export async function setAuthToken(token: string | null) {
@@ -50,19 +42,6 @@ export async function setAuthToken(token: string | null) {
 
 export function getAuthToken(): string | null {
 	return authToken;
-}
-
-export async function setRefreshToken(token: string | null) {
-	refreshToken = token;
-	if (token) {
-		await saveRefreshToken(token);
-	} else {
-		await removeRefreshToken();
-	}
-}
-
-export function getRefreshToken(): string | null {
-	return refreshToken;
 }
 
 export function setOnUnauthenticated(callback: (() => void) | null) {
@@ -88,23 +67,8 @@ client.instance.interceptors.request.use(config => {
 	return config;
 });
 
-// Response interceptor: handle 401 with auto-refresh
-let isRefreshing = false;
-let failedQueue: Array<{
-	resolve: (token: string) => void;
-	reject: (error: unknown) => void;
-}> = [];
-
-function processQueue(error: unknown, token: string | null = null) {
-	failedQueue.forEach(prom => {
-		if (error) prom.reject(error);
-		else prom.resolve(token!);
-	});
-	failedQueue = [];
-}
-
 function emitNetworkTelemetry(
-	config: InternalAxiosRequestConfig | undefined,
+	config: { url?: string } | undefined,
 	status: number,
 ) {
 	if (!config?.url) return;
@@ -119,13 +83,15 @@ function emitNetworkTelemetry(
 	});
 
 	networkTelemetryBus.emit({
-		method: (config.method ?? "get").toUpperCase(),
+		method: (config as { method?: string }).method?.toUpperCase() ?? "GET",
 		path: url.pathname,
 		status,
 		query,
 	});
 }
 
+// Response interceptor: on 401, end the local session — better-auth sessions
+// have no client-side refresh flow to retry.
 client.instance.interceptors.response.use(
 	(response: AxiosResponse) => {
 		emitNetworkTelemetry(response.config, response.status);
@@ -134,71 +100,12 @@ client.instance.interceptors.response.use(
 	async (error: AxiosError) => {
 		emitNetworkTelemetry(error.config, error.response?.status ?? 0);
 
-		const originalRequest = error.config as {
-			_retry?: boolean;
-			url?: string;
-			headers: Record<string, string>;
-		} & typeof error.config;
-
-		if (
-			error.response?.status !== 401 ||
-			originalRequest?._retry ||
-			originalRequest?.url?.includes("/v1/auth/refresh")
-		) {
-			return Promise.reject(error);
+		if (error.response?.status === 401) {
+			authToken = null;
+			await clearTokens();
+			onUnauthenticated?.();
 		}
 
-		if (isRefreshing) {
-			return new Promise<string>((resolve, reject) => {
-				failedQueue.push({ resolve, reject });
-			}).then(token => {
-				originalRequest.headers.Authorization = `Bearer ${token}`;
-				return client.instance(originalRequest);
-			});
-		}
-
-		originalRequest._retry = true;
-		isRefreshing = true;
-
-		try {
-			const storedRefreshToken =
-				refreshToken ?? (await getStoredRefreshToken());
-			if (!storedRefreshToken) throw new Error("No refresh token");
-
-			const response = await client.instance.patch(
-				"/v1/auth/refresh",
-				{ refreshToken: storedRefreshToken },
-				{ headers: { "Content-Type": "application/json" } },
-			);
-
-			const { token: newToken, refreshToken: newRefreshToken } =
-				response.data as { token: string; refreshToken: string };
-
-			await Promise.all([
-				setAuthToken(newToken),
-				setRefreshToken(newRefreshToken),
-			]);
-
-			processQueue(null, newToken);
-
-			originalRequest.headers.Authorization = `Bearer ${newToken}`;
-			return client.instance(originalRequest);
-		} catch (refreshError) {
-			processQueue(refreshError, null);
-
-			if (
-				refreshError instanceof AxiosError &&
-				refreshError.response?.status === 401
-			) {
-				authToken = null;
-				refreshToken = null;
-				await clearTokens();
-				onUnauthenticated?.();
-			}
-
-			return Promise.reject(refreshError);
-		} finally {
-			isRefreshing = false;
-		}
+		return Promise.reject(error);
 	},
 );

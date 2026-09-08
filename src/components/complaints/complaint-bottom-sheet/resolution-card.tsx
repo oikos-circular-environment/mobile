@@ -1,3 +1,4 @@
+import type { GetV1ComplaintsByIdResolutionsResponses } from "@oikos-circular-environment/oikos-sdk";
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { BuildingIcon, UserIcon } from "lucide-react-native";
@@ -9,7 +10,6 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Text } from "@/components/ui/text";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
-import type { GetV1ComplaintsByIdResolutionsResponses } from "@/libs/oikos-sdk";
 import { SwipeDeleteAction } from "./swipe-delete-action";
 import { SwipeEditAction } from "./swipe-edit-action";
 
