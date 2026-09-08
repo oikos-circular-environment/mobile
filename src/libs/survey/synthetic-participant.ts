@@ -1,18 +1,12 @@
 import { fakerPT_BR as faker } from "@faker-js/faker";
-import {
-	postV1AuthLogin,
-	postV1UsersRegister,
-	putV1Profiles,
-} from "@oikos-circular-environment/oikos-sdk";
-import { AxiosError } from "axios";
-import { setAuthToken, setRefreshToken } from "@/libs/api/oikos-api";
+import { putV1Profiles } from "@oikos-circular-environment/oikos-sdk";
+import { setAuthToken } from "@/libs/api/oikos-api";
+import { authClient } from "@/libs/auth/auth-client";
 import {
 	getCepV2,
 	listIbgeMunicipios,
 	listIbgeUfs,
 } from "@/libs/brasil-api-sdk";
-
-type SyntheticCredentials = { email: string; password: string };
 
 export type SyntheticLocationInput = {
 	latitude: number;
@@ -68,13 +62,6 @@ async function resolveSyntheticAddress(location: SyntheticLocationInput) {
 	}
 }
 
-function generateCredentials(): SyntheticCredentials {
-	return {
-		email: `oikos-survey-${faker.string.uuid()}@participant.invalid`,
-		password: faker.internet.password({ length: 16 }),
-	};
-}
-
 /**
  * Nome genérico em vez de um nome real gerado por faker — um participante
  * sintético mostrado com um nome de pessoa real (ex.: "Larissa") pode soar
@@ -85,35 +72,21 @@ function generateSyntheticName(): string {
 	return `USUARIO-${suffix}`;
 }
 
-async function registerParticipant(): Promise<SyntheticCredentials> {
-	const credentials = generateCredentials();
-
-	try {
-		await postV1UsersRegister({ body: credentials });
-		return credentials;
-	} catch (error) {
-		if (!(error instanceof AxiosError) || error.response?.status !== 409) {
-			throw error;
-		}
-	}
-
-	const retryCredentials = generateCredentials();
-	await postV1UsersRegister({ body: retryCredentials });
-	return retryCredentials;
-}
-
 export async function provisionSyntheticParticipant(
 	location?: SyntheticLocationInput | null,
 ): Promise<void> {
-	const credentials = await registerParticipant();
-
-	const authResponse = await postV1AuthLogin({ body: credentials });
-	const { token, refreshToken } = authResponse.data ?? {};
-	if (!token || !refreshToken) {
-		throw new Error("Token não recebido ao provisionar participante sintético");
+	const { error } = await authClient.signIn.anonymous(undefined, {
+		onSuccess: ctx => {
+			const token = ctx.response.headers.get("set-auth-token");
+			if (token) setAuthToken(token);
+		},
+	});
+	if (error) {
+		throw new Error(
+			"Não foi possível provisionar participante sintético (sign-in anônimo falhou)",
+			{ cause: error },
+		);
 	}
-
-	await Promise.all([setAuthToken(token), setRefreshToken(refreshToken)]);
 
 	const address = location ? await resolveSyntheticAddress(location) : null;
 	const syntheticName = generateSyntheticName();
