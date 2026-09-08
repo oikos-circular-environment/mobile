@@ -20,7 +20,7 @@ module.exports = {
 	setupFilesAfterEnv: ["<rootDir>/src/tests/setup.ts"],
 	// Estende o padrão do jest-expo para incluir pacotes ESM usados no projeto
 	transformIgnorePatterns: [
-		"/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|nativewind|@gluestack-ui|lucide-react-native|@legendapp|@gorhom|tailwind-merge|@faker-js/faker|standard-navigation|@oikos-circular-environment/oikos-sdk))",
+		"/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|nativewind|@gluestack-ui|lucide-react-native|@legendapp|@gorhom|tailwind-merge|@faker-js/faker|standard-navigation|@oikos-circular-environment/oikos-sdk|better-auth|@better-auth|@better-fetch|nanostores|kysely))",
 		"/node_modules/react-native-reanimated/plugin/",
 	],
 	collectCoverageFrom: [
