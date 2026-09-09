@@ -5,12 +5,10 @@ import { Calendar, Clock, User } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { AttachmentPreviewList } from "@/components/support/attachment-row";
+import { SupportContextBadge } from "@/components/support/context-badge";
 import { useCancelSupportRequest } from "@/components/support/hooks/use-cancel-support-request";
 import { StatusBadge } from "@/components/support/status-badge";
-import {
-	SupportContextBadge,
-	SupportTypeBadge,
-} from "@/components/support/type-badge";
+import { SupportTypeBadge } from "@/components/support/type-badge";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import {
@@ -45,9 +43,14 @@ export default function SupportDetailScreen() {
 					</Text>
 				</View>
 			) : (
-				<ScrollView showsVerticalScrollIndicator={false}>
-					<View className="gap-3 p-4">
-						<Heading size="lg">{data.title}</Heading>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					contentContainerClassName="gap-4 p-4 pb-8"
+				>
+					<View className="gap-3">
+						<Heading size="lg" style={{ fontFamily: "Oswald_700Bold" }}>
+							{data.title.toUpperCase()}
+						</Heading>
 						<View className="flex-row items-center gap-2">
 							<SupportContextBadge />
 							<SupportTypeBadge type={data.type} />
@@ -92,7 +95,7 @@ export default function SupportDetailScreen() {
 					</View>
 
 					{data.status === "OPEN" && (
-						<View className="px-4">
+						<View>
 							<Button
 								variant="destructive"
 								onPress={() => setShowCancelModal(true)}
@@ -105,7 +108,7 @@ export default function SupportDetailScreen() {
 					{data.moderated_at != null &&
 					data.reason != null &&
 					data.reason.length > 0 ? (
-						<View className="mx-4 mt-3 gap-2 rounded-xl border border-gray-100 bg-gray-50 p-3">
+						<View className="gap-2 rounded-xl border border-gray-100 bg-gray-50 p-3">
 							<Text className="text-xs font-bold uppercase text-gray-500">
 								Resposta da moderação
 							</Text>

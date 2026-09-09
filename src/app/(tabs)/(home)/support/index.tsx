@@ -5,15 +5,13 @@ import { router } from "expo-router";
 import { ArrowUpRight } from "lucide-react-native";
 import { useCallback, useRef } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
+import { SupportContextBadge } from "@/components/support/context-badge";
 import { CreateSupportBottomSheet } from "@/components/support/create-support-bottom-sheet";
 import { useLoadSupportRequests } from "@/components/support/hooks/use-load-support-requests";
 import { StatusBadge } from "@/components/support/status-badge";
 import { SupportCardSkeleton } from "@/components/support/support-card-skeleton";
 import { SupportListHeader } from "@/components/support/support-list-header";
-import {
-	SupportContextBadge,
-	SupportTypeBadge,
-} from "@/components/support/type-badge";
+import { SupportTypeBadge } from "@/components/support/type-badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -102,7 +100,7 @@ export default function SupportListScreen() {
 			<FlatList<SupportRequest>
 				data={supports}
 				keyExtractor={item => item.id}
-				contentContainerClassName="p-4 gap-3"
+				contentContainerClassName="gap-4 p-4 pb-8"
 				refreshControl={
 					<RefreshControl
 						refreshing={isRefetching}

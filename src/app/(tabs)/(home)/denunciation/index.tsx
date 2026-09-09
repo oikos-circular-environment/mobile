@@ -5,14 +5,12 @@ import { router } from "expo-router";
 import { ArrowUpRight } from "lucide-react-native";
 import { useCallback, useRef } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
+import { DenunciationContextBadge } from "@/components/denunciation/context-badge";
 import { CreateDenunciationBottomSheet } from "@/components/denunciation/create-denunciation-bottom-sheet";
 import { DenunciationCardSkeleton } from "@/components/denunciation/denunciation-card-skeleton";
 import { DenunciationListHeader } from "@/components/denunciation/denunciation-list-header";
 import { useLoadDenunciations } from "@/components/denunciation/hooks/use-load-denunciations";
-import {
-	DenunciationContextBadge,
-	DenunciationSeverityBadge,
-} from "@/components/denunciation/severity-badge";
+import { DenunciationSeverityBadge } from "@/components/denunciation/severity-badge";
 import { DenunciationStatusBadge } from "@/components/denunciation/status-badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Pressable } from "@/components/ui/pressable";
@@ -102,7 +100,7 @@ export default function DenunciationListScreen() {
 			<FlatList<Denunciation>
 				data={denunciations}
 				keyExtractor={item => item.id}
-				contentContainerClassName="p-4 gap-3"
+				contentContainerClassName="gap-4 p-4 pb-8"
 				refreshControl={
 					<RefreshControl
 						refreshing={isRefetching}
