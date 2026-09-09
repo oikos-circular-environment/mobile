@@ -1,14 +1,18 @@
 import type { ErrorUtils as RNErrorUtils } from "react-native";
-import { setLastError } from "@/libs/moderation/last-error-store";
+import { recordAppError } from "@/libs/moderation/record-app-error";
 
 declare const ErrorUtils: RNErrorUtils;
 
 const originalHandler = ErrorUtils.getGlobalHandler();
 
 ErrorUtils.setGlobalHandler((error, isFatal) => {
-	setLastError({
-		message: error instanceof Error ? error.message : String(error),
-		stack: error instanceof Error ? error.stack : undefined,
-	});
+	const normalizedError =
+		error instanceof Error ? error : new Error(String(error));
+	recordAppError(
+		normalizedError,
+		undefined,
+		undefined,
+		isFatal ? "fatal" : "error",
+	);
 	originalHandler(error, isFatal);
 });

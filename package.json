@@ -12,6 +12,7 @@
 		"lint": "biome lint --write --files-ignore-unknown=true .",
 		"format": "biome format --write --files-ignore-unknown=true .",
 		"db:survey:generate": "drizzle-kit generate",
+		"db:oikos-app:generate": "drizzle-kit generate --config drizzle.oikos-app.config.ts",
 		"test": "jest --forceExit --maxWorkers=8",
 		"test:coverage": "jest --coverage --forceExit --maxWorkers=8",
 		"sync:env": "eas env:push production --path .env.eas --force",

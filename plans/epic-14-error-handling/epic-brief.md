@@ -75,6 +75,31 @@ app hoje — só o boundary manual de root.
   ou precisa virar erro visível para o usuário.
 - Ticket de execução aplicando as classificações do relatório.
 
+## Adenda — persistência local estruturada do `last_error`
+
+Decisão tomada durante a execução (não estava no brief original): o `last_error` usado pelo
+formulário de suporte (`src/components/support/create-support-bottom-sheet.tsx:144-150`) tinha
+dois problemas:
+1. Vivia só em RAM (`src/libs/moderation/last-error-store.ts`) — não sobrevive a app morto,
+   exatamente o cenário (erro fatal) que a feature precisa cobrir.
+2. Guardava só o **último** erro, sobrescrito a cada novo — com boundary granular (este epic),
+   um erro contido numa tela não derruba mais o app, então o usuário pode acumular vários erros
+   não relacionados antes de abrir suporte. "Último erro" deixa de ser confiável pra saber qual
+   o usuário quer reportar.
+
+Solução: banco SQLite local novo e neutro, `oikos-app.db` (via `expo-sqlite` + `drizzle`, mesmo
+padrão que `survey.db` já usa, mas em módulo próprio — **não** reaproveita `src/libs/survey/db/`
+nem cria dependência de código no survey, só replica o padrão comprovado). Tabela `app_error`
+guarda cada erro capturado (histórico local, não mais slot único sobrescrito), consultável na
+hora de abrir suporte pra dar mais contexto. Nome específico (`oikos-app.db`, não `app.db`)
+para deixar claro que é infraestrutura da aplicação como um todo, isolada do survey mesmo que
+o survey seja removido no futuro.
+
+**Fila de sincronização em background** (enviar erros pro backend vinculados ao usuário,
+independente de suporte manual, replicando o padrão de `src/libs/survey/queue/outbox.ts`) fica
+**fora de escopo por agora** — decisão explícita de adiar, tabela já fica pronta pra suportar
+isso depois sem migração disruptiva, mas o outbox/drain em si é ticket futuro.
+
 ## Fora de escopo
 
 - Crash reporting nativo (Sentry/Crashlytics) — decisão adiada desde #204, não muda aqui.
@@ -84,6 +109,11 @@ app hoje — só o boundary manual de root.
   agora, só as 3 ativas.
 - Redesenho do design system em si — a tela de erro nova usa componentes/tokens gluestack já
   existentes.
+- Fila de sincronização em background do `app_error` pro backend (vinculada ao usuário) — ver
+  adenda acima, ticket futuro.
+- Política de retenção/limpeza da tabela `app_error` (quantos dias manter, prune automático)
+  — não entra agora, tabela cresce sem limite por enquanto; decisão explícita de adiar junto
+  com a fila.
 
 ## Impacto
 

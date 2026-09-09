@@ -1,5 +1,5 @@
 import { Observe } from "expo-observe";
-import { setLastError } from "@/libs/moderation/last-error-store";
+import { insertAppError } from "@/libs/moderation/app-errors-store";
 import { logAppErrorEvent } from "@/libs/observe-events";
 
 export function recordAppError(
@@ -10,9 +10,13 @@ export function recordAppError(
 ) {
 	logAppErrorEvent(error.message, route, severity);
 	Observe.reportError(error);
-	setLastError({
+	insertAppError({
 		message: error.message,
 		stack: error.stack,
-		component_stack: componentStack,
+		componentStack,
+		route,
+		severity,
+	}).catch(err => {
+		console.warn("[app-errors] falha ao persistir erro local", err);
 	});
 }

@@ -31,11 +31,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { isValidMimeType } from "@/libs/media-validation";
-import { getSupportDeviceInfo } from "@/libs/moderation/device-info";
 import {
-	clearLastError,
-	getLastError,
-} from "@/libs/moderation/last-error-store";
+	deleteAppError,
+	getLastAppError,
+} from "@/libs/moderation/app-errors-store";
+import { getSupportDeviceInfo } from "@/libs/moderation/device-info";
 import type {
 	SupportEnvironment,
 	SupportRequestType,
@@ -141,12 +141,20 @@ export const CreateSupportBottomSheet = forwardRef<
 		}
 	};
 
-	const onSubmit = handleSubmit(data => {
-		const lastError = selectedType === "ERROR" ? getLastError() : null;
+	const onSubmit = handleSubmit(async data => {
+		const lastError = selectedType === "ERROR" ? await getLastAppError() : null;
 		const environment: SupportEnvironment | undefined =
 			selectedType === "ERROR"
 				? lastError
-					? { ...getSupportDeviceInfo(), last_error: lastError }
+					? {
+							...getSupportDeviceInfo(),
+							last_error: {
+								message: lastError.message,
+								stack: lastError.stack,
+								component_stack: lastError.component_stack,
+								occurred_at: lastError.occurred_at,
+							},
+						}
 					: getSupportDeviceInfo()
 				: undefined;
 
@@ -163,7 +171,11 @@ export const CreateSupportBottomSheet = forwardRef<
 			},
 			{
 				onSuccess: () => {
-					if (lastError) clearLastError();
+					if (lastError) {
+						deleteAppError(lastError.id).catch(err => {
+							console.warn("[app-errors] falha ao excluir erro local", err);
+						});
+					}
 					reset();
 					setSelectedType("ERROR");
 					setSelectedAssets([]);
