@@ -1,3 +1,5 @@
+import { Observe } from "expo-observe";
+
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export type GoogleAddressFields = {
@@ -52,7 +54,8 @@ export async function reverseGeocode(
 			latitude: String(lat),
 			longitude: String(lon),
 		};
-	} catch {
+	} catch (error) {
+		Observe.reportError(error);
 		return null;
 	}
 }

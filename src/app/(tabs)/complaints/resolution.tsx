@@ -7,6 +7,7 @@ import {
 } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type * as ImagePicker from "expo-image-picker";
+import { Observe } from "expo-observe";
 import { router, useLocalSearchParams } from "expo-router";
 import {
 	AlertCircleIcon,
@@ -331,8 +332,13 @@ export default function ComplaintResolutionScreen() {
 			}
 			compressedMediaRef.current = compressed;
 			mutation.mutate(data);
-		} catch {
+		} catch (error) {
+			Observe.reportError(error);
 			setUploadProgress(null);
+			toast.error(
+				"Falha ao processar mídia",
+				"Não foi possível preparar os anexos. Tente novamente.",
+			);
 		}
 	};
 

@@ -5,6 +5,7 @@ import {
 	patchV1UsersMeCancelDeletion,
 } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Observe } from "expo-observe";
 import { useRouter } from "expo-router";
 import {
 	createContext,
@@ -95,6 +96,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 					await refetch();
 				}
 			} catch (error) {
+				Observe.reportError(error);
 				console.error("Error loading stored token:", error);
 			} finally {
 				setIsInitializing(false);
@@ -114,9 +116,14 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			const { error } = await authClient.signIn.email(
 				{ email: data.email, password: data.password },
 				{
-					onSuccess: ctx => {
+					onSuccess: async ctx => {
 						const token = ctx.response.headers.get("set-auth-token");
-						if (token) setAuthToken(token);
+						if (!token) return;
+						try {
+							await setAuthToken(token);
+						} catch (error) {
+							Observe.reportError(error);
+						}
 					},
 				},
 			);
@@ -175,9 +182,14 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 					name: data.email.split("@")[0],
 				},
 				{
-					onSuccess: ctx => {
+					onSuccess: async ctx => {
 						const token = ctx.response.headers.get("set-auth-token");
-						if (token) setAuthToken(token);
+						if (!token) return;
+						try {
+							await setAuthToken(token);
+						} catch (error) {
+							Observe.reportError(error);
+						}
 					},
 				},
 			);
@@ -329,8 +341,8 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			setUser(null);
 			setIsAuthenticated(false);
 			sessionBus.emit();
-			toast.info("Sessão expirada", "Faça o login novamente.");
-			router.push("/sign-in");
+			toast.info("Sessão expirada", "Faça o login novamente quando quiser.");
+			router.navigate("/(tabs)/(home)");
 		});
 		return () => setOnUnauthenticated(null);
 	}, [router]);

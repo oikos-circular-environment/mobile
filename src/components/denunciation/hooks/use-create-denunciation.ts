@@ -4,6 +4,7 @@ import {
 } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation } from "@tanstack/react-query";
 import type * as ImagePicker from "expo-image-picker";
+import { Observe } from "expo-observe";
 import { toast } from "@/components/toast";
 import { compressMedia } from "@/libs/media-compression";
 import {
@@ -61,7 +62,8 @@ export function useCreateDenunciation() {
 						path: { id: denunciation.id },
 						body: formData as unknown as undefined,
 					});
-				} catch {
+				} catch (error) {
+					Observe.reportError(error);
 					attachmentUploadFailed = true;
 				}
 			}

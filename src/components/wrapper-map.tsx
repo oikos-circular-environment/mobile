@@ -1,6 +1,7 @@
 "use client";
 
 import * as Location from "expo-location";
+import { Observe } from "expo-observe";
 import {
 	LocateFixedIcon,
 	LocateOffIcon,
@@ -97,7 +98,8 @@ export default function WrapperMap({
 			setDeviceLocation(nextLocation);
 			setSelectedLocation(nextLocation);
 			onChange?.(nextLocation);
-		} catch {
+		} catch (error) {
+			Observe.reportError(error);
 			setPermissionDenied(true);
 		} finally {
 			setIsResolvingLocation(false);

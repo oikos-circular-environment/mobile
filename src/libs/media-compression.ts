@@ -1,4 +1,5 @@
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { Observe } from "expo-observe";
 import { NativeModules } from "react-native";
 
 /**
@@ -43,7 +44,8 @@ export async function compressImage(
 			{ compress: quality, format: SaveFormat.JPEG },
 		);
 		return result.uri;
-	} catch {
+	} catch (error) {
+		Observe.reportError(error);
 		return uri;
 	}
 }
@@ -58,7 +60,8 @@ export async function compressVideo(uri: string): Promise<string> {
 			maxSize: 1280,
 			bitrate: 2_000_000,
 		});
-	} catch {
+	} catch (error) {
+		Observe.reportError(error);
 		return uri;
 	}
 }
