@@ -2,8 +2,10 @@ import type BottomSheet from "@gorhom/bottom-sheet";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { router } from "expo-router";
+import { ArrowUpRight } from "lucide-react-native";
 import { useCallback, useRef } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
+import { DenunciationContextBadge } from "@/components/denunciation/context-badge";
 import { CreateDenunciationBottomSheet } from "@/components/denunciation/create-denunciation-bottom-sheet";
 import { DenunciationCardSkeleton } from "@/components/denunciation/denunciation-card-skeleton";
 import { DenunciationListHeader } from "@/components/denunciation/denunciation-list-header";
@@ -36,20 +38,24 @@ export default function DenunciationListScreen() {
 				className="gap-2 rounded-xl border border-gray-100 p-3"
 				onPress={() => router.push(`/(tabs)/(home)/denunciation/${item.id}`)}
 			>
-				<Text className="font-semibold text-gray-900">{item.title}</Text>
-				<View className="flex-row items-center gap-2">
-					<DenunciationSeverityBadge severity={item.severity} />
-					<DenunciationStatusBadge status={item.status} />
+				<View className="flex-row items-center justify-between">
+					<Text className="text-xs text-gray-400">
+						{formatDistanceToNowStrict(item.created_at, {
+							locale: ptBR,
+							addSuffix: true,
+						})}
+					</Text>
+					<ArrowUpRight size={16} color="#9ca3af" />
 				</View>
-				<Text className="text-xs text-gray-400">
-					{formatDistanceToNowStrict(item.created_at, {
-						locale: ptBR,
-						addSuffix: true,
-					})}
-				</Text>
+				<Text className="font-semibold text-gray-900">{item.title}</Text>
 				<Text numberOfLines={2} className="text-sm text-gray-500">
 					{item.description}
 				</Text>
+				<View className="flex-row items-center gap-2">
+					<DenunciationContextBadge />
+					<DenunciationSeverityBadge severity={item.severity} />
+					<DenunciationStatusBadge status={item.status} />
+				</View>
 			</Pressable>
 		),
 		[],
@@ -94,7 +100,7 @@ export default function DenunciationListScreen() {
 			<FlatList<Denunciation>
 				data={denunciations}
 				keyExtractor={item => item.id}
-				contentContainerClassName="p-4 gap-3"
+				contentContainerClassName="gap-4 p-4 pb-8"
 				refreshControl={
 					<RefreshControl
 						refreshing={isRefetching}

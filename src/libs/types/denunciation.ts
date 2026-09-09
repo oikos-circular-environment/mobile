@@ -3,7 +3,12 @@ import type {
 	GetV1DenunciationsResponses,
 	PostV1DenunciationsData,
 } from "@oikos-circular-environment/oikos-sdk";
-import { AlertTriangle, Flame, ShieldAlert, Siren } from "lucide-react-native";
+import {
+	ChevronDownIcon,
+	ChevronsUpIcon,
+	ChevronUpIcon,
+	MinusIcon,
+} from "lucide-react-native";
 import type { ValueMapping } from "./value-mapping";
 
 // SDK-derived types
@@ -19,8 +24,8 @@ export type CreateDenunciationBody = PostV1DenunciationsData["body"];
 
 export const denunciationSeverityOptions: ValueMapping<DenunciationSeverity>[] =
 	[
-		{ value: "LOW", label: "Baixa", icon: AlertTriangle },
-		{ value: "MEDIUM", label: "Média", icon: ShieldAlert },
-		{ value: "HIGH", label: "Alta", icon: Flame },
-		{ value: "CRITICAL", label: "Crítica", icon: Siren },
+		{ value: "LOW", label: "Baixa", icon: ChevronDownIcon },
+		{ value: "MEDIUM", label: "Média", icon: MinusIcon },
+		{ value: "HIGH", label: "Alta", icon: ChevronUpIcon },
+		{ value: "CRITICAL", label: "Crítica", icon: ChevronsUpIcon },
 	];

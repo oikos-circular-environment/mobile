@@ -5,6 +5,7 @@ export function makeStoreCompany(overrides: Partial<Company> = {}): Company {
 	return {
 		id: faker.string.uuid(),
 		user_id: faker.string.uuid(),
+		organization_id: faker.string.uuid(),
 		identity: faker.string.numeric(14),
 		identity_type: "CNPJ",
 		company_type: "COMPANY",

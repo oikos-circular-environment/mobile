@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import type { CarouselRef } from "react-native-reanimated-carousel";
 import { ServicesCarouselContext } from "./context";
@@ -10,8 +10,9 @@ import type { ServiceCarouselItem } from "./types";
 /** Largura de referência do card no design (Pencil, node TpouA). Usada só como base de proporção — nunca como valor fixo. */
 const REFERENCE_CARD_WIDTH = 360;
 const REFERENCE_ASPECT_RATIO = 640 / 360;
-/** Teto de largura do card em telas grandes (tablets), pra não esticar o card virando um banner desproporcional. */
-const MAX_CARD_WIDTH = 480;
+/** Fração da altura da janela que o card pode ocupar; com a proporção do design, é o que limita
+ * o card em telas largas, no lugar de um teto fixo em pixels. */
+const MAX_CARD_HEIGHT_RATIO = 0.75;
 
 interface ServicesCarouselProps {
 	items: ServiceCarouselItem[];
@@ -24,6 +25,7 @@ export function ServicesCarousel({
 	autoPlayIntervalMs = 5000,
 	children,
 }: ServicesCarouselProps) {
+	const { height: windowHeight } = useWindowDimensions();
 	const [containerWidth, setContainerWidth] = useState(0);
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [isPaused, setIsPaused] = useState(false);
@@ -36,7 +38,7 @@ export function ServicesCarousel({
 
 	const cardWidth = Math.min(
 		containerWidth || REFERENCE_CARD_WIDTH,
-		MAX_CARD_WIDTH,
+		(windowHeight * MAX_CARD_HEIGHT_RATIO) / REFERENCE_ASPECT_RATIO,
 	);
 	const cardHeight = cardWidth * REFERENCE_ASPECT_RATIO;
 	const scale = cardWidth / REFERENCE_CARD_WIDTH;

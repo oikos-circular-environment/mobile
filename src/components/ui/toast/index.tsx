@@ -9,7 +9,7 @@ import Animated, { SlideInUp } from 'react-native-reanimated';
 const useToast = createToastHook(View);
 const SCOPE = 'TOAST';
 const AnimatedView = Animated.createAnimatedComponent(View);
-const StyledAnimatedView = styled(AnimatedView, { className: 'style' });
+const StyledAnimatedView = styled(AnimatedView as any, { className: 'style' });
 const toastStyle = tva({
   base: 'p-4 m-1 rounded-md gap-1 web:pointer-events-auto border-border',
   variants: {

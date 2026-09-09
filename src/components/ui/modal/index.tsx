@@ -16,8 +16,8 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedView = Animated.createAnimatedComponent(View);
 const SCOPE = 'MODAL';
 
-const StyledAnimatedPressable = styled(AnimatedPressable, { className: 'style' });
-const StyledAnimatedView = styled(AnimatedView, { className: 'style' });
+const StyledAnimatedPressable = styled(AnimatedPressable as any, { className: 'style' });
+const StyledAnimatedView = styled(AnimatedView as any, { className: 'style' });
 const UIModal = createModal({
   Root: withStyleContext(View as any, SCOPE),
   Backdrop: StyledAnimatedPressable,

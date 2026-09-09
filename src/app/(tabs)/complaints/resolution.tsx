@@ -68,7 +68,6 @@ import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 const MIN_ATTACHMENTS = 1;
-const MIN_CHARS = 50;
 
 type ExistingAttachment = { id: string; url: string; file_name: string };
 
@@ -78,12 +77,7 @@ function mediaTypeFromFileName(fileName: string): "photo" | "video" {
 }
 
 const resolutionSchema = z.object({
-	description: z
-		.string()
-		.min(
-			MIN_CHARS,
-			`A descrição precisa ter pelo menos ${MIN_CHARS} caracteres.`,
-		),
+	description: z.string().min(1, "Descrição é obrigatória."),
 });
 
 type ResolutionFormValues = z.infer<typeof resolutionSchema>;
@@ -399,9 +393,7 @@ export default function ComplaintResolutionScreen() {
 											Descrição
 										</FormControlLabelText>
 									</FormControlLabel>
-									<Text
-										className={`text-sm ${charCount >= MIN_CHARS ? "text-lime-700" : "text-gray-400"}`}
-									>
+									<Text className="text-sm text-gray-400">
 										{charCount} caracteres
 									</Text>
 								</View>
@@ -424,13 +416,7 @@ export default function ComplaintResolutionScreen() {
 											{errors.description.message}
 										</FormControlErrorText>
 									</FormControlError>
-								) : (
-									<FormControlHelper>
-										<FormControlHelperText>
-											Mínimo de {MIN_CHARS} caracteres.
-										</FormControlHelperText>
-									</FormControlHelper>
-								)}
+								) : null}
 							</FormControl>
 						)}
 					/>

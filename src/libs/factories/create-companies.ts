@@ -8,6 +8,7 @@ export const createCompanies = (count: number): Company[] => {
 			({
 				id: faker.database.mongodbObjectId(),
 				user_id: faker.database.mongodbObjectId(),
+				organization_id: faker.database.mongodbObjectId(),
 				corporate_name: faker.company.name(),
 				business_name: faker.company.name(),
 				email: faker.internet.email(),

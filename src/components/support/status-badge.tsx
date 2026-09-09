@@ -15,26 +15,26 @@ const STATUS_CONFIG: Record<SupportRequestStatus, StatusConfig> = {
 	OPEN: {
 		label: "ABERTO",
 		icon: CircleDot,
-		containerClassName: "border-lime-600 bg-lime-50",
-		contentClassName: "text-lime-700",
+		containerClassName: "border-amber-300 bg-amber-50",
+		contentClassName: "text-amber-600",
 	},
 	CLOSED: {
 		label: "RESOLVIDO",
 		icon: CircleCheck,
-		containerClassName: "border-lime-600 bg-lime-50",
-		contentClassName: "text-lime-700",
+		containerClassName: "border-lime-600 bg-lime-600",
+		contentClassName: "text-white",
 	},
 	RESOLVED: {
 		label: "RESOLVIDO",
 		icon: CircleCheck,
-		containerClassName: "border-lime-600 bg-lime-50",
-		contentClassName: "text-lime-700",
+		containerClassName: "border-lime-600 bg-lime-600",
+		contentClassName: "text-white",
 	},
 	CANCELLED: {
 		label: "CANCELADO",
 		icon: CircleX,
-		containerClassName: "border-gray-300 bg-gray-50",
-		contentClassName: "text-gray-600",
+		containerClassName: "border-red-300 bg-red-50",
+		contentClassName: "text-red-600",
 	},
 };
 
@@ -46,9 +46,7 @@ export function StatusBadge({ status }: { status: SupportRequestStatus }) {
 			className={cn("self-start gap-1", config.containerClassName)}
 		>
 			<BadgeIcon as={config.icon} className={config.contentClassName} />
-			<BadgeText
-				className={cn("text-[10px] font-semibold", config.contentClassName)}
-			>
+			<BadgeText className={cn(config.contentClassName)}>
 				{config.label}
 			</BadgeText>
 		</Badge>

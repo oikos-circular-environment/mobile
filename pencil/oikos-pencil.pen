@@ -42445,161 +42445,90 @@
                           "alignItems": "center",
                           "children": [
                             {
-                              "type": "frame",
-                              "id": "DEjTJ",
-                              "name": "HazardBadge",
-                              "context": "Grau de periculosidade (ABNT NBR 10004) — src/components/companies/waste-category/waste-category-hazard-level.tsx. Variantes: BAIXA (lime/chevron-down), MÉDIA (yellow/minus), ALTA (laranja #ea580c/chevron-up), MUITO ALTA (vermelho #dc2626/chevrons-up).",
+                              "id": "qbDhb",
+                              "type": "ref",
                               "reusable": true,
+                              "ref": "hNp9X",
+                              "name": "HazardBadge",
                               "fill": "$lime-50",
-                              "cornerRadius": 6,
                               "stroke": "$lime-200",
                               "strokeWidth": 1,
                               "strokeAlignment": "inner",
+                              "cornerRadius": 6,
                               "gap": 4,
                               "padding": [
                                 3,
                                 8
                               ],
                               "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "jxzjq",
-                                  "name": "HazardIcon",
-                                  "width": 12,
-                                  "height": 12,
+                              "descendants": {
+                                "r9uWx": {
+                                  "fill": "$lime-600",
                                   "icon": "chevron-down",
-                                  "library": "lucide",
-                                  "fill": "$lime-600"
+                                  "width": 12,
+                                  "height": 12
                                 },
-                                {
-                                  "type": "text",
-                                  "id": "PTm0X",
-                                  "name": "HazardLabel",
+                                "AwdGP": {
                                   "fill": "$lime-600",
                                   "content": "BAIXA",
-                                  "fontFamily": "$font-body",
                                   "fontSize": "$text-caption",
                                   "fontWeight": "600"
                                 }
-                              ]
+                              }
                             },
                             {
-                              "type": "frame",
-                              "id": "XUyMB",
+                              "id": "cmwmh",
+                              "type": "ref",
+                              "ref": "qbDhb",
                               "name": "Hazard Media",
-                              "context": "Grau de periculosidade (ABNT NBR 10004) — src/components/companies/waste-category/waste-category-hazard-level.tsx. Variantes: BAIXA (lime/chevron-down), MÉDIA (yellow/minus), ALTA (laranja #ea580c/chevron-up), MUITO ALTA (vermelho #dc2626/chevrons-up).",
                               "fill": "$yellow-50",
-                              "cornerRadius": 6,
                               "stroke": "$yellow-200",
-                              "strokeWidth": 1,
-                              "strokeAlignment": "inner",
-                              "gap": 4,
-                              "padding": [
-                                3,
-                                8
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "Wkzar",
-                                  "name": "HazardIcon",
-                                  "width": 12,
-                                  "height": 12,
-                                  "icon": "minus",
-                                  "library": "lucide",
-                                  "fill": "$yellow-700"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "v0POAb",
-                                  "name": "HazardLabel",
+                              "descendants": {
+                                "r9uWx": {
                                   "fill": "$yellow-700",
-                                  "content": "MÉDIA",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-caption",
-                                  "fontWeight": "600"
+                                  "icon": "minus"
+                                },
+                                "AwdGP": {
+                                  "fill": "$yellow-700",
+                                  "content": "MÉDIA"
                                 }
-                              ]
+                              }
                             },
                             {
-                              "type": "frame",
-                              "id": "okk1q",
+                              "id": "IZzIC",
+                              "type": "ref",
+                              "ref": "qbDhb",
                               "name": "Hazard Alta",
-                              "context": "Grau de periculosidade (ABNT NBR 10004) — src/components/companies/waste-category/waste-category-hazard-level.tsx. Variantes: BAIXA (lime/chevron-down), MÉDIA (yellow/minus), ALTA (laranja #ea580c/chevron-up), MUITO ALTA (vermelho #dc2626/chevrons-up).",
                               "fill": "#fff7ed",
-                              "cornerRadius": 6,
                               "stroke": "#fed7aa",
-                              "strokeWidth": 1,
-                              "strokeAlignment": "inner",
-                              "gap": 4,
-                              "padding": [
-                                3,
-                                8
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "j8HxSl",
-                                  "name": "HazardIcon",
-                                  "width": 12,
-                                  "height": 12,
-                                  "icon": "chevron-up",
-                                  "library": "lucide",
-                                  "fill": "#ea580c"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "Z1ZaaP",
-                                  "name": "HazardLabel",
+                              "descendants": {
+                                "r9uWx": {
                                   "fill": "#ea580c",
-                                  "content": "ALTA",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-caption",
-                                  "fontWeight": "600"
+                                  "icon": "chevron-up"
+                                },
+                                "AwdGP": {
+                                  "fill": "#ea580c",
+                                  "content": "ALTA"
                                 }
-                              ]
+                              }
                             },
                             {
-                              "type": "frame",
-                              "id": "yOYPm",
+                              "id": "JuNOB",
+                              "type": "ref",
+                              "ref": "qbDhb",
                               "name": "Hazard Muito Alta",
-                              "context": "Grau de periculosidade (ABNT NBR 10004) — src/components/companies/waste-category/waste-category-hazard-level.tsx. Variantes: BAIXA (lime/chevron-down), MÉDIA (yellow/minus), ALTA (laranja #ea580c/chevron-up), MUITO ALTA (vermelho #dc2626/chevrons-up).",
                               "fill": "#fef2f2",
-                              "cornerRadius": 6,
                               "stroke": "#fecaca",
-                              "strokeWidth": 1,
-                              "strokeAlignment": "inner",
-                              "gap": 4,
-                              "padding": [
-                                3,
-                                8
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "p9eo1",
-                                  "name": "HazardIcon",
-                                  "width": 12,
-                                  "height": 12,
-                                  "icon": "chevrons-up",
-                                  "library": "lucide",
-                                  "fill": "#dc2626"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "ADni9",
-                                  "name": "HazardLabel",
+                              "descendants": {
+                                "r9uWx": {
                                   "fill": "#dc2626",
-                                  "content": "MUITO ALTA",
-                                  "fontFamily": "$font-body",
-                                  "fontSize": "$text-caption",
-                                  "fontWeight": "600"
+                                  "icon": "chevrons-up"
+                                },
+                                "AwdGP": {
+                                  "fill": "#dc2626",
+                                  "content": "MUITO ALTA"
                                 }
-                              ]
+                              }
                             }
                           ]
                         },
