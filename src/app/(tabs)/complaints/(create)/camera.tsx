@@ -1,6 +1,6 @@
 import type { CameraCapturedPicture } from "expo-camera";
 import * as Crypto from "expo-crypto";
-import { router } from "expo-router";
+import { type ErrorBoundaryProps, router } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,15 +14,29 @@ import {
 	CameraRecordingTimer,
 	CameraZoomControls,
 } from "@/components/camera";
+import { ErrorFallback } from "@/components/error-fallback";
 import { colors } from "@/components/style/colors";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { getFileSize } from "@/libs/media-validation";
+import { useRecordScreenError } from "@/libs/moderation/use-record-screen-error";
 import type {
 	CameraCapturedVideo,
 	ComplaintCaptureMode,
 	DraftAttachment,
 } from "@/libs/types/complaint";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
+
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+	useRecordScreenError(error);
+
+	return (
+		<ErrorFallback
+			title="A câmera falhou"
+			message="Não foi possível continuar com a câmera. Tente novamente."
+			onRetry={retry}
+		/>
+	);
+}
 
 export default function ComplaintCameraScreen() {
 	useRouteInteractive();

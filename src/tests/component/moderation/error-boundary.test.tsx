@@ -4,6 +4,7 @@ import {
 	clearLastError,
 	getLastError,
 } from "@/libs/moderation/last-error-store";
+import { logAppErrorEvent } from "@/libs/observe-events";
 
 jest.mock("@/libs/observe-events", () => ({
 	logAppErrorEvent: jest.fn(),
@@ -21,6 +22,7 @@ describe("ErrorBoundary", () => {
 	afterEach(() => {
 		clearLastError();
 		consoleErrorSpy.mockClear();
+		jest.mocked(logAppErrorEvent).mockClear();
 	});
 
 	afterAll(() => {
@@ -50,5 +52,19 @@ describe("ErrorBoundary", () => {
 		expect(lastError?.message).toBe("kaboom");
 		expect(lastError?.stack).toContain("kaboom");
 		expect(lastError?.component_stack).toContain("Bomb");
+	});
+
+	it("reports the boundary error as fatal, since it takes down the whole app", async () => {
+		await render(
+			<ErrorBoundary>
+				<Bomb />
+			</ErrorBoundary>,
+		);
+
+		expect(logAppErrorEvent).toHaveBeenCalledWith(
+			"kaboom",
+			expect.any(String),
+			"fatal",
+		);
 	});
 });

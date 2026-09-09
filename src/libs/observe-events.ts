@@ -62,10 +62,14 @@ export function logComplaintEvent(
 	logEvent(name, attributes);
 }
 
-export function logAppErrorEvent(message: string, route?: string) {
+export function logAppErrorEvent(
+	message: string,
+	route?: string,
+	severity: "error" | "fatal" = "error",
+) {
 	logEvent(
 		"app.error_boundary_triggered",
 		{ message, route: route ?? "" },
-		"fatal",
+		severity,
 	);
 }
