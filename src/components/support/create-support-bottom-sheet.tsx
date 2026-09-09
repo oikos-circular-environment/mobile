@@ -143,9 +143,12 @@ export const CreateSupportBottomSheet = forwardRef<
 
 	const onSubmit = handleSubmit(data => {
 		const lastError = selectedType === "ERROR" ? getLastError() : null;
-		const environment: SupportEnvironment = lastError
-			? { ...getSupportDeviceInfo(), last_error: lastError }
-			: getSupportDeviceInfo();
+		const environment: SupportEnvironment | undefined =
+			selectedType === "ERROR"
+				? lastError
+					? { ...getSupportDeviceInfo(), last_error: lastError }
+					: getSupportDeviceInfo()
+				: undefined;
 
 		createSupportRequest.mutate(
 			{
