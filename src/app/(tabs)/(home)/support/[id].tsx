@@ -1,13 +1,17 @@
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Stack, useLocalSearchParams } from "expo-router";
+import { Calendar, Clock, User } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { AttachmentPreviewList } from "@/components/support/attachment-row";
 import { useCancelSupportRequest } from "@/components/support/hooks/use-cancel-support-request";
 import { StatusBadge } from "@/components/support/status-badge";
-import { SupportTypeBadge } from "@/components/support/type-badge";
-import { Button, ButtonText } from "@/components/ui/button";
+import {
+	SupportContextBadge,
+	SupportTypeBadge,
+} from "@/components/support/type-badge";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import {
 	Modal,
@@ -16,7 +20,6 @@ import {
 	ModalFooter,
 	ModalHeader,
 } from "@/components/ui/modal";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useSupportStore } from "@/stores/support-store";
@@ -34,7 +37,7 @@ export default function SupportDetailScreen() {
 
 	return (
 		<View className="flex-1 bg-white">
-			<Stack.Screen options={{ title: data?.title ?? "Chamado" }} />
+			<Stack.Screen options={{ title: "Suporte" }} />
 			{!data ? (
 				<View className="flex-1 items-center justify-center px-4">
 					<Text className="text-center text-gray-500">
@@ -44,32 +47,57 @@ export default function SupportDetailScreen() {
 			) : (
 				<ScrollView showsVerticalScrollIndicator={false}>
 					<View className="gap-3 p-4">
+						<Heading size="lg">{data.title}</Heading>
 						<View className="flex-row items-center gap-2">
+							<SupportContextBadge />
 							<SupportTypeBadge type={data.type} />
 							<StatusBadge status={data.status} />
 						</View>
 						{data.reporter_email ? (
-							<Text className="text-sm text-gray-500">
-								E-mail: {data.reporter_email}
-							</Text>
+							<View className="flex-row items-center gap-2">
+								<User size={14} color="#9ca3af" />
+								<Text className="text-sm text-gray-500">
+									{data.reporter_email}
+								</Text>
+							</View>
 						) : null}
-						<Text className="text-xs text-gray-400">
-							{`${format(data.created_at, "d 'de' MMMM 'de' yyyy", { locale: ptBR })} · Aberto ${formatDistanceToNowStrict(data.created_at, { locale: ptBR, addSuffix: true })}`}
-						</Text>
-						<Text className="text-gray-700">{data.description}</Text>
-						<AttachmentPreviewList attachments={data.attachments} />
+						<View className="flex-row items-center gap-2">
+							<Calendar size={14} color="#9ca3af" />
+							<Text className="text-xs text-gray-400">
+								{format(data.created_at, "d 'de' MMMM 'de' yyyy", {
+									locale: ptBR,
+								})}
+							</Text>
+						</View>
+						<View className="flex-row items-center gap-2">
+							<Clock size={14} color="#9ca3af" />
+							<Text className="text-xs text-gray-400">
+								{`Aberto ${formatDistanceToNowStrict(data.created_at, { locale: ptBR, addSuffix: true })}`}
+							</Text>
+						</View>
+						<View className="gap-1">
+							<Text className="text-xs font-bold uppercase text-gray-500">
+								Descrição
+							</Text>
+							<Text className="text-gray-700">{data.description}</Text>
+						</View>
+						{data.attachments.length > 0 ? (
+							<View className="gap-1">
+								<Text className="text-xs font-bold uppercase text-gray-500">
+									Anexos
+								</Text>
+								<AttachmentPreviewList attachments={data.attachments} />
+							</View>
+						) : null}
 					</View>
 
 					{data.status === "OPEN" && (
 						<View className="px-4">
 							<Button
-								variant="outline"
-								className="border-red-300"
+								variant="destructive"
 								onPress={() => setShowCancelModal(true)}
 							>
-								<ButtonText className="text-red-600">
-									Cancelar Chamado
-								</ButtonText>
+								<ButtonText>Cancelar Chamado</ButtonText>
 							</Button>
 						</View>
 					)}
@@ -81,10 +109,30 @@ export default function SupportDetailScreen() {
 							<Text className="text-xs font-bold uppercase text-gray-500">
 								Resposta da moderação
 							</Text>
-							<Text className="text-xs text-gray-400">
-								{`Equipe Oikos · ${format(data.moderated_at, "d 'de' MMMM 'de' yyyy", { locale: ptBR })} · ${formatDistanceToNowStrict(data.moderated_at, { locale: ptBR, addSuffix: true })}`}
-							</Text>
-							<Text className="text-gray-700">{data.reason}</Text>
+							<View className="flex-row items-center gap-2">
+								<User size={14} color="#9ca3af" />
+								<Text className="text-xs text-gray-400">Equipe Oikos</Text>
+							</View>
+							<View className="flex-row items-center gap-2">
+								<Calendar size={14} color="#9ca3af" />
+								<Text className="text-xs text-gray-400">
+									{format(data.moderated_at, "d 'de' MMMM 'de' yyyy", {
+										locale: ptBR,
+									})}
+								</Text>
+							</View>
+							<View className="flex-row items-center gap-2">
+								<Clock size={14} color="#9ca3af" />
+								<Text className="text-xs text-gray-400">
+									{`Respondido ${formatDistanceToNowStrict(data.moderated_at, { locale: ptBR, addSuffix: true })}`}
+								</Text>
+							</View>
+							<View className="gap-1">
+								<Text className="text-xs font-bold uppercase text-gray-500">
+									Descrição
+								</Text>
+								<Text className="text-gray-700">{data.reason}</Text>
+							</View>
 						</View>
 					) : null}
 				</ScrollView>
@@ -108,13 +156,14 @@ export default function SupportDetailScreen() {
 						<ModalFooter className="gap-2">
 							<Button
 								variant="outline"
-								className="flex-1 border-gray-200"
+								className="flex-1"
 								onPress={() => setShowCancelModal(false)}
 							>
-								<ButtonText className="text-gray-700">Cancelar</ButtonText>
+								<ButtonText>Cancelar</ButtonText>
 							</Button>
 							<Button
-								className="flex-1 bg-red-600"
+								variant="destructive"
+								className="flex-1"
 								disabled={cancelMutation.isPending}
 								onPress={() =>
 									cancelMutation.mutate(undefined, {
@@ -123,9 +172,9 @@ export default function SupportDetailScreen() {
 								}
 							>
 								{cancelMutation.isPending ? (
-									<Spinner size="small" />
+									<ButtonSpinner />
 								) : (
-									<ButtonText>Cancelar Chamado</ButtonText>
+									<ButtonText>Cancelar</ButtonText>
 								)}
 							</Button>
 						</ModalFooter>

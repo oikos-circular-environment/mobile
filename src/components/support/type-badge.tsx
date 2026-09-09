@@ -12,3 +12,16 @@ export function SupportTypeBadge({ type }: { type: SupportRequestType }) {
 		</Badge>
 	);
 }
+
+export function SupportContextBadge() {
+	return (
+		<Badge
+			variant="outline"
+			className="self-start gap-1 border-sky-600 bg-sky-50"
+		>
+			<BadgeText className="text-xs font-semibold text-sky-700">
+				SUPORTE
+			</BadgeText>
+		</Badge>
+	);
+}

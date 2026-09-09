@@ -16,3 +16,16 @@ export function DenunciationSeverityBadge({
 		</Badge>
 	);
 }
+
+export function DenunciationContextBadge() {
+	return (
+		<Badge
+			variant="outline"
+			className="self-start gap-1 border-red-600 bg-red-50"
+		>
+			<BadgeText className="text-[10px] font-semibold text-red-700">
+				DENÚNCIA
+			</BadgeText>
+		</Badge>
+	);
+}

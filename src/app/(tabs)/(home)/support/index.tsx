@@ -2,6 +2,7 @@ import type BottomSheet from "@gorhom/bottom-sheet";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { router } from "expo-router";
+import { ArrowUpRight } from "lucide-react-native";
 import { useCallback, useRef } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
 import { CreateSupportBottomSheet } from "@/components/support/create-support-bottom-sheet";
@@ -9,7 +10,10 @@ import { useLoadSupportRequests } from "@/components/support/hooks/use-load-supp
 import { StatusBadge } from "@/components/support/status-badge";
 import { SupportCardSkeleton } from "@/components/support/support-card-skeleton";
 import { SupportListHeader } from "@/components/support/support-list-header";
-import { SupportTypeBadge } from "@/components/support/type-badge";
+import {
+	SupportContextBadge,
+	SupportTypeBadge,
+} from "@/components/support/type-badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -36,20 +40,24 @@ export default function SupportListScreen() {
 				className="gap-2 rounded-xl border border-gray-100 p-3"
 				onPress={() => router.push(`/(tabs)/(home)/support/${item.id}`)}
 			>
-				<Text className="font-semibold text-gray-900">{item.title}</Text>
-				<View className="flex-row items-center gap-2">
-					<SupportTypeBadge type={item.type} />
-					<StatusBadge status={item.status} />
+				<View className="flex-row items-center justify-between">
+					<Text className="text-xs text-gray-400">
+						{formatDistanceToNowStrict(item.created_at, {
+							locale: ptBR,
+							addSuffix: true,
+						})}
+					</Text>
+					<ArrowUpRight size={16} color="#9ca3af" />
 				</View>
-				<Text className="text-xs text-gray-400">
-					{formatDistanceToNowStrict(item.created_at, {
-						locale: ptBR,
-						addSuffix: true,
-					})}
-				</Text>
+				<Text className="font-semibold text-gray-900">{item.title}</Text>
 				<Text numberOfLines={2} className="text-sm text-gray-500">
 					{item.description}
 				</Text>
+				<View className="flex-row items-center gap-2">
+					<SupportContextBadge />
+					<SupportTypeBadge type={item.type} />
+					<StatusBadge status={item.status} />
+				</View>
 			</Pressable>
 		),
 		[],
