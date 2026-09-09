@@ -1,3 +1,4 @@
+import { Observe } from "expo-observe";
 import { usePathname } from "expo-router";
 import {
 	Component,
@@ -24,6 +25,7 @@ class ErrorBoundaryBase extends Component<Props, State> {
 
 	componentDidCatch(error: Error, info: ErrorInfo) {
 		logAppErrorEvent(error.message, this.props.route);
+		Observe.reportError(error);
 		setLastError({
 			message: error.message,
 			stack: error.stack,
