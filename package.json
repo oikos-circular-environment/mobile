@@ -121,6 +121,7 @@
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/jest": "^30.0.0",
 		"@types/react": "~19.2.10",
+		"@typescript/native-preview": "^7.0.0-dev.20260707.2",
 		"agent-device": "^0.20.10",
 		"babel-plugin-module-resolver": "^5.0.3",
 		"better-sqlite3": "^13.0.2",

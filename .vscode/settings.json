@@ -7,5 +7,6 @@
 		"source.fixAll.biome": "always"
 	},
 	"eslint.enable": false,
-	"typescript.tsserver.maxTsServerMemory": 6144
+	"typescript.tsserver.maxTsServerMemory": 6144,
+	"js/ts.experimental.useTsgo": true
 }
