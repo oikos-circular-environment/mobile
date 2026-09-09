@@ -1,9 +1,15 @@
 import { usePathname } from "expo-router";
-import { Component, type PropsWithChildren, type ReactNode } from "react";
+import {
+	Component,
+	type ErrorInfo,
+	type PropsWithChildren,
+	type ReactNode,
+} from "react";
 import { View } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { setLastError } from "@/libs/moderation/last-error-store";
 import { logAppErrorEvent } from "@/libs/observe-events";
 
 type Props = PropsWithChildren<{ route?: string }>;
@@ -16,8 +22,13 @@ class ErrorBoundaryBase extends Component<Props, State> {
 		return { hasError: true };
 	}
 
-	componentDidCatch(error: Error) {
+	componentDidCatch(error: Error, info: ErrorInfo) {
 		logAppErrorEvent(error.message, this.props.route);
+		setLastError({
+			message: error.message,
+			stack: error.stack,
+			component_stack: info.componentStack ?? undefined,
+		});
 	}
 
 	render(): ReactNode {

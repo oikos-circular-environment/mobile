@@ -18,6 +18,7 @@ import { NotificationProvider } from "@/contexts/notification-context";
 import { sessionBus } from "@/libs/session-bus";
 import "./global.css";
 import "@/libs/api/oikos-api";
+import "@/libs/moderation/global-error-handler";
 import { Oswald_700Bold, useFonts } from "@expo-google-fonts/oswald";
 import { ReemKufi_700Bold } from "@expo-google-fonts/reem-kufi";
 import { SpaceGrotesk_400Regular } from "@expo-google-fonts/space-grotesk";

@@ -21,14 +21,14 @@ const STATUS_CONFIG: Record<SupportRequestStatus, StatusConfig> = {
 	CLOSED: {
 		label: "RESOLVIDO",
 		icon: CircleCheck,
-		containerClassName: "border-lime-600 bg-lime-600",
-		contentClassName: "text-white",
+		containerClassName: "border-lime-600 bg-lime-50",
+		contentClassName: "text-lime-600",
 	},
 	RESOLVED: {
 		label: "RESOLVIDO",
 		icon: CircleCheck,
-		containerClassName: "border-lime-600 bg-lime-600",
-		contentClassName: "text-white",
+		containerClassName: "border-lime-600 bg-lime-50",
+		contentClassName: "text-lime-600",
 	},
 	CANCELLED: {
 		label: "CANCELADO",

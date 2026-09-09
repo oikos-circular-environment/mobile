@@ -31,7 +31,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { isValidMimeType } from "@/libs/media-validation";
-import type { SupportRequestType } from "@/libs/types/support";
+import { getSupportDeviceInfo } from "@/libs/moderation/device-info";
+import {
+	clearLastError,
+	getLastError,
+} from "@/libs/moderation/last-error-store";
+import type {
+	SupportEnvironment,
+	SupportRequestType,
+} from "@/libs/types/support";
 import { supportTypeOptions } from "@/libs/types/support";
 import { usePickImage } from "@/libs/use-pick-image";
 import { cn } from "@/libs/utils";
@@ -133,7 +141,15 @@ export const CreateSupportBottomSheet = forwardRef<
 		}
 	};
 
-	const onSubmit = handleSubmit(data =>
+	const onSubmit = handleSubmit(data => {
+		const lastError = selectedType === "ERROR" ? getLastError() : null;
+		const environment: SupportEnvironment | undefined =
+			selectedType === "ERROR"
+				? lastError
+					? { ...getSupportDeviceInfo(), last_error: lastError }
+					: getSupportDeviceInfo()
+				: undefined;
+
 		createSupportRequest.mutate(
 			{
 				body: {
@@ -141,19 +157,21 @@ export const CreateSupportBottomSheet = forwardRef<
 					description: data.description,
 					type: selectedType,
 					reporter_email: data.email,
+					environment,
 				},
 				attachments: selectedAssets,
 			},
 			{
 				onSuccess: () => {
+					if (lastError) clearLastError();
 					reset();
 					setSelectedType("ERROR");
 					setSelectedAssets([]);
 					onSuccess();
 				},
 			},
-		),
-	);
+		);
+	});
 
 	return (
 		<BottomSheet

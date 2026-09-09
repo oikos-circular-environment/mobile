@@ -14,6 +14,10 @@ export type SupportRequestType = SupportRequest["type"];
 export type SupportRequestStatus = SupportRequest["status"];
 
 export type CreateSupportRequestBody = PostV1SupportData["body"];
+export type SupportEnvironment = NonNullable<
+	CreateSupportRequestBody["environment"]
+>;
+export type SupportLastError = NonNullable<SupportEnvironment["last_error"]>;
 
 export const supportTypeOptions: ValueMapping<SupportRequestType>[] = [
 	{ value: "ERROR", label: "Erro", icon: ShieldAlert },
