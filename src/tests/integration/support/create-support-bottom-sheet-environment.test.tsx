@@ -1,12 +1,9 @@
 import type BottomSheet from "@gorhom/bottom-sheet";
-import { act, render, screen, userEvent } from "@testing-library/react-native";
+import { render, screen, userEvent } from "@testing-library/react-native";
 import { useEffect, useRef } from "react";
 import { CreateSupportBottomSheet } from "@/components/support/create-support-bottom-sheet";
 import { useCreateSupportRequest } from "@/components/support/hooks/use-create-support-request";
-import {
-	deleteAppError,
-	getLastAppError,
-} from "@/libs/moderation/app-errors-store";
+import { getRecentAppErrors } from "@/libs/moderation/app-errors-store";
 
 jest.mock("@/components/support/hooks/use-create-support-request", () => ({
 	useCreateSupportRequest: jest.fn(),
@@ -34,12 +31,10 @@ jest.mock("@/libs/moderation/device-info", () => ({
 }));
 
 jest.mock("@/libs/moderation/app-errors-store", () => ({
-	getLastAppError: jest.fn(),
-	deleteAppError: jest.fn(),
+	getRecentAppErrors: jest.fn(),
 }));
 
-const mockedGetLastAppError = getLastAppError as jest.Mock;
-const mockedDeleteAppError = deleteAppError as jest.Mock;
+const mockedGetRecentAppErrors = getRecentAppErrors as jest.Mock;
 const mockedUseCreateSupportRequest = useCreateSupportRequest as jest.Mock;
 
 function OpenedCreateSupportBottomSheet({
@@ -75,8 +70,7 @@ describe("CreateSupportBottomSheet environment metadata", () => {
 
 	beforeEach(() => {
 		jest.useFakeTimers();
-		mockedGetLastAppError.mockReset().mockResolvedValue(null);
-		mockedDeleteAppError.mockReset().mockResolvedValue(undefined);
+		mockedGetRecentAppErrors.mockReset().mockResolvedValue([]);
 		mutate = jest.fn();
 		mockedUseCreateSupportRequest.mockReturnValue({
 			mutate,
@@ -102,13 +96,21 @@ describe("CreateSupportBottomSheet environment metadata", () => {
 		});
 	});
 
-	it("attaches last_error without the local bookkeeping id when type is ERROR and a snapshot was captured", async () => {
-		mockedGetLastAppError.mockResolvedValue({
-			id: "local-row-id",
-			message: "boom",
-			stack: "Error: boom",
-			occurred_at: new Date("2026-01-01T00:00:00.000Z"),
-		});
+	it("attaches last_error (most recent) and last_errors (up to 10) without the local bookkeeping id", async () => {
+		mockedGetRecentAppErrors.mockResolvedValue([
+			{
+				id: "row-2",
+				message: "boom 2",
+				stack: "Error: boom 2",
+				occurred_at: new Date("2026-01-02T00:00:00.000Z"),
+			},
+			{
+				id: "row-1",
+				message: "boom 1",
+				stack: "Error: boom 1",
+				occurred_at: new Date("2026-01-01T00:00:00.000Z"),
+			},
+		]);
 
 		await render(<OpenedCreateSupportBottomSheet onSuccess={jest.fn()} />);
 		// "ERROR" já é o tipo padrão selecionado no formulário.
@@ -117,29 +119,24 @@ describe("CreateSupportBottomSheet environment metadata", () => {
 		expect(mutate).toHaveBeenCalledTimes(1);
 		const [{ body }] = mutate.mock.calls[0];
 		expect(body.environment.last_error).toEqual({
-			message: "boom",
-			stack: "Error: boom",
+			message: "boom 2",
+			stack: "Error: boom 2",
 			component_stack: undefined,
-			occurred_at: new Date("2026-01-01T00:00:00.000Z"),
+			occurred_at: new Date("2026-01-02T00:00:00.000Z"),
 		});
-	});
-
-	it("deletes the stored app error only after a successful submit", async () => {
-		mockedGetLastAppError.mockResolvedValue({
-			id: "local-row-id",
-			message: "boom",
-		});
-
-		await render(<OpenedCreateSupportBottomSheet onSuccess={jest.fn()} />);
-		await fillAndSubmit();
-
-		const [, callbacks] = mutate.mock.calls[0];
-		expect(mockedDeleteAppError).not.toHaveBeenCalled();
-
-		act(() => {
-			callbacks.onSuccess();
-		});
-
-		expect(mockedDeleteAppError).toHaveBeenCalledWith("local-row-id");
+		expect(body.environment.last_errors).toEqual([
+			{
+				message: "boom 2",
+				stack: "Error: boom 2",
+				component_stack: undefined,
+				occurred_at: new Date("2026-01-02T00:00:00.000Z"),
+			},
+			{
+				message: "boom 1",
+				stack: "Error: boom 1",
+				component_stack: undefined,
+				occurred_at: new Date("2026-01-01T00:00:00.000Z"),
+			},
+		]);
 	});
 });

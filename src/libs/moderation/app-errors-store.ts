@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { getOikosAppDb } from "@/libs/db/client";
 import { appError } from "@/libs/db/schema";
@@ -22,26 +22,20 @@ export async function insertAppError(error: {
 	});
 }
 
-export async function getLastAppError(): Promise<
-	(SupportLastError & { id: string }) | null
-> {
-	const [row] = await getOikosAppDb()
+export async function getRecentAppErrors(
+	limit = 10,
+): Promise<(SupportLastError & { id: string })[]> {
+	const rows = await getOikosAppDb()
 		.select()
 		.from(appError)
 		.orderBy(desc(appError.occurredAt))
-		.limit(1);
+		.limit(limit);
 
-	if (!row) return null;
-
-	return {
+	return rows.map(row => ({
 		id: row.id,
 		message: row.message,
 		stack: row.stack ?? undefined,
 		component_stack: row.componentStack ?? undefined,
 		occurred_at: new Date(row.occurredAt),
-	};
-}
-
-export async function deleteAppError(id: string) {
-	await getOikosAppDb().delete(appError).where(eq(appError.id, id));
+	}));
 }

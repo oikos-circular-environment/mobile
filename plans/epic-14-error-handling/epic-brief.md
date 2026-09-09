@@ -100,6 +100,24 @@ independente de suporte manual, replicando o padrão de `src/libs/survey/queue/o
 **fora de escopo por agora** — decisão explícita de adiar, tabela já fica pronta pra suportar
 isso depois sem migração disruptiva, mas o outbox/drain em si é ticket futuro.
 
+### Quantos erros anexar no suporte
+
+`getLastAppError` (pega só o mais recente) não resolvia o problema #2 acima — decisão:
+`getRecentAppErrors(10)` busca os últimos 10 eventos, `create-support-bottom-sheet.tsx` envia
+os dois campos no `environment`: `last_error` (o mais recente, mantido por compatibilidade com
+o que a API já lê hoje) e `last_errors` (array com os até 10, campo novo). O tipo gerado do SDK
+tem `[key: string]: unknown` em `environment`, então `last_errors` passa sem quebrar tipo nem
+exigir regen do SDK — a API hoje ignora o campo extra, sem risco. Enviar suporte **não apaga**
+os erros locais (responsabilidade explicitamente adiada) — deleção fica pra quando a fila de
+sincronização em background existir; ela é quem vai marcar/apagar o que já foi entregue ao
+backend, não o formulário de suporte.
+
+**Dependência cross-repo**: o usuário vai alterar o schema da API (`api`, banco/tabela de
+suporte) pra receber `last_errors` de forma categorizada em vez de só armazenar o blob JSON —
+trabalho à parte, no repo `api`, fora do escopo desta branch. Quando isso acontecer, o SDK
+(`@oikos-circular-environment/oikos-sdk`) precisa ser regenerado e `last_error` (singular) pode
+ser removido daqui se a API não precisar mais dele.
+
 ## Fora de escopo
 
 - Crash reporting nativo (Sentry/Crashlytics) — decisão adiada desde #204, não muda aqui.
