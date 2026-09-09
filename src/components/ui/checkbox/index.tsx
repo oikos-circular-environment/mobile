@@ -138,7 +138,8 @@ const CheckboxIcon = React.forwardRef<
       />
     );
   } else if (
-    (props.height !== undefined || props.width !== undefined) &&
+    (('height' in props && props.height !== undefined) ||
+      ('width' in props && props.width !== undefined)) &&
     size === undefined
   ) {
     return (

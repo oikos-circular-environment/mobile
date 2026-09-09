@@ -5,5 +5,7 @@
 	"editor.codeActionsOnSave": {
 		"source.organizeImports.biome": "always",
 		"source.fixAll.biome": "always"
-	}
+	},
+	"eslint.enable": false,
+	"typescript.tsserver.maxTsServerMemory": 6144
 }
