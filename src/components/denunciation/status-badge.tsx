@@ -15,26 +15,26 @@ const STATUS_CONFIG: Record<DenunciationStatus, StatusConfig> = {
 	OPEN: {
 		label: "ABERTO",
 		icon: CircleDot,
-		containerClassName: "border-gray-300 bg-gray-50",
-		contentClassName: "text-gray-600",
+		containerClassName: "border-yellow-300 bg-yellow-50",
+		contentClassName: "text-yellow-600",
 	},
 	CLOSED: {
 		label: "RESOLVIDO",
 		icon: CircleCheck,
-		containerClassName: "border-lime-600 bg-lime-600",
-		contentClassName: "text-white",
+		containerClassName: "border-lime-600 bg-lime-50",
+		contentClassName: "text-lime-600",
 	},
 	RESOLVED: {
 		label: "RESOLVIDO",
 		icon: CircleCheck,
-		containerClassName: "border-lime-600 bg-lime-600",
-		contentClassName: "text-white",
+		containerClassName: "border-lime-600 bg-lime-50",
+		contentClassName: "text-lime-600",
 	},
 	CANCELLED: {
 		label: "CANCELADO",
 		icon: CircleX,
-		containerClassName: "border-gray-300 bg-gray-50",
-		contentClassName: "text-gray-600",
+		containerClassName: "border-red-300 bg-red-50",
+		contentClassName: "text-red-600",
 	},
 };
 
@@ -50,9 +50,7 @@ export function DenunciationStatusBadge({
 			className={cn("self-start gap-1", config.containerClassName)}
 		>
 			<BadgeIcon as={config.icon} className={config.contentClassName} />
-			<BadgeText
-				className={cn("text-[10px] font-semibold", config.contentClassName)}
-			>
+			<BadgeText className={cn(config.contentClassName)}>
 				{config.label}
 			</BadgeText>
 		</Badge>

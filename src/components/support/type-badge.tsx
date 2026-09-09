@@ -40,9 +40,7 @@ export function SupportTypeBadge({ type }: { type: SupportRequestType }) {
 			className={cn("self-start gap-1", config.containerClassName)}
 		>
 			<BadgeIcon as={config.icon} className={config.contentClassName} />
-			<BadgeText
-				className={cn("text-[10px] font-semibold", config.contentClassName)}
-			>
+			<BadgeText className={cn(config.contentClassName)}>
 				{config.label}
 			</BadgeText>
 		</Badge>

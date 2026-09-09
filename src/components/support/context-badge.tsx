@@ -1,10 +1,14 @@
 import { LifeBuoyIcon } from "lucide-react-native";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
+
 export function SupportContextBadge() {
 	return (
-		<Badge variant="secondary" className="self-start gap-1">
+		<Badge
+			variant="secondary"
+			className="self-start gap-1 border border-transparent"
+		>
 			<BadgeIcon as={LifeBuoyIcon} />
-			<BadgeText className="text-[10px] font-semibold">SUPORTE</BadgeText>
+			<BadgeText>SUPORTE</BadgeText>
 		</Badge>
 	);
 }
