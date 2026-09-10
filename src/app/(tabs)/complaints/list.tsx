@@ -13,8 +13,8 @@ import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import type { Complaint } from "@/libs/types/complaint";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import {
 	selectFilteredComplaints,
 	useComplaintsStore,

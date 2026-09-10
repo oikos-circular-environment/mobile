@@ -64,6 +64,8 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
+import { usePickImage } from "@/hooks/use-pick-image";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { getCnpj } from "@/libs/brasil-api-sdk";
 import { cnpjRegex, cpfRegex, mask, phoneRegex } from "@/libs/mask";
@@ -71,8 +73,6 @@ import {
 	companyTypeOptions,
 	identityTypeOptions,
 } from "@/libs/types/companies";
-import { usePickImage } from "@/libs/use-pick-image";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 

@@ -29,7 +29,7 @@ import {
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 
 export default function HomeScreen() {
 	useRouteInteractive();

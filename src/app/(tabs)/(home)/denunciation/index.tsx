@@ -15,8 +15,8 @@ import { DenunciationStatusBadge } from "@/components/denunciation/status-badge"
 import { Button, ButtonText } from "@/components/ui/button";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import type { Denunciation } from "@/libs/types/denunciation";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useDenunciationStore } from "@/stores/denunciation-store";
 
 export default function DenunciationListScreen() {

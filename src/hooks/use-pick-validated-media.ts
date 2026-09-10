@@ -1,7 +1,7 @@
 import type * as ImagePicker from "expo-image-picker";
 import { toast } from "@/components/toast";
+import { type PickImageOptions, usePickImage } from "@/hooks/use-pick-image";
 import { isValidMimeType } from "@/libs/media-validation";
-import { type PickImageOptions, usePickImage } from "@/libs/use-pick-image";
 
 export function usePickValidatedMedia() {
 	const { pickImage, isPicking } = usePickImage();

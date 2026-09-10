@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
-import { usePickValidatedMedia } from "@/libs/use-pick-validated-media";
+import { usePickValidatedMedia } from "@/hooks/use-pick-validated-media";
 
 // BottomSheet só reposiciona sobre o teclado se o campo for o
 // BottomSheetTextInput dele — o InputField do gluestack renderiza um

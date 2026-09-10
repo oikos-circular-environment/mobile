@@ -14,7 +14,7 @@ import { SettingOptionRow } from "@/components/settings/setting-option-row";
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 
 const DELETION_GRACE_PERIOD_DAYS = 90;
 

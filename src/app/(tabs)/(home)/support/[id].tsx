@@ -19,7 +19,7 @@ import {
 	ModalHeader,
 } from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { useSupportStore } from "@/stores/support-store";
 
 export default function SupportDetailScreen() {

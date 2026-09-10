@@ -43,8 +43,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { mask } from "@/libs/mask";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 import { useCompaniesStore } from "@/stores/companies-store";
 

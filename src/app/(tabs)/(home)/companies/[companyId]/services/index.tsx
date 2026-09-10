@@ -17,7 +17,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { SwipeableCard } from "@/components/ui/swipeable-card";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function ServicesIndexScreen() {

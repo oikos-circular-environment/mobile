@@ -23,7 +23,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 type CompanySetting = {

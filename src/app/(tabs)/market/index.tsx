@@ -26,12 +26,12 @@ import { VStack } from "@/components/ui/vstack";
 import { useNow } from "@/contexts/clock-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { formatDistance } from "@/libs/format-distance";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { maskCnpj } from "@/libs/mask";
 import type { MarketCompany } from "@/libs/types/market";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 function CompanyCardSkeleton() {
 	return (

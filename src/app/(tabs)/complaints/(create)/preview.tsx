@@ -10,7 +10,7 @@ import {
 import { colors } from "@/components/style/colors";
 import { Text } from "@/components/ui/text";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 
 export default function ComplaintPreviewScreen() {
 	useRouteInteractive();

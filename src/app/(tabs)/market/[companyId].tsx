@@ -23,6 +23,7 @@ import { Text } from "@/components/ui/text";
 import { useNow } from "@/contexts/clock-context";
 import { CompanyDetailProvider } from "@/contexts/company-detail-context";
 import { useMarket } from "@/contexts/market-context";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { formatDistance } from "@/libs/format-distance";
 import {
@@ -32,7 +33,6 @@ import {
 import type { MarketSimulationItemType } from "@/libs/memory/market-simulations";
 import { daysOfWeek } from "@/libs/types/business-hour";
 import type { MarketBusinessHour } from "@/libs/types/market";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 type MarketDetailTab = "general" | "simulation";
 

@@ -4,7 +4,7 @@ import { useAuthContext } from "@/contexts/auth-context";
 
 jest.mock("@/contexts/auth-context");
 
-jest.mock("@/libs/use-route-interactive", () => ({
+jest.mock("@/hooks/use-route-interactive", () => ({
 	useRouteInteractive: jest.fn(),
 }));
 

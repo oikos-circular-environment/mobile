@@ -41,8 +41,8 @@ import { MapSkeleton } from "@/components/ui/map-skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { useRecordScreenError } from "@/libs/moderation/use-record-screen-error";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 const fabShadow = {
 	shadowColor: colors.black,

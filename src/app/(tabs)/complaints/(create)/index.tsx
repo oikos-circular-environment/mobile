@@ -56,6 +56,9 @@ import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useCepLookup } from "@/hooks/use-cep-lookup";
+import { usePickValidatedMedia } from "@/hooks/use-pick-validated-media";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import {
 	type GoogleAddressFields,
 	reverseGeocode,
@@ -68,9 +71,6 @@ import {
 	MAX_FILE_SIZE_BYTES,
 } from "@/libs/media-validation";
 import type { Geospatial } from "@/libs/types/complaint";
-import { useCepLookup } from "@/libs/use-cep-lookup";
-import { usePickValidatedMedia } from "@/libs/use-pick-validated-media";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 const schema = z.object({
 	observations: z.string().max(500, "Máximo de 500 caracteres.").optional(),

@@ -17,6 +17,7 @@ import {
 import { ErrorFallback } from "@/components/error-fallback";
 import { colors } from "@/components/style/colors";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getFileSize } from "@/libs/media-validation";
 import { useRecordScreenError } from "@/libs/moderation/use-record-screen-error";
 import type {
@@ -24,7 +25,6 @@ import type {
 	ComplaintCaptureMode,
 	DraftAttachment,
 } from "@/libs/types/complaint";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 	useRecordScreenError(error);

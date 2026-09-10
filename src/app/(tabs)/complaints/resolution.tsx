@@ -38,9 +38,9 @@ import { Input, InputField } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { usePickValidatedMedia } from "@/hooks/use-pick-validated-media";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { mediaTypeFromFileName } from "@/libs/media-validation";
-import { usePickValidatedMedia } from "@/libs/use-pick-validated-media";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 const MIN_ATTACHMENTS = 1;

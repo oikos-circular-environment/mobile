@@ -29,6 +29,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
+import { usePickValidatedMedia } from "@/hooks/use-pick-validated-media";
 import { getRecentAppErrors } from "@/libs/moderation/app-errors-store";
 import { getSupportDeviceInfo } from "@/libs/moderation/device-info";
 import type {
@@ -36,7 +37,6 @@ import type {
 	SupportRequestType,
 } from "@/libs/types/support";
 import { supportTypeOptions } from "@/libs/types/support";
-import { usePickValidatedMedia } from "@/libs/use-pick-validated-media";
 import { cn } from "@/libs/utils";
 
 // BottomSheet só reposiciona sobre o teclado se o campo for o

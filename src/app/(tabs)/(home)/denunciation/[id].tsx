@@ -19,7 +19,7 @@ import {
 	ModalHeader,
 } from "@/components/ui/modal";
 import { Text } from "@/components/ui/text";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { useDenunciationStore } from "@/stores/denunciation-store";
 
 export default function DenunciationDetailScreen() {
