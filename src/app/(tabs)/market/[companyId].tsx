@@ -23,6 +23,7 @@ import { Text } from "@/components/ui/text";
 import { useNow } from "@/contexts/clock-context";
 import { CompanyDetailProvider } from "@/contexts/company-detail-context";
 import { useMarket } from "@/contexts/market-context";
+import type { MarketSimulationItemType } from "@/contexts/market-simulations-store";
 import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { formatDistance } from "@/libs/format-distance";
@@ -30,7 +31,6 @@ import {
 	getCurrentBusinessHour,
 	isCompanyOpenNow,
 } from "@/libs/market/is-company-open";
-import type { MarketSimulationItemType } from "@/libs/memory/market-simulations";
 import { daysOfWeek } from "@/libs/types/business-hour";
 import type { MarketBusinessHour } from "@/libs/types/market";
 

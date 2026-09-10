@@ -27,7 +27,7 @@ import {
 	getMarketCheckoutDraft,
 	type MarketCheckoutItemDraft,
 	type MarketSimulationItemType,
-} from "@/libs/memory/market-simulations";
+} from "@/contexts/market-simulations-store";
 import { HStack } from "../ui/hstack";
 import { VStack } from "../ui/vstack";
 
