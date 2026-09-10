@@ -29,6 +29,7 @@ export type MapControlsSheetRef = { open: () => void };
 type MapControlsBottomSheetProps = {
 	ref?: React.Ref<MapControlsSheetRef>;
 	mapRef: RefObject<MapView | null>;
+	isMapReady: boolean;
 	permissionDenied: boolean;
 	showUserLocation: boolean;
 	onToggleUserLocation: () => void;
@@ -49,6 +50,7 @@ const controlShadow = {
 export function MapControlsBottomSheet({
 	ref,
 	mapRef,
+	isMapReady,
 	permissionDenied,
 	showUserLocation,
 	onToggleUserLocation,
@@ -79,6 +81,7 @@ export function MapControlsBottomSheet({
 	);
 
 	const handleZoomIn = async () => {
+		if (!isMapReady) return;
 		const camera = await mapRef.current?.getCamera();
 		if (!camera) return;
 		mapRef.current?.animateCamera({
@@ -88,6 +91,7 @@ export function MapControlsBottomSheet({
 	};
 
 	const handleZoomOut = async () => {
+		if (!isMapReady) return;
 		const camera = await mapRef.current?.getCamera();
 		if (!camera) return;
 		mapRef.current?.animateCamera({

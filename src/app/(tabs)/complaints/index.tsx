@@ -166,13 +166,13 @@ export default function ComplaintsMapScreen() {
 	const { isAuthenticated, needsProfileCompletion } = useAuthContext();
 	const { location, permissionDenied } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
-	const { mapHeading, handleResetNorth, handleRegionChangeComplete } =
-		useMapHeading(mapRef);
 	const filterSheetRef = useRef<BottomSheetRef>(null);
 	const mapControlsSheetRef = useRef<MapControlsSheetRef>(null);
 	const hasAnimatedRef = useRef(false);
 	const suppressMapPressRef = useRef(false);
 	const [isMapReady, setIsMapReady] = useState(false);
+	const { mapHeading, handleResetNorth, handleRegionChangeComplete } =
+		useMapHeading(mapRef, isMapReady);
 
 	const userLocation = location
 		? { lat: location.coords.latitude, lon: location.coords.longitude }
@@ -476,6 +476,7 @@ export default function ComplaintsMapScreen() {
 			<MapControlsBottomSheet
 				ref={mapControlsSheetRef}
 				mapRef={mapRef}
+				isMapReady={isMapReady}
 				permissionDenied={permissionDenied}
 				showUserLocation={showUserLocation}
 				onToggleUserLocation={() => setShowUserLocation(v => !v)}

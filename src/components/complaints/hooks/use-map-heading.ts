@@ -2,7 +2,10 @@ import type { RefObject } from "react";
 import { useState } from "react";
 import type MapView from "react-native-maps";
 
-export function useMapHeading(mapRef: RefObject<MapView | null>) {
+export function useMapHeading(
+	mapRef: RefObject<MapView | null>,
+	isMapReady: boolean,
+) {
 	const [mapHeading, setMapHeading] = useState(0);
 
 	const handleResetNorth = () => {
@@ -11,6 +14,7 @@ export function useMapHeading(mapRef: RefObject<MapView | null>) {
 	};
 
 	const handleRegionChangeComplete = async () => {
+		if (!isMapReady) return;
 		const camera = await mapRef.current?.getCamera();
 		if (camera?.heading !== undefined) {
 			setMapHeading(camera.heading);
