@@ -38,11 +38,8 @@ import { Input, InputField } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
-import {
-	isValidMimeType,
-	mediaTypeFromFileName,
-} from "@/libs/media-validation";
-import { usePickImage } from "@/libs/use-pick-image";
+import { mediaTypeFromFileName } from "@/libs/media-validation";
+import { usePickValidatedMedia } from "@/libs/use-pick-validated-media";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
@@ -127,40 +124,21 @@ export default function ComplaintResolutionScreen() {
 		};
 	}, [selectedMapComplaint, complaintsInList, id]);
 
-	const { pickImage, isPicking } = usePickImage();
+	const { pickValidatedMedia, isPicking } = usePickValidatedMedia();
 
 	const handlePickMedia = async () => {
-		const assets = await pickImage({
-			requestPermission: true,
-			mediaTypes: ["images", "videos"],
-			allowsMultipleSelection: true,
-			quality: 0.85,
-			orderedSelection: true,
-		});
-		if (!assets) return;
-
-		const existingUris = new Set(selectedAssets.map(a => a.uri));
-		const validAssets: ImagePicker.ImagePickerAsset[] = [];
-		let skippedCount = 0;
-
-		for (const asset of assets) {
-			if (existingUris.has(asset.uri)) continue;
-			if (!isValidMimeType(asset.mimeType)) {
-				skippedCount++;
-				continue;
-			}
-			validAssets.push(asset);
-		}
-
+		const validAssets = await pickValidatedMedia(
+			selectedAssets.map(a => a.uri),
+			{
+				requestPermission: true,
+				mediaTypes: ["images", "videos"],
+				allowsMultipleSelection: true,
+				quality: 0.85,
+				orderedSelection: true,
+			},
+		);
 		if (validAssets.length > 0) {
 			setSelectedAssets(prev => [...prev, ...validAssets]);
-		}
-
-		if (skippedCount > 0) {
-			toast.warning(
-				"Arquivos ignorados",
-				`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
-			);
 		}
 	};
 

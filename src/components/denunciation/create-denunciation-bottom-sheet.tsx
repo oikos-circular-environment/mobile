@@ -14,7 +14,6 @@ import { z } from "zod";
 import { AttachmentPickerRow } from "@/components/denunciation/attachment-row";
 import { useCreateDenunciation } from "@/components/denunciation/hooks/use-create-denunciation";
 import { colors } from "@/components/style/colors";
-import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -29,8 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
-import { isValidMimeType } from "@/libs/media-validation";
-import { usePickImage } from "@/libs/use-pick-image";
+import { usePickValidatedMedia } from "@/libs/use-pick-validated-media";
 
 // BottomSheet só reposiciona sobre o teclado se o campo for o
 // BottomSheetTextInput dele — o InputField do gluestack renderiza um
@@ -78,7 +76,7 @@ export const CreateDenunciationBottomSheet = forwardRef<
 		mode: "onTouched",
 	});
 
-	const { pickImage, isPicking } = usePickImage();
+	const { pickValidatedMedia, isPicking } = usePickValidatedMedia();
 	const createDenunciation = useCreateDenunciation();
 
 	const backdropComponent = useCallback(
@@ -94,37 +92,18 @@ export const CreateDenunciationBottomSheet = forwardRef<
 	);
 
 	const handlePickMedia = async () => {
-		const assets = await pickImage({
-			requestPermission: true,
-			mediaTypes: ["images", "videos"],
-			allowsMultipleSelection: true,
-			quality: 0.85,
-			orderedSelection: true,
-		});
-		if (!assets) return;
-
-		const existingUris = new Set(selectedAssets.map(a => a.uri));
-		const validAssets: ImagePicker.ImagePickerAsset[] = [];
-		let skippedCount = 0;
-
-		for (const asset of assets) {
-			if (existingUris.has(asset.uri)) continue;
-			if (!isValidMimeType(asset.mimeType)) {
-				skippedCount++;
-				continue;
-			}
-			validAssets.push(asset);
-		}
-
+		const validAssets = await pickValidatedMedia(
+			selectedAssets.map(a => a.uri),
+			{
+				requestPermission: true,
+				mediaTypes: ["images", "videos"],
+				allowsMultipleSelection: true,
+				quality: 0.85,
+				orderedSelection: true,
+			},
+		);
 		if (validAssets.length > 0) {
 			setSelectedAssets(prev => [...prev, ...validAssets]);
-		}
-
-		if (skippedCount > 0) {
-			toast.warning(
-				"Arquivos ignorados",
-				`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
-			);
 		}
 	};
 

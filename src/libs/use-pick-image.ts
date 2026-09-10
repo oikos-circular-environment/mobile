@@ -2,7 +2,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useRef, useState } from "react";
 import { toast } from "@/components/toast";
 
-type PickImageOptions = ImagePicker.ImagePickerOptions & {
+export type PickImageOptions = ImagePicker.ImagePickerOptions & {
 	requestPermission?: boolean;
 };
 

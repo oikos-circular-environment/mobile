@@ -14,7 +14,6 @@ import { z } from "zod";
 import { colors } from "@/components/style/colors";
 import { AttachmentPickerRow } from "@/components/support/attachment-row";
 import { useCreateSupportRequest } from "@/components/support/hooks/use-create-support-request";
-import { toast } from "@/components/toast";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
 	FormControl,
@@ -30,7 +29,6 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
-import { isValidMimeType } from "@/libs/media-validation";
 import { getRecentAppErrors } from "@/libs/moderation/app-errors-store";
 import { getSupportDeviceInfo } from "@/libs/moderation/device-info";
 import type {
@@ -38,7 +36,7 @@ import type {
 	SupportRequestType,
 } from "@/libs/types/support";
 import { supportTypeOptions } from "@/libs/types/support";
-import { usePickImage } from "@/libs/use-pick-image";
+import { usePickValidatedMedia } from "@/libs/use-pick-validated-media";
 import { cn } from "@/libs/utils";
 
 // BottomSheet só reposiciona sobre o teclado se o campo for o
@@ -88,7 +86,7 @@ export const CreateSupportBottomSheet = forwardRef<
 		mode: "onTouched",
 	});
 
-	const { pickImage, isPicking } = usePickImage();
+	const { pickValidatedMedia, isPicking } = usePickValidatedMedia();
 	const createSupportRequest = useCreateSupportRequest();
 
 	const backdropComponent = useCallback(
@@ -104,37 +102,18 @@ export const CreateSupportBottomSheet = forwardRef<
 	);
 
 	const handlePickMedia = async () => {
-		const assets = await pickImage({
-			requestPermission: true,
-			mediaTypes: ["images", "videos"],
-			allowsMultipleSelection: true,
-			quality: 0.85,
-			orderedSelection: true,
-		});
-		if (!assets) return;
-
-		const existingUris = new Set(selectedAssets.map(a => a.uri));
-		const validAssets: ImagePicker.ImagePickerAsset[] = [];
-		let skippedCount = 0;
-
-		for (const asset of assets) {
-			if (existingUris.has(asset.uri)) continue;
-			if (!isValidMimeType(asset.mimeType)) {
-				skippedCount++;
-				continue;
-			}
-			validAssets.push(asset);
-		}
-
+		const validAssets = await pickValidatedMedia(
+			selectedAssets.map(a => a.uri),
+			{
+				requestPermission: true,
+				mediaTypes: ["images", "videos"],
+				allowsMultipleSelection: true,
+				quality: 0.85,
+				orderedSelection: true,
+			},
+		);
 		if (validAssets.length > 0) {
 			setSelectedAssets(prev => [...prev, ...validAssets]);
-		}
-
-		if (skippedCount > 0) {
-			toast.warning(
-				"Arquivos ignorados",
-				`${skippedCount} arquivo(s) com formato não suportado. Use JPEG, PNG, MP4, MOV ou WEBM.`,
-			);
 		}
 	};
 
