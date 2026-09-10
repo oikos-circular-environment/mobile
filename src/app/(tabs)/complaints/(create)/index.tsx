@@ -5,9 +5,7 @@ import {
 	AlertCircleIcon,
 	CameraIcon,
 	ImageIcon,
-	SearchIcon,
 	ShieldAlertIcon,
-	XIcon,
 } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -15,29 +13,22 @@ import {
 	InteractionManager,
 	KeyboardAvoidingView,
 	ScrollView,
-	TouchableOpacity,
 	View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
+import { AttachmentDeleteConfirmModal } from "@/components/complaints/attachments/attachment-delete-confirm-modal";
+import { AttachmentThumbnail } from "@/components/complaints/attachments/attachment-thumbnail";
+import { AddressFormFields } from "@/components/complaints/complaint-form/address-form-fields";
+import { SectionHeader } from "@/components/complaints/complaint-form/section-header";
+import { WasteCategorySelector } from "@/components/complaints/complaint-form/waste-category-selector";
 import type { UploadProgress } from "@/components/complaints/hooks/upload-progress";
 import { useAttachmentRemove } from "@/components/complaints/hooks/use-attachment-remove";
 import { useEditComplaint } from "@/components/complaints/hooks/use-edit-complaint";
 import type { MediaItem } from "@/components/complaints/hooks/use-submit-complaints";
 import { useSubmitComplaints } from "@/components/complaints/hooks/use-submit-complaints";
 import { MediaUploadProgress } from "@/components/complaints/media-upload-progress";
-import {
-	type HazardLevelVariant,
-	WasteCategory,
-	WasteCategoryChip,
-	WasteCategoryChips,
-	WasteCategoryChipText,
-	WasteCategoryContent,
-	WasteCategoryHazardLevel,
-	WasteCategoryHazardLevelIcon,
-} from "@/components/custom/waste-category";
 import { GooglePlacesInput } from "@/components/google-places-input";
-import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
 import {
@@ -57,16 +48,8 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Heading } from "@/components/ui/heading";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Input, InputField } from "@/components/ui/input";
 import { MapSkeleton } from "@/components/ui/map-skeleton";
-import {
-	Modal,
-	ModalBackdrop,
-	ModalBody,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-} from "@/components/ui/modal";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -525,14 +508,14 @@ export default function ComplaintCreateScreen() {
 				</Card>
 
 				{/* Localização */}
-				<View className="gap-1 pt-1">
-					<Heading size="sm">Localização do ocorrido</Heading>
-					<Text className="text-sm text-gray-500">
-						{isEditMode
+				<SectionHeader
+					title="Localização do ocorrido"
+					description={
+						isEditMode
 							? "Ajuste pelo mapa, busca de endereço ou CEP se necessário."
-							: "Preenchido automaticamente pela sua localização. Ajuste pelo mapa, busca de endereço ou CEP se necessário."}
-					</Text>
-				</View>
+							: "Preenchido automaticamente pela sua localização. Ajuste pelo mapa, busca de endereço ou CEP se necessário."
+					}
+				/>
 
 				<GooglePlacesInput onSelect={handleAddressSelect} />
 
@@ -573,209 +556,24 @@ export default function ComplaintCreateScreen() {
 						haja necessidade, faça a modificação manualmente.
 					</Text>
 				</VStack>
-				<FormControl isInvalid={!!errors.postalCode} className="gap-1">
-					<FormControlLabel>
-						<FormControlLabelText>CEP *</FormControlLabelText>
-					</FormControlLabel>
-					<Controller
-						control={control}
-						name="postalCode"
-						render={({ field: { value, onChange, onBlur } }) => (
-							<Input>
-								<InputField
-									placeholder="00000-000"
-									keyboardType="default"
-									autoCorrect={false}
-									autoCapitalize="none"
-									spellCheck={false}
-									value={value}
-									onChangeText={v => onChange(mask.cep(v))}
-									onBlur={() => {
-										onBlur();
-										void handleCepLookup(value);
-									}}
-									maxLength={9}
-									returnKeyType="done"
-								/>
-
-								<InputSlot
-									className="pr-3"
-									testID="cep-search-btn"
-									onPress={() => void handleCepLookup(value)}
-								>
-									<InputIcon as={isLookingUpCep ? Spinner : SearchIcon} />
-								</InputSlot>
-							</Input>
-						)}
-					/>
-					{errors.postalCode?.message && (
-						<FormControlError>
-							<FormControlErrorIcon as={AlertCircleIcon} />
-							<FormControlErrorText>
-								{errors.postalCode.message}
-							</FormControlErrorText>
-						</FormControlError>
-					)}
-				</FormControl>
-
-				{/* Rua + Número */}
-				<View className="flex-row gap-3">
-					<FormControl isInvalid={!!errors.street} className="flex-1 gap-1">
-						<FormControlLabel>
-							<FormControlLabelText>Rua *</FormControlLabelText>
-						</FormControlLabel>
-						<Controller
-							control={control}
-							name="street"
-							render={({ field: { value, onChange } }) => (
-								<Input>
-									<InputField
-										placeholder="Nome da rua"
-										value={value}
-										onChangeText={onChange}
-									/>
-								</Input>
-							)}
-						/>
-						{errors.street?.message && (
-							<FormControlError>
-								<FormControlErrorIcon as={AlertCircleIcon} />
-								<FormControlErrorText>
-									{errors.street.message}
-								</FormControlErrorText>
-							</FormControlError>
-						)}
-					</FormControl>
-
-					<FormControl isInvalid={!!errors.streetNumber} className="w-24 gap-1">
-						<FormControlLabel>
-							<FormControlLabelText>Nº *</FormControlLabelText>
-						</FormControlLabel>
-						<Controller
-							control={control}
-							name="streetNumber"
-							render={({ field: { value, onChange } }) => (
-								<Input>
-									<InputField
-										placeholder="123"
-										keyboardType="numeric"
-										value={value}
-										onChangeText={onChange}
-									/>
-								</Input>
-							)}
-						/>
-						{errors.streetNumber?.message && (
-							<FormControlError>
-								<FormControlErrorIcon as={AlertCircleIcon} />
-								<FormControlErrorText>
-									{errors.streetNumber.message}
-								</FormControlErrorText>
-							</FormControlError>
-						)}
-					</FormControl>
-				</View>
-
-				{/* Bairro + UF */}
-				<View className="flex-row gap-3">
-					<FormControl isInvalid={!!errors.district} className="flex-1 gap-1">
-						<FormControlLabel>
-							<FormControlLabelText>Bairro *</FormControlLabelText>
-						</FormControlLabel>
-						<Controller
-							control={control}
-							name="district"
-							render={({ field: { value, onChange } }) => (
-								<Input>
-									<InputField
-										placeholder="Bairro"
-										value={value}
-										onChangeText={onChange}
-									/>
-								</Input>
-							)}
-						/>
-						{errors.district?.message && (
-							<FormControlError>
-								<FormControlErrorIcon as={AlertCircleIcon} />
-								<FormControlErrorText>
-									{errors.district.message}
-								</FormControlErrorText>
-							</FormControlError>
-						)}
-					</FormControl>
-
-					<FormControl isInvalid={!!errors.region} className="w-24 gap-1">
-						<FormControlLabel>
-							<FormControlLabelText>UF *</FormControlLabelText>
-						</FormControlLabel>
-						<Controller
-							control={control}
-							name="region"
-							render={({ field: { value, onChange } }) => (
-								<Input>
-									<InputField
-										placeholder="SP"
-										value={value}
-										onChangeText={v =>
-											onChange(
-												v
-													.toUpperCase()
-													.replace(/[^A-Z]/g, "")
-													.slice(0, 2),
-											)
-										}
-										maxLength={2}
-										autoCapitalize="characters"
-									/>
-								</Input>
-							)}
-						/>
-						{errors.region?.message && (
-							<FormControlError>
-								<FormControlErrorIcon as={AlertCircleIcon} />
-								<FormControlErrorText>
-									{errors.region.message}
-								</FormControlErrorText>
-							</FormControlError>
-						)}
-					</FormControl>
-				</View>
-
-				{/* Cidade */}
-				<FormControl isInvalid={!!errors.city} className="gap-1">
-					<FormControlLabel>
-						<FormControlLabelText>Cidade *</FormControlLabelText>
-					</FormControlLabel>
-					<Controller
-						control={control}
-						name="city"
-						render={({ field: { value, onChange } }) => (
-							<Input>
-								<InputField
-									placeholder="Cidade"
-									value={value}
-									onChangeText={onChange}
-								/>
-							</Input>
-						)}
-					/>
-					{errors.city?.message && (
-						<FormControlError>
-							<FormControlErrorIcon as={AlertCircleIcon} />
-							<FormControlErrorText>{errors.city.message}</FormControlErrorText>
-						</FormControlError>
-					)}
-				</FormControl>
+				<AddressFormFields
+					control={control}
+					errors={errors}
+					handleCepLookup={handleCepLookup}
+					isLookingUpCep={isLookingUpCep}
+				/>
 
 				{/* Mídias */}
 				<View className="gap-2 pt-1">
-					<Heading size="sm">Fotos e vídeos</Heading>
-					<Text className="text-sm text-gray-500">
-						{isEditMode
-							? "Adicione novas mídias ou remova as existentes."
-							: "Capture pela câmera ou selecione da galeria. Ao menos uma mídia é obrigatória."}
-					</Text>
+					<SectionHeader
+						title="Fotos e vídeos"
+						description={
+							isEditMode
+								? "Adicione novas mídias ou remova as existentes."
+								: "Capture pela câmera ou selecione da galeria. Ao menos uma mídia é obrigatória."
+						}
+						className="gap-0 pt-0"
+					/>
 
 					<View className="flex-row gap-2">
 						<Button
@@ -810,37 +608,19 @@ export default function ComplaintCreateScreen() {
 								const uri = attachment.uri ?? attachment.url;
 								if (!uri) return null;
 								return (
-									<View
+									<AttachmentThumbnail
 										key={attachment.id}
-										className="relative"
-										style={{ width: 80, height: 80 }}
-									>
-										<TouchableOpacity
-											activeOpacity={0.85}
-											onPress={() =>
-												router.push({
-													pathname: "/(tabs)/complaints/(create)/preview",
-													params: { id: attachment.id },
-												})
-											}
-											className="flex-1 overflow-hidden rounded-xl"
-										>
-											<MediaThumbnail
-												mediaType={attachment.mediaType}
-												uri={uri}
-												fallbackLabel={
-													attachment.mediaType === "video" ? "VÍD" : "IMG"
-												}
-												fileSizeBytes={attachment.fileSize}
-											/>
-										</TouchableOpacity>
-										<TouchableOpacity
-											className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
-											onPress={() => handleRemove(attachment)}
-										>
-											<XIcon size={12} color={colors.white} strokeWidth={2.5} />
-										</TouchableOpacity>
-									</View>
+										uri={uri}
+										mediaType={attachment.mediaType}
+										fileSizeBytes={attachment.fileSize}
+										onRemove={() => handleRemove(attachment)}
+										onPress={() =>
+											router.push({
+												pathname: "/(tabs)/complaints/(create)/preview",
+												params: { id: attachment.id },
+											})
+										}
+									/>
 								);
 							})}
 						</ScrollView>
@@ -881,45 +661,10 @@ export default function ComplaintCreateScreen() {
 				</FormControl>
 
 				{/* Categorias */}
-				<View className="gap-2 pt-1">
-					<Heading size="sm">Categorias identificadas</Heading>
-					<Text className="text-sm text-gray-500">
-						Selecione os tipos de resíduos que você consegue identificar no
-						local.
-					</Text>
-					<WasteCategory
-						selectionMode="multiple"
-						defaultCategoryIds={editingComplaint?.categories.map(c => c.id)}
-						onSelectionChange={cats =>
-							setSelectedCategoryIds(cats.map(c => c.id))
-						}
-					>
-						<ScrollView
-							horizontal
-							showsHorizontalScrollIndicator={false}
-							contentContainerClassName="gap-2 py-0.5"
-						>
-							<WasteCategoryChips>
-								{category => (
-									<WasteCategoryChip key={category.id} category={category}>
-										<WasteCategoryChipText>
-											{category.name}
-										</WasteCategoryChipText>
-										{category.hazard_levels.map(hazard => (
-											<WasteCategoryHazardLevel
-												key={hazard}
-												variant={hazard.toLowerCase() as HazardLevelVariant}
-											>
-												<WasteCategoryHazardLevelIcon />
-											</WasteCategoryHazardLevel>
-										))}
-									</WasteCategoryChip>
-								)}
-							</WasteCategoryChips>
-						</ScrollView>
-						<WasteCategoryContent />
-					</WasteCategory>
-				</View>
+				<WasteCategorySelector
+					defaultCategoryIds={editingComplaint?.categories.map(c => c.id)}
+					onSelectionChange={setSelectedCategoryIds}
+				/>
 
 				{/* Ações */}
 				<View className="flex-row gap-3 pt-2">
@@ -946,39 +691,12 @@ export default function ComplaintCreateScreen() {
 				</View>
 			</ScrollView>
 
-			{/* Modal de confirmação de deleção de anexo */}
-			<Modal isOpen={!!pendingDelete} onClose={cancelDelete} size="sm">
-				<ModalBackdrop />
-				<ModalContent>
-					<ModalHeader>
-						<Heading size="md">Remover anexo</Heading>
-					</ModalHeader>
-					<ModalBody>
-						<Text className="text-sm text-gray-600">
-							Tem certeza que deseja remover este anexo? Esta ação não pode ser
-							desfeita.
-						</Text>
-					</ModalBody>
-					<ModalFooter className="gap-2">
-						<Button
-							variant="outline"
-							className="flex-1"
-							onPress={cancelDelete}
-							isDisabled={isDeleting}
-						>
-							<ButtonText>Cancelar</ButtonText>
-						</Button>
-						<Button
-							className="flex-1 bg-red-600"
-							onPress={confirmDelete}
-							isDisabled={isDeleting}
-						>
-							<ButtonText className="text-white">Remover</ButtonText>
-							{isDeleting && <ButtonSpinner />}
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+			<AttachmentDeleteConfirmModal
+				pendingDelete={pendingDelete}
+				cancelDelete={cancelDelete}
+				confirmDelete={confirmDelete}
+				isDeleting={isDeleting}
+			/>
 
 			<MediaUploadProgress progress={uploadProgress} />
 		</KeyboardAvoidingView>
