@@ -1,4 +1,5 @@
 import {
+	deleteV1ComplaintsByIdResolutions,
 	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
 	patchV1ComplaintsByIdResolutionsByResolutionId,
 	postV1ComplaintsByIdResolutions,
@@ -173,5 +174,28 @@ export function useResolutionMutation({
 		},
 	});
 
-	return { mutation, uploadProgress };
+	const deleteMutation = useMutation({
+		mutationFn: () =>
+			deleteV1ComplaintsByIdResolutions({ path: { id: complaintId } }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["complaint", "resolutions", complaintId],
+			});
+			logComplaintEvent("complaint.resolved", {
+				success: true,
+				action: "deleted",
+			});
+			toast.success("Resolução removida.", "Sua resolução foi excluída.");
+			router.back();
+		},
+		onError: () => {
+			logComplaintEvent("complaint.resolved", {
+				success: false,
+				action: "deleted",
+			});
+			toast.error("Erro", "Não foi possível excluir a resolução.");
+		},
+	});
+
+	return { mutation, deleteMutation, uploadProgress };
 }

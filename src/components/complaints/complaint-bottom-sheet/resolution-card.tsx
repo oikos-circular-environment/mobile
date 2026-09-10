@@ -2,16 +2,13 @@ import type { GetV1ComplaintsByIdResolutionsResponses } from "@oikos-circular-en
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { BuildingIcon, UserIcon } from "lucide-react-native";
-import { View } from "react-native";
-import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import { Pressable, View } from "react-native";
 import { ResolutionAttachmentsStack } from "@/components/complaints/resolution-attachments-stack";
 import { colors } from "@/components/style/colors";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Text } from "@/components/ui/text";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
-import { SwipeDeleteAction } from "./swipe-delete-action";
-import { SwipeEditAction } from "./swipe-edit-action";
 
 export type Resolution =
 	GetV1ComplaintsByIdResolutionsResponses[200]["resolutions"][number];
@@ -20,14 +17,12 @@ export type ResolutionCardProps = {
 	resolution: Resolution;
 	isOwnResolution: boolean;
 	onEdit: () => void;
-	onDelete: () => void;
 };
 
 export function ResolutionCard({
 	resolution,
 	isOwnResolution,
 	onEdit,
-	onDelete,
 }: ResolutionCardProps) {
 	const isCompanyResolution = resolution.resolver_company !== null;
 
@@ -106,31 +101,9 @@ export function ResolutionCard({
 
 	if (isOwnResolution) {
 		return (
-			<ReanimatedSwipeable
-				friction={2}
-				overshootLeft={false}
-				overshootRight={false}
-				renderLeftActions={(_, translation, swipeable) => (
-					<SwipeEditAction
-						translation={translation}
-						onEdit={() => {
-							swipeable.close();
-							onEdit();
-						}}
-					/>
-				)}
-				renderRightActions={(_, translation, swipeable) => (
-					<SwipeDeleteAction
-						translation={translation}
-						onDelete={() => {
-							swipeable.close();
-							onDelete();
-						}}
-					/>
-				)}
-			>
+			<Pressable onPress={onEdit} hitSlop={4}>
 				{cardContent}
-			</ReanimatedSwipeable>
+			</Pressable>
 		);
 	}
 

@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type * as ImagePicker from "expo-image-picker";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { AlertCircleIcon } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -23,6 +23,7 @@ import { ComplaintAlertBanner } from "@/components/complaints/complaint-form/ale
 import { CompanyPickerField } from "@/components/complaints/complaint-form/company-picker-field";
 import { useResolutionMutation } from "@/components/complaints/hooks/use-resolution-mutation";
 import { MediaUploadProgress } from "@/components/complaints/media-upload-progress";
+import { ResolutionDeleteConfirmModal } from "@/components/complaints/resolution-delete-confirm-modal";
 import { toast } from "@/components/toast";
 import {
 	FormControl,
@@ -74,6 +75,7 @@ export default function ComplaintResolutionScreen() {
 	const [removedAttachmentIds, setRemovedAttachmentIds] = useState<Set<string>>(
 		new Set(),
 	);
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 	useEffect(() => {
 		if (!resolutionDraft) return;
@@ -146,7 +148,7 @@ export default function ComplaintResolutionScreen() {
 		setSelectedAssets(prev => prev.filter(a => a.uri !== uri));
 	};
 
-	const { mutation, uploadProgress } = useResolutionMutation({
+	const { mutation, deleteMutation, uploadProgress } = useResolutionMutation({
 		complaintId: id,
 		isEditMode,
 		resolutionId,
@@ -352,23 +354,73 @@ export default function ComplaintResolutionScreen() {
 						)}
 					</FormControl>
 
-					<TouchableOpacity
-						onPress={handleSubmit(onSubmit)}
-						disabled={!canSubmit}
-						activeOpacity={0.85}
-						className={`h-12 items-center justify-center rounded-xl ${canSubmit ? "bg-lime-800" : "bg-gray-200"}`}
-						style={{ marginBottom: insets.bottom || 16 }}
-					>
-						{mutation.isPending ? (
-							<Spinner size="small" />
-						) : (
-							<Text
-								className={`text-base font-bold ${canSubmit ? "text-white" : "text-gray-400"}`}
+					{isEditMode ? (
+						<View
+							className="gap-3"
+							style={{ marginBottom: insets.bottom || 16 }}
+						>
+							<View className="flex-row gap-3">
+								<TouchableOpacity
+									onPress={() => router.back()}
+									disabled={mutation.isPending}
+									activeOpacity={0.85}
+									className="h-12 flex-1 items-center justify-center rounded-xl border border-gray-200"
+								>
+									<Text className="text-base font-bold text-gray-600">
+										Cancelar
+									</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									onPress={handleSubmit(onSubmit)}
+									disabled={!canSubmit}
+									activeOpacity={0.85}
+									className={`h-12 flex-1 items-center justify-center rounded-xl ${canSubmit ? "bg-lime-800" : "bg-gray-200"}`}
+								>
+									{mutation.isPending ? (
+										<Spinner size="small" />
+									) : (
+										<Text
+											className={`text-base font-bold ${canSubmit ? "text-white" : "text-gray-400"}`}
+										>
+											Salvar
+										</Text>
+									)}
+								</TouchableOpacity>
+							</View>
+							<TouchableOpacity
+								onPress={() => setShowDeleteConfirm(true)}
+								disabled={deleteMutation.isPending}
+								activeOpacity={0.85}
+								className="h-12 items-center justify-center rounded-xl border border-red-200 bg-red-50"
 							>
-								{isEditMode ? "Atualizar Resolução" : "Confirmar Resolução"}
-							</Text>
-						)}
-					</TouchableOpacity>
+								{deleteMutation.isPending ? (
+									<Spinner size="small" />
+								) : (
+									<Text className="text-base font-bold text-red-600">
+										Deletar Resolução
+									</Text>
+								)}
+							</TouchableOpacity>
+						</View>
+					) : (
+						<TouchableOpacity
+							onPress={handleSubmit(onSubmit)}
+							disabled={!canSubmit}
+							activeOpacity={0.85}
+							className={`h-12 items-center justify-center rounded-xl ${canSubmit ? "bg-lime-800" : "bg-gray-200"}`}
+							style={{ marginBottom: insets.bottom || 16 }}
+						>
+							{mutation.isPending ? (
+								<Spinner size="small" />
+							) : (
+								<Text
+									className={`text-base font-bold ${canSubmit ? "text-white" : "text-gray-400"}`}
+								>
+									Confirmar Resolução
+								</Text>
+							)}
+						</TouchableOpacity>
+					)}
 				</ScrollView>
 			</KeyboardAvoidingView>
 
@@ -378,6 +430,13 @@ export default function ComplaintResolutionScreen() {
 				onSelect={company => setSelectedCompany(company)}
 				selectedCompanyId={selectedCompany?.id}
 				disablePortal
+			/>
+
+			<ResolutionDeleteConfirmModal
+				isOpen={showDeleteConfirm}
+				onClose={() => setShowDeleteConfirm(false)}
+				onConfirm={() => deleteMutation.mutate()}
+				isDeleting={deleteMutation.isPending}
 			/>
 
 			<MediaUploadProgress progress={uploadProgress} />

@@ -3,11 +3,8 @@ import BottomSheet, {
 	type BottomSheetBackdropProps,
 	BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import {
-	deleteV1ComplaintsByIdResolutions,
-	getV1ComplaintsByIdResolutions,
-} from "@oikos-circular-environment/oikos-sdk";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getV1ComplaintsByIdResolutions } from "@oikos-circular-environment/oikos-sdk";
+import { useQuery } from "@tanstack/react-query";
 import { BlurTargetView, BlurView } from "expo-blur";
 import { router, useIsFocused } from "expo-router";
 import {
@@ -25,7 +22,6 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
-import { toast } from "@/components/toast";
 import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
@@ -44,7 +40,6 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
-import { logComplaintEvent } from "@/libs/observe-events";
 import type { MapComplaintAttachment } from "@/libs/types/complaint";
 import { uiEventBus } from "@/libs/ui-event-bus";
 import { cn } from "@/libs/utils";
@@ -80,7 +75,6 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 	);
 	const setResolutionDraft = useComplaintsStore(s => s.setResolutionDraft);
 
-	const queryClient = useQueryClient();
 	const isOpen = !!complaint;
 
 	const isFocused = useIsFocused();
@@ -137,28 +131,6 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 			return res.data;
 		},
 		enabled: isOpen && !!complaintId && isAuthenticated,
-	});
-
-	const deleteMutation = useMutation({
-		mutationFn: () =>
-			deleteV1ComplaintsByIdResolutions({ path: { id: complaintId } }),
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: ["complaint", "resolutions", complaintId],
-			});
-			logComplaintEvent("complaint.resolved", {
-				success: true,
-				action: "deleted",
-			});
-			toast.success("Resolução removida.", "Sua resolução foi excluída.");
-		},
-		onError: () => {
-			logComplaintEvent("complaint.resolved", {
-				success: false,
-				action: "deleted",
-			});
-			toast.error("Erro", "Não foi possível excluir a resolução.");
-		},
 	});
 
 	const resolutions = resolutionsData?.resolutions ?? [];
@@ -391,7 +363,6 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 														isAuthenticated && resolution.is_owner
 													}
 													onEdit={() => handleEditResolution(resolution)}
-													onDelete={() => deleteMutation.mutate()}
 												/>
 											))
 										) : (
