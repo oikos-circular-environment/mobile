@@ -21,9 +21,6 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
-# Store credentials
-docs/oikos-circular-economy-*.json
-
 # Metro
 .metro-health-check*
 
@@ -60,10 +57,15 @@ store/apple/
 # graphify knowledge graph
 graphify-out/
 
-# local per-machine agent config
-.claude/settings.json
-.claude/settings.local.json
-
-# extras específicos do upload EAS
+# extras: pastas versionadas no repo mas irrelevantes pro processo de build do EAS
 pencil/
 store/
+docs/
+plans/
+.agents/
+.claude/
+.github/
+.opencode/
+.vscode/
+android-emulator/
+android-studio/
