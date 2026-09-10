@@ -423,7 +423,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 											>
 												<LockKeyholeIcon size={16} color={colors.gray[600]} />
 												<Text className="text-center text-sm text-gray-600">
-													É preciso estar autenticado para ver as resoluções
+													É preciso estar autenticado para ver as resoluções.
 												</Text>
 												<Button
 													className="bg-lime-800"
@@ -433,7 +433,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 													}}
 												>
 													<ButtonText className="font-semibold">
-														Registrar-se
+														Iniciar sessão
 													</ButtonText>
 												</Button>
 											</BlurView>
