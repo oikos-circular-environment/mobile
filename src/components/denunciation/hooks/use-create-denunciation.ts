@@ -6,12 +6,12 @@ import { useMutation } from "@tanstack/react-query";
 import type * as ImagePicker from "expo-image-picker";
 import { Observe } from "expo-observe";
 import { toast } from "@/components/toast";
-import { compressMedia } from "@/libs/media-compression";
+import { compressMedia } from "@/libs/media/compression";
 import {
 	formatFileSize,
 	getFileSize,
 	MAX_FILE_SIZE_BYTES,
-} from "@/libs/media-validation";
+} from "@/libs/media/validation";
 import type { CreateDenunciationBody } from "@/libs/types/denunciation";
 import { useDenunciationStore } from "@/stores/denunciation-store";
 

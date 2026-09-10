@@ -64,12 +64,12 @@ import {
 	reverseGeocode,
 } from "@/libs/google/reverse-geocode";
 import { mask } from "@/libs/mask";
-import { compressMedia } from "@/libs/media-compression";
+import { compressMedia } from "@/libs/media/compression";
 import {
 	formatFileSize,
 	getFileSize,
 	MAX_FILE_SIZE_BYTES,
-} from "@/libs/media-validation";
+} from "@/libs/media/validation";
 import type { Geospatial } from "@/libs/types/complaint";
 
 const schema = z.object({

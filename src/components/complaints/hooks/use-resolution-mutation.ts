@@ -12,12 +12,12 @@ import { useState } from "react";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import type { UploadProgress } from "@/components/complaints/hooks/upload-progress";
 import { toast } from "@/components/toast";
-import { compressMedia } from "@/libs/media-compression";
+import { compressMedia } from "@/libs/media/compression";
 import {
 	formatFileSize,
 	getFileSize,
 	MAX_FILE_SIZE_BYTES,
-} from "@/libs/media-validation";
+} from "@/libs/media/validation";
 import { logComplaintEvent } from "@/libs/observe-events";
 
 type ResolutionMutationInput = {

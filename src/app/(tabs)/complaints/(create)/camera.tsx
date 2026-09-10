@@ -18,7 +18,7 @@ import { ErrorFallback } from "@/components/error-fallback";
 import { colors } from "@/components/style/colors";
 import { useComplaintCreation } from "@/contexts/complaint-creation-context";
 import { useRouteInteractive } from "@/hooks/use-route-interactive";
-import { getFileSize } from "@/libs/media-validation";
+import { getFileSize } from "@/libs/media/validation";
 import { useRecordScreenError } from "@/libs/moderation/use-record-screen-error";
 import type {
 	CameraCapturedVideo,

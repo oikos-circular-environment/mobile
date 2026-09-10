@@ -68,7 +68,7 @@ import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
-import { compressImage } from "@/libs/media-compression";
+import { compressImage } from "@/libs/media/compression";
 import { logProfileEvent } from "@/libs/observe-events";
 import { cn } from "@/libs/utils";
 

@@ -89,7 +89,7 @@ jest.mock("expo-image-picker", () => ({
 	launchImageLibraryAsync: jest.fn(),
 }));
 
-jest.mock("@/libs/media-compression", () => ({
+jest.mock("@/libs/media/compression", () => ({
 	compressImage: jest.fn().mockResolvedValue("compressed-uri"),
 }));
 
