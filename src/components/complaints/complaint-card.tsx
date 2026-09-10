@@ -35,7 +35,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import type { Complaint } from "@/libs/types/complaint";
 import { ComplaintMap } from "./complaint-map";
-import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
+import { ComplaintStatusBadge } from "./filters";
 
 interface ComplaintCardProps {
 	complaint: Complaint;

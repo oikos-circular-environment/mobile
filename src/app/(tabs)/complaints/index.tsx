@@ -13,16 +13,16 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
 import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
+import { ComplaintMarkerPin } from "@/components/complaints/complaint-marker-pin";
+import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
 import {
 	type BottomSheetRef,
 	ComplaintFilterBottomSheet,
+	ComplaintFilterRow,
 	DEFAULT_FILTERS,
 	type FilterState,
 	RADIUS_OPTIONS,
-} from "@/components/complaints/complaint-filter-bottom-sheet";
-import { ComplaintMarkerPin } from "@/components/complaints/complaint-marker-pin";
-import { ComplaintFilterRow } from "@/components/complaints/complaint-pressable-filter";
-import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
+} from "@/components/complaints/filters";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
 import { useMapHeading } from "@/components/complaints/hooks/use-map-heading";

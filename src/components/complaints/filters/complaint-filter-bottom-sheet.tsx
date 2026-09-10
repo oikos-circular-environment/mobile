@@ -19,23 +19,13 @@ import {
 	ComplaintPressableFilter,
 	ComplaintPressableFilterIcon,
 	ComplaintPressableFilterText,
-} from "@/components/complaints/complaint-pressable-filter";
-import type { HazardLevelVariant } from "@/components/custom/waste-category";
+} from "@/components/complaints/filters/complaint-pressable-filter";
 import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import type { WasteCategory } from "@/libs/types/waste-category";
-
-export const RADIUS_OPTIONS = [
-	{ label: "2 km", value: 2000 },
-	{ label: "5 km", value: 5000 },
-	{ label: "10 km", value: 10000 },
-	{ label: "15 km", value: 15000 },
-	{ label: "20 km", value: 20000 },
-	{ label: "30 km", value: 30000 },
-	{ label: "40 km", value: 40000 },
-];
+import { type BottomSheetRef, type FilterState, RADIUS_OPTIONS } from "./types";
 
 const STATUS_OPTIONS = [
 	{ key: "ALL", label: "Todos", icon: null },
@@ -50,28 +40,6 @@ const HAZARD_OPTIONS = [
 	{ key: "high", label: "Alta", icon: ChevronUpIcon },
 	{ key: "very_high", label: "Muito alta", icon: ChevronsUpIcon },
 ] as const;
-
-export type FilterState = {
-	status: "ALL" | "OPEN" | "RESOLVED";
-	category: WasteCategory | null;
-	hazardLevel: "all" | HazardLevelVariant;
-	radius: number;
-};
-
-export const DEFAULT_FILTERS: FilterState = {
-	status: "OPEN",
-	category: null,
-	hazardLevel: "all",
-	radius: 2000,
-};
-
-export type BottomSheetRef = {
-	open: () => void;
-	close: () => void;
-	snapToIndex: (index: number) => void;
-	expand: () => void;
-	collapse: () => void;
-};
 
 type ComplaintFilterBottomSheetProps = {
 	ref?: React.Ref<BottomSheetRef>;

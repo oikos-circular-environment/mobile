@@ -27,7 +27,7 @@ import {
 	deriveAddress,
 	highestHazardVariant,
 } from "./complaint-hazard-address-utils";
-import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
+import { ComplaintStatusBadge } from "./filters";
 
 export type HeaderComplaint = {
 	id: string;
