@@ -1,6 +1,13 @@
 android/**/*
 ios/**/*
 
+# Build artifacts left inside native module packages after a local
+# npm run android/ios (android/build, ios/build) — pollute the package's
+# dir hash and cause local-vs-EAS fingerprint mismatches.
+node_modules/**/android/build/**/*
+node_modules/**/android/.cxx/**/*
+node_modules/**/ios/build/**/*
+
 # Tooling, docs and agent config unrelated to native runtime
 .agents/**/*
 .claude/**/*

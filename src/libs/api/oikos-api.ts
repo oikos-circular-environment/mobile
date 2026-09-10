@@ -1,6 +1,7 @@
 import { client } from "@oikos-circular-environment/oikos-sdk/client.gen";
 import type { AxiosError, AxiosResponse } from "axios";
 import Constants from "expo-constants";
+import { Observe } from "expo-observe";
 import { networkTelemetryBus } from "../network-telemetry-bus";
 import {
 	clearTokens,
@@ -27,9 +28,13 @@ let authToken: string | null = null;
 let onUnauthenticated: (() => void) | null = null;
 
 // Initialize token from storage
-getStoredToken().then(token => {
-	if (token) authToken = token;
-});
+getStoredToken()
+	.then(token => {
+		if (token) authToken = token;
+	})
+	.catch(error => {
+		Observe.reportError(error);
+	});
 
 export async function setAuthToken(token: string | null) {
 	authToken = token;

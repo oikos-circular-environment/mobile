@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import { Leaf, RecycleIcon, Shield } from "lucide-react-native";
+import { ScreenErrorBoundary } from "@/components/screen-error-boundary";
 import { colors } from "@/components/style/colors";
 
 // const TAB_BAR_HEIGHT = 64;
@@ -7,6 +8,7 @@ import { colors } from "@/components/style/colors";
 
 export const unstable_settings = {
 	initialRouteName: "(home)",
+	screenErrorBoundary: ScreenErrorBoundary,
 };
 
 export default function TabsNavigator() {

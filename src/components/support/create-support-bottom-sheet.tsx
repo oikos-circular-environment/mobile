@@ -31,11 +31,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { isValidMimeType } from "@/libs/media-validation";
+import { getRecentAppErrors } from "@/libs/moderation/app-errors-store";
 import { getSupportDeviceInfo } from "@/libs/moderation/device-info";
-import {
-	clearLastError,
-	getLastError,
-} from "@/libs/moderation/last-error-store";
 import type {
 	SupportEnvironment,
 	SupportRequestType,
@@ -141,13 +138,26 @@ export const CreateSupportBottomSheet = forwardRef<
 		}
 	};
 
-	const onSubmit = handleSubmit(data => {
-		const lastError = selectedType === "ERROR" ? getLastError() : null;
+	const onSubmit = handleSubmit(async data => {
+		const recentErrors =
+			selectedType === "ERROR" ? await getRecentAppErrors(10) : [];
+		const lastError = recentErrors[0] ?? null;
 		const environment: SupportEnvironment | undefined =
 			selectedType === "ERROR"
-				? lastError
-					? { ...getSupportDeviceInfo(), last_error: lastError }
-					: getSupportDeviceInfo()
+				? {
+						...getSupportDeviceInfo(),
+						...(lastError && {
+							last_error: {
+								message: lastError.message,
+								stack: lastError.stack,
+								component_stack: lastError.component_stack,
+								occurred_at: lastError.occurred_at,
+							},
+						}),
+						...(recentErrors.length > 0 && {
+							last_errors: recentErrors.map(({ id, ...error }) => error),
+						}),
+					}
 				: undefined;
 
 		createSupportRequest.mutate(
@@ -163,7 +173,6 @@ export const CreateSupportBottomSheet = forwardRef<
 			},
 			{
 				onSuccess: () => {
-					if (lastError) clearLastError();
 					reset();
 					setSelectedType("ERROR");
 					setSelectedAssets([]);

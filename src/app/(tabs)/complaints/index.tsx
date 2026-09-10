@@ -3,7 +3,7 @@ import GorhomBottomSheet, {
 	type BottomSheetBackdropProps,
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { router } from "expo-router";
+import { type ErrorBoundaryProps, router } from "expo-router";
 import {
 	ListIcon,
 	LocateFixedIcon,
@@ -42,6 +42,7 @@ import { ComplaintFilterRow } from "@/components/complaints/complaint-pressable-
 import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
+import { ErrorFallback } from "@/components/error-fallback";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { colors } from "@/components/style/colors";
 import { TestingWarningAlert } from "@/components/testing-warning-alert";
@@ -52,6 +53,7 @@ import { MapSkeleton } from "@/components/ui/map-skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
+import { useRecordScreenError } from "@/libs/moderation/use-record-screen-error";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 
@@ -194,6 +196,18 @@ function ComplaintMarkerPin({
 				/>
 			</Svg>
 		</View>
+	);
+}
+
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+	useRecordScreenError(error);
+
+	return (
+		<ErrorFallback
+			title="Não foi possível carregar o mapa"
+			message="Tente novamente. Se o problema continuar, verifique sua conexão."
+			onRetry={retry}
+		/>
 	);
 }
 

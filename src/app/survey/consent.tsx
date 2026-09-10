@@ -1,4 +1,5 @@
 import * as Clipboard from "expo-clipboard";
+import { Observe } from "expo-observe";
 import { useRouter } from "expo-router";
 import { CopyIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -144,6 +145,7 @@ export default function SurveyConsentScreen() {
 				wasAuthenticated ? "/survey/consent-ended" : "/survey/persona",
 			);
 		} catch (error) {
+			Observe.reportError(error);
 			console.error("Falha ao provisionar participante sintético:", error);
 			toast.error(
 				"Não foi possível iniciar a pesquisa",

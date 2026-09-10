@@ -27,6 +27,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { BootSplashScreen } from "@/components/boot-splash-screen";
+import { OikosAppMigrationsRunner } from "@/components/oikos-app-migrations-runner";
 import { SurveyExecutionOverlay } from "@/components/survey/survey-execution-overlay";
 import { SurveyMigrationsRunner } from "@/components/survey/survey-migrations-runner";
 import { Toaster } from "@/components/toast";
@@ -134,6 +135,7 @@ function RootLayout() {
 
 	return (
 		<GestureHandlerRootView style={{ flex: 1, backgroundColor: "white" }}>
+			<OikosAppMigrationsRunner />
 			<ErrorBoundary>
 				<GluestackUIProvider mode="light">
 					<QueryClientProvider client={queryClient}>

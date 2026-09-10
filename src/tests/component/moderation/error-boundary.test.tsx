@@ -1,12 +1,9 @@
 import { render, screen } from "@testing-library/react-native";
 import { ErrorBoundary } from "@/components/error-boundary";
-import {
-	clearLastError,
-	getLastError,
-} from "@/libs/moderation/last-error-store";
+import { recordAppError } from "@/libs/moderation/record-app-error";
 
-jest.mock("@/libs/observe-events", () => ({
-	logAppErrorEvent: jest.fn(),
+jest.mock("@/libs/moderation/record-app-error", () => ({
+	recordAppError: jest.fn(),
 }));
 
 function Bomb(): never {
@@ -19,8 +16,8 @@ describe("ErrorBoundary", () => {
 		.mockImplementation(() => {});
 
 	afterEach(() => {
-		clearLastError();
 		consoleErrorSpy.mockClear();
+		jest.mocked(recordAppError).mockClear();
 	});
 
 	afterAll(() => {
@@ -37,7 +34,7 @@ describe("ErrorBoundary", () => {
 		expect(screen.queryByText("Algo deu errado")).not.toBeOnTheScreen();
 	});
 
-	it("shows the fallback and stores the last_error snapshot when a child throws", async () => {
+	it("shows the fallback when a child throws", async () => {
 		await render(
 			<ErrorBoundary>
 				<Bomb />
@@ -45,10 +42,20 @@ describe("ErrorBoundary", () => {
 		);
 
 		expect(screen.getByText("Algo deu errado")).toBeOnTheScreen();
+	});
 
-		const lastError = getLastError();
-		expect(lastError?.message).toBe("kaboom");
-		expect(lastError?.stack).toContain("kaboom");
-		expect(lastError?.component_stack).toContain("Bomb");
+	it("records the error as fatal, since it takes down the whole app", async () => {
+		await render(
+			<ErrorBoundary>
+				<Bomb />
+			</ErrorBoundary>,
+		);
+
+		expect(recordAppError).toHaveBeenCalledWith(
+			expect.objectContaining({ message: "kaboom" }),
+			expect.any(String),
+			expect.any(String),
+			"fatal",
+		);
 	});
 });

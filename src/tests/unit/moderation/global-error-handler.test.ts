@@ -1,3 +1,7 @@
+jest.mock("@/libs/moderation/record-app-error", () => ({
+	recordAppError: jest.fn(),
+}));
+
 type FakeErrorUtils = {
 	getGlobalHandler: jest.Mock;
 	setGlobalHandler: jest.Mock;
@@ -22,12 +26,12 @@ describe("global-error-handler", () => {
 		jest.resetModules();
 	});
 
-	it("chains the previous global handler and stores the error snapshot", () => {
+	it("chains the previous global handler and records the error as fatal", () => {
 		const originalHandler = jest.fn();
 		const fakeErrorUtils = installFakeErrorUtils(originalHandler);
 
 		require("@/libs/moderation/global-error-handler");
-		const { getLastError } = require("@/libs/moderation/last-error-store");
+		const { recordAppError } = require("@/libs/moderation/record-app-error");
 
 		const registeredHandler = fakeErrorUtils.setGlobalHandler.mock.calls[0][0];
 		const error = new Error("boom");
@@ -35,27 +39,31 @@ describe("global-error-handler", () => {
 		registeredHandler(error, true);
 
 		expect(originalHandler).toHaveBeenCalledWith(error, true);
-		expect(getLastError()).toMatchObject({
-			message: "boom",
-			stack: error.stack,
-		});
+		expect(recordAppError).toHaveBeenCalledWith(
+			error,
+			undefined,
+			undefined,
+			"fatal",
+		);
 	});
 
-	it("stringifies non-Error values instead of leaving message empty", () => {
+	it("stringifies non-Error values and records with error severity when not fatal", () => {
 		const originalHandler = jest.fn();
 		const fakeErrorUtils = installFakeErrorUtils(originalHandler);
 
 		require("@/libs/moderation/global-error-handler");
-		const { getLastError } = require("@/libs/moderation/last-error-store");
+		const { recordAppError } = require("@/libs/moderation/record-app-error");
 
 		const registeredHandler = fakeErrorUtils.setGlobalHandler.mock.calls[0][0];
 
 		registeredHandler("plain string error", false);
 
 		expect(originalHandler).toHaveBeenCalledWith("plain string error", false);
-		expect(getLastError()).toMatchObject({
-			message: "plain string error",
-			stack: undefined,
-		});
+		expect(recordAppError).toHaveBeenCalledWith(
+			expect.objectContaining({ message: "plain string error" }),
+			undefined,
+			undefined,
+			"error",
+		);
 	});
 });

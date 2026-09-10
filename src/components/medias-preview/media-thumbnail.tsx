@@ -1,4 +1,5 @@
 import { Image } from "expo-image";
+import { Observe } from "expo-observe";
 import type { VideoThumbnail } from "expo-video";
 import { useVideoPlayer } from "expo-video";
 import { useEffect, useRef, useState } from "react";
@@ -93,7 +94,8 @@ export function MediaThumbnail({
 				if (isMountedRef.current) {
 					setVideoThumbnail(results[0] ?? "failed");
 				}
-			} catch {
+			} catch (error) {
+				Observe.reportError(error);
 				if (isMountedRef.current) {
 					setVideoThumbnail("failed");
 				}

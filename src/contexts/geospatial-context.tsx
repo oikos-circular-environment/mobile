@@ -1,4 +1,5 @@
 import * as Location from "expo-location";
+import { Observe } from "expo-observe";
 import {
 	createContext,
 	type PropsWithChildren,
@@ -139,7 +140,8 @@ export function GeospatialProvider({ children }: PropsWithChildren) {
 						}
 					},
 				);
-			} catch {
+			} catch (error) {
+				Observe.reportError(error);
 				if (isMounted) {
 					setPermissionDenied(true);
 				}

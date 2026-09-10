@@ -4,6 +4,7 @@ import BottomSheet, {
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { TRPCClientError } from "@trpc/client";
+import { Observe } from "expo-observe";
 import { useRouter } from "expo-router";
 import {
 	forwardRef,
@@ -71,6 +72,7 @@ export const DeleteSurveyDataSheet = forwardRef<
 			const alreadyGone =
 				error instanceof TRPCClientError && error.data?.code === "NOT_FOUND";
 			if (!alreadyGone) {
+				Observe.reportError(error);
 				setIsDeleting(false);
 				toast.error(
 					"Não foi possível excluir do servidor",

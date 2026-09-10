@@ -20,7 +20,7 @@ import {
 	ShieldCheckIcon,
 } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
@@ -136,7 +136,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 			});
 			return res.data;
 		},
-		enabled: isOpen && !!complaintId,
+		enabled: isOpen && !!complaintId && isAuthenticated,
 	});
 
 	const deleteMutation = useMutation({
@@ -368,21 +368,20 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 
 									<View className="relative my-4 gap-4">
 										{showResolutionsLocked ? (
-											<BlurTargetView
-												ref={resolutionBlurTargetRef}
-												className="gap-4"
-											>
-												{Array.from({
-													length: Math.min(complaint.resolution_count, 3),
-												}).map((_, i) => (
-													<ResolutionCardSkeleton key={i} />
-												))}
+											<BlurTargetView ref={resolutionBlurTargetRef}>
+												<View className="flex-col gap-4">
+													{Array.from({
+														length: Math.min(complaint.resolution_count, 3),
+													}).map((_, i) => (
+														<ResolutionCardSkeleton key={i} />
+													))}
+												</View>
 											</BlurTargetView>
 										) : isLoadingResolutions ? (
-											<>
+											<View className="flex-col gap-4">
 												<ResolutionCardSkeleton />
 												<ResolutionCardSkeleton />
-											</>
+											</View>
 										) : resolutions.length > 0 ? (
 											resolutions.map(resolution => (
 												<ResolutionCard
@@ -406,7 +405,9 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 												blurTarget={resolutionBlurTargetRef}
 												intensity={15}
 												tint="light"
-												blurMethod="dimezisBlurView"
+												blurMethod={
+													Platform.OS === "android" ? "none" : "dimezisBlurView"
+												}
 												style={{
 													position: "absolute",
 													top: 0,

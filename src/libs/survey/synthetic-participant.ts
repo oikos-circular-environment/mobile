@@ -1,5 +1,6 @@
 import { fakerPT_BR as faker } from "@faker-js/faker";
 import { putV1Profiles } from "@oikos-circular-environment/oikos-sdk";
+import { Observe } from "expo-observe";
 import { setAuthToken } from "@/libs/api/oikos-api";
 import { authClient } from "@/libs/auth/auth-client";
 import {
@@ -54,6 +55,7 @@ async function resolveSyntheticAddress(location: SyntheticLocationInput) {
 			longitude: location.longitude,
 		};
 	} catch (error) {
+		Observe.reportError(error);
 		console.warn(
 			"[survey] não foi possível resolver o endereço do participante sintético a partir da localização atual",
 			error,
