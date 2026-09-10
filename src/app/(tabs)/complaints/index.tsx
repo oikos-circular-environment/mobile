@@ -12,7 +12,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
-import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
 import { ComplaintMarkerPin } from "@/components/complaints/complaint-marker-pin";
 import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
 import {
@@ -242,9 +241,11 @@ export default function ComplaintsMapScreen() {
 
 	const handleMarkerPress = (complaint: MapComplaint) => {
 		suppressMapPressRef.current = true;
-		setSelectedMapComplaint(
-			selectedMapComplaint?.id === complaint.id ? null : complaint,
-		);
+		setSelectedMapComplaint(complaint);
+		router.push({
+			pathname: "/(tabs)/complaints/[id]",
+			params: { id: complaint.id, source: "map" },
+		});
 		setTimeout(() => {
 			suppressMapPressRef.current = false;
 		}, 100);
@@ -267,6 +268,10 @@ export default function ComplaintsMapScreen() {
 			500,
 		);
 		setSelectedMapComplaint(complaint);
+		router.push({
+			pathname: "/(tabs)/complaints/[id]",
+			params: { id: complaint.id, source: "map" },
+		});
 	};
 
 	const handleOpenMapControlsSheet = () => {
@@ -461,8 +466,6 @@ export default function ComplaintsMapScreen() {
 				userLocation={userLocation}
 				onSelectComplaint={handleComplaintListItemPress}
 			/>
-
-			<ComplaintBottomSheet source="map" />
 
 			<ComplaintFilterBottomSheet
 				ref={filterSheetRef}

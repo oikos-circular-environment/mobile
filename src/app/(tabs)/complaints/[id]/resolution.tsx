@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type * as ImagePicker from "expo-image-picker";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { AlertCircleIcon } from "lucide-react-native";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	KeyboardAvoidingView,
@@ -21,6 +21,7 @@ import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker
 import { ComplaintDetailsHeader } from "@/components/complaints/complaint-details-header";
 import { ComplaintAlertBanner } from "@/components/complaints/complaint-form/alert-banner";
 import { CompanyPickerField } from "@/components/complaints/complaint-form/company-picker-field";
+import { useComplaintForId } from "@/components/complaints/hooks/use-complaint-for-id";
 import { useResolutionMutation } from "@/components/complaints/hooks/use-resolution-mutation";
 import { MediaUploadProgress } from "@/components/complaints/media-upload-progress";
 import { ResolutionDeleteConfirmModal } from "@/components/complaints/resolution-delete-confirm-modal";
@@ -82,18 +83,14 @@ export default function ComplaintResolutionScreen() {
 		if (resolutionDraft.companyJson) {
 			try {
 				setSelectedCompany(JSON.parse(resolutionDraft.companyJson) as Company);
-			} catch {
-				// ignore malformed JSON
-			}
+			} catch {}
 		}
 		if (resolutionDraft.attachmentsJson) {
 			try {
 				setExistingAttachments(
 					JSON.parse(resolutionDraft.attachmentsJson) as AttachmentMedia[],
 				);
-			} catch {
-				// ignore malformed JSON
-			}
+			} catch {}
 		}
 		return () => clearResolutionDraft();
 	}, [resolutionDraft, clearResolutionDraft]);
@@ -112,19 +109,7 @@ export default function ComplaintResolutionScreen() {
 	const description = watch("description");
 	const charCount = description.length;
 
-	const selectedMapComplaint = useComplaintsStore(s => s.selectedMapComplaint);
-	const complaintsInList = useComplaintsStore(s => s.complaints);
-
-	const complaintForHeader = useMemo(() => {
-		if (selectedMapComplaint?.id === id) return selectedMapComplaint;
-		const found = complaintsInList.find(c => c.id === id);
-		if (!found) return null;
-		const coords = found.geospatial.location.coords;
-		return {
-			...found,
-			location: { lat: coords.latitude, lon: coords.longitude },
-		};
-	}, [selectedMapComplaint, complaintsInList, id]);
+	const complaintForHeader = useComplaintForId(id);
 
 	const { pickValidatedMedia, isPicking } = usePickValidatedMedia();
 
@@ -179,6 +164,7 @@ export default function ComplaintResolutionScreen() {
 
 	return (
 		<>
+			<Stack.Screen options={{ title: "Resolução" }} />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				className="flex-1 bg-white"
@@ -186,30 +172,22 @@ export default function ComplaintResolutionScreen() {
 				<ScrollView
 					className="flex-1 px-4"
 					contentContainerStyle={{
-						paddingTop: insets.top,
 						gap: 16,
 						paddingBottom: 24,
 					}}
 					keyboardShouldPersistTaps="handled"
 					showsVerticalScrollIndicator={false}
 				>
-					{/* Header — dados da denúncia */}
-					<View className="gap-2 mt-8">
-						<View className="flex-1 items-center justify-center">
-							<View className="w-8 h-1 bg-gray-500 rounded-sm" />
-						</View>
-						{complaintForHeader && (
+					{complaintForHeader && (
+						<View className="mt-4">
 							<ComplaintDetailsHeader complaint={complaintForHeader} />
-						)}
-					</View>
+						</View>
+					)}
 
-					{/* Info contextual */}
 					<ComplaintAlertBanner variant="info" />
 
-					{/* Aviso de publicidade */}
 					<ComplaintAlertBanner variant="warning" />
 
-					{/* Descrição */}
 					<Controller
 						control={control}
 						name="description"
@@ -249,7 +227,6 @@ export default function ComplaintResolutionScreen() {
 						)}
 					/>
 
-					{/* Empresa vinculada (opcional) */}
 					<FormControl>
 						<View className="mb-2 flex-row items-center justify-between">
 							<FormControlLabel>
@@ -273,7 +250,6 @@ export default function ComplaintResolutionScreen() {
 						</FormControlHelper>
 					</FormControl>
 
-					{/* Anexos */}
 					<FormControl
 						isInvalid={
 							!isEditMode && selectedAssets.length > 0 && attachmentsMissing > 0
@@ -303,7 +279,6 @@ export default function ComplaintResolutionScreen() {
 						>
 							<AddMediaTile onPress={handlePickMedia} isPicking={isPicking} />
 
-							{/* Anexos existentes do servidor */}
 							{existingAttachments
 								.filter(a => !removedAttachmentIds.has(a.id))
 								.map(attachment => (
@@ -321,7 +296,6 @@ export default function ComplaintResolutionScreen() {
 									/>
 								))}
 
-							{/* Novos anexos selecionados localmente */}
 							{selectedAssets.map(asset => (
 								<AttachmentThumbnail
 									key={asset.uri}

@@ -47,7 +47,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 		openInGoogleMaps,
 		openInAppleMaps,
 		isCancelingComplaint,
-		openBottomSheet,
+		openComplaintDetail,
 		editComplaint,
 	} = useComplaintCard(complaint);
 	const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -167,7 +167,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 								<MenuItem
 									key="view-complaint"
 									textValue="Ver denúncia"
-									onPress={openBottomSheet}
+									onPress={openComplaintDetail}
 								>
 									<View className="flex-row items-center gap-2">
 										<EyeIcon
