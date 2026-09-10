@@ -10,7 +10,6 @@ import {
 } from "lucide-react-native";
 import { Alert, Platform, ScrollView, View } from "react-native";
 import {
-	type HazardLevelVariant,
 	WasteCategoryHazardLevel,
 	WasteCategoryHazardLevelIcon,
 	WasteCategoryHazardLevelText,
@@ -24,6 +23,10 @@ import { Text } from "@/components/ui/text";
 import { formatDistance } from "@/libs/format-distance";
 import { openAppleMaps, openGoogleMaps, openInMaps } from "@/libs/open-in-maps";
 import { HStack } from "../ui/hstack";
+import {
+	deriveAddress,
+	highestHazardVariant,
+} from "./complaint-hazard-address-utils";
 import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
 
 export type HeaderComplaint = {
@@ -50,37 +53,6 @@ type Props = {
 	complaint: HeaderComplaint;
 	userLocation?: { lat: number; lon: number } | null;
 };
-
-const HAZARD_PRIORITY: Record<string, number> = {
-	LOW: 1,
-	MEDIUM: 2,
-	HIGH: 3,
-	VERY_HIGH: 4,
-};
-
-const HAZARD_VARIANT: Record<string, HazardLevelVariant> = {
-	LOW: "low",
-	MEDIUM: "medium",
-	HIGH: "high",
-	VERY_HIGH: "very_high",
-};
-
-function highestHazardVariant(levels: string[]): HazardLevelVariant {
-	const highest = levels.reduce(
-		(max, lvl) =>
-			(HAZARD_PRIORITY[lvl] ?? 0) > (HAZARD_PRIORITY[max] ?? 0) ? lvl : max,
-		levels[0] ?? "LOW",
-	);
-	return HAZARD_VARIANT[highest] ?? "low";
-}
-
-function deriveAddress(complaint: HeaderComplaint): string | null {
-	const { addresses } = complaint.geospatial;
-	const streetPart = [addresses.street, addresses.streetNumber]
-		.filter(Boolean)
-		.join(", ");
-	return [streetPart, addresses.district].filter(Boolean).join(" — ") || null;
-}
 
 export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 	const createdAt = new Date(complaint.created_at);
