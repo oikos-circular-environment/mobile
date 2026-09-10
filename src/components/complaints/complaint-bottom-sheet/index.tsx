@@ -136,7 +136,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 			});
 			return res.data;
 		},
-		enabled: isOpen && !!complaintId,
+		enabled: isOpen && !!complaintId && isAuthenticated,
 	});
 
 	const deleteMutation = useMutation({
