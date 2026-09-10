@@ -123,52 +123,54 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 				<BadgeText>{complaint.id}</BadgeText>
 			</Badge>
 
-			<View className="flex-row items-center justify-between gap-2">
+			<View className="flex-row items-start justify-between gap-2">
 				<Text
 					className="flex-1 shrink text-2xl font-bold text-gray-950"
 					style={{ fontFamily: "Oswald_700Bold" }}
-					numberOfLines={2}
 				>
 					DESCARTE IRREGULAR
 				</Text>
 
-				{!!complaint.location &&
-					(Platform.OS === "ios" ? (
-						<Menu
-							placement="bottom right"
-							offset={8}
-							trigger={triggerProps => (
-								<Button variant="outline" size="sm" {...triggerProps}>
-									<ButtonIcon as={ForwardIcon} />
-									<ButtonText>Abrir no mapa</ButtonText>
-								</Button>
-							)}
-						>
-							<MenuItem
-								key="apple-maps"
-								textValue="Abrir na Apple Maps"
-								onPress={() => handleOpenInMaps("apple")}
+				{!!complaint.location && (
+					<View className="shrink-0">
+						{Platform.OS === "ios" ? (
+							<Menu
+								placement="bottom right"
+								offset={8}
+								trigger={triggerProps => (
+									<Button variant="outline" size="sm" {...triggerProps}>
+										<ButtonIcon as={ForwardIcon} />
+										<ButtonText>Abrir no mapa</ButtonText>
+									</Button>
+								)}
 							>
-								<MenuItemLabel>Abrir na Apple Maps</MenuItemLabel>
-							</MenuItem>
-							<MenuItem
-								key="google-maps"
-								textValue="Abrir no Google Maps"
-								onPress={() => handleOpenInMaps("google")}
+								<MenuItem
+									key="apple-maps"
+									textValue="Abrir na Apple Maps"
+									onPress={() => handleOpenInMaps("apple")}
+								>
+									<MenuItemLabel>Abrir na Apple Maps</MenuItemLabel>
+								</MenuItem>
+								<MenuItem
+									key="google-maps"
+									textValue="Abrir no Google Maps"
+									onPress={() => handleOpenInMaps("google")}
+								>
+									<MenuItemLabel>Abrir no Google Maps</MenuItemLabel>
+								</MenuItem>
+							</Menu>
+						) : (
+							<Button
+								variant="outline"
+								size="sm"
+								onPress={() => handleOpenInMaps()}
 							>
-								<MenuItemLabel>Abrir no Google Maps</MenuItemLabel>
-							</MenuItem>
-						</Menu>
-					) : (
-						<Button
-							variant="outline"
-							size="sm"
-							onPress={() => handleOpenInMaps()}
-						>
-							<ButtonIcon as={ForwardIcon} />
-							<ButtonText>Abrir no mapa</ButtonText>
-						</Button>
-					))}
+								<ButtonIcon as={ForwardIcon} />
+								<ButtonText>Abrir no mapa</ButtonText>
+							</Button>
+						)}
+					</View>
+				)}
 			</View>
 
 			<View className="flex-row items-center justify-between">
