@@ -9,16 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type * as ImagePicker from "expo-image-picker";
 import { Observe } from "expo-observe";
 import { router, useLocalSearchParams } from "expo-router";
-import {
-	AlertCircleIcon,
-	AlertTriangleIcon,
-	BuildingIcon,
-	ChevronDownIcon,
-	ImageIcon,
-	InfoIcon,
-	X,
-	XIcon,
-} from "lucide-react-native";
+import { AlertCircleIcon } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -30,16 +21,17 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
+import { AddMediaTile } from "@/components/complaints/attachments/add-media-tile";
+import { AttachmentThumbnail } from "@/components/complaints/attachments/attachment-thumbnail";
+import type { AttachmentMedia } from "@/components/complaints/attachments/types";
 import type { Company } from "@/components/complaints/company-picker-bottom-sheet";
 import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker-bottom-sheet";
 import { ComplaintDetailsHeader } from "@/components/complaints/complaint-details-header";
+import { ComplaintAlertBanner } from "@/components/complaints/complaint-form/alert-banner";
+import { CompanyPickerField } from "@/components/complaints/complaint-form/company-picker-field";
 import type { UploadProgress } from "@/components/complaints/hooks/upload-progress";
 import { MediaUploadProgress } from "@/components/complaints/media-upload-progress";
-import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
-import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
-import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
 	FormControl,
 	FormControlError,
@@ -51,17 +43,16 @@ import {
 	FormControlLabelText,
 } from "@/components/ui/form-control";
 import { Input, InputField } from "@/components/ui/input";
-import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
-import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { compressMedia } from "@/libs/media-compression";
 import {
 	formatFileSize,
 	getFileSize,
 	isValidMimeType,
 	MAX_FILE_SIZE_BYTES,
+	mediaTypeFromFileName,
 } from "@/libs/media-validation";
 import { logComplaintEvent } from "@/libs/observe-events";
 import { usePickImage } from "@/libs/use-pick-image";
@@ -69,13 +60,6 @@ import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useComplaintsStore } from "@/stores/complaints-store";
 
 const MIN_ATTACHMENTS = 1;
-
-type ExistingAttachment = { id: string; url: string; file_name: string };
-
-function mediaTypeFromFileName(fileName: string): "photo" | "video" {
-	const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
-	return ["mp4", "mov", "avi", "webm", "mkv"].includes(ext) ? "video" : "photo";
-}
 
 const resolutionSchema = z.object({
 	description: z.string().min(1, "Descrição é obrigatória."),
@@ -107,7 +91,7 @@ export default function ComplaintResolutionScreen() {
 	const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 	const [showCompanyPicker, setShowCompanyPicker] = useState(false);
 	const [existingAttachments, setExistingAttachments] = useState<
-		ExistingAttachment[]
+		AttachmentMedia[]
 	>([]);
 	const [removedAttachmentIds, setRemovedAttachmentIds] = useState<Set<string>>(
 		new Set(),
@@ -125,7 +109,7 @@ export default function ComplaintResolutionScreen() {
 		if (resolutionDraft.attachmentsJson) {
 			try {
 				setExistingAttachments(
-					JSON.parse(resolutionDraft.attachmentsJson) as ExistingAttachment[],
+					JSON.parse(resolutionDraft.attachmentsJson) as AttachmentMedia[],
 				);
 			} catch {
 				// ignore malformed JSON
@@ -369,23 +353,10 @@ export default function ComplaintResolutionScreen() {
 					</View>
 
 					{/* Info contextual */}
-					<Alert className="flex-row items-start gap-2 rounded-lg border border-sky-700 bg-sky-50 p-3">
-						<AlertIcon as={InfoIcon} className="text-sky-700" />
-						<AlertText className="flex-1 text-sky-700">
-							Deixe a comunidade saber quem resolveu e como resolveu, assim
-							conseguimos inspirar voluntários e órgãos competentes a ajudarem
-							na solução de um ambiente mais limpo e seguro.
-						</AlertText>
-					</Alert>
+					<ComplaintAlertBanner variant="info" />
 
 					{/* Aviso de publicidade */}
-					<Alert className="flex-row items-start gap-2 rounded-lg border border-amber-500 bg-amber-50 p-3">
-						<AlertIcon as={AlertTriangleIcon} className="text-amber-600" />
-						<AlertText className="flex-1 text-amber-700">
-							As resoluções serão públicas, utilize este local apenas para
-							postagens íntegras que levarão à resolução da denúncia.
-						</AlertText>
-					</Alert>
+					<ComplaintAlertBanner variant="warning" />
 
 					{/* Descrição */}
 					<Controller
@@ -403,7 +374,7 @@ export default function ComplaintResolutionScreen() {
 										{charCount} caracteres
 									</Text>
 								</View>
-								<Input className="min-h-[100px]">
+								<Input className="min-h-28">
 									<InputField
 										value={value}
 										onChangeText={onChange}
@@ -438,55 +409,11 @@ export default function ComplaintResolutionScreen() {
 							<Text className="text-xs text-gray-400">opcional</Text>
 						</View>
 
-						{selectedCompany ? (
-							<View className="flex-row items-center gap-3 rounded-xl border border-lime-700 bg-lime-50 p-3">
-								<Avatar size="sm" className="h-9 w-9 rounded-full bg-lime-100">
-									<BuildingIcon
-										size={16}
-										color={colors.lime[800]}
-										strokeWidth={2}
-									/>
-									{selectedCompany.avatar?.url && (
-										<AvatarImage
-											source={{
-												uri: selectedCompany.avatar.url,
-												headers: getAuthenticatedImageHeaders(),
-											}}
-										/>
-									)}
-								</Avatar>
-								<View className="flex-1">
-									<Text className="font-semibold text-lime-900">
-										{selectedCompany.business_name ??
-											selectedCompany.corporate_name}
-									</Text>
-									<Text className="text-xs text-lime-700">
-										{selectedCompany.company_type}
-									</Text>
-								</View>
-								<TouchableOpacity
-									onPress={() => setSelectedCompany(null)}
-									hitSlop={8}
-								>
-									<XIcon size={16} color={colors.lime[800]} strokeWidth={2} />
-								</TouchableOpacity>
-							</View>
-						) : (
-							<TouchableOpacity
-								onPress={() => setShowCompanyPicker(true)}
-								activeOpacity={0.8}
-								className="h-11 flex-row items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4"
-							>
-								<Text className="text-sm text-gray-400">
-									Selecionar empresa...
-								</Text>
-								<ChevronDownIcon
-									size={16}
-									color={colors.gray[400]}
-									strokeWidth={2}
-								/>
-							</TouchableOpacity>
-						)}
+						<CompanyPickerField
+							company={selectedCompany}
+							onPress={() => setShowCompanyPicker(true)}
+							onClear={() => setSelectedCompany(null)}
+						/>
 
 						<FormControlHelper>
 							<FormControlHelperText>
@@ -523,81 +450,35 @@ export default function ComplaintResolutionScreen() {
 							nestedScrollEnabled
 							keyboardShouldPersistTaps="always"
 						>
-							<Pressable
-								onPress={handlePickMedia}
-								disabled={isPicking}
-								className="items-center justify-center rounded-xl border border-gray-200 bg-gray-50"
-								style={{ width: 80, height: 80 }}
-							>
-								{isPicking ? (
-									<Spinner color={colors.gray[400]} />
-								) : (
-									<ImageIcon
-										size={24}
-										color={colors.gray[400]}
-										strokeWidth={1.5}
-									/>
-								)}
-							</Pressable>
+							<AddMediaTile onPress={handlePickMedia} isPicking={isPicking} />
 
 							{/* Anexos existentes do servidor */}
 							{existingAttachments
 								.filter(a => !removedAttachmentIds.has(a.id))
 								.map(attachment => (
-									<View
+									<AttachmentThumbnail
 										key={attachment.id}
-										className="relative"
-										style={{ width: 80, height: 80 }}
-									>
-										<View className="flex-1 overflow-hidden rounded-xl">
-											<MediaThumbnail
-												mediaType={mediaTypeFromFileName(attachment.file_name)}
-												uri={attachment.url}
-												fallbackLabel={
-													mediaTypeFromFileName(attachment.file_name) ===
-													"video"
-														? "VÍD"
-														: "IMG"
-												}
-											/>
-										</View>
-										<TouchableOpacity
-											className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
-											onPress={() =>
-												setRemovedAttachmentIds(prev => {
-													const next = new Set(prev);
-													next.add(attachment.id);
-													return next;
-												})
-											}
-										>
-											<X size={12} color={colors.white} strokeWidth={2.5} />
-										</TouchableOpacity>
-									</View>
+										uri={attachment.url}
+										mediaType={mediaTypeFromFileName(attachment.file_name)}
+										onRemove={() =>
+											setRemovedAttachmentIds(prev => {
+												const next = new Set(prev);
+												next.add(attachment.id);
+												return next;
+											})
+										}
+									/>
 								))}
 
 							{/* Novos anexos selecionados localmente */}
 							{selectedAssets.map(asset => (
-								<View
+								<AttachmentThumbnail
 									key={asset.uri}
-									className="relative"
-									style={{ width: 80, height: 80 }}
-								>
-									<View className="flex-1 overflow-hidden rounded-xl">
-										<MediaThumbnail
-											mediaType={asset.type === "video" ? "video" : "photo"}
-											uri={asset.uri}
-											fallbackLabel={asset.type === "video" ? "VÍD" : "IMG"}
-											fileSizeBytes={asset.fileSize}
-										/>
-									</View>
-									<TouchableOpacity
-										className="absolute -right-1 -top-1 items-center justify-center rounded-full bg-red-500 p-0.5"
-										onPress={() => handleRemoveAsset(asset.uri)}
-									>
-										<X size={12} color={colors.white} strokeWidth={2.5} />
-									</TouchableOpacity>
-								</View>
+									uri={asset.uri}
+									mediaType={asset.type === "video" ? "video" : "photo"}
+									fileSizeBytes={asset.fileSize}
+									onRemove={() => handleRemoveAsset(asset.uri)}
+								/>
 							))}
 						</ScrollView>
 
