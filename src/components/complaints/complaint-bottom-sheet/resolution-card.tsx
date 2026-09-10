@@ -43,13 +43,13 @@ export function ResolutionCard({
 
 	const cardContent = (
 		<View
-			className="gap-2 rounded-[10px] border border-gray-100 p-3"
+			className="gap-2 rounded-xl border border-gray-100 p-3"
 			style={isOwnResolution ? { borderColor: colors.lime[200] } : undefined}
 		>
 			{isOwnResolution && (
 				<View className="self-start">
 					<Badge variant="outline" className="border-lime-600 bg-lime-50">
-						<BadgeText className="text-[10px] font-semibold text-lime-700">
+						<BadgeText className="text-xs font-semibold text-lime-700">
 							Sua Resolução
 						</BadgeText>
 					</Badge>

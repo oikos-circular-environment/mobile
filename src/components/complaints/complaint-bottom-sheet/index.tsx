@@ -276,7 +276,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 													setPreviewMapComplaintAttachment(att);
 													setSelectedMapComplaintAttachmentId(att.id);
 												}}
-												className="h-[110px] w-[110px] overflow-hidden rounded-lg bg-gray-100"
+												className="h-28 w-28 overflow-hidden rounded-lg bg-gray-100"
 												style={
 													isSelected
 														? { borderWidth: 2, borderColor: colors.lime[700] }
@@ -446,7 +446,7 @@ export function ComplaintBottomSheet({ source }: ComplaintBottomSheetProps) {
 									onPress={handleAddResolution}
 									disabled={complaint.status === "RESOLVED"}
 									className={cn(
-										"h-11 flex-row items-center justify-center gap-1.5 rounded-[10px] border",
+										"h-11 flex-row items-center justify-center gap-1.5 rounded-xl border",
 										complaint.status === "RESOLVED"
 											? "border-gray-100 bg-gray-50"
 											: "border-gray-200 bg-white",

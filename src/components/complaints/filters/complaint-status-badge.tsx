@@ -46,9 +46,9 @@ const BADGE_ICON_ONLY: Record<ChipSize, string> = {
 };
 
 const BADGE_TEXT: Record<ChipSize, string> = {
-	xs: "text-[10px]",
-	sm: "text-[11px]",
-	md: "text-[13px]",
+	xs: "text-xs",
+	sm: "text-xs",
+	md: "text-sm",
 	lg: "text-sm",
 };
 

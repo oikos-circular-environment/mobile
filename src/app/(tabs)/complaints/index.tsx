@@ -382,7 +382,7 @@ export default function ComplaintsMapScreen() {
 				<TouchableOpacity
 					activeOpacity={0.9}
 					onPress={handleOpenMapControlsSheet}
-					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
+					className="h-12 w-12 items-center justify-center rounded-xl bg-white"
 					style={fabShadow}
 				>
 					<SlidersHorizontalIcon
@@ -414,7 +414,7 @@ export default function ComplaintsMapScreen() {
 						}
 						router.push("/(tabs)/complaints/list");
 					}}
-					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
+					className="h-12 w-12 items-center justify-center rounded-xl bg-white"
 					style={fabShadow}
 				>
 					<ListIcon size={20} color={colors.gray[700]} strokeWidth={2} />
@@ -433,7 +433,7 @@ export default function ComplaintsMapScreen() {
 						}
 						router.push("/(tabs)/complaints/(create)");
 					}}
-					className="h-[50px] w-[50px] items-center justify-center rounded-[14px] bg-lime-800"
+					className="h-12 w-12 items-center justify-center rounded-xl bg-lime-800"
 					style={{
 						shadowColor: colors.black,
 						shadowOffset: { width: 0, height: 2 },

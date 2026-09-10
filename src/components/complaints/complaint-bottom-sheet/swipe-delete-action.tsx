@@ -20,7 +20,7 @@ export function SwipeDeleteAction({
 	return (
 		<Animated.View
 			style={[animatedStyle, { width: SWIPE_ACTION_WIDTH }]}
-			className="overflow-hidden rounded-r-[10px]"
+			className="overflow-hidden rounded-r-xl"
 		>
 			<TouchableOpacity
 				activeOpacity={0.85}
@@ -28,7 +28,7 @@ export function SwipeDeleteAction({
 				className="flex-1 items-center justify-center gap-1 bg-red-500"
 			>
 				<Trash2Icon size={16} color={colors.white} strokeWidth={2} />
-				<Text className="text-[10px] font-semibold text-white">Excluir</Text>
+				<Text className="text-xs font-semibold text-white">Excluir</Text>
 			</TouchableOpacity>
 		</Animated.View>
 	);

@@ -20,7 +20,7 @@ export function SwipeEditAction({
 	return (
 		<Animated.View
 			style={[animatedStyle, { width: SWIPE_ACTION_WIDTH }]}
-			className="overflow-hidden rounded-l-[10px]"
+			className="overflow-hidden rounded-l-xl"
 		>
 			<TouchableOpacity
 				activeOpacity={0.85}
@@ -28,7 +28,7 @@ export function SwipeEditAction({
 				className="flex-1 items-center justify-center gap-1 bg-lime-700"
 			>
 				<PencilIcon size={16} color={colors.white} strokeWidth={2} />
-				<Text className="text-[10px] font-semibold text-white">Editar</Text>
+				<Text className="text-xs font-semibold text-white">Editar</Text>
 			</TouchableOpacity>
 		</Animated.View>
 	);

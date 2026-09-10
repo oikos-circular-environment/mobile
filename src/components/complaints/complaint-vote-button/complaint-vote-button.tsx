@@ -36,10 +36,7 @@ export function ComplaintVoteButton({ type }: ComplaintVoteButtonProps) {
 
 	if (isPending) {
 		return (
-			<Skeleton
-				startColor="bg-gray-200"
-				className="h-14 flex-1 rounded-[10px]"
-			/>
+			<Skeleton startColor="bg-gray-200" className="h-14 flex-1 rounded-xl" />
 		);
 	}
 
@@ -53,7 +50,7 @@ export function ComplaintVoteButton({ type }: ComplaintVoteButtonProps) {
 			onPress={() => onVote(type)}
 			disabled={disabled}
 			className={cn(
-				"h-14 flex-1 flex-row items-center gap-3 rounded-[10px] px-4",
+				"h-14 flex-1 flex-row items-center gap-3 rounded-xl px-4",
 				disabled
 					? "border border-gray-100 bg-gray-50"
 					: isActive

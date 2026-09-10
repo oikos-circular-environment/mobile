@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function ResolutionCardSkeleton() {
 	return (
-		<View className="gap-2 rounded-[10px] border border-gray-100 p-3">
+		<View className="gap-2 rounded-xl border border-gray-100 p-3">
 			<View className="flex-row items-center gap-2">
 				<Skeleton startColor="bg-gray-200" className="h-8 w-8 rounded-full" />
 				<View className="flex-1 gap-1.5">

@@ -507,14 +507,14 @@ export default function ComplaintResolutionScreen() {
 						onPress={handleSubmit(onSubmit)}
 						disabled={!canSubmit}
 						activeOpacity={0.85}
-						className={`h-12 items-center justify-center rounded-[10px] ${canSubmit ? "bg-lime-800" : "bg-gray-200"}`}
+						className={`h-12 items-center justify-center rounded-xl ${canSubmit ? "bg-lime-800" : "bg-gray-200"}`}
 						style={{ marginBottom: insets.bottom || 16 }}
 					>
 						{mutation.isPending ? (
 							<Spinner size="small" />
 						) : (
 							<Text
-								className={`text-[15px] font-bold ${canSubmit ? "text-white" : "text-gray-400"}`}
+								className={`text-base font-bold ${canSubmit ? "text-white" : "text-gray-400"}`}
 							>
 								{isEditMode ? "Atualizar Resolução" : "Confirmar Resolução"}
 							</Text>
