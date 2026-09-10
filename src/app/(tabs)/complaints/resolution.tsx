@@ -1,16 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
-	patchV1ComplaintsByIdResolutionsByResolutionId,
-	postV1ComplaintsByIdResolutions,
-	postV1ComplaintsByIdResolutionsAttachments,
-} from "@oikos-circular-environment/oikos-sdk";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type * as ImagePicker from "expo-image-picker";
-import { Observe } from "expo-observe";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { AlertCircleIcon } from "lucide-react-native";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	KeyboardAvoidingView,
@@ -29,7 +21,7 @@ import { CompanyPickerBottomSheet } from "@/components/complaints/company-picker
 import { ComplaintDetailsHeader } from "@/components/complaints/complaint-details-header";
 import { ComplaintAlertBanner } from "@/components/complaints/complaint-form/alert-banner";
 import { CompanyPickerField } from "@/components/complaints/complaint-form/company-picker-field";
-import type { UploadProgress } from "@/components/complaints/hooks/upload-progress";
+import { useResolutionMutation } from "@/components/complaints/hooks/use-resolution-mutation";
 import { MediaUploadProgress } from "@/components/complaints/media-upload-progress";
 import { toast } from "@/components/toast";
 import {
@@ -46,15 +38,10 @@ import { Input, InputField } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
-import { compressMedia } from "@/libs/media-compression";
 import {
-	formatFileSize,
-	getFileSize,
 	isValidMimeType,
-	MAX_FILE_SIZE_BYTES,
 	mediaTypeFromFileName,
 } from "@/libs/media-validation";
-import { logComplaintEvent } from "@/libs/observe-events";
 import { usePickImage } from "@/libs/use-pick-image";
 import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useComplaintsStore } from "@/stores/complaints-store";
@@ -72,7 +59,6 @@ export default function ComplaintResolutionScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const insets = useSafeAreaInsets();
 	const { isAuthenticated } = useAuthContext();
-	const queryClient = useQueryClient();
 
 	const resolutionDraft = useComplaintsStore(s => s.resolutionDraft);
 	const clearResolutionDraft = useComplaintsStore(s => s.clearResolutionDraft);
@@ -83,11 +69,6 @@ export default function ComplaintResolutionScreen() {
 	const [selectedAssets, setSelectedAssets] = useState<
 		ImagePicker.ImagePickerAsset[]
 	>([]);
-	type CompressedMedia = { uri: string; name: string; type: string };
-	const compressedMediaRef = useRef<CompressedMedia[]>([]);
-	const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
-		null,
-	);
 	const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 	const [showCompanyPicker, setShowCompanyPicker] = useState(false);
 	const [existingAttachments, setExistingAttachments] = useState<
@@ -187,81 +168,10 @@ export default function ComplaintResolutionScreen() {
 		setSelectedAssets(prev => prev.filter(a => a.uri !== uri));
 	};
 
-	const mutation = useMutation({
-		mutationFn: async (data: ResolutionFormValues) => {
-			if (!id) throw new Error("Dados inválidos.");
-
-			if (isEditMode && resolutionId) {
-				await patchV1ComplaintsByIdResolutionsByResolutionId({
-					path: { id, resolutionId },
-					body: {
-						description: data.description,
-						...(selectedCompany ? { company_id: selectedCompany.id } : {}),
-					},
-				});
-				for (const attachmentId of removedAttachmentIds) {
-					await deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId({
-						path: { id, attachmentId },
-					});
-				}
-			} else {
-				await postV1ComplaintsByIdResolutions({
-					path: { id },
-					body: {
-						description: data.description,
-						...(selectedCompany ? { company_id: selectedCompany.id } : {}),
-					},
-				});
-			}
-
-			const mediaList = compressedMediaRef.current;
-			for (let i = 0; i < mediaList.length; i++) {
-				const media = mediaList[i];
-				setUploadProgress({
-					phase: "uploading",
-					current: i + 1,
-					total: mediaList.length,
-				});
-				const formData = new FormData();
-				formData.append("file", {
-					uri: media.uri,
-					name: media.name,
-					type: media.type,
-				} as unknown as Blob);
-				await postV1ComplaintsByIdResolutionsAttachments({
-					path: { id },
-					body: formData as unknown as undefined,
-				});
-			}
-		},
-		onSuccess: () => {
-			setUploadProgress(null);
-			queryClient.invalidateQueries({
-				queryKey: ["complaint", "resolutions", id],
-			});
-			logComplaintEvent("complaint.resolved", {
-				success: true,
-				action: isEditMode ? "updated" : "created",
-			});
-			toast.success(
-				isEditMode ? "Resolução atualizada!" : "Resolução publicada!",
-				isEditMode
-					? "Sua resolução foi atualizada."
-					: "Sua resolução foi registrada.",
-			);
-			router.back();
-		},
-		onError: () => {
-			setUploadProgress(null);
-			logComplaintEvent("complaint.resolved", {
-				success: false,
-				action: isEditMode ? "updated" : "created",
-			});
-			toast.error(
-				"Erro",
-				`Não foi possível ${isEditMode ? "atualizar" : "publicar"} a resolução.`,
-			);
-		},
+	const { mutation, uploadProgress } = useResolutionMutation({
+		complaintId: id,
+		isEditMode,
+		resolutionId,
 	});
 
 	const attachmentsMissing = MIN_ATTACHMENTS - selectedAssets.length;
@@ -270,7 +180,7 @@ export default function ComplaintResolutionScreen() {
 		(isEditMode || selectedAssets.length >= MIN_ATTACHMENTS) &&
 		!mutation.isPending;
 
-	const onSubmit = async (data: ResolutionFormValues) => {
+	const onSubmit = (data: ResolutionFormValues) => {
 		if (!isEditMode && selectedAssets.length < MIN_ATTACHMENTS) {
 			toast.error(
 				"Anexos insuficientes",
@@ -279,51 +189,12 @@ export default function ComplaintResolutionScreen() {
 			return;
 		}
 
-		try {
-			setUploadProgress({
-				phase: "compressing",
-				current: 0,
-				total: selectedAssets.length,
-			});
-
-			const compressed: CompressedMedia[] = [];
-			for (let i = 0; i < selectedAssets.length; i++) {
-				const asset = selectedAssets[i];
-				setUploadProgress({
-					phase: "compressing",
-					current: i + 1,
-					total: selectedAssets.length,
-				});
-				const isPhoto = asset.type === "image";
-				const ext = isPhoto ? "jpg" : "mp4";
-				const compressedUri = await compressMedia(
-					asset.uri,
-					isPhoto ? "photo" : "video",
-				);
-				const size = getFileSize(compressedUri);
-				if (size != null && size > MAX_FILE_SIZE_BYTES) {
-					toast.error(
-						"Arquivo muito grande",
-						`Um arquivo excede ${formatFileSize(MAX_FILE_SIZE_BYTES)} após compressão. Reduza a qualidade ou duração.`,
-					);
-					return;
-				}
-				compressed.push({
-					uri: compressedUri,
-					name: asset.fileName ?? `resolution_${id}_${Date.now()}.${ext}`,
-					type: isPhoto ? "image/jpeg" : "video/mp4",
-				});
-			}
-			compressedMediaRef.current = compressed;
-			mutation.mutate(data);
-		} catch (error) {
-			Observe.reportError(error);
-			setUploadProgress(null);
-			toast.error(
-				"Falha ao processar mídia",
-				"Não foi possível preparar os anexos. Tente novamente.",
-			);
-		}
+		mutation.mutate({
+			description: data.description,
+			company: selectedCompany,
+			assets: selectedAssets,
+			removedAttachmentIds,
+		});
 	};
 
 	return (
