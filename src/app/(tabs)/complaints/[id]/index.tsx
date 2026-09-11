@@ -189,7 +189,7 @@ export default function ComplaintDetailScreen() {
 				options={{
 					title: "Descarte Irregular",
 					headerLeft: () => (
-						<Pressable onPress={() => router.back()} className="pl-1">
+						<Pressable onPress={() => router.back()}>
 							<ChevronLeftIcon size={24} color={colors.gray[950]} />
 						</Pressable>
 					),
@@ -197,7 +197,7 @@ export default function ComplaintDetailScreen() {
 			/>
 			<ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
 				{complaint && (
-					<View className="items-start gap-2.5 px-4">
+					<View className="items-start gap-2.5 p-4">
 						<ComplaintDetailsHeader
 							complaint={complaint}
 							userLocation={userLocation}

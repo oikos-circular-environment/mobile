@@ -24612,7 +24612,7 @@
               "name": "complaints/list",
               "clip": true,
               "width": 430,
-              "height": 932,
+              "height": 973,
               "fill": "$--background",
               "layout": "none",
               "children": [
@@ -24622,7 +24622,7 @@
                   "x": 0,
                   "y": 0,
                   "name": "Complaint Container",
-                  "height": 932,
+                  "height": 965,
                   "layout": "vertical",
                   "children": [
                     {
@@ -25194,17 +25194,112 @@
                                 {
                                   "type": "frame",
                                   "id": "NGsjH",
+                                  "name": "header",
                                   "width": "fill_container",
                                   "gap": 8,
                                   "alignItems": "center",
                                   "children": [
                                     {
                                       "type": "frame",
+                                      "id": "XkPhX",
+                                      "width": "fill_container",
+                                      "layout": "vertical",
+                                      "gap": 2,
+                                      "children": [
+                                        {
+                                          "type": "frame",
+                                          "id": "POGQ2",
+                                          "name": "Frame 80",
+                                          "clip": true,
+                                          "width": "fill_container",
+                                          "layout": "vertical",
+                                          "gap": 10,
+                                          "children": [
+                                            {
+                                              "type": "text",
+                                              "id": "Fwl4d",
+                                              "fill": "$--foreground",
+                                              "content": "AVENIDA ALENCAR DE AZEVEDO, 1354, CENTRO",
+                                              "fontFamily": "Oswald",
+                                              "fontSize": "$radius-xl",
+                                              "fontWeight": "600"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "AsZhr",
+                                          "width": "fill_container",
+                                          "gap": 6,
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "icon",
+                                              "id": "N7IWw",
+                                              "width": 12,
+                                              "height": 12,
+                                              "icon": "calendar",
+                                              "library": "lucide",
+                                              "fill": "#6b7280"
+                                            },
+                                            {
+                                              "type": "text",
+                                              "id": "V3RKwb",
+                                              "fill": "#6b7280",
+                                              "content": "26 de maio de 2026 às 14:32 - Aberta à 5 horas",
+                                              "fontFamily": "Space Grotesk",
+                                              "fontSize": "$radius-lg",
+                                              "fontWeight": "normal"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "xDbDn",
+                                          "width": "fill_container",
+                                          "gap": 6,
+                                          "justifyContent": "space_between",
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "frame",
+                                              "id": "BUWcB",
+                                              "name": "Frame 57",
+                                              "gap": 6,
+                                              "alignItems": "center",
+                                              "children": [
+                                                {
+                                                  "type": "icon",
+                                                  "id": "PTI3F",
+                                                  "width": 12,
+                                                  "height": 12,
+                                                  "icon": "crosshair",
+                                                  "library": "lucide",
+                                                  "fill": "#6b7280"
+                                                },
+                                                {
+                                                  "type": "text",
+                                                  "id": "z0Vts5",
+                                                  "fill": "#6b7280",
+                                                  "content": "-16.4707, -54.6375",
+                                                  "fontFamily": "Space Grotesk",
+                                                  "fontSize": "$radius-lg",
+                                                  "fontWeight": "normal"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
                                       "id": "oJLpr",
                                       "name": "Frame 15",
+                                      "context": "Stack Image, deve mostrar um badge caso tenha mais de uma imagem.",
                                       "clip": true,
-                                      "width": 48,
-                                      "height": 48,
+                                      "width": 58,
+                                      "height": "fill_container",
                                       "cornerRadius": 8,
                                       "justifyContent": "space_around",
                                       "alignItems": "center",
@@ -25222,77 +25317,44 @@
                                           "height": 122
                                         }
                                       ]
-                                    },
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "r7GJ4",
+                                  "name": "badges-list",
+                                  "context": "Container que contém status, resíduos com periculosidades.",
+                                  "width": "fill_container",
+                                  "fill": "#f5f5f5",
+                                  "cornerRadius": 8,
+                                  "gap": 8,
+                                  "padding": 8,
+                                  "justifyContent": "space_between",
+                                  "alignItems": "center",
+                                  "children": [
                                     {
                                       "type": "frame",
-                                      "id": "XkPhX",
-                                      "width": "fill_container",
-                                      "layout": "vertical",
-                                      "gap": 2,
-                                      "children": [
-                                        {
-                                          "type": "text",
-                                          "id": "Fwl4d",
-                                          "fill": "$--foreground",
-                                          "textGrowth": "fixed-width",
-                                          "width": "fill_container",
-                                          "content": "Av. Paulista, 456 – Bela Vista",
-                                          "fontFamily": "Inter",
-                                          "fontSize": 13,
-                                          "fontWeight": "600"
-                                        },
-                                        {
-                                          "type": "text",
-                                          "id": "tH4V8",
-                                          "fill": "$--muted-foreground",
-                                          "textGrowth": "fixed-width",
-                                          "width": "fill_container",
-                                          "content": "24/05/2026, 09:15:00",
-                                          "fontFamily": "Inter",
-                                          "fontSize": 11,
-                                          "fontWeight": "normal"
-                                        },
-                                        {
-                                          "type": "text",
-                                          "id": "mRhOn",
-                                          "fill": "$--muted-foreground",
-                                          "textGrowth": "fixed-width",
-                                          "width": "fill_container",
-                                          "content": "-23.563800, -46.654200",
-                                          "fontFamily": "Inter",
-                                          "fontSize": 11,
-                                          "fontWeight": "normal"
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "frame",
-                                      "id": "StbCY",
-                                      "width": 28,
-                                      "fill": "#f5f5f5",
-                                      "cornerRadius": 8,
-                                      "layout": "vertical",
-                                      "gap": 8,
-                                      "padding": 4,
-                                      "justifyContent": "center",
-                                      "alignItems": "center",
+                                      "id": "qaUzo",
+                                      "x": 8,
+                                      "y": 8.5,
+                                      "name": "Frame 79",
+                                      "enabled": false,
+                                      "gap": 4,
                                       "children": [
                                         {
                                           "type": "frame",
-                                          "id": "fsQZp",
-                                          "width": "fill_container",
-                                          "fill": "#ecfccb",
+                                          "id": "a4S4L",
+                                          "width": 20,
+                                          "fill": "$lime-100",
                                           "cornerRadius": 4,
-                                          "padding": [
-                                            4,
-                                            2
-                                          ],
+                                          "padding": 4,
                                           "justifyContent": "center",
                                           "alignItems": "center",
                                           "children": [
                                             {
                                               "type": "icon",
-                                              "id": "D92rvc",
+                                              "id": "JL0PP",
                                               "width": 12,
                                               "height": 12,
                                               "icon": "shield-check",
@@ -25302,15 +25364,107 @@
                                           ]
                                         },
                                         {
-                                          "type": "icon",
-                                          "id": "rcy1L",
-                                          "width": 12,
-                                          "height": 12,
-                                          "icon": "ellipsis-vertical",
-                                          "library": "lucide",
-                                          "fill": "#374151"
+                                          "id": "o9Bnc7",
+                                          "type": "ref",
+                                          "ref": "hNp9X",
+                                          "name": "Badge destructive",
+                                          "fill": "$red-100",
+                                          "x": 24,
+                                          "y": 0,
+                                          "flipX": false,
+                                          "flipY": false,
+                                          "width": 20,
+                                          "height": 20,
+                                          "justifyContent": "center",
+                                          "alignItems": "center",
+                                          "padding": 4,
+                                          "descendants": {
+                                            "r9uWx": {
+                                              "fill": "$9:--destructive",
+                                              "library": "lucide",
+                                              "icon": "chevrons-up"
+                                            },
+                                            "AwdGP": {
+                                              "content": "CONSTRUÇÃO CIVIL E DEMOLIÇÃO (RCD)",
+                                              "fill": "#dc2626",
+                                              "enabled": false
+                                            }
+                                          }
                                         }
                                       ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "fGeTt",
+                                      "width": "fill_container",
+                                      "gap": 8,
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "id": "aosa2",
+                                          "type": "ref",
+                                          "ref": "hNp9X",
+                                          "name": "Badge destructive",
+                                          "fill": "$sky-100",
+                                          "x": 0,
+                                          "y": 0,
+                                          "descendants": {
+                                            "r9uWx": {
+                                              "fill": "#7ed4fcff",
+                                              "library": "lucide",
+                                              "icon": "shield"
+                                            },
+                                            "AwdGP": {
+                                              "content": "ABERTO",
+                                              "fill": "#7dd3fc"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "id": "qLK0X",
+                                          "type": "ref",
+                                          "ref": "hNp9X",
+                                          "name": "Badge destructive",
+                                          "fill": "#fee2e2",
+                                          "x": 85,
+                                          "y": 0,
+                                          "descendants": {
+                                            "r9uWx": {
+                                              "fill": "$9:--destructive",
+                                              "library": "lucide",
+                                              "icon": "chevrons-up"
+                                            },
+                                            "AwdGP": {
+                                              "content": "CONSTRUÇÃO CIVIL E DEMOLIÇÃO (RCD)",
+                                              "fill": "#dc2626"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "YAZQQ",
+                                  "name": "description",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 10,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "W6bUYr",
+                                      "context": "Máximo de 2 linhas da descrição",
+                                      "fill": "$9:--muted-foreground",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "Entulhos de obra que estão no local a muito tempo e não foram recolhidos.",
+                                      "fontFamily": "Space Grotesk",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
                                     }
                                   ]
                                 },
@@ -25397,164 +25551,72 @@
                                       ]
                                     }
                                   ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "hZinf",
-                              "name": "Complaint Card",
-                              "width": "fill_container",
-                              "fill": "#ffffff",
-                              "cornerRadius": 8,
-                              "stroke": "#f3f4f6",
-                              "strokeWidth": 1,
-                              "strokeAlignment": "inner",
-                              "layout": "vertical",
-                              "gap": 8,
-                              "padding": 12,
-                              "children": [
+                                },
                                 {
                                   "type": "frame",
-                                  "id": "QRMzw",
+                                  "id": "RMNlE",
+                                  "name": "Frame 78",
                                   "width": "fill_container",
                                   "gap": 8,
-                                  "alignItems": "center",
+                                  "justifyContent": "space_between",
                                   "children": [
                                     {
-                                      "type": "frame",
-                                      "id": "cITVo",
-                                      "name": "Frame 15",
-                                      "clip": true,
-                                      "width": 48,
-                                      "height": 48,
-                                      "cornerRadius": 8,
-                                      "justifyContent": "space_around",
-                                      "alignItems": "center",
-                                      "children": [
-                                        {
-                                          "type": "rectangle",
-                                          "id": "F6dQo",
-                                          "fill": {
-                                            "type": "image",
-                                            "enabled": true,
-                                            "url": "waste.png",
-                                            "mode": "fill"
-                                          },
-                                          "width": 120,
-                                          "height": 122
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "frame",
-                                      "id": "SwBBd",
+                                      "id": "TS1eN",
+                                      "type": "ref",
+                                      "ref": "J7k5q",
                                       "width": "fill_container",
-                                      "layout": "vertical",
-                                      "gap": 2,
-                                      "children": [
-                                        {
-                                          "type": "text",
-                                          "id": "tfMcO",
-                                          "fill": "$--foreground",
-                                          "textGrowth": "fixed-width",
-                                          "width": "fill_container",
-                                          "content": "Rua das Flores, 123 – Centro, São Paulo",
-                                          "fontFamily": "Inter",
-                                          "fontSize": 13,
-                                          "fontWeight": "600"
-                                        },
-                                        {
-                                          "type": "text",
-                                          "id": "PGCjl",
-                                          "fill": "$--muted-foreground",
-                                          "textGrowth": "fixed-width",
-                                          "width": "fill_container",
-                                          "content": "25/05/2026, 14:30:00",
-                                          "fontFamily": "Inter",
-                                          "fontSize": 11,
-                                          "fontWeight": "normal"
-                                        },
-                                        {
-                                          "type": "text",
-                                          "id": "omtpA",
-                                          "fill": "$--muted-foreground",
-                                          "textGrowth": "fixed-width",
-                                          "width": "fill_container",
-                                          "content": "-23.550520, -46.633308",
-                                          "fontFamily": "Inter",
-                                          "fontSize": 11,
-                                          "fontWeight": "normal"
+                                      "fill": "$gray-100",
+                                      "name": "Btn Secondary Texto",
+                                      "x": 0,
+                                      "y": 0,
+                                      "descendants": {
+                                        "M3upe": {
+                                          "content": "Cancelar",
+                                          "fill": "#0a0a0a"
                                         }
-                                      ]
+                                      }
                                     },
                                     {
-                                      "type": "frame",
-                                      "id": "w1Mhk2",
-                                      "width": 28,
-                                      "fill": "#f5f5f5",
-                                      "cornerRadius": 8,
-                                      "layout": "vertical",
-                                      "gap": 8,
-                                      "padding": 4,
-                                      "justifyContent": "center",
-                                      "alignItems": "center",
-                                      "children": [
-                                        {
-                                          "type": "frame",
-                                          "id": "FSySI",
-                                          "width": "fill_container",
-                                          "fill": "#e0f2fe",
-                                          "cornerRadius": 4,
-                                          "padding": [
-                                            4,
-                                            2
-                                          ],
-                                          "justifyContent": "center",
-                                          "alignItems": "center",
-                                          "children": [
-                                            {
-                                              "type": "icon",
-                                              "id": "R0tfD",
-                                              "width": 12,
-                                              "height": 12,
-                                              "icon": "shield",
-                                              "library": "lucide",
-                                              "fill": "#0ea5e9"
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "icon",
-                                          "id": "v0aPFn",
-                                          "width": 12,
-                                          "height": 12,
-                                          "icon": "ellipsis-vertical",
-                                          "library": "lucide",
-                                          "fill": "#374151"
+                                      "id": "JTqta",
+                                      "type": "ref",
+                                      "ref": "J7k5q",
+                                      "width": "fill_container",
+                                      "fill": "$gray-100",
+                                      "name": "Btn Secondary Texto",
+                                      "x": 190.99999999999997,
+                                      "y": 0,
+                                      "descendants": {
+                                        "M3upe": {
+                                          "content": "Editar",
+                                          "fill": "#0a0a0a"
                                         }
-                                      ]
+                                      }
                                     }
                                   ]
                                 },
                                 {
                                   "type": "frame",
-                                  "id": "oSVsW",
+                                  "id": "ptqVV",
+                                  "name": "Frame 78",
                                   "width": "fill_container",
-                                  "height": 100,
-                                  "fill": "#e5e7eb",
-                                  "cornerRadius": 8,
-                                  "justifyContent": "center",
-                                  "alignItems": "center",
+                                  "gap": 8,
+                                  "justifyContent": "space_between",
                                   "children": [
                                     {
-                                      "type": "icon",
-                                      "id": "S2nCkc",
-                                      "width": 24,
-                                      "height": 24,
-                                      "icon": "map-pin",
-                                      "library": "lucide",
-                                      "fill": "#9ca3af"
+                                      "id": "o4A3pd",
+                                      "type": "ref",
+                                      "ref": "J7k5q",
+                                      "width": "fill_container",
+                                      "fill": "$gray-100",
+                                      "name": "Btn Secondary Texto",
+                                      "x": 0,
+                                      "y": 0,
+                                      "descendants": {
+                                        "M3upe": {
+                                          "content": "Detalhes",
+                                          "fill": "#0a0a0a"
+                                        }
+                                      }
                                     }
                                   ]
                                 }
@@ -25569,9 +25631,10 @@
                       "type": "ref",
                       "ref": "fnnKk",
                       "name": "TabBar",
-                      "width": "fill_container",
+                      "width": "fill_container(430)",
                       "x": 0,
                       "y": 832,
+                      "enabled": false,
                       "descendants": {
                         "A9iHd": {
                           "fill": "#f2f3f580"

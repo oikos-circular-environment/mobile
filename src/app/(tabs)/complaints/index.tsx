@@ -373,7 +373,7 @@ export default function ComplaintsMapScreen() {
 			)}
 
 			<View
-				className="absolute"
+				className="absolute gap-2"
 				style={{
 					right: 16 + insets.right,
 					bottom:
@@ -396,7 +396,7 @@ export default function ComplaintsMapScreen() {
 						strokeWidth={2}
 					/>
 				</TouchableOpacity>
-			</View>
+				{/* </View>
 
 			<View
 				className="absolute flex-row gap-2 items-center"
@@ -405,7 +405,7 @@ export default function ComplaintsMapScreen() {
 					bottom: windowHeight * LIST_SHEET_MIN_SNAP_RATIO + FAB_GROUP_GAP,
 				}}
 				pointerEvents="box-none"
-			>
+			> */}
 				<TouchableOpacity
 					activeOpacity={0.9}
 					onPress={() => {
