@@ -15,19 +15,19 @@ const TYPE_CONFIG: Record<SupportRequestType, TypeConfig> = {
 	ERROR: {
 		label: "Erro",
 		icon: BugIcon,
-		containerClassName: "border-red-300 bg-red-50",
+		containerClassName: "bg-red-100",
 		contentClassName: "text-red-600",
 	},
 	SUPPORT: {
 		label: "Ajuda",
 		icon: HandHelpingIcon,
-		containerClassName: "border-sky-300 bg-sky-50",
+		containerClassName: "bg-sky-100",
 		contentClassName: "text-sky-600",
 	},
 	IMPROVEMENT: {
 		label: "Melhoria",
 		icon: SparklesIcon,
-		containerClassName: "border-yellow-300 bg-yellow-50",
+		containerClassName: "bg-yellow-100",
 		contentClassName: "text-yellow-600",
 	},
 };
@@ -36,7 +36,7 @@ export function SupportTypeBadge({ type }: { type: SupportRequestType }) {
 	const config = TYPE_CONFIG[type];
 	return (
 		<Badge
-			variant="outline"
+			variant="soft"
 			className={cn("self-start gap-1", config.containerClassName)}
 		>
 			<BadgeIcon as={config.icon} className={config.contentClassName} />

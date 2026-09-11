@@ -18,6 +18,7 @@ const badgeStyle = tva({
       destructive:
         'bg-destructive dark:bg-destructive/60',
       outline: 'border border-border dark:border-border/90 bg-transparent',
+      soft: 'bg-transparent',
     },
   },
 });
@@ -30,6 +31,7 @@ const badgeTextStyle = tva({
       secondary: 'text-secondary-foreground',
       destructive: 'text-white',
       outline: 'text-foreground',
+      soft: 'text-foreground',
     },
   },
 });
@@ -42,6 +44,7 @@ const badgeIconStyle = tva({
       secondary: 'text-secondary-foreground',
       destructive: 'text-white',
       outline: 'text-foreground',
+      soft: 'text-foreground',
     },
   },
 });

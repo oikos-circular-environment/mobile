@@ -119,12 +119,19 @@ function CompanyCardItem({
 										</BadgeText>
 									</Badge>
 									{company.company_type === "COLLECTOR" && (
-										<Badge variant="default">
-											<BadgeText>Coletor</BadgeText>
+										<Badge variant="soft" className="bg-lime-100">
+											<BadgeText className="text-lime-600">Coletor</BadgeText>
 										</Badge>
 									)}
-									<Badge variant={isOpen ? "default" : "destructive"}>
-										<BadgeText>{isOpen ? "Aberto" : "Fechado"}</BadgeText>
+									<Badge
+										variant="soft"
+										className={isOpen ? "bg-lime-100" : "bg-red-100"}
+									>
+										<BadgeText
+											className={isOpen ? "text-lime-600" : "text-red-600"}
+										>
+											{isOpen ? "Aberto" : "Fechado"}
+										</BadgeText>
 									</Badge>
 								</HStack>
 							</View>

@@ -42,10 +42,8 @@ export function ResolutionCard({
 			<View className="flex-1 flex-row justify-between">
 				{isOwnResolution && (
 					<View className="self-start">
-						<Badge variant="outline" className="border-lime-600 bg-lime-50">
-							<BadgeText className="text-xs font-semibold text-lime-700">
-								Sua Resolução
-							</BadgeText>
+						<Badge variant="soft" className="bg-lime-100">
+							<BadgeText className="text-lime-600">Sua Resolução</BadgeText>
 						</Badge>
 					</View>
 				)}

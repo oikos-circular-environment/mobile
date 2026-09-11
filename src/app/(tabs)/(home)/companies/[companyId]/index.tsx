@@ -216,10 +216,10 @@ export default function CompanyHubScreen() {
 										</View>
 										{!option.validation.is_validation && (
 											<Badge
-												variant="outline"
-												className="flex-row justify-start items-start bg-rose-100 border border-rose-200"
+												variant="soft"
+												className="flex-row justify-start items-start bg-rose-100"
 											>
-												<BadgeText className="normal-case text-start text-muted-foreground">
+												<BadgeText className="text-start text-rose-600">
 													{option.validation.description}
 												</BadgeText>
 											</Badge>
