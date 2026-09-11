@@ -22,6 +22,7 @@ type ListActions = {
 	setActiveFilter: (status: ComplaintStatus | null) => void;
 	shiftComplaintStatus: (id: string, newStatus: ComplaintStatus) => void;
 	updateComplaint: (id: string, patch: Partial<Complaint>) => void;
+	adjustResolutionCount: (id: string, delta: number) => void;
 };
 
 type VoteType = "RESOLVED" | "NOT_RESOLVED";
@@ -125,6 +126,28 @@ export const useComplaintsStore = create<ComplaintsStoreState>(set => ({
 
 	setSelectedMapComplaint: complaint =>
 		set({ selectedMapComplaint: complaint }),
+
+	adjustResolutionCount: (id, delta) =>
+		set(state => {
+			const complaints = state.complaints.map(c =>
+				c.id === id
+					? { ...c, resolution_count: Math.max(0, c.resolution_count + delta) }
+					: c,
+			);
+
+			const selectedMapComplaint =
+				state.selectedMapComplaint?.id === id
+					? {
+							...state.selectedMapComplaint,
+							resolution_count: Math.max(
+								0,
+								state.selectedMapComplaint.resolution_count + delta,
+							),
+						}
+					: state.selectedMapComplaint;
+
+			return { complaints, selectedMapComplaint };
+		}),
 
 	patchSelectedMapComplaintVoteCounts: ({ previousVote, nextVote }) =>
 		set(state => {

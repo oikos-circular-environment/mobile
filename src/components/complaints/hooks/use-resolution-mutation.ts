@@ -20,6 +20,7 @@ import {
 	MAX_FILE_SIZE_BYTES,
 } from "@/libs/media/validation";
 import { logComplaintEvent } from "@/libs/observe-events";
+import { useComplaintsStore } from "@/stores/complaints-store";
 
 type ResolutionMutationInput = {
 	description: string;
@@ -40,6 +41,9 @@ export function useResolutionMutation({
 	resolutionId,
 }: UseResolutionMutationParams) {
 	const queryClient = useQueryClient();
+	const adjustResolutionCount = useComplaintsStore(
+		s => s.adjustResolutionCount,
+	);
 	const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
 		null,
 	);
@@ -132,6 +136,7 @@ export function useResolutionMutation({
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", complaintId],
 			});
+			if (!isEditMode) adjustResolutionCount(complaintId, 1);
 			logComplaintEvent("complaint.resolved", {
 				success: true,
 				action: isEditMode ? "updated" : "created",
@@ -181,6 +186,7 @@ export function useResolutionMutation({
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", complaintId],
 			});
+			adjustResolutionCount(complaintId, -1);
 			logComplaintEvent("complaint.resolved", {
 				success: true,
 				action: "deleted",
