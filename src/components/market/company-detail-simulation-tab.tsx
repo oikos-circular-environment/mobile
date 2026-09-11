@@ -1,5 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircleIcon, Calculator, Trash2 } from "lucide-react-native";
+import {
+	AlertCircleIcon,
+	Calculator,
+	InfoIcon,
+	Trash2,
+} from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
@@ -9,6 +14,7 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { z } from "zod";
 import { colors } from "@/components/style/colors";
 import { toast } from "@/components/toast";
+import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DecimalInput, DecimalInputField } from "@/components/ui/decimal-input";
@@ -345,11 +351,14 @@ export function CompanyDetailSimulationTab({
 			</Card>
 
 			<VStack className="gap-3 rounded-lg border-gray-200">
-				<VStack>
+				<VStack space="sm">
 					<Heading size="md">Lista</Heading>
-					<Text className="text-muted-foreground text-sm">
-						Deslize o card para a esquerda para deletar um item da lista.
-					</Text>
+					<Alert className="border-sky-700 bg-sky-50 items-start">
+						<AlertIcon as={InfoIcon} className="text-sky-700" />
+						<AlertText className="text-sky-700 font-medium">
+							Deslize o card para a esquerda para deletar um item da lista.
+						</AlertText>
+					</Alert>
 				</VStack>
 
 				{checkoutItems.length ? (

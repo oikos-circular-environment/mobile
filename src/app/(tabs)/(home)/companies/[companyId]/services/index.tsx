@@ -1,5 +1,10 @@
 import { Redirect, Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeftIcon, HammerIcon, PlusIcon } from "lucide-react-native";
+import {
+	ChevronLeftIcon,
+	HammerIcon,
+	InfoIcon,
+	PlusIcon,
+} from "lucide-react-native";
 import { FlatList, View } from "react-native";
 import { useSaveServices } from "@/components/companies/hooks/use-save-services";
 import { ServiceSkeleton } from "@/components/companies/services/service-skeleton";
@@ -8,6 +13,7 @@ import {
 	WasteCategoryHazardLevel,
 } from "@/components/custom/waste-category";
 import { colors } from "@/components/style/colors";
+import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -127,12 +133,15 @@ export default function ServicesIndexScreen() {
 							<ButtonText>Novo resíduo</ButtonText>
 						</Button>
 
-						<VStack>
+						<VStack space="sm">
 							<Heading size="md">Meus Serviços</Heading>
-							<Text size="sm" className="text-muted-foreground">
-								Clique sobre o resíduo para editar, arraste da direta para
-								esquerda para deletar
-							</Text>
+							<Alert className="border-sky-700 bg-sky-50 items-start">
+								<AlertIcon as={InfoIcon} className="text-sky-700" />
+								<AlertText className="text-sky-700 font-medium">
+									Clique sobre o resíduo para editar, arraste da direita para
+									esquerda para deletar.
+								</AlertText>
+							</Alert>
 						</VStack>
 					</VStack>
 				}

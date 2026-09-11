@@ -23,19 +23,18 @@ export function ComplaintAlertBanner({
 
 	return (
 		<Alert
+			variant={isWarning ? "warning" : undefined}
 			className={cn(
 				"flex-row items-start gap-2 rounded-lg border p-3",
-				isWarning ? "border-amber-500 bg-amber-50" : "border-sky-700 bg-sky-50",
+				!isWarning && "border-sky-700 bg-sky-50",
 				className,
 			)}
 		>
 			<AlertIcon
 				as={isWarning ? AlertTriangleIcon : InfoIcon}
-				className={isWarning ? "text-amber-600" : "text-sky-700"}
+				className={isWarning ? undefined : "text-sky-700"}
 			/>
-			<AlertText
-				className={cn("flex-1", isWarning ? "text-amber-700" : "text-sky-700")}
-			>
+			<AlertText className={cn("flex-1", !isWarning && "text-sky-700")}>
 				{COPY[variant]}
 			</AlertText>
 		</Alert>

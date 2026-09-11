@@ -155,8 +155,8 @@ export default function CompanyHubScreen() {
 						</View>
 					</Card>
 
-					<Alert className="gap-3 bg-amber-100 border-amber-400">
-						<AlertIcon as={TriangleAlertIcon} className="text-amber-400" />
+					<Alert variant="warning" className="gap-3">
+						<AlertIcon as={TriangleAlertIcon} />
 						<AlertText className="text-foreground/80">
 							Para que sua empresa seja listada no Mercado, é necessário que
 							tenha todos os dados preenchidos e com dados reais. A cada seção

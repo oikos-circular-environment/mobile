@@ -305,12 +305,12 @@ export default function ComplaintDetailScreen() {
 										<BadgeText>{complaint.resolution_count}</BadgeText>
 									</Badge>
 								</HStack>
-								<Alert className="flex-row items-start gap-2 rounded-lg border border-amber-700 bg-amber-50 p-3">
-									<AlertIcon
-										as={AlertTriangleIcon}
-										className="text-amber-700"
-									/>
-									<AlertText className="text-amber-700">
+								<Alert
+									variant="warning"
+									className="flex-row items-start gap-2 rounded-lg p-3"
+								>
+									<AlertIcon as={AlertTriangleIcon} />
+									<AlertText>
 										As resoluções serão públicas, utilize este local apenas para
 										postagens íntegras que levarão à resolução da denúncia.
 									</AlertText>

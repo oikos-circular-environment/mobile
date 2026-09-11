@@ -14,7 +14,10 @@ const alertStyle = tva({
   variants: {
     variant: {
       default: 'bg-card border-border',
-      destructive: 'bg-card border-destructive',
+      warning:
+        'border-amber-500/50 bg-amber-600/10 dark:border-amber-600/50 dark:bg-amber-600/15',
+      destructive:
+        'border-destructive/30 bg-destructive/10 dark:border-destructive/50 dark:bg-destructive/15',
     },
   },
 });
@@ -24,6 +27,7 @@ const alertTextStyle = tva({
   parentVariants: {
     variant: {
       default: 'text-card-foreground',
+      warning: 'text-amber-500',
       destructive: 'text-destructive',
     },
   },
@@ -34,6 +38,7 @@ const alertIconStyle = tva({
   parentVariants: {
     variant: {
       default: 'text-card-foreground',
+      warning: 'text-amber-500',
       destructive: 'text-destructive',
     },
   },

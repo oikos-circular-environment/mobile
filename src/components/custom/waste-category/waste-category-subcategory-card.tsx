@@ -28,7 +28,7 @@ export function WasteCategorySubcategoryCard({
 				</Box>
 			</HStack>
 			{subItem.observations && (
-				<Alert className="p-1 gap-2 bg-destructive/10 border-destructive/20 items-center">
+				<Alert variant="destructive" className="p-1 gap-2 items-center">
 					<AlertIcon
 						as={CircleAlertIcon}
 						size={14}

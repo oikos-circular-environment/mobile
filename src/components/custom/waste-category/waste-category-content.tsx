@@ -49,7 +49,7 @@ export function WasteCategoryContent() {
 			)}
 
 			{selectedWasteCategory?.observations && (
-				<Alert className="gap-2 bg-destructive/10 border-destructive/20">
+				<Alert variant="destructive" className="gap-2">
 					<AlertIcon as={CircleAlertIcon} className="text-destructive/40" />
 					<AlertText className="flex-col text-foreground/80">
 						{selectedWasteCategory.observations}
