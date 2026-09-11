@@ -1,4 +1,9 @@
-import { AlertTriangleIcon, FactoryIcon } from "lucide-react-native";
+import {
+	AlertTriangleIcon,
+	BadgeCheckIcon,
+	BadgeXIcon,
+	FactoryIcon,
+} from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import { colors } from "@/components/style/colors";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -7,6 +12,7 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import type { Company } from "@/libs/types/companies";
+import { cn } from "@/libs/utils";
 import { Badge, BadgeIcon, BadgeText } from "../ui/badge";
 
 interface CompanyCardProps {
@@ -49,8 +55,22 @@ export function CompanyCard({ company, onPress }: CompanyCardProps) {
 						</Text>
 
 						<View className="flex-row gap-2 mt-1 flex-wrap">
-							<Badge variant={company.status ? "default" : "destructive"}>
-								<BadgeText>{company.status ? "Ativa" : "Inativa"}</BadgeText>
+							<Badge
+								variant="soft"
+								className={cn(
+									company.status ? "bg-lime-100" : "bg-red-100",
+									"gap-1",
+								)}
+							>
+								<BadgeIcon
+									as={company.status ? BadgeCheckIcon : BadgeXIcon}
+									color={company.status ? colors.lime[600] : colors.red[600]}
+								/>
+								<BadgeText
+									className={company.status ? "text-lime-600" : "text-red-600"}
+								>
+									{company.status ? "Ativa" : "Inativa"}
+								</BadgeText>
 							</Badge>
 
 							{!company.is_company_valid && (
