@@ -1,9 +1,9 @@
 import {
-	deleteV1ComplaintsByIdResolutions,
-	deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId,
+	deleteV1ComplaintsByIdResolutionsByResolutionId,
+	deleteV1ComplaintsByIdResolutionsByResolutionIdAttachmentsByAttachmentId,
 	patchV1ComplaintsByIdResolutionsByResolutionId,
 	postV1ComplaintsByIdResolutions,
-	postV1ComplaintsByIdResolutionsAttachments,
+	postV1ComplaintsByIdResolutionsByResolutionIdAttachments,
 } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type * as ImagePicker from "expo-image-picker";
@@ -89,7 +89,10 @@ export function useResolutionMutation({
 				});
 			}
 
+			let targetResolutionId: string;
+
 			if (isEditMode && resolutionId) {
+				targetResolutionId = resolutionId;
 				await patchV1ComplaintsByIdResolutionsByResolutionId({
 					path: { id: complaintId, resolutionId },
 					body: {
@@ -98,18 +101,20 @@ export function useResolutionMutation({
 					},
 				});
 				for (const attachmentId of removedAttachmentIds) {
-					await deleteV1ComplaintsByIdResolutionsAttachmentsByAttachmentId({
-						path: { id: complaintId, attachmentId },
-					});
+					await deleteV1ComplaintsByIdResolutionsByResolutionIdAttachmentsByAttachmentId(
+						{ path: { id: complaintId, resolutionId, attachmentId } },
+					);
 				}
 			} else {
-				await postV1ComplaintsByIdResolutions({
+				const created = await postV1ComplaintsByIdResolutions({
 					path: { id: complaintId },
 					body: {
 						description,
 						...(company ? { company_id: company.id } : {}),
 					},
 				});
+				if (!created.data) throw new Error("Dados inválidos.");
+				targetResolutionId = created.data.id;
 			}
 
 			for (let i = 0; i < compressed.length; i++) {
@@ -125,8 +130,8 @@ export function useResolutionMutation({
 					name: media.name,
 					type: media.type,
 				} as unknown as Blob);
-				await postV1ComplaintsByIdResolutionsAttachments({
-					path: { id: complaintId },
+				await postV1ComplaintsByIdResolutionsByResolutionIdAttachments({
+					path: { id: complaintId, resolutionId: targetResolutionId },
 					body: formData as unknown as undefined,
 				});
 			}
@@ -180,8 +185,12 @@ export function useResolutionMutation({
 	});
 
 	const deleteMutation = useMutation({
-		mutationFn: () =>
-			deleteV1ComplaintsByIdResolutions({ path: { id: complaintId } }),
+		mutationFn: () => {
+			if (!resolutionId) throw new Error("Dados inválidos.");
+			return deleteV1ComplaintsByIdResolutionsByResolutionId({
+				path: { id: complaintId, resolutionId },
+			});
+		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["complaint", "resolutions", complaintId],

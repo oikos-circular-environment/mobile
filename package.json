@@ -38,7 +38,7 @@
 		"@hookform/resolvers": "^5.2.2",
 		"@legendapp/motion": "^2.5.3",
 		"@oikos-circular-environment/apple-connect-api": "^0.1.2",
-		"@oikos-circular-environment/oikos-sdk": "^0.1.0-beta.11",
+		"@oikos-circular-environment/oikos-sdk": "^0.1.0-beta.12",
 		"@oikos-circular-environment/survey-api": "^0.1.24",
 		"@react-native-async-storage/async-storage": "2.2.0",
 		"@react-native-community/netinfo": "12.0.1",
