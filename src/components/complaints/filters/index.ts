@@ -5,7 +5,10 @@ export {
 	ComplaintPressableFilterIcon,
 	ComplaintPressableFilterText,
 } from "./complaint-pressable-filter";
-export { ComplaintStatusBadge } from "./complaint-status-badge";
+export {
+	ComplaintStatusBadge,
+	getComplaintStatusLabel,
+} from "./complaint-status-badge";
 export {
 	type BottomSheetRef,
 	DEFAULT_FILTERS,

@@ -78,6 +78,10 @@ const BADGE_TEXT_COLOR: Record<ComplaintStatus, string> = {
 	CANCELED: "text-red-600",
 };
 
+export function getComplaintStatusLabel(status: ComplaintStatus): string {
+	return BADGE_LABELS[status];
+}
+
 export type ComplaintStatusBadgeProps = {
 	status: ComplaintStatus;
 	size?: ChipSize;

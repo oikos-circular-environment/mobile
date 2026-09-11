@@ -1,27 +1,21 @@
 "use client";
 
-import {
-	EllipsisVertical,
-	EyeIcon,
-	MapPinned,
-	PencilIcon,
-	PlayCircleIcon,
-	ShieldXIcon,
-} from "lucide-react-native";
+import { format, formatDistanceToNowStrict } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CompassIcon, PlayCircleIcon } from "lucide-react-native";
 import { useState } from "react";
-import { Platform, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useComplaintCard } from "@/components/complaints/hooks/use-complaint-card";
+import {
+	WasteCategoryHazardLevel,
+	WasteCategoryHazardLevelIcon,
+	WasteCategoryHazardLevelText,
+} from "@/components/custom/waste-category/waste-category-hazard-level";
 import { MediaThumbnail } from "@/components/medias-preview/media-thumbnail";
 import { colors } from "@/components/style/colors";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
-import {
-	Menu,
-	MenuItem,
-	MenuItemLabel,
-	MenuSeparator,
-} from "@/components/ui/menu";
 import {
 	Modal,
 	ModalBackdrop,
@@ -30,12 +24,11 @@ import {
 	ModalFooter,
 	ModalHeader,
 } from "@/components/ui/modal";
-import { Pressable } from "@/components/ui/pressable";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import type { Complaint } from "@/libs/types/complaint";
+import { highestHazardVariant } from "./complaint-hazard-address-utils";
 import { ComplaintMap } from "./complaint-map";
-import { ComplaintStatusBadge } from "./filters";
+import { ComplaintStatusBadge, getComplaintStatusLabel } from "./filters";
 
 interface ComplaintCardProps {
 	complaint: Complaint;
@@ -44,8 +37,6 @@ interface ComplaintCardProps {
 export function ComplaintCard({ complaint }: ComplaintCardProps) {
 	const {
 		cancelComplaint,
-		openInGoogleMaps,
-		openInAppleMaps,
 		isCancelingComplaint,
 		openComplaintDetail,
 		editComplaint,
@@ -68,16 +59,13 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 			.filter(Boolean)
 			.join(", ");
 
-	const createdAtLabel = new Date(complaint.created_at).toLocaleString(
-		"pt-BR",
-		{
-			dateStyle: "short",
-			timeStyle: "medium",
-		},
-	);
+	const createdAtDate = new Date(complaint.created_at);
+	const createdAtLabel = `${format(createdAtDate, "d 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })} - ${getComplaintStatusLabel(complaint.status)} à ${formatDistanceToNowStrict(createdAtDate, { locale: ptBR })}`;
 	const coordinatesLabel = coords
 		? `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`
 		: "—";
+
+	const isEditDisabled = complaint.status !== "OPEN";
 
 	const handleConfirmCancel = () => {
 		setIsCancelModalOpen(false);
@@ -90,8 +78,27 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 				size="sm"
 				className="gap-3 rounded-md border border-gray-100 bg-white p-3 shadow-none"
 			>
-				<View className="gap-2">
+				<View className="gap-3">
 					<View className="flex-row items-center gap-2">
+						<View className="flex-1 justify-center">
+							<Heading numberOfLines={1}>
+								{address || "Endereço não informado"}
+							</Heading>
+							<Text className="text-sm text-gray-500" selectable>
+								{createdAtLabel}
+							</Text>
+							<View className="flex-row items-center gap-1">
+								<CompassIcon
+									size={12}
+									color={colors.gray[400]}
+									strokeWidth={2}
+								/>
+								<Text className="text-sm text-gray-500" selectable>
+									{coordinatesLabel}
+								</Text>
+							</View>
+						</View>
+
 						{firstAttachment?.url && (
 							<View
 								style={{
@@ -124,148 +131,65 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
 								)}
 							</View>
 						)}
-						<View className="flex-1 justify-center">
-							<Heading numberOfLines={1}>
-								{address || "Endereço não informado"}
-							</Heading>
-							<Text className="text-sm text-gray-500" selectable>
-								{createdAtLabel}
-							</Text>
-							<Text className="text-sm text-gray-500" selectable>
-								{coordinatesLabel}
-							</Text>
-						</View>
-
-						<View className="items-center gap-2 rounded-md bg-gray-100 p-1">
-							<Menu
-								placement="bottom right"
-								offset={8}
-								trigger={triggerProps => (
-									<Pressable
-										className="flex flex-col flex-1 items-center justify-between"
-										{...triggerProps}
-									>
-										<ComplaintStatusBadge
-											status={complaint.status}
-											size="sm"
-											iconOnly
-										/>
-										<View className="size-5 items-center justify-center">
-											{isCancelingComplaint ? (
-												<Spinner size="small" />
-											) : (
-												<EllipsisVertical
-													size={12}
-													color={colors.gray[950]}
-													strokeWidth={2.2}
-												/>
-											)}
-										</View>
-									</Pressable>
-								)}
-							>
-								<MenuItem
-									key="view-complaint"
-									textValue="Ver denúncia"
-									onPress={openComplaintDetail}
-								>
-									<View className="flex-row items-center gap-2">
-										<EyeIcon
-											size={14}
-											color={colors.gray[950]}
-											strokeWidth={2.2}
-										/>
-										<MenuItemLabel>Ver denúncia</MenuItemLabel>
-									</View>
-								</MenuItem>
-
-								<MenuItem
-									key="edit-complaint"
-									textValue="Editar denúncia"
-									onPress={editComplaint}
-									disabled={complaint.status !== "OPEN"}
-								>
-									<View className="flex-row items-center gap-2">
-										<PencilIcon
-											size={14}
-											strokeWidth={2.2}
-											color={
-												complaint.status !== "OPEN"
-													? colors.gray[400]
-													: colors.gray[950]
-											}
-										/>
-										<MenuItemLabel
-											className={
-												complaint.status !== "OPEN" ? "text-gray-400" : ""
-											}
-										>
-											Editar denúncia
-										</MenuItemLabel>
-									</View>
-								</MenuItem>
-
-								<MenuItem
-									key="cancel-complaint"
-									textValue="Cancelar denúncia"
-									onPress={() => setIsCancelModalOpen(true)}
-									disabled={isCancelingComplaint}
-								>
-									<View className="flex-row items-center gap-2">
-										{isCancelingComplaint ? (
-											<Spinner size="small" />
-										) : (
-											<ShieldXIcon
-												size={14}
-												color={colors.red[700]}
-												strokeWidth={2.2}
-											/>
-										)}
-										<MenuItemLabel>Cancelar denúncia</MenuItemLabel>
-									</View>
-								</MenuItem>
-
-								<MenuSeparator />
-
-								<MenuItem
-									key="open-google-maps"
-									textValue="Abrir no Google Maps"
-									onPress={openInGoogleMaps}
-								>
-									<View className="flex-row items-center gap-2">
-										<MapPinned
-											size={14}
-											color={colors.gray[950]}
-											strokeWidth={2.2}
-										/>
-										<MenuItemLabel>Abrir no Google Maps</MenuItemLabel>
-									</View>
-								</MenuItem>
-
-								{Platform.OS === "ios" && (
-									<MenuItem
-										key="open-apple-maps"
-										textValue="Abrir no Apple Maps"
-										onPress={openInAppleMaps}
-									>
-										<View className="flex-row items-center gap-2">
-											<MapPinned
-												size={14}
-												color={colors.gray[950]}
-												strokeWidth={2.2}
-											/>
-											<MenuItemLabel>Abrir no Apple Maps</MenuItemLabel>
-										</View>
-									</MenuItem>
-								)}
-							</Menu>
-						</View>
 					</View>
+
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						contentContainerClassName="gap-2 px-2"
+					>
+						<ComplaintStatusBadge status={complaint.status} size="sm" />
+						{complaint.categories.map(category => (
+							<WasteCategoryHazardLevel
+								key={category.id}
+								variant={highestHazardVariant(category.hazard_levels)}
+							>
+								<WasteCategoryHazardLevelIcon />
+								<WasteCategoryHazardLevelText>
+									{category.name}
+								</WasteCategoryHazardLevelText>
+							</WasteCategoryHazardLevel>
+						))}
+					</ScrollView>
+
+					{complaint.observations && (
+						<Text className="text-gray-600" numberOfLines={2}>
+							{complaint.observations}
+						</Text>
+					)}
 
 					<ComplaintMap
 						latitude={coords?.latitude ?? 0}
 						longitude={coords?.longitude ?? 0}
 					/>
+
+					<View className="flex-row gap-2">
+						<Button
+							variant="outline"
+							className="flex-1 rounded-xl border-0 bg-gray-100"
+							onPress={() => setIsCancelModalOpen(true)}
+							isDisabled={isCancelingComplaint}
+						>
+							{isCancelingComplaint && <ButtonSpinner />}
+							<ButtonText className="text-gray-900">Cancelar</ButtonText>
+						</Button>
+						<Button
+							variant="outline"
+							className="flex-1 rounded-xl border-0 bg-gray-100"
+							onPress={editComplaint}
+							isDisabled={isEditDisabled}
+						>
+							<ButtonText className="text-gray-900">Editar</ButtonText>
+						</Button>
+					</View>
+
+					<Button
+						variant="outline"
+						className="w-full rounded-xl border-0 bg-gray-100"
+						onPress={openComplaintDetail}
+					>
+						<ButtonText className="text-gray-900">Detalhes</ButtonText>
+					</Button>
 				</View>
 			</Card>
 
