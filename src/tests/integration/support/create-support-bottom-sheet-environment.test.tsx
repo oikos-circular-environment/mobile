@@ -13,7 +13,7 @@ jest.mock("@/contexts/auth-context", () => ({
 	useAuthContext: () => ({ account: { email: "user@test.com" } }),
 }));
 
-jest.mock("@/libs/use-pick-image", () => ({
+jest.mock("@/hooks/use-pick-image", () => ({
 	usePickImage: () => ({ pickImage: jest.fn(), isPicking: false }),
 }));
 

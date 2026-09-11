@@ -62,14 +62,14 @@ import { Spinner } from "@/components/ui/spinner";
 import { VStack } from "@/components/ui/vstack";
 import WrapperMap from "@/components/wrapper-map";
 import { useAuthContext } from "@/contexts/auth-context";
+import { useCepLookup } from "@/hooks/use-cep-lookup";
+import { usePickImage } from "@/hooks/use-pick-image";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { listIbgeMunicipios, listIbgeUfs } from "@/libs/brasil-api-sdk";
 import { mask } from "@/libs/mask";
-import { compressImage } from "@/libs/media-compression";
+import { compressImage } from "@/libs/media/compression";
 import { logProfileEvent } from "@/libs/observe-events";
-import { useCepLookup } from "@/libs/use-cep-lookup";
-import { usePickImage } from "@/libs/use-pick-image";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { cn } from "@/libs/utils";
 
 const profileSchema = z.object({

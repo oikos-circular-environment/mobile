@@ -12,20 +12,20 @@ const SEVERITY_COLORS: Partial<
 	Record<NonNullable<DenunciationSeverity>, SeverityColors>
 > = {
 	LOW: {
-		containerClassName: "border-lime-600 bg-lime-50",
+		containerClassName: "bg-lime-100",
 		contentClassName: "text-lime-600",
 	},
 	MEDIUM: {
-		containerClassName: "border-yellow-300 bg-yellow-50",
+		containerClassName: "bg-yellow-100",
 		contentClassName: "text-yellow-600",
 	},
 	HIGH: {
-		containerClassName: "border-orange-300 bg-orange-50",
+		containerClassName: "bg-orange-100",
 		contentClassName: "text-orange-600",
 	},
 	CRITICAL: {
-		containerClassName: "border-red-600 bg-red-600",
-		contentClassName: "text-white",
+		containerClassName: "bg-red-100",
+		contentClassName: "text-red-600",
 	},
 };
 
@@ -39,7 +39,7 @@ export function DenunciationSeverityBadge({
 	if (!option || !colors) return null;
 	return (
 		<Badge
-			variant="outline"
+			variant="soft"
 			className={cn("self-start gap-1", colors.containerClassName)}
 		>
 			{option.icon ? (

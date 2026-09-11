@@ -67,8 +67,8 @@ export const BusinessHoursBottomSheet = forwardRef<
 								</Text>
 								<View>
 									{!item.is_open || !item.time_slots.length ? (
-										<Badge variant="destructive">
-											<BadgeText>Fechado</BadgeText>
+										<Badge variant="soft" className="bg-red-100">
+											<BadgeText className="text-red-600">Fechado</BadgeText>
 										</Badge>
 									) : (
 										<View className="items-end gap-0.5">

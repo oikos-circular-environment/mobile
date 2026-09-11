@@ -15,25 +15,25 @@ const STATUS_CONFIG: Record<DenunciationStatus, StatusConfig> = {
 	OPEN: {
 		label: "ABERTO",
 		icon: CircleDot,
-		containerClassName: "border-yellow-300 bg-yellow-50",
+		containerClassName: "bg-yellow-100",
 		contentClassName: "text-yellow-600",
 	},
 	CLOSED: {
 		label: "RESOLVIDO",
 		icon: CircleCheck,
-		containerClassName: "border-lime-600 bg-lime-50",
+		containerClassName: "bg-lime-100",
 		contentClassName: "text-lime-600",
 	},
 	RESOLVED: {
 		label: "RESOLVIDO",
 		icon: CircleCheck,
-		containerClassName: "border-lime-600 bg-lime-50",
+		containerClassName: "bg-lime-100",
 		contentClassName: "text-lime-600",
 	},
 	CANCELLED: {
 		label: "CANCELADO",
 		icon: CircleX,
-		containerClassName: "border-red-300 bg-red-50",
+		containerClassName: "bg-red-100",
 		contentClassName: "text-red-600",
 	},
 };

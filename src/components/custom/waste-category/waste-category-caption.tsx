@@ -16,24 +16,18 @@ export function WasteCategoryCaption() {
 			<Card className="shadow-none">
 				<VStack space="md">
 					<VStack space="md" className="items-start">
-						<Badge
-							variant="secondary"
-							className="gap-1 bg-red-50 border border-red-200"
-						>
+						<Badge variant="soft" className="gap-1 bg-red-100">
 							<BadgeIcon as={RadiationIcon} className="text-red-600 stroke-3" />
-							<BadgeText className="text-red-600 font-semibold">RP</BadgeText>
+							<BadgeText className="text-red-600">RP</BadgeText>
 						</Badge>
 						<Box className="flex-1">
 							<Text>Resíduo Perigoso.</Text>
 						</Box>
 					</VStack>
 					<VStack space="md" className="items-start">
-						<Badge
-							variant="secondary"
-							className="gap-1 bg-gray-50 border border-gray-200"
-						>
+						<Badge variant="soft" className="gap-1 bg-gray-100">
 							<BadgeIcon as={HandIcon} className="text-gray-600 stroke-3" />
-							<BadgeText className="text-gray-600 font-semibold">RNP</BadgeText>
+							<BadgeText className="text-gray-600">RNP</BadgeText>
 						</Badge>
 						<Box className="flex-1">
 							<Text>Resíduo Não Perigoso.</Text>

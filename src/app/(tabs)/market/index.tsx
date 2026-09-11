@@ -26,12 +26,12 @@ import { VStack } from "@/components/ui/vstack";
 import { useNow } from "@/contexts/clock-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { useMarket } from "@/contexts/market-context";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { formatDistance } from "@/libs/format-distance";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
 import { maskCnpj } from "@/libs/mask";
 import type { MarketCompany } from "@/libs/types/market";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 function CompanyCardSkeleton() {
 	return (
@@ -119,12 +119,19 @@ function CompanyCardItem({
 										</BadgeText>
 									</Badge>
 									{company.company_type === "COLLECTOR" && (
-										<Badge variant="default">
-											<BadgeText>Coletor</BadgeText>
+										<Badge variant="soft" className="bg-lime-100">
+											<BadgeText className="text-lime-600">Coletor</BadgeText>
 										</Badge>
 									)}
-									<Badge variant={isOpen ? "default" : "destructive"}>
-										<BadgeText>{isOpen ? "Aberto" : "Fechado"}</BadgeText>
+									<Badge
+										variant="soft"
+										className={isOpen ? "bg-lime-100" : "bg-red-100"}
+									>
+										<BadgeText
+											className={isOpen ? "text-lime-600" : "text-red-600"}
+										>
+											{isOpen ? "Aberto" : "Fechado"}
+										</BadgeText>
 									</Badge>
 								</HStack>
 							</View>

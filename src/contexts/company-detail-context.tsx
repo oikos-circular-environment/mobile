@@ -6,7 +6,7 @@ import {
 	useRef,
 } from "react";
 import { BusinessHoursBottomSheet } from "@/components/market/business-hours-bottom-sheet";
-import type { MarketSimulationItemType } from "@/libs/memory/market-simulations";
+import type { MarketSimulationItemType } from "@/contexts/market-simulations-store";
 import type { MarketBusinessHour, MarketCompany } from "@/libs/types/market";
 
 type CompanyDetailContextValue = {

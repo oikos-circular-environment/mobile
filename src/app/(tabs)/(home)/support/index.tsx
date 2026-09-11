@@ -15,8 +15,8 @@ import { SupportTypeBadge } from "@/components/support/type-badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import type { SupportRequest } from "@/libs/types/support";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useSupportStore } from "@/stores/support-store";
 
 export default function SupportListScreen() {
