@@ -23,7 +23,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 type CompanySetting = {
@@ -155,8 +155,8 @@ export default function CompanyHubScreen() {
 						</View>
 					</Card>
 
-					<Alert className="gap-3 bg-amber-100 border-amber-400">
-						<AlertIcon as={TriangleAlertIcon} className="text-amber-400" />
+					<Alert variant="warning" className="gap-3">
+						<AlertIcon as={TriangleAlertIcon} />
 						<AlertText className="text-foreground/80">
 							Para que sua empresa seja listada no Mercado, é necessário que
 							tenha todos os dados preenchidos e com dados reais. A cada seção
@@ -216,10 +216,10 @@ export default function CompanyHubScreen() {
 										</View>
 										{!option.validation.is_validation && (
 											<Badge
-												variant="outline"
-												className="flex-row justify-start items-start bg-rose-100 border border-rose-200"
+												variant="soft"
+												className="flex-row justify-start items-start bg-rose-100"
 											>
-												<BadgeText className="normal-case text-start text-muted-foreground">
+												<BadgeText className="text-start text-rose-600">
 													{option.validation.description}
 												</BadgeText>
 											</Badge>

@@ -1,3 +1,5 @@
+import { Observe } from "expo-observe";
+
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export type GeocodedCoordinates = {
@@ -20,7 +22,8 @@ export async function geocodeAddress(
 
 		const { lat, lng } = data.results[0].geometry.location;
 		return { latitude: String(lat), longitude: String(lng) };
-	} catch {
+	} catch (error) {
+		Observe.reportError(error);
 		return null;
 	}
 }

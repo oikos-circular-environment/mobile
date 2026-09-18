@@ -103,7 +103,7 @@ const Separator = React.forwardRef<
   );
 });
 
-const StyledAnimatedView = styled(AnimatedView, {
+const StyledAnimatedView = styled(AnimatedView as any, {
   className: 'style',
 });
 export const UIMenu = createMenu({
@@ -121,7 +121,7 @@ type IMenuItemLabelProps = React.ComponentProps<typeof UIMenu.ItemLabel> &
   VariantProps<typeof menuItemLabelStyle> & { className?: string };
 
 const Menu = React.forwardRef<React.ComponentRef<typeof UIMenu>, IMenuProps>(
-  function Menu({ className, ...props }, ref) {
+  function Menu({ className, trigger, ...props }, ref) {
     return (
       <UIMenu
         entering={ZoomIn.duration(150).withInitialValues({
@@ -130,6 +130,7 @@ const Menu = React.forwardRef<React.ComponentRef<typeof UIMenu>, IMenuProps>(
         })}
         exiting={FadeOut.duration(150)}
         ref={ref}
+        trigger={trigger}
         className={menuStyle({
           class: className,
         })}

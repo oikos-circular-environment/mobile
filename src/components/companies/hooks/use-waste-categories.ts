@@ -1,5 +1,5 @@
+import { getV1WasteCategories } from "@oikos-circular-environment/oikos-sdk";
 import { useQuery } from "@tanstack/react-query";
-import { getV1WasteCategories } from "@/libs/oikos-sdk";
 
 export function useWasteCategories() {
 	const query = useQuery({

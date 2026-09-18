@@ -12,7 +12,7 @@
  */
 
 const { execFileSync } = require("node:child_process");
-const { readFileSync } = require("node:fs");
+const { readdirSync, readFileSync } = require("node:fs");
 const { join } = require("node:path");
 
 const SHARED_DIR = join(__dirname, "store", "shared");
@@ -40,13 +40,14 @@ function getExpoVersion() {
 
 /**
  * @param {string} displayType
- * @param {string[]} fileNames Na ordem em que aparecem na ficha.
  * @returns {string[]}
  */
-function screenshots(displayType, fileNames) {
-	return fileNames.map(fileName =>
-		join(SCREENSHOTS_DIR, displayType, fileName),
-	);
+function screenshotsFromDir(displayType) {
+	const dir = join(__dirname, SCREENSHOTS_DIR, displayType);
+	return readdirSync(dir)
+		.filter(file => /\.(png|jpg|jpeg)$/i.test(file))
+		.sort()
+		.map(fileName => join(SCREENSHOTS_DIR, displayType, fileName));
 }
 
 module.exports = () => {
@@ -84,26 +85,8 @@ module.exports = () => {
 					supportUrl: contact.supportUrl,
 					privacyPolicyUrl: "https://oikos.company/politica-de-privacidade",
 					screenshots: {
-						APP_IPHONE_65: screenshots("APP_IPHONE_65", [
-							"01-home.jpg",
-							"02-complaints-map.jpg",
-							"03-companies-waste-points.jpg",
-							"04-company-waste-point-detail.jpg",
-							"05-user-companies-list.jpg",
-							"06-user-logged.jpg",
-							"07-signin.jpg",
-							"08-signup.jpg",
-						]),
-						APP_IPAD_PRO_3GEN_129: screenshots("APP_IPAD_PRO_3GEN_129", [
-							"01-home.jpg",
-							"02-home2.jpg",
-							"03-complaints-points.jpg",
-							"04-companies.jpg",
-							"05-company-waste.jpg",
-							"06-company-waste-detail.jpg",
-							"07-signin.jpg",
-							"08-signup.jpg",
-						]),
+						APP_IPHONE_65: screenshotsFromDir("APP_IPHONE_65"),
+						APP_IPAD_PRO_3GEN_129: screenshotsFromDir("APP_IPAD_PRO_3GEN_129"),
 					},
 				},
 			},

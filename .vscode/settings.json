@@ -5,5 +5,7 @@
 	"editor.codeActionsOnSave": {
 		"source.organizeImports.biome": "always",
 		"source.fixAll.biome": "always"
-	}
+	},
+	"js/ts.experimental.useTsgo": true,
+	"js/ts.tsdk.path": "node_modules/@typescript/native-preview"
 }

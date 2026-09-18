@@ -1,6 +1,7 @@
 "use client";
 
 import * as Location from "expo-location";
+import { Observe } from "expo-observe";
 import {
 	LocateFixedIcon,
 	LocateOffIcon,
@@ -97,7 +98,8 @@ export default function WrapperMap({
 			setDeviceLocation(nextLocation);
 			setSelectedLocation(nextLocation);
 			onChange?.(nextLocation);
-		} catch {
+		} catch (error) {
+			Observe.reportError(error);
 			setPermissionDenied(true);
 		} finally {
 			setIsResolvingLocation(false);
@@ -199,9 +201,9 @@ export default function WrapperMap({
 				</Alert>
 
 				{permissionDenied && (
-					<Alert className="gap-3 bg-red-50 border-red-200">
-						<AlertIcon as={LocateOffIcon} className="text-red-500" />
-						<AlertText className="text-red-500">
+					<Alert variant="destructive" className="gap-3">
+						<AlertIcon as={LocateOffIcon} />
+						<AlertText>
 							Permissão de localização negada. Você ainda pode definir o ponto
 							tocando no mapa.
 						</AlertText>

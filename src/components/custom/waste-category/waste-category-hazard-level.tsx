@@ -22,13 +22,13 @@ export type HazardLevelVariant = "low" | "medium" | "high" | "very_high";
 const SCOPE = "WASTE_CATEGORY_HAZARD_LEVEL";
 
 const hazardLevelStyle = tva({
-	base: "gap-1 border flex-row items-center rounded-full px-2.5 py-0.5",
+	base: "gap-1 flex-row items-center rounded-sm px-2.5 py-0.5",
 	variants: {
 		variant: {
-			low: "bg-lime-50 border-lime-200",
-			medium: "bg-yellow-50 border-yellow-200",
-			high: "bg-orange-50 border-orange-200",
-			very_high: "bg-red-50 border-red-200",
+			low: "bg-lime-100",
+			medium: "bg-yellow-100",
+			high: "bg-orange-100",
+			very_high: "bg-red-100",
 		},
 	},
 });
@@ -46,7 +46,7 @@ const hazardLevelIconStyle = tva({
 });
 
 const hazardLevelTextStyle = tva({
-	base: "text-xs font-semibold",
+	base: "text-xs font-medium uppercase",
 	parentVariants: {
 		variant: {
 			low: "text-lime-600",

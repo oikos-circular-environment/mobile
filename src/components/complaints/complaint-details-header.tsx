@@ -10,7 +10,6 @@ import {
 } from "lucide-react-native";
 import { Alert, Platform, ScrollView, View } from "react-native";
 import {
-	type HazardLevelVariant,
 	WasteCategoryHazardLevel,
 	WasteCategoryHazardLevelIcon,
 	WasteCategoryHazardLevelText,
@@ -24,7 +23,11 @@ import { Text } from "@/components/ui/text";
 import { formatDistance } from "@/libs/format-distance";
 import { openAppleMaps, openGoogleMaps, openInMaps } from "@/libs/open-in-maps";
 import { HStack } from "../ui/hstack";
-import { ComplaintStatusBadge } from "./filter-components/complaint-status-chip";
+import {
+	deriveAddress,
+	highestHazardVariant,
+} from "./complaint-hazard-address-utils";
+import { ComplaintStatusBadge } from "./filters";
 
 export type HeaderComplaint = {
 	id: string;
@@ -50,37 +53,6 @@ type Props = {
 	complaint: HeaderComplaint;
 	userLocation?: { lat: number; lon: number } | null;
 };
-
-const HAZARD_PRIORITY: Record<string, number> = {
-	LOW: 1,
-	MEDIUM: 2,
-	HIGH: 3,
-	VERY_HIGH: 4,
-};
-
-const HAZARD_VARIANT: Record<string, HazardLevelVariant> = {
-	LOW: "low",
-	MEDIUM: "medium",
-	HIGH: "high",
-	VERY_HIGH: "very_high",
-};
-
-function highestHazardVariant(levels: string[]): HazardLevelVariant {
-	const highest = levels.reduce(
-		(max, lvl) =>
-			(HAZARD_PRIORITY[lvl] ?? 0) > (HAZARD_PRIORITY[max] ?? 0) ? lvl : max,
-		levels[0] ?? "LOW",
-	);
-	return HAZARD_VARIANT[highest] ?? "low";
-}
-
-function deriveAddress(complaint: HeaderComplaint): string | null {
-	const { addresses } = complaint.geospatial;
-	const streetPart = [addresses.street, addresses.streetNumber]
-		.filter(Boolean)
-		.join(", ");
-	return [streetPart, addresses.district].filter(Boolean).join(" — ") || null;
-}
 
 export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 	const createdAt = new Date(complaint.created_at);
@@ -123,52 +95,54 @@ export function ComplaintDetailsHeader({ complaint, userLocation }: Props) {
 				<BadgeText>{complaint.id}</BadgeText>
 			</Badge>
 
-			<View className="flex-row items-center justify-between gap-2">
+			<View className="flex-row items-start justify-between gap-2">
 				<Text
 					className="flex-1 shrink text-2xl font-bold text-gray-950"
 					style={{ fontFamily: "Oswald_700Bold" }}
-					numberOfLines={2}
 				>
 					DESCARTE IRREGULAR
 				</Text>
 
-				{!!complaint.location &&
-					(Platform.OS === "ios" ? (
-						<Menu
-							placement="bottom right"
-							offset={8}
-							trigger={triggerProps => (
-								<Button variant="outline" size="sm" {...triggerProps}>
-									<ButtonIcon as={ForwardIcon} />
-									<ButtonText>Abrir no mapa</ButtonText>
-								</Button>
-							)}
-						>
-							<MenuItem
-								key="apple-maps"
-								textValue="Abrir na Apple Maps"
-								onPress={() => handleOpenInMaps("apple")}
+				{!!complaint.location && (
+					<View className="shrink-0">
+						{Platform.OS === "ios" ? (
+							<Menu
+								placement="bottom right"
+								offset={8}
+								trigger={triggerProps => (
+									<Button variant="outline" size="sm" {...triggerProps}>
+										<ButtonIcon as={ForwardIcon} />
+										<ButtonText>Abrir no mapa</ButtonText>
+									</Button>
+								)}
 							>
-								<MenuItemLabel>Abrir na Apple Maps</MenuItemLabel>
-							</MenuItem>
-							<MenuItem
-								key="google-maps"
-								textValue="Abrir no Google Maps"
-								onPress={() => handleOpenInMaps("google")}
+								<MenuItem
+									key="apple-maps"
+									textValue="Abrir na Apple Maps"
+									onPress={() => handleOpenInMaps("apple")}
+								>
+									<MenuItemLabel>Abrir na Apple Maps</MenuItemLabel>
+								</MenuItem>
+								<MenuItem
+									key="google-maps"
+									textValue="Abrir no Google Maps"
+									onPress={() => handleOpenInMaps("google")}
+								>
+									<MenuItemLabel>Abrir no Google Maps</MenuItemLabel>
+								</MenuItem>
+							</Menu>
+						) : (
+							<Button
+								variant="outline"
+								size="sm"
+								onPress={() => handleOpenInMaps()}
 							>
-								<MenuItemLabel>Abrir no Google Maps</MenuItemLabel>
-							</MenuItem>
-						</Menu>
-					) : (
-						<Button
-							variant="outline"
-							size="sm"
-							onPress={() => handleOpenInMaps()}
-						>
-							<ButtonIcon as={ForwardIcon} />
-							<ButtonText>Abrir no mapa</ButtonText>
-						</Button>
-					))}
+								<ButtonIcon as={ForwardIcon} />
+								<ButtonText>Abrir no mapa</ButtonText>
+							</Button>
+						)}
+					</View>
+				)}
 			</View>
 
 			<View className="flex-row items-center justify-between">

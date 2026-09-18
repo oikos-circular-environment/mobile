@@ -1,4 +1,5 @@
 import { desc, eq } from "drizzle-orm";
+import { Observe } from "expo-observe";
 import { surveyClient } from "./api/client";
 import { getSurveyDb } from "./db/client";
 import { surveySession, surveySuiteRun, surveyTaskRun } from "./db/schema";
@@ -93,6 +94,7 @@ export async function restoreSurveySessionIfNeeded() {
 				protocolVersion = remote.version;
 			}
 		} catch (error) {
+			Observe.reportError(error);
 			console.warn(
 				"[survey] não foi possível buscar o protocolo na rede para restore de sessão em andamento — usando cache",
 				error,
@@ -127,6 +129,7 @@ export async function restoreSurveySessionIfNeeded() {
 					protocolKey = remote.key;
 				}
 			} catch (error) {
+				Observe.reportError(error);
 				console.warn(
 					"[survey] não foi possível buscar o protocolo para restore",
 					error,
@@ -151,6 +154,7 @@ export async function restoreSurveySessionIfNeeded() {
 		try {
 			await deleteLocalSurveyData(restored.sessionId);
 		} catch (error) {
+			Observe.reportError(error);
 			console.warn(
 				"[survey] falha ao apagar dados locais de sessão com protocolo desatualizado",
 				error,

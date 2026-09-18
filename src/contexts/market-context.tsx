@@ -1,4 +1,5 @@
 import type BottomSheet from "@gorhom/bottom-sheet";
+import { getV1Market } from "@oikos-circular-environment/oikos-sdk";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import {
 	createContext,
@@ -15,7 +16,6 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { roundCoord } from "@/libs/geospatial";
 import { logMarketEvent } from "@/libs/observe-events";
-import { getV1Market } from "@/libs/oikos-sdk";
 import type { MarketCompany } from "@/libs/types/market";
 
 export const marketFilterSchema = z.object({

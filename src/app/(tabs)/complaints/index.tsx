@@ -1,23 +1,6 @@
-import GorhomBottomSheet, {
-	BottomSheetBackdrop,
-	type BottomSheetBackdropProps,
-	BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { router } from "expo-router";
-import {
-	ListIcon,
-	LocateFixedIcon,
-	LocateOffIcon,
-	MapIcon,
-	MapPinnedIcon,
-	MinusIcon,
-	MoonIcon,
-	Navigation2Icon,
-	PlusIcon,
-	SlidersHorizontalIcon,
-	SunIcon,
-} from "lucide-react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type ErrorBoundaryProps, router } from "expo-router";
+import { ListIcon, PlusIcon, SlidersHorizontalIcon } from "lucide-react-native";
+import { useEffect, useRef, useState } from "react";
 import {
 	Platform,
 	TouchableOpacity,
@@ -26,22 +9,27 @@ import {
 } from "react-native";
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Path } from "react-native-svg";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { ProfileCompletionModal } from "@/components/auth/profile-completion-modal";
 import { useWasteCategories } from "@/components/companies/hooks/use-waste-categories";
-import { ComplaintBottomSheet } from "@/components/complaints/complaint-bottom-sheet";
+import { ComplaintMarkerPin } from "@/components/complaints/complaint-marker-pin";
+import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
 import {
 	type BottomSheetRef,
 	ComplaintFilterBottomSheet,
+	ComplaintFilterRow,
 	DEFAULT_FILTERS,
 	type FilterState,
 	RADIUS_OPTIONS,
-} from "@/components/complaints/complaint-filter-bottom-sheet";
-import { ComplaintFilterRow } from "@/components/complaints/complaint-pressable-filter";
-import { ComplaintsListBottomSheet } from "@/components/complaints/complaints-list-bottom-sheet";
+} from "@/components/complaints/filters";
 import type { MapComplaint } from "@/components/complaints/hooks/use-complaints-map";
 import { useComplaintsMap } from "@/components/complaints/hooks/use-complaints-map";
+import { useMapHeading } from "@/components/complaints/hooks/use-map-heading";
+import {
+	MapControlsBottomSheet,
+	type MapControlsSheetRef,
+} from "@/components/complaints/map-controls-bottom-sheet";
+import { ErrorFallback } from "@/components/error-fallback";
 import { LocationPermissionAlert } from "@/components/location-permission-alert";
 import { colors } from "@/components/style/colors";
 import { TestingWarningAlert } from "@/components/testing-warning-alert";
@@ -52,16 +40,8 @@ import { MapSkeleton } from "@/components/ui/map-skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
-import { cn } from "@/libs/utils";
-
-const controlShadow = {
-	shadowColor: colors.black,
-	shadowOffset: { width: 0, height: 2 },
-	shadowOpacity: 0.15,
-	shadowRadius: 3,
-	elevation: 3,
-};
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
+import { useRecordScreenError } from "@/libs/moderation/use-record-screen-error";
 
 const fabShadow = {
 	shadowColor: colors.black,
@@ -166,34 +146,15 @@ const LIST_SHEET_MIN_SNAP_RATIO = 0.15;
 const FAB_SIZE = 50;
 const FAB_GROUP_GAP = 12;
 
-const MARKER_PIN_PATH =
-	"M4.74,21.5 A13,13 0 1 1 27.26,21.5 L18.6,36.5 A3,3 0 0 1 13.4,36.5 Z";
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+	useRecordScreenError(error);
 
-function ComplaintMarkerPin({
-	color,
-	selected,
-}: {
-	color: string;
-	selected: boolean;
-}) {
 	return (
-		<View
-			style={{
-				shadowColor: colors.black,
-				shadowOffset: { width: 0, height: 2 },
-				shadowOpacity: 0.35,
-				shadowRadius: 3,
-			}}
-		>
-			<Svg width={30} height={38} viewBox="0 0 32 40">
-				<Path
-					d={MARKER_PIN_PATH}
-					fill={color}
-					stroke={colors.white}
-					strokeWidth={selected ? 2.5 : 1.5}
-				/>
-			</Svg>
-		</View>
+		<ErrorFallback
+			title="Não foi possível carregar o mapa"
+			message="Tente novamente. Se o problema continuar, verifique sua conexão."
+			onRetry={retry}
+		/>
 	);
 }
 
@@ -205,10 +166,12 @@ export default function ComplaintsMapScreen() {
 	const { location, permissionDenied } = useGeospatial();
 	const mapRef = useRef<MapView>(null);
 	const filterSheetRef = useRef<BottomSheetRef>(null);
-	const mapControlsSheetRef = useRef<GorhomBottomSheet>(null);
+	const mapControlsSheetRef = useRef<MapControlsSheetRef>(null);
 	const hasAnimatedRef = useRef(false);
 	const suppressMapPressRef = useRef(false);
 	const [isMapReady, setIsMapReady] = useState(false);
+	const { mapHeading, handleResetNorth, handleRegionChangeComplete } =
+		useMapHeading(mapRef, isMapReady);
 
 	const userLocation = location
 		? { lat: location.coords.latitude, lon: location.coords.longitude }
@@ -218,7 +181,6 @@ export default function ComplaintsMapScreen() {
 
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [showProfileModal, setShowProfileModal] = useState(false);
-	const [mapHeading, setMapHeading] = useState(0);
 	const [showUserLocation, setShowUserLocation] = useState(true);
 	const [isDarkMap, setIsDarkMap] = useState(false);
 
@@ -279,9 +241,11 @@ export default function ComplaintsMapScreen() {
 
 	const handleMarkerPress = (complaint: MapComplaint) => {
 		suppressMapPressRef.current = true;
-		setSelectedMapComplaint(
-			selectedMapComplaint?.id === complaint.id ? null : complaint,
-		);
+		setSelectedMapComplaint(complaint);
+		router.push({
+			pathname: "/(tabs)/complaints/[id]",
+			params: { id: complaint.id, source: "map" },
+		});
 		setTimeout(() => {
 			suppressMapPressRef.current = false;
 		}, 100);
@@ -304,68 +268,15 @@ export default function ComplaintsMapScreen() {
 			500,
 		);
 		setSelectedMapComplaint(complaint);
-	};
-
-	const handleZoomIn = async () => {
-		if (!isMapReady) return;
-		const camera = await mapRef.current?.getCamera();
-		if (!camera) return;
-		mapRef.current?.animateCamera({
-			zoom: (camera.zoom ?? 14) + 1,
-			altitude: (camera.altitude ?? 1000) / 2,
+		router.push({
+			pathname: "/(tabs)/complaints/[id]",
+			params: { id: complaint.id, source: "map" },
 		});
-	};
-
-	const handleZoomOut = async () => {
-		if (!isMapReady) return;
-		const camera = await mapRef.current?.getCamera();
-		if (!camera) return;
-		mapRef.current?.animateCamera({
-			zoom: (camera.zoom ?? 14) - 1,
-			altitude: (camera.altitude ?? 1000) * 2,
-		});
-	};
-
-	const handleGoToLocation = () => {
-		if (!location) return;
-		mapRef.current?.animateToRegion(
-			{
-				latitude: location.coords.latitude,
-				longitude: location.coords.longitude,
-				latitudeDelta: 0.02,
-				longitudeDelta: 0.02,
-			},
-			600,
-		);
-	};
-
-	const handleResetNorth = () => {
-		mapRef.current?.animateCamera({ heading: 0 }, { duration: 300 });
-		setMapHeading(0);
-	};
-
-	const handleRegionChangeComplete = async () => {
-		if (!isMapReady) return;
-		const camera = await mapRef.current?.getCamera();
-		if (camera?.heading !== undefined) {
-			setMapHeading(camera.heading);
-		}
 	};
 
 	const handleOpenMapControlsSheet = () => {
-		mapControlsSheetRef.current?.snapToIndex(0);
+		mapControlsSheetRef.current?.open();
 	};
-
-	const mapControlsBackdropComponent = useCallback(
-		(props: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop
-				{...props}
-				appearsOnIndex={0}
-				disappearsOnIndex={-1}
-			/>
-		),
-		[],
-	);
 
 	return (
 		<View className="flex-1">
@@ -425,7 +336,6 @@ export default function ComplaintsMapScreen() {
 			</MapView>
 			{!isMapReady && <MapSkeleton />}
 
-			{/* Filter row */}
 			<View
 				className="absolute left-0 right-0 gap-2 px-4"
 				style={{ top: insets.top + 16 }}
@@ -447,7 +357,6 @@ export default function ComplaintsMapScreen() {
 				)}
 			</View>
 
-			{/* Loading indicator */}
 			{isLoadingMap && (
 				<View
 					className="absolute self-center items-center justify-center"
@@ -463,9 +372,8 @@ export default function ComplaintsMapScreen() {
 				</View>
 			)}
 
-			{/* Map controls trigger */}
 			<View
-				className="absolute"
+				className="absolute gap-2"
 				style={{
 					right: 16 + insets.right,
 					bottom:
@@ -479,7 +387,7 @@ export default function ComplaintsMapScreen() {
 				<TouchableOpacity
 					activeOpacity={0.9}
 					onPress={handleOpenMapControlsSheet}
-					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
+					className="h-12 w-12 items-center justify-center rounded-xl bg-white"
 					style={fabShadow}
 				>
 					<SlidersHorizontalIcon
@@ -488,9 +396,8 @@ export default function ComplaintsMapScreen() {
 						strokeWidth={2}
 					/>
 				</TouchableOpacity>
-			</View>
+				{/* </View>
 
-			{/* FABs */}
 			<View
 				className="absolute flex-row gap-2 items-center"
 				style={{
@@ -498,7 +405,7 @@ export default function ComplaintsMapScreen() {
 					bottom: windowHeight * LIST_SHEET_MIN_SNAP_RATIO + FAB_GROUP_GAP,
 				}}
 				pointerEvents="box-none"
-			>
+			> */}
 				<TouchableOpacity
 					activeOpacity={0.9}
 					onPress={() => {
@@ -512,7 +419,7 @@ export default function ComplaintsMapScreen() {
 						}
 						router.push("/(tabs)/complaints/list");
 					}}
-					className="h-[50px] w-[50px] items-center justify-center rounded-xl bg-white"
+					className="h-12 w-12 items-center justify-center rounded-xl bg-white"
 					style={fabShadow}
 				>
 					<ListIcon size={20} color={colors.gray[700]} strokeWidth={2} />
@@ -531,7 +438,7 @@ export default function ComplaintsMapScreen() {
 						}
 						router.push("/(tabs)/complaints/(create)");
 					}}
-					className="h-[50px] w-[50px] items-center justify-center rounded-[14px] bg-lime-800"
+					className="h-12 w-12 items-center justify-center rounded-xl bg-lime-800"
 					style={{
 						shadowColor: colors.black,
 						shadowOffset: { width: 0, height: 2 },
@@ -560,8 +467,6 @@ export default function ComplaintsMapScreen() {
 				onSelectComplaint={handleComplaintListItemPress}
 			/>
 
-			<ComplaintBottomSheet source="map" />
-
 			<ComplaintFilterBottomSheet
 				ref={filterSheetRef}
 				filters={draftFilters}
@@ -571,137 +476,18 @@ export default function ComplaintsMapScreen() {
 				onClear={handleClearFilters}
 			/>
 
-			<GorhomBottomSheet
+			<MapControlsBottomSheet
 				ref={mapControlsSheetRef}
-				index={-1}
-				enableDynamicSizing
-				enablePanDownToClose
-				backdropComponent={mapControlsBackdropComponent}
-				handleIndicatorStyle={{ backgroundColor: "#d1d5db", width: 40 }}
-			>
-				<BottomSheetView>
-					<View
-						className="gap-4 pb-8 pt-2"
-						style={{
-							paddingLeft: 16 + insets.left,
-							paddingRight: 16 + insets.right,
-						}}
-					>
-						<Heading size="md" className="text-gray-900">
-							Controles do mapa
-						</Heading>
-
-						<View className="flex-row flex-wrap justify-center gap-3">
-							<TouchableOpacity
-								activeOpacity={0.85}
-								onPress={handleZoomIn}
-								className="h-11 w-11 items-center justify-center rounded-xl bg-white"
-								style={controlShadow}
-							>
-								<PlusIcon
-									size={18}
-									color={colors.gray[700]}
-									strokeWidth={2.2}
-								/>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								activeOpacity={0.85}
-								onPress={handleZoomOut}
-								className="h-11 w-11 items-center justify-center rounded-xl bg-white"
-								style={controlShadow}
-							>
-								<MinusIcon
-									size={18}
-									color={colors.gray[700]}
-									strokeWidth={2.2}
-								/>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								activeOpacity={0.85}
-								onPress={() => setShowUserLocation(v => !v)}
-								className={cn(
-									"h-11 w-11 items-center justify-center rounded-xl",
-									showUserLocation ? "bg-lime-800" : "bg-white",
-								)}
-								style={controlShadow}
-							>
-								{showUserLocation ? (
-									<MapPinnedIcon
-										size={18}
-										color={colors.white}
-										strokeWidth={2.2}
-									/>
-								) : (
-									<MapIcon
-										size={18}
-										color={colors.gray[700]}
-										strokeWidth={2.2}
-									/>
-								)}
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								activeOpacity={0.85}
-								onPress={() => setIsDarkMap(v => !v)}
-								className="h-11 w-11 items-center justify-center rounded-xl bg-white"
-								style={controlShadow}
-							>
-								{isDarkMap ? (
-									<SunIcon
-										size={18}
-										color={colors.amber[500]}
-										strokeWidth={2.2}
-									/>
-								) : (
-									<MoonIcon
-										size={18}
-										color={colors.gray[700]}
-										strokeWidth={2.2}
-									/>
-								)}
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								activeOpacity={0.85}
-								onPress={handleResetNorth}
-								className="h-11 w-11 items-center justify-center rounded-xl bg-primary"
-								style={controlShadow}
-							>
-								<View style={{ transform: [{ rotate: `${-mapHeading}deg` }] }}>
-									<Navigation2Icon
-										size={20}
-										color={colors.white}
-										strokeWidth={2.2}
-									/>
-								</View>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								activeOpacity={0.85}
-								onPress={handleGoToLocation}
-								className="h-11 w-11 items-center justify-center rounded-xl bg-white"
-								style={controlShadow}
-							>
-								{permissionDenied ? (
-									<LocateOffIcon
-										size={18}
-										color={colors.red[500]}
-										strokeWidth={2.2}
-									/>
-								) : (
-									<LocateFixedIcon
-										size={18}
-										color={colors.gray[700]}
-										strokeWidth={2.2}
-									/>
-								)}
-							</TouchableOpacity>
-						</View>
-					</View>
-				</BottomSheetView>
-			</GorhomBottomSheet>
+				mapRef={mapRef}
+				isMapReady={isMapReady}
+				permissionDenied={permissionDenied}
+				showUserLocation={showUserLocation}
+				onToggleUserLocation={() => setShowUserLocation(v => !v)}
+				isDarkMap={isDarkMap}
+				onToggleDarkMap={() => setIsDarkMap(v => !v)}
+				mapHeading={mapHeading}
+				onResetNorth={handleResetNorth}
+			/>
 		</View>
 	);
 }

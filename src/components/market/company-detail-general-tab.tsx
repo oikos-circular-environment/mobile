@@ -180,8 +180,15 @@ export function CompanyDetailGeneralTab() {
 							<View>
 								<View className="flex flex-row gap-2 items-center">
 									<Text className="text-md font-bold ">{currentDayLabel}</Text>
-									<Badge variant={isOpenNow ? "default" : "destructive"}>
-										<BadgeText>{isOpenNow ? "Aberto" : "Fechado"}</BadgeText>
+									<Badge
+										variant="soft"
+										className={isOpenNow ? "bg-lime-100" : "bg-red-100"}
+									>
+										<BadgeText
+											className={isOpenNow ? "text-lime-600" : "text-red-600"}
+										>
+											{isOpenNow ? "Aberto" : "Fechado"}
+										</BadgeText>
 									</Badge>
 								</View>
 								<Text className="text-xs">Agora são {currentTimeLabel}</Text>

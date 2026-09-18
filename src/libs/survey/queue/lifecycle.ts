@@ -1,3 +1,5 @@
+import { Observe } from "expo-observe";
+
 export const TICK_MS = 30_000;
 export const STALE_SENDING_MS = 60_000;
 
@@ -18,7 +20,7 @@ export function triggerDrain(
 	sessionId: string,
 	drain: (sessionId: string) => Promise<void>,
 ) {
-	drain(sessionId).catch(() => {});
+	drain(sessionId).catch(error => Observe.reportError(error));
 }
 
 export interface LifecycleDependencies {

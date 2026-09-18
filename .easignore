@@ -1,0 +1,71 @@
+# .easignore substitui .gitignore por completo no upload do eas build
+# (não é aditivo — ver node_modules/eas-cli vcs/local.js "if .easignore exists,
+# .gitignore files are not used"). Por isso replicamos tudo que o .gitignore
+# já ignora, e adicionamos o que só queremos fora do upload do EAS.
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# env files
+.env
+.env*.local
+.env.eas
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+/android
+
+# Test
+/coverage
+
+# Gerado por `eas metadata:pull`; a fonte de verdade é store.config.js
+store.config.json
+store/apple/
+
+# graphify knowledge graph
+graphify-out/
+
+# extras: pastas versionadas no repo mas irrelevantes pro processo de build do EAS
+pencil/
+store/
+docs/
+plans/
+.agents/
+.claude/
+.github/
+.opencode/
+.vscode/
+android-emulator/
+android-studio/

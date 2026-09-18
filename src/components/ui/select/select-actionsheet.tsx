@@ -38,21 +38,21 @@ type IMotionViewProps = React.ComponentProps<typeof View> &
 
 const MotionView = Motion.View as React.ComponentType<IMotionViewProps>;
 
-const StyledMotionView = styled(MotionView, { className: 'style' });
-const StyledAnimatedPressable = styled(AnimatedPressable, { className: 'style' });
-const StyledScrollView = styled(ScrollView, {
+const StyledMotionView = styled(MotionView as any, { className: 'style' });
+const StyledAnimatedPressable = styled(AnimatedPressable as any, { className: 'style' });
+const StyledScrollView = styled(ScrollView as any, {
   className: 'style',
   contentContainerClassName: 'contentContainerStyle',
   indicatorClassName: 'indicatorStyle',
 });
-const StyledVirtualizedList = styled(VirtualizedList, {
+const StyledVirtualizedList = styled(VirtualizedList as any, {
   className: 'style',
   ListFooterComponentClassName: 'ListFooterComponentStyle',
   ListHeaderComponentClassName: 'ListHeaderComponentStyle',
   contentContainerClassName: 'contentContainerStyle',
   indicatorClassName: 'indicatorStyle',
 });
-const StyledFlatList = styled(FlatList, {
+const StyledFlatList = styled(FlatList as any, {
   className: 'style',
   ListFooterComponentClassName: 'ListFooterComponentStyle',
   ListHeaderComponentClassName: 'ListHeaderComponentStyle',
@@ -60,13 +60,13 @@ const StyledFlatList = styled(FlatList, {
   contentContainerClassName: 'contentContainerStyle',
   indicatorClassName: 'indicatorStyle',
 });
-const StyledIcon = styled(UIIcon, {
+const StyledIcon = styled(UIIcon as any, {
   className: {
     target: 'style',
   },
 });
-const StyledSectionList = styled(SectionList, { className: 'style' });
-const StyledSectionHeaderText = styled(H4, { className: 'style' });
+const StyledSectionList = styled(SectionList as any, { className: 'style' });
+const StyledSectionHeaderText = styled(H4 as any, { className: 'style' });
 
 export const UIActionsheet = createActionsheet({
   Root: View,

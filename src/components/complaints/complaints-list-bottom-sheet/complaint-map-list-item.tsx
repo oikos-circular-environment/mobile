@@ -2,7 +2,6 @@ import { getDistance } from "geolib";
 import { HashIcon, MapPinIcon, Trash2Icon } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import {
-	type HazardLevelVariant,
 	WasteCategoryHazardLevel,
 	WasteCategoryHazardLevelIcon,
 	WasteCategoryHazardLevelText,
@@ -14,7 +13,11 @@ import { Text } from "@/components/ui/text";
 import { formatDistance } from "@/libs/format-distance";
 import type { MapComplaint } from "@/libs/types/complaint";
 import { cn } from "@/libs/utils";
-import { ComplaintStatusBadge } from "../filter-components/complaint-status-chip";
+import {
+	deriveAddress,
+	highestHazardVariant,
+} from "../complaint-hazard-address-utils";
+import { ComplaintStatusBadge } from "../filters";
 
 type Props = {
 	complaint: MapComplaint;
@@ -22,37 +25,6 @@ type Props = {
 	isSelected: boolean;
 	onPress: (complaint: MapComplaint) => void;
 };
-
-const HAZARD_PRIORITY: Record<string, number> = {
-	LOW: 1,
-	MEDIUM: 2,
-	HIGH: 3,
-	VERY_HIGH: 4,
-};
-
-const HAZARD_VARIANT: Record<string, HazardLevelVariant> = {
-	LOW: "low",
-	MEDIUM: "medium",
-	HIGH: "high",
-	VERY_HIGH: "very_high",
-};
-
-function highestHazardVariant(levels: string[]): HazardLevelVariant {
-	const highest = levels.reduce(
-		(max, lvl) =>
-			(HAZARD_PRIORITY[lvl] ?? 0) > (HAZARD_PRIORITY[max] ?? 0) ? lvl : max,
-		levels[0] ?? "LOW",
-	);
-	return HAZARD_VARIANT[highest] ?? "low";
-}
-
-function deriveAddress(complaint: MapComplaint): string | null {
-	const { addresses } = complaint.geospatial;
-	const streetPart = [addresses.street, addresses.streetNumber]
-		.filter(Boolean)
-		.join(", ");
-	return [streetPart, addresses.district].filter(Boolean).join(" — ") || null;
-}
 
 export function ComplaintMapListItem({
 	complaint,

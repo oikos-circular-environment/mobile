@@ -1,6 +1,6 @@
+import { getV1ComplaintsMap } from "@oikos-circular-environment/oikos-sdk";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { roundCoord } from "@/libs/geospatial";
-import { getV1ComplaintsMap } from "@/libs/oikos-sdk";
 import type { ComplaintStatus } from "@/libs/types/complaint";
 import { useComplaintsStore } from "@/stores/complaints-store";
 

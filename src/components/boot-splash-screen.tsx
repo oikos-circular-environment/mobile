@@ -1,4 +1,5 @@
 import { getLoadedFonts, isLoaded as isFontLoaded } from "expo-font";
+import { Observe } from "expo-observe";
 import * as Updates from "expo-updates";
 import { useUpdates } from "expo-updates";
 import {
@@ -248,6 +249,7 @@ export function OtaBootSplash({ onReady }: BootSplashScreenProps) {
 				// Falha silenciosa: mostra o mesmo "pronto" do caminho feliz e
 				// segue com o bundle atual. Download/reload parcial retoma no
 				// próximo boot.
+				Observe.reportError(err);
 				reloading = false;
 				console.warn(
 					"[boot-splash] checagem/download/reload de OTA falhou",

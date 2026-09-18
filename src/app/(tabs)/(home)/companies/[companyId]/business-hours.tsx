@@ -17,8 +17,8 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { type DayOfWeek, daysOfWeek } from "@/libs/types/business-hour";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 const defaultBusinessHours: BusinessHoursFormValues["businessHours"] = [

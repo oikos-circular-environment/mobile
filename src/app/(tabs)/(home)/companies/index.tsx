@@ -9,8 +9,8 @@ import { colors } from "@/components/style/colors";
 import { Card } from "@/components/ui/card";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import type { Company } from "@/libs/types/companies";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 export default function CompaniesListScreen() {

@@ -1,10 +1,12 @@
 import { usePathname } from "expo-router";
-import { Component, type PropsWithChildren, type ReactNode } from "react";
-import { View } from "react-native";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
-import { Text } from "@/components/ui/text";
-import { logAppErrorEvent } from "@/libs/observe-events";
+import {
+	Component,
+	type ErrorInfo,
+	type PropsWithChildren,
+	type ReactNode,
+} from "react";
+import { ErrorFallback } from "@/components/error-fallback";
+import { recordAppError } from "@/libs/moderation/record-app-error";
 
 type Props = PropsWithChildren<{ route?: string }>;
 type State = { hasError: boolean };
@@ -16,27 +18,19 @@ class ErrorBoundaryBase extends Component<Props, State> {
 		return { hasError: true };
 	}
 
-	componentDidCatch(error: Error) {
-		logAppErrorEvent(error.message, this.props.route);
+	componentDidCatch(error: Error, info: ErrorInfo) {
+		recordAppError(
+			error,
+			this.props.route,
+			info.componentStack ?? undefined,
+			"fatal",
+		);
 	}
 
 	render(): ReactNode {
 		if (this.state.hasError) {
 			return (
-				<View className="flex-1 items-center justify-center gap-3 bg-background p-6">
-					<Heading size="md" className="text-center text-gray-950">
-						Algo deu errado
-					</Heading>
-					<Text className="text-center text-sm text-gray-500">
-						Ocorreu um erro inesperado. Tente novamente.
-					</Text>
-					<Button
-						className="bg-lime-800 rounded-md"
-						onPress={() => this.setState({ hasError: false })}
-					>
-						<ButtonText>Tentar novamente</ButtonText>
-					</Button>
-				</View>
+				<ErrorFallback onRetry={() => this.setState({ hasError: false })} />
 			);
 		}
 

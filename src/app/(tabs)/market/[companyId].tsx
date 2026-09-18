@@ -23,16 +23,16 @@ import { Text } from "@/components/ui/text";
 import { useNow } from "@/contexts/clock-context";
 import { CompanyDetailProvider } from "@/contexts/company-detail-context";
 import { useMarket } from "@/contexts/market-context";
+import type { MarketSimulationItemType } from "@/contexts/market-simulations-store";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 import { getAuthenticatedImageHeaders } from "@/libs/api/oikos-api";
 import { formatDistance } from "@/libs/format-distance";
 import {
 	getCurrentBusinessHour,
 	isCompanyOpenNow,
 } from "@/libs/market/is-company-open";
-import type { MarketSimulationItemType } from "@/libs/memory/market-simulations";
 import { daysOfWeek } from "@/libs/types/business-hour";
 import type { MarketBusinessHour } from "@/libs/types/market";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
 
 type MarketDetailTab = "general" | "simulation";
 
@@ -214,12 +214,19 @@ export default function MarketCompanyDetailScreen() {
 										</BadgeText>
 									</Badge>
 									{company.company_type === "COLLECTOR" && (
-										<Badge variant="default">
-											<BadgeText>Coletor</BadgeText>
+										<Badge variant="soft" className="bg-lime-100">
+											<BadgeText className="text-lime-600">Coletor</BadgeText>
 										</Badge>
 									)}
-									<Badge variant={isOpen ? "default" : "destructive"}>
-										<BadgeText>{isOpen ? "Aberto" : "Fechado"}</BadgeText>
+									<Badge
+										variant="soft"
+										className={isOpen ? "bg-lime-100" : "bg-red-100"}
+									>
+										<BadgeText
+											className={isOpen ? "text-lime-600" : "text-red-600"}
+										>
+											{isOpen ? "Aberto" : "Fechado"}
+										</BadgeText>
 									</Badge>
 								</HStack>
 							</View>

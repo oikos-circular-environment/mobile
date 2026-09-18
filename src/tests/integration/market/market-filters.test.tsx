@@ -1,3 +1,4 @@
+import { getV1Market } from "@oikos-circular-environment/oikos-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
 	act,
@@ -14,7 +15,6 @@ import { useNow } from "@/contexts/clock-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
 import { MarketProvider } from "@/contexts/market-context";
 import { isCompanyOpenNow } from "@/libs/market/is-company-open";
-import { getV1Market } from "@/libs/oikos-sdk";
 import {
 	makeAddress,
 	makeCompany,
@@ -48,7 +48,7 @@ jest.mock("@/contexts/auth-context");
 jest.mock("@/contexts/geospatial-context");
 jest.mock("@/contexts/clock-context");
 
-jest.mock("@/libs/oikos-sdk", () => ({
+jest.mock("@oikos-circular-environment/oikos-sdk", () => ({
 	getV1Market: jest.fn(),
 }));
 

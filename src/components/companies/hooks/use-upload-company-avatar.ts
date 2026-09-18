@@ -1,9 +1,9 @@
+import { postV1CompaniesByIdAvatar } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation } from "@tanstack/react-query";
 import type { ImagePickerAsset } from "expo-image-picker";
 import { toast } from "@/components/toast";
-import { compressImage } from "@/libs/media-compression";
+import { compressImage } from "@/libs/media/compression";
 import { logCompanyEvent } from "@/libs/observe-events";
-import { postV1CompaniesByIdAvatar } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 type UploadAvatarParams = {

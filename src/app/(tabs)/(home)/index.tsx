@@ -29,7 +29,7 @@ import {
 import { Text } from "@/components/ui/text";
 import { useAuthContext } from "@/contexts/auth-context";
 import { useGeospatial } from "@/contexts/geospatial-context";
-import { useRouteInteractive } from "@/libs/use-route-interactive";
+import { useRouteInteractive } from "@/hooks/use-route-interactive";
 
 export default function HomeScreen() {
 	useRouteInteractive();
@@ -66,6 +66,16 @@ export default function HomeScreen() {
 	const handleOpenAccount = useCallback(() => {
 		settingsSheetRef.current?.close();
 		router.push("/(tabs)/(home)/account");
+	}, [router]);
+
+	const handleOpenSupport = useCallback(() => {
+		settingsSheetRef.current?.close();
+		router.push("/(tabs)/(home)/support");
+	}, [router]);
+
+	const handleOpenDenunciation = useCallback(() => {
+		settingsSheetRef.current?.close();
+		router.push("/(tabs)/(home)/denunciation");
 	}, [router]);
 
 	const handleSignOut = useCallback(() => {
@@ -178,6 +188,8 @@ export default function HomeScreen() {
 					<SettingsBottomSheet
 						ref={settingsSheetRef}
 						onOpenAccount={handleOpenAccount}
+						onOpenSupport={handleOpenSupport}
+						onOpenDenunciation={handleOpenDenunciation}
 						onSignOut={handleSignOut}
 					/>
 

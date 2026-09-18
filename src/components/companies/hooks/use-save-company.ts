@@ -1,8 +1,8 @@
+import type { PutV1CompaniesByIdData } from "@oikos-circular-environment/oikos-sdk";
+import { putV1CompaniesById } from "@oikos-circular-environment/oikos-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/toast";
 import { logCompanyEvent } from "@/libs/observe-events";
-import type { PutV1CompaniesByIdData } from "@/libs/oikos-sdk";
-import { putV1CompaniesById } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 type SaveCompanyBody = PutV1CompaniesByIdData["body"];

@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useCepLookup } from "@/hooks/use-cep-lookup";
 import {
 	listIbgeMunicipios,
 	listIbgeUfs,
 	type Municipio,
 	type State,
 } from "@/libs/brasil-api-sdk";
-import { useCepLookup } from "@/libs/use-cep-lookup";
 
 export type ResolvedCepValues = {
 	zip_code: string;

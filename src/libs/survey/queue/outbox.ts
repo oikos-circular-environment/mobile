@@ -2,6 +2,7 @@ import type { AppRouter } from "@oikos-circular-environment/survey-api/routers/i
 import type { inferRouterInputs } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
+import { Observe } from "expo-observe";
 import { useSurveyExecutionStore } from "@/stores/survey-execution-store";
 import { useSurveyStore } from "@/stores/survey-store";
 import { surveyClient } from "../api/client";
@@ -304,6 +305,7 @@ async function sendOutboxItem(item: typeof surveyOutbox.$inferSelect) {
 			.where(eq(surveyOutbox.id, item.id));
 		return true;
 	} catch (error) {
+		Observe.reportError(error);
 		await db
 			.update(surveyOutbox)
 			.set({

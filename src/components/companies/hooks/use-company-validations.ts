@@ -1,7 +1,7 @@
+import { getV1CompaniesByIdValidations } from "@oikos-circular-environment/oikos-sdk";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect } from "react";
-import { getV1CompaniesByIdValidations } from "@/libs/oikos-sdk";
 import { useCompaniesStore } from "@/stores/companies-store";
 
 export function useCompanyValidations(companyId: string) {

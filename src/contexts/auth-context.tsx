@@ -1,5 +1,11 @@
+import {
+	deleteV1UsersMe,
+	getV1Profiles,
+	getV1UsersMe,
+	patchV1UsersMeCancelDeletion,
+} from "@oikos-circular-environment/oikos-sdk";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { Observe } from "expo-observe";
 import { useRouter } from "expo-router";
 import {
 	createContext,
@@ -12,22 +18,12 @@ import {
 } from "react";
 import { toast } from "@/components/toast";
 import {
+	authHydrated,
 	getAuthToken,
-	getRefreshToken,
 	setAuthToken,
 	setOnUnauthenticated,
-	setRefreshToken,
 } from "@/libs/api/oikos-api";
-import {
-	deleteV1UsersMe,
-	getV1Profiles,
-	getV1UsersMe,
-	patchV1UsersMeCancelDeletion,
-	patchV1UsersMeChangePassword,
-	postV1AuthLogin,
-	postV1AuthLogout,
-	postV1UsersRegister,
-} from "@/libs/oikos-sdk";
+import { authClient } from "@/libs/auth/auth-client";
 import { sessionBus } from "@/libs/session-bus";
 import type { Account, User } from "@/libs/types/user";
 
@@ -95,12 +91,14 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 	useEffect(() => {
 		async function loadStorageData() {
 			try {
+				await authHydrated;
 				const tokenValue = getAuthToken();
 
 				if (tokenValue) {
 					await refetch();
 				}
 			} catch (error) {
+				Observe.reportError(error);
 				console.error("Error loading stored token:", error);
 			} finally {
 				setIsInitializing(false);
@@ -117,14 +115,21 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 	const signInMutation = useMutation({
 		mutationKey: ["sign-in"],
 		mutationFn: async (data: { email: string; password: string }) => {
-			const authResponse = await postV1AuthLogin({
-				body: { email: data.email, password: data.password },
-			});
-
-			const { token, refreshToken } = authResponse.data ?? {};
-			if (!token || !refreshToken) throw new Error("Token não recebido");
-
-			await Promise.all([setAuthToken(token), setRefreshToken(refreshToken)]);
+			const { error } = await authClient.signIn.email(
+				{ email: data.email, password: data.password },
+				{
+					onSuccess: async ctx => {
+						const token = ctx.response.headers.get("set-auth-token");
+						if (!token) return;
+						try {
+							await setAuthToken(token);
+						} catch (error) {
+							Observe.reportError(error);
+						}
+					},
+				},
+			);
+			if (error) throw error;
 
 			const [profileResponse, userResponse] = await Promise.all([
 				getV1Profiles(),
@@ -152,25 +157,17 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 				router.push("/(tabs)/(home)/profile");
 			}
 		},
-		onError: error => {
+		onError: (error: { code?: string }) => {
 			console.error(error);
-			if (error instanceof AxiosError) {
-				switch (error.response?.data.code) {
-					case "INVALID_CREDENTIALS":
-						toast.error(
-							"Verifique suas credenciais",
-							"Os dados estão incorretos ou não existem.",
-						);
-						break;
-					default:
-						toast.error("Verifique suas credenciais");
-				}
-			} else {
-				toast.error(
-					"Erro na autenticação",
-					"Caso o erro persista, entre em contato com a nossa equipe!",
-				);
-				console.error("SignIn Error:", error);
+			switch (error?.code) {
+				case "INVALID_EMAIL_OR_PASSWORD":
+					toast.error(
+						"Verifique suas credenciais",
+						"Os dados estão incorretos ou não existem.",
+					);
+					break;
+				default:
+					toast.error("Verifique suas credenciais");
 			}
 		},
 	});
@@ -178,20 +175,59 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 	const signUpMutation = useMutation({
 		mutationKey: ["sign-up"],
 		mutationFn: async (data: { email: string; password: string }) => {
-			return await postV1UsersRegister({
-				body: { email: data.email, password: data.password },
-			});
-		},
-		onSuccess: () => {
-			router.push("/sign-in");
-			toast.success(
-				"Conta criada",
-				"Agora, informe os dados para fazer o login.",
+			// `name` é obrigatório no better-auth; o preenchimento real acontece
+			// depois, na etapa de perfil (needsProfileCompletion).
+			const { error } = await authClient.signUp.email(
+				{
+					email: data.email,
+					password: data.password,
+					name: data.email.split("@")[0],
+				},
+				{
+					onSuccess: async ctx => {
+						const token = ctx.response.headers.get("set-auth-token");
+						if (!token) return;
+						try {
+							await setAuthToken(token);
+						} catch (error) {
+							Observe.reportError(error);
+						}
+					},
+				},
 			);
+			if (error) throw error;
+
+			// REQUIRE_EMAIL_VERIFICATION é false neste ambiente — signUp já
+			// estabelece sessão, sem passo intermediário de login.
+			const [profileResponse, userResponse] = await Promise.all([
+				getV1Profiles(),
+				getV1UsersMe(),
+			]);
+			return {
+				profile: profileResponse.data?.profile,
+				account: userResponse.data?.user,
+			};
 		},
-		onError: error => {
+		onSuccess: data => {
+			setIsAuthenticated(true);
+			const profile = data?.profile;
+			const userAccount = data?.account ?? null;
+			setAccount(userAccount);
+
+			if (profile && userAccount) {
+				setUser({ account: userAccount, profile } as User);
+				router.push("/(tabs)/(home)");
+			} else {
+				toast.success(
+					"Conta criada",
+					"Por favor, preencha as informações no seu cadastro.",
+				);
+				router.push("/(tabs)/(home)/profile");
+			}
+		},
+		onError: (error: { code?: string }) => {
+			console.error(error);
 			toast.error("Erro ao criar a conta", "Verfique os dados incluidos!");
-			console.error("SignUp Error:", error);
 		},
 	});
 
@@ -251,44 +287,26 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			currentPassword,
 			newPassword,
 		}: ChangePasswordInput) => {
-			const response = await patchV1UsersMeChangePassword({
-				body: {
-					current_password: currentPassword,
-					new_password: newPassword,
-				},
+			const { error } = await authClient.changePassword({
+				currentPassword,
+				newPassword,
+				revokeOtherSessions: true,
 			});
-			return response.data;
+			if (error) throw error;
 		},
-		onSuccess: async data => {
-			// A troca de senha derruba as outras sessões; o par novo mantém este
-			// dispositivo logado.
-			if (data?.token && data?.refreshToken) {
-				await Promise.all([
-					setAuthToken(data.token),
-					setRefreshToken(data.refreshToken),
-				]);
-			}
+		onSuccess: () => {
 			toast.success(
 				"Senha alterada",
 				"Suas outras sessões foram desconectadas.",
 			);
 		},
-		onError: error => {
-			if (error instanceof AxiosError) {
-				switch (error.response?.data.code) {
-					case "INVALID_CREDENTIALS":
-						toast.error(
-							"Senha atual incorreta",
-							"Confira a senha atual e tente novamente.",
-						);
-						return;
-					case "SAME_PASSWORD":
-						toast.error(
-							"Escolha outra senha",
-							"A nova senha precisa ser diferente da atual.",
-						);
-						return;
-				}
+		onError: (error: { code?: string }) => {
+			if (error?.code === "INVALID_PASSWORD") {
+				toast.error(
+					"Senha atual incorreta",
+					"Confira a senha atual e tente novamente.",
+				);
+				return;
 			}
 			toast.error("Erro ao alterar a senha", "Tente novamente mais tarde.");
 		},
@@ -296,23 +314,13 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 
 	const signOut = useCallback(
 		async (options?: { silent?: boolean }) => {
-			// Best-effort: revoga o refresh token no servidor. O header vai explícito
-			// porque a sessão local é limpa logo abaixo, antes do interceptor rodar.
-			const currentAuthToken = getAuthToken();
-			const currentRefreshToken = getRefreshToken();
+			// Best-effort: revoga a sessão no servidor. A sessão local é limpa
+			// logo abaixo, antes do interceptor rodar.
+			authClient.signOut().catch(() => {
+				// Falha ao revogar não pode impedir o logout local.
+			});
 
-			if (currentRefreshToken) {
-				postV1AuthLogout({
-					body: { refreshToken: currentRefreshToken },
-					headers: currentAuthToken
-						? { Authorization: `Bearer ${currentAuthToken}` }
-						: undefined,
-				}).catch(() => {
-					// Falha ao revogar não pode impedir o logout local.
-				});
-			}
-
-			await Promise.all([setAuthToken(null), setRefreshToken(null)]);
+			await setAuthToken(null);
 			setUser(null);
 			setAccount(null);
 			setIsAuthenticated(false);
@@ -335,8 +343,8 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 			setUser(null);
 			setIsAuthenticated(false);
 			sessionBus.emit();
-			toast.info("Sessão expirada", "Faça o login novamente.");
-			router.push("/sign-in");
+			toast.info("Sessão expirada", "Faça o login novamente quando quiser.");
+			router.navigate("/(tabs)/(home)");
 		});
 		return () => setOnUnauthenticated(null);
 	}, [router]);

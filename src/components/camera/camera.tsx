@@ -5,6 +5,7 @@ import {
 	useCameraPermissions,
 	useMicrophonePermissions,
 } from "expo-camera";
+import { Observe } from "expo-observe";
 import {
 	type PropsWithChildren,
 	useCallback,
@@ -110,6 +111,7 @@ export function Camera({
 				if (picture?.uri) onCapture(picture, "photo");
 			} catch (err) {
 				console.error("[Camera] takePictureAsync failed:", err);
+				Observe.reportError(err);
 			} finally {
 				setIsCapturing(false);
 			}
@@ -132,6 +134,7 @@ export function Camera({
 			}
 		} catch (err) {
 			console.error("[Camera] recordAsync failed:", err);
+			Observe.reportError(err);
 		} finally {
 			setIsRecording(false);
 		}
