@@ -27,8 +27,10 @@ client.setConfig({ baseURL, throwOnError: true });
 let authToken: string | null = null;
 let onUnauthenticated: (() => void) | null = null;
 
-// Initialize token from storage
-getStoredToken()
+// Initialize token from storage. Callers that need `authToken` populated
+// (e.g. AuthContext's boot check) must await this — otherwise a token set in
+// the meantime (login, anonymous sign-in) can be clobbered when this resolves.
+export const authHydrated: Promise<void> = getStoredToken()
 	.then(token => {
 		if (token) authToken = token;
 	})

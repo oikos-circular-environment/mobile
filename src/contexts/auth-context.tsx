@@ -18,6 +18,7 @@ import {
 } from "react";
 import { toast } from "@/components/toast";
 import {
+	authHydrated,
 	getAuthToken,
 	setAuthToken,
 	setOnUnauthenticated,
@@ -90,6 +91,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 	useEffect(() => {
 		async function loadStorageData() {
 			try {
+				await authHydrated;
 				const tokenValue = getAuthToken();
 
 				if (tokenValue) {
