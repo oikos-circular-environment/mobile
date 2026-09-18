@@ -46,6 +46,15 @@ const config: ExpoConfig = {
 		withAndroidSplashWindowBackground,
 		"expo-router",
 		[
+			"expo-build-properties",
+			{
+				android: {
+					enableMinifyInReleaseBuilds: true,
+					enableShrinkResourcesInReleaseBuilds: true,
+				},
+			},
+		],
+		[
 			"expo-splash-screen",
 			{
 				image: "./src/assets/icons/splash-icon.png",
