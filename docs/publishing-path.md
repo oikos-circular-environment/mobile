@@ -354,6 +354,8 @@ Isso escreve um `store.config.json` estático e baixa os screenshots para `store
 
 Ficam em `store/ios/screenshots/<DISPLAY_TYPE>/`, e a ordem na ficha é a ordem do array em `store.config.js` — daí o prefixo numérico nos nomes.
 
+Dimensões exigidas: `APP_IPHONE_65` em 1242×2688 e `APP_IPAD_PRO_3GEN_129` em 2064×2752. Copiar o arquivo de iPhone para a pasta do iPad faz o `eas metadata:push` falhar com `IMAGE_INCORRECT_DIMENSIONS`.
+
 A Apple nunca documentou os enums de `screenshotDisplayType` dos tamanhos novos: a própria App Store Connect classifica os assets de iPad 13" (2064×2752) como `APP_IPAD_PRO_3GEN_129` e os de iPhone 6.9" como `APP_IPHONE_67`. Para ver o que a ASC usa de fato neste app:
 
 ```bash
