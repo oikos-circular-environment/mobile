@@ -404,6 +404,8 @@ store/
 
 **Regra de resolução das notas da versão:** vale `store/<loja>/whats-new/<version>.md` se existir; senão, `store/shared/whats-new/<version>.md`. Como a Google limita as notas a **500 caracteres** (a Apple, a 4.000), o texto compartilhado precisa caber nos 500 — se algum release exigir mais na App Store, é só criar o override em `store/ios/`.
 
+> **Texto padrão das notas:** salvo release com novidade visível ao usuário, use `Correções de erros e melhorias de usabilidade dentro da aplicação.` Notas descrevem só o que o usuário percebe, não o que mudou por dentro.
+
 > **Ao redigir `store/shared/whats-new/<version>.md`:** confira o tamanho antes de commitar — `wc -m store/shared/whats-new/<version>.md` (conta caracteres, não bytes; importante com acentuação em pt-BR). O limite de 500 é validado em `RELEASE_NOTES_MAX_LENGTH` (`store/scripts/lib/store-config.mjs`) e só falha tarde, dentro do job `publish_android` — **depois** que o `submit_android` já subiu e publicou o binário na loja (ver "Publicação na Google Play" abaixo). Foi o que quebrou o release da 1.0.4 (721 caracteres).
 
 O que **não** é compartilhado, e por quê: descrição, keywords e texto promocional têm limites e campos distintos em cada loja; screenshots usam sistemas de classificação diferentes; conta de demonstração e contato de revisão só existem na Apple; trilha e rollout só existem na Google.
